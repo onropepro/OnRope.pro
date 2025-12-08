@@ -15589,12 +15589,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           .orderBy(sql`${jobPostings.createdAt} DESC`);
       } else {
         // Technicians/employees see all active job postings (platform + company)
+        // Also filter out expired postings
         result = await db.select({
           job: jobPostings,
           companyName: users.companyName,
         }).from(jobPostings)
           .leftJoin(users, eq(jobPostings.companyId, users.id))
-          .where(eq(jobPostings.status, "active"))
+          .where(and(
+            eq(jobPostings.status, "active"),
+            sql`(${jobPostings.expiresAt} IS NULL OR ${jobPostings.expiresAt} > NOW())`
+          ))
           .orderBy(sql`${jobPostings.createdAt} DESC`);
         
         // Flatten the result for technicians
