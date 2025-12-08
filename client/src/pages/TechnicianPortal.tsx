@@ -2200,11 +2200,12 @@ export default function TechnicianPortal() {
                     Payroll Information
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <InfoItem label="SIN" value={user.socialInsuranceNumber ? "••• ••• •••" : null} masked />
+                    <InfoItem label="SIN" value={user.socialInsuranceNumber || null} />
                     <InfoItem 
                       label="Bank Account" 
-                      value={user.bankTransitNumber ? `Transit: ${user.bankTransitNumber}` : null} 
-                      masked
+                      value={user.bankTransitNumber && user.bankInstitutionNumber && user.bankAccountNumber 
+                        ? `${user.bankTransitNumber}-${user.bankInstitutionNumber}-${user.bankAccountNumber}` 
+                        : null} 
                     />
                   </div>
                   
@@ -2241,7 +2242,7 @@ export default function TechnicianPortal() {
                   {(user.driversLicenseNumber || user.driversLicenseExpiry) && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {user.driversLicenseNumber && (
-                        <InfoItem label={t.licenseNumber} value="••••••••" masked />
+                        <InfoItem label={t.licenseNumber} value={user.driversLicenseNumber} />
                       )}
                       {user.driversLicenseExpiry && (
                         <InfoItem 
