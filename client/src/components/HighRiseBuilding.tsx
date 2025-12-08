@@ -65,9 +65,9 @@ export function HighRiseBuilding({
           {completedDrops} of {totalDrops} Total Drops Complete
         </div>
         {hasAnyExceeded && (
-          <div className="flex items-center justify-center gap-2 mt-2 text-amber-600 dark:text-amber-400">
-            <AlertTriangle className="w-4 h-4" />
-            <span className="text-xs font-medium">Some elevations have more drops than planned</span>
+          <div className="inline-flex items-center justify-center gap-2 mt-3 px-4 py-2 bg-amber-100 dark:bg-amber-900/40 border border-amber-400 dark:border-amber-600 rounded-lg">
+            <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+            <span className="text-sm font-semibold text-amber-700 dark:text-amber-300">Some elevations have more drops than planned</span>
           </div>
         )}
       </div>
