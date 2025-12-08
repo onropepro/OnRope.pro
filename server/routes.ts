@@ -2581,6 +2581,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         birthday,
         specialMedicalConditions,
         irataBaselineHours,
+        irataExpirationDate,
+        spratExpirationDate,
       } = req.body;
 
       // Validate required fields
@@ -2620,6 +2622,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (birthday !== undefined) updateData.birthday = birthday || null;
       if (driversLicenseExpiry !== undefined) updateData.driversLicenseExpiry = driversLicenseExpiry || null;
       if (irataBaselineHours !== undefined) updateData.irataBaselineHours = irataBaselineHours || "0";
+      if (irataExpirationDate !== undefined) updateData.irataExpirationDate = irataExpirationDate || null;
+      if (spratExpirationDate !== undefined) updateData.spratExpirationDate = spratExpirationDate || null;
 
       // Sensitive fields - these are encrypted by storage.updateUser via encryptSensitiveFields
       if (socialInsuranceNumber !== undefined) updateData.socialInsuranceNumber = socialInsuranceNumber || null;
@@ -2667,6 +2671,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("[Technician-Profile] Error updating profile:", error);
       res.status(500).json({ message: error.message || "Failed to update profile" });
+    }
+  });
+
+  // Technician: Update certification expiration date only
+  // This is a simpler endpoint that only updates expiration dates without requiring full profile data
+  app.patch("/api/technician/expiration-date", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Only technicians and employees can update their own expiration dates
+      const allowedRoles = ['rope_access_tech', 'operations_manager', 'office_admin', 'safety_officer', 'ground_crew'];
+      if (!allowedRoles.includes(user.role)) {
+        return res.status(403).json({ message: "Only technicians can update expiration dates via this endpoint" });
+      }
+
+      const { type, date } = req.body;
+
+      if (!type || !['irata', 'sprat'].includes(type)) {
+        return res.status(400).json({ message: "Invalid type. Must be 'irata' or 'sprat'" });
+      }
+
+      if (!date) {
+        return res.status(400).json({ message: "Date is required" });
+      }
+
+      // Validate date format (YYYY-MM-DD)
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!dateRegex.test(date)) {
+        return res.status(400).json({ message: "Invalid date format. Use YYYY-MM-DD" });
+      }
+
+      const updateData: any = {};
+      if (type === 'irata') {
+        updateData.irataExpirationDate = date;
+      } else {
+        updateData.spratExpirationDate = date;
+      }
+
+      await storage.updateUser(userId, updateData);
+
+      console.log(`[Technician-Expiration] ${type.toUpperCase()} expiration date updated to ${date} for user ${userId}`);
+
+      res.json({ success: true, message: `${type.toUpperCase()} expiration date updated` });
+    } catch (error: any) {
+      console.error("[Technician-Expiration] Error updating expiration date:", error);
+      res.status(500).json({ message: error.message || "Failed to update expiration date" });
     }
   });
 

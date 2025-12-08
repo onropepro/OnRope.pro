@@ -22,6 +22,15 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate, formatDateTime, parseLocalDate } from "@/lib/dateUtils";
@@ -56,7 +65,8 @@ import {
   Briefcase,
   Copy,
   Share2,
-  Users
+  Users,
+  Pencil
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
@@ -279,6 +289,11 @@ const translations = {
     codeCopied: "Copied!",
     referredTimes: "Referred {count} technician(s)",
     noReferralCodeYet: "No referral code yet",
+    editExpirationDate: "Edit Expiration Date",
+    setExpirationDate: "Set Expiration Date",
+    expirationDateUpdated: "Expiration date updated",
+    expirationDateUpdateFailed: "Failed to update expiration date",
+    selectDate: "Select date",
     referralCodeGenerating: "Your referral code will be generated when you complete registration",
   },
   fr: {
@@ -497,6 +512,11 @@ const translations = {
     codeCopied: "Copié!",
     referredTimes: "Parrainé {count} technicien(s)",
     noReferralCodeYet: "Pas encore de code de parrainage",
+    editExpirationDate: "Modifier la date d'expiration",
+    setExpirationDate: "Définir la date d'expiration",
+    expirationDateUpdated: "Date d'expiration mise à jour",
+    expirationDateUpdateFailed: "Échec de la mise à jour de la date d'expiration",
+    selectDate: "Sélectionner une date",
     referralCodeGenerating: "Votre code de parrainage sera généré lorsque vous terminerez l'inscription",
   }
 };
@@ -636,6 +656,33 @@ export default function TechnicianPortal() {
   });
 
   const [processingInvitationId, setProcessingInvitationId] = useState<string | null>(null);
+  
+  // Expiration date editing state
+  const [editingExpirationDate, setEditingExpirationDate] = useState<'irata' | 'sprat' | null>(null);
+  const [expirationDateValue, setExpirationDateValue] = useState<string>("");
+
+  // Mutation for updating expiration date (uses dedicated endpoint)
+  const updateExpirationDateMutation = useMutation({
+    mutationFn: async ({ type, date }: { type: 'irata' | 'sprat'; date: string }) => {
+      return apiRequest("PATCH", "/api/technician/expiration-date", { type, date });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      setEditingExpirationDate(null);
+      setExpirationDateValue("");
+      toast({
+        title: t.expirationDateUpdated,
+        description: editingExpirationDate?.toUpperCase() + " " + t.expirationDateUpdated.toLowerCase(),
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: t.expirationDateUpdateFailed,
+        description: error.message || t.expirationDateUpdateFailed,
+        variant: "destructive",
+      });
+    },
+  });
 
   const { data: invitationsData } = useQuery<{
     invitations: Array<{
@@ -1889,7 +1936,7 @@ export default function TechnicianPortal() {
                         <div className="mt-2 space-y-1 text-sm">
                           <p data-testid="text-irata-level"><span className="text-muted-foreground">{t.level}:</span> {user.irataLevel}</p>
                           <p data-testid="text-irata-license"><span className="text-muted-foreground">{t.licenseNumber}:</span> {user.irataLicenseNumber || 'N/A'}</p>
-                          <p data-testid="text-irata-expiry">
+                          <div data-testid="text-irata-expiry" className="flex items-center gap-2 flex-wrap">
                             <span className="text-muted-foreground">{t.expiresOn}:</span>{' '}
                             {user.irataExpirationDate ? (
                               (() => {
@@ -1909,7 +1956,7 @@ export default function TechnicianPortal() {
                                       badge = <Badge variant="outline" className="ml-2 bg-yellow-500/10 border-yellow-500 text-yellow-700 dark:text-yellow-400 text-xs" data-testid="badge-irata-expiring">{t.expiringSoon}</Badge>;
                                     }
                                   }
-                                  return <>{formattedDate}{badge}</>;
+                                  return <><span>{formattedDate}</span>{badge}</>;
                                 } catch (e) {
                                   console.error('Failed to parse IRATA expiration date:', e);
                                   return <span className="text-muted-foreground italic">{t.notSet}</span>;
@@ -1918,7 +1965,20 @@ export default function TechnicianPortal() {
                             ) : (
                               <span className="text-muted-foreground italic">{t.notSet}</span>
                             )}
-                          </p>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 px-2 text-xs"
+                              onClick={() => {
+                                setEditingExpirationDate('irata');
+                                setExpirationDateValue(user.irataExpirationDate || '');
+                              }}
+                              data-testid="button-edit-irata-expiry"
+                            >
+                              <Pencil className="w-3 h-3 mr-1" />
+                              {user.irataExpirationDate ? t.editExpirationDate : t.setExpirationDate}
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     )}
@@ -1939,7 +1999,7 @@ export default function TechnicianPortal() {
                         <div className="mt-2 space-y-1 text-sm">
                           <p data-testid="text-sprat-level"><span className="text-muted-foreground">{t.level}:</span> {user.spratLevel}</p>
                           <p data-testid="text-sprat-license"><span className="text-muted-foreground">{t.licenseNumber}:</span> {user.spratLicenseNumber || 'N/A'}</p>
-                          <p data-testid="text-sprat-expiry">
+                          <div data-testid="text-sprat-expiry" className="flex items-center gap-2 flex-wrap">
                             <span className="text-muted-foreground">{t.expiresOn}:</span>{' '}
                             {user.spratExpirationDate ? (
                               (() => {
@@ -1959,7 +2019,7 @@ export default function TechnicianPortal() {
                                       badge = <Badge variant="outline" className="ml-2 bg-yellow-500/10 border-yellow-500 text-yellow-700 dark:text-yellow-400 text-xs" data-testid="badge-sprat-expiring">{t.expiringSoon}</Badge>;
                                     }
                                   }
-                                  return <>{formattedDate}{badge}</>;
+                                  return <><span>{formattedDate}</span>{badge}</>;
                                 } catch (e) {
                                   console.error('Failed to parse SPRAT expiration date:', e);
                                   return <span className="text-muted-foreground italic">{t.notSet}</span>;
@@ -1968,7 +2028,20 @@ export default function TechnicianPortal() {
                             ) : (
                               <span className="text-muted-foreground italic">{t.notSet}</span>
                             )}
-                          </p>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 px-2 text-xs"
+                              onClick={() => {
+                                setEditingExpirationDate('sprat');
+                                setExpirationDateValue(user.spratExpirationDate || '');
+                              }}
+                              data-testid="button-edit-sprat-expiry"
+                            >
+                              <Pencil className="w-3 h-3 mr-1" />
+                              {user.spratExpirationDate ? t.editExpirationDate : t.setExpirationDate}
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     )}
@@ -2919,6 +2992,70 @@ export default function TechnicianPortal() {
           </CardContent>
         </Card>
       </main>
+
+      {/* Expiration Date Edit Dialog */}
+      <Dialog open={editingExpirationDate !== null} onOpenChange={(open) => {
+        if (!open) {
+          setEditingExpirationDate(null);
+          setExpirationDateValue("");
+        }
+      }}>
+        <DialogContent className="sm:max-w-md" data-testid="dialog-edit-expiration">
+          <DialogHeader>
+            <DialogTitle>
+              {editingExpirationDate?.toUpperCase()} {expirationDateValue ? t.editExpirationDate : t.setExpirationDate}
+            </DialogTitle>
+            <DialogDescription>
+              {t.selectDate}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="expiration-date">{t.expiresOn}</Label>
+              <Input
+                id="expiration-date"
+                type="date"
+                value={expirationDateValue}
+                onChange={(e) => setExpirationDateValue(e.target.value)}
+                data-testid="input-expiration-date"
+              />
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setEditingExpirationDate(null);
+                setExpirationDateValue("");
+              }}
+              data-testid="button-cancel-expiration"
+            >
+              {t.cancel}
+            </Button>
+            <Button
+              onClick={() => {
+                if (editingExpirationDate && expirationDateValue) {
+                  updateExpirationDateMutation.mutate({
+                    type: editingExpirationDate,
+                    date: expirationDateValue,
+                  });
+                }
+              }}
+              disabled={!expirationDateValue || updateExpirationDateMutation.isPending}
+              data-testid="button-save-expiration"
+            >
+              {updateExpirationDateMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {t.saving}
+                </>
+              ) : (
+                t.saveChanges
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
