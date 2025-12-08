@@ -71,6 +71,7 @@ const projectSchema = z.object({
   totalDropsWest: z.string().optional(),
   dailyDropTarget: z.string().optional(),
   floorCount: z.string().optional(),
+  buildingHeight: z.string().optional(),
   startDate: z.string().optional(),
   endDate: z.string().optional(),
   targetCompletionDate: z.string().optional(),
@@ -990,6 +991,7 @@ export default function Dashboard() {
       totalDropsWest: "",
       dailyDropTarget: "",
       floorCount: "",
+      buildingHeight: "",
       startDate: "",
       endDate: "",
       targetCompletionDate: "",
@@ -1350,7 +1352,8 @@ export default function Dashboard() {
                      (data.totalDropsSouth ? parseInt(data.totalDropsSouth) : 0) + 
                      (data.totalDropsWest ? parseInt(data.totalDropsWest) : 0),
           dailyDropTarget: data.dailyDropTarget ? parseInt(data.dailyDropTarget) : undefined,
-          floorCount: parseInt(data.floorCount),
+          floorCount: data.floorCount ? parseInt(data.floorCount) : undefined,
+          buildingHeight: data.buildingHeight || undefined,
           startDate: data.startDate || undefined,
           endDate: data.endDate || undefined,
           estimatedHours: data.estimatedHours ? parseInt(data.estimatedHours) : undefined,
@@ -3326,6 +3329,29 @@ export default function Dashboard() {
                             )}
                           />
                         )}
+
+                        {/* Building Height - for IRATA logbook */}
+                        <FormField
+                          control={projectForm.control}
+                          name="buildingHeight"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('dashboard.projectForm.buildingHeight', 'Building Height')}</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  placeholder={t('dashboard.projectForm.buildingHeightPlaceholder', 'e.g., 25 floors, 100m, 300ft')} 
+                                  {...field} 
+                                  data-testid="input-building-height" 
+                                  className="h-12" 
+                                />
+                              </FormControl>
+                              <p className="text-xs text-muted-foreground">
+                                {t('dashboard.projectForm.buildingHeightHint', 'Used for IRATA logbook hour tracking')}
+                              </p>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
 
                         {(projectForm.watch("jobType") === "window_cleaning" || 
                           projectForm.watch("jobType") === "building_wash" || 

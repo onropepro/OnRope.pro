@@ -292,6 +292,7 @@ export const projects = pgTable("projects", {
   
   dailyDropTarget: integer("daily_drop_target"),
   floorCount: integer("floor_count"),
+  buildingHeight: varchar("building_height"), // e.g., "25 floors", "100m", "300ft" - for IRATA logbook hours
   targetCompletionDate: date("target_completion_date"), // Optional target completion date
   estimatedHours: integer("estimated_hours"), // Estimated total hours for the entire building
   startDate: date("start_date"), // Schedule start date
