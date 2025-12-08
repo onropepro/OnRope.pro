@@ -819,8 +819,17 @@ export default function TechnicianPortal() {
     const docType = uploadingDocTypeRef.current;
     console.log('[TechnicianPortal] handleDocumentUpload called:', { file: file?.name, docType, stateValue: uploadingDocType });
     
-    if (!file || !docType) {
-      console.log('[TechnicianPortal] Upload aborted - file:', !!file, 'docType:', docType);
+    if (!file) {
+      console.log('[TechnicianPortal] No file selected');
+      return;
+    }
+    
+    if (!docType) {
+      toast({
+        title: "Upload Error",
+        description: "Document type not set. Please try again.",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -835,6 +844,12 @@ export default function TechnicianPortal() {
       uploadingDocTypeRef.current = null;
       return;
     }
+
+    // Show that we're starting the upload
+    toast({
+      title: "Uploading...",
+      description: `Uploading ${file.name} (${(file.size / 1024).toFixed(1)} KB)`,
+    });
 
     try {
       const formData = new FormData();
@@ -879,14 +894,23 @@ export default function TechnicianPortal() {
   // Trigger document upload for a specific type
   const triggerDocumentUpload = (docType: string) => {
     console.log('[TechnicianPortal] triggerDocumentUpload called:', docType);
+    
     // Set the ref FIRST (synchronous) before state (async)
     uploadingDocTypeRef.current = docType;
     setUploadingDocType(docType);
     
-    // Reset the input value first to ensure onChange fires even if same file is selected
-    if (documentInputRef.current) {
-      documentInputRef.current.value = '';
+    // Check if ref exists
+    if (!documentInputRef.current) {
+      toast({
+        title: "Upload Error",
+        description: "File input not found. Please refresh the page.",
+        variant: "destructive",
+      });
+      return;
     }
+    
+    // Reset the input value first to ensure onChange fires even if same file is selected
+    documentInputRef.current.value = '';
     
     // Handle case where user cancels the file dialog
     // When the file dialog is closed, window regains focus
@@ -904,7 +928,7 @@ export default function TechnicianPortal() {
     
     window.addEventListener('focus', handleDialogClose);
     console.log('[TechnicianPortal] About to click file input:', documentInputRef.current);
-    documentInputRef.current?.click();
+    documentInputRef.current.click();
     console.log('[TechnicianPortal] File input clicked');
   };
 
