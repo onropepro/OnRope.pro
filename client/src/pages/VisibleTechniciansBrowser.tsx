@@ -1,0 +1,558 @@
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { 
+  ArrowLeft, 
+  Users, 
+  MapPin, 
+  Award,
+  FileText,
+  Calendar,
+  Search,
+  Filter,
+  Shield,
+  Download,
+  Eye,
+  Clock,
+  Loader2,
+  AlertCircle,
+  ChevronRight,
+  Building,
+  User
+} from "lucide-react";
+import { format, differenceInYears } from "date-fns";
+import type { User as UserType } from "@shared/schema";
+
+type Language = 'en' | 'fr';
+
+const translations = {
+  en: {
+    title: "Talent Browser",
+    subtitle: "Browse technicians available for hire",
+    backToDashboard: "Back to Dashboard",
+    searchPlaceholder: "Search by name or location...",
+    certificationPlaceholder: "Certification",
+    levelPlaceholder: "Level",
+    allCerts: "All Certs",
+    irataOnly: "IRATA Only",
+    spratOnly: "SPRAT Only",
+    bothCerts: "Both",
+    allLevels: "All Levels",
+    level1: "Level 1",
+    level2: "Level 2",
+    level3: "Level 3",
+    techniciansCount: (count: number) => count === 1 ? "1 technician available" : `${count} technicians available`,
+    loading: "Loading available technicians...",
+    noTechniciansTitle: "No Technicians Found",
+    noTechniciansFilterMsg: "Try adjusting your filters to see more results.",
+    noTechniciansEmptyMsg: "No technicians have opted in to be visible to employers yet.",
+    experience: "Experience",
+    yearsInRopeAccess: "years in rope access",
+    since: "Since",
+    certifications: "Certifications",
+    noCertifications: "No certifications on file",
+    resumeCV: "Resume / CV",
+    visibleSince: "Profile visible since",
+    expired: "Expired",
+    expiringSoon: "Expiring Soon",
+    license: "License",
+    expires: "Expires",
+    yrsExp: "yrs exp",
+    resume: "Resume",
+    unknown: "Unknown",
+    irataLevelLabel: "IRATA Level",
+    spratLevelLabel: "SPRAT Level",
+  },
+  fr: {
+    title: "Navigateur de talents",
+    subtitle: "Parcourir les techniciens disponibles a l'embauche",
+    backToDashboard: "Retour au tableau de bord",
+    searchPlaceholder: "Rechercher par nom ou lieu...",
+    certificationPlaceholder: "Certification",
+    levelPlaceholder: "Niveau",
+    allCerts: "Toutes les certifications",
+    irataOnly: "IRATA seulement",
+    spratOnly: "SPRAT seulement",
+    bothCerts: "Les deux",
+    allLevels: "Tous les niveaux",
+    level1: "Niveau 1",
+    level2: "Niveau 2",
+    level3: "Niveau 3",
+    techniciansCount: (count: number) => count === 1 ? "1 technicien disponible" : `${count} techniciens disponibles`,
+    loading: "Chargement des techniciens disponibles...",
+    noTechniciansTitle: "Aucun technicien trouve",
+    noTechniciansFilterMsg: "Essayez d'ajuster vos filtres pour voir plus de resultats.",
+    noTechniciansEmptyMsg: "Aucun technicien n'a encore choisi d'etre visible par les employeurs.",
+    experience: "Experience",
+    yearsInRopeAccess: "ans en acces par corde",
+    since: "Depuis",
+    certifications: "Certifications",
+    noCertifications: "Aucune certification en dossier",
+    resumeCV: "CV / Resume",
+    visibleSince: "Profil visible depuis",
+    expired: "Expire",
+    expiringSoon: "Expire bientot",
+    license: "Licence",
+    expires: "Expire le",
+    yrsExp: "ans exp",
+    resume: "CV",
+    unknown: "Inconnu",
+    irataLevelLabel: "IRATA Niveau",
+    spratLevelLabel: "SPRAT Niveau",
+  }
+};
+
+interface VisibleTechnician {
+  id: string;
+  firstName: string | null;
+  lastName: string | null;
+  name: string | null;
+  photoUrl: string | null;
+  irataLevel: string | null;
+  irataLicenseNumber: string | null;
+  irataExpirationDate: Date | string | null;
+  spratLevel: string | null;
+  spratLicenseNumber: string | null;
+  spratExpirationDate: Date | string | null;
+  ropeAccessStartDate: Date | string | null;
+  resumeDocuments: any[] | null;
+  employeeCity: string | null;
+  employeeProvinceState: string | null;
+  employeeCountry: string | null;
+  visibilityEnabledAt: Date | string | null;
+}
+
+export default function VisibleTechniciansBrowser() {
+  const [, setLocation] = useLocation();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [certFilter, setCertFilter] = useState<string>("all");
+  const [levelFilter, setLevelFilter] = useState<string>("all");
+  const [selectedTech, setSelectedTech] = useState<VisibleTechnician | null>(null);
+  const [language, setLanguage] = useState<Language>(() => {
+    const saved = localStorage.getItem("dashboardLanguage");
+    return (saved === "fr" ? "fr" : "en") as Language;
+  });
+  const t = translations[language];
+
+  const { data: userData } = useQuery<{ user: UserType }>({
+    queryKey: ["/api/user"],
+  });
+
+  const { data: techsData, isLoading } = useQuery<{ technicians: VisibleTechnician[] }>({
+    queryKey: ["/api/visible-technicians"],
+  });
+
+  const user = userData?.user;
+  const technicians = techsData?.technicians || [];
+
+  const getDisplayName = (tech: VisibleTechnician) => {
+    if (tech.firstName && tech.lastName) {
+      return `${tech.firstName} ${tech.lastName}`;
+    }
+    return tech.name || t.unknown;
+  };
+
+  const getInitials = (tech: VisibleTechnician) => {
+    if (tech.firstName && tech.lastName) {
+      return `${tech.firstName[0]}${tech.lastName[0]}`.toUpperCase();
+    }
+    if (tech.name) {
+      return tech.name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
+    }
+    return "??";
+  };
+
+  const getLocation = (tech: VisibleTechnician) => {
+    const parts = [tech.employeeCity, tech.employeeProvinceState, tech.employeeCountry].filter(Boolean);
+    return parts.length > 0 ? parts.join(", ") : null;
+  };
+
+  const getYearsExperience = (startDate: Date | string | null) => {
+    if (!startDate) return null;
+    const date = typeof startDate === "string" ? new Date(startDate) : startDate;
+    return differenceInYears(new Date(), date);
+  };
+
+  const formatDate = (date: Date | string | null) => {
+    if (!date) return null;
+    const d = typeof date === "string" ? new Date(date) : date;
+    return format(d, "MMM d, yyyy");
+  };
+
+  const isExpiringSoon = (date: Date | string | null) => {
+    if (!date) return false;
+    const d = typeof date === "string" ? new Date(date) : date;
+    const daysUntil = Math.ceil((d.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+    return daysUntil <= 60 && daysUntil > 0;
+  };
+
+  const isExpired = (date: Date | string | null) => {
+    if (!date) return false;
+    const d = typeof date === "string" ? new Date(date) : date;
+    return d < new Date();
+  };
+
+  const filteredTechnicians = technicians.filter(tech => {
+    const name = getDisplayName(tech).toLowerCase();
+    const location = getLocation(tech)?.toLowerCase() || "";
+    const matchesSearch = name.includes(searchQuery.toLowerCase()) || location.includes(searchQuery.toLowerCase());
+
+    let matchesCert = true;
+    if (certFilter === "irata") {
+      matchesCert = !!tech.irataLevel;
+    } else if (certFilter === "sprat") {
+      matchesCert = !!tech.spratLevel;
+    } else if (certFilter === "both") {
+      matchesCert = !!tech.irataLevel && !!tech.spratLevel;
+    }
+
+    let matchesLevel = true;
+    if (levelFilter !== "all") {
+      matchesLevel = tech.irataLevel === levelFilter || tech.spratLevel === levelFilter;
+    }
+
+    return matchesSearch && matchesCert && matchesLevel;
+  });
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
+      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-full bg-primary/10">
+              <Users className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-lg font-bold">{t.title}</h1>
+              <p className="text-xs text-muted-foreground hidden sm:block">{t.subtitle}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                const newLang = language === "en" ? "fr" : "en";
+                setLanguage(newLang);
+                localStorage.setItem("dashboardLanguage", newLang);
+              }}
+              data-testid="button-toggle-language"
+            >
+              {language === "en" ? "FR" : "EN"}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setLocation("/dashboard")}
+              className="gap-1.5"
+              data-testid="button-back-to-dashboard"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span className="hidden sm:inline">{t.backToDashboard}</span>
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-6xl mx-auto px-4 py-6 space-y-6">
+        {/* Search and Filters */}
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder={t.searchPlaceholder}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9"
+                  data-testid="input-search-technicians"
+                />
+              </div>
+              <Select value={certFilter} onValueChange={setCertFilter}>
+                <SelectTrigger className="w-full sm:w-40" data-testid="select-cert-filter">
+                  <Filter className="w-4 h-4 mr-2" />
+                  <SelectValue placeholder={t.certificationPlaceholder} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t.allCerts}</SelectItem>
+                  <SelectItem value="irata">{t.irataOnly}</SelectItem>
+                  <SelectItem value="sprat">{t.spratOnly}</SelectItem>
+                  <SelectItem value="both">{t.bothCerts}</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={levelFilter} onValueChange={setLevelFilter}>
+                <SelectTrigger className="w-full sm:w-32" data-testid="select-level-filter">
+                  <Award className="w-4 h-4 mr-2" />
+                  <SelectValue placeholder={t.levelPlaceholder} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t.allLevels}</SelectItem>
+                  <SelectItem value="1">{t.level1}</SelectItem>
+                  <SelectItem value="2">{t.level2}</SelectItem>
+                  <SelectItem value="3">{t.level3}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Results Summary */}
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">
+            {t.techniciansCount(filteredTechnicians.length)}
+          </p>
+        </div>
+
+        {/* Loading State */}
+        {isLoading && (
+          <Card>
+            <CardContent className="p-12 text-center">
+              <Loader2 className="w-8 h-8 animate-spin mx-auto text-muted-foreground mb-4" />
+              <p className="text-muted-foreground">{t.loading}</p>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Empty State */}
+        {!isLoading && filteredTechnicians.length === 0 && (
+          <Card>
+            <CardContent className="p-12 text-center">
+              <Users className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="font-semibold text-lg mb-2">{t.noTechniciansTitle}</h3>
+              <p className="text-muted-foreground">
+                {searchQuery || certFilter !== "all" || levelFilter !== "all"
+                  ? t.noTechniciansFilterMsg
+                  : t.noTechniciansEmptyMsg}
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Technicians Grid */}
+        {!isLoading && filteredTechnicians.length > 0 && (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {filteredTechnicians.map((tech) => {
+              const yearsExp = getYearsExperience(tech.ropeAccessStartDate);
+              const location = getLocation(tech);
+              const hasResume = tech.resumeDocuments && tech.resumeDocuments.length > 0;
+
+              return (
+                <Card 
+                  key={tech.id} 
+                  className="hover-elevate cursor-pointer transition-all"
+                  onClick={() => setSelectedTech(tech)}
+                  data-testid={`card-technician-${tech.id}`}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-start gap-3">
+                      <Avatar className="w-12 h-12">
+                        <AvatarImage src={tech.photoUrl || undefined} />
+                        <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                          {getInitials(tech)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold truncate">{getDisplayName(tech)}</h3>
+                        {location && (
+                          <p className="text-sm text-muted-foreground flex items-center gap-1 truncate">
+                            <MapPin className="w-3 h-3 flex-shrink-0" />
+                            {location}
+                          </p>
+                        )}
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                    </div>
+
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {tech.irataLevel && (
+                        <Badge variant={isExpired(tech.irataExpirationDate) ? "destructive" : isExpiringSoon(tech.irataExpirationDate) ? "secondary" : "default"} className="text-xs">
+                          IRATA L{tech.irataLevel}
+                        </Badge>
+                      )}
+                      {tech.spratLevel && (
+                        <Badge variant={isExpired(tech.spratExpirationDate) ? "destructive" : isExpiringSoon(tech.spratExpirationDate) ? "secondary" : "default"} className="text-xs">
+                          SPRAT L{tech.spratLevel}
+                        </Badge>
+                      )}
+                      {yearsExp !== null && (
+                        <Badge variant="outline" className="text-xs">
+                          {yearsExp}+ {t.yrsExp}
+                        </Badge>
+                      )}
+                      {hasResume && (
+                        <Badge variant="outline" className="text-xs gap-1">
+                          <FileText className="w-3 h-3" />
+                          {t.resume}
+                        </Badge>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
+      </main>
+
+      {/* Technician Detail Dialog */}
+      <Dialog open={!!selectedTech} onOpenChange={(open) => !open && setSelectedTech(null)}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          {selectedTech && (
+            <>
+              <DialogHeader>
+                <div className="flex items-center gap-4">
+                  <Avatar className="w-16 h-16">
+                    <AvatarImage src={selectedTech.photoUrl || undefined} />
+                    <AvatarFallback className="bg-primary/10 text-primary font-medium text-xl">
+                      {getInitials(selectedTech)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <DialogTitle className="text-xl">{getDisplayName(selectedTech)}</DialogTitle>
+                    {getLocation(selectedTech) && (
+                      <DialogDescription className="flex items-center gap-1 mt-1">
+                        <MapPin className="w-4 h-4" />
+                        {getLocation(selectedTech)}
+                      </DialogDescription>
+                    )}
+                  </div>
+                </div>
+              </DialogHeader>
+
+              <div className="space-y-4 mt-4">
+                {/* Experience */}
+                {selectedTech.ropeAccessStartDate && (
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                    <Clock className="w-5 h-5 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm text-muted-foreground">{t.experience}</p>
+                      <p className="font-medium">
+                        {getYearsExperience(selectedTech.ropeAccessStartDate)}+ {t.yearsInRopeAccess}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {t.since} {formatDate(selectedTech.ropeAccessStartDate)}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Certifications */}
+                <div className="space-y-3">
+                  <h4 className="font-semibold flex items-center gap-2">
+                    <Award className="w-4 h-4" />
+                    {t.certifications}
+                  </h4>
+
+                  {selectedTech.irataLevel && (
+                    <div className="p-3 rounded-lg border">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Badge>{t.irataLevelLabel} {selectedTech.irataLevel}</Badge>
+                          {isExpired(selectedTech.irataExpirationDate) && (
+                            <Badge variant="destructive">{t.expired}</Badge>
+                          )}
+                          {isExpiringSoon(selectedTech.irataExpirationDate) && !isExpired(selectedTech.irataExpirationDate) && (
+                            <Badge variant="secondary">{t.expiringSoon}</Badge>
+                          )}
+                        </div>
+                      </div>
+                      <div className="mt-2 text-sm text-muted-foreground space-y-1">
+                        {selectedTech.irataLicenseNumber && (
+                          <p>{t.license}: {selectedTech.irataLicenseNumber}</p>
+                        )}
+                        {selectedTech.irataExpirationDate && (
+                          <p>{t.expires}: {formatDate(selectedTech.irataExpirationDate)}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedTech.spratLevel && (
+                    <div className="p-3 rounded-lg border">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Badge>{t.spratLevelLabel} {selectedTech.spratLevel}</Badge>
+                          {isExpired(selectedTech.spratExpirationDate) && (
+                            <Badge variant="destructive">{t.expired}</Badge>
+                          )}
+                          {isExpiringSoon(selectedTech.spratExpirationDate) && !isExpired(selectedTech.spratExpirationDate) && (
+                            <Badge variant="secondary">{t.expiringSoon}</Badge>
+                          )}
+                        </div>
+                      </div>
+                      <div className="mt-2 text-sm text-muted-foreground space-y-1">
+                        {selectedTech.spratLicenseNumber && (
+                          <p>{t.license}: {selectedTech.spratLicenseNumber}</p>
+                        )}
+                        {selectedTech.spratExpirationDate && (
+                          <p>{t.expires}: {formatDate(selectedTech.spratExpirationDate)}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {!selectedTech.irataLevel && !selectedTech.spratLevel && (
+                    <p className="text-sm text-muted-foreground italic">{t.noCertifications}</p>
+                  )}
+                </div>
+
+                {/* Resume/CV */}
+                {selectedTech.resumeDocuments && selectedTech.resumeDocuments.length > 0 && (
+                  <div className="space-y-3">
+                    <h4 className="font-semibold flex items-center gap-2">
+                      <FileText className="w-4 h-4" />
+                      {t.resumeCV}
+                    </h4>
+                    <div className="space-y-2">
+                      {selectedTech.resumeDocuments.map((doc: any, index: number) => (
+                        <a
+                          key={index}
+                          href={doc.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 p-2 rounded-lg border hover-elevate"
+                          data-testid={`link-resume-${index}`}
+                        >
+                          <FileText className="w-4 h-4 text-muted-foreground" />
+                          <span className="flex-1 truncate text-sm">{doc.name || `${t.resume} ${index + 1}`}</span>
+                          <Download className="w-4 h-4 text-muted-foreground" />
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Visibility Info */}
+                {selectedTech.visibilityEnabledAt && (
+                  <div className="pt-3 border-t">
+                    <p className="text-xs text-muted-foreground flex items-center gap-1">
+                      <Eye className="w-3 h-3" />
+                      {t.visibleSince} {formatDate(selectedTech.visibilityEnabledAt)}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}

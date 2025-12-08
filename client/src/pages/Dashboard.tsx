@@ -2423,6 +2423,17 @@ export default function Dashboard() {
       category: "team",
     },
     {
+      id: "talent-browser",
+      label: t('dashboard.cards.talentBrowser.label', 'Talent Browser'),
+      description: t('dashboard.cards.talentBrowser.description', 'Browse available technicians'),
+      icon: "person_search",
+      onClick: () => setLocation("/talent-browser"),
+      testId: "button-nav-talent-browser",
+      isVisible: (user: any) => user?.role === 'company', // Company owners only
+      borderColor: "#7c3aed",
+      category: "team",
+    },
+    {
       id: "clients",
       label: t('dashboard.cards.clients.label', 'Clients'),
       description: t('dashboard.cards.clients.description', 'Property managers'),

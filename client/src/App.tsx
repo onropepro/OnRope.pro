@@ -76,6 +76,7 @@ import TechnicianPortal from "@/pages/TechnicianPortal";
 import TechnicianLoggedHours from "@/pages/TechnicianLoggedHours";
 import TechnicianJobBoard from "@/pages/TechnicianJobBoard";
 import CompanyJobBoard from "@/pages/CompanyJobBoard";
+import VisibleTechniciansBrowser from "@/pages/VisibleTechniciansBrowser";
 import NotFound from "@/pages/not-found";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { EMPLOYEE_ROLES } from "@/lib/permissions";
@@ -193,6 +194,11 @@ function Router() {
       <Route path="/job-board">
         <ProtectedRoute allowedRoles={["company"]}>
           <CompanyJobBoard />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/talent-browser">
+        <ProtectedRoute allowedRoles={["company", "superuser"]}>
+          <VisibleTechniciansBrowser />
         </ProtectedRoute>
       </Route>
       <Route path="/complaints/:id">
