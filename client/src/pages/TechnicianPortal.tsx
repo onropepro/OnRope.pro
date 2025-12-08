@@ -1470,6 +1470,33 @@ export default function TechnicianPortal() {
           </Card>
         )}
 
+        {/* Job Board Card - Prominent placement */}
+        {user && (
+          <Card className="border-blue-500/50 bg-gradient-to-r from-blue-500/10 to-purple-500/10">
+            <CardContent className="p-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-blue-500/20">
+                    <Briefcase className="w-5 h-5 text-blue-500" />
+                  </div>
+                  <div>
+                    <p className="font-medium">{t.jobBoard}</p>
+                    <p className="text-sm text-muted-foreground">{t.jobBoardDesc}</p>
+                  </div>
+                </div>
+                <Button
+                  onClick={() => setLocation("/technician-job-board")}
+                  className="gap-2 bg-blue-600 hover:bg-blue-700"
+                  data-testid="button-browse-jobs"
+                >
+                  {t.browseJobs}
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Team Invitations Section - Show for unlinked technicians OR self-resigned technicians */}
         {user && user.role === 'rope_access_tech' && (!user.companyId || user.terminatedDate) && (
           <Card className="border-primary/30 bg-primary/5">
@@ -2935,31 +2962,6 @@ export default function TechnicianPortal() {
                     </div>
                   </div>
                   
-                </div>
-
-                {/* Job Board Navigation */}
-                <Separator />
-                <div className="space-y-3">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-start gap-3">
-                      <div className="p-2 rounded-full bg-blue-500/10 mt-1">
-                        <Briefcase className="w-5 h-5 text-blue-500" />
-                      </div>
-                      <div className="space-y-1">
-                        <p className="font-semibold text-base">{t.jobBoard}</p>
-                        <p className="text-sm text-muted-foreground">{t.jobBoardDesc}</p>
-                      </div>
-                    </div>
-                    <Button
-                      onClick={() => setLocation("/technician-job-board")}
-                      variant="outline"
-                      className="gap-2 whitespace-nowrap"
-                      data-testid="button-browse-jobs"
-                    >
-                      {t.browseJobs}
-                      <ArrowRight className="w-4 h-4" />
-                    </Button>
-                  </div>
                 </div>
 
                 {user.hasFirstAid && (
