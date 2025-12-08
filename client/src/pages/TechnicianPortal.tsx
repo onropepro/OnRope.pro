@@ -991,34 +991,6 @@ export default function TechnicianPortal() {
           </Card>
         )}
 
-        {/* My Logged Hours - Show for all technicians */}
-        {user && user.role === 'rope_access_tech' && (
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-full bg-muted">
-                    <Clock className="w-5 h-5 text-muted-foreground" />
-                  </div>
-                  <div>
-                    <p className="font-medium">{t.myLoggedHours}</p>
-                    <p className="text-sm text-muted-foreground">{t.viewLoggedHoursDesc}</p>
-                  </div>
-                </div>
-                <Button
-                  variant="outline"
-                  onClick={() => setLocation("/technician-logged-hours")}
-                  className="gap-2"
-                  data-testid="button-view-logged-hours"
-                >
-                  {t.viewLoggedHours}
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
         {/* Team Invitations Section - Show for unlinked technicians OR self-resigned technicians */}
         {user && user.role === 'rope_access_tech' && (!user.companyId || user.terminatedDate) && (
           <Card className="border-primary/30 bg-primary/5">
@@ -1654,6 +1626,30 @@ export default function TechnicianPortal() {
                       <InfoItem label={t.baselineHours} value={`${user.irataBaselineHours} ${t.hours}`} icon={<Clock className="w-4 h-4" />} />
                     )}
                   </div>
+                  
+                  {/* My Logged Hours - inside Certifications section */}
+                  <div className="mt-4 p-3 bg-muted/50 rounded-lg border">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <Clock className="w-5 h-5 text-muted-foreground" />
+                        <div>
+                          <p className="font-medium text-sm">{t.myLoggedHours}</p>
+                          <p className="text-xs text-muted-foreground">{t.viewLoggedHoursDesc}</p>
+                        </div>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setLocation("/technician-logged-hours")}
+                        className="gap-2"
+                        data-testid="button-view-logged-hours"
+                      >
+                        {t.viewLoggedHours}
+                        <ArrowRight className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                  
                   {user.irataDocuments && user.irataDocuments.filter((u: string) => u && u.trim()).length > 0 && (
                     <div className="pt-3">
                       <p className="text-sm text-muted-foreground mb-3">{t.certificationCard}</p>
