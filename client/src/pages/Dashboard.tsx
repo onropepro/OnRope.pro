@@ -7241,6 +7241,41 @@ export default function Dashboard() {
                           <div className="text-sm font-medium">IRATA {employeeToView.techLevel}</div>
                         </div>
                       )}
+                      {employeeToView.ropeAccessStartDate && (
+                        <div>
+                          <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.ropeAccessExperience', 'Rope Access Experience')}</div>
+                          <div className="text-sm font-medium">
+                            {(() => {
+                              const startDate = parseLocalDate(employeeToView.ropeAccessStartDate);
+                              const now = new Date();
+                              // Calculate years and months using proper date math
+                              let years = now.getFullYear() - startDate.getFullYear();
+                              let months = now.getMonth() - startDate.getMonth();
+                              if (months < 0 || (months === 0 && now.getDate() < startDate.getDate())) {
+                                years--;
+                                months += 12;
+                              }
+                              if (now.getDate() < startDate.getDate()) {
+                                months--;
+                                if (months < 0) months += 12;
+                              }
+                              
+                              if (years === 0 && months === 0) return t('dashboard.employeeDetails.lessThanMonth', 'Less than a month');
+                              // Use interpolation pattern for localization
+                              const yearsMonthsTemplate = t('dashboard.employeeDetails.yearsMonths', '{years} year(s), {months} month(s)');
+                              const yearsOnlyTemplate = t('dashboard.employeeDetails.yearsOnly', '{years} year(s)');
+                              const monthsOnlyTemplate = t('dashboard.employeeDetails.monthsOnly', '{months} month(s)');
+                              
+                              if (years === 0) return monthsOnlyTemplate.replace('{months}', months.toString());
+                              if (months === 0) return yearsOnlyTemplate.replace('{years}', years.toString());
+                              return yearsMonthsTemplate.replace('{years}', years.toString()).replace('{months}', months.toString());
+                            })()}
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            {t('dashboard.employeeDetails.startedOn', 'Started')}: {formatLocalDate(employeeToView.ropeAccessStartDate)}
+                          </div>
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
 

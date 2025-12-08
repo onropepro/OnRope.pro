@@ -66,6 +66,10 @@ const translations = {
     totalHoursSubtitle: "This helps employers understand your experience level",
     enterHours: "Enter total hours",
     optional: "(optional)",
+    experienceStart: "Experience Start",
+    experienceStartQuestion: "When did you start your rope access career?",
+    experienceStartSubtitle: "Select the date you first started working in rope access",
+    experienceStartLabel: "Career Start Date",
     firstAid: "First Aid Certification",
     haveFirstAid: "Do you have a valid First Aid certification?",
     firstAidSubtitle: "Many job sites require valid First Aid training",
@@ -225,6 +229,10 @@ const translations = {
     totalHoursSubtitle: "Cela aide les employeurs à comprendre votre niveau d'expérience",
     enterHours: "Entrez le total des heures",
     optional: "(facultatif)",
+    experienceStart: "Début de carrière",
+    experienceStartQuestion: "Quand avez-vous commencé votre carrière d'accès sur corde?",
+    experienceStartSubtitle: "Sélectionnez la date à laquelle vous avez commencé à travailler en accès sur corde",
+    experienceStartLabel: "Date de début de carrière",
     firstAid: "Certification de premiers soins",
     haveFirstAid: "Avez-vous une certification de premiers soins valide?",
     firstAidSubtitle: "De nombreux chantiers exigent une formation en premiers soins",
@@ -472,6 +480,7 @@ type RegistrationStep =
   | "certification"
   | "licenseNumbers"
   | "logbookHours"
+  | "experienceStart"
   | "firstAid"
   | "address"
   | "email"
@@ -495,6 +504,7 @@ interface TechnicianData {
   spratLicenseNumber: string;
   certificationCardFile: File | null;
   logbookTotalHours: string;
+  ropeAccessStartDate: string;
   hasFirstAid: boolean;
   firstAidType: string;
   firstAidExpiry: string;
@@ -543,6 +553,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
     spratLicenseNumber: "",
     certificationCardFile: null,
     logbookTotalHours: "",
+    ropeAccessStartDate: "",
     hasFirstAid: false,
     firstAidType: "",
     firstAidExpiry: "",
@@ -599,6 +610,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
       spratLicenseNumber: "",
       certificationCardFile: null,
       logbookTotalHours: "",
+      ropeAccessStartDate: "",
       hasFirstAid: false,
       firstAidType: "",
       firstAidExpiry: "",
@@ -642,6 +654,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
     "certification",
     "licenseNumbers",
     "logbookHours",
+    "experienceStart",
     "firstAid",
     "address",
     "email",
@@ -837,6 +850,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
       formData.append('spratLevel', data.spratLevel);
       formData.append('spratLicenseNumber', data.spratLicenseNumber);
       formData.append('logbookTotalHours', data.logbookTotalHours);
+      formData.append('ropeAccessStartDate', data.ropeAccessStartDate);
       formData.append('streetAddress', data.streetAddress);
       formData.append('city', data.city);
       formData.append('provinceState', data.provinceState);
@@ -1434,6 +1448,106 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 data-testid="button-continue-logbook"
               >
                 {data.logbookTotalHours ? "Continue" : "Skip for now"}
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+              <Button 
+                variant="ghost" 
+                onClick={handleBack}
+                className="w-full"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                {t.back}
+              </Button>
+            </DialogFooter>
+          </>
+        );
+
+      case "experienceStart":
+        return (
+          <>
+            <DialogHeader>
+              <div className="flex items-center justify-center mb-4">
+                <div className="p-3 rounded-full bg-indigo-500/10">
+                  <Calendar className="w-8 h-8 text-indigo-500" />
+                </div>
+              </div>
+              <DialogTitle className="text-center text-xl">
+                {t.experienceStartQuestion}
+              </DialogTitle>
+              <DialogDescription className="text-center">
+                {t.experienceStartSubtitle}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-6 space-y-4">
+              <div className="p-4 rounded-lg bg-muted/50 border">
+                <div className="flex items-start gap-3">
+                  <Info className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                  <div className="space-y-2 text-sm text-muted-foreground">
+                    <p>
+                      <strong>{language === 'en' ? "Why we ask (optional):" : "Pourquoi nous demandons (facultatif):"}</strong>
+                    </p>
+                    <p>
+                      {language === 'en' 
+                        ? "Knowing when you started helps employers understand your overall experience level. We'll automatically calculate your years and months of experience."
+                        : "Savoir quand vous avez commencé aide les employeurs à comprendre votre niveau d'expérience global. Nous calculerons automatiquement vos années et mois d'expérience."}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="ropeAccessStartDate">{t.experienceStartLabel} {t.optional}</Label>
+                <Input
+                  id="ropeAccessStartDate"
+                  data-testid="input-rope-access-start-date"
+                  type="date"
+                  max={new Date().toISOString().split('T')[0]}
+                  value={data.ropeAccessStartDate}
+                  onChange={(e) => setData({ ...data, ropeAccessStartDate: e.target.value })}
+                />
+                <p className="text-xs text-muted-foreground">
+                  {language === 'en'
+                    ? "Select the approximate date you first started working in rope access."
+                    : "Sélectionnez la date approximative à laquelle vous avez commencé à travailler en accès sur corde."}
+                </p>
+              </div>
+
+              {data.ropeAccessStartDate && (
+                <div className="p-3 rounded-lg bg-indigo-500/10 border border-indigo-500/20">
+                  <p className="text-sm text-center">
+                    {(() => {
+                      const startDate = new Date(data.ropeAccessStartDate + 'T00:00:00');
+                      const now = new Date();
+                      const diffMs = now.getTime() - startDate.getTime();
+                      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                      const years = Math.floor(diffDays / 365);
+                      const months = Math.floor((diffDays % 365) / 30);
+                      
+                      if (language === 'en') {
+                        if (years === 0 && months === 0) return `Experience: Less than a month`;
+                        if (years === 0) return `Experience: ${months} month${months !== 1 ? 's' : ''}`;
+                        if (months === 0) return `Experience: ${years} year${years !== 1 ? 's' : ''}`;
+                        return `Experience: ${years} year${years !== 1 ? 's' : ''}, ${months} month${months !== 1 ? 's' : ''}`;
+                      } else {
+                        if (years === 0 && months === 0) return `Expérience: Moins d'un mois`;
+                        if (years === 0) return `Expérience: ${months} mois`;
+                        if (months === 0) return `Expérience: ${years} an${years !== 1 ? 's' : ''}`;
+                        return `Expérience: ${years} an${years !== 1 ? 's' : ''}, ${months} mois`;
+                      }
+                    })()}
+                  </p>
+                </div>
+              )}
+
+              {error && <p className="text-destructive text-sm text-center">{error}</p>}
+            </div>
+            <DialogFooter className="flex-col gap-2 sm:flex-col">
+              <Button 
+                onClick={handleContinue} 
+                className="w-full"
+                data-testid="button-continue-experience"
+              >
+                {data.ropeAccessStartDate ? t.continue : (language === 'en' ? "Skip for now" : "Passer pour l'instant")}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
               <Button 

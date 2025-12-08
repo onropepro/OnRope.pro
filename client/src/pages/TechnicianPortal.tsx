@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
-import { formatLocalDate, formatDateTime } from "@/lib/dateUtils";
+import { formatLocalDate, formatDateTime, parseLocalDate } from "@/lib/dateUtils";
 import { 
   User, 
   LogOut, 
@@ -147,6 +147,16 @@ const translations = {
     uploadSpratCertificationCard: "Upload SPRAT Card",
     irataCertificationCard: "IRATA Certification Card",
     spratCertificationCard: "SPRAT Certification Card",
+    experience: "Experience",
+    ropeAccessExperience: "Rope Access Experience",
+    yearsMonths: "{years} year(s), {months} month(s)",
+    lessThanMonth: "Less than a month",
+    startedOn: "Started on",
+    notSet: "Not set",
+    resume: "Resume / CV",
+    uploadResume: "Upload Resume",
+    addResume: "Add Another Resume",
+    resumeUploaded: "Resume Uploaded",
     documentUploaded: "Document Uploaded",
     documentUploadedDesc: "Your document has been uploaded successfully.",
     uploadFailed: "Upload Failed",
@@ -339,6 +349,16 @@ const translations = {
     uploadSpratCertificationCard: "Téléverser la carte SPRAT",
     irataCertificationCard: "Carte de certification IRATA",
     spratCertificationCard: "Carte de certification SPRAT",
+    experience: "Expérience",
+    ropeAccessExperience: "Expérience d'accès sur corde",
+    yearsMonths: "{years} an(s), {months} mois",
+    lessThanMonth: "Moins d'un mois",
+    startedOn: "Début le",
+    notSet: "Non défini",
+    resume: "Curriculum vitae",
+    uploadResume: "Téléverser CV",
+    addResume: "Ajouter un autre CV",
+    resumeUploaded: "CV téléversé",
     documentUploaded: "Document téléversé",
     documentUploadedDesc: "Votre document a été téléversé avec succès.",
     uploadFailed: "Échec du téléversement",
@@ -1700,6 +1720,46 @@ export default function TechnicianPortal() {
                     )}
                   </div>
                   
+                  {/* Experience Display */}
+                  {user.ropeAccessStartDate && (
+                    <div className="mt-4 p-3 bg-indigo-500/10 border border-indigo-500/30 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <Calendar className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                        <div>
+                          <p className="font-medium text-sm">{t.ropeAccessExperience}</p>
+                          <p className="text-sm text-indigo-700 dark:text-indigo-300">
+                            {(() => {
+                              const startDate = parseLocalDate(user.ropeAccessStartDate);
+                              const now = new Date();
+                              // Calculate years and months using proper date math
+                              let years = now.getFullYear() - startDate.getFullYear();
+                              let months = now.getMonth() - startDate.getMonth();
+                              if (months < 0 || (months === 0 && now.getDate() < startDate.getDate())) {
+                                years--;
+                                months += 12;
+                              }
+                              if (now.getDate() < startDate.getDate()) {
+                                months--;
+                                if (months < 0) months += 12;
+                              }
+                              
+                              let expString = t.lessThanMonth;
+                              if (years > 0 || months > 0) {
+                                expString = t.yearsMonths
+                                  .replace('{years}', years.toString())
+                                  .replace('{months}', months.toString());
+                              }
+                              return expString;
+                            })()}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {t.startedOn}: {formatLocalDate(user.ropeAccessStartDate)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
                   {/* My Logged Hours - inside Certifications section */}
                   <div className="mt-4 p-3 bg-muted/50 rounded-lg border">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -2511,6 +2571,79 @@ export default function TechnicianPortal() {
                     </div>
                   </>
                 )}
+
+                {/* Resume / CV Section */}
+                <Separator />
+                <div className="space-y-3">
+                  <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
+                    <FileText className="w-4 h-4" />
+                    {t.resume}
+                  </h3>
+                  
+                  {user.resumeDocuments && user.resumeDocuments.filter((u: string) => u && u.trim()).length > 0 && (
+                    <div className="space-y-3">
+                      {user.resumeDocuments.filter((u: string) => u && u.trim()).map((url: string, index: number) => {
+                        const lowerUrl = url.toLowerCase();
+                        const isPdf = lowerUrl.endsWith('.pdf');
+                        const isImage = lowerUrl.match(/\.(jpg|jpeg|png|gif|webp|bmp)(\?|$)/i) || 
+                                      lowerUrl.includes('image') || 
+                                      (!isPdf && !lowerUrl.endsWith('.doc') && !lowerUrl.endsWith('.docx'));
+                        
+                        return (
+                          <a 
+                            key={index} 
+                            href={url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity bg-muted/30"
+                            data-testid={`link-resume-${index}`}
+                          >
+                            {isPdf ? (
+                              <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
+                                <FileText className="w-12 h-12 text-muted-foreground" />
+                                <span className="text-sm text-muted-foreground font-medium">{t.tapToViewPdf}</span>
+                              </div>
+                            ) : isImage ? (
+                              <img 
+                                src={url} 
+                                alt={`Resume ${index + 1}`}
+                                className="w-full h-auto max-h-64 object-contain"
+                                data-testid={`img-resume-${index}`}
+                              />
+                            ) : (
+                              <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
+                                <FileText className="w-12 h-12 text-muted-foreground" />
+                                <span className="text-sm text-muted-foreground font-medium">{t.tapToViewDocument}</span>
+                              </div>
+                            )}
+                          </a>
+                        );
+                      })}
+                    </div>
+                  )}
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => triggerDocumentUpload('resume')}
+                    disabled={uploadingDocType === 'resume'}
+                    data-testid="button-upload-resume"
+                  >
+                    {uploadingDocType === 'resume' ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        {t.uploading}
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-4 h-4 mr-2" />
+                        {user.resumeDocuments && user.resumeDocuments.filter((u: string) => u && u.trim()).length > 0 
+                          ? t.addResume 
+                          : t.uploadResume}
+                      </>
+                    )}
+                  </Button>
+                </div>
               </div>
             )}
           </CardContent>

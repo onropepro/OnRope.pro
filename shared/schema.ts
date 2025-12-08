@@ -98,6 +98,7 @@ export const users = pgTable("users", {
   driversLicenseProvince: varchar("drivers_license_province"), // Province where driver's license was issued (optional)
   driversLicenseExpiry: date("drivers_license_expiry"), // Driver's license expiry date (optional)
   driversLicenseDocuments: text("drivers_license_documents").array().default(sql`ARRAY[]::text[]`), // Array of document URLs (driver's license photos, abstracts, etc.)
+  resumeDocuments: text("resume_documents").array().default(sql`ARRAY[]::text[]`), // Array of resume/CV document URLs
   
   // Employee address fields (separate fields for self-registration)
   employeeStreetAddress: text("employee_street_address"), // Employee street address
@@ -125,6 +126,7 @@ export const users = pgTable("users", {
   irataExpirationDate: date("irata_expiration_date"), // IRATA certification expiration date
   irataDocuments: text("irata_documents").array().default(sql`ARRAY[]::text[]`), // Array of IRATA certification document URLs
   irataBaselineHours: numeric("irata_baseline_hours", { precision: 10, scale: 2 }).default("0"), // Baseline logbook hours before using this system
+  ropeAccessStartDate: date("rope_access_start_date"), // Date technician started rope access career (for experience calculation)
   irataVerifiedAt: timestamp("irata_verified_at"), // Timestamp of last successful IRATA verification via screenshot
   irataVerificationStatus: varchar("irata_verification_status"), // Status from IRATA verification (e.g., "Valid", "Active")
   

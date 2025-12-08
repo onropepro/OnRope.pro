@@ -852,6 +852,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         spratLevel,
         spratLicenseNumber,
         logbookTotalHours,
+        ropeAccessStartDate,
         streetAddress,
         city,
         provinceState,
@@ -1047,6 +1048,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Baseline logbook hours (optional - for future hour tracking accuracy)
         irataBaselineHours: logbookTotalHours ? logbookTotalHours : "0",
+        
+        // Rope access career start date (for experience calculation)
+        ropeAccessStartDate: ropeAccessStartDate || null,
         
         // Start date - use timezone-safe utility
         startDate: getTodayString(),
@@ -2696,7 +2700,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Document type is required" });
       }
 
-      const validTypes = ['voidCheque', 'driversLicense', 'driversAbstract', 'firstAidCertificate', 'certificationCard', 'irataCertificationCard', 'spratCertificationCard'];
+      const validTypes = ['voidCheque', 'driversLicense', 'driversAbstract', 'firstAidCertificate', 'certificationCard', 'irataCertificationCard', 'spratCertificationCard', 'resume'];
       if (!validTypes.includes(documentType)) {
         return res.status(400).json({ message: `Invalid document type. Must be one of: ${validTypes.join(', ')}` });
       }
@@ -2729,6 +2733,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else if (documentType === 'spratCertificationCard') {
         const existingDocs = user.spratDocuments || [];
         updateData.spratDocuments = [...existingDocs, url];
+      } else if (documentType === 'resume') {
+        const existingDocs = user.resumeDocuments || [];
+        updateData.resumeDocuments = [...existingDocs, url];
       }
 
       await storage.updateUser(userId, updateData);
