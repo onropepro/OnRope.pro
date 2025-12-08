@@ -342,7 +342,7 @@ const translations = {
     sessionRating: "Session Rating",
     improvementNeeded: "Areas to improve:",
     improveHarness: "Complete harness inspection before clocking in",
-    improveDocs: "Sign Health & Safety Manual and Company Policy documents",
+    improveDocs: "Sign all assigned safety documents",
   },
   fr: {
     technicianPortal: "Portail du technicien",
@@ -609,7 +609,7 @@ const translations = {
     sessionRating: "Note de Session",
     improvementNeeded: "Points à améliorer:",
     improveHarness: "Effectuer l'inspection du harnais avant de pointer",
-    improveDocs: "Signer le Manuel de Santé et Sécurité et les Politiques de l'entreprise",
+    improveDocs: "Signer tous les documents de sécurité assignés",
   }
 };
 

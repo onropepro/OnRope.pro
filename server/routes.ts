@@ -8624,45 +8624,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const inspectionDates = new Set(inspections.map(i => i.inspectionDate));
       
       // Get document compliance data
-      // If tech has a company, get company documents and their signatures
-      let documentCompliance = 100; // Default to 100% if no company or no required documents
+      // Count all documents assigned to this employee for review and how many are signed
+      let documentCompliance = 100; // Default to 100% if no assigned documents
       let requiredDocsCount = 0;
       let signedDocsCount = 0;
       
       if (currentUser.companyId) {
-        // Get all company documents (health_safety_manual and company_policy types require review)
-        const companyDocs = await storage.getCompanyDocuments(currentUser.companyId);
-        const requiredDocs = companyDocs.filter(
-          (d: any) => d.documentType === 'health_safety_manual' || d.documentType === 'company_policy'
-        );
-        requiredDocsCount = requiredDocs.length;
+        // Get all document review assignments for this employee at their current company
+        const employeeSignatures = await storage.getDocumentReviewSignaturesByEmployee(currentUser.id);
+        // Filter to only documents from current company
+        const assignedDocs = employeeSignatures.filter(s => s.companyId === currentUser.companyId);
+        requiredDocsCount = assignedDocs.length;
         
         if (requiredDocsCount > 0) {
-          // Get employee's document signatures for this company only
-          const employeeSignatures = await storage.getDocumentReviewSignaturesByEmployee(currentUser.id);
-          // Filter to only signatures from current company that are signed
-          const signedDocIds = new Set(
-            employeeSignatures
-              .filter(s => s.signedAt !== null && s.companyId === currentUser.companyId)
-              .map(s => s.documentId)
-          );
-          
-          // Count how many specific required documents have been signed by ID
-          // For documents without a documentId in the signature, fall back to checking by type
-          signedDocsCount = requiredDocs.filter((doc: any) => {
-            // Check if this specific document ID is in the signed set
-            if (signedDocIds.has(doc.id)) return true;
-            
-            // Also check for signatures that match by document type (legacy signatures)
-            const signedByType = employeeSignatures.some(
-              s => s.signedAt !== null && 
-                   s.companyId === currentUser.companyId && 
-                   s.documentType === doc.documentType &&
-                   !s.documentId // Only for signatures without specific document ID
-            );
-            return signedByType;
-          }).length;
-          
+          // Count how many have been signed
+          signedDocsCount = assignedDocs.filter(s => s.signedAt !== null).length;
           documentCompliance = Math.round((signedDocsCount / requiredDocsCount) * 100);
         }
       }
