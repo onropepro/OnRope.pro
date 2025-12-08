@@ -244,6 +244,7 @@ const translations = {
     confirmDeletePreviousHours: "Are you sure you want to delete this previous hours entry?",
     deleteConfirm: "Delete",
     cancelDelete: "Cancel",
+    logbookDisclaimer: "This does not replace your official IRATA/SPRAT logbook.",
   },
   fr: {
     technicianPortal: "Portail du technicien",
@@ -429,6 +430,7 @@ const translations = {
     confirmDeletePreviousHours: "Êtes-vous sûr de vouloir supprimer cette entrée d'heures précédentes ?",
     deleteConfirm: "Supprimer",
     cancelDelete: "Annuler",
+    logbookDisclaimer: "Ceci ne remplace pas votre carnet IRATA/SPRAT officiel.",
   }
 };
 
@@ -1648,6 +1650,10 @@ export default function TechnicianPortal() {
                         <ArrowRight className="w-4 h-4" />
                       </Button>
                     </div>
+                    <p className="text-xs text-amber-700 dark:text-amber-400 mt-2 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" />
+                      {t.logbookDisclaimer}
+                    </p>
                   </div>
                   
                   {user.irataDocuments && user.irataDocuments.filter((u: string) => u && u.trim()).length > 0 && (

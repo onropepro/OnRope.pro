@@ -26,7 +26,8 @@ import {
   Loader2,
   CheckCircle2,
   MapPin,
-  ChevronRight
+  ChevronRight,
+  AlertTriangle
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr, enUS } from "date-fns/locale";
@@ -88,6 +89,7 @@ const translations = {
     hoursRequired: "Please enter hours worked",
     dateRequired: "Please enter start and end dates",
     unknownProject: "Unknown Project",
+    logbookDisclaimer: "This digital log is for personal tracking only. It does not replace your official IRATA/SPRAT logbook, which remains the required record for certification purposes.",
   },
   fr: {
     title: "Mes heures enregistrées",
@@ -143,6 +145,7 @@ const translations = {
     hoursRequired: "Veuillez entrer les heures travaillées",
     dateRequired: "Veuillez entrer les dates de début et de fin",
     unknownProject: "Projet inconnu",
+    logbookDisclaimer: "Ce journal numérique est uniquement pour le suivi personnel. Il ne remplace pas votre carnet IRATA/SPRAT officiel, qui reste le document requis pour les fins de certification.",
   }
 };
 
@@ -382,6 +385,14 @@ export default function TechnicianLoggedHours() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+        {/* Important disclaimer notice */}
+        <div className="flex items-start gap-3 p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+          <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-amber-800 dark:text-amber-200">
+            {t.logbookDisclaimer}
+          </p>
+        </div>
+
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
