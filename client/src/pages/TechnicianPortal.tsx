@@ -122,6 +122,8 @@ const translations = {
     firstAidType: "Type",
     expiresOn: "Expires on",
     expired: "Expired",
+    expiringSoon: "Expiring Soon",
+    verified: "Verified",
     firstAidCertificate: "First Aid Certificate",
     uploadedDocuments: "Uploaded Documents",
     licensePhoto: "License Photo",
@@ -324,6 +326,8 @@ const translations = {
     firstAidType: "Type",
     expiresOn: "Expire le",
     expired: "Expiré",
+    expiringSoon: "Expire bientôt",
+    verified: "Vérifié",
     firstAidCertificate: "Certificat de premiers soins",
     uploadedDocuments: "Documents téléversés",
     licensePhoto: "Photo du permis",
@@ -1708,12 +1712,106 @@ export default function TechnicianPortal() {
                     <Award className="w-4 h-4" />
                     {t.certifications}
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-3">
                     {user.irataLevel && (
-                      <InfoItem label="IRATA" value={`${user.irataLevel} - ${user.irataLicenseNumber || 'N/A'}`} />
+                      <div className="p-3 bg-muted/50 rounded-lg border" data-testid="card-irata-certification">
+                        <div className="flex items-center justify-between gap-2 flex-wrap">
+                          <div className="flex items-center gap-2">
+                            <Award className="w-4 h-4 text-muted-foreground" />
+                            <span className="font-medium">IRATA</span>
+                            {user.irataVerifiedAt && (
+                              <Badge variant="default" className="bg-green-600 text-xs" data-testid="badge-irata-verified">
+                                <CheckCircle2 className="w-3 h-3 mr-1" />
+                                {t.verified}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                        <div className="mt-2 space-y-1 text-sm">
+                          <p data-testid="text-irata-level"><span className="text-muted-foreground">{t.level}:</span> {user.irataLevel}</p>
+                          <p data-testid="text-irata-license"><span className="text-muted-foreground">{t.licenseNumber}:</span> {user.irataLicenseNumber || 'N/A'}</p>
+                          <p data-testid="text-irata-expiry">
+                            <span className="text-muted-foreground">{t.expiresOn}:</span>{' '}
+                            {user.irataExpirationDate ? (
+                              (() => {
+                                try {
+                                  const expirationDate = parseLocalDate(user.irataExpirationDate);
+                                  const formattedDate = formatLocalDate(user.irataExpirationDate);
+                                  const today = new Date();
+                                  today.setHours(0, 0, 0, 0);
+                                  
+                                  let badge = null;
+                                  if (expirationDate < today) {
+                                    badge = <Badge variant="destructive" className="ml-2 text-xs" data-testid="badge-irata-expired">{t.expired}</Badge>;
+                                  } else {
+                                    const thirtyDaysFromNow = new Date();
+                                    thirtyDaysFromNow.setDate(today.getDate() + 30);
+                                    if (expirationDate <= thirtyDaysFromNow) {
+                                      badge = <Badge variant="outline" className="ml-2 bg-yellow-500/10 border-yellow-500 text-yellow-700 dark:text-yellow-400 text-xs" data-testid="badge-irata-expiring">{t.expiringSoon}</Badge>;
+                                    }
+                                  }
+                                  return <>{formattedDate}{badge}</>;
+                                } catch (e) {
+                                  console.error('Failed to parse IRATA expiration date:', e);
+                                  return <span className="text-muted-foreground italic">{t.notSet}</span>;
+                                }
+                              })()
+                            ) : (
+                              <span className="text-muted-foreground italic">{t.notSet}</span>
+                            )}
+                          </p>
+                        </div>
+                      </div>
                     )}
                     {user.spratLevel && (
-                      <InfoItem label="SPRAT" value={`${user.spratLevel} - ${user.spratLicenseNumber || 'N/A'}`} />
+                      <div className="p-3 bg-muted/50 rounded-lg border" data-testid="card-sprat-certification">
+                        <div className="flex items-center justify-between gap-2 flex-wrap">
+                          <div className="flex items-center gap-2">
+                            <Award className="w-4 h-4 text-muted-foreground" />
+                            <span className="font-medium">SPRAT</span>
+                            {user.spratVerifiedAt && (
+                              <Badge variant="default" className="bg-green-600 text-xs" data-testid="badge-sprat-verified">
+                                <CheckCircle2 className="w-3 h-3 mr-1" />
+                                {t.verified}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                        <div className="mt-2 space-y-1 text-sm">
+                          <p data-testid="text-sprat-level"><span className="text-muted-foreground">{t.level}:</span> {user.spratLevel}</p>
+                          <p data-testid="text-sprat-license"><span className="text-muted-foreground">{t.licenseNumber}:</span> {user.spratLicenseNumber || 'N/A'}</p>
+                          <p data-testid="text-sprat-expiry">
+                            <span className="text-muted-foreground">{t.expiresOn}:</span>{' '}
+                            {user.spratExpirationDate ? (
+                              (() => {
+                                try {
+                                  const expirationDate = parseLocalDate(user.spratExpirationDate);
+                                  const formattedDate = formatLocalDate(user.spratExpirationDate);
+                                  const today = new Date();
+                                  today.setHours(0, 0, 0, 0);
+                                  
+                                  let badge = null;
+                                  if (expirationDate < today) {
+                                    badge = <Badge variant="destructive" className="ml-2 text-xs" data-testid="badge-sprat-expired">{t.expired}</Badge>;
+                                  } else {
+                                    const thirtyDaysFromNow = new Date();
+                                    thirtyDaysFromNow.setDate(today.getDate() + 30);
+                                    if (expirationDate <= thirtyDaysFromNow) {
+                                      badge = <Badge variant="outline" className="ml-2 bg-yellow-500/10 border-yellow-500 text-yellow-700 dark:text-yellow-400 text-xs" data-testid="badge-sprat-expiring">{t.expiringSoon}</Badge>;
+                                    }
+                                  }
+                                  return <>{formattedDate}{badge}</>;
+                                } catch (e) {
+                                  console.error('Failed to parse SPRAT expiration date:', e);
+                                  return <span className="text-muted-foreground italic">{t.notSet}</span>;
+                                }
+                              })()
+                            ) : (
+                              <span className="text-muted-foreground italic">{t.notSet}</span>
+                            )}
+                          </p>
+                        </div>
+                      </div>
                     )}
                     {user.irataBaselineHours && parseFloat(user.irataBaselineHours) > 0 && (
                       <InfoItem label={t.baselineHours} value={`${user.irataBaselineHours} ${t.hours}`} icon={<Clock className="w-4 h-4" />} />

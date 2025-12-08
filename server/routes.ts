@@ -6025,7 +6025,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ==================== IRATA/SPRAT VERIFICATION ROUTES ====================
   
   // Verify IRATA/SPRAT license via screenshot analysis
-  const { analyzeIrataScreenshot, analyzeSpratScreenshot } = await import("./gemini");
+  const { analyzeIrataScreenshot, analyzeSpratScreenshot, normalizeExpiryDate } = await import("./gemini");
   
   const verificationUpload = multer({
     storage: multer.memoryStorage(),
@@ -6063,11 +6063,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // If verification was successful, update the user's verification status
       if (result.isValid && result.confidence !== "low") {
-        // Store verification result timestamp (pass Date object for timestamp column)
-        await storage.updateUser(user.id, {
+        // Build update object with verification data extracted by AI
+        const updateData: any = {
           irataVerifiedAt: new Date(),
           irataVerificationStatus: result.status || "Verified",
-        });
+        };
+        
+        // Save extracted expiry date if available (normalized to ISO format)
+        // Always set to clear any prior invalid data
+        if (result.expiryDate) {
+          const normalizedDate = normalizeExpiryDate(result.expiryDate);
+          if (normalizedDate) {
+            updateData.irataExpirationDate = normalizedDate;
+            console.log(`[IRATA-Verify] Extracted expiry date: ${result.expiryDate} -> normalized to: ${normalizedDate}`);
+          } else {
+            // Normalization failed - clear any prior invalid value
+            updateData.irataExpirationDate = null;
+            console.log(`[IRATA-Verify] Could not normalize expiry date: ${result.expiryDate} - clearing field`);
+          }
+        }
+        
+        // Save extracted level if available and different from current
+        if (result.irataLevel) {
+          updateData.irataLevel = `Level ${result.irataLevel}`;
+          console.log(`[IRATA-Verify] Extracted level: Level ${result.irataLevel}`);
+        }
+        
+        // Save extracted license number if available
+        if (result.irataNumber) {
+          updateData.irataLicenseNumber = result.irataNumber;
+          console.log(`[IRATA-Verify] Extracted license number: ${result.irataNumber}`);
+        }
+        
+        await storage.updateUser(user.id, updateData);
         
         console.log(`[IRATA-Verify] User ${user.id} IRATA license verified successfully`);
       }
@@ -6110,11 +6138,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // If verification was successful, update the user's verification status
       if (result.isValid && result.confidence !== "low") {
-        // Store verification result timestamp (pass Date object for timestamp column)
-        await storage.updateUser(user.id, {
+        // Build update object with verification data extracted by AI
+        const updateData: any = {
           spratVerifiedAt: new Date(),
           spratVerificationStatus: result.status || "Verified",
-        });
+        };
+        
+        // Save extracted expiry date if available (normalized to ISO format)
+        // Always set to clear any prior invalid data
+        if (result.expiryDate) {
+          const normalizedDate = normalizeExpiryDate(result.expiryDate);
+          if (normalizedDate) {
+            updateData.spratExpirationDate = normalizedDate;
+            console.log(`[SPRAT-Verify] Extracted expiry date: ${result.expiryDate} -> normalized to: ${normalizedDate}`);
+          } else {
+            // Normalization failed - clear any prior invalid value
+            updateData.spratExpirationDate = null;
+            console.log(`[SPRAT-Verify] Could not normalize expiry date: ${result.expiryDate} - clearing field`);
+          }
+        }
+        
+        // Save extracted level if available
+        if (result.spratLevel) {
+          updateData.spratLevel = `Level ${result.spratLevel}`;
+          console.log(`[SPRAT-Verify] Extracted level: Level ${result.spratLevel}`);
+        }
+        
+        // Save extracted certification number if available
+        if (result.spratNumber) {
+          updateData.spratLicenseNumber = result.spratNumber;
+          console.log(`[SPRAT-Verify] Extracted certification number: ${result.spratNumber}`);
+        }
+        
+        await storage.updateUser(user.id, updateData);
         
         console.log(`[SPRAT-Verify] User ${user.id} SPRAT license verified successfully`);
       }
