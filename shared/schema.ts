@@ -2371,6 +2371,12 @@ export const jobPostings = pgTable("job_postings", {
   requiredIrataLevel: varchar("required_irata_level"), // Level 1 | Level 2 | Level 3
   requiredSpratLevel: varchar("required_sprat_level"), // Level 1 | Level 2 | Level 3
   
+  // Additional job details
+  startDate: timestamp("start_date"), // Expected job start date
+  benefits: text("benefits"), // Benefits offered (health insurance, vacation, etc.)
+  workDays: varchar("work_days"), // e.g., "Monday to Friday", "Rotating shifts"
+  experienceRequired: varchar("experience_required"), // e.g., "1-2 years", "3-5 years", "5+ years"
+  
   // Status and visibility
   status: varchar("status").notNull().default("active"), // draft | active | paused | closed | expired
   

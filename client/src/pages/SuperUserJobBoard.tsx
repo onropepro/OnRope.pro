@@ -31,6 +31,10 @@ type JobPosting = {
   salaryPeriod: string | null;
   requiredIrataLevel: string | null;
   requiredSpratLevel: string | null;
+  startDate: string | null;
+  benefits: string | null;
+  workDays: string | null;
+  experienceRequired: string | null;
   status: string;
   createdAt: string;
   updatedAt: string;
@@ -66,6 +70,24 @@ const CERT_LEVELS = [
   { value: "Level 3", label: "Level 3" },
 ];
 
+const WORK_DAYS_OPTIONS = [
+  { value: "monday_friday", label: "Monday to Friday" },
+  { value: "monday_saturday", label: "Monday to Saturday" },
+  { value: "flexible", label: "Flexible Schedule" },
+  { value: "rotating", label: "Rotating Shifts" },
+  { value: "weekends", label: "Weekends Only" },
+  { value: "on_call", label: "On Call" },
+];
+
+const EXPERIENCE_OPTIONS = [
+  { value: "", label: "Not Specified" },
+  { value: "entry", label: "Entry Level (0-1 years)" },
+  { value: "junior", label: "1-2 years" },
+  { value: "mid", label: "3-5 years" },
+  { value: "senior", label: "5+ years" },
+  { value: "expert", label: "10+ years" },
+];
+
 export default function SuperUserJobBoard() {
   const { toast } = useToast();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -86,6 +108,10 @@ export default function SuperUserJobBoard() {
     salaryPeriod: "hourly",
     requiredIrataLevel: "",
     requiredSpratLevel: "",
+    startDate: "",
+    benefits: "",
+    workDays: "",
+    experienceRequired: "",
     expiresAt: "",
   });
 
@@ -158,6 +184,10 @@ export default function SuperUserJobBoard() {
       salaryPeriod: "hourly",
       requiredIrataLevel: "",
       requiredSpratLevel: "",
+      startDate: "",
+      benefits: "",
+      workDays: "",
+      experienceRequired: "",
       expiresAt: "",
     });
   };
@@ -180,6 +210,10 @@ export default function SuperUserJobBoard() {
       salaryPeriod: formData.salaryPeriod || null,
       requiredIrataLevel: formData.requiredIrataLevel || null,
       requiredSpratLevel: formData.requiredSpratLevel || null,
+      startDate: formData.startDate ? new Date(formData.startDate) : null,
+      benefits: formData.benefits || null,
+      workDays: formData.workDays || null,
+      experienceRequired: formData.experienceRequired || null,
       expiresAt: formData.expiresAt ? new Date(formData.expiresAt) : null,
     });
   };
@@ -204,6 +238,10 @@ export default function SuperUserJobBoard() {
         salaryPeriod: formData.salaryPeriod || null,
         requiredIrataLevel: formData.requiredIrataLevel || null,
         requiredSpratLevel: formData.requiredSpratLevel || null,
+        startDate: formData.startDate ? new Date(formData.startDate) : null,
+        benefits: formData.benefits || null,
+        workDays: formData.workDays || null,
+        experienceRequired: formData.experienceRequired || null,
         expiresAt: formData.expiresAt ? new Date(formData.expiresAt) : null,
       },
     });
@@ -228,6 +266,10 @@ export default function SuperUserJobBoard() {
       salaryPeriod: job.salaryPeriod || "hourly",
       requiredIrataLevel: job.requiredIrataLevel || "",
       requiredSpratLevel: job.requiredSpratLevel || "",
+      startDate: job.startDate ? job.startDate.split("T")[0] : "",
+      benefits: job.benefits || "",
+      workDays: job.workDays || "",
+      experienceRequired: job.experienceRequired || "",
       expiresAt: job.expiresAt ? job.expiresAt.split("T")[0] : "",
     });
     setEditingJob(job);
@@ -551,14 +593,67 @@ export default function SuperUserJobBoard() {
               </div>
             </div>
 
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="startDate">Job Start Date</Label>
+                <Input
+                  id="startDate"
+                  type="date"
+                  value={formData.startDate}
+                  onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                  data-testid="input-start-date"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="expiresAt">Posting Expiration Date</Label>
+                <Input
+                  id="expiresAt"
+                  type="date"
+                  value={formData.expiresAt}
+                  onChange={(e) => setFormData({ ...formData, expiresAt: e.target.value })}
+                  data-testid="input-expires-at"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="workDays">Work Days</Label>
+                <Select value={formData.workDays} onValueChange={(v) => setFormData({ ...formData, workDays: v })}>
+                  <SelectTrigger data-testid="select-work-days">
+                    <SelectValue placeholder="Select schedule" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {WORK_DAYS_OPTIONS.map((t) => (
+                      <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="experienceRequired">Experience Required</Label>
+                <Select value={formData.experienceRequired} onValueChange={(v) => setFormData({ ...formData, experienceRequired: v })}>
+                  <SelectTrigger data-testid="select-experience">
+                    <SelectValue placeholder="Select experience level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {EXPERIENCE_OPTIONS.map((t) => (
+                      <SelectItem key={t.value || "none"} value={t.value || "none"}>{t.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
             <div className="space-y-2">
-              <Label htmlFor="expiresAt">Expiration Date (optional)</Label>
-              <Input
-                id="expiresAt"
-                type="date"
-                value={formData.expiresAt}
-                onChange={(e) => setFormData({ ...formData, expiresAt: e.target.value })}
-                data-testid="input-expires-at"
+              <Label htmlFor="benefits">Benefits Offered</Label>
+              <Textarea
+                id="benefits"
+                value={formData.benefits}
+                onChange={(e) => setFormData({ ...formData, benefits: e.target.value })}
+                placeholder="Health insurance, dental, vision, 401k, PTO, etc."
+                rows={3}
+                data-testid="textarea-benefits"
               />
             </div>
           </div>

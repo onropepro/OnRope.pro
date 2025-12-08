@@ -15651,10 +15651,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const isPlatformPost = currentUser.role === "superuser";
       
-      // Convert expiresAt string to Date if provided
+      // Convert date strings to Date objects if provided
       const bodyWithParsedDates = {
         ...req.body,
         expiresAt: req.body.expiresAt ? new Date(req.body.expiresAt) : null,
+        startDate: req.body.startDate ? new Date(req.body.startDate) : null,
       };
       
       const jobData = insertJobPostingSchema.parse({
@@ -15712,6 +15713,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         requiredSpratLevel: req.body.requiredSpratLevel,
         status: req.body.status,
         expiresAt: req.body.expiresAt ? new Date(req.body.expiresAt) : req.body.expiresAt,
+        startDate: req.body.startDate ? new Date(req.body.startDate) : req.body.startDate,
+        benefits: req.body.benefits,
+        workDays: req.body.workDays,
+        experienceRequired: req.body.experienceRequired,
         updatedAt: new Date(),
       };
 
