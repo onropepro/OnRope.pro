@@ -7248,15 +7248,27 @@ export default function Dashboard() {
                   {employeeToView.irataLevel && (
                     <Card>
                       <CardHeader>
-                        <CardTitle className="text-base flex items-center gap-2">
-                          <span className="material-icons text-lg">workspace_premium</span>
-                          {t('dashboard.employeeDetails.irataCertification', 'IRATA Certification')}
+                        <CardTitle className="text-base flex items-center gap-2 justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="material-icons text-lg">workspace_premium</span>
+                            {t('dashboard.employeeDetails.irataCertification', 'IRATA Certification')}
+                          </div>
+                          {employeeToView.irataVerifiedAt ? (
+                            <Badge variant="default" className="bg-green-600">
+                              <span className="material-icons text-xs mr-1">verified</span>
+                              {t('dashboard.employeeDetails.verified', 'Verified')}
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="text-muted-foreground">
+                              {t('dashboard.employeeDetails.notVerified', 'Not Verified')}
+                            </Badge>
+                          )}
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-3">
                         <div>
                           <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.level', 'Level')}</div>
-                          <div className="text-sm font-medium">{t('dashboard.employeeDetails.levelValue', 'Level')} {employeeToView.irataLevel}</div>
+                          <div className="text-sm font-medium">{employeeToView.irataLevel}</div>
                         </div>
                         {employeeToView.irataLicenseNumber && (
                           <div>
@@ -7264,9 +7276,9 @@ export default function Dashboard() {
                             <div className="text-sm font-medium">{employeeToView.irataLicenseNumber}</div>
                           </div>
                         )}
-                        {employeeToView.irataExpirationDate && (
-                          <div>
-                            <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.expirationDate', 'Expiration Date')}</div>
+                        <div>
+                          <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.expirationDate', 'Expiration Date')}</div>
+                          {employeeToView.irataExpirationDate ? (
                             <div className="text-sm font-medium">
                               {formatLocalDate(employeeToView.irataExpirationDate)}
                               {(() => {
@@ -7284,6 +7296,14 @@ export default function Dashboard() {
                                 return null;
                               })()}
                             </div>
+                          ) : (
+                            <div className="text-sm text-muted-foreground italic">{t('dashboard.employeeDetails.notSet', 'Not set')}</div>
+                          )}
+                        </div>
+                        {employeeToView.irataVerifiedAt && (
+                          <div>
+                            <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.verifiedOn', 'Verified On')}</div>
+                            <div className="text-sm font-medium">{formatLocalDate(employeeToView.irataVerifiedAt)}</div>
                           </div>
                         )}
                         {employeeToView.irataDocuments && employeeToView.irataDocuments.length > 0 && (
@@ -7313,15 +7333,27 @@ export default function Dashboard() {
                   {employeeToView.spratLevel && (
                     <Card>
                       <CardHeader>
-                        <CardTitle className="text-base flex items-center gap-2">
-                          <span className="material-icons text-lg">verified</span>
-                          {t('dashboard.employeeDetails.spratCertification', 'SPRAT Certification')}
+                        <CardTitle className="text-base flex items-center gap-2 justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="material-icons text-lg">verified</span>
+                            {t('dashboard.employeeDetails.spratCertification', 'SPRAT Certification')}
+                          </div>
+                          {employeeToView.spratVerifiedAt ? (
+                            <Badge variant="default" className="bg-green-600">
+                              <span className="material-icons text-xs mr-1">verified</span>
+                              {t('dashboard.employeeDetails.verified', 'Verified')}
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="text-muted-foreground">
+                              {t('dashboard.employeeDetails.notVerified', 'Not Verified')}
+                            </Badge>
+                          )}
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-3">
                         <div>
                           <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.level', 'Level')}</div>
-                          <div className="text-sm font-medium">{t('dashboard.employeeDetails.levelValue', 'Level')} {employeeToView.spratLevel}</div>
+                          <div className="text-sm font-medium">{employeeToView.spratLevel}</div>
                         </div>
                         {employeeToView.spratLicenseNumber && (
                           <div>
@@ -7329,9 +7361,9 @@ export default function Dashboard() {
                             <div className="text-sm font-medium">{employeeToView.spratLicenseNumber}</div>
                           </div>
                         )}
-                        {employeeToView.spratExpirationDate && (
-                          <div>
-                            <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.expirationDate', 'Expiration Date')}</div>
+                        <div>
+                          <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.expirationDate', 'Expiration Date')}</div>
+                          {employeeToView.spratExpirationDate ? (
                             <div className="text-sm font-medium">
                               {formatLocalDate(employeeToView.spratExpirationDate)}
                               {(() => {
@@ -7349,6 +7381,14 @@ export default function Dashboard() {
                                 return null;
                               })()}
                             </div>
+                          ) : (
+                            <div className="text-sm text-muted-foreground italic">{t('dashboard.employeeDetails.notSet', 'Not set')}</div>
+                          )}
+                        </div>
+                        {employeeToView.spratVerifiedAt && (
+                          <div>
+                            <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.verifiedOn', 'Verified On')}</div>
+                            <div className="text-sm font-medium">{formatLocalDate(employeeToView.spratVerifiedAt)}</div>
                           </div>
                         )}
                         {employeeToView.spratDocuments && employeeToView.spratDocuments.length > 0 && (
