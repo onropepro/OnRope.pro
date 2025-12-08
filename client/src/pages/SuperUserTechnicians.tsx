@@ -107,17 +107,35 @@ export default function SuperUserTechnicians() {
   const [selectedTechnician, setSelectedTechnician] = useState<string | null>(null);
   const pageSize = 25;
 
+  // Build the URL with query parameters
+  const buildTechniciansUrl = () => {
+    const params = new URLSearchParams();
+    params.set("page", currentPage.toString());
+    params.set("pageSize", pageSize.toString());
+    if (searchQuery) params.set("search", searchQuery);
+    if (linkedFilter === "linked") params.set("linkedOnly", "true");
+    if (linkedFilter === "unlinked") params.set("linkedOnly", "false");
+    return `/api/superuser/technicians?${params.toString()}`;
+  };
+
+  const techniciansUrl = buildTechniciansUrl();
+
   const { data: techniciansData, isLoading } = useQuery<TechniciansResponse>({
-    queryKey: ["/api/superuser/technicians", { 
-      page: currentPage, 
-      pageSize, 
-      search: searchQuery || undefined,
-      linkedOnly: linkedFilter === "linked" ? "true" : linkedFilter === "unlinked" ? "false" : undefined
-    }],
+    queryKey: ["/api/superuser/technicians", currentPage, pageSize, searchQuery, linkedFilter],
+    queryFn: async () => {
+      const res = await fetch(techniciansUrl, { credentials: "include" });
+      if (!res.ok) throw new Error(`${res.status}: ${await res.text()}`);
+      return res.json();
+    },
   });
 
   const { data: technicianDetailData, isLoading: isLoadingDetail } = useQuery<TechnicianDetailResponse>({
-    queryKey: ["/api/superuser/technicians", selectedTechnician],
+    queryKey: ["/api/superuser/technicians", "detail", selectedTechnician],
+    queryFn: async () => {
+      const res = await fetch(`/api/superuser/technicians/${selectedTechnician}`, { credentials: "include" });
+      if (!res.ok) throw new Error(`${res.status}: ${await res.text()}`);
+      return res.json();
+    },
     enabled: !!selectedTechnician,
   });
 
