@@ -178,6 +178,12 @@ const translations = {
     errorEmergencyPhone: "Please enter emergency contact phone",
     errorEmergencyRelationship: "Please enter your relationship to the contact",
     errorBirthday: "Please enter your birthday",
+    referralCodeTitle: "Have a Referral Code?",
+    referralCodeSubtitle: "If someone referred you to OnRopePro, enter their code below",
+    referralCodePlaceholder: "Enter referral code",
+    referralCodeOptional: "This is optional - skip if you don't have one",
+    referralCodeSkip: "Skip - No referral code",
+    referralCodeInvalid: "Invalid referral code. Please check and try again.",
   },
   fr: {
     welcomeTitle: "Bienvenue à l'inscription des techniciens",
@@ -341,6 +347,12 @@ const translations = {
     errorEmergencyPhone: "Veuillez entrer le téléphone du contact d'urgence",
     errorEmergencyRelationship: "Veuillez entrer votre relation avec le contact",
     errorBirthday: "Veuillez entrer votre date de naissance",
+    referralCodeTitle: "Avez-vous un code de parrainage?",
+    referralCodeSubtitle: "Si quelqu'un vous a recommandé OnRopePro, entrez son code ci-dessous",
+    referralCodePlaceholder: "Entrez le code de parrainage",
+    referralCodeOptional: "C'est facultatif - passez si vous n'en avez pas",
+    referralCodeSkip: "Passer - Pas de code de parrainage",
+    referralCodeInvalid: "Code de parrainage invalide. Veuillez vérifier et réessayer.",
   }
 };
 
@@ -475,6 +487,7 @@ type CertificationType = "irata" | "sprat" | "both" | "none" | null;
 
 type RegistrationStep = 
   | "welcome"
+  | "referralCode"
   | "firstName"
   | "lastName"
   | "certification"
@@ -495,6 +508,7 @@ type RegistrationStep =
   | "complete";
 
 interface TechnicianData {
+  referralCodeInput: string;
   firstName: string;
   lastName: string;
   certification: CertificationType;
@@ -544,6 +558,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
   const [, setLocation] = useLocation();
   const [step, setStep] = useState<RegistrationStep>("welcome");
   const [data, setData] = useState<TechnicianData>({
+    referralCodeInput: "",
     firstName: "",
     lastName: "",
     certification: null,
@@ -599,8 +614,9 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
   };
 
   const resetForm = () => {
-    setStep("firstName");
+    setStep("welcome");
     setData({
+      referralCodeInput: "",
       firstName: "",
       lastName: "",
       certification: null,
@@ -649,6 +665,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
 
   const stepOrder: RegistrationStep[] = [
     "welcome",
+    "referralCode",
     "firstName",
     "lastName", 
     "certification",
@@ -841,6 +858,11 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
   const registrationMutation = useMutation({
     mutationFn: async () => {
       const formData = new FormData();
+      
+      // Include referral code if provided
+      if (data.referralCodeInput) {
+        formData.append('referralCodeInput', data.referralCodeInput);
+      }
       
       formData.append('firstName', data.firstName);
       formData.append('lastName', data.lastName);
@@ -1038,6 +1060,72 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 data-testid="button-cancel-registration"
               >
                 {t.cancel}
+              </Button>
+            </DialogFooter>
+          </>
+        );
+
+      case "referralCode":
+        return (
+          <>
+            <DialogHeader>
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-9" />
+                <div className="p-3 rounded-full bg-primary/10">
+                  <Award className="w-8 h-8 text-primary" />
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleLanguage}
+                  data-testid="button-toggle-language-registration"
+                  title={language === 'en' ? 'Passer au français' : 'Switch to English'}
+                >
+                  <Languages className="w-5 h-5" />
+                </Button>
+              </div>
+              <DialogTitle className="text-center text-xl">{t.referralCodeTitle}</DialogTitle>
+              <DialogDescription className="text-center">
+                {t.referralCodeSubtitle}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-6 space-y-4">
+              <div>
+                <Label htmlFor="referralCode" className="sr-only">{t.referralCodeTitle}</Label>
+                <Input
+                  id="referralCode"
+                  data-testid="input-technician-referral-code"
+                  placeholder={t.referralCodePlaceholder}
+                  value={data.referralCodeInput}
+                  onChange={(e) => setData({ ...data, referralCodeInput: e.target.value.toUpperCase() })}
+                  onKeyDown={(e) => e.key === "Enter" && handleContinue()}
+                  autoFocus
+                  className="text-center text-lg h-12 uppercase tracking-widest font-mono"
+                  maxLength={10}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground text-center">{t.referralCodeOptional}</p>
+              {error && <p className="text-destructive text-sm text-center">{error}</p>}
+            </div>
+            <DialogFooter className="flex-col gap-2 sm:flex-col">
+              <Button 
+                onClick={handleContinue} 
+                className="w-full"
+                data-testid="button-continue-referral-code"
+              >
+                {t.continue}
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+              <Button 
+                variant="ghost" 
+                onClick={() => {
+                  setData({ ...data, referralCodeInput: "" });
+                  setStep(getNextStep("referralCode"));
+                }}
+                className="w-full"
+                data-testid="button-skip-referral-code"
+              >
+                {t.referralCodeSkip}
               </Button>
             </DialogFooter>
           </>

@@ -172,6 +172,11 @@ export const users = pgTable("users", {
   // Property Manager linking code (company role only)
   propertyManagerCode: varchar("property_manager_code", { length: 10 }).unique(), // 10-character code for property managers to link to company - UNIQUE
   
+  // Technician referral system (rope_access_tech role)
+  referralCode: varchar("referral_code", { length: 20 }).unique(), // Unique 10-char referral code for this technician (generated on registration)
+  referredByUserId: varchar("referred_by_user_id").references(() => users.id, { onDelete: "set null" }), // User ID of the technician who referred them
+  referredByCode: varchar("referred_by_code", { length: 20 }), // The referral code they used to register (for tracking purposes)
+  
   // White label branding (company role only)
   brandingLogoUrl: text("branding_logo_url"), // Custom logo URL for resident portal
   brandingColors: text("branding_colors").array().default(sql`ARRAY[]::text[]`), // Array of brand colors (hex codes)

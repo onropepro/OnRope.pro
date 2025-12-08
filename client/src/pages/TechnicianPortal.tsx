@@ -53,7 +53,10 @@ import {
   UserMinus,
   DollarSign,
   ArrowRight,
-  Briefcase
+  Briefcase,
+  Copy,
+  Share2,
+  Users
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
@@ -270,6 +273,13 @@ const translations = {
     deleteConfirm: "Delete",
     cancelDelete: "Cancel",
     logbookDisclaimer: "This is a personal tracking tool only. You must still record all hours in your official IRATA/SPRAT logbook - this digital log does not replace it.",
+    yourReferralCode: "Your Referral Code",
+    shareReferralCode: "Share this code with fellow technicians to invite them to OnRopePro",
+    copyCode: "Copy Code",
+    codeCopied: "Copied!",
+    referredTimes: "Referred {count} technician(s)",
+    noReferralCodeYet: "No referral code yet",
+    referralCodeGenerating: "Your referral code will be generated when you complete registration",
   },
   fr: {
     technicianPortal: "Portail du technicien",
@@ -481,6 +491,13 @@ const translations = {
     deleteConfirm: "Supprimer",
     cancelDelete: "Annuler",
     logbookDisclaimer: "Ceci est un outil de suivi personnel uniquement. Vous devez toujours enregistrer toutes vos heures dans votre carnet IRATA/SPRAT officiel - ce journal numérique ne le remplace pas.",
+    yourReferralCode: "Votre code de parrainage",
+    shareReferralCode: "Partagez ce code avec d'autres techniciens pour les inviter sur OnRopePro",
+    copyCode: "Copier le code",
+    codeCopied: "Copié!",
+    referredTimes: "Parrainé {count} technicien(s)",
+    noReferralCodeYet: "Pas encore de code de parrainage",
+    referralCodeGenerating: "Votre code de parrainage sera généré lorsque vous terminerez l'inscription",
   }
 };
 
@@ -643,6 +660,28 @@ export default function TechnicianPortal() {
     queryKey: ["/api/my-irata-task-logs"],
     enabled: !!user && user.role === 'rope_access_tech',
   });
+  
+  // Fetch referral count for the technician
+  const { data: referralCountData } = useQuery<{ count: number }>({
+    queryKey: ["/api/my-referral-count"],
+    enabled: !!user && user.role === 'rope_access_tech',
+  });
+  
+  // State for copy button
+  const [codeCopied, setCodeCopied] = useState(false);
+  
+  // Handle copy referral code
+  const handleCopyReferralCode = () => {
+    if (user?.referralCode) {
+      navigator.clipboard.writeText(user.referralCode);
+      setCodeCopied(true);
+      toast({
+        title: t.codeCopied,
+        description: user.referralCode,
+      });
+      setTimeout(() => setCodeCopied(false), 2000);
+    }
+  };
   
   // Calculate work session hours from task logs
   const workSessionHours = useMemo(() => {
@@ -1218,6 +1257,71 @@ export default function TechnicianPortal() {
                   ))}
                 </div>
               )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Your Referral Code Section - Show for all technicians */}
+        {user && user.role === 'rope_access_tech' && (
+          <Card className="border-2 border-primary/30 bg-primary/5">
+            <CardHeader className="pb-2">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <Share2 className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">{t.yourReferralCode}</CardTitle>
+                    <CardDescription>
+                      {t.shareReferralCode}
+                    </CardDescription>
+                  </div>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                {user.referralCode ? (
+                  <>
+                    <div className="flex items-center gap-3 bg-background border-2 border-primary/40 rounded-lg px-4 py-3">
+                      <span className="text-xl sm:text-2xl font-mono font-bold tracking-wider text-primary" data-testid="text-referral-code">
+                        {user.referralCode}
+                      </span>
+                      <Button
+                        variant={codeCopied ? "default" : "outline"}
+                        size="sm"
+                        onClick={handleCopyReferralCode}
+                        className="gap-2"
+                        data-testid="button-copy-referral-code"
+                      >
+                        {codeCopied ? (
+                          <>
+                            <CheckCircle2 className="w-4 h-4" />
+                            {t.codeCopied}
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-4 h-4" />
+                            {t.copyCode}
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                    {(referralCountData?.count ?? 0) > 0 && (
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Users className="w-4 h-4 text-primary" />
+                        <span data-testid="text-referral-count">
+                          {t.referredTimes.replace('{count}', String(referralCountData?.count ?? 0))}
+                        </span>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-muted-foreground text-sm">
+                    {t.referralCodeGenerating}
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
         )}

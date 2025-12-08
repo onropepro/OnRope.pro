@@ -29,6 +29,16 @@ export class Storage {
     return result[0] ? decryptSensitiveFields(result[0]) : undefined;
   }
 
+  async getUserByReferralCode(referralCode: string): Promise<User | undefined> {
+    const result = await db.select().from(users).where(eq(users.referralCode, referralCode)).limit(1);
+    return result[0] ? decryptSensitiveFields(result[0]) : undefined;
+  }
+
+  async getReferralCount(userId: string): Promise<number> {
+    const result = await db.select().from(users).where(eq(users.referredByUserId, userId));
+    return result.length;
+  }
+
   async getUserByLicenseKey(licenseKey: string): Promise<User | undefined> {
     const result = await db.select().from(users).where(eq(users.licenseKey, licenseKey)).limit(1);
     return result[0] ? decryptSensitiveFields(result[0]) : undefined;

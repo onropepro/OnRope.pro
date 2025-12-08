@@ -405,6 +405,33 @@ async function generatePropertyManagerCode(): Promise<string> {
   throw new Error('Unable to generate unique property manager code. Please try again.');
 }
 
+// Generate unique 10-character referral code for technicians using cryptographically secure randomness
+async function generateReferralCode(): Promise<string> {
+  const crypto = await import('crypto');
+  const characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Excluding confusing characters like 0, O, 1, I
+  const codeLength = 10;
+  const maxAttempts = 10; // Prevent infinite loops in case of database issues
+  
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    // Generate 10-character code using crypto.randomBytes for security
+    const randomBytes = crypto.randomBytes(codeLength);
+    let code = '';
+    
+    for (let i = 0; i < codeLength; i++) {
+      const randomIndex = randomBytes[i] % characters.length;
+      code += characters.charAt(randomIndex);
+    }
+    
+    // Check if code already exists
+    const existing = await storage.getUserByReferralCode(code);
+    if (!existing) {
+      return code;
+    }
+  }
+  
+  throw new Error('Failed to generate unique referral code after maximum attempts');
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // ==================== ADDRESS AUTOCOMPLETE ====================
   
@@ -876,9 +903,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         firstAidType,
         firstAidExpiry,
         companyCode, // Optional - code to link to a specific company
+        referralCodeInput, // Optional - referral code from another technician
       } = req.body;
 
-      console.log('[Technician-Register] Received registration:', { firstName, lastName, email, certification });
+      console.log('[Technician-Register] Received registration:', { firstName, lastName, email, certification, referralCodeInput });
 
       // Validate required fields
       if (!firstName || !lastName) {
@@ -926,6 +954,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (existingUser) {
         return res.status(400).json({ message: "An account with this email already exists. Please log in instead." });
       }
+
+      // Validate referral code if provided and get referrer info
+      let referredByUserId: string | null = null;
+      let referredByCode: string | null = null;
+      
+      if (referralCodeInput && referralCodeInput.trim()) {
+        const referrer = await storage.getUserByReferralCode(referralCodeInput.trim().toUpperCase());
+        if (!referrer) {
+          return res.status(400).json({ message: "Invalid referral code. Please check and try again." });
+        }
+        // Verify the referrer is an active technician
+        if (referrer.role !== 'rope_access_tech') {
+          return res.status(400).json({ message: "Invalid referral code. Please check and try again." });
+        }
+        referredByUserId = referrer.id;
+        referredByCode = referralCodeInput.trim().toUpperCase();
+        console.log(`[Technician-Register] Valid referral code from ${referrer.name} (${referrer.id})`);
+      }
+
+      // Generate unique referral code for the new technician
+      const newReferralCode = await generateReferralCode();
+      console.log(`[Technician-Register] Generated referral code: ${newReferralCode}`);
 
       // Handle file uploads
       const files = req.files as { [fieldname: string]: Express.Multer.File[] };
@@ -1054,6 +1104,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Start date - use timezone-safe utility
         startDate: getTodayString(),
+        
+        // Referral tracking
+        referralCode: newReferralCode,
+        referredByUserId: referredByUserId,
+        referredByCode: referredByCode,
       });
 
       console.log('[Technician-Register] User created:', user.id);
@@ -4089,6 +4144,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         companiesObject[key] = value;
       });
 
+      // Get referral counts for all technicians in this batch
+      const referralCounts = new Map<string, number>();
+      for (const tech of result.technicians) {
+        const count = await storage.getReferralCount(tech.id);
+        referralCounts.set(tech.id, count);
+      }
+
       // Format technicians for response (exclude sensitive fields)
       const technicians = result.technicians.map(tech => ({
         id: tech.id,
@@ -4112,6 +4174,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         employeeCity: tech.employeeCity,
         employeeProvinceState: tech.employeeProvinceState,
         employeeCountry: tech.employeeCountry,
+        referralCode: tech.referralCode,
+        referralCount: referralCounts.get(tech.id) || 0,
       }));
 
       res.json({ 
@@ -5516,6 +5580,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get the count of technicians referred by the logged-in user
+  app.get("/api/my-referral-count", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (user.role !== 'rope_access_tech') {
+        return res.status(403).json({ message: "Only technicians can view referral count" });
+      }
+      
+      const count = await storage.getReferralCount(user.id);
+      return res.json({ count });
+    } catch (error) {
+      console.error('[Referral] Error getting referral count:', error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Get pending invitations for the logged-in technician
   app.get("/api/my-invitations", requireAuth, async (req: Request, res: Response) => {
     try {
