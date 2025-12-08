@@ -2696,7 +2696,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Document type is required" });
       }
 
-      const validTypes = ['voidCheque', 'driversLicense', 'driversAbstract', 'firstAidCertificate', 'certificationCard'];
+      const validTypes = ['voidCheque', 'driversLicense', 'driversAbstract', 'firstAidCertificate', 'certificationCard', 'irataCertificationCard', 'spratCertificationCard'];
       if (!validTypes.includes(documentType)) {
         return res.status(400).json({ message: `Invalid document type. Must be one of: ${validTypes.join(', ')}` });
       }
@@ -2723,9 +2723,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else if (documentType === 'firstAidCertificate') {
         const existingDocs = user.firstAidDocuments || [];
         updateData.firstAidDocuments = [...existingDocs, url];
-      } else if (documentType === 'certificationCard') {
+      } else if (documentType === 'certificationCard' || documentType === 'irataCertificationCard') {
         const existingDocs = user.irataDocuments || [];
         updateData.irataDocuments = [...existingDocs, url];
+      } else if (documentType === 'spratCertificationCard') {
+        const existingDocs = user.spratDocuments || [];
+        updateData.spratDocuments = [...existingDocs, url];
       }
 
       await storage.updateUser(userId, updateData);
