@@ -927,23 +927,33 @@ export default function TechnicianLoggedHours() {
     buildingName: string; 
     buildingAddress: string; 
     buildingHeight: string;
+    companyName: string;
     logs: IrataTaskLog[];
     totalHours: number;
+    allTasks: string[];
   }> = {};
   
-  logs.forEach((log: IrataTaskLog) => {
-    const projectKey = log.buildingName || t.unknownProject;
+  logs.forEach((log: any) => {
+    const projectKey = log.projectId || log.buildingName || t.unknownProject;
     if (!groupedByProject[projectKey]) {
       groupedByProject[projectKey] = {
         buildingName: log.buildingName || t.unknownProject,
         buildingAddress: log.buildingAddress || "",
         buildingHeight: log.buildingHeight || "",
+        companyName: log.companyName || "",
         logs: [],
         totalHours: 0,
+        allTasks: [],
       };
     }
     groupedByProject[projectKey].logs.push(log);
     groupedByProject[projectKey].totalHours += parseFloat(log.hoursWorked || "0");
+    // Collect unique tasks across all sessions
+    (log.tasksPerformed || []).forEach((taskId: string) => {
+      if (!groupedByProject[projectKey].allTasks.includes(taskId)) {
+        groupedByProject[projectKey].allTasks.push(taskId);
+      }
+    });
   });
 
   Object.values(groupedByProject).forEach((project) => {
@@ -1086,25 +1096,47 @@ export default function TechnicianLoggedHours() {
                     className="border rounded-lg px-4"
                   >
                     <AccordionTrigger className="py-4">
-                      <div className="flex items-center justify-between w-full pr-4">
-                        <div className="flex items-center gap-3">
-                          <Building className="w-5 h-5 text-muted-foreground" />
-                          <div className="text-left">
-                            <p className="font-medium">{project.buildingName}</p>
-                            {project.buildingAddress && (
-                              <p className="text-sm text-muted-foreground">{project.buildingAddress}</p>
-                            )}
-                            {project.buildingHeight && (
-                              <p className="text-sm text-muted-foreground">{t.buildingHeight}: {project.buildingHeight}</p>
-                            )}
+                      <div className="flex flex-col w-full pr-4 gap-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <Building className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                            <div className="text-left">
+                              <p className="font-medium">{project.buildingName}</p>
+                              {project.buildingAddress && (
+                                <p className="text-sm text-muted-foreground">{project.buildingAddress}</p>
+                              )}
+                              <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
+                                {project.buildingHeight && (
+                                  <span>{project.buildingHeight}</span>
+                                )}
+                                {project.companyName && (
+                                  <span>{t.employer}: {project.companyName}</span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-right flex-shrink-0">
+                            <p className="font-semibold">{project.totalHours.toFixed(1)} {t.hr}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {project.logs.length} {project.logs.length === 1 ? t.session : t.sessions}
+                            </p>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <p className="font-semibold">{project.totalHours.toFixed(1)} {t.hr}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {project.logs.length} {project.logs.length === 1 ? t.session : t.sessions}
-                          </p>
-                        </div>
+                        {project.allTasks.length > 0 && (
+                          <div className="flex flex-wrap gap-1 ml-8">
+                            {project.allTasks.slice(0, 5).map((taskId) => (
+                              <Badge key={taskId} variant="outline" className="text-xs">
+                                <span className="material-icons text-xs mr-1">{getTaskIcon(taskId)}</span>
+                                {getTaskLabel(taskId, language)}
+                              </Badge>
+                            ))}
+                            {project.allTasks.length > 5 && (
+                              <Badge variant="secondary" className="text-xs">
+                                +{project.allTasks.length - 5}
+                              </Badge>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </AccordionTrigger>
                     <AccordionContent>
