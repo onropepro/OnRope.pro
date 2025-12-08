@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Briefcase, MapPin, DollarSign, Calendar, Edit, Trash2, Pause, Play, ArrowLeft } from "lucide-react";
+import { Plus, Briefcase, MapPin, DollarSign, Calendar, Edit, Trash2, Pause, Play, ArrowLeft, Users } from "lucide-react";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
 
@@ -320,11 +320,23 @@ export default function CompanyJobBoard() {
               </p>
             </div>
           </div>
-          <Button onClick={() => setIsCreateOpen(true)} className="gap-2" data-testid="button-create-job">
-            <Plus className="w-4 h-4" />
-            <span className="hidden sm:inline">{t("jobBoard.createJob", "Create Job Posting")}</span>
-            <span className="sm:hidden">{t("jobBoard.create", "Create")}</span>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => setLocation("/talent-browser")} 
+              className="gap-2" 
+              data-testid="button-browse-talent"
+            >
+              <Users className="w-4 h-4" />
+              <span className="hidden sm:inline">{t("jobBoard.browseTalent", "Browse Talent")}</span>
+              <span className="sm:hidden">{t("jobBoard.talent", "Talent")}</span>
+            </Button>
+            <Button onClick={() => setIsCreateOpen(true)} className="gap-2" data-testid="button-create-job">
+              <Plus className="w-4 h-4" />
+              <span className="hidden sm:inline">{t("jobBoard.createJob", "Create Job Posting")}</span>
+              <span className="sm:hidden">{t("jobBoard.create", "Create")}</span>
+            </Button>
+          </div>
         </div>
       </header>
 

@@ -2414,23 +2414,12 @@ export default function Dashboard() {
     {
       id: "job-board",
       label: t('dashboard.cards.jobBoard.label', 'Job Board'),
-      description: t('dashboard.cards.jobBoard.description', 'Post job openings'),
+      description: t('dashboard.cards.jobBoard.description', 'Jobs & talent'),
       icon: "work",
       onClick: () => setLocation("/job-board"),
       testId: "button-nav-job-board",
       isVisible: (user: any) => user?.role === 'company', // Company owners only
       borderColor: "#059669",
-      category: "team",
-    },
-    {
-      id: "talent-browser",
-      label: t('dashboard.cards.talentBrowser.label', 'Talent Browser'),
-      description: t('dashboard.cards.talentBrowser.description', 'Browse available technicians'),
-      icon: "person_search",
-      onClick: () => setLocation("/talent-browser"),
-      testId: "button-nav-talent-browser",
-      isVisible: (user: any) => user?.role === 'company', // Company owners only
-      borderColor: "#7c3aed",
       category: "team",
     },
     {
