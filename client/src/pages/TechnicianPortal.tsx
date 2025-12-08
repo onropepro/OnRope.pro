@@ -341,8 +341,8 @@ const translations = {
     harnessNo: "No Inspection",
     sessionRating: "Session Rating",
     improvementNeeded: "Areas to improve:",
-    improveHarness: "Complete harness inspections on work days",
-    improveDocs: "Sign required safety documents",
+    improveHarness: "Complete harness inspection before clocking in",
+    improveDocs: "Sign Health & Safety Manual and Company Policy documents",
   },
   fr: {
     technicianPortal: "Portail du technicien",
@@ -608,8 +608,8 @@ const translations = {
     harnessNo: "Pas d'Inspection",
     sessionRating: "Note de Session",
     improvementNeeded: "Points à améliorer:",
-    improveHarness: "Effectuer les inspections de harnais les jours de travail",
-    improveDocs: "Signer les documents de sécurité requis",
+    improveHarness: "Effectuer l'inspection du harnais avant de pointer",
+    improveDocs: "Signer le Manuel de Santé et Sécurité et les Politiques de l'entreprise",
   }
 };
 
