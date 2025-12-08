@@ -89,7 +89,7 @@ const translations = {
     hoursRequired: "Please enter hours worked",
     dateRequired: "Please enter start and end dates",
     unknownProject: "Unknown Project",
-    logbookDisclaimer: "This digital log is for personal tracking only. It does not replace your official IRATA/SPRAT logbook, which remains the required record for certification purposes.",
+    logbookDisclaimer: "This is a personal tracking tool to help you monitor your rope access hours. You must still record all hours in your official IRATA/SPRAT logbook - this digital log does not replace it and is not valid for certification purposes.",
   },
   fr: {
     title: "Mes heures enregistrées",
@@ -145,7 +145,7 @@ const translations = {
     hoursRequired: "Veuillez entrer les heures travaillées",
     dateRequired: "Veuillez entrer les dates de début et de fin",
     unknownProject: "Projet inconnu",
-    logbookDisclaimer: "Ce journal numérique est uniquement pour le suivi personnel. Il ne remplace pas votre carnet IRATA/SPRAT officiel, qui reste le document requis pour les fins de certification.",
+    logbookDisclaimer: "Ceci est un outil de suivi personnel pour vous aider à surveiller vos heures d'accès sur corde. Vous devez toujours enregistrer toutes vos heures dans votre carnet IRATA/SPRAT officiel - ce journal numérique ne le remplace pas et n'est pas valide pour les fins de certification.",
   }
 };
 

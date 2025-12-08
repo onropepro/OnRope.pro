@@ -246,7 +246,7 @@ const translations = {
     confirmDeletePreviousHours: "Are you sure you want to delete this previous hours entry?",
     deleteConfirm: "Delete",
     cancelDelete: "Cancel",
-    logbookDisclaimer: "This does not replace your official IRATA/SPRAT logbook.",
+    logbookDisclaimer: "This is a personal tracking tool only. You must still record all hours in your official IRATA/SPRAT logbook - this digital log does not replace it.",
   },
   fr: {
     technicianPortal: "Portail du technicien",
@@ -434,7 +434,7 @@ const translations = {
     confirmDeletePreviousHours: "Êtes-vous sûr de vouloir supprimer cette entrée d'heures précédentes ?",
     deleteConfirm: "Supprimer",
     cancelDelete: "Annuler",
-    logbookDisclaimer: "Ceci ne remplace pas votre carnet IRATA/SPRAT officiel.",
+    logbookDisclaimer: "Ceci est un outil de suivi personnel uniquement. Vous devez toujours enregistrer toutes vos heures dans votre carnet IRATA/SPRAT officiel - ce journal numérique ne le remplace pas.",
   }
 };
 
