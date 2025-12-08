@@ -153,12 +153,12 @@ function Router() {
       <Route path="/building-portal" component={BuildingPortal} />
       <Route path="/technician-login" component={TechnicianLogin} />
       <Route path="/technician-portal">
-        <ProtectedRoute allowedRoles={["rope_access_tech", "company"]}>
+        <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
           <TechnicianPortal />
         </ProtectedRoute>
       </Route>
       <Route path="/technician-logged-hours">
-        <ProtectedRoute allowedRoles={["rope_access_tech", "company"]}>
+        <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
           <TechnicianLoggedHours />
         </ProtectedRoute>
       </Route>
