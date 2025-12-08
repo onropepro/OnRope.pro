@@ -2412,6 +2412,17 @@ export default function Dashboard() {
       category: "team",
     },
     {
+      id: "job-board",
+      label: t('dashboard.cards.jobBoard.label', 'Job Board'),
+      description: t('dashboard.cards.jobBoard.description', 'Post job openings'),
+      icon: "work",
+      onClick: () => setLocation("/job-board"),
+      testId: "button-nav-job-board",
+      isVisible: (user: any) => user?.role === 'company', // Company owners only
+      borderColor: "#059669",
+      category: "team",
+    },
+    {
       id: "clients",
       label: t('dashboard.cards.clients.label', 'Clients'),
       description: t('dashboard.cards.clients.description', 'Property managers'),
