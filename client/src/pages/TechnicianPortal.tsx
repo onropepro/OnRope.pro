@@ -516,6 +516,8 @@ export default function TechnicianPortal() {
   const spratScreenshotInputRef = useRef<HTMLInputElement>(null);
   const documentInputRef = useRef<HTMLInputElement>(null);
   const [uploadingDocType, setUploadingDocType] = useState<string | null>(null);
+  // Use a ref to store the doc type immediately (refs are synchronous, state is async)
+  const uploadingDocTypeRef = useRef<string | null>(null);
 
   const { data: userData, isLoading } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
@@ -813,10 +815,12 @@ export default function TechnicianPortal() {
   // Handler for uploading documents (void cheque, driver's license, etc.)
   const handleDocumentUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    console.log('[TechnicianPortal] handleDocumentUpload called:', { file: file?.name, uploadingDocType });
+    // Use the ref value which is synchronously updated (state may not have updated yet)
+    const docType = uploadingDocTypeRef.current;
+    console.log('[TechnicianPortal] handleDocumentUpload called:', { file: file?.name, docType, stateValue: uploadingDocType });
     
-    if (!file || !uploadingDocType) {
-      console.log('[TechnicianPortal] Upload aborted - file:', !!file, 'docType:', uploadingDocType);
+    if (!file || !docType) {
+      console.log('[TechnicianPortal] Upload aborted - file:', !!file, 'docType:', docType);
       return;
     }
 
@@ -828,15 +832,16 @@ export default function TechnicianPortal() {
         variant: "destructive",
       });
       setUploadingDocType(null);
+      uploadingDocTypeRef.current = null;
       return;
     }
 
     try {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('documentType', uploadingDocType);
+      formData.append('documentType', docType);
 
-      console.log('[TechnicianPortal] Sending upload request to server...');
+      console.log('[TechnicianPortal] Sending upload request to server for docType:', docType);
       const response = await fetch('/api/technician/upload-document', {
         method: 'POST',
         credentials: 'include',
@@ -864,6 +869,7 @@ export default function TechnicianPortal() {
       });
     } finally {
       setUploadingDocType(null);
+      uploadingDocTypeRef.current = null;
       if (documentInputRef.current) {
         documentInputRef.current.value = '';
       }
@@ -873,6 +879,8 @@ export default function TechnicianPortal() {
   // Trigger document upload for a specific type
   const triggerDocumentUpload = (docType: string) => {
     console.log('[TechnicianPortal] triggerDocumentUpload called:', docType);
+    // Set the ref FIRST (synchronous) before state (async)
+    uploadingDocTypeRef.current = docType;
     setUploadingDocType(docType);
     
     // Handle case where user cancels the file dialog
@@ -883,6 +891,7 @@ export default function TechnicianPortal() {
         if (documentInputRef.current && !documentInputRef.current.files?.length) {
           console.log('[TechnicianPortal] No file selected, resetting uploadingDocType');
           setUploadingDocType(null);
+          uploadingDocTypeRef.current = null;
         }
       }, 300);
       window.removeEventListener('focus', handleDialogClose);
