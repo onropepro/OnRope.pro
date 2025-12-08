@@ -134,9 +134,9 @@ function ScrollingProblems({ problems, direction }: { problems: string[], direct
   const duplicatedProblems = [...problems, ...problems, ...problems];
   
   return (
-    <div className="overflow-hidden py-3 border-b border-border/30">
+    <div className="overflow-hidden py-2">
       <div 
-        className={`flex gap-8 whitespace-nowrap ${
+        className={`flex gap-10 whitespace-nowrap ${
           direction === "left" ? "animate-scroll-left" : "animate-scroll-right"
         }`}
         style={{
@@ -146,7 +146,7 @@ function ScrollingProblems({ problems, direction }: { problems: string[], direct
         {duplicatedProblems.map((problem, index) => (
           <span 
             key={index} 
-            className="text-sm text-muted-foreground/70 flex items-center gap-2"
+            className="text-lg text-muted-foreground/80 flex items-center gap-3"
           >
             {problem}
             <span className="text-muted-foreground/40">•</span>
@@ -781,16 +781,18 @@ export default function TechnicianLogin() {
       </div>
 
       {/* Right Column - 30% Scrolling Problems (Desktop only) */}
-      <div className="hidden lg:flex lg:w-[30%] bg-muted/50 flex-col overflow-hidden border-l">
-        <div className="sticky top-0 bg-muted/50 border-b p-4 z-10">
-          <p className="text-sm font-medium text-muted-foreground text-center">
-            Sound familiar?
-          </p>
-        </div>
-        <div className="flex-1 flex flex-col justify-center py-4">
-          {problemRows.map((row, index) => (
-            <ScrollingProblems key={index} problems={row.problems} direction={row.direction} />
-          ))}
+      <div className="hidden lg:block lg:w-[30%] bg-muted/50 border-l h-screen sticky top-0 overflow-hidden">
+        <div className="h-full flex flex-col">
+          <div className="shrink-0 bg-muted/50 border-b p-4">
+            <p className="text-base font-medium text-muted-foreground text-center">
+              Sound familiar?
+            </p>
+          </div>
+          <div className="flex-1 flex flex-col justify-evenly py-6">
+            {problemRows.map((row, index) => (
+              <ScrollingProblems key={index} problems={row.problems} direction={row.direction} />
+            ))}
+          </div>
         </div>
       </div>
 
