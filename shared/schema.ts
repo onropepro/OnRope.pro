@@ -206,6 +206,7 @@ export const buildings = pgTable("buildings", {
   
   // Building specifications
   floorCount: integer("floor_count"),
+  buildingHeight: varchar("building_height"), // Height in meters or feet for rope access jobs, e.g., "45m", "150ft"
   parkingStalls: integer("parking_stalls"),
   totalUnits: integer("total_units"), // Total residential/commercial units
   
@@ -285,6 +286,7 @@ export const projects = pgTable("projects", {
   
   dailyDropTarget: integer("daily_drop_target"),
   floorCount: integer("floor_count"),
+  buildingHeight: varchar("building_height"), // Height in meters or feet for rope access jobs, e.g., "45m", "150ft"
   targetCompletionDate: date("target_completion_date"), // Optional target completion date
   estimatedHours: integer("estimated_hours"), // Estimated total hours for the entire building
   startDate: date("start_date"), // Schedule start date
