@@ -66,7 +66,9 @@ import {
   Copy,
   Share2,
   Users,
-  Pencil
+  Pencil,
+  Star,
+  Gift
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
@@ -287,6 +289,14 @@ const translations = {
     shareReferralCode: "Share this code with fellow technicians to invite them to OnRopePro",
     referralPremiumBenefit: "You'll get PLUS access when your code is used!",
     viewPlusBenefits: "View PLUS Benefits",
+    plusBenefitsTitle: "PLUS Benefits",
+    plusBenefit1: "Unlimited employer connections",
+    plusBenefit2: "Enhanced task detail logging",
+    plusBenefit3: "Exportable work history (PDF/CSV)",
+    plusBenefit4: "Work history analytics",
+    plusBenefit5: "60-day certification expiry alerts",
+    plusBenefit6: "Rope access company profile visibility (opt-in)",
+    plusUnlockInfo: "Unlock: Refer 1 verified tech who completes account creation",
     copyCode: "Copy Code",
     codeCopied: "Copied!",
     referredTimes: "Referred {count} technician(s)",
@@ -518,6 +528,14 @@ const translations = {
     shareReferralCode: "Partagez ce code avec d'autres techniciens pour les inviter sur OnRopePro",
     referralPremiumBenefit: "Vous obtiendrez un accès PLUS lorsque votre code sera utilisé!",
     viewPlusBenefits: "Voir les avantages PLUS",
+    plusBenefitsTitle: "Avantages PLUS",
+    plusBenefit1: "Connexions employeurs illimitées",
+    plusBenefit2: "Journalisation détaillée des tâches améliorée",
+    plusBenefit3: "Historique de travail exportable (PDF/CSV)",
+    plusBenefit4: "Analytique de l'historique de travail",
+    plusBenefit5: "Alertes d'expiration de certification à 60 jours",
+    plusBenefit6: "Visibilité du profil d'entreprise de travaux sur cordes (opt-in)",
+    plusUnlockInfo: "Débloquer: Parrainez 1 technicien vérifié qui complète la création de son compte",
     copyCode: "Copier le code",
     codeCopied: "Copié!",
     referredTimes: "Parrainé {count} technicien(s)",
@@ -758,6 +776,9 @@ export default function TechnicianPortal() {
   
   // State for copy button
   const [codeCopied, setCodeCopied] = useState(false);
+  
+  // State for PLUS benefits dialog
+  const [showPlusBenefits, setShowPlusBenefits] = useState(false);
   
   // Handle copy referral code
   const handleCopyReferralCode = () => {
@@ -1372,6 +1393,7 @@ export default function TechnicianPortal() {
                         variant="ghost"
                         size="sm"
                         className="h-auto px-2 py-0.5 text-sm text-primary underline"
+                        onClick={() => setShowPlusBenefits(true)}
                         data-testid="button-view-plus-benefits"
                       >
                         {t.viewPlusBenefits}
@@ -3187,6 +3209,57 @@ export default function TechnicianPortal() {
               ) : (
                 t.saveChanges
               )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* PLUS Benefits Dialog */}
+      <Dialog open={showPlusBenefits} onOpenChange={setShowPlusBenefits}>
+        <DialogContent className="sm:max-w-md" data-testid="dialog-plus-benefits">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Star className="w-5 h-5 text-primary" />
+              {t.plusBenefitsTitle}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <ul className="space-y-3">
+              <li className="flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                <span>{t.plusBenefit1}</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                <span>{t.plusBenefit2}</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                <span>{t.plusBenefit3}</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                <span>{t.plusBenefit4}</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                <span>{t.plusBenefit5}</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                <span>{t.plusBenefit6}</span>
+              </li>
+            </ul>
+            <div className="mt-4 pt-4 border-t">
+              <p className="text-sm font-medium text-primary flex items-center gap-2">
+                <Gift className="w-4 h-4" />
+                {t.plusUnlockInfo}
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setShowPlusBenefits(false)} data-testid="button-close-plus-benefits">
+              {t.cancel}
             </Button>
           </DialogFooter>
         </DialogContent>
