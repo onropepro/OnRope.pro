@@ -87,6 +87,12 @@ type RecentChange = {
 const recentChangesData: RecentChange[] = [
   {
     date: "December 8, 2025",
+    title: "Document Upload UX Improvements",
+    description: "Moved upload buttons into their respective sections (Driver's License, Banking Documents, First Aid, Certifications) for better organization. Buttons now show contextual text - 'Upload' when no document exists, 'Add More' or 'Replace' when documents already uploaded. Fixed upload button getting stuck in 'Uploading...' state when file dialog is cancelled",
+    type: "improvement"
+  },
+  {
+    date: "December 8, 2025",
     title: "My Logged Hours for Technicians",
     description: "Technicians can now view all their logged work hours from the Technician Portal. The new 'My Logged Hours' page shows work sessions grouped by building with total hours, tasks performed, and dates. Includes bilingual support (EN/FR)",
     type: "feature"

@@ -129,10 +129,20 @@ const translations = {
     voidCheque: "Void Cheque / Bank Info",
     uploadDocument: "Upload Document",
     uploadVoidCheque: "Upload Void Cheque",
+    replaceVoidCheque: "Replace Void Cheque",
+    addVoidCheque: "Add Another Void Cheque",
     uploadDriversLicense: "Upload Driver's License",
+    replaceDriversLicense: "Replace License",
+    addDriversLicense: "Add License Photo",
     uploadDriversAbstract: "Upload Driver's Abstract",
+    replaceDriversAbstract: "Replace Abstract",
+    addDriversAbstract: "Add Abstract",
     uploadFirstAidCert: "Upload First Aid Certificate",
+    replaceFirstAidCert: "Replace Certificate",
+    addFirstAidCert: "Add Certificate",
     uploadCertificationCard: "Upload Certification Card",
+    replaceCertificationCard: "Replace Card",
+    addCertificationCard: "Add Card",
     documentUploaded: "Document Uploaded",
     documentUploadedDesc: "Your document has been uploaded successfully.",
     uploadFailed: "Upload Failed",
@@ -304,10 +314,20 @@ const translations = {
     voidCheque: "Chèque annulé / Info bancaire",
     uploadDocument: "Téléverser un document",
     uploadVoidCheque: "Téléverser un chèque annulé",
+    replaceVoidCheque: "Remplacer le chèque annulé",
+    addVoidCheque: "Ajouter un autre chèque",
     uploadDriversLicense: "Téléverser le permis de conduire",
+    replaceDriversLicense: "Remplacer le permis",
+    addDriversLicense: "Ajouter une photo",
     uploadDriversAbstract: "Téléverser le relevé de conduite",
+    replaceDriversAbstract: "Remplacer le relevé",
+    addDriversAbstract: "Ajouter un relevé",
     uploadFirstAidCert: "Téléverser le certificat de premiers soins",
+    replaceFirstAidCert: "Remplacer le certificat",
+    addFirstAidCert: "Ajouter un certificat",
     uploadCertificationCard: "Téléverser la carte de certification",
+    replaceCertificationCard: "Remplacer la carte",
+    addCertificationCard: "Ajouter une carte",
     documentUploaded: "Document téléversé",
     documentUploadedDesc: "Votre document a été téléversé avec succès.",
     uploadFailed: "Échec du téléversement",
@@ -831,6 +851,20 @@ export default function TechnicianPortal() {
   // Trigger document upload for a specific type
   const triggerDocumentUpload = (docType: string) => {
     setUploadingDocType(docType);
+    
+    // Handle case where user cancels the file dialog
+    // When the file dialog is closed, window regains focus
+    const handleDialogClose = () => {
+      // Small delay to allow the change event to fire first if a file was selected
+      setTimeout(() => {
+        if (documentInputRef.current && !documentInputRef.current.files?.length) {
+          setUploadingDocType(null);
+        }
+      }, 300);
+      window.removeEventListener('focus', handleDialogClose);
+    };
+    
+    window.addEventListener('focus', handleDialogClose);
     documentInputRef.current?.click();
   };
 
@@ -1931,6 +1965,29 @@ export default function TechnicianPortal() {
                         </div>
                       )}
                   </div>
+                  
+                  {/* Upload certification card button */}
+                  <div className="mt-4">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => triggerDocumentUpload('certificationCard')}
+                      disabled={uploadingDocType === 'certificationCard'}
+                      data-testid="button-upload-certification-card"
+                    >
+                      {uploadingDocType === 'certificationCard' ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          {t.uploading}
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4 mr-2" />
+                          {t.uploadCertificationCard}
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 </div>
 
                 {user.hasFirstAid && (
@@ -2003,6 +2060,29 @@ export default function TechnicianPortal() {
                           </div>
                         </div>
                       )}
+                      
+                      {/* Upload button for first aid certificate */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => triggerDocumentUpload('firstAidCertificate')}
+                        disabled={uploadingDocType === 'firstAidCertificate'}
+                        data-testid="button-upload-first-aid"
+                      >
+                        {uploadingDocType === 'firstAidCertificate' ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            {t.uploading}
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-4 h-4 mr-2" />
+                            {user.firstAidDocuments && user.firstAidDocuments.filter((u: string) => u && u.trim()).length > 0 
+                              ? t.addFirstAidCert 
+                              : t.uploadFirstAidCert}
+                          </>
+                        )}
+                      </Button>
                     </div>
                   </>
                 )}
@@ -2036,6 +2116,29 @@ export default function TechnicianPortal() {
                       masked
                     />
                   </div>
+                  
+                  {/* Upload void cheque button - always visible if no banking documents exist */}
+                  {(!user.bankDocuments || user.bankDocuments.filter((u: string) => u && u.trim()).length === 0) && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => triggerDocumentUpload('voidCheque')}
+                      disabled={uploadingDocType === 'voidCheque'}
+                      data-testid="button-upload-void-cheque-payroll"
+                    >
+                      {uploadingDocType === 'voidCheque' ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          {t.uploading}
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4 mr-2" />
+                          {t.uploadVoidCheque}
+                        </>
+                      )}
+                    </Button>
+                  )}
                 </div>
 
                 {user.driversLicenseNumber && (
@@ -2115,6 +2218,52 @@ export default function TechnicianPortal() {
                           </div>
                         </div>
                       )}
+                      
+                      {/* Upload buttons for driver's license section */}
+                      <div className="flex flex-wrap gap-2 pt-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => triggerDocumentUpload('driversLicense')}
+                          disabled={uploadingDocType === 'driversLicense'}
+                          data-testid="button-upload-drivers-license"
+                        >
+                          {uploadingDocType === 'driversLicense' ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              {t.uploading}
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="w-4 h-4 mr-2" />
+                              {user.driversLicenseDocuments && user.driversLicenseDocuments.filter((u: string) => u && u.trim()).length > 0 
+                                ? t.addDriversLicense 
+                                : t.uploadDriversLicense}
+                            </>
+                          )}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => triggerDocumentUpload('driversAbstract')}
+                          disabled={uploadingDocType === 'driversAbstract'}
+                          data-testid="button-upload-drivers-abstract"
+                        >
+                          {uploadingDocType === 'driversAbstract' ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              {t.uploading}
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="w-4 h-4 mr-2" />
+                              {user.driversLicenseDocuments && user.driversLicenseDocuments.some((u: string) => u && u.toLowerCase().includes('abstract'))
+                                ? t.replaceDriversAbstract 
+                                : t.uploadDriversAbstract}
+                            </>
+                          )}
+                        </Button>
+                      </div>
                     </div>
                   </>
                 )}
@@ -2177,6 +2326,29 @@ export default function TechnicianPortal() {
                           );
                         })}
                       </div>
+                      
+                      {/* Upload button for void cheque */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => triggerDocumentUpload('voidCheque')}
+                        disabled={uploadingDocType === 'voidCheque'}
+                        data-testid="button-upload-void-cheque"
+                      >
+                        {uploadingDocType === 'voidCheque' ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            {t.uploading}
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-4 h-4 mr-2" />
+                            {user.bankDocuments && user.bankDocuments.filter((u: string) => u && u.trim()).length > 0 
+                              ? t.addVoidCheque 
+                              : t.uploadVoidCheque}
+                          </>
+                        )}
+                      </Button>
                     </div>
                   </>
                 )}
@@ -2193,119 +2365,6 @@ export default function TechnicianPortal() {
                     </div>
                   </>
                 )}
-
-                {/* Document Upload Section */}
-                <Separator />
-                <div className="space-y-4">
-                  <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
-                    <Upload className="w-4 h-4" />
-                    {t.uploadDocument}
-                  </h3>
-                  <div className="grid grid-cols-1 gap-3">
-                    <Button
-                      variant="outline"
-                      className="justify-start"
-                      onClick={() => triggerDocumentUpload('voidCheque')}
-                      disabled={uploadingDocType === 'voidCheque'}
-                      data-testid="button-upload-void-cheque"
-                    >
-                      {uploadingDocType === 'voidCheque' ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          {t.uploading}
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="w-4 h-4 mr-2" />
-                          {t.uploadVoidCheque}
-                        </>
-                      )}
-                    </Button>
-                    
-                    <Button
-                      variant="outline"
-                      className="justify-start"
-                      onClick={() => triggerDocumentUpload('driversLicense')}
-                      disabled={uploadingDocType === 'driversLicense'}
-                      data-testid="button-upload-drivers-license"
-                    >
-                      {uploadingDocType === 'driversLicense' ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          {t.uploading}
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="w-4 h-4 mr-2" />
-                          {t.uploadDriversLicense}
-                        </>
-                      )}
-                    </Button>
-                    
-                    <Button
-                      variant="outline"
-                      className="justify-start"
-                      onClick={() => triggerDocumentUpload('driversAbstract')}
-                      disabled={uploadingDocType === 'driversAbstract'}
-                      data-testid="button-upload-drivers-abstract"
-                    >
-                      {uploadingDocType === 'driversAbstract' ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          {t.uploading}
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="w-4 h-4 mr-2" />
-                          {t.uploadDriversAbstract}
-                        </>
-                      )}
-                    </Button>
-                    
-                    <Button
-                      variant="outline"
-                      className="justify-start"
-                      onClick={() => triggerDocumentUpload('firstAidCertificate')}
-                      disabled={uploadingDocType === 'firstAidCertificate'}
-                      data-testid="button-upload-first-aid"
-                    >
-                      {uploadingDocType === 'firstAidCertificate' ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          {t.uploading}
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="w-4 h-4 mr-2" />
-                          {t.uploadFirstAidCert}
-                        </>
-                      )}
-                    </Button>
-                    
-                    <Button
-                      variant="outline"
-                      className="justify-start"
-                      onClick={() => triggerDocumentUpload('certificationCard')}
-                      disabled={uploadingDocType === 'certificationCard'}
-                      data-testid="button-upload-certification-card"
-                    >
-                      {uploadingDocType === 'certificationCard' ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          {t.uploading}
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="w-4 h-4 mr-2" />
-                          {t.uploadCertificationCard}
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {t.selectFile}
-                  </p>
-                </div>
               </div>
             )}
           </CardContent>
