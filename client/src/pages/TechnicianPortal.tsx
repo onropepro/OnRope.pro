@@ -151,6 +151,8 @@ const translations = {
     spratCertificationCard: "SPRAT Certification Card",
     experience: "Experience",
     ropeAccessExperience: "Rope Access Experience",
+    experienceStartDate: "Experience Start Date",
+    experienceStartDateHelp: "When did you start your rope access career?",
     yearsMonths: "{years} year(s), {months} month(s)",
     lessThanMonth: "Less than a month",
     startedOn: "Started on",
@@ -355,6 +357,8 @@ const translations = {
     spratCertificationCard: "Carte de certification SPRAT",
     experience: "Expérience",
     ropeAccessExperience: "Expérience d'accès sur corde",
+    experienceStartDate: "Date de début d'expérience",
+    experienceStartDateHelp: "Quand avez-vous commencé votre carrière d'accès sur corde?",
     yearsMonths: "{years} an(s), {months} mois",
     lessThanMonth: "Moins d'un mois",
     startedOn: "Début le",
@@ -491,6 +495,7 @@ const createProfileSchema = (t: typeof translations['en']) => z.object({
   birthday: z.string().optional(),
   specialMedicalConditions: z.string().optional(),
   irataBaselineHours: z.string().optional(),
+  ropeAccessStartDate: z.string().optional(),
 });
 
 type ProfileFormData = z.infer<ReturnType<typeof createProfileSchema>>;
@@ -572,6 +577,7 @@ export default function TechnicianPortal() {
       birthday: "",
       specialMedicalConditions: "",
       irataBaselineHours: "",
+      ropeAccessStartDate: "",
     },
   });
 
@@ -981,6 +987,7 @@ export default function TechnicianPortal() {
         birthday: user.birthday || "",
         specialMedicalConditions: user.specialMedicalConditions || "",
         irataBaselineHours: user.irataBaselineHours || "",
+        ropeAccessStartDate: user.ropeAccessStartDate || "",
       });
     }
     setIsEditing(true);
@@ -1638,6 +1645,23 @@ export default function TechnicianPortal() {
                           </FormControl>
                           <p className="text-xs text-muted-foreground">
                             This is a personal tracking tool only, not an official IRATA/SPRAT record.
+                          </p>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="ropeAccessStartDate"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t.experienceStartDate}</FormLabel>
+                          <FormControl>
+                            <Input {...field} type="date" data-testid="input-experience-start-date" />
+                          </FormControl>
+                          <p className="text-xs text-muted-foreground">
+                            {t.experienceStartDateHelp}
                           </p>
                           <FormMessage />
                         </FormItem>
