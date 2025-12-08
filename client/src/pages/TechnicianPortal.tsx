@@ -823,13 +823,13 @@ export default function TechnicianPortal() {
   // Fetch logged hours for display on portal
   const { data: loggedHoursData } = useQuery<{ logs: Array<{ hoursWorked: string }> }>({
     queryKey: ["/api/my-irata-task-logs"],
-    enabled: !!user && user.role === 'rope_access_tech',
+    enabled: !!user && (user.role === 'rope_access_tech' || user.role === 'company'),
   });
   
   // Fetch referral count for the technician
   const { data: referralCountData } = useQuery<{ count: number }>({
     queryKey: ["/api/my-referral-count"],
-    enabled: !!user && user.role === 'rope_access_tech',
+    enabled: !!user && (user.role === 'rope_access_tech' || user.role === 'company'),
   });
   
   // Fetch performance metrics for the technician
@@ -858,7 +858,7 @@ export default function TechnicianPortal() {
     };
   }>({
     queryKey: ["/api/my-performance-metrics"],
-    enabled: !!user && user.role === 'rope_access_tech',
+    enabled: !!user && (user.role === 'rope_access_tech' || user.role === 'company'),
   });
   
   // State for copy button
@@ -1527,8 +1527,8 @@ export default function TechnicianPortal() {
           </Card>
         )}
 
-        {/* Your Referral Code Section - Show for all technicians */}
-        {user && user.role === 'rope_access_tech' && (
+        {/* Your Referral Code Section - Show for technicians and company owners */}
+        {user && (user.role === 'rope_access_tech' || user.role === 'company') && (
           <Card className="border-2 border-primary/30 bg-primary/5">
             <CardHeader className="pb-2">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -1606,8 +1606,8 @@ export default function TechnicianPortal() {
           </Card>
         )}
 
-        {/* Performance & Safety Rating Card */}
-        {user && user.role === 'rope_access_tech' && (
+        {/* Performance & Safety Rating Card - Show for technicians and company owners */}
+        {user && (user.role === 'rope_access_tech' || user.role === 'company') && (
           <Card className="border-muted overflow-visible">
             <CardHeader className="pb-2">
               <div className="flex items-center gap-3">

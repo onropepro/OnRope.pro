@@ -2357,6 +2357,17 @@ export default function Dashboard() {
   // Dashboard card configuration with permission filtering
   const dashboardCards = useMemo(() => [
     {
+      id: "my-profile",
+      label: t('dashboard.cards.myProfile.label', 'My Profile'),
+      description: t('dashboard.cards.myProfile.description', 'Hours & certifications'),
+      icon: "person",
+      onClick: () => setLocation("/technician-portal"),
+      testId: "button-nav-my-profile",
+      isVisible: (user: any) => user?.role === 'company', // Company owners who work on buildings
+      borderColor: "#8b5cf6",
+      category: "team",
+    },
+    {
       id: "projects",
       label: t('dashboard.cards.projects.label', 'Projects'),
       description: t('dashboard.cards.projects.description', 'Active projects'),
