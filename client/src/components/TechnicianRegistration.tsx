@@ -1101,7 +1101,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                   onKeyDown={(e) => e.key === "Enter" && handleContinue()}
                   autoFocus
                   className="text-center text-lg h-12 uppercase tracking-widest font-mono"
-                  maxLength={10}
+                  maxLength={12}
                 />
               </div>
               <p className="text-xs text-muted-foreground text-center">{t.referralCodeOptional}</p>

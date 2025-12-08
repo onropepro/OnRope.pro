@@ -764,7 +764,7 @@ export default function TechnicianPortal() {
       setCodeCopied(true);
       toast({
         title: t.codeCopied,
-        description: user.referralCode,
+        description: `${user.referralCode} (${user.referralCode.length} characters)`,
       });
       setTimeout(() => setCodeCopied(false), 2000);
     }
