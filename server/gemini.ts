@@ -302,30 +302,45 @@ export async function analyzeLogbookPage(
 ): Promise<LogbookAnalysisResult> {
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-2.5-pro",
       contents: [
         {
           role: "user",
           parts: [
             {
-              text: `You are analyzing a photograph of an IRATA or SPRAT rope access logbook page. 
-Extract ALL work entries visible on this page. Each entry typically includes:
-- Date(s) of work (may be a single date or date range)
-- Building/Site name and address
-- Building height (if visible)
-- Tasks performed (rope access techniques like: rope transfer, re-anchor, ascending, descending, rigging, deviation, aid climbing, edge transition, knot passing, rope to rope transfer, mid-rope changeover, rescue technique, hauling, lowering, tensioned rope work, horizontal traverse, window cleaning, building inspection, maintenance work)
-- Hours worked
-- Employer/Company name
-- Any notes or comments
+              text: `You are an expert at analyzing IRATA and SPRAT rope access logbook pages. Your task is to CAREFULLY extract EVERY work entry visible on this logbook page.
 
-For each entry found, extract all available information. Dates should be in YYYY-MM-DD format. If only partial information is available for an entry, still include it with what you can read. If dates only show day/month, assume the current year unless context suggests otherwise.
+CRITICAL INSTRUCTIONS FOR HOURS:
+- The "Hours Worked" field is MANDATORY for each entry
+- Look for columns labeled: "Hours", "Hrs", "Time", "Duration", "Total", or similar
+- Hours may be written as: "8", "8.5", "8h", "8 hours", "8:00", etc.
+- If you see a time range (e.g., "08:00-16:00"), calculate the duration (8 hours)
+- IRATA logbooks ALWAYS record hours - look carefully at every column
+- If hours column is unclear/illegible, estimate based on a typical 8-hour workday and set confidence to "low"
+- NEVER return null for hoursWorked unless the entry is clearly incomplete
 
-Common rope access task types to look for:
-- rope_transfer, re_anchor, ascending, descending, rigging, deviation
-- aid_climbing, edge_transition, knot_passing, rope_to_rope_transfer
-- mid_rope_changeover, rescue_technique, hauling, lowering
-- tensioned_rope, horizontal_traverse, window_cleaning
-- building_inspection, maintenance_work, other
+For EACH entry on the page, extract:
+1. DATE(S): Start and end date in YYYY-MM-DD format. If only day/month visible, use current year (2024 or 2025).
+2. HOURS WORKED: This is CRITICAL - always extract or estimate this value
+3. BUILDING/SITE: Name and address of the work location
+4. BUILDING HEIGHT: If visible (floors, meters, feet)
+5. TASKS: Rope access work performed (use task IDs below)
+6. EMPLOYER: Company name if visible
+7. NOTES: Any additional information
+
+Task IDs to use:
+rope_transfer, re_anchor, ascending, descending, rigging, deviation,
+aid_climbing, edge_transition, knot_passing, rope_to_rope_transfer,
+mid_rope_changeover, rescue_technique, hauling, lowering,
+tensioned_rope, horizontal_traverse, window_cleaning,
+building_inspection, maintenance_work, other
+
+RULES:
+- Extract EVERY entry visible, even if partially readable
+- ALWAYS provide hoursWorked (estimate 8 if truly unclear)
+- For unclear entries, set confidence to "low"
+- Use "other" for unrecognizable tasks
+- If handwriting is unclear, make your best interpretation
 
 Respond ONLY with valid JSON matching this structure:
 {

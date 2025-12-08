@@ -116,6 +116,7 @@ const translations = {
     selectAll: "Select All",
     deselectAll: "Deselect All",
     missingRequired: "Missing required fields",
+    enterHoursToSelect: "Enter hours to select this entry",
     retryPhoto: "Try Another Photo",
   },
   fr: {
@@ -195,6 +196,7 @@ const translations = {
     selectAll: "Tout sélectionner",
     deselectAll: "Tout désélectionner",
     missingRequired: "Champs requis manquants",
+    enterHoursToSelect: "Entrez les heures pour sélectionner cette entrée",
     retryPhoto: "Essayer une autre photo",
   }
 };
@@ -485,22 +487,44 @@ export default function TechnicianLoggedHours() {
     }
   };
 
-  // Toggle entry selection
+  // Toggle entry selection (only allow if entry is valid)
   const toggleEntrySelection = (entryId: string) => {
     setScannedEntries(prev => 
-      prev.map(entry => 
-        entry.id === entryId 
-          ? { ...entry, selected: !entry.selected }
-          : entry
-      )
+      prev.map(entry => {
+        if (entry.id !== entryId) return entry;
+        // Only allow selection if entry has date and valid hours
+        const isValid = entry.date && entry.hours && entry.hours > 0;
+        if (!isValid) return entry; // Don't toggle invalid entries
+        return { ...entry, selected: !entry.selected };
+      })
     );
   };
 
-  // Select/deselect all entries
-  const toggleSelectAll = () => {
-    const allSelected = scannedEntries.every(e => e.selected);
+  // Update entry hours (for inline editing) - auto-clear selection if hours become invalid
+  const updateEntryHours = (entryId: string, hours: number | null) => {
     setScannedEntries(prev => 
-      prev.map(entry => ({ ...entry, selected: !allSelected }))
+      prev.map(entry => {
+        if (entry.id !== entryId) return entry;
+        // If hours become null or invalid, also clear selection
+        const isValid = hours !== null && hours > 0;
+        return { 
+          ...entry, 
+          hours,
+          selected: isValid ? entry.selected : false 
+        };
+      })
+    );
+  };
+
+  // Select/deselect all valid entries (those with date AND hours)
+  const toggleSelectAll = () => {
+    const validEntries = scannedEntries.filter(e => e.date && e.hours && e.hours > 0);
+    const allSelected = validEntries.length > 0 && validEntries.every(e => e.selected);
+    setScannedEntries(prev => 
+      prev.map(entry => (entry.date && entry.hours && entry.hours > 0) 
+        ? { ...entry, selected: !allSelected } 
+        : entry
+      )
     );
   };
 
@@ -1138,12 +1162,15 @@ export default function TechnicianLoggedHours() {
           <ScrollArea className="flex-1 max-h-[50vh]">
             <div className="space-y-3 py-2 pr-4">
               {scannedEntries.map((entry) => {
-                const isValid = entry.date && entry.hours;
+                const hasDate = !!entry.date;
+                const hasHours = entry.hours !== null && entry.hours > 0;
+                const isValid = hasDate && hasHours;
+                const canSelect = isValid; // Can only select if both date AND hours exist
                 return (
                   <div
                     key={entry.id}
                     className={`p-4 border rounded-lg ${
-                      !isValid ? 'border-destructive/50 bg-destructive/5' : 
+                      !isValid ? 'border-muted bg-muted/20' : 
                       entry.selected ? 'border-primary/50 bg-primary/5' : ''
                     }`}
                     data-testid={`scanned-entry-${entry.id}`}
@@ -1153,7 +1180,7 @@ export default function TechnicianLoggedHours() {
                         id={entry.id}
                         checked={entry.selected}
                         onCheckedChange={() => toggleEntrySelection(entry.id)}
-                        disabled={!isValid}
+                        disabled={!canSelect}
                         data-testid={`checkbox-entry-${entry.id}`}
                       />
                       <div className="flex-1 min-w-0">
@@ -1168,16 +1195,29 @@ export default function TechnicianLoggedHours() {
                               {t.date}: -
                             </Badge>
                           )}
-                          {entry.hours ? (
-                            <Badge variant="secondary" className="gap-1">
-                              <Clock className="w-3 h-3" />
-                              {entry.hours} {t.hr}
-                            </Badge>
-                          ) : (
-                            <Badge variant="destructive" className="gap-1">
-                              {t.hoursWorked}: -
-                            </Badge>
-                          )}
+                          <div className="flex items-center gap-1">
+                            <Clock className="w-3 h-3 text-muted-foreground" />
+                            <Input
+                              type="number"
+                              step="0.5"
+                              min="0.5"
+                              max="24"
+                              value={entry.hours !== null && entry.hours > 0 ? entry.hours : ''}
+                              placeholder="8"
+                              className="w-16 h-7 text-xs text-center"
+                              onChange={(e) => {
+                                const rawValue = e.target.value.trim();
+                                if (rawValue === '') {
+                                  updateEntryHours(entry.id, null);
+                                } else {
+                                  const val = parseFloat(rawValue);
+                                  updateEntryHours(entry.id, isNaN(val) || val <= 0 ? null : val);
+                                }
+                              }}
+                              data-testid={`input-hours-${entry.id}`}
+                            />
+                            <span className="text-xs text-muted-foreground">{t.hr}</span>
+                          </div>
                           <Badge variant={getConfidenceBadgeVariant(entry.confidence) as any}>
                             {entry.confidence === 'high' ? t.highConfidence :
                              entry.confidence === 'medium' ? t.mediumConfidence :
@@ -1217,9 +1257,9 @@ export default function TechnicianLoggedHours() {
                         )}
                         
                         {!isValid && (
-                          <p className="text-xs text-destructive mt-2 flex items-center gap-1">
+                          <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
                             <AlertTriangle className="w-3 h-3" />
-                            {t.missingRequired}
+                            {!hasDate ? t.missingRequired : t.enterHoursToSelect}
                           </p>
                         )}
                       </div>
