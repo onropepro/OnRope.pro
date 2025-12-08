@@ -18,7 +18,7 @@ The platform is built with a React 18 frontend (TypeScript, Wouter for routing),
 *   **Workforce & Time Tracking:** Includes employee management, real-time clock-in/out with GPS, billable/non-billable hours, payroll-ready reporting, and IRATA certification expiration tracking.
 *   **Technician Self-Registration:** Comprehensive multi-step registration collecting personal, certification, contact, financial, and driving information, with strict privacy notices. Includes experience tracking.
 *   **Technician Referral System:** Unique 12-character referral codes for technicians to refer others, tracking referred users and displaying referral counts.
-*   **Technician PLUS Access:** A premium tier offering certification expiry alerts, unlimited employer connections, enhanced IRATA task logging, exportable work history, and profile visibility.
+*   **Technician PLUS Access:** A premium tier offering certification expiry alerts (60-day yellow badge, 30-day red badge with banner), unlimited employer connections, enhanced IRATA task logging, exportable work history, and profile visibility. PLUS members display a gold "PRO" badge next to their name (visible in both Technician Portal and Dashboard employee cards). Uses `hasPlusAccess` field in users schema. Currently all features are displayed (gating will be added later).
 *   **Resume/CV Upload:** Technicians can upload and preview multiple resume/CV documents.
 *   **IRATA Task Logging System:** Comprehensive work hours logging for IRATA technicians to track tasks for certification progression.
 *   **Client Relationship Management (CRM):** Manages client and building records with autofill intelligence and streamlines client-to-project workflows.

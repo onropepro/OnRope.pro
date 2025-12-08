@@ -31,6 +31,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate, formatDateTime, parseLocalDate } from "@/lib/dateUtils";
@@ -143,6 +144,8 @@ const translations = {
     expiringIn30Days: "Urgent: 30 days",
     certificationExpiryBannerTitle: "Certification Expiring Soon!",
     certificationExpiryBannerMessage: "Your {cert} certification expires on {date}. Renew now to avoid work interruption.",
+    proBadge: "PRO",
+    proBadgeTooltip: "PLUS Member",
     verified: "Verified",
     firstAidCertificate: "First Aid Certificate",
     uploadedDocuments: "Uploaded Documents",
@@ -386,6 +389,8 @@ const translations = {
     expiringIn30Days: "Urgent: 30 jours",
     certificationExpiryBannerTitle: "Certification expire bientôt!",
     certificationExpiryBannerMessage: "Votre certification {cert} expire le {date}. Renouvelez maintenant pour éviter une interruption de travail.",
+    proBadge: "PRO",
+    proBadgeTooltip: "Membre PLUS",
     verified: "Vérifié",
     firstAidCertificate: "Certificat de premiers soins",
     uploadedDocuments: "Documents téléversés",
@@ -1221,7 +1226,25 @@ export default function TechnicianPortal() {
             />
             <div className="hidden sm:block">
               <h1 className="font-semibold text-sm">{t.technicianPortal}</h1>
-              <p className="text-xs text-muted-foreground">{user.name}</p>
+              <div className="flex items-center gap-1.5">
+                <p className="text-xs text-muted-foreground">{user.name}</p>
+                {/* PRO Badge - Always shown for now, will be gated behind PLUS access later */}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Badge 
+                      variant="default" 
+                      className="bg-gradient-to-r from-amber-500 to-yellow-400 text-white text-[10px] px-1.5 py-0 h-4 font-bold border-0" 
+                      data-testid="badge-pro"
+                    >
+                      <Star className="w-2.5 h-2.5 mr-0.5 fill-current" />
+                      {t.proBadge}
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{t.proBadgeTooltip}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-2">

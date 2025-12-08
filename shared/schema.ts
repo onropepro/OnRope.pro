@@ -177,6 +177,9 @@ export const users = pgTable("users", {
   referredByUserId: varchar("referred_by_user_id").references(() => users.id, { onDelete: "set null" }), // User ID of the technician who referred them
   referredByCode: varchar("referred_by_code", { length: 20 }), // The referral code they used to register (for tracking purposes)
   
+  // Technician PLUS access (premium tier)
+  hasPlusAccess: boolean("has_plus_access").default(false), // Whether technician has PLUS benefits (from referrals or subscription)
+  
   // White label branding (company role only)
   brandingLogoUrl: text("branding_logo_url"), // Custom logo URL for resident portal
   brandingColors: text("branding_colors").array().default(sql`ARRAY[]::text[]`), // Array of brand colors (hex codes)
