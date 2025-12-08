@@ -231,6 +231,9 @@ const translations = {
     viewLoggedHours: "View Logged Hours",
     totalHoursLogged: "Total Hours Logged",
     hoursLogged: "hours logged",
+    totalHoursLabel: "total hours",
+    baselinePlus: "baseline +",
+    fromSessions: "from sessions",
     workSessions: "Work Sessions",
     previousHours: "Previous Hours",
     previousHoursDesc: "Hours from work before joining this platform (not counted in totals)",
@@ -438,6 +441,9 @@ const translations = {
     viewLoggedHours: "Voir les heures enregistrées",
     totalHoursLogged: "Total des heures enregistrées",
     hoursLogged: "heures enregistrées",
+    totalHoursLabel: "heures totales",
+    baselinePlus: "base +",
+    fromSessions: "des sessions",
     workSessions: "Sessions de travail",
     previousHours: "Heures précédentes",
     previousHoursDesc: "Heures de travail avant de rejoindre cette plateforme (non comptabilisées dans les totaux)",
@@ -636,10 +642,20 @@ export default function TechnicianPortal() {
     enabled: !!user && user.role === 'rope_access_tech',
   });
   
-  const totalLoggedHours = useMemo(() => {
+  // Calculate work session hours from task logs
+  const workSessionHours = useMemo(() => {
     if (!loggedHoursData?.logs) return 0;
     return loggedHoursData.logs.reduce((sum, log) => sum + parseFloat(log.hoursWorked || "0"), 0);
   }, [loggedHoursData]);
+  
+  // Get baseline hours from user profile
+  const baselineHours = useMemo(() => {
+    if (!user?.irataBaselineHours) return 0;
+    return parseFloat(user.irataBaselineHours) || 0;
+  }, [user?.irataBaselineHours]);
+  
+  // Combined total = baseline + work sessions
+  const combinedTotalHours = baselineHours + workSessionHours;
 
   const acceptInvitationMutation = useMutation({
     mutationFn: async (invitationId: string) => {
@@ -1903,9 +1919,14 @@ export default function TechnicianPortal() {
                         <div>
                           <p className="font-medium text-sm">{t.myLoggedHours}</p>
                           <p className="text-xs text-muted-foreground">{t.viewLoggedHoursDesc}</p>
-                          {totalLoggedHours > 0 && (
+                          {(combinedTotalHours > 0 || workSessionHours > 0) && (
                             <p className="text-sm font-semibold text-primary mt-1" data-testid="text-total-logged-hours">
-                              {totalLoggedHours.toFixed(1)} {t.hoursLogged}
+                              {combinedTotalHours.toFixed(1)} {t.totalHoursLabel}
+                              {workSessionHours > 0 && baselineHours > 0 && (
+                                <span className="text-xs font-normal text-muted-foreground ml-1">
+                                  ({baselineHours.toFixed(1)} {t.baselinePlus} {workSessionHours.toFixed(1)} {t.fromSessions})
+                                </span>
+                              )}
                             </p>
                           )}
                         </div>

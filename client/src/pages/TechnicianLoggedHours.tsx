@@ -43,6 +43,8 @@ const translations = {
     title: "My Logged Hours",
     backToPortal: "Back to Portal",
     totalHours: "Total Hours",
+    combinedTotal: "Combined Total (Baseline + Sessions)",
+    baselineHours: "Baseline Hours",
     fromWorkSessions: "From Work Sessions",
     workSessions: "Work Sessions",
     previousHours: "Previous Hours",
@@ -120,6 +122,8 @@ const translations = {
     title: "Mes heures enregistrées",
     backToPortal: "Retour au portail",
     totalHours: "Total des heures",
+    combinedTotal: "Total combiné (Base + Sessions)",
+    baselineHours: "Heures de base",
     fromWorkSessions: "Des sessions de travail",
     workSessions: "Sessions de travail",
     previousHours: "Heures précédentes",
@@ -266,6 +270,10 @@ export default function TechnicianLoggedHours() {
   }>>([]);
   const [isCommitting, setIsCommitting] = useState(false);
 
+  const { data: userData } = useQuery<{ user: any }>({
+    queryKey: ["/api/user"],
+  });
+
   const { data: logsData, isLoading: logsLoading } = useQuery<{ logs: IrataTaskLog[] }>({
     queryKey: ["/api/my-irata-task-logs"],
   });
@@ -274,16 +282,25 @@ export default function TechnicianLoggedHours() {
     queryKey: ["/api/my-historical-hours"],
   });
 
+  const user = userData?.user;
   const logs = logsData?.logs || [];
   const historicalHours = historicalData?.historicalHours || [];
 
+  // Baseline hours from user profile
+  const baselineHours = user?.irataBaselineHours ? parseFloat(user.irataBaselineHours) || 0 : 0;
+  
+  // Hours from work sessions
   const totalLoggedHours = logs.reduce((sum: number, log: IrataTaskLog) => {
     return sum + parseFloat(log.hoursWorked || "0");
   }, 0);
 
+  // Previous/historical hours (not counted in certification totals)
   const totalHistoricalHours = historicalHours.reduce((sum: number, entry: HistoricalHours) => {
     return sum + parseFloat(entry.hoursWorked || "0");
   }, 0);
+  
+  // Combined total = baseline + work sessions (excludes historical)
+  const combinedTotalHours = baselineHours + totalLoggedHours;
 
   const addHistoricalMutation = useMutation({
     mutationFn: async (data: {
@@ -665,19 +682,34 @@ export default function TechnicianLoggedHours() {
 
         <Card>
           <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-full bg-primary/10">
-                  <Clock className="w-5 h-5 text-primary" />
+            <div className="flex flex-col gap-4">
+              {/* Combined Total Hours */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-primary/10">
+                    <Clock className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold" data-testid="text-combined-total-hours">{combinedTotalHours.toFixed(1)} {t.hr}</p>
+                    <p className="text-sm text-muted-foreground">{t.combinedTotal}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-2xl font-bold">{totalLoggedHours.toFixed(1)} {t.hr}</p>
-                  <p className="text-sm text-muted-foreground">{t.totalHours} ({t.fromWorkSessions})</p>
+                <div className="text-right">
+                  <p className="text-lg font-medium">{logs.length}</p>
+                  <p className="text-sm text-muted-foreground">{logs.length === 1 ? t.session : t.sessions}</p>
                 </div>
               </div>
-              <div className="text-right">
-                <p className="text-lg font-medium">{logs.length}</p>
-                <p className="text-sm text-muted-foreground">{logs.length === 1 ? t.session : t.sessions}</p>
+              
+              {/* Hours Breakdown */}
+              <div className="grid grid-cols-2 gap-4 pt-3 border-t">
+                <div className="text-center p-2 rounded-lg bg-muted/50">
+                  <p className="text-lg font-semibold" data-testid="text-baseline-hours">{baselineHours.toFixed(1)} {t.hr}</p>
+                  <p className="text-xs text-muted-foreground">{t.baselineHours}</p>
+                </div>
+                <div className="text-center p-2 rounded-lg bg-muted/50">
+                  <p className="text-lg font-semibold" data-testid="text-session-hours">{totalLoggedHours.toFixed(1)} {t.hr}</p>
+                  <p className="text-xs text-muted-foreground">{t.fromWorkSessions}</p>
+                </div>
               </div>
             </div>
           </CardContent>
