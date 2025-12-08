@@ -883,6 +883,11 @@ export default function TechnicianPortal() {
     uploadingDocTypeRef.current = docType;
     setUploadingDocType(docType);
     
+    // Reset the input value first to ensure onChange fires even if same file is selected
+    if (documentInputRef.current) {
+      documentInputRef.current.value = '';
+    }
+    
     // Handle case where user cancels the file dialog
     // When the file dialog is closed, window regains focus
     const handleDialogClose = () => {
