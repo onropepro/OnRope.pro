@@ -1661,10 +1661,14 @@ export default function TechnicianPortal() {
                         <ArrowRight className="w-4 h-4" />
                       </Button>
                     </div>
-                    <p className="text-xs text-amber-700 dark:text-amber-400 mt-2 flex items-center gap-1">
-                      <AlertCircle className="w-3 h-3" />
-                      {t.logbookDisclaimer}
-                    </p>
+                    <div className="mt-3 p-3 bg-red-500/15 border-2 border-red-500/40 rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                        <p className="text-sm font-semibold text-red-700 dark:text-red-300">
+                          {t.logbookDisclaimer}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                   
                   {user.irataDocuments && user.irataDocuments.filter((u: string) => u && u.trim()).length > 0 && (

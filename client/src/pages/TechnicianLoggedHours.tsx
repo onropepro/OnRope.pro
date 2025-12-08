@@ -89,6 +89,7 @@ const translations = {
     hoursRequired: "Please enter hours worked",
     dateRequired: "Please enter start and end dates",
     unknownProject: "Unknown Project",
+    importantNotice: "Important Notice",
     logbookDisclaimer: "This is a personal tracking tool to help you monitor your rope access hours. You must still record all hours in your official IRATA/SPRAT logbook - this digital log does not replace it and is not valid for certification purposes.",
   },
   fr: {
@@ -145,6 +146,7 @@ const translations = {
     hoursRequired: "Veuillez entrer les heures travaillées",
     dateRequired: "Veuillez entrer les dates de début et de fin",
     unknownProject: "Projet inconnu",
+    importantNotice: "Avis important",
     logbookDisclaimer: "Ceci est un outil de suivi personnel pour vous aider à surveiller vos heures d'accès sur corde. Vous devez toujours enregistrer toutes vos heures dans votre carnet IRATA/SPRAT officiel - ce journal numérique ne le remplace pas et n'est pas valide pour les fins de certification.",
   }
 };
@@ -385,12 +387,21 @@ export default function TechnicianLoggedHours() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
-        {/* Important disclaimer notice */}
-        <div className="flex items-start gap-3 p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg">
-          <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-amber-800 dark:text-amber-200">
-            {t.logbookDisclaimer}
-          </p>
+        {/* Important disclaimer notice - MUST BE HIGHLY VISIBLE */}
+        <div className="p-4 bg-red-500/15 border-2 border-red-500/50 rounded-lg shadow-sm">
+          <div className="flex items-start gap-3">
+            <div className="p-2 bg-red-500/20 rounded-full flex-shrink-0">
+              <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
+            </div>
+            <div>
+              <p className="text-base font-bold text-red-700 dark:text-red-300 uppercase tracking-wide mb-1">
+                {t.importantNotice}
+              </p>
+              <p className="text-base font-semibold text-red-700 dark:text-red-300">
+                {t.logbookDisclaimer}
+              </p>
+            </div>
+          </div>
         </div>
 
         <Card>
