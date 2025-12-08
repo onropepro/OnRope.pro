@@ -31,7 +31,9 @@ import {
   Calendar
 } from "lucide-react";
 import { format } from "date-fns";
-import type { JobPosting, User } from "@shared/schema";
+import type { JobPosting, User, JobApplication } from "@shared/schema";
+
+type ApplicationWithJob = JobApplication & { jobPosting: JobPosting };
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 type Language = 'en' | 'fr';
@@ -110,6 +112,24 @@ const translations = {
     threeToFive: "3-5 years",
     fivePlus: "5+ years",
     tenPlus: "10+ years",
+    applied: "Applied",
+    applyNow: "Apply Now",
+    withdrawApplication: "Withdraw",
+    applicationSubmitted: "Application Submitted",
+    applicationSubmittedDesc: "Your interest has been noted. The employer will review your profile.",
+    applicationWithdrawn: "Application Withdrawn",
+    applicationWithdrawnDesc: "Your application has been removed.",
+    applyFailed: "Failed to submit application",
+    withdrawFailed: "Failed to withdraw application",
+    myApplications: "My Applications",
+    noApplications: "You haven't applied to any jobs yet",
+    applicationStatus: "Status",
+    statusApplied: "Applied",
+    statusReviewing: "Under Review",
+    statusInterviewed: "Interviewed",
+    statusOffered: "Offer Made",
+    statusHired: "Hired",
+    statusRejected: "Not Selected",
   },
   fr: {
     title: "Offres d'emploi",
@@ -184,6 +204,24 @@ const translations = {
     threeToFive: "3-5 ans",
     fivePlus: "5+ ans",
     tenPlus: "10+ ans",
+    applied: "Postule",
+    applyNow: "Postuler",
+    withdrawApplication: "Retirer",
+    applicationSubmitted: "Candidature soumise",
+    applicationSubmittedDesc: "Votre interet a ete note. L'employeur examinera votre profil.",
+    applicationWithdrawn: "Candidature retiree",
+    applicationWithdrawnDesc: "Votre candidature a ete supprimee.",
+    applyFailed: "Echec de la soumission",
+    withdrawFailed: "Echec du retrait",
+    myApplications: "Mes candidatures",
+    noApplications: "Vous n'avez postule a aucun emploi",
+    applicationStatus: "Statut",
+    statusApplied: "Postule",
+    statusReviewing: "En cours d'examen",
+    statusInterviewed: "Entrevue",
+    statusOffered: "Offre faite",
+    statusHired: "Embauche",
+    statusRejected: "Non selectionne",
   }
 };
 
@@ -208,8 +246,59 @@ export default function TechnicianJobBoard() {
     queryKey: ["/api/job-postings/public"],
   });
 
+  const { data: applicationsData } = useQuery<{ applications: ApplicationWithJob[] }>({
+    queryKey: ["/api/job-applications/my"],
+  });
+
   const user = userData?.user;
   const jobs = jobsData?.jobPostings || [];
+  const myApplications = applicationsData?.applications || [];
+
+  const hasApplied = (jobId: string) => {
+    return myApplications.some(app => app.jobPostingId === jobId);
+  };
+
+  const getApplication = (jobId: string) => {
+    return myApplications.find(app => app.jobPostingId === jobId);
+  };
+
+  const applyMutation = useMutation({
+    mutationFn: async (jobPostingId: string) => {
+      return apiRequest("POST", "/api/job-applications", { jobPostingId });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/job-applications/my"] });
+      toast({
+        title: t.applicationSubmitted,
+        description: t.applicationSubmittedDesc,
+      });
+    },
+    onError: () => {
+      toast({
+        title: t.applyFailed,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const withdrawMutation = useMutation({
+    mutationFn: async (applicationId: string) => {
+      return apiRequest("DELETE", `/api/job-applications/${applicationId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/job-applications/my"] });
+      toast({
+        title: t.applicationWithdrawn,
+        description: t.applicationWithdrawnDesc,
+      });
+    },
+    onError: () => {
+      toast({
+        title: t.withdrawFailed,
+        variant: "destructive",
+      });
+    },
+  });
 
   const visibilityMutation = useMutation({
     mutationFn: async (isVisible: boolean) => {
@@ -638,10 +727,34 @@ export default function TechnicianJobBoard() {
             </div>
           )}
 
-          <DialogFooter>
+          <DialogFooter className="gap-2 sm:gap-0">
             <Button variant="outline" onClick={() => setSelectedJob(null)} data-testid="button-close-job-details">
               {t.close}
             </Button>
+            {selectedJob && hasApplied(selectedJob.id) ? (
+              <Button 
+                variant="secondary"
+                onClick={() => {
+                  const app = getApplication(selectedJob.id);
+                  if (app) withdrawMutation.mutate(app.id);
+                }}
+                disabled={withdrawMutation.isPending}
+                data-testid="button-withdraw-application"
+              >
+                {withdrawMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                <CheckCircle2 className="w-4 h-4 mr-2" />
+                {t.applied}
+              </Button>
+            ) : (
+              <Button 
+                onClick={() => selectedJob && applyMutation.mutate(selectedJob.id)}
+                disabled={applyMutation.isPending}
+                data-testid="button-apply-job"
+              >
+                {applyMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                {t.applyNow}
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
