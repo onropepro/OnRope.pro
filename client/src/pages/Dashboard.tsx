@@ -7436,7 +7436,7 @@ export default function Dashboard() {
                   )}
 
                   {/* Driver's License */}
-                  {(employeeToView.driversLicenseNumber || employeeToView.driversLicenseProvince) && (
+                  {(employeeToView.driversLicenseNumber || employeeToView.driversLicenseProvince || (employeeToView.driversLicenseDocuments && employeeToView.driversLicenseDocuments.length > 0)) && (
                     <Card>
                       <CardHeader>
                         <CardTitle className="text-base flex items-center gap-2">
@@ -7457,22 +7457,63 @@ export default function Dashboard() {
                             <div className="text-sm font-medium">{employeeToView.driversLicenseProvince}</div>
                           </div>
                         )}
+                        {employeeToView.driversLicenseExpiry && (
+                          <div>
+                            <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.expiry', 'Expiry')}</div>
+                            <div className="text-sm font-medium">{formatLocalDate(employeeToView.driversLicenseExpiry)}</div>
+                          </div>
+                        )}
                         {employeeToView.driversLicenseDocuments && employeeToView.driversLicenseDocuments.length > 0 && (
                           <div>
                             <div className="text-xs text-muted-foreground mb-2">{t('dashboard.employeeDetails.documents', 'Documents')}</div>
-                            <div className="space-y-1">
-                              {employeeToView.driversLicenseDocuments.map((doc: string, idx: number) => (
-                                <a 
-                                  key={idx} 
-                                  href={doc} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="flex items-center gap-2 text-sm text-primary hover:underline"
-                                >
-                                  <span className="material-icons text-sm">description</span>
-                                  {t('dashboard.employeeDetails.document', 'Document')} {idx + 1}
-                                </a>
-                              ))}
+                            <div className="space-y-2">
+                              {employeeToView.driversLicenseDocuments.map((doc: string, idx: number) => {
+                                const lowerUrl = doc.toLowerCase();
+                                const isPdf = lowerUrl.endsWith('.pdf');
+                                const isAbstract = lowerUrl.includes('abstract');
+                                const isImage = lowerUrl.match(/\.(jpg|jpeg|png|gif|webp|bmp)(\?|$)/i) || 
+                                              lowerUrl.includes('image') || 
+                                              (!isPdf && !lowerUrl.endsWith('.doc') && !lowerUrl.endsWith('.docx'));
+                                const documentLabel = isAbstract 
+                                  ? t('dashboard.employeeDetails.driversAbstract', "Driver's Abstract")
+                                  : t('dashboard.employeeDetails.licensePhoto', 'License Photo');
+                                
+                                return (
+                                  <div key={idx} className="space-y-1">
+                                    <div className="text-xs font-medium text-muted-foreground">{documentLabel}</div>
+                                    <a 
+                                      href={doc} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="block border rounded-lg overflow-hidden hover:opacity-80 transition-opacity"
+                                    >
+                                      {isPdf ? (
+                                        <div className="flex items-center justify-center py-4 bg-muted gap-2">
+                                          <span className="material-icons text-muted-foreground">picture_as_pdf</span>
+                                          <span className="text-sm text-muted-foreground">{t('dashboard.employeeDetails.viewPdf', 'View PDF')}</span>
+                                        </div>
+                                      ) : isImage ? (
+                                        <img 
+                                          src={doc} 
+                                          alt={documentLabel}
+                                          className="w-full object-contain"
+                                          style={{ maxHeight: '200px', minHeight: '60px' }}
+                                          onError={(e) => {
+                                            const target = e.target as HTMLImageElement;
+                                            target.onerror = null;
+                                            target.style.display = 'none';
+                                          }}
+                                        />
+                                      ) : (
+                                        <div className="flex items-center justify-center py-4 bg-muted gap-2">
+                                          <span className="material-icons text-muted-foreground">description</span>
+                                          <span className="text-sm text-muted-foreground">{t('dashboard.employeeDetails.viewDocument', 'View Document')}</span>
+                                        </div>
+                                      )}
+                                    </a>
+                                  </div>
+                                );
+                              })}
                             </div>
                           </div>
                         )}

@@ -2235,21 +2235,25 @@ export default function TechnicianPortal() {
                   )}
                 </div>
 
-                {user.driversLicenseNumber && (
-                  <>
-                    <Separator />
-                    <div className="space-y-3">
-                      <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
-                        <CreditCard className="w-4 h-4" />
-                        {t.driversLicense}
-                      </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <InfoItem label="License #" value="••••••••" masked />
+                <Separator />
+                <div className="space-y-3">
+                  <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
+                    <CreditCard className="w-4 h-4" />
+                    {t.driversLicense}
+                  </h3>
+                  {(user.driversLicenseNumber || user.driversLicenseExpiry) && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {user.driversLicenseNumber && (
+                        <InfoItem label={t.licenseNumber} value="••••••••" masked />
+                      )}
+                      {user.driversLicenseExpiry && (
                         <InfoItem 
-                          label="Expiry" 
-                          value={user.driversLicenseExpiry ? formatLocalDate(user.driversLicenseExpiry) : null} 
+                          label={t.expiry}
+                          value={formatLocalDate(user.driversLicenseExpiry)} 
                         />
-                      </div>
+                      )}
+                    </div>
+                  )}
                       {user.driversLicenseDocuments && user.driversLicenseDocuments.filter((u: string) => u && u.trim()).length > 0 && (
                         <div className="pt-3">
                           <p className="text-sm text-muted-foreground mb-3">Uploaded Documents</p>
@@ -2358,9 +2362,7 @@ export default function TechnicianPortal() {
                           )}
                         </Button>
                       </div>
-                    </div>
-                  </>
-                )}
+                </div>
 
                 {user.bankDocuments && user.bankDocuments.filter((u: string) => u && u.trim()).length > 0 && (
                   <>
