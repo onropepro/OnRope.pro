@@ -405,15 +405,15 @@ async function generatePropertyManagerCode(): Promise<string> {
   throw new Error('Unable to generate unique property manager code. Please try again.');
 }
 
-// Generate unique 10-character referral code for technicians using cryptographically secure randomness
+// Generate unique 12-character referral code for technicians using cryptographically secure randomness
 async function generateReferralCode(): Promise<string> {
   const crypto = await import('crypto');
   const characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Excluding confusing characters like 0, O, 1, I
-  const codeLength = 10;
+  const codeLength = 12;
   const maxAttempts = 10; // Prevent infinite loops in case of database issues
   
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    // Generate 10-character code using crypto.randomBytes for security
+    // Generate 12-character code using crypto.randomBytes for security
     const randomBytes = crypto.randomBytes(codeLength);
     let code = '';
     
