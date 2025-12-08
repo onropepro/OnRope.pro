@@ -9115,7 +9115,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const logs = await storage.getIrataTaskLogsByEmployee(currentUser.id);
-      res.json({ logs });
+      
+      // Enrich logs with building height from project if not already set
+      const enrichedLogs = await Promise.all(logs.map(async (log) => {
+        // If log already has building height, return as-is
+        if (log.buildingHeight) {
+          return log;
+        }
+        
+        // Try to get building height from the associated project
+        if (log.projectId) {
+          const project = await storage.getProjectById(log.projectId);
+          if (project) {
+            let derivedHeight = project.buildingHeight || null;
+            
+            // Calculate from floors if no explicit height
+            if (!derivedHeight && project.buildingFloors) {
+              const floors = project.buildingFloors;
+              const heightFeet = floors * 9;
+              const heightMeters = Math.round(heightFeet / 3.281);
+              derivedHeight = `${heightFeet}ft (${heightMeters}m)`;
+            }
+            
+            if (derivedHeight) {
+              return { ...log, buildingHeight: derivedHeight };
+            }
+          }
+        }
+        
+        return log;
+      }));
+      
+      res.json({ logs: enrichedLogs });
     } catch (error) {
       console.error("Get my IRATA task logs error:", error);
       res.status(500).json({ message: "Internal server error" });
