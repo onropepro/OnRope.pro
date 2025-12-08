@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { AlertTriangle } from "lucide-react";
 
 interface HighRiseBuildingProps {
   floors: number;
@@ -48,11 +49,13 @@ export function HighRiseBuilding({
   }, [floors]);
 
   const elevations = [
-    { name: "North", progress: northProgress, completed: completedDropsNorth, total: totalDropsNorth },
-    { name: "East", progress: eastProgress, completed: completedDropsEast, total: totalDropsEast },
-    { name: "South", progress: southProgress, completed: completedDropsSouth, total: totalDropsSouth },
-    { name: "West", progress: westProgress, completed: completedDropsWest, total: totalDropsWest },
+    { name: "North", progress: northProgress, completed: completedDropsNorth, total: totalDropsNorth, exceeded: completedDropsNorth > totalDropsNorth && totalDropsNorth > 0 },
+    { name: "East", progress: eastProgress, completed: completedDropsEast, total: totalDropsEast, exceeded: completedDropsEast > totalDropsEast && totalDropsEast > 0 },
+    { name: "South", progress: southProgress, completed: completedDropsSouth, total: totalDropsSouth, exceeded: completedDropsSouth > totalDropsSouth && totalDropsSouth > 0 },
+    { name: "West", progress: westProgress, completed: completedDropsWest, total: totalDropsWest, exceeded: completedDropsWest > totalDropsWest && totalDropsWest > 0 },
   ];
+  
+  const hasAnyExceeded = elevations.some(e => e.exceeded);
 
   return (
     <div className={`w-full ${className}`} data-testid="highrise-building">
@@ -61,6 +64,12 @@ export function HighRiseBuilding({
         <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2">
           {completedDrops} of {totalDrops} Total Drops Complete
         </div>
+        {hasAnyExceeded && (
+          <div className="flex items-center justify-center gap-2 mt-2 text-amber-600 dark:text-amber-400">
+            <AlertTriangle className="w-4 h-4" />
+            <span className="text-xs font-medium">Some elevations have more drops than planned</span>
+          </div>
+        )}
       </div>
 
       {/* Four Elevations - Minimalist Premium Design */}
@@ -109,7 +118,8 @@ export function HighRiseBuilding({
               <div className="text-3xl font-bold mb-1 text-primary">
                 {Math.round(elevation.progress)}%
               </div>
-              <div className="text-sm text-muted-foreground font-medium">
+              <div className={`text-sm font-medium flex items-center justify-center gap-1 ${elevation.exceeded ? 'text-amber-600 dark:text-amber-400' : 'text-muted-foreground'}`}>
+                {elevation.exceeded && <AlertTriangle className="w-3 h-3" />}
                 {elevation.completed} / {elevation.total}
               </div>
             </div>
