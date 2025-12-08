@@ -7178,6 +7178,33 @@ export default function Dashboard() {
                     </CardContent>
                   </Card>
 
+                  {/* Address */}
+                  {(employeeToView.employeeStreetAddress || employeeToView.employeeCity || employeeToView.employeeProvinceState || employeeToView.employeeCountry || employeeToView.employeePostalCode) && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-base flex items-center gap-2">
+                          <span className="material-icons text-lg">home</span>
+                          {t('dashboard.employeeDetails.address', 'Address')}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-1">
+                        {employeeToView.employeeStreetAddress && (
+                          <div className="text-sm">{employeeToView.employeeStreetAddress}</div>
+                        )}
+                        <div className="text-sm">
+                          {[
+                            employeeToView.employeeCity,
+                            employeeToView.employeeProvinceState,
+                            employeeToView.employeePostalCode
+                          ].filter(Boolean).join(', ')}
+                        </div>
+                        {employeeToView.employeeCountry && (
+                          <div className="text-sm">{employeeToView.employeeCountry}</div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  )}
+
                   {/* Employment Details */}
                   <Card>
                     <CardHeader>
@@ -7537,11 +7564,11 @@ export default function Dashboard() {
                             <div className="text-sm font-medium font-mono">{employeeToView.bankAccountNumber}</div>
                           </div>
                         )}
-                        {employeeToView.voidChequeDocuments && employeeToView.voidChequeDocuments.length > 0 && (
+                        {employeeToView.bankDocuments && employeeToView.bankDocuments.length > 0 && (
                           <div>
                             <div className="text-xs text-muted-foreground mb-2">{t('dashboard.employeeDetails.voidCheque', 'Void Cheque')}</div>
                             <div className="space-y-1">
-                              {employeeToView.voidChequeDocuments.map((doc: string, idx: number) => (
+                              {employeeToView.bankDocuments.map((doc: string, idx: number) => (
                                 <a 
                                   key={idx} 
                                   href={doc} 
@@ -7570,18 +7597,19 @@ export default function Dashboard() {
                     </CardHeader>
                     <CardContent>
                       {(() => {
-                        const grantedPermissions = [
-                          { granted: employeeToView.canCreateProjects, label: t('dashboard.employeeDetails.createProjects', 'Create Projects') },
-                          { granted: employeeToView.canViewAllProjects, label: t('dashboard.employeeDetails.viewAllProjects', 'View All Projects') },
-                          { granted: employeeToView.canManageEmployees, label: t('dashboard.employeeDetails.manageEmployees', 'Manage Employees') },
-                          { granted: employeeToView.canAccessFinancials, label: t('dashboard.employeeDetails.accessFinancials', 'Access Financials') },
-                          { granted: employeeToView.canGenerateReports, label: t('dashboard.employeeDetails.generateReports', 'Generate Reports') },
-                          { granted: employeeToView.canManageClients, label: t('dashboard.employeeDetails.manageClients', 'Manage Clients') },
-                          { granted: employeeToView.canApproveHours, label: t('dashboard.employeeDetails.approveHours', 'Approve Hours') },
-                          { granted: employeeToView.canManageCompliance, label: t('dashboard.employeeDetails.manageCompliance', 'Manage Compliance') },
-                        ].filter(p => p.granted);
+                        // Normalize permissions array (handle string, array, or null)
+                        let perms: string[] = [];
+                        if (Array.isArray(employeeToView.permissions)) {
+                          perms = employeeToView.permissions;
+                        } else if (typeof employeeToView.permissions === 'string') {
+                          if (employeeToView.permissions.startsWith('[')) {
+                            try { perms = JSON.parse(employeeToView.permissions); } catch { perms = []; }
+                          } else if (employeeToView.permissions.startsWith('{') && employeeToView.permissions.endsWith('}')) {
+                            perms = employeeToView.permissions.slice(1, -1).split(',').map((s: string) => s.trim()).filter(Boolean);
+                          }
+                        }
 
-                        if (grantedPermissions.length === 0) {
+                        if (perms.length === 0) {
                           return (
                             <div className="text-sm text-muted-foreground">
                               {t('dashboard.employeeDetails.noPermissions', 'No permissions assigned')}
@@ -7591,12 +7619,17 @@ export default function Dashboard() {
 
                         return (
                           <div className="grid grid-cols-2 gap-2">
-                            {grantedPermissions.map((permission, index) => (
-                              <div key={index} className="flex items-center gap-2">
-                                <span className="material-icons text-sm text-green-600">check_circle</span>
-                                <span className="text-sm">{permission.label}</span>
-                              </div>
-                            ))}
+                            {perms.map((permId: string, index: number) => {
+                              // Find the permission label from AVAILABLE_PERMISSIONS
+                              const perm = AVAILABLE_PERMISSIONS.find((p: any) => p.id === permId);
+                              const label = perm ? t(perm.labelKey, permId.replace(/_/g, ' ')) : permId.replace(/_/g, ' ');
+                              return (
+                                <div key={index} className="flex items-center gap-2">
+                                  <span className="material-icons text-sm text-green-600">check_circle</span>
+                                  <span className="text-sm capitalize">{label}</span>
+                                </div>
+                              );
+                            })}
                           </div>
                         );
                       })()}
