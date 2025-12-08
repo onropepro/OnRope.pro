@@ -340,6 +340,9 @@ const translations = {
     harnessYes: "Inspection Done",
     harnessNo: "No Inspection",
     sessionRating: "Session Rating",
+    improvementNeeded: "Areas to improve:",
+    improveHarness: "Complete harness inspections on work days",
+    improveDocs: "Sign required safety documents",
   },
   fr: {
     technicianPortal: "Portail du technicien",
@@ -604,6 +607,9 @@ const translations = {
     harnessYes: "Inspection Faite",
     harnessNo: "Pas d'Inspection",
     sessionRating: "Note de Session",
+    improvementNeeded: "Points à améliorer:",
+    improveHarness: "Effectuer les inspections de harnais les jours de travail",
+    improveDocs: "Signer les documents de sécurité requis",
   }
 };
 
@@ -1617,7 +1623,7 @@ export default function TechnicianPortal() {
               {performanceData?.summary?.totalSessions && performanceData.summary.totalSessions > 0 ? (
                 <div className="space-y-4">
                   {/* Main Score Display */}
-                  <div className="flex items-center justify-between p-4 rounded-lg bg-gradient-to-r from-amber-500/10 to-yellow-400/10 border border-amber-200/30 dark:border-amber-800/30">
+                  <div className="p-4 rounded-lg bg-gradient-to-r from-amber-500/10 to-yellow-400/10 border border-amber-200/30 dark:border-amber-800/30">
                     <div className="flex items-center gap-4">
                       <div className="text-4xl font-bold text-amber-600 dark:text-amber-400" data-testid="text-performance-score">
                         {performanceData.summary.averageScore}
@@ -1640,6 +1646,29 @@ export default function TechnicianPortal() {
                         </Badge>
                       </div>
                     </div>
+                    
+                    {/* Improvement hints - show when not excellent */}
+                    {(performanceData.summary.overallRating === 'needs_improvement' || 
+                      performanceData.summary.overallRating === 'poor') && 
+                      (performanceData.summary.harnessCompliance < 80 || performanceData.summary.documentCompliance < 100) && (
+                      <div className="mt-3 pt-3 border-t border-amber-200/30 dark:border-amber-800/30">
+                        <p className="text-xs font-medium text-muted-foreground mb-1">{t.improvementNeeded}</p>
+                        <ul className="text-xs text-muted-foreground space-y-1">
+                          {performanceData.summary.harnessCompliance < 80 && (
+                            <li className="flex items-center gap-1.5" data-testid="hint-harness">
+                              <AlertTriangle className="w-3 h-3 text-amber-500" />
+                              {t.improveHarness}
+                            </li>
+                          )}
+                          {performanceData.summary.documentCompliance < 100 && (
+                            <li className="flex items-center gap-1.5" data-testid="hint-docs">
+                              <AlertTriangle className="w-3 h-3 text-amber-500" />
+                              {t.improveDocs}
+                            </li>
+                          )}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                   
                   {/* Stats Row */}
