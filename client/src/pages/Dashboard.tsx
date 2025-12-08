@@ -5381,15 +5381,15 @@ export default function Dashboard() {
                               <div className="flex-1">
                                 <div className="flex items-center gap-2">
                                   <div className="font-medium text-lg">{employee.name || employee.companyName || employee.email}</div>
-                                  {/* PRO Badge - Always shown for now, will be gated behind PLUS access later */}
+                                  {/* PLUS Badge - Always shown for now, will be gated behind PLUS access later */}
                                   {employee.role === 'rope_access_tech' && (
                                     <Badge 
                                       variant="default" 
                                       className="bg-gradient-to-r from-amber-500 to-yellow-400 text-white text-[10px] px-1.5 py-0 h-4 font-bold border-0" 
-                                      data-testid={`badge-pro-${employee.id}`}
+                                      data-testid={`badge-plus-${employee.id}`}
                                     >
                                       <Star className="w-2.5 h-2.5 mr-0.5 fill-current" />
-                                      PRO
+                                      PLUS
                                     </Badge>
                                   )}
                                   {irataStatus === 'expired' && (
