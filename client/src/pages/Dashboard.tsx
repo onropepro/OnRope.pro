@@ -7351,7 +7351,7 @@ export default function Dashboard() {
                     </Card>
                   )}
 
-                  {/* Permissions */}
+                  {/* Permissions - Only show granted permissions */}
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-base flex items-center gap-2">
@@ -7360,72 +7360,37 @@ export default function Dashboard() {
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="flex items-center gap-2">
-                          {employeeToView.canCreateProjects ? (
-                            <span className="material-icons text-sm text-green-600">check_circle</span>
-                          ) : (
-                            <span className="material-icons text-sm text-muted-foreground">cancel</span>
-                          )}
-                          <span className="text-sm">{t('dashboard.employeeDetails.createProjects', 'Create Projects')}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {employeeToView.canViewAllProjects ? (
-                            <span className="material-icons text-sm text-green-600">check_circle</span>
-                          ) : (
-                            <span className="material-icons text-sm text-muted-foreground">cancel</span>
-                          )}
-                          <span className="text-sm">{t('dashboard.employeeDetails.viewAllProjects', 'View All Projects')}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {employeeToView.canManageEmployees ? (
-                            <span className="material-icons text-sm text-green-600">check_circle</span>
-                          ) : (
-                            <span className="material-icons text-sm text-muted-foreground">cancel</span>
-                          )}
-                          <span className="text-sm">{t('dashboard.employeeDetails.manageEmployees', 'Manage Employees')}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {employeeToView.canAccessFinancials ? (
-                            <span className="material-icons text-sm text-green-600">check_circle</span>
-                          ) : (
-                            <span className="material-icons text-sm text-muted-foreground">cancel</span>
-                          )}
-                          <span className="text-sm">{t('dashboard.employeeDetails.accessFinancials', 'Access Financials')}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {employeeToView.canGenerateReports ? (
-                            <span className="material-icons text-sm text-green-600">check_circle</span>
-                          ) : (
-                            <span className="material-icons text-sm text-muted-foreground">cancel</span>
-                          )}
-                          <span className="text-sm">{t('dashboard.employeeDetails.generateReports', 'Generate Reports')}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {employeeToView.canManageClients ? (
-                            <span className="material-icons text-sm text-green-600">check_circle</span>
-                          ) : (
-                            <span className="material-icons text-sm text-muted-foreground">cancel</span>
-                          )}
-                          <span className="text-sm">{t('dashboard.employeeDetails.manageClients', 'Manage Clients')}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {employeeToView.canApproveHours ? (
-                            <span className="material-icons text-sm text-green-600">check_circle</span>
-                          ) : (
-                            <span className="material-icons text-sm text-muted-foreground">cancel</span>
-                          )}
-                          <span className="text-sm">{t('dashboard.employeeDetails.approveHours', 'Approve Hours')}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {employeeToView.canManageCompliance ? (
-                            <span className="material-icons text-sm text-green-600">check_circle</span>
-                          ) : (
-                            <span className="material-icons text-sm text-muted-foreground">cancel</span>
-                          )}
-                          <span className="text-sm">{t('dashboard.employeeDetails.manageCompliance', 'Manage Compliance')}</span>
-                        </div>
-                      </div>
+                      {(() => {
+                        const grantedPermissions = [
+                          { granted: employeeToView.canCreateProjects, label: t('dashboard.employeeDetails.createProjects', 'Create Projects') },
+                          { granted: employeeToView.canViewAllProjects, label: t('dashboard.employeeDetails.viewAllProjects', 'View All Projects') },
+                          { granted: employeeToView.canManageEmployees, label: t('dashboard.employeeDetails.manageEmployees', 'Manage Employees') },
+                          { granted: employeeToView.canAccessFinancials, label: t('dashboard.employeeDetails.accessFinancials', 'Access Financials') },
+                          { granted: employeeToView.canGenerateReports, label: t('dashboard.employeeDetails.generateReports', 'Generate Reports') },
+                          { granted: employeeToView.canManageClients, label: t('dashboard.employeeDetails.manageClients', 'Manage Clients') },
+                          { granted: employeeToView.canApproveHours, label: t('dashboard.employeeDetails.approveHours', 'Approve Hours') },
+                          { granted: employeeToView.canManageCompliance, label: t('dashboard.employeeDetails.manageCompliance', 'Manage Compliance') },
+                        ].filter(p => p.granted);
+
+                        if (grantedPermissions.length === 0) {
+                          return (
+                            <div className="text-sm text-muted-foreground">
+                              {t('dashboard.employeeDetails.noPermissions', 'No permissions assigned')}
+                            </div>
+                          );
+                        }
+
+                        return (
+                          <div className="grid grid-cols-2 gap-2">
+                            {grantedPermissions.map((permission, index) => (
+                              <div key={index} className="flex items-center gap-2">
+                                <span className="material-icons text-sm text-green-600">check_circle</span>
+                                <span className="text-sm">{permission.label}</span>
+                              </div>
+                            ))}
+                          </div>
+                        );
+                      })()}
                     </CardContent>
                   </Card>
                 </div>
