@@ -73,8 +73,8 @@ const translations = {
     buildingAddress: "Building Address",
     buildingHeight: "Building Height",
     heightPlaceholder: "e.g., 25 floors, 100m",
-    previousEmployer: "Previous Employer",
-    previousEmployerPlaceholder: "Company name (optional)",
+    employer: "Employer",
+    employerPlaceholder: "Company name (optional)",
     notes: "Notes",
     notesPlaceholder: "Any additional details (optional)",
     selectTasks: "Select Tasks Performed",
@@ -172,8 +172,8 @@ const translations = {
     buildingAddress: "Adresse du bâtiment",
     buildingHeight: "Hauteur du bâtiment",
     heightPlaceholder: "ex: 25 étages, 100m",
-    previousEmployer: "Employeur précédent",
-    previousEmployerPlaceholder: "Nom de l'entreprise (facultatif)",
+    employer: "Employeur",
+    employerPlaceholder: "Nom de l'entreprise (facultatif)",
     notes: "Notes",
     notesPlaceholder: "Détails supplémentaires (facultatif)",
     selectTasks: "Sélectionner les tâches effectuées",
@@ -648,7 +648,7 @@ export default function TechnicianLoggedHours() {
 
           if (entry.previousEmployer) {
             doc.setTextColor(100, 100, 100);
-            doc.text(`${t.previousEmployer}: ${entry.previousEmployer}`, margin + 5, yPos);
+            doc.text(`${t.employer}: ${entry.previousEmployer}`, margin + 5, yPos);
             yPos += 5;
           }
 
@@ -1232,7 +1232,7 @@ export default function TechnicianLoggedHours() {
                           
                           {entry.previousEmployer && (
                             <p className="text-sm text-muted-foreground mb-2">
-                              {t.previousEmployer}: {entry.previousEmployer}
+                              {t.employer}: {entry.previousEmployer}
                             </p>
                           )}
                           
@@ -1387,13 +1387,13 @@ export default function TechnicianLoggedHours() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="previousEmployer">{t.previousEmployer}</Label>
+              <Label htmlFor="previousEmployer">{t.employer}</Label>
               <Input
                 id="previousEmployer"
-                placeholder={t.previousEmployerPlaceholder}
+                placeholder={t.employerPlaceholder}
                 value={formData.previousEmployer}
                 onChange={(e) => setFormData({ ...formData, previousEmployer: e.target.value })}
-                data-testid="input-previous-employer"
+                data-testid="input-employer"
               />
             </div>
 
@@ -1551,7 +1551,7 @@ export default function TechnicianLoggedHours() {
                         )}
                         {entry.employer && (
                           <p className="text-sm text-muted-foreground mt-1">
-                            {t.previousEmployer}: {entry.employer}
+                            {t.employer}: {entry.employer}
                           </p>
                         )}
                         {entry.tasks.length > 0 && (
