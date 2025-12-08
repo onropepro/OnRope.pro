@@ -15651,8 +15651,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const isPlatformPost = currentUser.role === "superuser";
       
-      const jobData = insertJobPostingSchema.parse({
+      // Convert expiresAt string to Date if provided
+      const bodyWithParsedDates = {
         ...req.body,
+        expiresAt: req.body.expiresAt ? new Date(req.body.expiresAt) : null,
+      };
+      
+      const jobData = insertJobPostingSchema.parse({
+        ...bodyWithParsedDates,
         companyId: isPlatformPost ? null : currentUser.id,
         isPlatformPost,
       });
@@ -15705,7 +15711,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         requiredIrataLevel: req.body.requiredIrataLevel,
         requiredSpratLevel: req.body.requiredSpratLevel,
         status: req.body.status,
-        expiresAt: req.body.expiresAt,
+        expiresAt: req.body.expiresAt ? new Date(req.body.expiresAt) : req.body.expiresAt,
         updatedAt: new Date(),
       };
 
