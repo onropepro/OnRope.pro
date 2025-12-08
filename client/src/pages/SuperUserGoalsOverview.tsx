@@ -1,18 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "wouter";
 import SuperUserLayout from "@/components/SuperUserLayout";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
-  AreaChart, Area, BarChart, Bar, LineChart, Line, 
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart, Pie, Legend
-} from "recharts";
-import { 
-  Users, Target, Building2, Globe, Zap, CreditCard, Rocket, 
-  ArrowRight, TrendingUp, CheckCircle2, Clock, AlertTriangle, DollarSign,
-  Activity, Percent, Calculator
+  Users, Target, Building2, TrendingUp, TrendingDown, DollarSign,
+  Activity, AlertCircle, CheckCircle2, Clock, Share2, 
+  MapPin, BarChart3, Gauge, Bell, Calendar
 } from "lucide-react";
 
 interface MetricsSummary {
@@ -32,150 +27,260 @@ interface MetricsSummary {
   };
 }
 
-const TIPPING_POINTS = [
+type MetricStatus = "on-track" | "at-risk" | "behind";
+
+interface LeadingMetric {
+  id: string;
+  name: string;
+  current: number;
+  goal: number;
+  unit: string;
+  daysLeft: number;
+  requiredRate: number;
+  actualRate: number;
+  status: MetricStatus;
+  icon: typeof Users;
+  goalDate: string;
+}
+
+interface LaggingMetric {
+  id: string;
+  name: string;
+  current: number | string;
+  goal: number | string;
+  unit: string;
+  status: MetricStatus;
+  icon: typeof DollarSign;
+  description: string;
+}
+
+const getStatusConfig = (status: MetricStatus) => {
+  const configs = {
+    "on-track": { 
+      label: "On Track", 
+      icon: CheckCircle2, 
+      color: "text-emerald-500", 
+      bg: "bg-emerald-50 dark:bg-emerald-500/10",
+      badge: "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400"
+    },
+    "at-risk": { 
+      label: "At Risk", 
+      icon: Clock, 
+      color: "text-amber-500", 
+      bg: "bg-amber-50 dark:bg-amber-500/10",
+      badge: "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400"
+    },
+    "behind": { 
+      label: "Behind", 
+      icon: AlertCircle, 
+      color: "text-red-500", 
+      bg: "bg-red-50 dark:bg-red-500/10",
+      badge: "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400"
+    }
+  };
+  return configs[status];
+};
+
+const leadingIndicators: LeadingMetric[] = [
   {
-    id: "tech-premium",
-    part: 1,
-    title: "Tech Premium Launch",
-    subtitle: "$14.99/mo per tech",
-    target: "Q4 Year 2",
-    revenueImpact: "$22K → $270K ARR (Y5)",
-    primaryTrigger: "2,500 tech accounts",
+    id: "tech-accounts",
+    name: "Tech Accounts",
+    current: 162,
+    goal: 500,
+    unit: "accounts",
+    daysLeft: 87,
+    requiredRate: 3.9,
+    actualRate: 2.1,
+    status: "behind",
     icon: Users,
-    color: "blue",
-    bgColor: "bg-blue-50 dark:bg-blue-500/10",
-    textColor: "text-blue-500",
-    currentKey: "totalEmployees",
-    targetValue: 2500,
+    goalDate: "Jun 30, 2026"
   },
   {
-    id: "pm-premium",
-    part: 2,
-    title: "PM Premium Launch",
-    subtitle: "$49/building/mo",
-    target: "After 150 PMs + 50% engagement",
-    revenueImpact: "$9K → $94K → $150K ARR",
-    primaryTrigger: "150 PMs + 50% engagement",
+    id: "viral-coefficient",
+    name: "Viral Coefficient (k)",
+    current: 0.90,
+    goal: 1.0,
+    unit: "",
+    daysLeft: 120,
+    requiredRate: 1.0,
+    actualRate: 0.90,
+    status: "at-risk",
+    icon: Share2,
+    goalDate: "Q2 2026"
+  },
+  {
+    id: "trial-starts",
+    name: "Trial Starts",
+    current: 6,
+    goal: 10,
+    unit: "/month",
+    daysLeft: 12,
+    requiredRate: 0.33,
+    actualRate: 0.29,
+    status: "at-risk",
     icon: Target,
-    color: "purple",
-    bgColor: "bg-purple-50 dark:bg-purple-500/10",
-    textColor: "text-purple-500",
-    currentKey: "totalClients",
-    targetValue: 150,
+    goalDate: "Month 3"
   },
   {
-    id: "pm-feature-definition",
-    part: 3,
-    title: "PM Premium Feature Definition",
-    subtitle: "Research & define features",
-    target: "Q1 Year 2",
-    revenueImpact: "Enables PM Premium launch",
-    primaryTrigger: "100+ PM accounts",
-    icon: Building2,
-    color: "emerald",
-    bgColor: "bg-emerald-50 dark:bg-emerald-500/10",
-    textColor: "text-emerald-500",
-    currentKey: "totalClients",
-    targetValue: 100,
+    id: "trial-conversion",
+    name: "Trial-to-Paid Conversion",
+    current: 36,
+    goal: 40,
+    unit: "%",
+    daysLeft: 0,
+    requiredRate: 40,
+    actualRate: 36,
+    status: "at-risk",
+    icon: TrendingUp,
+    goalDate: "Ongoing"
+  }
+];
+
+const laggingIndicators: LaggingMetric[] = [
+  {
+    id: "paying-customers",
+    name: "Paying Customers",
+    current: 8,
+    goal: 25,
+    unit: "customers",
+    status: "at-risk",
+    icon: Users,
+    description: "25 customers by Dec 31, 2026"
   },
   {
-    id: "us-west",
-    part: 4,
-    title: "US West Coast Launch",
-    subtitle: "Seattle, SF, LA, San Diego",
-    target: "Q1 Year 3",
-    revenueImpact: "+55 customers, $635K ARR",
-    primaryTrigger: "40% Canada penetration",
-    icon: Globe,
-    color: "orange",
-    bgColor: "bg-orange-50 dark:bg-orange-500/10",
-    textColor: "text-orange-500",
-    currentKey: "active",
-    targetValue: 35,
+    id: "mrr",
+    name: "Monthly Recurring Revenue",
+    current: 6304,
+    goal: 19700,
+    unit: "$",
+    status: "at-risk",
+    icon: DollarSign,
+    description: "$19,700 MRR by Dec 31, 2026"
   },
   {
-    id: "us-east",
-    part: 5,
-    title: "US East Coast Expansion",
-    subtitle: "NYC, Boston, Philly, DC, Miami",
-    target: "Q1 Year 4",
-    revenueImpact: "Path to $6.7M ARR",
-    primaryTrigger: "75 US customers",
-    icon: Rocket,
-    color: "pink",
-    bgColor: "bg-pink-50 dark:bg-pink-500/10",
-    textColor: "text-pink-500",
-    currentKey: null,
-    targetValue: 75,
+    id: "arpu",
+    name: "Average Revenue Per User",
+    current: 788,
+    goal: 788,
+    unit: "$/month",
+    status: "on-track",
+    icon: BarChart3,
+    description: "$99 base + $34.95/employee"
   },
   {
-    id: "unlimited-tier",
-    part: 6,
-    title: "Unlimited Tier Push",
-    subtitle: "$1,999/mo unlimited tier",
-    target: "Q3 Year 2",
-    revenueImpact: "$24K → $2.38M ARR (Y5)",
-    primaryTrigger: "10 Enterprise customers",
-    icon: Zap,
-    color: "amber",
-    bgColor: "bg-amber-50 dark:bg-amber-500/10",
-    textColor: "text-amber-500",
-    currentKey: null,
-    targetValue: 10,
+    id: "churn",
+    name: "Monthly Churn Rate",
+    current: "0.0%",
+    goal: "<0.83%",
+    unit: "",
+    status: "on-track",
+    icon: TrendingDown,
+    description: "<10% annual target"
   },
   {
-    id: "transaction-fees",
-    part: 7,
-    title: "Transaction Fees",
-    subtitle: "1.5% platform fees",
-    target: "Year 4+",
-    revenueImpact: "+$150K revenue",
-    primaryTrigger: "50K platform transactions/yr",
-    icon: CreditCard,
-    color: "cyan",
-    bgColor: "bg-cyan-50 dark:bg-cyan-500/10",
-    textColor: "text-cyan-500",
-    currentKey: null,
-    targetValue: 50000,
+    id: "nrr",
+    name: "Net Revenue Retention",
+    current: "115%",
+    goal: "≥115%",
+    unit: "",
+    status: "on-track",
+    icon: Activity,
+    description: "Expansion offsets churn"
+  }
+];
+
+const geographicData = {
+  buildings: {
+    total: 0,
+    byCountry: [
+      { name: "Canada", count: 0, goal: null },
+      { name: "USA", count: 0, goal: null }
+    ],
+    byProvince: [
+      { name: "British Columbia", count: 0 },
+      { name: "Alberta", count: 0 },
+      { name: "Ontario", count: 0 },
+      { name: "California", count: 0 },
+      { name: "Washington", count: 0 }
+    ]
   },
+  techs: {
+    total: 0,
+    goal: 500,
+    byCountry: [
+      { name: "Canada", count: 0, goal: 400 },
+      { name: "USA", count: 0, goal: 100 }
+    ]
+  },
+  employers: {
+    total: 0,
+    goal: 25,
+    byCountry: [
+      { name: "Canada", count: 0, goal: 25 },
+      { name: "USA", count: 0, goal: 0 }
+    ]
+  },
+  propertyManagers: {
+    total: 0,
+    byCountry: [
+      { name: "Canada", count: 0 },
+      { name: "USA", count: 0 }
+    ]
+  }
+};
+
+const unitEconomics = {
+  cac: { value: 0, goal: 1500, status: "on-track" as MetricStatus },
+  ltv: { value: 89866, arpu: 788, margin: 0.95, lifespan: 10 },
+  ltvCac: { value: null as number | null, goal: 3, target: 60 },
+  payback: { value: null as number | null, goal: 12, monthlyContribution: 749 }
+};
+
+const engagementMetrics = {
+  employers: {
+    dauMau: 0,
+    sessionsPerWeek: 0,
+    projectsCreated: 0,
+    photosUploaded: 0,
+    timeEntriesLogged: 0
+  },
+  techs: {
+    activeTechs: 0,
+    percentActive: 0,
+    sessionsPerWeek: 0,
+    profileCompleteness: 0
+  },
+  propertyManagers: {
+    activePMs: 0,
+    portalLogins: 0,
+    reportsViewed: 0
+  },
+  healthScore: 0
+};
+
+const smartGoals = [
+  { goal: "Tech Accounts", specific: "500 free tech accounts", measurable: "Dashboard count", achievable: "Industry size supports", relevant: "Drives employer adoption", timeBound: "Jun 30, 2026" },
+  { goal: "Viral Coefficient", specific: "k ≥ 1.0", measurable: "Referrals/Signups", achievable: "Referral program in place", relevant: "Self-sustaining growth", timeBound: "Q2 2026" },
+  { goal: "Customers", specific: "25 paying employers", measurable: "Subscription count", achievable: "Market validation", relevant: "Revenue foundation", timeBound: "Dec 31, 2026" },
+  { goal: "MRR", specific: "$19,700", measurable: "Stripe revenue", achievable: "25 × $788 ARPU", relevant: "Break-even path", timeBound: "Dec 31, 2026" },
+  { goal: "Churn", specific: "<10% annual", measurable: "Lost/Starting", achievable: "Industry benchmark", relevant: "LTV protection", timeBound: "Ongoing" },
+  { goal: "NRR", specific: "≥115%", measurable: "Cohort analysis", achievable: "Seat expansion trend", relevant: "Growth efficiency", timeBound: "Ongoing" }
 ];
 
-const arrTrajectory = [
-  { year: "Now", target: 0, actual: 0, projected: 0, employers: 0, label: "$0" },
-  { year: "Y1", target: 124000, actual: 124000, projected: 124000, employers: 15, label: "$124K" },
-  { year: "Y2", target: 533000, actual: 533000, projected: 533000, employers: 55, label: "$533K" },
-  { year: "Y3", target: 1880000, actual: 1880000, projected: 1880000, employers: 150, label: "$1.88M" },
-  { year: "Y4", target: 3900000, actual: 3900000, projected: 3900000, employers: 320, label: "$3.9M" },
-  { year: "Y5", target: 6700000, actual: 6900000, projected: 6900000, employers: 500, label: "$6.9M" },
+const triggerEscalations = [
+  { condition: "Any metric Behind for 7+ days", alert: "Slack + Email", action: "Immediate review" },
+  { condition: "3+ metrics At Risk", alert: "Weekly summary", action: "Strategy adjustment" },
+  { condition: "Tech signups <1/day for 3 days", alert: "Slack alert", action: "Marketing push" },
+  { condition: "Trial starts = 0 for 7 days", alert: "Urgent alert", action: "Outreach review" },
+  { condition: "Any churn event", alert: "Instant alert", action: "Exit interview" },
+  { condition: "MRR decline MoM", alert: "Weekly alert", action: "Churn analysis" }
 ];
 
-const tierMixEvolution = [
-  { year: "Y1", Starter: 27, Professional: 53, Enterprise: 13, Unlimited: 7 },
-  { year: "Y2", Starter: 25, Professional: 45, Enterprise: 22, Unlimited: 8 },
-  { year: "Y3", Starter: 20, Professional: 40, Enterprise: 28, Unlimited: 12 },
-  { year: "Y4", Starter: 18, Professional: 35, Enterprise: 32, Unlimited: 15 },
-  { year: "Y5", Starter: 15, Professional: 32, Enterprise: 35, Unlimited: 18 },
-];
-
-const revenueStreamsY5 = [
-  { name: "Employer Subs", value: 6130500, fill: "#10b981" },
-  { name: "Employer Add-ons", value: 350000, fill: "#3b82f6" },
-  { name: "Tech Premium", value: 270000, fill: "#8b5cf6" },
-  { name: "PM Premium", value: 150000, fill: "#f97316" },
-];
-
-const leadingMetricsWeekly = [
-  { metric: "Tech Signups", target: "25+", redFlag: "<10", status: "track" },
-  { metric: "Trial Starts", target: "1+", redFlag: "0 for 2 weeks", status: "track" },
-  { metric: "Buildings Added", target: "15+", redFlag: "<5", status: "track" },
-  { metric: "Weekly Active Employers", target: "80%+", redFlag: "<60%", status: "track" },
-];
-
-const unitEconomics = [
-  { year: "Y1", ltv: 82000, cac: 1193, ratio: 69, payback: 1.9 },
-  { year: "Y2", ltv: 114000, cac: 720, ratio: 158, payback: 1.0 },
-  { year: "Y3", ltv: 223000, cac: 519, ratio: 430, payback: 0.6 },
-  { year: "Y5", ltv: 270000, cac: 300, ratio: 900, payback: 0.3 },
+const reviewCadence = [
+  { frequency: "Daily", review: "Tech signups, trial starts" },
+  { frequency: "Weekly", review: "All leading indicators" },
+  { frequency: "Monthly", review: "All metrics, goal adjustment" },
+  { frequency: "Quarterly", review: "Strategic review, goal reset" }
 ];
 
 export default function SuperUserGoalsOverview() {
@@ -187,36 +292,20 @@ export default function SuperUserGoalsOverview() {
   const currentBuildings = metrics?.usage?.totalBuildings || 0;
   const currentPropertyManagers = metrics?.usage?.totalClients || 0;
   const currentEmployers = metrics?.customers?.active || 0;
-  const currentARR = metrics?.arr || 0;
+  const currentMRR = metrics?.mrr || 0;
 
-  const getProgress = (tp: typeof TIPPING_POINTS[0]) => {
-    let current = 0;
-    if (tp.currentKey === "totalEmployees") current = currentTechAccounts;
-    else if (tp.currentKey === "totalClients") current = currentPropertyManagers;
-    else if (tp.currentKey === "totalBuildings") current = currentBuildings;
-    else if (tp.currentKey === "active") current = currentEmployers;
-    return Math.min((current / tp.targetValue) * 100, 100);
-  };
-
-  const getStatus = (progress: number) => {
-    if (progress >= 100) return { label: "Complete", icon: CheckCircle2, color: "text-emerald-500" };
-    if (progress >= 50) return { label: "On Track", icon: TrendingUp, color: "text-blue-500" };
-    if (progress >= 25) return { label: "In Progress", icon: Clock, color: "text-amber-500" };
-    return { label: "Not Started", icon: AlertTriangle, color: "text-gray-400" };
-  };
-
-  const overallProgress = TIPPING_POINTS.reduce((acc, tp) => acc + getProgress(tp), 0) / TIPPING_POINTS.length;
+  const onTrackCount = [...leadingIndicators, ...laggingIndicators].filter(m => m.status === "on-track").length;
+  const totalMetrics = leadingIndicators.length + laggingIndicators.length;
+  const overallHealth = onTrackCount >= totalMetrics * 0.6 ? "on-track" : onTrackCount >= totalMetrics * 0.4 ? "at-risk" : "behind";
 
   if (isLoading) {
     return (
-      <SuperUserLayout title="Goals & KPIs Overview">
+      <SuperUserLayout title="Goals & KPIs">
         <div className="p-6">
           <div className="max-w-7xl mx-auto space-y-6">
             <Skeleton className="h-32 w-full" />
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Skeleton className="h-48" />
-              <Skeleton className="h-48" />
-              <Skeleton className="h-48" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[1,2,3,4].map(i => <Skeleton key={i} className="h-48" />)}
             </div>
           </div>
         </div>
@@ -225,488 +314,640 @@ export default function SuperUserGoalsOverview() {
   }
 
   return (
-    <SuperUserLayout title="Goals & KPIs Overview">
+    <SuperUserLayout title="Goals & KPIs">
       <div className="p-6">
         <div className="max-w-7xl mx-auto space-y-8">
-          {/* Header Section */}
+          
           <div className="space-y-2">
-            <h1 className="text-2xl font-bold text-gray-800 dark:text-white/90">Path to $100M Valuation</h1>
-            <p className="text-gray-500 dark:text-gray-400">
-              Target: $6.7M ARR at 15x = $100M valuation. <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Projected Y5: $6.9M ARR (exceeds target)</span>
-            </p>
-          </div>
-
-          {/* Top Summary Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            <div className="su-metric-card">
-              <div className="flex items-center gap-3">
-                <div className="su-metric-icon bg-emerald-50 dark:bg-emerald-500/10">
-                  <DollarSign className="h-5 w-5 text-emerald-500" />
-                </div>
-                <div>
-                  <p className="su-metric-label">Current ARR</p>
-                  <p className="su-metric-value text-emerald-600 dark:text-emerald-400">
-                    ${currentARR.toLocaleString()}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">/ $124K Y1 target</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="su-metric-card">
-              <div className="flex items-center gap-3">
-                <div className="su-metric-icon bg-blue-50 dark:bg-blue-500/10">
-                  <Users className="h-5 w-5 text-blue-500" />
-                </div>
-                <div>
-                  <p className="su-metric-label">Employers</p>
-                  <p className="su-metric-value">{currentEmployers}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">/ 15 Y1 target</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="su-metric-card">
-              <div className="flex items-center gap-3">
-                <div className="su-metric-icon bg-purple-50 dark:bg-purple-500/10">
-                  <Activity className="h-5 w-5 text-purple-500" />
-                </div>
-                <div>
-                  <p className="su-metric-label">Tech Accounts</p>
-                  <p className="su-metric-value">{currentTechAccounts.toLocaleString()}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">/ 500 Y1 target</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="su-metric-card">
-              <div className="flex items-center gap-3">
-                <div className="su-metric-icon bg-amber-50 dark:bg-amber-500/10">
-                  <Building2 className="h-5 w-5 text-amber-500" />
-                </div>
-                <div>
-                  <p className="su-metric-label">Buildings</p>
-                  <p className="su-metric-value">{currentBuildings.toLocaleString()}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">/ 800 Y1 target</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="su-metric-card">
-              <div className="flex items-center gap-3">
-                <div className="su-metric-icon bg-teal-50 dark:bg-teal-500/10">
-                  <TrendingUp className="h-5 w-5 text-teal-500" />
-                </div>
-                <div>
-                  <p className="su-metric-label">Milestone Progress</p>
-                  <p className="su-metric-value">{Math.round(overallProgress)}%</p>
-                </div>
-              </div>
-              <Progress value={overallProgress} className="h-1.5 mt-2" />
-            </div>
-          </div>
-
-          {/* ARR Trajectory & Valuation Path */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="su-card">
-              <div className="su-card-header">
-                <h3 className="font-semibold text-gray-800 dark:text-white/90">5-Year ARR Trajectory</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Goal vs Projected (Target: $6.7M for $100M valuation)</p>
-              </div>
-              <div className="su-card-body">
-                <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={arrTrajectory}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                      <XAxis dataKey="year" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
-                      <YAxis 
-                        tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} 
-                        tickFormatter={(value) => value >= 1000000 ? `$${(value / 1000000).toFixed(1)}M` : `$${value / 1000}K`}
-                      />
-                      <Tooltip 
-                        formatter={(value: number, name: string) => {
-                          if (value === null || value === undefined) return ['--', name];
-                          const labelMap: Record<string, string> = {
-                            target: 'Goal ($6.7M)',
-                            projected: 'Projected ($6.9M)',
-                            actual: 'Actual Progress'
-                          };
-                          return [`$${value.toLocaleString()}`, labelMap[name] || name];
-                        }}
-                        labelFormatter={(label) => label === 'Now' ? 'Current' : `Year ${label.replace('Y', '')}`}
-                        contentStyle={{ 
-                          backgroundColor: 'hsl(var(--card))', 
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '8px'
-                        }} 
-                      />
-                      <Legend 
-                        formatter={(value) => {
-                          const labelMap: Record<string, string> = {
-                            target: 'Goal ($6.7M)',
-                            projected: 'Projected ($6.9M)',
-                            actual: 'Actual Progress'
-                          };
-                          return labelMap[value] || value;
-                        }}
-                      />
-                      <Area 
-                        type="monotone" 
-                        dataKey="projected" 
-                        stroke="#10b981" 
-                        fill="#10b981" 
-                        fillOpacity={0.2}
-                        strokeWidth={2}
-                        name="projected"
-                      />
-                      <Line 
-                        type="monotone" 
-                        dataKey="target" 
-                        stroke="#6366f1" 
-                        strokeWidth={2}
-                        strokeDasharray="5 5"
-                        dot={{ fill: '#6366f1', strokeWidth: 2 }}
-                        name="target"
-                      />
-                      <Line 
-                        type="monotone" 
-                        dataKey="actual" 
-                        stroke="#f59e0b" 
-                        strokeWidth={3}
-                        dot={{ fill: '#f59e0b', strokeWidth: 2, r: 5 }}
-                        name="actual"
-                        connectNulls={false}
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="mt-4 flex items-center justify-center gap-6 text-xs">
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-0.5 bg-amber-500"></div>
-                    <span className="text-gray-600 dark:text-gray-400">Actual Progress</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-0.5 bg-indigo-500" style={{ borderTop: '2px dashed' }}></div>
-                    <span className="text-gray-600 dark:text-gray-400">Goal ($6.7M)</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-2 bg-emerald-500/30 border border-emerald-500"></div>
-                    <span className="text-gray-600 dark:text-gray-400">Projected ($6.9M)</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Tier Mix Evolution */}
-            <div className="su-card">
-              <div className="su-card-header">
-                <h3 className="font-semibold text-gray-800 dark:text-white/90">Tier Mix Evolution</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Shift from 20% to 53% Enterprise/Unlimited</p>
-              </div>
-              <div className="su-card-body">
-                <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={tierMixEvolution}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                      <XAxis dataKey="year" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
-                      <YAxis tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} tickFormatter={(v) => `${v}%`} />
-                      <Tooltip 
-                        formatter={(value: number) => [`${value}%`, '']}
-                        contentStyle={{ 
-                          backgroundColor: 'hsl(var(--card))', 
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '8px'
-                        }} 
-                      />
-                      <Legend />
-                      <Bar dataKey="Starter" stackId="a" fill="#94a3b8" />
-                      <Bar dataKey="Professional" stackId="a" fill="#3b82f6" />
-                      <Bar dataKey="Enterprise" stackId="a" fill="#8b5cf6" />
-                      <Bar dataKey="Unlimited" stackId="a" fill="#10b981" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 text-center">
-                  ARPU grows from $639/mo (Y1) to $1,022/mo (Y5) as tier mix shifts upward
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-800 dark:text-white/90" data-testid="text-page-title">
+                  Metrics Dashboard
+                </h1>
+                <p className="text-gray-500 dark:text-gray-400">
+                  Real-time visibility into the metrics that matter
                 </p>
               </div>
+              <div className="flex items-center gap-2">
+                <Badge className={getStatusConfig(overallHealth).badge} data-testid="badge-overall-health">
+                  {getStatusConfig(overallHealth).label}: {onTrackCount}/{totalMetrics} metrics on track
+                </Badge>
+              </div>
             </div>
           </div>
 
-          {/* Revenue Streams & Unit Economics */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Y5 Revenue Streams */}
-            <div className="su-card">
-              <div className="su-card-header">
-                <h3 className="font-semibold text-gray-800 dark:text-white/90">Y5 Revenue Streams</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">$6.9M total ARR breakdown</p>
-              </div>
-              <div className="su-card-body">
-                <div className="h-48">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={revenueStreamsY5}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={40}
-                        outerRadius={70}
-                        paddingAngle={2}
-                        dataKey="value"
-                      >
-                        {revenueStreamsY5.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.fill} />
-                        ))}
-                      </Pie>
-                      <Tooltip 
-                        formatter={(value: number) => [`$${(value / 1000000).toFixed(2)}M`, '']}
-                        contentStyle={{ 
-                          backgroundColor: 'hsl(var(--card))', 
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '8px'
-                        }} 
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="space-y-1.5 mt-2">
-                  {revenueStreamsY5.map((s) => (
-                    <div key={s.name} className="flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2">
-                        <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: s.fill }} />
-                        <span className="text-gray-600 dark:text-gray-300">{s.name}</span>
-                      </div>
-                      <span className="font-medium text-gray-800 dark:text-white/90">${(s.value / 1000000).toFixed(2)}M</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+          <Tabs defaultValue="summary" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-1" data-testid="tabs-metrics">
+              <TabsTrigger value="summary" data-testid="tab-summary">Summary</TabsTrigger>
+              <TabsTrigger value="leading" data-testid="tab-leading">Leading</TabsTrigger>
+              <TabsTrigger value="lagging" data-testid="tab-lagging">Lagging</TabsTrigger>
+              <TabsTrigger value="geographic" data-testid="tab-geographic">Geographic</TabsTrigger>
+              <TabsTrigger value="economics" data-testid="tab-economics">Unit Economics</TabsTrigger>
+              <TabsTrigger value="engagement" data-testid="tab-engagement">Engagement</TabsTrigger>
+              <TabsTrigger value="goals" data-testid="tab-goals">SMART Goals</TabsTrigger>
+            </TabsList>
 
-            {/* Unit Economics */}
-            <div className="su-card lg:col-span-2">
-              <div className="su-card-header">
-                <h3 className="font-semibold text-gray-800 dark:text-white/90">Unit Economics Evolution</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">LTV:CAC improves from 69:1 to 900:1</p>
-              </div>
-              <div className="su-card-body">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-gray-200 dark:border-gray-700">
-                        <th className="text-left py-2 px-3 font-medium text-gray-600 dark:text-gray-400">Year</th>
-                        <th className="text-right py-2 px-3 font-medium text-gray-600 dark:text-gray-400">LTV</th>
-                        <th className="text-right py-2 px-3 font-medium text-gray-600 dark:text-gray-400">CAC</th>
-                        <th className="text-right py-2 px-3 font-medium text-gray-600 dark:text-gray-400">LTV:CAC</th>
-                        <th className="text-right py-2 px-3 font-medium text-gray-600 dark:text-gray-400">Payback</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {unitEconomics.map((row) => (
-                        <tr key={row.year} className="border-b border-gray-100 dark:border-gray-800">
-                          <td className="py-2.5 px-3 font-medium text-gray-800 dark:text-white/90">{row.year}</td>
-                          <td className="py-2.5 px-3 text-right text-gray-600 dark:text-gray-300">${(row.ltv / 1000).toFixed(0)}K</td>
-                          <td className="py-2.5 px-3 text-right text-gray-600 dark:text-gray-300">${row.cac.toLocaleString()}</td>
-                          <td className="py-2.5 px-3 text-right">
-                            <Badge variant="outline" className="text-emerald-600 border-emerald-300 dark:border-emerald-700">{row.ratio}:1</Badge>
-                          </td>
-                          <td className="py-2.5 px-3 text-right text-gray-600 dark:text-gray-300">{row.payback} mo</td>
+            <TabsContent value="summary" className="space-y-6">
+              <div className="su-card" data-testid="card-summary-dashboard">
+                <div className="su-card-header">
+                  <h3 className="font-semibold text-gray-800 dark:text-white/90">At-a-Glance View</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">All key metrics in one place</p>
+                </div>
+                <div className="su-card-body">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm" data-testid="table-summary">
+                      <thead>
+                        <tr className="border-b border-gray-200 dark:border-gray-700">
+                          <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400">Metric</th>
+                          <th className="text-right py-3 px-4 font-medium text-gray-600 dark:text-gray-400">Goal</th>
+                          <th className="text-right py-3 px-4 font-medium text-gray-600 dark:text-gray-400">Actual</th>
+                          <th className="text-center py-3 px-4 font-medium text-gray-600 dark:text-gray-400">Status</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-3">
-                  Benchmark: 3:1 is healthy, 5:1 is excellent. Network effects create exceptional ratios.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Leading Metrics Quick View */}
-          <div className="su-card">
-            <div className="su-card-header flex flex-row items-center justify-between gap-4">
-              <div>
-                <h3 className="font-semibold text-gray-800 dark:text-white/90">Weekly Leading Metrics</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Predictive indicators that drive future results</p>
-              </div>
-              <Badge variant="outline" className="text-blue-600 border-blue-300">Live Tracking</Badge>
-            </div>
-            <div className="su-card-body">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {leadingMetricsWeekly.map((m) => (
-                  <div key={m.metric} className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-gray-800 dark:text-white/90">{m.metric}</span>
-                      <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                    </div>
-                    <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{m.target}</p>
-                    <p className="text-xs text-red-500 mt-1">Red flag: {m.redFlag}</p>
+                      </thead>
+                      <tbody>
+                        {leadingIndicators.map((m) => {
+                          const StatusIcon = getStatusConfig(m.status).icon;
+                          return (
+                            <tr key={m.id} className="border-b border-gray-100 dark:border-gray-800" data-testid={`row-metric-${m.id}`}>
+                              <td className="py-3 px-4 font-medium text-gray-800 dark:text-white/90">{m.name}</td>
+                              <td className="py-3 px-4 text-right text-gray-600 dark:text-gray-300">
+                                {typeof m.goal === 'number' && m.goal >= 1 ? m.goal.toLocaleString() : m.goal}{m.unit}
+                              </td>
+                              <td className="py-3 px-4 text-right text-gray-600 dark:text-gray-300">
+                                {typeof m.current === 'number' && m.current >= 1 ? m.current.toLocaleString() : m.current}{m.unit}
+                              </td>
+                              <td className="py-3 px-4 text-center">
+                                <StatusIcon className={`h-5 w-5 mx-auto ${getStatusConfig(m.status).color}`} />
+                              </td>
+                            </tr>
+                          );
+                        })}
+                        {laggingIndicators.map((m) => {
+                          const StatusIcon = getStatusConfig(m.status).icon;
+                          return (
+                            <tr key={m.id} className="border-b border-gray-100 dark:border-gray-800" data-testid={`row-metric-${m.id}`}>
+                              <td className="py-3 px-4 font-medium text-gray-800 dark:text-white/90">{m.name}</td>
+                              <td className="py-3 px-4 text-right text-gray-600 dark:text-gray-300">
+                                {m.unit === '$' ? `$${typeof m.goal === 'number' ? m.goal.toLocaleString() : m.goal}` : m.goal}
+                              </td>
+                              <td className="py-3 px-4 text-right text-gray-600 dark:text-gray-300">
+                                {m.unit === '$' ? `$${typeof m.current === 'number' ? m.current.toLocaleString() : m.current}` : m.current}
+                              </td>
+                              <td className="py-3 px-4 text-center">
+                                <StatusIcon className={`h-5 w-5 mx-auto ${getStatusConfig(m.status).color}`} />
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
                   </div>
-                ))}
+                </div>
               </div>
-            </div>
-          </div>
 
-          {/* The 7 Tipping Points */}
-          <div className="su-card">
-            <div className="su-card-header flex flex-row items-center justify-between gap-4">
-              <div>
-                <h3 className="font-semibold text-gray-800 dark:text-white/90">The 7 Tipping Points</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Click any milestone for detailed metrics, SMART goals, and KPIs</p>
-              </div>
-            </div>
-            <div className="su-card-body">
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {TIPPING_POINTS.map((tp) => {
-                  const progress = getProgress(tp);
-                  const status = getStatus(progress);
-                  const IconComponent = tp.icon;
-                  const StatusIcon = status.icon;
-
-                  return (
-                    <Link key={tp.id} href={`/superuser/goals/${tp.id}`}>
-                      <div 
-                        className="su-card hover-elevate cursor-pointer group border border-gray-200 dark:border-gray-800"
-                        data-testid={`link-goal-${tp.id}`}
-                      >
-                        <div className="p-4 space-y-3">
-                          <div className="flex items-start justify-between gap-2">
-                            <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${tp.bgColor}`}>
-                              <IconComponent className={`h-5 w-5 ${tp.textColor}`} />
-                            </div>
-                            <Badge variant="outline" className="text-xs">
-                              Part {tp.part}
-                            </Badge>
-                          </div>
-
-                          <div>
-                            <h4 className="font-semibold text-gray-800 dark:text-white/90 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                              {tp.title}
-                            </h4>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">{tp.subtitle}</p>
-                          </div>
-
-                          <div className="space-y-2">
-                            <div className="flex items-center justify-between text-xs">
-                              <span className="text-gray-500 dark:text-gray-400">{tp.target}</span>
-                              <span className={`flex items-center gap-1 ${status.color}`}>
-                                <StatusIcon className="h-3 w-3" />
-                                {Math.round(progress)}%
-                              </span>
-                            </div>
-                            <Progress value={progress} className="h-1.5" />
-                          </div>
-
-                          <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-800">
-                            <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
-                              {tp.revenueImpact}
-                            </span>
-                            <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-blue-500 transition-colors" />
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="su-card" data-testid="card-trigger-escalations">
+                  <div className="su-card-header">
+                    <div className="flex items-center gap-2">
+                      <Bell className="h-5 w-5 text-amber-500" />
+                      <h3 className="font-semibold text-gray-800 dark:text-white/90">Trigger Escalations</h3>
+                    </div>
+                  </div>
+                  <div className="su-card-body">
+                    <div className="space-y-3">
+                      {triggerEscalations.map((t, idx) => (
+                        <div key={idx} className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50" data-testid={`row-trigger-${idx}`}>
+                          <AlertCircle className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-800 dark:text-white/90">{t.condition}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{t.alert} → {t.action}</p>
                           </div>
                         </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="su-card" data-testid="card-review-cadence">
+                  <div className="su-card-header">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-5 w-5 text-blue-500" />
+                      <h3 className="font-semibold text-gray-800 dark:text-white/90">Review Cadence</h3>
+                    </div>
+                  </div>
+                  <div className="su-card-body">
+                    <div className="space-y-3">
+                      {reviewCadence.map((r, idx) => (
+                        <div key={idx} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50" data-testid={`row-cadence-${idx}`}>
+                          <span className="font-medium text-gray-800 dark:text-white/90">{r.frequency}</span>
+                          <span className="text-sm text-gray-600 dark:text-gray-400">{r.review}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="leading" className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {leadingIndicators.map((metric) => {
+                  const Icon = metric.icon;
+                  const statusConfig = getStatusConfig(metric.status);
+                  const StatusIcon = statusConfig.icon;
+                  const progress = metric.goal > 0 ? (metric.current / metric.goal) * 100 : 0;
+                  const remaining = metric.goal - metric.current;
+
+                  return (
+                    <div key={metric.id} className="su-card" data-testid={`card-leading-${metric.id}`}>
+                      <div className="su-card-header">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-3">
+                            <div className={`p-2 rounded-lg ${statusConfig.bg}`}>
+                              <Icon className={`h-5 w-5 ${statusConfig.color}`} />
+                            </div>
+                            <h3 className="font-semibold text-gray-800 dark:text-white/90">{metric.name}</h3>
+                          </div>
+                          <Badge className={statusConfig.badge}>
+                            <StatusIcon className="h-3 w-3 mr-1" />
+                            {statusConfig.label}
+                          </Badge>
+                        </div>
                       </div>
-                    </Link>
+                      <div className="su-card-body space-y-4">
+                        <div className="flex items-baseline justify-between">
+                          <span className="text-3xl font-bold text-gray-800 dark:text-white/90">
+                            {metric.current.toLocaleString()}{metric.unit === '%' ? '%' : ''}
+                          </span>
+                          <span className="text-gray-500 dark:text-gray-400">
+                            of {metric.goal.toLocaleString()}{metric.unit === '%' ? '%' : ''}
+                          </span>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Progress value={Math.min(progress, 100)} className="h-2" />
+                          <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                            <span>{progress.toFixed(1)}% complete</span>
+                            <span>Goal: {metric.goalDate}</span>
+                          </div>
+                        </div>
+
+                        {metric.daysLeft > 0 && (
+                          <div className="grid grid-cols-2 gap-4 pt-2 border-t border-gray-100 dark:border-gray-800">
+                            <div>
+                              <p className="text-xs text-gray-500 dark:text-gray-400">Remaining</p>
+                              <p className="font-medium text-gray-800 dark:text-white/90">
+                                {remaining.toLocaleString()} · {metric.daysLeft} days
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-500 dark:text-gray-400">Rate (Need vs Actual)</p>
+                              <p className="font-medium text-gray-800 dark:text-white/90">
+                                {metric.requiredRate}/day vs {metric.actualRate}/day
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   );
                 })}
               </div>
-            </div>
-          </div>
+            </TabsContent>
 
-          {/* Milestone Progress Bar Chart */}
-          <div className="su-card">
-            <div className="su-card-header">
-              <h3 className="font-semibold text-gray-800 dark:text-white/90">Progress by Milestone</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Completion percentage for each tipping point</p>
-            </div>
-            <div className="su-card-body">
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={TIPPING_POINTS.map(tp => ({ 
-                    name: tp.title.split(' ')[0], 
-                    progress: Math.round(getProgress(tp)),
-                    color: tp.color 
-                  }))} layout="vertical">
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis type="number" domain={[0, 100]} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
-                    <YAxis dataKey="name" type="category" width={80} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} />
-                    <Tooltip 
-                      formatter={(value: number) => [`${value}%`, 'Progress']}
-                      contentStyle={{ 
-                        backgroundColor: 'hsl(var(--card))', 
-                        border: '1px solid hsl(var(--border))',
-                        borderRadius: '8px'
-                      }} 
-                    />
-                    <Bar dataKey="progress" radius={[0, 4, 4, 0]}>
-                      {TIPPING_POINTS.map((tp, index) => (
-                        <Cell 
-                          key={`cell-${index}`} 
-                          fill={
-                            tp.color === 'blue' ? '#3b82f6' :
-                            tp.color === 'purple' ? '#8b5cf6' :
-                            tp.color === 'emerald' ? '#10b981' :
-                            tp.color === 'orange' ? '#f97316' :
-                            tp.color === 'pink' ? '#ec4899' :
-                            tp.color === 'amber' ? '#f59e0b' :
-                            '#06b6d4'
-                          } 
-                        />
+            <TabsContent value="lagging" className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {laggingIndicators.map((metric) => {
+                  const Icon = metric.icon;
+                  const statusConfig = getStatusConfig(metric.status);
+                  const StatusIcon = statusConfig.icon;
+                  const numCurrent = typeof metric.current === 'number' ? metric.current : 0;
+                  const numGoal = typeof metric.goal === 'number' ? metric.goal : 0;
+                  const progress = numGoal > 0 ? (numCurrent / numGoal) * 100 : (metric.status === 'on-track' ? 100 : 0);
+
+                  return (
+                    <div key={metric.id} className="su-card" data-testid={`card-lagging-${metric.id}`}>
+                      <div className="su-card-header">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-3">
+                            <div className={`p-2 rounded-lg ${statusConfig.bg}`}>
+                              <Icon className={`h-5 w-5 ${statusConfig.color}`} />
+                            </div>
+                            <h3 className="font-semibold text-gray-800 dark:text-white/90 text-sm">{metric.name}</h3>
+                          </div>
+                          <StatusIcon className={`h-5 w-5 ${statusConfig.color}`} />
+                        </div>
+                      </div>
+                      <div className="su-card-body space-y-3">
+                        <div className="flex items-baseline justify-between">
+                          <span className="text-2xl font-bold text-gray-800 dark:text-white/90">
+                            {metric.unit === '$' ? `$${numCurrent.toLocaleString()}` : metric.current}
+                          </span>
+                          <span className="text-sm text-gray-500 dark:text-gray-400">
+                            Goal: {metric.unit === '$' ? `$${numGoal.toLocaleString()}` : metric.goal}
+                          </span>
+                        </div>
+                        
+                        {numGoal > 0 && (
+                          <Progress value={Math.min(progress, 100)} className="h-1.5" />
+                        )}
+
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{metric.description}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="su-card" data-testid="card-pricing-model">
+                <div className="su-card-header">
+                  <h3 className="font-semibold text-gray-800 dark:text-white/90">Pricing Model</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Current subscription structure</p>
+                </div>
+                <div className="su-card-body">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30">
+                      <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">Base Fee</p>
+                      <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">$99/month</p>
+                      <p className="text-xs text-blue-500 dark:text-blue-400 mt-1">Per account</p>
+                    </div>
+                    <div className="p-4 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30">
+                      <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">Per Employee</p>
+                      <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-300">$34.95/month</p>
+                      <p className="text-xs text-emerald-500 dark:text-emerald-400 mt-1">Per active employee</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="geographic" className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="su-card" data-testid="card-geo-buildings">
+                  <div className="su-card-header">
+                    <div className="flex items-center gap-2">
+                      <Building2 className="h-5 w-5 text-amber-500" />
+                      <h3 className="font-semibold text-gray-800 dark:text-white/90">Buildings by Location</h3>
+                    </div>
+                  </div>
+                  <div className="su-card-body">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+                        <span className="font-medium text-gray-800 dark:text-white/90">Total</span>
+                        <span className="text-xl font-bold text-gray-800 dark:text-white/90">{geographicData.buildings.total}</span>
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">By Country</p>
+                        {geographicData.buildings.byCountry.map((c) => (
+                          <div key={c.name} className="flex items-center justify-between py-2 px-3">
+                            <div className="flex items-center gap-2">
+                              <MapPin className="h-4 w-4 text-gray-400" />
+                              <span className="text-gray-700 dark:text-gray-300">{c.name}</span>
+                            </div>
+                            <span className="font-medium text-gray-800 dark:text-white/90">{c.count}</span>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">By Province/State</p>
+                        {geographicData.buildings.byProvince.map((p) => (
+                          <div key={p.name} className="flex items-center justify-between py-2 px-3">
+                            <span className="text-gray-700 dark:text-gray-300">{p.name}</span>
+                            <span className="font-medium text-gray-800 dark:text-white/90">{p.count}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="su-card" data-testid="card-geo-techs">
+                  <div className="su-card-header">
+                    <div className="flex items-center gap-2">
+                      <Users className="h-5 w-5 text-blue-500" />
+                      <h3 className="font-semibold text-gray-800 dark:text-white/90">Tech Accounts by Location</h3>
+                    </div>
+                  </div>
+                  <div className="su-card-body">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+                        <span className="font-medium text-gray-800 dark:text-white/90">Total</span>
+                        <div className="text-right">
+                          <span className="text-xl font-bold text-gray-800 dark:text-white/90">{geographicData.techs.total}</span>
+                          <span className="text-sm text-gray-500 dark:text-gray-400 ml-2">/ {geographicData.techs.goal}</span>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">By Country</p>
+                        {geographicData.techs.byCountry.map((c) => (
+                          <div key={c.name} className="flex items-center justify-between py-2 px-3">
+                            <div className="flex items-center gap-2">
+                              <MapPin className="h-4 w-4 text-gray-400" />
+                              <span className="text-gray-700 dark:text-gray-300">{c.name}</span>
+                            </div>
+                            <div>
+                              <span className="font-medium text-gray-800 dark:text-white/90">{c.count}</span>
+                              <span className="text-sm text-gray-500 dark:text-gray-400 ml-1">/ {c.goal}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="su-card" data-testid="card-geo-employers">
+                  <div className="su-card-header">
+                    <div className="flex items-center gap-2">
+                      <Target className="h-5 w-5 text-purple-500" />
+                      <h3 className="font-semibold text-gray-800 dark:text-white/90">Employer Accounts by Location</h3>
+                    </div>
+                  </div>
+                  <div className="su-card-body">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+                        <span className="font-medium text-gray-800 dark:text-white/90">Total</span>
+                        <div className="text-right">
+                          <span className="text-xl font-bold text-gray-800 dark:text-white/90">{geographicData.employers.total}</span>
+                          <span className="text-sm text-gray-500 dark:text-gray-400 ml-2">/ {geographicData.employers.goal}</span>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">By Country</p>
+                        {geographicData.employers.byCountry.map((c) => (
+                          <div key={c.name} className="flex items-center justify-between py-2 px-3">
+                            <div className="flex items-center gap-2">
+                              <MapPin className="h-4 w-4 text-gray-400" />
+                              <span className="text-gray-700 dark:text-gray-300">{c.name}</span>
+                            </div>
+                            <div>
+                              <span className="font-medium text-gray-800 dark:text-white/90">{c.count}</span>
+                              <span className="text-sm text-gray-500 dark:text-gray-400 ml-1">/ {c.goal}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="su-card" data-testid="card-geo-pms">
+                  <div className="su-card-header">
+                    <div className="flex items-center gap-2">
+                      <Building2 className="h-5 w-5 text-teal-500" />
+                      <h3 className="font-semibold text-gray-800 dark:text-white/90">Property Manager Accounts</h3>
+                    </div>
+                  </div>
+                  <div className="su-card-body">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+                        <span className="font-medium text-gray-800 dark:text-white/90">Total</span>
+                        <span className="text-xl font-bold text-gray-800 dark:text-white/90">{geographicData.propertyManagers.total}</span>
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">By Country</p>
+                        {geographicData.propertyManagers.byCountry.map((c) => (
+                          <div key={c.name} className="flex items-center justify-between py-2 px-3">
+                            <div className="flex items-center gap-2">
+                              <MapPin className="h-4 w-4 text-gray-400" />
+                              <span className="text-gray-700 dark:text-gray-300">{c.name}</span>
+                            </div>
+                            <span className="font-medium text-gray-800 dark:text-white/90">{c.count}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="economics" className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="su-card" data-testid="card-cac">
+                  <div className="su-card-header">
+                    <h3 className="font-semibold text-gray-800 dark:text-white/90">Customer Acquisition Cost</h3>
+                  </div>
+                  <div className="su-card-body space-y-3">
+                    <div className="text-3xl font-bold text-gray-800 dark:text-white/90">
+                      ${unitEconomics.cac.value.toLocaleString()}
+                    </div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Goal: &lt;${unitEconomics.cac.goal.toLocaleString()}
+                    </p>
+                    <Badge className={getStatusConfig(unitEconomics.cac.status).badge}>
+                      {getStatusConfig(unitEconomics.cac.status).label}
+                    </Badge>
+                  </div>
+                </div>
+
+                <div className="su-card" data-testid="card-ltv">
+                  <div className="su-card-header">
+                    <h3 className="font-semibold text-gray-800 dark:text-white/90">Lifetime Value (LTV)</h3>
+                  </div>
+                  <div className="su-card-body space-y-3">
+                    <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
+                      ${unitEconomics.ltv.value.toLocaleString()}
+                    </div>
+                    <div className="space-y-1 text-xs text-gray-500 dark:text-gray-400">
+                      <p>ARPU: ${unitEconomics.ltv.arpu}/mo</p>
+                      <p>Gross Margin: {(unitEconomics.ltv.margin * 100).toFixed(0)}%</p>
+                      <p>Avg Lifespan: {unitEconomics.ltv.lifespan} years</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="su-card" data-testid="card-ltv-cac">
+                  <div className="su-card-header">
+                    <h3 className="font-semibold text-gray-800 dark:text-white/90">LTV:CAC Ratio</h3>
+                  </div>
+                  <div className="su-card-body space-y-3">
+                    <div className="text-3xl font-bold text-gray-800 dark:text-white/90">
+                      {unitEconomics.ltvCac.value !== null ? `${unitEconomics.ltvCac.value}:1` : '—'}
+                    </div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Goal: &gt;{unitEconomics.ltvCac.goal}x (target: {unitEconomics.ltvCac.target}x+)
+                    </p>
+                  </div>
+                </div>
+
+                <div className="su-card" data-testid="card-payback">
+                  <div className="su-card-header">
+                    <h3 className="font-semibold text-gray-800 dark:text-white/90">CAC Payback</h3>
+                  </div>
+                  <div className="su-card-body space-y-3">
+                    <div className="text-3xl font-bold text-gray-800 dark:text-white/90">
+                      {unitEconomics.payback.value !== null ? `${unitEconomics.payback.value} mo` : '—'}
+                    </div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Goal: &lt;{unitEconomics.payback.goal} months
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      Monthly Contribution: ${unitEconomics.payback.monthlyContribution}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="engagement" className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="su-card" data-testid="card-employer-engagement">
+                  <div className="su-card-header">
+                    <div className="flex items-center gap-2">
+                      <Target className="h-5 w-5 text-blue-500" />
+                      <h3 className="font-semibold text-gray-800 dark:text-white/90">Employer Engagement</h3>
+                    </div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Last 30 days</p>
+                  </div>
+                  <div className="su-card-body">
+                    <div className="space-y-3">
+                      {[
+                        { label: "DAU/MAU Ratio", value: `${engagementMetrics.employers.dauMau}%`, goal: ">20%" },
+                        { label: "Sessions/User/Week", value: engagementMetrics.employers.sessionsPerWeek, goal: ">3" },
+                        { label: "Projects Created", value: engagementMetrics.employers.projectsCreated, goal: "—" },
+                        { label: "Photos Uploaded", value: engagementMetrics.employers.photosUploaded, goal: "—" },
+                        { label: "Time Entries", value: engagementMetrics.employers.timeEntriesLogged, goal: "—" },
+                      ].map((item) => (
+                        <div key={item.label} className="flex items-center justify-between py-2">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">{item.label}</span>
+                          <div className="text-right">
+                            <span className="font-medium text-gray-800 dark:text-white/90">{item.value}</span>
+                            <span className="text-xs text-gray-400 ml-2">({item.goal})</span>
+                          </div>
+                        </div>
                       ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          </div>
+                    </div>
+                  </div>
+                </div>
 
-          {/* Quick Links */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Link href="/superuser/goals/north-star">
-              <div className="su-card hover-elevate cursor-pointer p-4 border border-gray-200 dark:border-gray-800" data-testid="link-north-star">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center">
-                    <Target className="h-5 w-5 text-indigo-500" />
+                <div className="su-card" data-testid="card-tech-engagement">
+                  <div className="su-card-header">
+                    <div className="flex items-center gap-2">
+                      <Users className="h-5 w-5 text-purple-500" />
+                      <h3 className="font-semibold text-gray-800 dark:text-white/90">Tech Engagement</h3>
+                    </div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Last 30 days</p>
                   </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-800 dark:text-white/90">North Star Metrics</h4>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">3-year strategic targets</p>
+                  <div className="su-card-body">
+                    <div className="space-y-3">
+                      {[
+                        { label: "Active Techs", value: engagementMetrics.techs.activeTechs, goal: "—" },
+                        { label: "% Active", value: `${engagementMetrics.techs.percentActive}%`, goal: ">50%" },
+                        { label: "Sessions/Tech/Week", value: engagementMetrics.techs.sessionsPerWeek, goal: ">2" },
+                        { label: "Profile Completeness", value: `${engagementMetrics.techs.profileCompleteness}%`, goal: ">80%" },
+                      ].map((item) => (
+                        <div key={item.label} className="flex items-center justify-between py-2">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">{item.label}</span>
+                          <div className="text-right">
+                            <span className="font-medium text-gray-800 dark:text-white/90">{item.value}</span>
+                            <span className="text-xs text-gray-400 ml-2">({item.goal})</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <ArrowRight className="h-4 w-4 text-gray-400 ml-auto" />
+                </div>
+
+                <div className="su-card" data-testid="card-pm-engagement">
+                  <div className="su-card-header">
+                    <div className="flex items-center gap-2">
+                      <Building2 className="h-5 w-5 text-teal-500" />
+                      <h3 className="font-semibold text-gray-800 dark:text-white/90">PM Engagement</h3>
+                    </div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Last 30 days</p>
+                  </div>
+                  <div className="su-card-body">
+                    <div className="space-y-3">
+                      {[
+                        { label: "Active PMs", value: engagementMetrics.propertyManagers.activePMs, goal: "—" },
+                        { label: "Portal Logins", value: engagementMetrics.propertyManagers.portalLogins, goal: "—" },
+                        { label: "Reports Viewed", value: engagementMetrics.propertyManagers.reportsViewed, goal: "—" },
+                      ].map((item) => (
+                        <div key={item.label} className="flex items-center justify-between py-2">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">{item.label}</span>
+                          <div className="text-right">
+                            <span className="font-medium text-gray-800 dark:text-white/90">{item.value}</span>
+                            <span className="text-xs text-gray-400 ml-2">({item.goal})</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </Link>
 
-            <Link href="/superuser/goals/tracking">
-              <div className="su-card hover-elevate cursor-pointer p-4 border border-gray-200 dark:border-gray-800" data-testid="link-tracking">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-lg bg-teal-50 dark:bg-teal-500/10 flex items-center justify-center">
-                    <TrendingUp className="h-5 w-5 text-teal-500" />
+              <div className="su-card" data-testid="card-health-score">
+                <div className="su-card-header">
+                  <div className="flex items-center gap-2">
+                    <Gauge className="h-5 w-5 text-amber-500" />
+                    <h3 className="font-semibold text-gray-800 dark:text-white/90">Engagement Health Score</h3>
                   </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-800 dark:text-white/90">Weekly/Monthly Tracking</h4>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Operational KPIs</p>
+                </div>
+                <div className="su-card-body">
+                  <div className="flex items-center gap-8">
+                    <div className="text-center">
+                      <div className="text-5xl font-bold text-gray-800 dark:text-white/90">
+                        {engagementMetrics.healthScore}
+                      </div>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">/ 100</p>
+                    </div>
+                    <div className="flex-1 space-y-2">
+                      <div className="flex items-center gap-3">
+                        <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">0-40: Low engagement (Churn risk)</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-3 h-3 rounded-full bg-amber-500"></div>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">41-70: Moderate (Monitor)</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">71-100: High (Healthy)</span>
+                      </div>
+                    </div>
                   </div>
-                  <ArrowRight className="h-4 w-4 text-gray-400 ml-auto" />
                 </div>
               </div>
-            </Link>
+            </TabsContent>
 
-            <Link href="/superuser/goals/risk-triggers">
-              <div className="su-card hover-elevate cursor-pointer p-4 border border-gray-200 dark:border-gray-800" data-testid="link-risk-triggers">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-lg bg-red-50 dark:bg-red-500/10 flex items-center justify-center">
-                    <AlertTriangle className="h-5 w-5 text-red-500" />
+            <TabsContent value="goals" className="space-y-6">
+              <div className="su-card" data-testid="card-smart-goals">
+                <div className="su-card-header">
+                  <h3 className="font-semibold text-gray-800 dark:text-white/90">Year 1 SMART Goals</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Launch → Dec 31, 2026</p>
+                </div>
+                <div className="su-card-body">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm" data-testid="table-smart-goals">
+                      <thead>
+                        <tr className="border-b border-gray-200 dark:border-gray-700">
+                          <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400">Goal</th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400">Specific</th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400">Measurable</th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400">Achievable</th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400">Relevant</th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400">Time-bound</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {smartGoals.map((g) => (
+                          <tr key={g.goal} className="border-b border-gray-100 dark:border-gray-800" data-testid={`row-goal-${g.goal.toLowerCase().replace(/\s+/g, '-')}`}>
+                            <td className="py-3 px-4 font-medium text-gray-800 dark:text-white/90">{g.goal}</td>
+                            <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{g.specific}</td>
+                            <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{g.measurable}</td>
+                            <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{g.achievable}</td>
+                            <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{g.relevant}</td>
+                            <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{g.timeBound}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-800 dark:text-white/90">Risk Triggers</h4>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Warning signs & responses</p>
-                  </div>
-                  <ArrowRight className="h-4 w-4 text-gray-400 ml-auto" />
                 </div>
               </div>
-            </Link>
-          </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </SuperUserLayout>

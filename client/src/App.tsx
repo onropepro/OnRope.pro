@@ -38,10 +38,6 @@ import ViewAsCompany from "@/pages/ViewAsCompany";
 import SuperUserFeatureRequests from "@/pages/SuperUserFeatureRequests";
 import SuperUserMetrics from "@/pages/SuperUserMetrics";
 import SuperUserGoalsOverview from "@/pages/SuperUserGoalsOverview";
-import SuperUserGoalDetail from "@/pages/SuperUserGoalDetail";
-import SuperUserNorthStar from "@/pages/SuperUserNorthStar";
-import SuperUserTracking from "@/pages/SuperUserTracking";
-import SuperUserRiskTriggers from "@/pages/SuperUserRiskTriggers";
 import FounderResources from "@/pages/FounderResources";
 import BuildingPortal from "@/pages/BuildingPortal";
 import SuperUserBuildings from "@/pages/SuperUserBuildings";
@@ -122,26 +118,6 @@ function Router() {
       <Route path="/superuser/metrics">
         <ProtectedRoute allowedRoles={["superuser"]}>
           <SuperUserMetrics />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/superuser/goals/north-star">
-        <ProtectedRoute allowedRoles={["superuser"]}>
-          <SuperUserNorthStar />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/superuser/goals/tracking">
-        <ProtectedRoute allowedRoles={["superuser"]}>
-          <SuperUserTracking />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/superuser/goals/risk-triggers">
-        <ProtectedRoute allowedRoles={["superuser"]}>
-          <SuperUserRiskTriggers />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/superuser/goals/:goalId">
-        <ProtectedRoute allowedRoles={["superuser"]}>
-          <SuperUserGoalDetail />
         </ProtectedRoute>
       </Route>
       <Route path="/superuser/goals">
