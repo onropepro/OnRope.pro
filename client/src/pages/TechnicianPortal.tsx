@@ -813,7 +813,12 @@ export default function TechnicianPortal() {
   // Handler for uploading documents (void cheque, driver's license, etc.)
   const handleDocumentUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file || !uploadingDocType) return;
+    console.log('[TechnicianPortal] handleDocumentUpload called:', { file: file?.name, uploadingDocType });
+    
+    if (!file || !uploadingDocType) {
+      console.log('[TechnicianPortal] Upload aborted - file:', !!file, 'docType:', uploadingDocType);
+      return;
+    }
 
     const isValidType = file.type.startsWith('image/') || file.type === 'application/pdf';
     if (!isValidType) {
@@ -831,6 +836,7 @@ export default function TechnicianPortal() {
       formData.append('file', file);
       formData.append('documentType', uploadingDocType);
 
+      console.log('[TechnicianPortal] Sending upload request to server...');
       const response = await fetch('/api/technician/upload-document', {
         method: 'POST',
         credentials: 'include',
@@ -838,6 +844,7 @@ export default function TechnicianPortal() {
       });
 
       const result = await response.json();
+      console.log('[TechnicianPortal] Server response:', response.ok, result);
 
       if (!response.ok) {
         throw new Error(result.message || t.uploadFailed);
@@ -847,6 +854,7 @@ export default function TechnicianPortal() {
         title: t.documentUploaded,
         description: t.documentUploadedDesc,
       });
+      console.log('[TechnicianPortal] Invalidating query cache...');
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
     } catch (error: any) {
       toast({
@@ -864,6 +872,7 @@ export default function TechnicianPortal() {
 
   // Trigger document upload for a specific type
   const triggerDocumentUpload = (docType: string) => {
+    console.log('[TechnicianPortal] triggerDocumentUpload called:', docType);
     setUploadingDocType(docType);
     
     // Handle case where user cancels the file dialog
@@ -872,6 +881,7 @@ export default function TechnicianPortal() {
       // Small delay to allow the change event to fire first if a file was selected
       setTimeout(() => {
         if (documentInputRef.current && !documentInputRef.current.files?.length) {
+          console.log('[TechnicianPortal] No file selected, resetting uploadingDocType');
           setUploadingDocType(null);
         }
       }, 300);
@@ -879,7 +889,9 @@ export default function TechnicianPortal() {
     };
     
     window.addEventListener('focus', handleDialogClose);
+    console.log('[TechnicianPortal] About to click file input:', documentInputRef.current);
     documentInputRef.current?.click();
+    console.log('[TechnicianPortal] File input clicked');
   };
 
   const startEditing = () => {
