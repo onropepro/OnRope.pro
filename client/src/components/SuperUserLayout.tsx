@@ -64,15 +64,6 @@ const changelogSubItems: SubMenuItem[] = [
   { title: "Property Manager Guide", path: "/changelog/property-manager" },
 ];
 
-const goalsSubItems: SubMenuItem[] = [
-  { title: "Tech Premium Launch", path: "/superuser/goals/tech-premium" },
-  { title: "PM Premium Launch", path: "/superuser/goals/pm-premium" },
-  { title: "PM Feature Definition", path: "/superuser/goals/pm-feature-definition" },
-  { title: "US West Coast Launch", path: "/superuser/goals/us-west" },
-  { title: "US East Coast Expansion", path: "/superuser/goals/us-east" },
-  { title: "Unlimited Tier Push", path: "/superuser/goals/unlimited-tier" },
-  { title: "Transaction Fees", path: "/superuser/goals/transaction-fees" },
-];
 
 interface SuperUserLayoutProps {
   children: React.ReactNode;
@@ -138,7 +129,6 @@ const menuGroups: MenuGroup[] = [
         title: "Goals & KPIs",
         icon: "flag",
         path: "/superuser/goals",
-        subItems: goalsSubItems,
       },
     ],
   },
@@ -170,11 +160,9 @@ function SidebarContents() {
   });
   
   const isOnChangelogPage = location.startsWith("/changelog");
-  const isOnGoalsPage = location.startsWith("/superuser/goals");
   
   const [expandedSubMenus, setExpandedSubMenus] = useState<Record<string, boolean>>({
     Changelog: isOnChangelogPage,
-    "Goals & KPIs": isOnGoalsPage,
   });
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
@@ -183,10 +171,7 @@ function SidebarContents() {
     if (isOnChangelogPage && !expandedSubMenus.Changelog) {
       setExpandedSubMenus(prev => ({ ...prev, Changelog: true }));
     }
-    if (isOnGoalsPage && !expandedSubMenus["Goals & KPIs"]) {
-      setExpandedSubMenus(prev => ({ ...prev, "Goals & KPIs": true }));
-    }
-  }, [isOnChangelogPage, isOnGoalsPage]);
+  }, [isOnChangelogPage]);
 
   const toggleGroup = (label: string) => {
     setExpandedGroups((prev) => ({
