@@ -301,8 +301,10 @@ export async function analyzeLogbookPage(
   mimeType: string = "image/jpeg"
 ): Promise<LogbookAnalysisResult> {
   try {
+    // Use gemini-2.5-flash for better compatibility and speed
+    // Note: We don't use responseSchema because it can cause strict validation errors
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-pro",
+      model: "gemini-2.5-flash",
       contents: [
         {
           role: "user",
@@ -344,23 +346,23 @@ RULES:
 
 Respond ONLY with valid JSON matching this structure:
 {
-  "success": boolean (true if this appears to be a valid logbook page),
+  "success": true,
   "entries": [
     {
-      "startDate": "YYYY-MM-DD" or null,
-      "endDate": "YYYY-MM-DD" or null (same as startDate for single day),
-      "hoursWorked": number or null,
-      "buildingName": string or null,
-      "buildingAddress": string or null,
-      "buildingHeight": string or null (e.g., "25 floors", "100m"),
-      "tasksPerformed": ["task_id", ...] (use the task IDs listed above),
-      "previousEmployer": string or null,
-      "notes": string or null,
-      "confidence": "high" | "medium" | "low"
+      "startDate": "YYYY-MM-DD",
+      "endDate": "YYYY-MM-DD",
+      "hoursWorked": 8,
+      "buildingName": "string or null",
+      "buildingAddress": "string or null",
+      "buildingHeight": "string or null",
+      "tasksPerformed": ["task_id"],
+      "previousEmployer": "string or null",
+      "notes": "string or null",
+      "confidence": "high"
     }
   ],
-  "pageWarnings": ["warning about unreadable sections or issues"],
-  "error": null or "error message if not a logbook page"
+  "pageWarnings": [],
+  "error": null
 }`
             },
             {
@@ -373,38 +375,25 @@ Respond ONLY with valid JSON matching this structure:
         }
       ],
       config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            success: { type: Type.BOOLEAN },
-            entries: {
-              type: Type.ARRAY,
-              items: {
-                type: Type.OBJECT,
-                properties: {
-                  startDate: { type: Type.STRING, nullable: true },
-                  endDate: { type: Type.STRING, nullable: true },
-                  hoursWorked: { type: Type.NUMBER, nullable: true },
-                  buildingName: { type: Type.STRING, nullable: true },
-                  buildingAddress: { type: Type.STRING, nullable: true },
-                  buildingHeight: { type: Type.STRING, nullable: true },
-                  tasksPerformed: { type: Type.ARRAY, items: { type: Type.STRING } },
-                  previousEmployer: { type: Type.STRING, nullable: true },
-                  notes: { type: Type.STRING, nullable: true },
-                  confidence: { type: Type.STRING }
-                }
-              }
-            },
-            pageWarnings: { type: Type.ARRAY, items: { type: Type.STRING } },
-            error: { type: Type.STRING, nullable: true }
-          },
-          required: ["success", "entries", "pageWarnings"]
-        }
+        responseMimeType: "application/json"
+        // Note: Not using responseSchema to avoid strict validation errors
       }
     });
 
-    const result = JSON.parse(response.text || "{}");
+    // Parse JSON response, handling potential issues
+    let result: any;
+    try {
+      const responseText = response.text || "{}";
+      result = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error("Failed to parse Gemini response:", parseError);
+      return {
+        success: false,
+        entries: [],
+        pageWarnings: [],
+        error: "Failed to parse AI response. Please try again with a clearer image."
+      };
+    }
     
     // Normalize dates in the entries
     const normalizedEntries: LogbookEntry[] = (result.entries || []).map((entry: any) => ({
