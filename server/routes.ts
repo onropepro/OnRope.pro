@@ -4101,6 +4101,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         terminatedDate: tech.terminatedDate,
         terminationReason: tech.terminationReason,
         createdAt: tech.createdAt,
+        lastActivityAt: tech.lastActivityAt,
         employeeCity: tech.employeeCity,
         employeeProvinceState: tech.employeeProvinceState,
         employeeCountry: tech.employeeCountry,
@@ -4195,6 +4196,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Metadata
         createdAt: technician.createdAt,
+        lastActivityAt: technician.lastActivityAt,
         irataBaselineHours: technician.irataBaselineHours,
       };
 

@@ -28,6 +28,7 @@ interface Technician {
   terminatedDate: string | null;
   terminationReason: string | null;
   createdAt: string;
+  lastActivityAt: string | null;
   employeeCity: string | null;
   employeeProvinceState: string | null;
   employeeCountry: string | null;
@@ -76,6 +77,7 @@ interface TechnicianDetail {
   spratDocuments: string[] | null;
   specialMedicalConditions: string | null;
   createdAt: string;
+  lastActivityAt: string | null;
   irataBaselineHours: string | null;
 }
 
@@ -151,6 +153,25 @@ export default function SuperUserTechnicians() {
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString();
+  };
+
+  const formatRelativeTime = (dateString: string | null) => {
+    if (!dateString) return "Never";
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays === 1) return "Yesterday";
+    if (diffDays < 7) return `${diffDays}d ago`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
+    if (diffDays < 365) return `${Math.floor(diffDays / 30)}mo ago`;
+    return `${Math.floor(diffDays / 365)}y ago`;
   };
 
   const getStatusBadge = (tech: Technician) => {
@@ -283,6 +304,10 @@ export default function SuperUserTechnicians() {
                             {tech.companyName}
                           </Badge>
                         )}
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground" title={tech.lastActivityAt ? `Last active: ${new Date(tech.lastActivityAt).toLocaleString()}` : 'Never active'}>
+                          <span className="material-icons text-xs">schedule</span>
+                          {formatRelativeTime(tech.lastActivityAt)}
+                        </div>
                         <span className="material-icons text-muted-foreground text-sm">chevron_right</span>
                       </div>
                     </div>
@@ -354,6 +379,13 @@ export default function SuperUserTechnicians() {
                       <InfoItem label="Phone" value={technicianDetailData.technician.employeePhoneNumber} />
                       <InfoItem label="Birthday" value={formatDate(technicianDetailData.technician.birthday)} />
                       <InfoItem label="Registered" value={formatDate(technicianDetailData.technician.createdAt)} />
+                      <InfoItem 
+                        label="Last Activity" 
+                        value={technicianDetailData.technician.lastActivityAt 
+                          ? `${formatRelativeTime(technicianDetailData.technician.lastActivityAt)} (${formatDate(technicianDetailData.technician.lastActivityAt)})`
+                          : "Never"
+                        } 
+                      />
                     </div>
                   </div>
 
