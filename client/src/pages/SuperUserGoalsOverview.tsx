@@ -81,7 +81,33 @@ const getStatusConfig = (status: MetricStatus) => {
   return configs[status];
 };
 
-const leadingIndicators: LeadingMetric[] = [
+const calculateRateStatus = (actualRate: number, requiredRate: number): MetricStatus => {
+  const ratio = actualRate / requiredRate;
+  if (ratio >= 1.0) return "on-track";
+  if (ratio >= 0.5) return "at-risk";
+  return "behind";
+};
+
+const calculatePaceStatus = (current: number, goal: number, percentThreshold = 0.8): MetricStatus => {
+  const ratio = current / goal;
+  if (ratio >= percentThreshold) return "on-track";
+  if (ratio >= percentThreshold * 0.625) return "at-risk";
+  return "behind";
+};
+
+const calculateViralStatus = (k: number): MetricStatus => {
+  if (k >= 1.0) return "on-track";
+  if (k >= 0.7) return "at-risk";
+  return "behind";
+};
+
+const calculateConversionStatus = (rate: number, goal: number): MetricStatus => {
+  if (rate >= goal) return "on-track";
+  if (rate >= goal * 0.75) return "at-risk";
+  return "behind";
+};
+
+const leadingIndicatorsData = [
   {
     id: "tech-accounts",
     name: "Tech Accounts",
@@ -91,7 +117,6 @@ const leadingIndicators: LeadingMetric[] = [
     daysLeft: 87,
     requiredRate: 3.9,
     actualRate: 2.1,
-    status: "behind",
     icon: Users,
     goalDate: "Jun 30, 2026"
   },
@@ -104,7 +129,6 @@ const leadingIndicators: LeadingMetric[] = [
     daysLeft: 120,
     requiredRate: 1.0,
     actualRate: 0.90,
-    status: "at-risk",
     icon: Share2,
     goalDate: "Q2 2026"
   },
@@ -117,7 +141,6 @@ const leadingIndicators: LeadingMetric[] = [
     daysLeft: 12,
     requiredRate: 0.33,
     actualRate: 0.29,
-    status: "at-risk",
     icon: Target,
     goalDate: "Month 3"
   },
@@ -130,22 +153,57 @@ const leadingIndicators: LeadingMetric[] = [
     daysLeft: 0,
     requiredRate: 40,
     actualRate: 36,
-    status: "at-risk",
     icon: TrendingUp,
     goalDate: "Ongoing"
   }
 ];
 
-const laggingIndicators: LaggingMetric[] = [
+const leadingIndicators: LeadingMetric[] = leadingIndicatorsData.map(m => {
+  let status: MetricStatus;
+  if (m.id === "tech-accounts") {
+    status = calculateRateStatus(m.actualRate, m.requiredRate);
+  } else if (m.id === "viral-coefficient") {
+    status = calculateViralStatus(m.current);
+  } else if (m.id === "trial-starts") {
+    status = calculatePaceStatus(m.current, m.goal, 0.8);
+  } else if (m.id === "trial-conversion") {
+    status = calculateConversionStatus(m.current, m.goal);
+  } else {
+    status = "at-risk";
+  }
+  return { ...m, status };
+});
+
+const calculateArpuStatus = (current: number, goal: number): MetricStatus => {
+  const variance = Math.abs(current - goal) / goal;
+  if (variance <= 0.05) return "on-track";
+  if (variance <= 0.15) return "at-risk";
+  return "behind";
+};
+
+const calculateChurnStatus = (currentPercent: number, goalPercent: number): MetricStatus => {
+  if (currentPercent <= goalPercent) return "on-track";
+  if (currentPercent <= goalPercent * 1.8) return "at-risk";
+  return "behind";
+};
+
+const calculateNrrStatus = (current: number, goal: number): MetricStatus => {
+  if (current >= goal) return "on-track";
+  if (current >= 100) return "at-risk";
+  return "behind";
+};
+
+const laggingIndicatorsData = [
   {
     id: "paying-customers",
     name: "Paying Customers",
     current: 8,
     goal: 25,
     unit: "customers",
-    status: "at-risk",
     icon: Users,
-    description: "25 customers by Dec 31, 2026"
+    description: "25 customers by Dec 31, 2026",
+    requiredRate: 0.12,
+    actualRate: 0.10
   },
   {
     id: "mrr",
@@ -153,9 +211,10 @@ const laggingIndicators: LaggingMetric[] = [
     current: 6304,
     goal: 19700,
     unit: "$",
-    status: "at-risk",
     icon: DollarSign,
-    description: "$19,700 MRR by Dec 31, 2026"
+    description: "$19,700 MRR by Dec 31, 2026",
+    requiredRate: 94,
+    actualRate: 78
   },
   {
     id: "arpu",
@@ -163,31 +222,59 @@ const laggingIndicators: LaggingMetric[] = [
     current: 788,
     goal: 788,
     unit: "$/month",
-    status: "on-track",
     icon: BarChart3,
     description: "$99 base + $34.95/employee"
   },
   {
     id: "churn",
     name: "Monthly Churn Rate",
+    currentPercent: 0.0,
+    goalPercent: 0.83,
     current: "0.0%",
     goal: "<0.83%",
     unit: "",
-    status: "on-track",
     icon: TrendingDown,
     description: "<10% annual target"
   },
   {
     id: "nrr",
     name: "Net Revenue Retention",
+    currentPercent: 115,
+    goalPercent: 115,
     current: "115%",
     goal: "≥115%",
     unit: "",
-    status: "on-track",
     icon: Activity,
     description: "Expansion offsets churn"
   }
 ];
+
+const laggingIndicators: LaggingMetric[] = laggingIndicatorsData.map(m => {
+  let status: MetricStatus;
+  if (m.id === "paying-customers" || m.id === "mrr") {
+    const rate = m.actualRate as number;
+    const required = m.requiredRate as number;
+    status = calculateRateStatus(rate, required);
+  } else if (m.id === "arpu") {
+    status = calculateArpuStatus(m.current as number, m.goal as number);
+  } else if (m.id === "churn") {
+    status = calculateChurnStatus((m as { currentPercent: number }).currentPercent, (m as { goalPercent: number }).goalPercent);
+  } else if (m.id === "nrr") {
+    status = calculateNrrStatus((m as { currentPercent: number }).currentPercent, (m as { goalPercent: number }).goalPercent);
+  } else {
+    status = "at-risk";
+  }
+  return { 
+    id: m.id,
+    name: m.name,
+    current: m.current,
+    goal: m.goal,
+    unit: m.unit,
+    icon: m.icon,
+    description: m.description,
+    status 
+  };
+});
 
 const geographicData = {
   buildings: {
