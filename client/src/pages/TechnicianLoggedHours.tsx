@@ -127,6 +127,13 @@ const translations = {
     selectDateRange: "Select Date Range",
     from: "From",
     exportingPdf: "Generating PDF...",
+    totalDrops: "Total Drops",
+    drops: "drops",
+    dropsCompleted: "Drops Completed",
+    north: "North",
+    east: "East",
+    south: "South",
+    west: "West",
     pdfExported: "PDF Exported",
     pdfExportedDesc: "Your work history has been downloaded",
     noDataInRange: "No Data Found",
@@ -231,6 +238,13 @@ const translations = {
     selectDateRange: "Sélectionner la période",
     from: "Du",
     exportingPdf: "Génération du PDF...",
+    totalDrops: "Descentes totales",
+    drops: "descentes",
+    dropsCompleted: "Descentes effectuées",
+    north: "Nord",
+    east: "Est",
+    south: "Sud",
+    west: "Ouest",
     pdfExported: "PDF exporté",
     pdfExportedDesc: "Votre historique de travail a été téléchargé",
     noDataInRange: "Aucune donnée trouvée",
@@ -930,6 +944,7 @@ export default function TechnicianLoggedHours() {
     companyName: string;
     logs: IrataTaskLog[];
     totalHours: number;
+    totalDrops: number;
     allTasks: string[];
   }> = {};
   
@@ -943,11 +958,13 @@ export default function TechnicianLoggedHours() {
         companyName: log.companyName || "",
         logs: [],
         totalHours: 0,
+        totalDrops: 0,
         allTasks: [],
       };
     }
     groupedByProject[projectKey].logs.push(log);
     groupedByProject[projectKey].totalHours += parseFloat(log.hoursWorked || "0");
+    groupedByProject[projectKey].totalDrops += (log.totalDrops || 0);
     // Collect unique tasks across all sessions
     (log.tasksPerformed || []).forEach((taskId: string) => {
       if (!groupedByProject[projectKey].allTasks.includes(taskId)) {
@@ -955,6 +972,9 @@ export default function TechnicianLoggedHours() {
       }
     });
   });
+  
+  // Calculate grand total drops across all sessions
+  const grandTotalDrops = logs.reduce((sum: number, log: any) => sum + (log.totalDrops || 0), 0);
 
   Object.values(groupedByProject).forEach((project) => {
     project.logs.sort((a, b) => {
@@ -1047,9 +1067,15 @@ export default function TechnicianLoggedHours() {
                     <p className="text-sm text-muted-foreground">{t.combinedTotal}</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-lg font-medium">{logs.length}</p>
-                  <p className="text-sm text-muted-foreground">{logs.length === 1 ? t.session : t.sessions}</p>
+                <div className="text-right flex items-center gap-6">
+                  <div>
+                    <p className="text-lg font-medium" data-testid="text-total-drops">{grandTotalDrops}</p>
+                    <p className="text-sm text-muted-foreground">{t.totalDrops}</p>
+                  </div>
+                  <div>
+                    <p className="text-lg font-medium">{logs.length}</p>
+                    <p className="text-sm text-muted-foreground">{logs.length === 1 ? t.session : t.sessions}</p>
+                  </div>
                 </div>
               </div>
               
@@ -1823,6 +1849,34 @@ export default function TechnicianLoggedHours() {
                       <p className="font-medium">{format(parseLocalDate(selectedLog.workDate), 'PPP', { locale: dateLocale })}</p>
                     </div>
                   </div>
+                  
+                  {/* Drops Completed */}
+                  {((selectedLog as any).totalDrops > 0) && (
+                    <div className="pt-2 border-t">
+                      <p className="text-xs text-muted-foreground mb-2">{t.dropsCompleted}</p>
+                      <div className="grid grid-cols-4 gap-2">
+                        <div className="text-center p-2 rounded bg-background">
+                          <p className="text-lg font-bold">{(selectedLog as any).dropsNorth || 0}</p>
+                          <p className="text-xs text-muted-foreground">{t.north}</p>
+                        </div>
+                        <div className="text-center p-2 rounded bg-background">
+                          <p className="text-lg font-bold">{(selectedLog as any).dropsEast || 0}</p>
+                          <p className="text-xs text-muted-foreground">{t.east}</p>
+                        </div>
+                        <div className="text-center p-2 rounded bg-background">
+                          <p className="text-lg font-bold">{(selectedLog as any).dropsSouth || 0}</p>
+                          <p className="text-xs text-muted-foreground">{t.south}</p>
+                        </div>
+                        <div className="text-center p-2 rounded bg-background">
+                          <p className="text-lg font-bold">{(selectedLog as any).dropsWest || 0}</p>
+                          <p className="text-xs text-muted-foreground">{t.west}</p>
+                        </div>
+                      </div>
+                      <div className="text-center mt-2">
+                        <p className="text-sm font-medium">{t.totalDrops}: {(selectedLog as any).totalDrops}</p>
+                      </div>
+                    </div>
+                  )}
                   
                   <div>
                     <p className="text-xs text-muted-foreground mb-2">{t.tasksPerformed}</p>

@@ -9116,7 +9116,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const logs = await storage.getIrataTaskLogsByEmployee(currentUser.id);
       
-      // Enrich logs with building height from project and company name
+      // Enrich logs with building height, company name, and drop counts from work session
       const enrichedLogs = await Promise.all(logs.map(async (log) => {
         let enrichedLog: any = { ...log };
         
@@ -9125,6 +9125,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const company = await storage.getUserById(log.companyId);
           if (company) {
             enrichedLog.companyName = company.companyName || company.name || null;
+          }
+        }
+        
+        // Get drop counts from the associated work session
+        if (log.workSessionId) {
+          const workSession = await storage.getWorkSessionById(log.workSessionId);
+          if (workSession) {
+            const dropsNorth = workSession.dropsCompletedNorth || 0;
+            const dropsEast = workSession.dropsCompletedEast || 0;
+            const dropsSouth = workSession.dropsCompletedSouth || 0;
+            const dropsWest = workSession.dropsCompletedWest || 0;
+            enrichedLog.totalDrops = dropsNorth + dropsEast + dropsSouth + dropsWest;
+            enrichedLog.dropsNorth = dropsNorth;
+            enrichedLog.dropsEast = dropsEast;
+            enrichedLog.dropsSouth = dropsSouth;
+            enrichedLog.dropsWest = dropsWest;
           }
         }
         
