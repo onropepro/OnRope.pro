@@ -8830,6 +8830,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const project = await storage.getProjectById(workSession.projectId);
       const derivedBuildingName = project?.buildingName || null;
       const derivedBuildingAddress = project?.buildingAddress || null;
+      const derivedBuildingHeight = project?.buildingHeight || null;
       
       // Get company ID from work session (authoritative source)
       const companyId = workSession.companyId;
@@ -8842,6 +8843,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           projectId: workSession.projectId,
           buildingName: derivedBuildingName,
           buildingAddress: derivedBuildingAddress,
+          buildingHeight: derivedBuildingHeight,
           tasksPerformed: canonicalTasks,
           workDate,
           hoursWorked,

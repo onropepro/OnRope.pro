@@ -1841,6 +1841,7 @@ export const irataTaskLogs = pgTable("irata_task_logs", {
   projectId: varchar("project_id").references(() => projects.id, { onDelete: "set null" }),
   buildingName: varchar("building_name"),
   buildingAddress: text("building_address"),
+  buildingHeight: varchar("building_height"), // e.g., "25 floors", "100m", etc.
   
   // Tasks performed (stored as array of task type strings)
   tasksPerformed: text("tasks_performed").array().default(sql`ARRAY[]::text[]`).notNull(),

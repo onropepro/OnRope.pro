@@ -628,6 +628,7 @@ export default function TechnicianLoggedHours() {
   const groupedByProject: Record<string, { 
     buildingName: string; 
     buildingAddress: string; 
+    buildingHeight: string;
     logs: IrataTaskLog[];
     totalHours: number;
   }> = {};
@@ -638,6 +639,7 @@ export default function TechnicianLoggedHours() {
       groupedByProject[projectKey] = {
         buildingName: log.buildingName || t.unknownProject,
         buildingAddress: log.buildingAddress || "",
+        buildingHeight: log.buildingHeight || "",
         logs: [],
         totalHours: 0,
       };
@@ -774,6 +776,9 @@ export default function TechnicianLoggedHours() {
                             <p className="font-medium">{project.buildingName}</p>
                             {project.buildingAddress && (
                               <p className="text-sm text-muted-foreground">{project.buildingAddress}</p>
+                            )}
+                            {project.buildingHeight && (
+                              <p className="text-sm text-muted-foreground">{t.buildingHeight}: {project.buildingHeight}</p>
                             )}
                           </div>
                         </div>
