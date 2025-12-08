@@ -28,7 +28,8 @@ import {
   CheckCircle2,
   AlertCircle,
   Loader2,
-  Calendar
+  Calendar,
+  FileText
 } from "lucide-react";
 import { format } from "date-fns";
 import type { JobPosting, User, JobApplication } from "@shared/schema";
@@ -121,15 +122,17 @@ const translations = {
     applicationWithdrawnDesc: "Your application has been removed.",
     applyFailed: "Failed to submit application",
     withdrawFailed: "Failed to withdraw application",
-    myApplications: "My Applications",
-    noApplications: "You haven't applied to any jobs yet",
+    myApplications: "My Applications & Offers",
+    noApplications: "No applications or offers yet",
     applicationStatus: "Status",
     statusApplied: "Applied",
     statusReviewing: "Under Review",
     statusInterviewed: "Interviewed",
-    statusOffered: "Offer Made",
+    statusOffered: "Job Offer Received",
     statusHired: "Hired",
     statusRejected: "Not Selected",
+    jobOfferReceived: "You received a job offer!",
+    receivedOn: "Received",
   },
   fr: {
     title: "Offres d'emploi",
@@ -213,15 +216,17 @@ const translations = {
     applicationWithdrawnDesc: "Votre candidature a ete supprimee.",
     applyFailed: "Echec de la soumission",
     withdrawFailed: "Echec du retrait",
-    myApplications: "Mes candidatures",
-    noApplications: "Vous n'avez postule a aucun emploi",
+    myApplications: "Mes candidatures et offres",
+    noApplications: "Aucune candidature ou offre pour le moment",
     applicationStatus: "Statut",
     statusApplied: "Postule",
     statusReviewing: "En cours d'examen",
     statusInterviewed: "Entrevue",
-    statusOffered: "Offre faite",
+    statusOffered: "Offre d'emploi recue",
     statusHired: "Embauche",
     statusRejected: "Non selectionne",
+    jobOfferReceived: "Vous avez recu une offre d'emploi!",
+    receivedOn: "Recu le",
   }
 };
 
@@ -495,6 +500,87 @@ export default function TechnicianJobBoard() {
         </Card>
 
         <Separator />
+
+        {/* My Applications & Offers Section */}
+        {myApplications.length > 0 && (
+          <>
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold flex items-center gap-2">
+                <FileText className="w-5 h-5 text-primary" />
+                {t.myApplications}
+                <Badge variant="secondary">{myApplications.length}</Badge>
+              </h2>
+
+              <div className="grid gap-3">
+                {myApplications.map((app) => {
+                  const isOffer = app.status === "offered";
+                  const statusLabel = {
+                    applied: t.statusApplied,
+                    reviewing: t.statusReviewing,
+                    interviewed: t.statusInterviewed,
+                    offered: t.statusOffered,
+                    hired: t.statusHired,
+                    rejected: t.statusRejected,
+                  }[app.status] || app.status;
+
+                  const statusVariant = {
+                    applied: "secondary" as const,
+                    reviewing: "secondary" as const,
+                    interviewed: "secondary" as const,
+                    offered: "default" as const,
+                    hired: "default" as const,
+                    rejected: "destructive" as const,
+                  }[app.status] || "secondary" as const;
+
+                  return (
+                    <Card 
+                      key={app.id}
+                      className={`${isOffer ? "border-primary bg-primary/5" : ""} hover-elevate cursor-pointer`}
+                      onClick={() => app.jobPosting && setSelectedJob(app.jobPosting)}
+                      data-testid={`card-application-${app.id}`}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                          <div className="flex-1 space-y-1">
+                            <div className="flex items-center gap-2">
+                              {isOffer && (
+                                <Badge className="bg-primary text-primary-foreground">
+                                  {t.jobOfferReceived}
+                                </Badge>
+                              )}
+                              <h3 className="font-semibold">
+                                {app.jobPosting?.title || "Unknown Job"}
+                              </h3>
+                            </div>
+                            <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                              <Badge variant={statusVariant}>{statusLabel}</Badge>
+                              {app.jobPosting?.location && (
+                                <span className="flex items-center gap-1">
+                                  <MapPin className="w-3 h-3" />
+                                  {app.jobPosting.location}
+                                </span>
+                              )}
+                              <span className="flex items-center gap-1">
+                                <Calendar className="w-3 h-3" />
+                                {t.receivedOn} {format(new Date(app.appliedAt), "MMM d, yyyy")}
+                              </span>
+                            </div>
+                          </div>
+                          <Button variant="ghost" size="sm" className="gap-1">
+                            {t.viewDetails}
+                            <ChevronRight className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            </div>
+
+            <Separator />
+          </>
+        )}
 
         {/* Job Listings */}
         <div className="space-y-4">
