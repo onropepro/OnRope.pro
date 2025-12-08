@@ -191,7 +191,8 @@ export default function TechnicianJobBoard() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [language, setLanguage] = useState<Language>(() => {
-    const saved = localStorage.getItem("preferredLanguage");
+    // Use same localStorage key as TechnicianPortal for consistency
+    const saved = localStorage.getItem("techPortalLanguage");
     return (saved === "fr" ? "fr" : "en") as Language;
   });
   const t = translations[language];
@@ -314,7 +315,11 @@ export default function TechnicianJobBoard() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setLanguage(language === "en" ? "fr" : "en")}
+              onClick={() => {
+                const newLang = language === "en" ? "fr" : "en";
+                setLanguage(newLang);
+                localStorage.setItem("techPortalLanguage", newLang);
+              }}
               data-testid="button-toggle-language"
             >
               {language === "en" ? "FR" : "EN"}
