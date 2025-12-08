@@ -7578,7 +7578,7 @@ export default function Dashboard() {
                   )}
 
                   {/* Banking Information */}
-                  {(employeeToView.bankTransitNumber || employeeToView.bankInstitutionNumber || employeeToView.bankAccountNumber) && (
+                  {(employeeToView.bankTransitNumber || employeeToView.bankInstitutionNumber || employeeToView.bankAccountNumber || (employeeToView.bankDocuments && employeeToView.bankDocuments.length > 0)) && (
                     <Card>
                       <CardHeader>
                         <CardTitle className="text-base flex items-center gap-2">
