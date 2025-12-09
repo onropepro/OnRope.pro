@@ -3455,10 +3455,17 @@ export default function Dashboard() {
                           }}
                         />
 
-                        {/* Elevation Toggle - shown for configurable job types */}
+                        {/* Elevation Toggle - shown for configurable job types, hidden for rock_scaling */}
                         {(() => {
                           const currentJobType = projectForm.watch("jobType");
                           const config = getJobTypeConfig(currentJobType);
+                          const category = projectForm.watch("jobCategory");
+                          
+                          // Rock scaling: elevation is always required but don't show any indicator
+                          if (category === 'rock_scaling') {
+                            return null;
+                          }
+                          
                           const isConfigurable = config?.elevationRequirement === 'configurable';
                           const isAlways = config?.elevationRequirement === 'always';
                           const isNever = config?.elevationRequirement === 'never';
