@@ -709,7 +709,7 @@ export default function TechnicianLogin() {
               <div className="p-8 rounded-lg border-2 border-primary bg-gradient-to-b from-primary/5 to-primary/10 relative">
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                   <span className="bg-action-500 text-white text-xs font-semibold px-4 py-1.5 rounded-full shadow-lg">
-                    Most Popular
+                    This One Is Better
                   </span>
                 </div>
                 <div className="flex items-center gap-3 mb-6">
