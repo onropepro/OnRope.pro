@@ -199,6 +199,12 @@ export const users = pgTable("users", {
   // Activity tracking
   lastActivityAt: timestamp("last_activity_at"), // Last time user made any API request (for activity monitoring)
   
+  // Account suspension (SuperUser can disable accounts for fraud/misuse)
+  isDisabled: boolean("is_disabled").default(false), // Whether account is suspended
+  disabledAt: timestamp("disabled_at"), // When account was disabled
+  disabledReason: text("disabled_reason"), // Reason for suspension (fraud, misuse, etc.)
+  disabledBy: varchar("disabled_by"), // SuperUser who disabled the account
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

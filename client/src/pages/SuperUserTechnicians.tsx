@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -39,6 +41,7 @@ interface Technician {
   referralCode: string | null;
   referralCount: number;
   hasPlusAccess: boolean;
+  isDisabled: boolean;
 }
 
 interface TechnicianDetail {
@@ -88,6 +91,9 @@ interface TechnicianDetail {
   irataBaselineHours: string | null;
   hasPlusAccess: boolean;
   referralCount: number;
+  isDisabled: boolean;
+  disabledAt: string | null;
+  disabledReason: string | null;
 }
 
 interface CompanyInfo {
@@ -116,6 +122,8 @@ export default function SuperUserTechnicians() {
   const [currentPage, setCurrentPage] = useState(1);
   const [linkedFilter, setLinkedFilter] = useState<string>("all");
   const [selectedTechnician, setSelectedTechnician] = useState<string | null>(null);
+  const [suspendDialogOpen, setSuspendDialogOpen] = useState(false);
+  const [suspendReason, setSuspendReason] = useState("");
   const pageSize = 25;
   const { toast } = useToast();
 
@@ -168,6 +176,41 @@ export default function SuperUserTechnicians() {
         description: `Successfully updated PLUS access for this technician.`,
       });
       queryClient.invalidateQueries({ queryKey: ["/api/superuser/technicians"] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const toggleAccountStatusMutation = useMutation({
+    mutationFn: async ({ userId, isDisabled, reason }: { userId: string; isDisabled: boolean; reason?: string }) => {
+      const res = await fetch(`/api/superuser/accounts/${userId}/status`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ 
+          isDisabled, 
+          reason,
+          confirmationCode: isDisabled ? 'CONFIRM-DISABLE' : 'CONFIRM-ENABLE'
+        }),
+      });
+      if (!res.ok) throw new Error(`${res.status}: ${await res.text()}`);
+      return res.json();
+    },
+    onSuccess: (_, variables) => {
+      toast({
+        title: variables.isDisabled ? "Account Disabled" : "Account Re-enabled",
+        description: variables.isDisabled 
+          ? "This account has been suspended and cannot login." 
+          : "This account has been re-activated.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/superuser/technicians"] });
+      setSuspendDialogOpen(false);
+      setSuspendReason("");
     },
     onError: (error: Error) => {
       toast({
@@ -322,7 +365,7 @@ export default function SuperUserTechnicians() {
                           <div className="font-medium flex items-center gap-2 flex-wrap">
                             {tech.name}
                             {tech.hasPlusAccess && (
-                              <Badge className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs">PRO</Badge>
+                              <Badge className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs">PLUS</Badge>
                             )}
                             {getStatusBadge(tech)}
                           </div>
@@ -619,7 +662,7 @@ export default function SuperUserTechnicians() {
                           <div className="flex items-center gap-2">
                             <p className="font-medium">Technician PLUS</p>
                             {technicianDetailData.technician.hasPlusAccess && (
-                              <Badge className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white">PRO</Badge>
+                              <Badge className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white">PLUS</Badge>
                             )}
                           </div>
                           <p className="text-sm text-muted-foreground">
@@ -649,6 +692,140 @@ export default function SuperUserTechnicians() {
                           <Label htmlFor="plus-access" className="sr-only">
                             Toggle PLUS Access
                           </Label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Account Status Management */}
+                  <Separator />
+                  <div>
+                    <h3 className="font-semibold mb-3 flex items-center gap-2">
+                      <span className={`material-icons text-sm ${technicianDetailData.technician.isDisabled ? 'text-red-500' : 'text-green-500'}`}>
+                        {technicianDetailData.technician.isDisabled ? 'block' : 'check_circle'}
+                      </span>
+                      Account Status
+                    </h3>
+                    <div className={`p-4 rounded-lg border ${technicianDetailData.technician.isDisabled ? 'bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800' : 'bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800'}`}>
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <p className="font-medium">
+                              {technicianDetailData.technician.isDisabled ? 'Account Suspended' : 'Account Active'}
+                            </p>
+                            <Badge variant={technicianDetailData.technician.isDisabled ? "destructive" : "default"} className={!technicianDetailData.technician.isDisabled ? "bg-green-600" : ""}>
+                              {technicianDetailData.technician.isDisabled ? 'Disabled' : 'Active'}
+                            </Badge>
+                          </div>
+                          {technicianDetailData.technician.isDisabled ? (
+                            <>
+                              <p className="text-sm text-muted-foreground">
+                                This account is suspended and cannot login.
+                              </p>
+                              {technicianDetailData.technician.disabledReason && (
+                                <p className="text-sm text-red-600 dark:text-red-400">
+                                  Reason: {technicianDetailData.technician.disabledReason}
+                                </p>
+                              )}
+                              {technicianDetailData.technician.disabledAt && (
+                                <p className="text-xs text-muted-foreground">
+                                  Suspended on: {formatDate(technicianDetailData.technician.disabledAt)}
+                                </p>
+                              )}
+                            </>
+                          ) : (
+                            <p className="text-sm text-muted-foreground">
+                              This account is active and can login normally.
+                            </p>
+                          )}
+                        </div>
+                        <div>
+                          {technicianDetailData.technician.isDisabled ? (
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="outline" className="gap-2">
+                                  <span className="material-icons text-sm">check_circle</span>
+                                  Re-enable Account
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Re-enable Account?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This will restore access for {technicianDetailData.technician.name}. They will be able to login again.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => {
+                                      if (selectedTechnician) {
+                                        toggleAccountStatusMutation.mutate({
+                                          userId: selectedTechnician,
+                                          isDisabled: false,
+                                        });
+                                      }
+                                    }}
+                                    disabled={toggleAccountStatusMutation.isPending}
+                                    className="bg-green-600 hover:bg-green-700"
+                                  >
+                                    {toggleAccountStatusMutation.isPending ? 'Enabling...' : 'Re-enable Account'}
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          ) : (
+                            <AlertDialog open={suspendDialogOpen} onOpenChange={setSuspendDialogOpen}>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="destructive" className="gap-2">
+                                  <span className="material-icons text-sm">block</span>
+                                  Suspend Account
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle className="text-red-600">Suspend Account?</AlertDialogTitle>
+                                  <AlertDialogDescription className="space-y-4">
+                                    <p>
+                                      You are about to suspend the account for <strong>{technicianDetailData.technician.name}</strong>.
+                                    </p>
+                                    <p>
+                                      They will not be able to login until you re-enable their account. No data will be deleted.
+                                    </p>
+                                    <div className="space-y-2">
+                                      <Label htmlFor="suspend-reason" className="text-foreground font-medium">Reason for suspension (required):</Label>
+                                      <Textarea
+                                        id="suspend-reason"
+                                        placeholder="Enter the reason for suspending this account (min 10 characters)..."
+                                        value={suspendReason}
+                                        onChange={(e) => setSuspendReason(e.target.value)}
+                                        className="min-h-[80px]"
+                                        data-testid="textarea-suspend-reason"
+                                      />
+                                    </div>
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel onClick={() => setSuspendReason("")}>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => {
+                                      if (selectedTechnician && suspendReason.trim().length >= 10) {
+                                        toggleAccountStatusMutation.mutate({
+                                          userId: selectedTechnician,
+                                          isDisabled: true,
+                                          reason: suspendReason,
+                                        });
+                                      }
+                                    }}
+                                    disabled={toggleAccountStatusMutation.isPending || suspendReason.trim().length < 10}
+                                    className="bg-red-600 hover:bg-red-700"
+                                  >
+                                    {toggleAccountStatusMutation.isPending ? 'Suspending...' : 'Confirm Suspension'}
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          )}
                         </div>
                       </div>
                     </div>
