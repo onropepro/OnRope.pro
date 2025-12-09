@@ -55,7 +55,7 @@ export const JOB_TYPES: JobTypeConfig[] = [
   { value: 'ndt_other', category: 'ndt', labelKey: 'dashboard.jobTypes.ndt_other', label: 'Other NDT', icon: 'more_horiz', elevationRequirement: 'configurable', progressType: 'hours' },
   
   // Rock Scaling (all hours-based, elevation always required for rope access work)
-  { value: 'rock_loose_removal', category: 'rock_scaling', labelKey: 'dashboard.jobTypes.rock_loose_removal', label: 'Loose Rock Removal', icon: 'landslide', elevationRequirement: 'always', progressType: 'hours' },
+  { value: 'rock_loose_removal', category: 'rock_scaling', labelKey: 'dashboard.jobTypes.rock_loose_removal', label: 'Loose Rock Removal', icon: 'texture', elevationRequirement: 'always', progressType: 'hours' },
   { value: 'rock_bolting', category: 'rock_scaling', labelKey: 'dashboard.jobTypes.rock_bolting', label: 'Rock Bolting / Anchoring', icon: 'hardware', elevationRequirement: 'always', progressType: 'hours' },
   { value: 'rock_mesh_installation', category: 'rock_scaling', labelKey: 'dashboard.jobTypes.rock_mesh_installation', label: 'Mesh / Net Installation', icon: 'grid_on', elevationRequirement: 'always', progressType: 'hours' },
   { value: 'rock_shotcrete', category: 'rock_scaling', labelKey: 'dashboard.jobTypes.rock_shotcrete', label: 'Shotcrete Application', icon: 'format_paint', elevationRequirement: 'always', progressType: 'hours' },
