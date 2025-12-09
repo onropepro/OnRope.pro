@@ -182,6 +182,11 @@ export const users = pgTable("users", {
   
   // Technician job board visibility (allows employers to see their profile)
   isVisibleToEmployers: boolean("is_visible_to_employers").default(false), // Whether technician's profile is visible on job board
+  
+  // Technician expected salary (visible to employers)
+  expectedSalaryMin: numeric("expected_salary_min", { precision: 12, scale: 2 }), // Minimum expected salary
+  expectedSalaryMax: numeric("expected_salary_max", { precision: 12, scale: 2 }), // Maximum expected salary
+  expectedSalaryPeriod: varchar("expected_salary_period"), // hourly | daily | weekly | monthly | annually
   visibilityEnabledAt: timestamp("visibility_enabled_at"), // When visibility was last enabled
   
   // White label branding (company role only)

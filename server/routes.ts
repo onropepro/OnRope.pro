@@ -15531,8 +15531,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Create new feature request (company owners only)
-  app.post("/api/feature-requests", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+  // Create new feature request (company owners and technicians)
+  app.post("/api/feature-requests", requireAuth, requireRole("company", "rope_access_tech"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       if (!currentUser) {
@@ -15544,7 +15544,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         companyId: currentUser.id,
         contactName: currentUser.name || currentUser.email || "Unknown",
         contactEmail: currentUser.email,
-        companyName: currentUser.companyName || "Unknown Company",
+        companyName: currentUser.role === 'rope_access_tech' ? "Technician Feedback" : (currentUser.companyName || "Unknown Company"),
       });
 
       const request = await storage.createFeatureRequest(requestData);
@@ -16335,6 +16335,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update technician expected salary
+  app.patch("/api/technician/expected-salary", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Only technicians can update their expected salary
+      const EMPLOYEE_ROLES = ["rope_access_tech", "ground_crew", "ground_crew_supervisor", "supervisor", "operations_manager", "manager"];
+      if (!EMPLOYEE_ROLES.includes(currentUser.role)) {
+        return res.status(403).json({ message: "Only technicians can update expected salary" });
+      }
+
+      const { minSalary, maxSalary, salaryPeriod } = req.body;
+      
+      const updates: any = {
+        expectedSalaryMin: minSalary || null,
+        expectedSalaryMax: maxSalary || null,
+        expectedSalaryPeriod: salaryPeriod || null,
+      };
+
+      const [updatedUser] = await db.update(users)
+        .set(updates)
+        .where(eq(users.id, currentUser.id))
+        .returning();
+
+      res.json({ 
+        expectedSalaryMin: updatedUser.expectedSalaryMin,
+        expectedSalaryMax: updatedUser.expectedSalaryMax,
+        expectedSalaryPeriod: updatedUser.expectedSalaryPeriod,
+      });
+    } catch (error) {
+      console.error("Update expected salary error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Get visible technicians (for companies browsing)
   app.get("/api/visible-technicians", requireAuth, requireRole("company", "superuser"), async (req: Request, res: Response) => {
     try {
@@ -16359,6 +16397,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         employeeProvinceState: users.employeeProvinceState,
         employeeCountry: users.employeeCountry,
         visibilityEnabledAt: users.visibilityEnabledAt,
+        expectedSalaryMin: users.expectedSalaryMin,
+        expectedSalaryMax: users.expectedSalaryMax,
+        expectedSalaryPeriod: users.expectedSalaryPeriod,
       }).from(users)
         .where(and(
           eq(users.isVisibleToEmployers, true),
