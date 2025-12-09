@@ -177,7 +177,7 @@ export default function SuperUserFeatureRequests() {
                 </select>
               </div>
               <CardDescription className="mt-2">
-                From: {currentRequest.companyName || 'Unknown Company'} ({currentRequest.userName || 'Unknown'})
+                From: {currentRequest.userName || 'Unknown User'}{currentRequest.companyName ? ` (${currentRequest.companyName})` : ''}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -214,7 +214,7 @@ export default function SuperUserFeatureRequests() {
                     >
                       <div className="flex items-center justify-between gap-2 mb-1">
                         <span className="text-xs font-medium">
-                          {msg.senderRole === 'superuser' ? 'OnRopePro Team (You)' : currentRequest.companyName || 'Company Owner'}
+                          {msg.senderRole === 'superuser' ? 'OnRopePro Team (You)' : currentRequest.userName || 'User'}
                         </span>
                         <span className="text-xs text-muted-foreground">
                           {format(new Date(msg.createdAt), 'MMM d, h:mm a')}
@@ -315,7 +315,7 @@ export default function SuperUserFeatureRequests() {
                       <div className="flex-1">
                         <h3 className="font-medium text-sm">{request.title}</h3>
                         <p className="text-xs text-muted-foreground mt-0.5">
-                          {request.companyName || 'Unknown Company'}
+                          {request.userName || 'Unknown User'}{request.companyName ? ` - ${request.companyName}` : ''}
                         </p>
                       </div>
                       <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
