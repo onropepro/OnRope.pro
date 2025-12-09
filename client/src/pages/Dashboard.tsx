@@ -2234,13 +2234,20 @@ export default function Dashboard() {
     try {
       // Track logout event before clearing session
       trackLogout();
+      // Remember the user's role before logging out
+      const userRole = user?.role;
       await fetch("/api/logout", {
         method: "POST",
         credentials: "include",
       });
       // Clear ALL query cache to prevent stale data from causing redirect issues
       queryClient.clear();
-      setLocation("/login");
+      // Redirect technicians to technician login, others to regular login
+      if (userRole === 'rope_access_tech') {
+        setLocation("/technician-login");
+      } else {
+        setLocation("/login");
+      }
     } catch (error) {
       toast({ title: t('dashboard.toast.error', 'Error'), description: t('dashboard.toast.logoutFailed', 'Failed to logout'), variant: "destructive" });
     }
