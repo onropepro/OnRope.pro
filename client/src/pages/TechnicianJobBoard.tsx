@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { 
@@ -32,7 +33,8 @@ import {
   FileText,
   Lock,
   Star,
-  Gift
+  Gift,
+  Save
 } from "lucide-react";
 import { format } from "date-fns";
 import type { JobPosting, User, JobApplication } from "@shared/schema";
@@ -152,6 +154,34 @@ const translations = {
     shareCode: "Share this code with fellow technicians",
     copyCode: "Copy Code",
     codeCopied: "Code copied!",
+    // Location Filters
+    filterByLocation: "Filter by Location",
+    country: "Country",
+    provinceState: "Province/State",
+    city: "City",
+    allCountries: "All Countries",
+    allProvinces: "All Provinces/States",
+    allCities: "All Cities",
+    clearFilters: "Clear Filters",
+    showingResults: "Showing",
+    of: "of",
+    jobs: "jobs",
+    // Expected Salary
+    expectedSalary: "Expected Salary",
+    expectedSalaryDesc: "Set your salary expectations (visible to employers)",
+    minimumSalary: "Minimum",
+    maximumSalary: "Maximum",
+    salaryPeriod: "Period",
+    selectPeriod: "Select period",
+    saveSalary: "Save",
+    salaryUpdated: "Salary expectations updated",
+    salaryUpdateFailed: "Failed to update salary expectations",
+    notSet: "Not set",
+    perHour: "Per hour",
+    perDay: "Per day",
+    perWeek: "Per week",
+    perMonth: "Per month",
+    perYear: "Per year",
   },
   fr: {
     title: "Offres d'emploi",
@@ -262,6 +292,34 @@ const translations = {
     shareCode: "Partagez ce code avec d'autres techniciens",
     copyCode: "Copier le code",
     codeCopied: "Code copie!",
+    // Location Filters
+    filterByLocation: "Filtrer par lieu",
+    country: "Pays",
+    provinceState: "Province/Etat",
+    city: "Ville",
+    allCountries: "Tous les pays",
+    allProvinces: "Toutes les provinces",
+    allCities: "Toutes les villes",
+    clearFilters: "Effacer les filtres",
+    showingResults: "Affichage de",
+    of: "sur",
+    jobs: "emplois",
+    // Expected Salary
+    expectedSalary: "Salaire attendu",
+    expectedSalaryDesc: "Definir vos attentes salariales (visible par les employeurs)",
+    minimumSalary: "Minimum",
+    maximumSalary: "Maximum",
+    salaryPeriod: "Periode",
+    selectPeriod: "Selectionner la periode",
+    saveSalary: "Sauvegarder",
+    salaryUpdated: "Attentes salariales mises a jour",
+    salaryUpdateFailed: "Echec de la mise a jour des attentes salariales",
+    notSet: "Non defini",
+    perHour: "Par heure",
+    perDay: "Par jour",
+    perWeek: "Par semaine",
+    perMonth: "Par mois",
+    perYear: "Par an",
   }
 };
 
@@ -277,6 +335,16 @@ export default function TechnicianJobBoard() {
 
   const [selectedJob, setSelectedJob] = useState<JobPosting | null>(null);
   const [showConfirmVisibility, setShowConfirmVisibility] = useState(false);
+  
+  // Location filters
+  const [filterCountry, setFilterCountry] = useState<string>("");
+  const [filterProvince, setFilterProvince] = useState<string>("");
+  const [filterCity, setFilterCity] = useState<string>("");
+  
+  // Expected salary state
+  const [expectedSalaryMin, setExpectedSalaryMin] = useState<string>("");
+  const [expectedSalaryMax, setExpectedSalaryMax] = useState<string>("");
+  const [expectedSalaryPeriod, setExpectedSalaryPeriod] = useState<string>("");
 
   const { data: userData } = useQuery<{ user: User }>({
     queryKey: ["/api/user"],
@@ -291,8 +359,29 @@ export default function TechnicianJobBoard() {
   });
 
   const user = userData?.user;
-  const jobs = jobsData?.jobPostings || [];
+  const allJobs = jobsData?.jobPostings || [];
   const myApplications = applicationsData?.applications || [];
+  
+  // Extract unique countries, provinces, and cities from jobs for filter options
+  const uniqueCountries = [...new Set(allJobs.map(j => j.jobCountry).filter(Boolean))] as string[];
+  const uniqueProvinces = [...new Set(allJobs.filter(j => !filterCountry || j.jobCountry === filterCountry).map(j => j.jobProvinceState).filter(Boolean))] as string[];
+  const uniqueCities = [...new Set(allJobs.filter(j => (!filterCountry || j.jobCountry === filterCountry) && (!filterProvince || j.jobProvinceState === filterProvince)).map(j => j.jobCity).filter(Boolean))] as string[];
+  
+  // Filter jobs based on selected filters
+  const jobs = allJobs.filter(job => {
+    if (filterCountry && job.jobCountry !== filterCountry) return false;
+    if (filterProvince && job.jobProvinceState !== filterProvince) return false;
+    if (filterCity && job.jobCity !== filterCity) return false;
+    return true;
+  });
+  
+  const hasActiveFilters = filterCountry || filterProvince || filterCity;
+  
+  const clearFilters = () => {
+    setFilterCountry("");
+    setFilterProvince("");
+    setFilterCity("");
+  };
 
   const hasApplied = (jobId: string) => {
     return myApplications.some(app => app.jobPostingId === jobId);
@@ -367,6 +456,48 @@ export default function TechnicianJobBoard() {
     } else {
       visibilityMutation.mutate(false);
     }
+  };
+
+  // Initialize expected salary from user data
+  const initializeExpectedSalary = () => {
+    if (user) {
+      setExpectedSalaryMin((user as any).expectedSalaryMin || "");
+      setExpectedSalaryMax((user as any).expectedSalaryMax || "");
+      setExpectedSalaryPeriod((user as any).expectedSalaryPeriod || "");
+    }
+  };
+  
+  // Initialize on first load
+  if (user && !expectedSalaryMin && !expectedSalaryMax && !expectedSalaryPeriod) {
+    if ((user as any).expectedSalaryMin || (user as any).expectedSalaryMax || (user as any).expectedSalaryPeriod) {
+      initializeExpectedSalary();
+    }
+  }
+
+  const salaryMutation = useMutation({
+    mutationFn: async (data: { minSalary: string; maxSalary: string; salaryPeriod: string }) => {
+      return apiRequest("PATCH", "/api/technician/expected-salary", data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      toast({
+        title: t.salaryUpdated,
+      });
+    },
+    onError: () => {
+      toast({
+        title: t.salaryUpdateFailed,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleSaveSalary = () => {
+    salaryMutation.mutate({
+      minSalary: expectedSalaryMin,
+      maxSalary: expectedSalaryMax,
+      salaryPeriod: expectedSalaryPeriod,
+    });
   };
 
   const getJobTypeBadge = (jobType: string) => {
@@ -595,6 +726,72 @@ export default function TechnicianJobBoard() {
           </CardContent>
         </Card>
 
+        {/* Expected Salary Card - Only show when visibility is enabled */}
+        {user?.isVisibleToEmployers && (
+          <Card className="border-muted">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <DollarSign className="w-4 h-4 text-primary" />
+                {t.expectedSalary}
+              </CardTitle>
+              <CardDescription>{t.expectedSalaryDesc}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label>{t.minimumSalary}</Label>
+                  <Input
+                    type="number"
+                    placeholder="0"
+                    value={expectedSalaryMin}
+                    onChange={(e) => setExpectedSalaryMin(e.target.value)}
+                    data-testid="input-salary-min"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>{t.maximumSalary}</Label>
+                  <Input
+                    type="number"
+                    placeholder="0"
+                    value={expectedSalaryMax}
+                    onChange={(e) => setExpectedSalaryMax(e.target.value)}
+                    data-testid="input-salary-max"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>{t.salaryPeriod}</Label>
+                  <Select value={expectedSalaryPeriod} onValueChange={setExpectedSalaryPeriod}>
+                    <SelectTrigger data-testid="select-salary-period">
+                      <SelectValue placeholder={t.selectPeriod} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="hourly">{t.perHour}</SelectItem>
+                      <SelectItem value="daily">{t.perDay}</SelectItem>
+                      <SelectItem value="weekly">{t.perWeek}</SelectItem>
+                      <SelectItem value="monthly">{t.perMonth}</SelectItem>
+                      <SelectItem value="yearly">{t.perYear}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="mt-4 flex justify-end">
+                <Button 
+                  onClick={handleSaveSalary}
+                  disabled={salaryMutation.isPending}
+                  data-testid="button-save-salary"
+                >
+                  {salaryMutation.isPending ? (
+                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  ) : (
+                    <Save className="w-4 h-4 mr-2" />
+                  )}
+                  {t.saveSalary}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         <Separator />
 
         {/* My Applications & Offers Section */}
@@ -677,6 +874,90 @@ export default function TechnicianJobBoard() {
             <Separator />
           </>
         )}
+
+        {/* Location Filters */}
+        <Card className="border-muted">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <MapPin className="w-4 h-4" />
+              {t.filterByLocation}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="filter-country" className="text-xs text-muted-foreground">{t.country}</Label>
+                <select
+                  id="filter-country"
+                  value={filterCountry}
+                  onChange={(e) => {
+                    setFilterCountry(e.target.value);
+                    setFilterProvince("");
+                    setFilterCity("");
+                  }}
+                  className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                  data-testid="select-filter-country"
+                >
+                  <option value="">{t.allCountries}</option>
+                  {uniqueCountries.map(country => (
+                    <option key={country} value={country}>{country}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="space-y-1.5">
+                <Label htmlFor="filter-province" className="text-xs text-muted-foreground">{t.provinceState}</Label>
+                <select
+                  id="filter-province"
+                  value={filterProvince}
+                  onChange={(e) => {
+                    setFilterProvince(e.target.value);
+                    setFilterCity("");
+                  }}
+                  className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                  data-testid="select-filter-province"
+                >
+                  <option value="">{t.allProvinces}</option>
+                  {uniqueProvinces.map(province => (
+                    <option key={province} value={province}>{province}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="space-y-1.5">
+                <Label htmlFor="filter-city" className="text-xs text-muted-foreground">{t.city}</Label>
+                <select
+                  id="filter-city"
+                  value={filterCity}
+                  onChange={(e) => setFilterCity(e.target.value)}
+                  className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                  data-testid="select-filter-city"
+                >
+                  <option value="">{t.allCities}</option>
+                  {uniqueCities.map(city => (
+                    <option key={city} value={city}>{city}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            
+            {hasActiveFilters && (
+              <div className="flex items-center justify-between mt-3 pt-3 border-t">
+                <span className="text-sm text-muted-foreground">
+                  {t.showingResults} {jobs.length} {t.of} {allJobs.length} {t.jobs}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearFilters}
+                  data-testid="button-clear-filters"
+                >
+                  {t.clearFilters}
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Job Listings */}
         <div className="space-y-4">

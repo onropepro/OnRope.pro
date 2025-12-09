@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -46,7 +47,8 @@ import {
   Mail, 
   Award, 
   Heart, 
-  Building, 
+  Building,
+  Building2,
   CreditCard,
   Calendar,
   AlertCircle,
@@ -64,6 +66,7 @@ import {
   UserMinus,
   DollarSign,
   ArrowRight,
+  ArrowLeft,
   Briefcase,
   Copy,
   Share2,
@@ -73,7 +76,12 @@ import {
   Gift,
   Lock,
   Crown,
-  MessageSquare
+  MessageSquare,
+  Home,
+  MoreHorizontal,
+  ChevronDown,
+  ChevronUp,
+  FileCheck
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
@@ -252,6 +260,13 @@ const translations = {
     accessProjects: "Access projects, clock in/out, and safety forms",
     dashboardDisabledNoCompany: "You need to be linked with a company to access the Work Dashboard. Accept an invitation below to get started.",
     dashboardDisabledTerminated: "Your employment has been terminated. Accept a new invitation to access the Work Dashboard.",
+    selectEmployer: "Select Employer",
+    selectEmployerDesc: "Choose which employer's dashboard to access",
+    connectedEmployers: "Connected Employers",
+    primaryEmployer: "Primary",
+    setPrimary: "Set as Primary",
+    continueToEmployer: "Continue",
+    noEmployersConnected: "No employers connected",
     myLoggedHours: "My Logged Hours",
     viewLoggedHoursDesc: "Track your rope access career progress",
     viewLoggedHours: "View Logged Hours",
@@ -376,6 +391,24 @@ const translations = {
     feedbackSuccess: "Thank You!",
     feedbackSuccessDesc: "Your feedback has been submitted. We appreciate your input and will review it carefully.",
     feedbackError: "Failed to submit feedback",
+    viewMyFeedback: "View My Feedback",
+    myFeedbackTitle: "My Feedback",
+    tabHome: "Home",
+    tabProfile: "Profile",
+    tabWork: "Work",
+    tabMore: "More",
+    backToHome: "Back to Home",
+    quickActions: "Quick Actions",
+    myFeedbackDesc: "View your submitted feedback and responses from OnRopePro",
+    noFeedbackYet: "You haven't submitted any feedback yet",
+    feedbackStatus: "Status",
+    feedbackResponses: "Responses",
+    fromTeam: "OnRopePro Team",
+    fromYou: "You",
+    replyToFeedback: "Reply",
+    sendReply: "Send Reply",
+    replyPlaceholder: "Type your reply...",
+    newResponse: "New Response",
   },
   fr: {
     technicianPortal: "Portail du technicien",
@@ -549,6 +582,13 @@ const translations = {
     accessProjects: "Accéder aux projets, pointage et formulaires de sécurité",
     dashboardDisabledNoCompany: "Vous devez être lié à une entreprise pour accéder au tableau de bord. Acceptez une invitation ci-dessous pour commencer.",
     dashboardDisabledTerminated: "Votre emploi a été résilié. Acceptez une nouvelle invitation pour accéder au tableau de bord.",
+    selectEmployer: "Sélectionner l'employeur",
+    selectEmployerDesc: "Choisissez le tableau de bord de l'employeur à accéder",
+    connectedEmployers: "Employeurs connectés",
+    primaryEmployer: "Principal",
+    setPrimary: "Définir comme principal",
+    continueToEmployer: "Continuer",
+    noEmployersConnected: "Aucun employeur connecté",
     myLoggedHours: "Mes heures enregistrées",
     viewLoggedHoursDesc: "Suivez votre progression de carrière en accès sur corde",
     viewLoggedHours: "Voir les heures enregistrées",
@@ -673,6 +713,24 @@ const translations = {
     feedbackSuccess: "Merci!",
     feedbackSuccessDesc: "Vos commentaires ont été soumis. Nous apprécions votre contribution et les examinerons attentivement.",
     feedbackError: "Échec de la soumission des commentaires",
+    viewMyFeedback: "Voir mes commentaires",
+    myFeedbackTitle: "Mes commentaires",
+    tabHome: "Accueil",
+    tabProfile: "Profil",
+    tabWork: "Travail",
+    tabMore: "Plus",
+    backToHome: "Retour à l'accueil",
+    quickActions: "Actions rapides",
+    myFeedbackDesc: "Consultez vos commentaires soumis et les réponses de OnRopePro",
+    noFeedbackYet: "Vous n'avez pas encore soumis de commentaires",
+    feedbackStatus: "Statut",
+    feedbackResponses: "Réponses",
+    fromTeam: "Équipe OnRopePro",
+    fromYou: "Vous",
+    replyToFeedback: "Répondre",
+    sendReply: "Envoyer la réponse",
+    replyPlaceholder: "Tapez votre réponse...",
+    newResponse: "Nouvelle réponse",
   }
 };
 
@@ -930,6 +988,10 @@ export default function TechnicianPortal() {
   // State for PLUS benefits dialog
   const [showPlusBenefits, setShowPlusBenefits] = useState(false);
   
+  // Mobile-friendly tab navigation
+  type TabType = 'home' | 'profile' | 'work' | 'more';
+  const [activeTab, setActiveTab] = useState<TabType>('home');
+  
   // Feedback state
   const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
   const [feedbackTitle, setFeedbackTitle] = useState("");
@@ -938,6 +1000,66 @@ export default function TechnicianPortal() {
   const [feedbackPriority, setFeedbackPriority] = useState("normal");
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
   const [showFeedbackSuccess, setShowFeedbackSuccess] = useState(false);
+  const [showMyFeedbackDialog, setShowMyFeedbackDialog] = useState(false);
+  const [selectedFeedbackId, setSelectedFeedbackId] = useState<string | null>(null);
+  const [feedbackReply, setFeedbackReply] = useState("");
+  const [isSubmittingReply, setIsSubmittingReply] = useState(false);
+  
+  // Query for user's feedback
+  const { data: myFeedbackData, refetch: refetchMyFeedback } = useQuery<{
+    requests: Array<{
+      id: string;
+      title: string;
+      description: string;
+      category: string;
+      priority: string;
+      status: string;
+      createdAt: string;
+      messages: Array<{
+        id: string;
+        message: string;
+        senderRole: string;
+        createdAt: string;
+        readAt: string | null;
+      }>;
+      unreadCount: number;
+    }>;
+  }>({
+    queryKey: ["/api/my-feedback"],
+    enabled: !!user,
+  });
+  
+  const totalUnreadFeedback = myFeedbackData?.requests?.reduce((sum, r) => sum + r.unreadCount, 0) ?? 0;
+  
+  // Employer selection state (for PLUS members with multiple employers)
+  const [showEmployerSelectDialog, setShowEmployerSelectDialog] = useState(false);
+  const [selectedEmployerId, setSelectedEmployerId] = useState<string | null>(null);
+  
+  // Query for employer connections (for PLUS members)
+  type EmployerConnection = {
+    id: string;
+    companyId: string;
+    isPrimary: boolean;
+    status: string;
+    connectedAt: Date | string;
+    company: {
+      id: string;
+      name: string;
+      companyName: string | null;
+      photoUrl: string | null;
+    } | null;
+  };
+  
+  const { data: employerConnectionsData } = useQuery<{
+    connections: EmployerConnection[];
+    hasPlusAccess: boolean;
+    canAddMore: boolean;
+  }>({
+    queryKey: ["/api/my-employer-connections"],
+    enabled: !!user && user.role === 'rope_access_tech',
+  });
+  
+  const hasMultipleEmployers = (employerConnectionsData?.connections?.length ?? 0) > 1;
   
   // Handle copy referral code
   const handleCopyReferralCode = () => {
@@ -1571,98 +1693,204 @@ export default function TechnicianPortal() {
         );
       })()}
 
-      <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
-        {/* Work Dashboard Quick Access - Show for all technicians */}
-        {user && user.role === 'rope_access_tech' && (
-          <Card className={user.companyId && !user.terminatedDate ? "border-primary bg-primary/5" : "border-muted bg-muted/30"}>
-            <CardContent className="p-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-full ${user.companyId && !user.terminatedDate ? "bg-primary/10" : "bg-muted"}`}>
-                    <Briefcase className={`w-5 h-5 ${user.companyId && !user.terminatedDate ? "text-primary" : "text-muted-foreground"}`} />
+      <main className="max-w-4xl mx-auto px-4 py-6 space-y-6 pb-24">
+        {/* HOME TAB - Quick actions and overview */}
+        {activeTab === 'home' && (
+          <>
+            {/* Work Dashboard Quick Access */}
+            {user && user.role === 'rope_access_tech' && (
+              <Card className={user.companyId && !user.terminatedDate ? "border-primary bg-primary/5" : "border-muted bg-muted/30"}>
+                <CardContent className="p-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className={`p-3 rounded-full ${user.companyId && !user.terminatedDate ? "bg-primary/10" : "bg-muted"}`}>
+                        <Briefcase className={`w-6 h-6 ${user.companyId && !user.terminatedDate ? "text-primary" : "text-muted-foreground"}`} />
+                      </div>
+                      <div>
+                        <p className={`font-medium ${!user.companyId || user.terminatedDate ? "text-muted-foreground" : ""}`}>{t.goToWorkDashboard}</p>
+                        <p className="text-sm text-muted-foreground">{t.accessProjects}</p>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={() => {
+                        if (hasMultipleEmployers) {
+                          setShowEmployerSelectDialog(true);
+                        } else {
+                          setLocation("/dashboard");
+                        }
+                      }}
+                      className="gap-2 h-12 text-base"
+                      disabled={!user.companyId || !!user.terminatedDate}
+                      data-testid="button-go-to-dashboard"
+                    >
+                      {t.goToWorkDashboard}
+                      <ArrowRight className="w-5 h-5" />
+                    </Button>
                   </div>
-                  <div>
-                    <p className={`font-medium ${!user.companyId || user.terminatedDate ? "text-muted-foreground" : ""}`}>{t.goToWorkDashboard}</p>
-                    <p className="text-sm text-muted-foreground">{t.accessProjects}</p>
+                  {(!user.companyId || user.terminatedDate) && (
+                    <p className="text-sm text-muted-foreground mt-3 pt-3 border-t">
+                      {user.terminatedDate ? t.dashboardDisabledTerminated : t.dashboardDisabledNoCompany}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Quick Actions Grid */}
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => setLocation("/technician-job-board")}
+                className="p-4 rounded-lg border bg-gradient-to-br from-blue-500/10 to-purple-500/10 hover-elevate text-left"
+                data-testid="quick-action-jobs"
+              >
+                <Briefcase className="w-8 h-8 text-blue-500 mb-2" />
+                <p className="font-medium text-sm">{t.jobBoard}</p>
+                <p className="text-xs text-muted-foreground">{t.browseJobs}</p>
+              </button>
+              
+              <button
+                onClick={() => setActiveTab('profile')}
+                className="p-4 rounded-lg border bg-card hover-elevate text-left"
+                data-testid="quick-action-profile"
+              >
+                <User className="w-8 h-8 text-primary mb-2" />
+                <p className="font-medium text-sm">{t.tabProfile}</p>
+                <p className="text-xs text-muted-foreground">{t.editProfile}</p>
+              </button>
+              
+              <button
+                onClick={() => setShowFeedbackDialog(true)}
+                className="p-4 rounded-lg border bg-gradient-to-br from-purple-500/5 to-pink-500/5 hover-elevate text-left relative"
+                data-testid="quick-action-feedback"
+              >
+                <MessageSquare className="w-8 h-8 text-purple-500 mb-2" />
+                <p className="font-medium text-sm">{t.feedback}</p>
+                <p className="text-xs text-muted-foreground">{t.sendFeedback}</p>
+                {totalUnreadFeedback > 0 && (
+                  <Badge variant="destructive" className="absolute top-2 right-2 text-xs">
+                    {totalUnreadFeedback}
+                  </Badge>
+                )}
+              </button>
+              
+              <button
+                onClick={() => setActiveTab('more')}
+                className="p-4 rounded-lg border bg-primary/5 hover-elevate text-left"
+                data-testid="quick-action-referral"
+              >
+                <Share2 className="w-8 h-8 text-primary mb-2" />
+                <p className="font-medium text-sm">{t.yourReferralCode}</p>
+                <p className="text-xs text-muted-foreground">{t.shareReferralCode.split(' ').slice(0, 3).join(' ')}...</p>
+              </button>
+            </div>
+          </>
+        )}
+        
+        {/* WORK TAB - Job board, invitations, employer */}
+        {activeTab === 'work' && (
+          <>
+            {/* Back to Home button */}
+            <Button
+              variant="ghost"
+              onClick={() => setActiveTab('home')}
+              className="gap-2 -mt-2 mb-2"
+              data-testid="button-back-to-home-work"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              {t.backToHome}
+            </Button>
+            
+            {/* Job Board Card */}
+            {user && (
+              <Card className="border-blue-500/50 bg-gradient-to-r from-blue-500/10 to-purple-500/10">
+                <CardContent className="p-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 rounded-full bg-blue-500/20">
+                        <Briefcase className="w-6 h-6 text-blue-500" />
+                      </div>
+                      <div>
+                        <p className="font-medium">{t.jobBoard}</p>
+                        <p className="text-sm text-muted-foreground">{t.jobBoardDesc}</p>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={() => setLocation("/technician-job-board")}
+                      className="gap-2 bg-blue-600 hover:bg-blue-700 h-12"
+                      data-testid="button-browse-jobs"
+                    >
+                      {t.browseJobs}
+                      <ArrowRight className="w-5 h-5" />
+                    </Button>
                   </div>
-                </div>
-                <Button
-                  onClick={() => setLocation("/dashboard")}
-                  className="gap-2"
-                  disabled={!user.companyId || !!user.terminatedDate}
-                  data-testid="button-go-to-dashboard"
-                >
-                  {t.goToWorkDashboard}
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              </div>
-              {/* Explanation when disabled */}
-              {(!user.companyId || user.terminatedDate) && (
-                <p className="text-sm text-muted-foreground mt-3 pt-3 border-t">
-                  {user.terminatedDate ? t.dashboardDisabledTerminated : t.dashboardDisabledNoCompany}
-                </p>
-              )}
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
+            )}
+          </>
+        )}
+        
+        {/* MORE TAB - Feedback, referral, settings */}
+        {activeTab === 'more' && (
+          <>
+            {/* Back to Home button */}
+            <Button
+              variant="ghost"
+              onClick={() => setActiveTab('home')}
+              className="gap-2 -mt-2 mb-2"
+              data-testid="button-back-to-home-more"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              {t.backToHome}
+            </Button>
+            
+            {/* Feedback Card */}
+            {user && (
+              <Card className="border-purple-500/30 bg-gradient-to-r from-purple-500/5 to-pink-500/5">
+                <CardContent className="p-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 rounded-full bg-purple-500/20">
+                        <MessageSquare className="w-6 h-6 text-purple-500" />
+                      </div>
+                      <div>
+                        <p className="font-medium">{t.feedback}</p>
+                        <p className="text-sm text-muted-foreground">{t.feedbackDesc}</p>
+                      </div>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowMyFeedbackDialog(true)}
+                        className="gap-2 relative h-11"
+                        data-testid="button-view-my-feedback"
+                      >
+                        <Mail className="w-4 h-4" />
+                        {t.viewMyFeedback}
+                        {totalUnreadFeedback > 0 && (
+                          <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 min-w-5 text-xs">
+                            {totalUnreadFeedback}
+                          </Badge>
+                        )}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowFeedbackDialog(true)}
+                        className="gap-2 h-11"
+                        data-testid="button-send-feedback"
+                      >
+                        <MessageSquare className="w-4 h-4" />
+                        {t.sendFeedback}
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </>
         )}
 
-        {/* Job Board Card - Prominent placement */}
-        {user && (
-          <Card className="border-blue-500/50 bg-gradient-to-r from-blue-500/10 to-purple-500/10">
-            <CardContent className="p-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-full bg-blue-500/20">
-                    <Briefcase className="w-5 h-5 text-blue-500" />
-                  </div>
-                  <div>
-                    <p className="font-medium">{t.jobBoard}</p>
-                    <p className="text-sm text-muted-foreground">{t.jobBoardDesc}</p>
-                  </div>
-                </div>
-                <Button
-                  onClick={() => setLocation("/technician-job-board")}
-                  className="gap-2 bg-blue-600 hover:bg-blue-700"
-                  data-testid="button-browse-jobs"
-                >
-                  {t.browseJobs}
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Feedback Card */}
-        {user && (
-          <Card className="border-purple-500/30 bg-gradient-to-r from-purple-500/5 to-pink-500/5">
-            <CardContent className="p-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-full bg-purple-500/20">
-                    <MessageSquare className="w-5 h-5 text-purple-500" />
-                  </div>
-                  <div>
-                    <p className="font-medium">{t.feedback}</p>
-                    <p className="text-sm text-muted-foreground">{t.feedbackDesc}</p>
-                  </div>
-                </div>
-                <Button
-                  variant="outline"
-                  onClick={() => setShowFeedbackDialog(true)}
-                  className="gap-2"
-                  data-testid="button-send-feedback"
-                >
-                  <MessageSquare className="w-4 h-4" />
-                  {t.sendFeedback}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Team Invitations Section - Show for unlinked technicians OR self-resigned technicians */}
-        {user && user.role === 'rope_access_tech' && (!user.companyId || user.terminatedDate) && (
+        {/* Team Invitations Section - Show for unlinked technicians OR self-resigned technicians (WORK TAB) */}
+        {activeTab === 'work' && user && user.role === 'rope_access_tech' && (!user.companyId || user.terminatedDate) && (
           <Card className="border-primary/30 bg-primary/5">
             <CardHeader>
               <div className="flex items-center gap-3">
@@ -1757,8 +1985,8 @@ export default function TechnicianPortal() {
           </Card>
         )}
 
-        {/* Your Referral Code Section - Show for technicians and company owners */}
-        {user && (user.role === 'rope_access_tech' || user.role === 'company') && (
+        {/* Your Referral Code Section - Show for technicians and company owners (MORE TAB) */}
+        {activeTab === 'more' && user && (user.role === 'rope_access_tech' || user.role === 'company') && (
           <Card className="border-2 border-primary/30 bg-primary/5">
             <CardHeader className="pb-2">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -1836,8 +2064,8 @@ export default function TechnicianPortal() {
           </Card>
         )}
 
-        {/* Performance & Safety Rating Card - Show for technicians and company owners */}
-        {user && (user.role === 'rope_access_tech' || user.role === 'company') && (
+        {/* Performance & Safety Rating Card - Show for technicians and company owners (HOME TAB) */}
+        {activeTab === 'home' && user && (user.role === 'rope_access_tech' || user.role === 'company') && (
           <Card className="border-muted overflow-visible">
             <CardHeader className="pb-2">
               <div className="flex items-center gap-3">
@@ -1934,8 +2162,8 @@ export default function TechnicianPortal() {
           </Card>
         )}
 
-        {/* Current Employer Section - Show for linked technicians (not terminated) */}
-        {user && user.role === 'rope_access_tech' && user.companyId && !user.terminatedDate && (
+        {/* Current Employer Section - Show for linked technicians (not terminated) (WORK TAB) */}
+        {activeTab === 'work' && user && user.role === 'rope_access_tech' && user.companyId && !user.terminatedDate && (
           <Card className="border-muted">
             <CardHeader>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -2017,15 +2245,29 @@ export default function TechnicianPortal() {
           </Card>
         )}
 
-        <Card>
-          <CardHeader className="space-y-4">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3 sm:gap-4">
-                <div className="p-2 sm:p-3 rounded-full bg-primary/10">
-                  <HardHat className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
-                </div>
-                <div>
-                  <CardTitle className="text-lg sm:text-xl">{user.name}</CardTitle>
+        {/* PROFILE TAB - Personal information and certifications */}
+        {activeTab === 'profile' && (
+          <>
+            {/* Back to Home button */}
+            <Button
+              variant="ghost"
+              onClick={() => setActiveTab('home')}
+              className="gap-2 -mt-2 mb-2"
+              data-testid="button-back-to-home"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              {t.backToHome}
+            </Button>
+            
+            <Card>
+              <CardHeader className="space-y-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="p-2 sm:p-3 rounded-full bg-primary/10">
+                      <HardHat className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg sm:text-xl">{user.name}</CardTitle>
                   <CardDescription className="flex flex-wrap items-center gap-2 mt-1">
                     {user.irataLevel && (
                       <Badge variant="secondary" className="gap-1">
@@ -3598,8 +3840,74 @@ export default function TechnicianPortal() {
               </div>
             )}
           </CardContent>
-        </Card>
+            </Card>
+          </>
+        )}
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-lg border-t z-50 safe-area-inset-bottom">
+        <div className="max-w-4xl mx-auto flex items-center justify-around py-2">
+          <button
+            onClick={() => setActiveTab('home')}
+            className={`flex flex-col items-center gap-1 px-4 py-2 min-w-[64px] rounded-lg transition-colors ${
+              activeTab === 'home' 
+                ? 'text-primary bg-primary/10' 
+                : 'text-muted-foreground'
+            }`}
+            data-testid="tab-home"
+          >
+            <Home className="w-5 h-5" />
+            <span className="text-xs font-medium">{t.tabHome}</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('profile')}
+            className={`flex flex-col items-center gap-1 px-4 py-2 min-w-[64px] rounded-lg transition-colors ${
+              activeTab === 'profile' 
+                ? 'text-primary bg-primary/10' 
+                : 'text-muted-foreground'
+            }`}
+            data-testid="tab-profile"
+          >
+            <User className="w-5 h-5" />
+            <span className="text-xs font-medium">{t.tabProfile}</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('work')}
+            className={`flex flex-col items-center gap-1 px-4 py-2 min-w-[64px] rounded-lg transition-colors relative ${
+              activeTab === 'work' 
+                ? 'text-primary bg-primary/10' 
+                : 'text-muted-foreground'
+            }`}
+            data-testid="tab-work"
+          >
+            <Briefcase className="w-5 h-5" />
+            <span className="text-xs font-medium">{t.tabWork}</span>
+            {pendingInvitations.length > 0 && (
+              <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
+                {pendingInvitations.length}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('more')}
+            className={`flex flex-col items-center gap-1 px-4 py-2 min-w-[64px] rounded-lg transition-colors relative ${
+              activeTab === 'more' 
+                ? 'text-primary bg-primary/10' 
+                : 'text-muted-foreground'
+            }`}
+            data-testid="tab-more"
+          >
+            <MoreHorizontal className="w-5 h-5" />
+            <span className="text-xs font-medium">{t.tabMore}</span>
+            {totalUnreadFeedback > 0 && (
+              <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
+                {totalUnreadFeedback}
+              </span>
+            )}
+          </button>
+        </div>
+      </nav>
 
       {/* Experience Start Date Edit Dialog */}
       <Dialog open={editingExperience} onOpenChange={(open) => {
@@ -3773,6 +4081,257 @@ export default function TechnicianPortal() {
           </div>
           <DialogFooter>
             <Button onClick={() => setShowPlusBenefits(false)} data-testid="button-close-plus-benefits">
+              {t.cancel}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Employer Selection Dialog (for PLUS members with multiple employers) */}
+      <Dialog open={showEmployerSelectDialog} onOpenChange={setShowEmployerSelectDialog}>
+        <DialogContent className="sm:max-w-md" data-testid="dialog-select-employer">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Building2 className="w-5 h-5 text-primary" />
+              {t.selectEmployer}
+            </DialogTitle>
+            <DialogDescription>{t.selectEmployerDesc}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-4">
+            {employerConnectionsData?.connections && employerConnectionsData.connections.length > 0 ? (
+              employerConnectionsData.connections.map((conn) => (
+                <div
+                  key={conn.id}
+                  className={`p-3 rounded-md border cursor-pointer hover-elevate ${
+                    selectedEmployerId === conn.companyId 
+                      ? "border-primary bg-primary/10" 
+                      : "border-muted"
+                  }`}
+                  onClick={() => setSelectedEmployerId(conn.companyId)}
+                  data-testid={`employer-option-${conn.companyId}`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      {conn.company?.photoUrl ? (
+                        <img 
+                          src={conn.company.photoUrl} 
+                          alt={conn.company.companyName || conn.company.name} 
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                      ) : (
+                        <Building2 className="w-5 h-5 text-primary" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium">
+                        {conn.company?.companyName || conn.company?.name || "Unknown Company"}
+                      </p>
+                      {conn.isPrimary && (
+                        <Badge variant="secondary" className="text-xs">
+                          {t.primaryEmployer}
+                        </Badge>
+                      )}
+                    </div>
+                    {selectedEmployerId === conn.companyId && (
+                      <CheckCircle2 className="w-5 h-5 text-primary" />
+                    )}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                {t.noEmployersConnected}
+              </p>
+            )}
+          </div>
+          <DialogFooter className="gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowEmployerSelectDialog(false)}
+              data-testid="button-cancel-employer-select"
+            >
+              {t.cancel}
+            </Button>
+            <Button 
+              onClick={() => {
+                setShowEmployerSelectDialog(false);
+                setLocation("/dashboard");
+              }}
+              disabled={!selectedEmployerId}
+              data-testid="button-continue-employer"
+            >
+              {t.continueToEmployer}
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* My Feedback Dialog */}
+      <Dialog open={showMyFeedbackDialog} onOpenChange={(open) => {
+        setShowMyFeedbackDialog(open);
+        if (!open) {
+          setSelectedFeedbackId(null);
+          setFeedbackReply("");
+        }
+      }}>
+        <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto" data-testid="dialog-my-feedback">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <MessageSquare className="w-5 h-5 text-purple-500" />
+              {t.myFeedbackTitle}
+            </DialogTitle>
+            <DialogDescription>{t.myFeedbackDesc}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            {myFeedbackData?.requests && myFeedbackData.requests.length > 0 ? (
+              myFeedbackData.requests.map((feedback) => (
+                <div 
+                  key={feedback.id} 
+                  className={`border rounded-lg p-4 space-y-3 ${
+                    selectedFeedbackId === feedback.id ? 'ring-2 ring-primary' : ''
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h4 className="font-medium">{feedback.title}</h4>
+                        {feedback.unreadCount > 0 && (
+                          <Badge variant="destructive" className="text-xs">
+                            {feedback.unreadCount} {t.newResponse}
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1">{feedback.description}</p>
+                    </div>
+                    <Badge variant={
+                      feedback.status === 'completed' ? 'default' :
+                      feedback.status === 'in_progress' ? 'secondary' :
+                      feedback.status === 'reviewing' ? 'secondary' :
+                      'outline'
+                    }>
+                      {feedback.status.replace('_', ' ')}
+                    </Badge>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Badge variant="outline" className="text-xs">{feedback.category}</Badge>
+                    <span>{formatDateTime(new Date(feedback.createdAt))}</span>
+                  </div>
+                  
+                  {feedback.messages && feedback.messages.length > 0 && (
+                    <div className="pt-3 border-t space-y-2">
+                      <p className="text-sm font-medium">{t.feedbackResponses}:</p>
+                      {feedback.messages.map((msg) => (
+                        <div 
+                          key={msg.id}
+                          className={`p-3 rounded-md text-sm ${
+                            msg.senderRole === 'superuser'
+                              ? 'bg-primary/10 border-l-2 border-primary'
+                              : 'bg-muted'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-2 mb-1">
+                            <span className="font-medium text-xs">
+                              {msg.senderRole === 'superuser' ? t.fromTeam : t.fromYou}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              {formatDateTime(new Date(msg.createdAt))}
+                            </span>
+                          </div>
+                          <p className="whitespace-pre-wrap">{msg.message}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {selectedFeedbackId === feedback.id ? (
+                    <div className="pt-3 border-t space-y-2">
+                      <Textarea
+                        placeholder={t.replyPlaceholder}
+                        value={feedbackReply}
+                        onChange={(e) => setFeedbackReply(e.target.value)}
+                        className="min-h-[80px]"
+                        data-testid="input-feedback-reply"
+                      />
+                      <div className="flex justify-end gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            setSelectedFeedbackId(null);
+                            setFeedbackReply("");
+                          }}
+                        >
+                          {t.cancel}
+                        </Button>
+                        <Button 
+                          size="sm"
+                          disabled={!feedbackReply.trim() || isSubmittingReply}
+                          onClick={async () => {
+                            if (!feedbackReply.trim()) return;
+                            setIsSubmittingReply(true);
+                            try {
+                              const response = await fetch(`/api/my-feedback/${feedback.id}/reply`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                credentials: 'include',
+                                body: JSON.stringify({ message: feedbackReply }),
+                              });
+                              if (response.ok) {
+                                setFeedbackReply("");
+                                setSelectedFeedbackId(null);
+                                refetchMyFeedback();
+                                toast({
+                                  title: language === 'en' ? "Reply sent" : "Réponse envoyée",
+                                });
+                              }
+                            } catch (error) {
+                              toast({
+                                title: language === 'en' ? "Failed to send reply" : "Échec de l'envoi de la réponse",
+                                variant: "destructive",
+                              });
+                            } finally {
+                              setIsSubmittingReply(false);
+                            }
+                          }}
+                          data-testid="button-send-reply"
+                        >
+                          {isSubmittingReply ? <Loader2 className="w-4 h-4 animate-spin" /> : t.sendReply}
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={async () => {
+                        setSelectedFeedbackId(feedback.id);
+                        if (feedback.unreadCount > 0) {
+                          await fetch(`/api/my-feedback/${feedback.id}/mark-read`, {
+                            method: 'POST',
+                            credentials: 'include',
+                          });
+                          refetchMyFeedback();
+                        }
+                      }}
+                      data-testid={`button-reply-feedback-${feedback.id}`}
+                    >
+                      <MessageSquare className="w-4 h-4 mr-2" />
+                      {t.replyToFeedback}
+                    </Button>
+                  )}
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-8">
+                <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                <p className="text-muted-foreground">{t.noFeedbackYet}</p>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setShowMyFeedbackDialog(false)} data-testid="button-close-my-feedback">
               {t.cancel}
             </Button>
           </DialogFooter>

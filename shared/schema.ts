@@ -182,6 +182,11 @@ export const users = pgTable("users", {
   
   // Technician job board visibility (allows employers to see their profile)
   isVisibleToEmployers: boolean("is_visible_to_employers").default(false), // Whether technician's profile is visible on job board
+  
+  // Technician expected salary (visible to employers)
+  expectedSalaryMin: numeric("expected_salary_min", { precision: 12, scale: 2 }), // Minimum expected salary
+  expectedSalaryMax: numeric("expected_salary_max", { precision: 12, scale: 2 }), // Maximum expected salary
+  expectedSalaryPeriod: varchar("expected_salary_period"), // hourly | daily | weekly | monthly | annually
   visibilityEnabledAt: timestamp("visibility_enabled_at"), // When visibility was last enabled
   
   // White label branding (company role only)
@@ -2341,6 +2346,30 @@ export const insertTeamInvitationSchema = createInsertSchema(teamInvitations).om
 export type TeamInvitation = typeof teamInvitations.$inferSelect;
 export type InsertTeamInvitation = z.infer<typeof insertTeamInvitationSchema>;
 
+// Technician Employer Connections - For PLUS members to connect with multiple employers
+export const technicianEmployerConnections = pgTable("technician_employer_connections", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  technicianId: varchar("technician_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  isPrimary: boolean("is_primary").default(false).notNull(), // Is this the primary/default employer
+  status: varchar("status").notNull().default("active"), // active | terminated
+  connectedAt: timestamp("connected_at").defaultNow().notNull(),
+  terminatedAt: timestamp("terminated_at"),
+  invitationId: varchar("invitation_id").references(() => teamInvitations.id, { onDelete: "set null" }), // Link to original invitation
+}, (table) => [
+  index("IDX_tech_employer_conn_technician").on(table.technicianId),
+  index("IDX_tech_employer_conn_company").on(table.companyId),
+  index("IDX_tech_employer_conn_status").on(table.status),
+]);
+
+export const insertTechnicianEmployerConnectionSchema = createInsertSchema(technicianEmployerConnections).omit({
+  id: true,
+  connectedAt: true,
+});
+
+export type TechnicianEmployerConnection = typeof technicianEmployerConnections.$inferSelect;
+export type InsertTechnicianEmployerConnection = z.infer<typeof insertTechnicianEmployerConnectionSchema>;
+
 // Job Postings - Employment opportunities posted by companies and SuperUsers
 export const jobPostings = pgTable("job_postings", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -2355,7 +2384,10 @@ export const jobPostings = pgTable("job_postings", {
   requirements: text("requirements"), // Job requirements/qualifications
   
   // Location
-  location: varchar("location"), // City, Province/State
+  location: varchar("location"), // City, Province/State (legacy field)
+  jobCity: varchar("job_city"), // City for filtering
+  jobProvinceState: varchar("job_province_state"), // Province/State for filtering
+  jobCountry: varchar("job_country"), // Country for filtering
   isRemote: boolean("is_remote").default(false),
   
   // Job type
