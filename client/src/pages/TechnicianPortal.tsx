@@ -547,13 +547,13 @@ const translations = {
     resume: "Curriculum vitae",
     uploadResume: "Téléverser CV",
     addResume: "Ajouter un autre CV",
-    specialties: "Spécialités accès sur corde",
+    specialties: "Spécialités d'accès sur corde",
     specialtiesDesc: "Sélectionnez les types de travaux dans lesquels vous vous spécialisez",
     noSpecialties: "Aucune spécialité sélectionnée",
-    addSpecialty: "Ajouter une spécialité",
+    addSpecialty: "Ajouter",
     removeSpecialty: "Retirer",
-    selectCategory: "Sélectionner une catégorie",
-    selectJobType: "Sélectionner un type de travail",
+    selectCategory: "Catégorie",
+    selectJobType: "Type de travail",
     resumeUploaded: "CV téléversé",
     documentUploaded: "Document téléversé",
     documentUploadedDesc: "Votre document a été téléversé avec succès.",
@@ -807,6 +807,8 @@ export default function TechnicianPortal() {
   const [, setLocation] = useLocation();
   const [isEditing, setIsEditing] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
+  const [specialtyCategory, setSpecialtyCategory] = useState<JobCategory | "">("");
+  const [selectedSpecialtyJobType, setSelectedSpecialtyJobType] = useState<string>("");
   const [language, setLanguage] = useState<Language>(() => {
     const saved = localStorage.getItem('techPortalLanguage');
     return (saved === 'fr' ? 'fr' : 'en') as Language;
@@ -4042,7 +4044,6 @@ export default function TechnicianPortal() {
                       <div className="flex flex-wrap gap-2">
                         {(form.watch("ropeAccessSpecialties") || []).map((specialty: string, index: number) => {
                           const jobType = JOB_TYPES.find(jt => jt.value === specialty);
-                          const category = JOB_CATEGORIES.find(c => c.value === jobType?.category);
                           return (
                             <Badge 
                               key={specialty} 
@@ -4050,7 +4051,7 @@ export default function TechnicianPortal() {
                               className="gap-1 pr-1"
                               data-testid={`badge-specialty-${index}`}
                             >
-                              <span className="material-icons text-xs">{jobType?.icon || 'work'}</span>
+                              <HardHat className="w-3 h-3" />
                               {jobType?.label || specialty}
                               <Button
                                 type="button"
@@ -4079,10 +4080,10 @@ export default function TechnicianPortal() {
                           id="specialty-category"
                           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                           data-testid="select-specialty-category"
-                          defaultValue=""
+                          value={specialtyCategory}
                           onChange={(e) => {
-                            const jobTypeSelect = document.getElementById('specialty-job-type') as HTMLSelectElement;
-                            if (jobTypeSelect) jobTypeSelect.value = "";
+                            setSpecialtyCategory(e.target.value as JobCategory | "");
+                            setSelectedSpecialtyJobType("");
                           }}
                         >
                           <option value="">{t.selectCategory}</option>
@@ -4094,34 +4095,29 @@ export default function TechnicianPortal() {
                           id="specialty-job-type"
                           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                           data-testid="select-specialty-job-type"
-                          defaultValue=""
+                          value={selectedSpecialtyJobType}
+                          onChange={(e) => setSelectedSpecialtyJobType(e.target.value)}
+                          disabled={!specialtyCategory}
                         >
                           <option value="">{t.selectJobType}</option>
-                          {(() => {
-                            const categorySelect = document.getElementById('specialty-category') as HTMLSelectElement;
-                            const selectedCategory = categorySelect?.value as JobCategory;
-                            if (!selectedCategory) return null;
-                            const currentSpecialties = form.getValues("ropeAccessSpecialties") || [];
-                            return getJobTypesByCategory(selectedCategory)
-                              .filter(jt => !jt.value.endsWith('_other') && !currentSpecialties.includes(jt.value))
-                              .map(jt => (
-                                <option key={jt.value} value={jt.value}>{jt.label}</option>
-                              ));
-                          })()}
+                          {specialtyCategory && getJobTypesByCategory(specialtyCategory)
+                            .filter(jt => !jt.value.endsWith('_other') && !(form.watch("ropeAccessSpecialties") || []).includes(jt.value))
+                            .map(jt => (
+                              <option key={jt.value} value={jt.value}>{jt.label}</option>
+                            ))}
                         </select>
                         <Button
                           type="button"
                           variant="outline"
                           className="h-10 whitespace-nowrap"
+                          disabled={!selectedSpecialtyJobType}
                           onClick={() => {
-                            const jobTypeSelect = document.getElementById('specialty-job-type') as HTMLSelectElement;
-                            const selectedJobType = jobTypeSelect?.value;
-                            if (selectedJobType) {
+                            if (selectedSpecialtyJobType) {
                               const current = form.getValues("ropeAccessSpecialties") || [];
-                              if (!current.includes(selectedJobType)) {
-                                form.setValue("ropeAccessSpecialties", [...current, selectedJobType]);
+                              if (!current.includes(selectedSpecialtyJobType)) {
+                                form.setValue("ropeAccessSpecialties", [...current, selectedSpecialtyJobType]);
                               }
-                              jobTypeSelect.value = "";
+                              setSelectedSpecialtyJobType("");
                             }
                           }}
                           data-testid="button-add-specialty"
@@ -4143,7 +4139,7 @@ export default function TechnicianPortal() {
                               className="gap-1"
                               data-testid={`badge-specialty-display-${index}`}
                             >
-                              <span className="material-icons text-xs">{jobType?.icon || 'work'}</span>
+                              <HardHat className="w-3 h-3" />
                               {jobType?.label || specialty}
                             </Badge>
                           );

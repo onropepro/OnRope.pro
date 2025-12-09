@@ -16998,6 +16998,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         expectedSalaryMin: users.expectedSalaryMin,
         expectedSalaryMax: users.expectedSalaryMax,
         expectedSalaryPeriod: users.expectedSalaryPeriod,
+        ropeAccessSpecialties: users.ropeAccessSpecialties,
       }).from(users)
         .where(and(
           eq(users.isVisibleToEmployers, true),

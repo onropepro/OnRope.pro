@@ -32,10 +32,12 @@ import {
   Building,
   User,
   Briefcase,
-  Send
+  Send,
+  HardHat
 } from "lucide-react";
 import { format, differenceInYears } from "date-fns";
 import type { User as UserType } from "@shared/schema";
+import { JOB_TYPES } from "@shared/jobTypes";
 
 type Language = 'en' | 'fr';
 
@@ -65,6 +67,8 @@ const translations = {
     since: "Since",
     certifications: "Certifications",
     noCertifications: "No certifications on file",
+    specialties: "Specialties",
+    noSpecialties: "No specialties listed",
     resumeCV: "Resume / CV",
     visibleSince: "Profile visible since",
     expired: "Expired",
@@ -116,6 +120,8 @@ const translations = {
     since: "Depuis",
     certifications: "Certifications",
     noCertifications: "Aucune certification en dossier",
+    specialties: "Spécialités",
+    noSpecialties: "Aucune spécialité indiquée",
     resumeCV: "CV / Resume",
     visibleSince: "Profil visible depuis",
     expired: "Expire",
@@ -170,6 +176,7 @@ interface VisibleTechnician {
   employeeProvinceState: string | null;
   employeeCountry: string | null;
   visibilityEnabledAt: Date | string | null;
+  ropeAccessSpecialties: string[] | null;
 }
 
 export default function VisibleTechniciansBrowser() {
@@ -587,6 +594,34 @@ export default function VisibleTechniciansBrowser() {
 
                   {!selectedTech.irataLevel && !selectedTech.spratLevel && (
                     <p className="text-sm text-muted-foreground italic">{t.noCertifications}</p>
+                  )}
+                </div>
+
+                {/* Specialties */}
+                <div className="space-y-3">
+                  <h4 className="font-semibold flex items-center gap-2">
+                    <HardHat className="w-4 h-4" />
+                    {t.specialties}
+                  </h4>
+                  {selectedTech.ropeAccessSpecialties && selectedTech.ropeAccessSpecialties.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {selectedTech.ropeAccessSpecialties.map((specialty: string, index: number) => {
+                        const jobType = JOB_TYPES.find(jt => jt.value === specialty);
+                        return (
+                          <Badge 
+                            key={specialty} 
+                            variant="secondary"
+                            className="gap-1"
+                            data-testid={`badge-specialty-${index}`}
+                          >
+                            <HardHat className="w-3 h-3" />
+                            {jobType?.label || specialty}
+                          </Badge>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground italic">{t.noSpecialties}</p>
                   )}
                 </div>
 
