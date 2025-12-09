@@ -68,7 +68,7 @@ const projectSchema = z.object({
   strataPlanNumber: z.string().optional(),
   buildingName: z.string().optional(),
   buildingAddress: z.string().optional(),
-  jobCategory: z.enum(['building_maintenance', 'ndt', 'rock_scaling', 'wind_turbine']).default('building_maintenance'),
+  jobCategory: z.enum(['building_maintenance', 'ndt', 'rock_scaling', 'wind_turbine', 'oil_field']).default('building_maintenance'),
   jobType: z.enum(ALL_JOB_TYPE_VALUES, {
     errorMap: () => ({ message: "Please select a valid job type" })
   }),
@@ -96,7 +96,7 @@ const projectSchema = z.object({
   peaceWork: z.boolean().default(false),
   pricePerDrop: z.string().optional(),
 }).refine((data) => {
-  if (data.jobType === "other" || data.jobType === "ndt_other" || data.jobType === "rock_other" || data.jobType === "turbine_other") {
+  if (data.jobType === "other" || data.jobType === "ndt_other" || data.jobType === "rock_other" || data.jobType === "turbine_other" || data.jobType === "oil_other") {
     return data.customJobType && data.customJobType.trim().length > 0;
   }
   return true;
@@ -3463,8 +3463,8 @@ export default function Dashboard() {
                           const formCategory = projectForm.watch("jobCategory");
                           const category = formCategory || (currentJobType ? getCategoryForJobType(currentJobType) : 'building_maintenance');
                           
-                          // Rock scaling and wind turbine: don't show elevation indicator at all
-                          if (category === 'rock_scaling' || category === 'wind_turbine') {
+                          // Rock scaling, wind turbine, and oil field: don't show elevation indicator at all
+                          if (category === 'rock_scaling' || category === 'wind_turbine' || category === 'oil_field') {
                             return null;
                           }
                           

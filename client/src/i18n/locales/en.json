@@ -665,7 +665,8 @@
       "building_maintenance": "Building Maintenance",
       "ndt": "NDT - Non-Destructive Testing",
       "rock_scaling": "Rock Scaling",
-      "wind_turbine": "Wind Turbine"
+      "wind_turbine": "Wind Turbine",
+      "oil_field": "Oil & Gas"
     },
     "jobTypes": {
       "window_cleaning": "Window Cleaning",
@@ -714,7 +715,22 @@
       "turbine_gearbox_service": "Gearbox Service",
       "turbine_nacelle_work": "Nacelle Work",
       "turbine_standby_rescue": "Standby / Rescue",
-      "turbine_other": "Other Wind Turbine"
+      "turbine_other": "Other Wind Turbine",
+      "oil_tank_inspection": "Tank Inspection",
+      "oil_tank_cleaning": "Tank Cleaning",
+      "oil_tank_repair": "Tank Repair",
+      "oil_flare_stack": "Flare Stack Work",
+      "oil_pipeline_inspection": "Pipeline Inspection",
+      "oil_pipeline_repair": "Pipeline Repair",
+      "oil_scaffolding_alternative": "Scaffolding Alternative",
+      "oil_vessel_inspection": "Pressure Vessel Inspection",
+      "oil_column_work": "Column / Tower Work",
+      "oil_refinery_maintenance": "Refinery Maintenance",
+      "oil_offshore_platform": "Offshore Platform Work",
+      "oil_coating_painting": "Industrial Coating / Painting",
+      "oil_confined_space": "Confined Space Entry",
+      "oil_standby_rescue": "Standby / Rescue",
+      "oil_other": "Other Oil & Gas"
     },
     "toast": {
       "projectCreated": "Project created successfully",

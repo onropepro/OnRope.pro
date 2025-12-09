@@ -1,4 +1,4 @@
-export type JobCategory = 'building_maintenance' | 'ndt' | 'rock_scaling' | 'wind_turbine';
+export type JobCategory = 'building_maintenance' | 'ndt' | 'rock_scaling' | 'wind_turbine' | 'oil_field';
 
 export type ElevationRequirement = 'always' | 'never' | 'configurable';
 
@@ -17,6 +17,7 @@ export const JOB_CATEGORIES: { value: JobCategory; labelKey: string; label: stri
   { value: 'ndt', labelKey: 'dashboard.jobCategories.ndt', label: 'NDT - Non-Destructive Testing', icon: 'science' },
   { value: 'rock_scaling', labelKey: 'dashboard.jobCategories.rock_scaling', label: 'Rock Scaling', icon: 'terrain' },
   { value: 'wind_turbine', labelKey: 'dashboard.jobCategories.wind_turbine', label: 'Wind Turbine', icon: 'air' },
+  { value: 'oil_field', labelKey: 'dashboard.jobCategories.oil_field', label: 'Oil & Gas', icon: 'local_gas_station' },
 ];
 
 export const JOB_TYPES: JobTypeConfig[] = [
@@ -80,6 +81,23 @@ export const JOB_TYPES: JobTypeConfig[] = [
   { value: 'turbine_nacelle_work', category: 'wind_turbine', labelKey: 'dashboard.jobTypes.turbine_nacelle_work', label: 'Nacelle Work', icon: 'engineering', elevationRequirement: 'never', progressType: 'hours' },
   { value: 'turbine_standby_rescue', category: 'wind_turbine', labelKey: 'dashboard.jobTypes.turbine_standby_rescue', label: 'Standby / Rescue', icon: 'health_and_safety', elevationRequirement: 'never', progressType: 'hours' },
   { value: 'turbine_other', category: 'wind_turbine', labelKey: 'dashboard.jobTypes.turbine_other', label: 'Other Wind Turbine', icon: 'more_horiz', elevationRequirement: 'never', progressType: 'hours' },
+  
+  // Oil & Gas (all hours-based, no building-specific fields needed)
+  { value: 'oil_tank_inspection', category: 'oil_field', labelKey: 'dashboard.jobTypes.oil_tank_inspection', label: 'Tank Inspection', icon: 'visibility', elevationRequirement: 'never', progressType: 'hours' },
+  { value: 'oil_tank_cleaning', category: 'oil_field', labelKey: 'dashboard.jobTypes.oil_tank_cleaning', label: 'Tank Cleaning', icon: 'cleaning_services', elevationRequirement: 'never', progressType: 'hours' },
+  { value: 'oil_tank_repair', category: 'oil_field', labelKey: 'dashboard.jobTypes.oil_tank_repair', label: 'Tank Repair', icon: 'build', elevationRequirement: 'never', progressType: 'hours' },
+  { value: 'oil_flare_stack', category: 'oil_field', labelKey: 'dashboard.jobTypes.oil_flare_stack', label: 'Flare Stack Work', icon: 'local_fire_department', elevationRequirement: 'never', progressType: 'hours' },
+  { value: 'oil_pipeline_inspection', category: 'oil_field', labelKey: 'dashboard.jobTypes.oil_pipeline_inspection', label: 'Pipeline Inspection', icon: 'search', elevationRequirement: 'never', progressType: 'hours' },
+  { value: 'oil_pipeline_repair', category: 'oil_field', labelKey: 'dashboard.jobTypes.oil_pipeline_repair', label: 'Pipeline Repair', icon: 'plumbing', elevationRequirement: 'never', progressType: 'hours' },
+  { value: 'oil_scaffolding_alternative', category: 'oil_field', labelKey: 'dashboard.jobTypes.oil_scaffolding_alternative', label: 'Scaffolding Alternative', icon: 'construction', elevationRequirement: 'never', progressType: 'hours' },
+  { value: 'oil_vessel_inspection', category: 'oil_field', labelKey: 'dashboard.jobTypes.oil_vessel_inspection', label: 'Pressure Vessel Inspection', icon: 'fact_check', elevationRequirement: 'never', progressType: 'hours' },
+  { value: 'oil_column_work', category: 'oil_field', labelKey: 'dashboard.jobTypes.oil_column_work', label: 'Column / Tower Work', icon: 'view_column', elevationRequirement: 'never', progressType: 'hours' },
+  { value: 'oil_refinery_maintenance', category: 'oil_field', labelKey: 'dashboard.jobTypes.oil_refinery_maintenance', label: 'Refinery Maintenance', icon: 'factory', elevationRequirement: 'never', progressType: 'hours' },
+  { value: 'oil_offshore_platform', category: 'oil_field', labelKey: 'dashboard.jobTypes.oil_offshore_platform', label: 'Offshore Platform Work', icon: 'directions_boat', elevationRequirement: 'never', progressType: 'hours' },
+  { value: 'oil_coating_painting', category: 'oil_field', labelKey: 'dashboard.jobTypes.oil_coating_painting', label: 'Industrial Coating / Painting', icon: 'format_paint', elevationRequirement: 'never', progressType: 'hours' },
+  { value: 'oil_confined_space', category: 'oil_field', labelKey: 'dashboard.jobTypes.oil_confined_space', label: 'Confined Space Entry', icon: 'meeting_room', elevationRequirement: 'never', progressType: 'hours' },
+  { value: 'oil_standby_rescue', category: 'oil_field', labelKey: 'dashboard.jobTypes.oil_standby_rescue', label: 'Standby / Rescue', icon: 'health_and_safety', elevationRequirement: 'never', progressType: 'hours' },
+  { value: 'oil_other', category: 'oil_field', labelKey: 'dashboard.jobTypes.oil_other', label: 'Other Oil & Gas', icon: 'more_horiz', elevationRequirement: 'never', progressType: 'hours' },
 ];
 
 export function getJobTypesByCategory(category: JobCategory): JobTypeConfig[] {

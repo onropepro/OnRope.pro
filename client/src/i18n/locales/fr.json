@@ -665,7 +665,8 @@
       "building_maintenance": "Entretien de bâtiment",
       "ndt": "CND - Contrôle Non Destructif",
       "rock_scaling": "Purge de paroi rocheuse",
-      "wind_turbine": "Éolienne"
+      "wind_turbine": "Éolienne",
+      "oil_field": "Pétrole et gaz"
     },
     "jobTypes": {
       "window_cleaning": "Nettoyage de vitres",
@@ -714,7 +715,22 @@
       "turbine_gearbox_service": "Entretien du réducteur",
       "turbine_nacelle_work": "Travaux sur nacelle",
       "turbine_standby_rescue": "Veille / Sauvetage",
-      "turbine_other": "Autre éolienne"
+      "turbine_other": "Autre éolienne",
+      "oil_tank_inspection": "Inspection de réservoir",
+      "oil_tank_cleaning": "Nettoyage de réservoir",
+      "oil_tank_repair": "Réparation de réservoir",
+      "oil_flare_stack": "Travaux sur torchère",
+      "oil_pipeline_inspection": "Inspection de pipeline",
+      "oil_pipeline_repair": "Réparation de pipeline",
+      "oil_scaffolding_alternative": "Alternative à l'échafaudage",
+      "oil_vessel_inspection": "Inspection de réservoir sous pression",
+      "oil_column_work": "Travaux sur colonne / tour",
+      "oil_refinery_maintenance": "Entretien de raffinerie",
+      "oil_offshore_platform": "Travaux sur plateforme offshore",
+      "oil_coating_painting": "Revêtement / Peinture industrielle",
+      "oil_confined_space": "Entrée en espace clos",
+      "oil_standby_rescue": "Veille / Sauvetage",
+      "oil_other": "Autre pétrole et gaz"
     },
     "toast": {
       "projectCreated": "Projet créé avec succès",

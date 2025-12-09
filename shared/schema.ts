@@ -1513,7 +1513,7 @@ export const insertProjectSchema = createInsertSchema(projects)
     jobType: z.enum(validJobTypeValues, {
       errorMap: () => ({ message: "Invalid job type selected" })
     }),
-    jobCategory: z.enum(['building_maintenance', 'ndt', 'rock_scaling', 'wind_turbine']).optional().default('building_maintenance'),
+    jobCategory: z.enum(['building_maintenance', 'ndt', 'rock_scaling', 'wind_turbine', 'oil_field']).optional().default('building_maintenance'),
     requiresElevation: z.boolean().optional().default(true),
   })
   .superRefine((data, ctx) => {
