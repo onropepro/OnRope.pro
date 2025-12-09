@@ -341,7 +341,7 @@ export default function TechnicianLogin() {
     {
       number: "5",
       title: "Share your code, unlock Plus",
-      description: "One tech signs up with your referral → you both get Plus. Unlimited employer connections, exportable history, expiry alerts, job board access."
+      description: "One tech signs up with your referral and you're automatically upgraded to Plus. Unlimited employer connections, exportable history, expiry alerts, job board access."
     }
   ];
 
@@ -368,7 +368,7 @@ export default function TechnicianLogin() {
     },
     {
       question: "What's the referral thing about?",
-      answer: "Share your unique code. When one tech signs up using it, you both get Plus: unlimited employer connections, exportable history, expiry alerts. Not MLM. Not commission. Just mutual benefit."
+      answer: "Share your unique code. When one tech signs up using it, you're automatically upgraded to Plus: unlimited employer connections, exportable history, expiry alerts. Not MLM. Not commission. Just a thank-you for spreading the word."
     }
   ];
 
@@ -742,7 +742,7 @@ export default function TechnicianLogin() {
             <div className="mt-12 text-center">
               <p className="text-sm text-muted-foreground flex items-center justify-center gap-2">
                 <Share2 className="w-4 h-4" />
-                Share with one tech. You both get Plus. It's that simple.
+                Share with one tech. You get Plus. It's that simple.
               </p>
             </div>
           </div>
