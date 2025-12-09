@@ -46,86 +46,85 @@ const problemRows = [
     direction: "left" as const,
     problems: [
       "New job, same paperwork again",
-      "Proving yourself from zero",
-      "Where's my first aid cert?",
-      "Can't find my logbook",
       "Filling out banking forms for the 4th time",
-      "IRATA expiring next week",
-      "Nobody told me",
+      "\"Bring a void cheque\"",
+      "Emergency contact form again",
+      "Half-day orientation",
+      "Why doesn't this follow me?",
     ]
   },
   {
     direction: "right" as const,
     problems: [
-      "Lost 3 hours to admin",
-      "Paper logbook is a disaster",
-      "Can't remember what I worked on",
-      "Certification scattered everywhere",
-      "New employer treats me like a rookie",
-      "Work history doesn't follow me",
+      "Texting hours to the office",
+      "Timesheet every Friday",
+      "\"Did you log yesterday?\"",
+      "Forgot to submit my time",
+      "Hope they entered it right",
+      "My word against their spreadsheet",
     ]
   },
   {
     direction: "left" as const,
+    problems: [
+      "Filling out my logbook two weeks late",
+      "What building was I at?",
+      "Making stuff up because I can't remember",
+      "Staring at my phone trying to recall",
+      "10 pages of guesswork",
+      "This can't be right",
+    ]
+  },
+  {
+    direction: "right" as const,
     problems: [
       "$63 missing from my check",
       "Supervisor logged wrong hours",
-      "My word against a spreadsheet",
       "Payroll disputes every month",
-      "I swear I worked 9 hours",
+      "\"I swear I worked 9 hours\"",
       "Can't prove anything",
-    ]
-  },
-  {
-    direction: "right" as const,
-    problems: [
-      "Indeed is useless for rope access jobs",
-      "Where are the good postings?",
-      "How do I prove 8 years experience?",
-      "Gut feel isn't negotiation leverage",
-      "High performer, average review",
+      "Who's actually tracking this?",
     ]
   },
   {
     direction: "left" as const,
     problems: [
-      "Safety records stayed with last employer",
-      "Can't prove training history",
-      "Paper forms somewhere in a truck",
-      "Audit asks for 6 months of inspections",
-      "My reputation locked in someone else's filing cabinet",
-    ]
-  },
-  {
-    direction: "right" as const,
-    problems: [
-      "Moonlighting is a coordination nightmare",
-      "Can't work two companies easily",
-      "Weekends wasted on admin",
-      "No way to track multiple employers",
-      "Building my own client base with no system",
-    ]
-  },
-  {
-    direction: "left" as const,
-    problems: [
-      "Onboarding takes half a day",
-      "Same questions every job",
-      "Emergency contact forms again",
-      "Voided cheque request #47",
-      "Why doesn't this follow me?",
-      "Starting over is exhausting",
-    ]
-  },
-  {
-    direction: "right" as const,
-    problems: [
-      "Career progress invisible",
+      "8 years experience, zero proof",
+      "\"I've done hundreds of rope transfers\"",
       "No data for raise negotiations",
-      "Performance measured by politics not output",
-      "High performers unrecognized",
-      "Coasters get the same treatment",
-      "Where's the proof?",
+      "Gut feel isn't leverage",
+      "How do I prove what I've done?",
+    ]
+  },
+  {
+    direction: "right" as const,
+    problems: [
+      "Indeed is useless for rope access",
+      "Endless search, zero results",
+      "Where are the real postings?",
+      "Nobody hiring on job boards",
+      "Industry jobs are invisible",
+    ]
+  },
+  {
+    direction: "left" as const,
+    problems: [
+      "IRATA expiring next week",
+      "Nobody told me",
+      "Scrambling for recert",
+      "Almost got caught on site",
+      "Why isn't there an alert?",
+      "This could have been prevented",
+    ]
+  },
+  {
+    direction: "right" as const,
+    problems: [
+      "Moonlighting is a nightmare",
+      "Can't work two companies easily",
+      "Weekend jobs with no system",
+      "Building my own clients with paper",
+      "One profile should handle this",
     ]
   },
 ];
@@ -252,100 +251,121 @@ export default function TechnicianLogin() {
 
   const features = [
     {
-      icon: FileText,
-      title: "Professional Profile",
-      description: "One tap to verify credentials. No more digging through emails."
+      icon: Users,
+      title: "Instant Employer Connection",
+      description: "Plug into any company using OnRopePro. Your certs, banking, contacts—auto-shared. Employer only enters salary and permissions."
     },
     {
       icon: Clock,
-      title: "Work Session Logging",
-      description: "Building, tasks, height, hours, supervisor signature—all searchable later."
+      title: "Automatic Work Logging",
+      description: "Connected to an employer? Hours, buildings, tasks submit automatically. No timesheets. No texts. No disputes."
     },
     {
-      icon: Shield,
-      title: "Logbook Scanner",
-      description: "Photograph paper pages → digitized, searchable records. Never lose your history."
+      icon: FileText,
+      title: "Logbook Reference",
+      description: "Every session recorded—building, tasks, height, hours. Fill out your IRATA logbook from real data, not guesswork two weeks later."
+    },
+    {
+      icon: Award,
+      title: "Professional Profile",
+      description: "IRATA/SPRAT ID, first aid, driver's abstract—verified and ready for any employer to see."
     },
     {
       icon: Lock,
       title: "Secure Document Vault",
-      description: "SIN, banking, void cheque—encrypted storage, shared only with your permission."
+      description: "SIN, banking, void cheque—encrypted. Shared only when YOU connect. Never asked for a void cheque again."
+    },
+    {
+      icon: Shield,
+      title: "Logbook Scanner",
+      description: "Photograph old paper pages → digitized, searchable records. Your history doesn't disappear."
     },
     {
       icon: Bell,
-      title: "Expiry Alerts",
-      description: "30 days before your IRATA/SPRAT expires. Your employer sees it too. Zero surprises."
+      title: "Expiry Alerts (Plus)",
+      description: "30 days before IRATA/SPRAT expires. Your employer sees it too. Zero surprises, zero lapses."
     },
     {
       icon: Download,
-      title: "Exportable History",
-      description: "PDF work history for job applications. Prove 178 rope transfers, not just \"experienced.\""
+      title: "Exportable History (Plus)",
+      description: "PDF proving 178 rope transfers, 3,500 deviations, 2,000 drops—not just \"I have 8 years experience.\""
     },
   ];
 
   const standardFeatures = [
-    "Connect to 1 employer",
+    "Connect to 1 employer (instant onboarding, automatic hour logging)",
     "Professional profile with verified credentials",
-    "Secure document vault",
-    "Full work session logging",
-    "Logbook photo scanning",
-    "Emergency contact storage",
-    "Referral code"
+    "Secure document vault (certs, banking, emergency contact)",
+    "Automatic work session submission (no timesheets)",
+    "Logbook reference (know what you actually worked on)",
+    "Logbook photo scanning (digitize your history)",
+    "Referral code to unlock Plus"
   ];
 
   const plusFeatures = [
     "Everything in Standard",
     "PLUS badge on your profile",
-    "30-day certification expiry alerts",
-    "Unlimited employer connections",
-    "Exportable work history PDF",
-    "Work history analytics",
-    "Resume storage"
+    "Unlimited employer connections (plug into multiple companies simultaneously)",
+    "30-day certification expiry alerts (you AND your employer notified)",
+    "Safety Rating score (0-100) with improvement recommendations",
+    "Exportable work history PDF (178 rope transfers, 3,500 deviations—actual proof)",
+    "Work history analytics (lifetime totals by task type)",
+    "Resume storage",
+    "Job board access (rope access-specific postings—no more endless Indeed searches)"
   ];
 
   const steps = [
     {
       number: "1",
       title: "Create your free profile",
-      description: "Name, email, IRATA/SPRAT ID. That's it."
+      description: "Name, email, IRATA/SPRAT ID. Done in 2 minutes."
     },
     {
       number: "2",
-      title: "Add your credentials",
-      description: "Upload certifications, first aid, driver's abstract. Stored securely."
+      title: "Add your credentials once",
+      description: "Upload certs, first aid, banking info. You'll never enter this again."
     },
     {
       number: "3",
-      title: "Start logging",
-      description: "New work sessions auto-track. Old paper pages become searchable digital records."
+      title: "Plug into your employer",
+      description: "If they use OnRopePro, connect your account. They instantly see your verified credentials—zero paperwork on their end, zero on yours."
     },
     {
       number: "4",
-      title: "Share your referral code",
-      description: "One tech signs up → you both unlock Plus. No commission schemes. Just mutual benefit."
+      title: "Work. Everything logs automatically.",
+      description: "Clock in through the app. Your hours, buildings, and tasks submit to your employer automatically. No timesheets. No texts. No disputes."
+    },
+    {
+      number: "5",
+      title: "Share your code, unlock Plus",
+      description: "One tech signs up with your referral → you both get Plus. Unlimited employer connections, exportable history, expiry alerts, job board access."
     }
   ];
 
   const faqs = [
     {
       question: "Why is this free?",
-      answer: "Employers pay. You don't. When you bring your verified profile to a new company, they save hours of onboarding paperwork. That's worth paying for. Your career data stays yours forever—we just make it portable."
+      answer: "Employers pay. You don't. When you plug your verified profile into a new company, they skip hours of onboarding paperwork and get automatic hour tracking. That's worth paying for. Your profile stays yours forever—we just make it portable."
     },
     {
-      question: "Who owns my data?",
-      answer: "You do. Export it anytime. Delete it anytime. Your profile, your rules."
+      question: "What does \"plug in\" actually mean?",
+      answer: "If your employer uses OnRopePro, you connect your account to theirs with one tap. Instantly, they see your verified certs, banking info, and emergency contact—no forms to fill. From then on, your work hours submit automatically when you clock in/out. No timesheets. No texts. No \"did you log yesterday?\""
     },
     {
       question: "What if my employer doesn't use OnRopePro?",
-      answer: "You still get all the personal benefits—document storage, logbook digitization, certification tracking. When they do eventually adopt it (most do), you're already set up."
+      answer: "You still get all the personal benefits—document storage, logbook digitization, certification tracking, exportable work history. And when you eventually work for a company that does use it (or convince your current one), you're already set up for instant onboarding."
+    },
+    {
+      question: "Who owns my data?",
+      answer: "You do. Export it anytime. Delete it anytime. Unplug from any employer anytime. Your profile, your rules."
     },
     {
       question: "Is my SIN/banking info safe?",
-      answer: "Bank-level encryption. Shared only when YOU connect to an employer. Never sold. Never shared otherwise."
+      answer: "Bank-level encryption. Shared only when YOU connect to an employer. Never sold. Never shared otherwise. You control access."
     },
     {
       question: "What's the referral thing about?",
-      answer: "Share your unique code. When one tech signs up using it, you both get Plus. Not MLM. Not commission. Just both of you getting upgraded for free."
+      answer: "Share your unique code. When one tech signs up using it, you both get Plus—unlimited employer connections, exportable history, expiry alerts. Not MLM. Not commission. Just mutual benefit."
     }
   ];
 
@@ -413,13 +433,13 @@ export default function TechnicianLogin() {
             </div>
             
             <h1 className="text-4xl lg:text-5xl font-bold tracking-tight mb-6">
-              Your Career Doesn't Follow You.{" "}
-              <span className="text-primary">It Should.</span>
+              You Work.{" "}
+              <span className="text-primary">Everything Else Is Automatic.</span>
             </h1>
             
             <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-              The free professional profile for rope access technicians. Your certifications, 
-              work history, and reputation—portable, verified, and yours forever.
+              One profile. Any employer. Hours submit themselves. Certs already verified. 
+              Logbook entries you didn't have to make up. Onboarding done before you arrive.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 mb-6">
@@ -445,26 +465,27 @@ export default function TechnicianLogin() {
           <div className="container mx-auto px-6">
             <div className="max-w-3xl">
               <h2 className="text-3xl font-bold mb-8">
-                You've earned your reputation. Why does it disappear every time you change jobs?
+                Same forms. Same timesheets. Same logbook you're making up.
               </h2>
               
               <div className="space-y-6 text-muted-foreground leading-relaxed">
-                <p className="text-lg">
-                  Eight years on rope. Level 3 IRATA. Hundreds of buildings. Zero safety incidents.
+                <p>
+                  New employer. New banking forms. New emergency contact sheet. New void cheque request. Again.
+                </p>
+                <p>
+                  Every Friday: text your hours to the office. Hope they log them right. Dispute the paycheck when they don't.
+                </p>
+                <p>
+                  And your logbook? You're filling it out two weeks late, staring at your phone trying to remember what building you were at, what tasks you did, making stuff up because who actually remembers.
                 </p>
                 <p className="text-lg font-medium text-foreground">
-                  None of that follows you.
+                  Eight years on rope. Level 3 IRATA. Hundreds of buildings.
                 </p>
                 <p>
-                  New employer? You're a stranger with a certification card. Back to proving yourself 
-                  on easy jobs while the loud guy who's been there six months gets the high-rise work.
-                </p>
-                <p>
-                  Your paper logbook is a mess. Your certifications are scattered across three email 
-                  accounts. Your banking info? You're filling it out for the fourth time this year.
+                  And you're still filling out the same forms, still texting timesheets, still guessing at logbook entries like it's your first month.
                 </p>
                 <p className="text-lg font-semibold text-foreground pt-4">
-                  This isn't how professionals work.
+                  There's a better way.
                 </p>
               </div>
             </div>
@@ -476,60 +497,49 @@ export default function TechnicianLogin() {
           <div className="container mx-auto px-6">
             <div className="max-w-3xl">
               <h2 className="text-3xl font-bold mb-8">
-                One profile. Every job. Forever yours.
+                Set up once. Plug into any employer. Done.
               </h2>
               
               <p className="text-lg text-muted-foreground mb-10">
-                OnRopePro gives you a portable professional identity that stays with you—no matter where you work.
+                OnRopePro gives you a portable professional identity that <strong className="text-foreground">connects</strong> to any company using the platform.
               </p>
               
-              <div className="grid gap-6">
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Award className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-1">Your credentials, verified</h3>
-                    <p className="text-muted-foreground">
-                      IRATA/SPRAT ID, first aid, driver's abstract—stored securely, shared when YOU connect.
-                    </p>
-                  </div>
+              <p className="font-semibold mb-4">Here's what that means:</p>
+              
+              <div className="grid gap-8">
+                <div>
+                  <h3 className="font-semibold mb-2 text-foreground">Day 1 at a new job?</h3>
+                  <p className="text-muted-foreground">
+                    You plug in. They instantly have your IRATA/SPRAT certs, first aid, driver's abstract, banking info, emergency contact—verified and ready. The only thing your employer has to do is enter your salary and permissions. That's it. No forms. No "bring a void cheque." No half-day orientation.
+                  </p>
                 </div>
                 
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Clock className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-1">Your history, preserved</h3>
-                    <p className="text-muted-foreground">
-                      Every work session, every building, every task. Scan your paper logbook pages to digitize years of experience.
-                    </p>
-                  </div>
+                <div>
+                  <h3 className="font-semibold mb-2 text-foreground">Every day after that?</h3>
+                  <p className="text-muted-foreground">
+                    Your work hours, buildings, tasks—logged automatically. Clock in, do your work, clock out. Hours submitted. No timesheets. No texts to the office. No "I swear I worked 9 hours" disputes.
+                  </p>
                 </div>
                 
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <FileText className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-1">Your documents, ready</h3>
-                    <p className="text-muted-foreground">
-                      Banking info, void cheque, emergency contact—auto-shared only when you join a new employer. No more paperwork on day one.
-                    </p>
-                  </div>
+                <div>
+                  <h3 className="font-semibold mb-2 text-foreground">When you fill out your logbook?</h3>
+                  <p className="text-muted-foreground">
+                    Every session is recorded. Building address, tasks, height, hours. Fill out your IRATA logbook from actual records—not fuzzy memory two weeks later.
+                  </p>
                 </div>
                 
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Bell className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-1">Your future, protected</h3>
-                    <p className="text-muted-foreground">
-                      30-day certification expiry alerts. Never get caught with a lapsed IRATA again.
-                    </p>
-                  </div>
+                <div>
+                  <h3 className="font-semibold mb-2 text-foreground">Change employers?</h3>
+                  <p className="text-muted-foreground">
+                    Unplug from Company A. Plug into Company B. Same instant onboarding. Same automatic logging. Your profile stays yours.
+                  </p>
+                </div>
+                
+                <div>
+                  <h3 className="font-semibold mb-2 text-foreground">Work multiple companies?</h3>
+                  <p className="text-muted-foreground">
+                    With Plus, connect to unlimited employers simultaneously. Four days at Company A, weekends at Company B, your own clients on the side. One profile handles it all.
+                  </p>
                 </div>
               </div>
             </div>
@@ -539,16 +549,16 @@ export default function TechnicianLogin() {
         {/* Features Grid */}
         <section className="bg-muted/30 py-16 lg:py-20">
           <div className="container mx-auto px-6">
-            <h2 className="text-3xl font-bold mb-4">Built for how you actually work</h2>
+            <h2 className="text-3xl font-bold mb-4">The system that works while you work</h2>
             <p className="text-muted-foreground mb-10 max-w-2xl">
               Everything you need to own your professional identity and take it with you.
             </p>
             
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {features.map((feature, index) => (
                 <Card key={index} className="border-border/50">
                   <CardContent className="pt-6">
-                    <div className="flex items-start gap-4">
+                    <div className="flex flex-col gap-3">
                       <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                         <feature.icon className="w-5 h-5 text-primary" />
                       </div>
@@ -654,7 +664,7 @@ export default function TechnicianLogin() {
         {/* How It Works */}
         <section className="bg-muted/30 py-16 lg:py-20">
           <div className="container mx-auto px-6">
-            <h2 className="text-3xl font-bold mb-4">2 minutes to start. Yours for life.</h2>
+            <h2 className="text-3xl font-bold mb-4">2 minutes to set up. Automatic from there.</h2>
             <p className="text-muted-foreground mb-10 max-w-2xl">
               Getting started is simple. Here's how it works:
             </p>
@@ -713,10 +723,10 @@ export default function TechnicianLogin() {
         <section className="bg-primary/5 border-t py-16 lg:py-20">
           <div className="container mx-auto px-6 text-center">
             <h2 className="text-3xl font-bold mb-4">
-              Your career is worth more than a paper logbook.
+              Set up once. That's it.
             </h2>
             <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
-              You've spent years building skills, experience, and reputation. Stop leaving it behind.
+              Your certs. Your banking info. Your hours. Your logbook reference. Enter them once. Plug into any employer. Automatic from there.
             </p>
             
             <div className="flex flex-col items-center gap-4">
@@ -740,7 +750,7 @@ export default function TechnicianLogin() {
             </div>
             
             <p className="text-sm text-muted-foreground mt-8">
-              Join thousands of rope access professionals who own their career data.
+              Free forever. Join rope access professionals who set up once and never looked back.
             </p>
           </div>
         </section>
