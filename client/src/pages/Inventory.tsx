@@ -2722,52 +2722,77 @@ export default function Inventory() {
                 )}
               />
 
-              {/* Rope-specific fields */}
+              {/* Rope-specific fields - Pricing */}
               {form.watch("equipmentType") === "Rope" && (
                 <>
-                  <FormField
-                    control={form.control}
-                    name="ropeLength"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('inventory.ropeLength', 'Rope Length (feet)')}</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            placeholder={t('inventory.placeholders.ropeLength', 'Enter rope length')}
-                            {...field}
-                            value={field.value || ""}
-                            data-testid="input-rope-length"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <div className="bg-primary/5 border border-primary/20 rounded-md p-4 space-y-4">
+                    <div className="text-sm font-semibold text-primary flex items-center gap-2">
+                      <span className="material-icons text-sm">straighten</span>
+                      {t('inventory.ropePricing', 'Rope Pricing')}
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="ropeLength"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t('inventory.lengthPerRope', 'Length Per Rope (ft)')}</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                placeholder="e.g., 400"
+                                {...field}
+                                value={field.value || ""}
+                                data-testid="input-rope-length"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                  <FormField
-                    control={form.control}
-                    name="pricePerFeet"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('inventory.pricePerFoot', 'Price Per Foot')}</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            placeholder={t('inventory.placeholders.pricePerFoot', 'Enter price per foot')}
-                            {...field}
-                            value={field.value || ""}
-                            data-testid="input-price-per-feet"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
+                      <FormField
+                        control={form.control}
+                        name="pricePerFeet"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t('inventory.pricePerFoot', 'Price Per Foot ($)')}</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                placeholder="e.g., 1.45"
+                                {...field}
+                                value={field.value || ""}
+                                data-testid="input-price-per-feet"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* Live calculation preview */}
+                    {form.watch("ropeLength") && form.watch("pricePerFeet") && form.watch("quantity") && (
+                      <div className="bg-background border rounded-md p-3 mt-2">
+                        <div className="text-xs text-muted-foreground mb-1">
+                          {t('inventory.calculatedValue', 'Calculated Value')}:
+                        </div>
+                        <div className="text-lg font-bold text-primary">
+                          {form.watch("quantity")} {form.watch("quantity") === 1 ? 'rope' : 'ropes'} × {form.watch("ropeLength")}ft × ${form.watch("pricePerFeet")}/ft = ${(
+                            parseFloat(form.watch("quantity")?.toString() || "0") *
+                            parseFloat(form.watch("ropeLength") || "0") *
+                            parseFloat(form.watch("pricePerFeet") || "0")
+                          ).toFixed(2)}
+                        </div>
+                      </div>
                     )}
-                  />
+                  </div>
 
                   <div className="border-t pt-4 mt-4">
                     <div className="text-sm font-medium mb-3">{t('inventory.assignToEmployee', 'Assign to Employee (Optional)')}</div>
