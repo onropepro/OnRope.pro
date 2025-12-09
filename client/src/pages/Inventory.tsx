@@ -1967,22 +1967,63 @@ export default function Inventory() {
               </CardHeader>
             </Card>
 
-            {/* View Inventory Section */}
-            <Card>
-              <CardHeader>
-                <CardTitle>{t('inventory.allInventoryItems', 'All Inventory Items')}</CardTitle>
-                <CardDescription>{t('inventory.viewAllItems', 'View all gear items in the system')}</CardDescription>
-              </CardHeader>
-              <CardContent>
+            {/* View Inventory Section - Grouped by Equipment Type */}
             {isLoading ? (
-              <div className="text-center py-8 text-muted-foreground">{t('inventory.loading', 'Loading inventory...')}</div>
+              <Card>
+                <CardContent className="py-8">
+                  <div className="text-center text-muted-foreground">{t('inventory.loading', 'Loading inventory...')}</div>
+                </CardContent>
+              </Card>
             ) : !gearData?.items || gearData.items.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                {t('inventory.empty.manageGear', 'No items in inventory yet. Click "Add Item to Inventory" to get started.')}
-              </div>
+              <Card>
+                <CardContent className="py-8">
+                  <div className="text-center text-muted-foreground">
+                    {t('inventory.empty.manageGear', 'No items in inventory yet. Click "Add Item to Inventory" to get started.')}
+                  </div>
+                </CardContent>
+              </Card>
             ) : (
-              <div className="space-y-2">
-                {gearData.items.map((item) => (
+              <div className="space-y-3">
+                {/* Group items by equipment type */}
+                {Object.entries(
+                  gearData.items.reduce((groups: Record<string, typeof gearData.items>, item) => {
+                    const type = item.equipmentType || "Other";
+                    if (!groups[type]) groups[type] = [];
+                    groups[type].push(item);
+                    return groups;
+                  }, {})
+                )
+                  .sort(([a], [b]) => a.localeCompare(b))
+                  .map(([equipmentType, items]) => {
+                    const typeIcon = EQUIPMENT_ICONS[equipmentType] || "build";
+                    const totalQty = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+                    const typeValue = items.reduce((sum, item) => sum + calculateItemValue(item), 0);
+                    
+                    return (
+                      <Card key={equipmentType}>
+                        <CardHeader className="pb-3">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-3">
+                              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                                <span className="material-icons text-primary">{typeIcon}</span>
+                              </div>
+                              <div>
+                                <CardTitle className="text-lg">{equipmentType}</CardTitle>
+                                <CardDescription>
+                                  {totalQty} {totalQty === 1 ? t('inventory.item', 'item') : t('inventory.items', 'items')}
+                                  {canViewFinancials && typeValue > 0 && (
+                                    <span className="ml-2 text-primary font-medium">
+                                      • ${typeValue.toFixed(2)}
+                                    </span>
+                                  )}
+                                </CardDescription>
+                              </div>
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                          <div className="space-y-2">
+                            {items.map((item) => (
                   <Card key={item.id} className="bg-muted/30" data-testid={`item-${item.id}`}>
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between gap-4">
@@ -2097,11 +2138,14 @@ export default function Inventory() {
                       </div>
                     </CardContent>
                   </Card>
-                ))}
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
               </div>
-                )}
-              </CardContent>
-            </Card>
+            )}
           </TabsContent>
           )}
 
