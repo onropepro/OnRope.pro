@@ -383,7 +383,7 @@ const pagesData: PageCategory[] = [
   {
     category: "Public Pages",
     icon: Globe,
-    iconColor: "text-green-600 dark:text-green-400",
+    iconColor: "text-success-600",
     pages: [
       { name: "Login", path: "/login", description: "User authentication", roles: ["Public"] },
       { name: "Register", path: "/register", description: "New company registration", roles: ["Public"] },
@@ -414,7 +414,7 @@ const pagesData: PageCategory[] = [
   {
     category: "Employee Dashboard & Core",
     icon: LayoutDashboard,
-    iconColor: "text-blue-600 dark:text-blue-400",
+    iconColor: "text-action-600 dark:text-action-400",
     pages: [
       { name: "Dashboard", path: "/dashboard", description: "Main employee dashboard with project cards", roles: ["Company", "Ops Manager", "Supervisor", "Technician"] },
       { name: "Projects", path: "/projects", description: "Project management and creation", roles: ["Company", "Ops Manager", "Supervisor"] },
@@ -426,7 +426,7 @@ const pagesData: PageCategory[] = [
   {
     category: "Safety & Compliance",
     icon: Shield,
-    iconColor: "text-red-600 dark:text-red-400",
+    iconColor: "text-rust-600 dark:text-rust-500",
     pages: [
       { name: "Harness Inspection", path: "/harness-inspection", description: "Digital harness inspection forms", roles: ["All Employees"] },
       { name: "Toolbox Meeting", path: "/toolbox-meeting", description: "Safety meeting documentation", roles: ["All Employees"] },
@@ -439,7 +439,7 @@ const pagesData: PageCategory[] = [
   {
     category: "Time & Scheduling",
     icon: Clock,
-    iconColor: "text-orange-600 dark:text-orange-400",
+    iconColor: "text-warning-600",
     pages: [
       { name: "Schedule", path: "/schedule", description: "Calendar and employee scheduling", roles: ["Company", "Ops Manager", "Supervisor"] },
       { name: "Active Workers", path: "/active-workers", description: "Real-time worker tracking", roles: ["Company", "Ops Manager", "Supervisor"] },
@@ -451,7 +451,7 @@ const pagesData: PageCategory[] = [
   {
     category: "Financial & Payroll",
     icon: CreditCard,
-    iconColor: "text-emerald-600 dark:text-emerald-400",
+    iconColor: "text-success-600",
     pages: [
       { name: "Payroll", path: "/payroll", description: "Timesheet and payroll management", roles: ["Company", "Ops Manager", "Supervisor"] },
       { name: "Quotes", path: "/quotes", description: "Quote generation with labor costs", roles: ["Company", "Ops Manager", "Supervisor", "Technician"] },
@@ -460,7 +460,7 @@ const pagesData: PageCategory[] = [
   {
     category: "Equipment & Inventory",
     icon: Package,
-    iconColor: "text-purple-600 dark:text-purple-400",
+    iconColor: "text-action-500 dark:text-action-400",
     pages: [
       { name: "Inventory", path: "/inventory", description: "Gear and equipment tracking", roles: ["All Employees"] },
     ]
@@ -468,7 +468,7 @@ const pagesData: PageCategory[] = [
   {
     category: "Resident Portal",
     icon: Home,
-    iconColor: "text-cyan-600 dark:text-cyan-400",
+    iconColor: "text-action-600 dark:text-action-400",
     pages: [
       { name: "Resident Dashboard", path: "/resident", description: "Resident feedback and photo access", roles: ["Resident"] },
     ]
@@ -476,7 +476,7 @@ const pagesData: PageCategory[] = [
   {
     category: "Property Manager Portal",
     icon: Building2,
-    iconColor: "text-indigo-600 dark:text-indigo-400",
+    iconColor: "text-action-600 dark:text-action-400",
     pages: [
       { name: "My Vendors", path: "/property-manager", description: "Vendor management dashboard", roles: ["Property Manager"] },
       { name: "PM Settings", path: "/property-manager/settings", description: "Property manager account settings", roles: ["Property Manager"] },
@@ -485,7 +485,7 @@ const pagesData: PageCategory[] = [
   {
     category: "Job Board",
     icon: Briefcase,
-    iconColor: "text-teal-600 dark:text-teal-400",
+    iconColor: "text-success-600",
     pages: [
       { name: "Technician Job Board", path: "/technician-job-board", description: "Browse jobs and manage visibility", roles: ["Technician"] },
       { name: "Company Job Board", path: "/company-job-board", description: "Post jobs and browse candidates", roles: ["Company", "Ops Manager"] },
@@ -496,7 +496,7 @@ const pagesData: PageCategory[] = [
   {
     category: "Communication",
     icon: MessageSquare,
-    iconColor: "text-pink-600 dark:text-pink-400",
+    iconColor: "text-action-500 dark:text-action-400",
     pages: [
       { name: "Residents Management", path: "/residents", description: "Resident feedback management", roles: ["Company", "Ops Manager", "Supervisor"] },
       { name: "Feedback Detail", path: "/complaints/:id", description: "Individual feedback view", roles: ["Company", "Ops Manager", "Supervisor", "Resident"] },
@@ -505,7 +505,7 @@ const pagesData: PageCategory[] = [
   {
     category: "Administration",
     icon: Settings,
-    iconColor: "text-gray-600 dark:text-gray-400",
+    iconColor: "text-neutral-400",
     pages: [
       { name: "SuperUser Dashboard", path: "/superuser", description: "Platform administration", roles: ["SuperUser"] },
       { name: "All Companies", path: "/superuser/companies", description: "Company oversight", roles: ["SuperUser"] },
@@ -518,7 +518,7 @@ const changelogData: ChangelogSection[] = [
   {
     title: "Authentication & User Management",
     icon: Lock,
-    iconColor: "text-blue-600 dark:text-blue-400",
+    iconColor: "text-action-600 dark:text-action-400",
     description: "Secure multi-tenant authentication with role-based access control",
     features: [
       "Session-based authentication with secure HTTP-only cookies",
@@ -533,7 +533,7 @@ const changelogData: ChangelogSection[] = [
   {
     title: "Project Management System",
     icon: Building2,
-    iconColor: "text-indigo-600 dark:text-indigo-400",
+    iconColor: "text-action-600 dark:text-action-400",
     description: "Comprehensive project tracking for rope access operations",
     features: [
       "Multiple job types: Window Cleaning, Dryer Vent, Building Wash, Parkade Cleaning, and more",
@@ -551,7 +551,7 @@ const changelogData: ChangelogSection[] = [
   {
     title: "Work Session & Time Tracking",
     icon: Clock,
-    iconColor: "text-emerald-600 dark:text-emerald-400",
+    iconColor: "text-success-600",
     description: "Real-time workforce tracking with GPS and elevation logging",
     features: [
       "Clock in/out with real-time GPS location capture",
@@ -568,7 +568,7 @@ const changelogData: ChangelogSection[] = [
   {
     title: "IRATA Task Logging System",
     icon: ClipboardCheck,
-    iconColor: "text-purple-600 dark:text-purple-400",
+    iconColor: "text-action-500 dark:text-action-400",
     description: "Comprehensive work hours logging for IRATA certification progression",
     features: [
       "Task selection dialog after ending work sessions (IRATA technicians only)",
@@ -584,7 +584,7 @@ const changelogData: ChangelogSection[] = [
   {
     title: "Safety & Compliance Documentation",
     icon: Shield,
-    iconColor: "text-red-600 dark:text-red-400",
+    iconColor: "text-rust-600 dark:text-rust-500",
     description: "Digital safety forms with signatures, personal kit integration, and PDF export",
     features: [
       "Harness Inspection Forms with personal kit selection",
@@ -624,7 +624,7 @@ const changelogData: ChangelogSection[] = [
   {
     title: "Document Management",
     icon: FileText,
-    iconColor: "text-teal-600 dark:text-teal-400",
+    iconColor: "text-success-600",
     description: "Centralized document storage with compliance tracking and role-based access",
     features: [
       "Health & Safety Manual uploads with employee acknowledgment",
@@ -647,7 +647,7 @@ const changelogData: ChangelogSection[] = [
   {
     title: "Employee Management",
     icon: Users,
-    iconColor: "text-cyan-600 dark:text-cyan-400",
+    iconColor: "text-action-600 dark:text-action-400",
     description: "Complete workforce administration with certification tracking",
     features: [
       "Employee profile management with contact details",
@@ -664,7 +664,7 @@ const changelogData: ChangelogSection[] = [
   {
     title: "Scheduling & Time-Off Management",
     icon: Calendar,
-    iconColor: "text-orange-600 dark:text-orange-400",
+    iconColor: "text-warning-600",
     description: "Dual-calendar system with comprehensive leave management",
     features: [
       "Project calendar with drag-and-drop assignment",
@@ -701,7 +701,7 @@ const changelogData: ChangelogSection[] = [
   {
     title: "Payroll & Financial",
     icon: CreditCard,
-    iconColor: "text-green-600 dark:text-green-400",
+    iconColor: "text-success-600",
     description: "Timesheet generation and payroll processing",
     features: [
       "Configurable pay periods (weekly, bi-weekly, semi-monthly, monthly)",
@@ -717,7 +717,7 @@ const changelogData: ChangelogSection[] = [
   {
     title: "Quoting & Sales Pipeline",
     icon: TrendingUp,
-    iconColor: "text-pink-600 dark:text-pink-400",
+    iconColor: "text-action-500 dark:text-action-400",
     description: "Complete CRM with quote generation, pipeline tracking, and analytics",
     features: [
       "Quote creation with itemized services and labor cost calculations",
@@ -818,7 +818,7 @@ const changelogData: ChangelogSection[] = [
   {
     title: "Platform Administration & Metrics",
     icon: Activity,
-    iconColor: "text-gray-600 dark:text-gray-400",
+    iconColor: "text-neutral-400",
     description: "Comprehensive platform oversight with revenue tracking and customer health monitoring",
     features: [
       "Centralized company oversight dashboard",
@@ -852,7 +852,7 @@ const changelogData: ChangelogSection[] = [
   {
     title: "Multi-Language Support",
     icon: Languages,
-    iconColor: "text-blue-600 dark:text-blue-400",
+    iconColor: "text-action-600 dark:text-action-400",
     description: "Internationalization with full French translation and user language preferences",
     features: [
       "Complete French translation of all interface elements",
@@ -870,7 +870,7 @@ const changelogData: ChangelogSection[] = [
   {
     title: "Mobile-First Design",
     icon: Smartphone,
-    iconColor: "text-indigo-600 dark:text-indigo-400",
+    iconColor: "text-action-600 dark:text-action-400",
     description: "Optimized for field worker mobile usage",
     features: [
       "Responsive design across all pages",
@@ -885,7 +885,7 @@ const changelogData: ChangelogSection[] = [
   {
     title: "GPS & Location Services",
     icon: MapPin,
-    iconColor: "text-red-600 dark:text-red-400",
+    iconColor: "text-rust-600 dark:text-rust-500",
     description: "Location tracking for work sessions and projects",
     features: [
       "GPS capture on clock in/out",
@@ -894,17 +894,36 @@ const changelogData: ChangelogSection[] = [
       "Building address geocoding"
     ],
     status: "complete"
+  },
+  {
+    title: "Job Board Ecosystem",
+    icon: Briefcase,
+    iconColor: "text-success-600",
+    description: "Connect technicians with employment opportunities across the platform",
+    features: [
+      "Company and SuperUser job posting with salary ranges and requirements",
+      "Multiple job types: Full-time, Part-time, Contract, Seasonal, Project-based",
+      "Required certifications specification (IRATA Level 1/2/3, SPRAT, etc.)",
+      "Technician job browsing with filter and search capabilities",
+      "Profile visibility toggle to make technician profiles discoverable by employers",
+      "Visible profiles display resume, safety rating, name, experience, and certifications",
+      "Direct job application submission with application tracking",
+      "Employer candidate browser to review visible technician profiles",
+      "SuperUser job board management for platform-wide oversight",
+      "Application status tracking: Pending, Reviewed, Contacted, Rejected"
+    ],
+    status: "complete"
   }
 ];
 
 function getStatusBadge(status: "complete" | "in-progress" | "planned") {
   switch (status) {
     case "complete":
-      return <Badge className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20">Complete</Badge>;
+      return <Badge className="bg-success-100 text-success-600 dark:bg-success-600/20 border-success-600/20">Complete</Badge>;
     case "in-progress":
-      return <Badge className="bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20">In Progress</Badge>;
+      return <Badge className="bg-warning-100 text-warning-600 dark:bg-warning-600/20 border-warning-600/20">In Progress</Badge>;
     case "planned":
-      return <Badge className="bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/20">Planned</Badge>;
+      return <Badge className="bg-action-600/10 text-action-600 dark:bg-action-600/20 dark:text-action-400 border-action-600/20">Planned</Badge>;
   }
 }
 
@@ -930,12 +949,12 @@ export default function Changelog() {
             </div>
           </div>
           
-          <Card className="bg-gradient-to-br from-primary/5 via-primary/2 to-transparent">
+          <Card className="bg-gradient-to-br from-neutral-100 via-neutral-50 to-transparent dark:from-navy-900 dark:via-navy-950 dark:to-transparent">
             <CardContent className="pt-6">
               <div className="flex flex-wrap gap-6">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-emerald-500/10 rounded-lg">
-                    <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                  <div className="p-2 bg-success-100 dark:bg-success-600/20 rounded-lg">
+                    <CheckCircle2 className="h-5 w-5 text-success-600" />
                   </div>
                   <div>
                     <div className="text-2xl font-bold">{completedCount}</div>
@@ -943,8 +962,8 @@ export default function Changelog() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-500/10 rounded-lg">
-                    <Zap className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  <div className="p-2 bg-action-600/10 dark:bg-action-600/20 rounded-lg">
+                    <Zap className="h-5 w-5 text-action-600 dark:text-action-400" />
                   </div>
                   <div>
                     <div className="text-2xl font-bold">{totalFeatures}</div>
@@ -952,8 +971,8 @@ export default function Changelog() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-purple-500/10 rounded-lg">
-                    <Package className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                  <div className="p-2 bg-action-500/10 dark:bg-action-500/20 rounded-lg">
+                    <Package className="h-5 w-5 text-action-500 dark:text-action-400" />
                   </div>
                   <div>
                     <div className="text-2xl font-bold">{pagesData.reduce((acc, cat) => acc + cat.pages.length, 0)}</div>
@@ -961,8 +980,8 @@ export default function Changelog() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-orange-500/10 rounded-lg">
-                    <Wrench className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                  <div className="p-2 bg-warning-100 dark:bg-warning-600/20 rounded-lg">
+                    <Wrench className="h-5 w-5 text-warning-600" />
                   </div>
                   <div>
                     <div className="text-2xl font-bold">{servicesData.length}</div>
@@ -970,8 +989,8 @@ export default function Changelog() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-pink-500/10 rounded-lg">
-                    <Code className="h-5 w-5 text-pink-600 dark:text-pink-400" />
+                  <div className="p-2 bg-action-400/10 dark:bg-action-400/20 rounded-lg">
+                    <Code className="h-5 w-5 text-action-600 dark:text-action-400" />
                   </div>
                   <div>
                     <div className="text-2xl font-bold">136,800</div>
@@ -986,8 +1005,8 @@ export default function Changelog() {
         <Card className="mb-8">
           <CardHeader>
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-amber-500/10 ring-1 ring-amber-500/20">
-                <History className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+              <div className="p-2.5 rounded-xl bg-warning-100 dark:bg-warning-600/20 ring-1 ring-warning-600/20">
+                <History className="h-5 w-5 text-warning-600" />
               </div>
               <div>
                 <CardTitle className="text-xl">Recent Changes</CardTitle>
@@ -1005,21 +1024,21 @@ export default function Changelog() {
                   className="p-4 rounded-lg bg-muted/30"
                 >
                   <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <span className="font-semibold text-[16px] text-black dark:text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>{change.title}</span>
+                    <span className="font-semibold text-base text-foreground">{change.title}</span>
                     <Badge 
                       variant="secondary" 
                       className={`text-xs ${
                         change.type === 'feature' 
-                          ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300' 
+                          ? 'bg-success-100 text-success-600 dark:bg-success-600/20' 
                           : change.type === 'improvement'
-                          ? 'bg-blue-500/10 text-blue-700 dark:text-blue-300'
-                          : 'bg-orange-500/10 text-orange-700 dark:text-orange-300'
+                          ? 'bg-action-600/10 text-action-600 dark:bg-action-600/20 dark:text-action-400'
+                          : 'bg-warning-100 text-warning-600 dark:bg-warning-600/20'
                       }`}
                     >
                       {change.type === 'feature' ? 'New Feature' : change.type === 'improvement' ? 'Improvement' : 'Fix'}
                     </Badge>
                   </div>
-                  <p className="text-[16px] text-gray-500 dark:text-gray-400 mt-2.5 mb-2.5" style={{ fontFamily: 'Outfit, sans-serif' }}>{change.description}</p>
+                  <p className="text-base text-muted-foreground mt-2.5 mb-2.5">{change.description}</p>
                   <p className="text-xs text-muted-foreground/70">{change.date}</p>
                 </div>
               ))}
@@ -1030,8 +1049,8 @@ export default function Changelog() {
         <Card className="mb-8">
           <CardHeader>
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-orange-500/10 ring-1 ring-orange-500/20">
-                <Wrench className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+              <div className="p-2.5 rounded-xl bg-warning-100 dark:bg-warning-600/20 ring-1 ring-warning-600/20">
+                <Wrench className="h-5 w-5 text-warning-600" />
               </div>
               <div>
                 <CardTitle className="text-xl">Services Managed</CardTitle>
@@ -1069,8 +1088,8 @@ export default function Changelog() {
         <Card className="mb-8">
           <CardHeader>
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-primary/10 ring-1 ring-primary/20">
-                <FolderOpen className="h-5 w-5 text-primary" />
+              <div className="p-2.5 rounded-xl bg-action-600/10 dark:bg-action-600/20 ring-1 ring-action-600/20">
+                <FolderOpen className="h-5 w-5 text-action-600 dark:text-action-400" />
               </div>
               <div>
                 <CardTitle className="text-xl">All Pages & Views</CardTitle>
@@ -1335,7 +1354,7 @@ export default function Changelog() {
                   <ul className="grid gap-2 text-sm">
                     {section.features.map((feature, featureIndex) => (
                       <li key={featureIndex} className="flex items-start gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+                        <CheckCircle2 className="h-4 w-4 text-success-600 mt-0.5 flex-shrink-0" />
                         <span className="text-muted-foreground">{feature}</span>
                       </li>
                     ))}
@@ -1346,7 +1365,7 @@ export default function Changelog() {
           })}
         </div>
 
-        <Card className="mt-8 bg-gradient-to-br from-muted/50 to-transparent">
+        <Card className="mt-8 bg-gradient-to-br from-neutral-100 to-transparent dark:from-navy-900 dark:to-transparent">
           <CardContent className="pt-6">
             <div className="text-center">
               <h3 className="text-lg font-semibold mb-2">Rope Access Management Platform</h3>
