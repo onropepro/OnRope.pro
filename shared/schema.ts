@@ -1511,19 +1511,22 @@ export const insertProjectSchema = createInsertSchema(projects)
     requiresElevation: z.boolean().optional().default(true),
   })
   .superRefine((data, ctx) => {
-    // Job types that use drop-based tracking (building maintenance with elevation)
-    const dropBasedJobTypes = ['window_cleaning', 'dryer_vent_cleaning', 'building_wash', 'gutter_cleaning', 'painting', 'caulking'];
-    
-    // NDT job types and other hours-based types don't require dailyDropTarget
-    const hoursBasedJobTypes = [
-      'ground_window_cleaning', 'general_pressure_washing', 'inspection', 'other',
-      'ndt_visual_inspection', 'ndt_ultrasonic_testing', 'ndt_magnetic_particle',
-      'ndt_dye_penetrant', 'ndt_radiographic', 'ndt_eddy_current', 'ndt_thermographic',
-      'ndt_acoustic_emission', 'ndt_phased_array', 'ndt_time_of_flight', 'ndt_other'
-    ];
+    // Helper to check if job type uses drop-based tracking
+    const isDropBasedJob = (jobType: string): boolean => {
+      // NDT jobs are never drop-based
+      if (jobType.startsWith('ndt_')) return false;
+      // Custom "other" types are hours-based
+      if (jobType === 'other' || jobType === 'ndt_other') return false;
+      // Ground-level and suite-based jobs are not drop-based
+      if (['ground_window_cleaning', 'general_pressure_washing', 'inspection', 
+           'in_suite_dryer_vent_cleaning', 'parkade_pressure_cleaning'].includes(jobType)) return false;
+      // Building maintenance jobs with elevation use drops
+      return ['window_cleaning', 'dryer_vent_cleaning', 'building_wash', 
+              'gutter_cleaning', 'painting', 'caulking'].includes(jobType);
+    };
     
     // Only require dailyDropTarget for drop-based jobs that require elevation
-    if (dropBasedJobTypes.includes(data.jobType) && data.requiresElevation !== false) {
+    if (isDropBasedJob(data.jobType) && data.requiresElevation !== false) {
       if (!data.dailyDropTarget || data.dailyDropTarget <= 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
