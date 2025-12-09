@@ -1029,7 +1029,9 @@
       "peaceWorkDesc": "Activer la rémunération à la pièce pour ce projet (paiement basé sur les descentes complétées au lieu des heures travaillées)",
       "pricePerDrop": "Prix par descente",
       "pricePerDropPlaceholder": "Entrer le prix par descente",
-      "pricePerDropHelp": "Montant payé par descente complétée"
+      "pricePerDropHelp": "Montant payé par descente complétée",
+      "siteMaxHeight": "Hauteur maximale du site",
+      "siteHeightExplain": "La hauteur du site est requise pour les entrées du carnet IRATA. Les techniciens en ont besoin pour suivre les travaux en hauteur pour la progression de leur certification."
     },
     "projects": {
       "activeProjects": "Projets actifs",
@@ -1177,8 +1179,8 @@
       "notesPlaceholder": "Toute information supplémentaire concernant la cessation d'emploi..."
     },
     "saveAsClient": {
-      "title": "Enregistrer le bâtiment comme client ?",
-      "description": "Souhaitez-vous enregistrer les informations de ce bâtiment dans votre base de données clients ? Cela facilitera la création de futurs projets pour cette propriété.",
+      "title": "Enregistrer comme client ?",
+      "description": "Souhaitez-vous enregistrer ces informations dans votre base de données clients ? Cela facilitera la création de futurs projets pour ce site.",
       "noThanks": "Non merci",
       "yesAdd": "Oui, ajouter aux clients"
     }

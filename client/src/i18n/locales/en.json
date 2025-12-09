@@ -1029,7 +1029,9 @@
       "peaceWorkDesc": "Enable piece rate compensation for this project (pay based on drops completed instead of hours worked)",
       "pricePerDrop": "Price Per Drop",
       "pricePerDropPlaceholder": "Enter price per drop",
-      "pricePerDropHelp": "Amount paid per drop completed"
+      "pricePerDropHelp": "Amount paid per drop completed",
+      "siteMaxHeight": "Site Max Height",
+      "siteHeightExplain": "Site height is required for IRATA logbook entries. Technicians need this to track work at height for certification progression."
     },
     "projects": {
       "activeProjects": "Active Projects",
@@ -1177,8 +1179,8 @@
       "notesPlaceholder": "Any additional information about the termination..."
     },
     "saveAsClient": {
-      "title": "Save Building as Client?",
-      "description": "Would you like to save this building information in your client database? This will make it easier to create future projects for this property.",
+      "title": "Save as Client?",
+      "description": "Would you like to save this information in your client database? This will make it easier to create future projects for this site.",
       "noThanks": "No, Thanks",
       "yesAdd": "Yes, Add to Clients"
     }

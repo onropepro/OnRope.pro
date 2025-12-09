@@ -68,7 +68,7 @@ const projectSchema = z.object({
   strataPlanNumber: z.string().optional(),
   buildingName: z.string().optional(),
   buildingAddress: z.string().optional(),
-  jobCategory: z.enum(['building_maintenance', 'ndt']).default('building_maintenance'),
+  jobCategory: z.enum(['building_maintenance', 'ndt', 'rock_scaling']).default('building_maintenance'),
   jobType: z.enum(ALL_JOB_TYPE_VALUES, {
     errorMap: () => ({ message: "Please select a valid job type" })
   }),
@@ -96,7 +96,7 @@ const projectSchema = z.object({
   peaceWork: z.boolean().default(false),
   pricePerDrop: z.string().optional(),
 }).refine((data) => {
-  if (data.jobType === "other" || data.jobType === "ndt_other") {
+  if (data.jobType === "other" || data.jobType === "ndt_other" || data.jobType === "rock_other") {
     return data.customJobType && data.customJobType.trim().length > 0;
   }
   return true;
@@ -3517,7 +3517,7 @@ export default function Dashboard() {
                           return null;
                         })()}
 
-                        {(projectForm.watch("jobType") === "other" || projectForm.watch("jobType") === "ndt_other") && (
+                        {(projectForm.watch("jobType") === "other" || projectForm.watch("jobType") === "ndt_other" || projectForm.watch("jobType") === "rock_other") && (
                           <>
                             <FormField
                               control={projectForm.control}
@@ -3638,9 +3638,10 @@ export default function Dashboard() {
                           />
                         )}
 
-                        {/* Hide Floor Count for General Pressure Washing and Ground Window (hours-based tracking) */}
+                        {/* Hide Floor Count for General Pressure Washing, Ground Window, and Rock Scaling (hours-based tracking) */}
                         {projectForm.watch("jobType") !== "general_pressure_washing" && 
-                         projectForm.watch("jobType") !== "ground_window_cleaning" && (
+                         projectForm.watch("jobType") !== "ground_window_cleaning" && 
+                         projectForm.watch("jobCategory") !== "rock_scaling" && (
                           <FormField
                             control={projectForm.control}
                             name="floorCount"
@@ -3662,44 +3663,25 @@ export default function Dashboard() {
                           />
                         )}
 
-                        {/* Building Height - for IRATA logbook */}
-                        <FormField
-                          control={projectForm.control}
-                          name="buildingHeight"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{t('dashboard.projectForm.buildingHeight', 'Building Height')}</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  placeholder={t('dashboard.projectForm.buildingHeightPlaceholder', 'e.g., 25 floors, 100m, 300ft')} 
-                                  {...field} 
-                                  data-testid="input-building-height" 
-                                  className="h-12" 
-                                />
-                              </FormControl>
-                              <p className="text-xs text-muted-foreground">
-                                {t('dashboard.projectForm.buildingHeightHint', 'Used for IRATA logbook hour tracking')}
-                              </p>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        {/* Show elevation fields when requiresElevation is true (regardless of job type) */}
+                        {/* Show drop tracking fields (N/E/S/W drops) ONLY for building_maintenance with drops-based jobs */}
                         {(() => {
                           const currentJobType = projectForm.watch("jobType");
+                          const currentJobCategory = projectForm.watch("jobCategory");
                           const requiresElevation = projectForm.watch("requiresElevation");
                           const jobConfig = getJobTypeConfig(currentJobType);
                           
-                          // Show elevation tracking fields if:
-                          // 1. Elevation is always required (job type)
-                          // 2. OR elevation is configurable AND toggle is ON
-                          // 3. OR custom job type with showOtherElevationFields
-                          // Never show for jobs with elevationRequirement: 'never'
+                          // Drop tracking is ONLY for building_maintenance category with drops-based progress
+                          // NDT and Rock Scaling use hours-based tracking, not drops
+                          if (currentJobCategory !== 'building_maintenance') return false;
+                          
+                          // Check if job uses drops-based progress
+                          if (jobConfig?.progressType !== 'drops') return false;
+                          
+                          // For configurable elevation, check the toggle
                           if (jobConfig?.elevationRequirement === 'never') return false;
                           if (jobConfig?.elevationRequirement === 'always') return true;
                           if (requiresElevation) return true;
-                          if ((currentJobType === "other" || currentJobType === "ndt_other") && showOtherElevationFields) return true;
+                          if (currentJobType === "other" && showOtherElevationFields) return true;
                           return false;
                         })() && (
                           <>
@@ -3850,6 +3832,8 @@ export default function Dashboard() {
                           name="buildingHeight"
                           render={({ field }) => {
                             const floorCount = projectForm.watch("floorCount");
+                            const currentJobCategory = projectForm.watch("jobCategory");
+                            const isRockScaling = currentJobCategory === "rock_scaling";
                             const heightValue = field.value || "";
                             
                             const calculateFromFloors = () => {
@@ -3882,7 +3866,12 @@ export default function Dashboard() {
                             
                             return (
                               <FormItem>
-                                <FormLabel>{t('dashboard.projectForm.buildingHeight', 'Building Height')}</FormLabel>
+                                <FormLabel>
+                                  {isRockScaling 
+                                    ? t('dashboard.projectForm.siteMaxHeight', 'Site Max Height')
+                                    : t('dashboard.projectForm.buildingHeight', 'Building Height')
+                                  }
+                                </FormLabel>
                                 <div className="space-y-2">
                                   <div className="flex gap-2">
                                     <FormControl>
@@ -3894,7 +3883,7 @@ export default function Dashboard() {
                                         className="h-12" 
                                       />
                                     </FormControl>
-                                    {floorCount && parseInt(floorCount) > 0 && (
+                                    {!isRockScaling && floorCount && parseInt(floorCount) > 0 && (
                                       <Button
                                         type="button"
                                         variant="outline"
@@ -3913,9 +3902,12 @@ export default function Dashboard() {
                                 </div>
                                 <FormDescription className="text-xs mt-2">
                                   <span className="font-medium text-foreground">{t('dashboard.projectForm.buildingHeightImportant', 'Important for technicians:')}</span>{' '}
-                                  {t('dashboard.projectForm.buildingHeightExplain', 'Building height is required for IRATA logbook entries. Technicians need this to track work at height for certification progression.')}
+                                  {isRockScaling
+                                    ? t('dashboard.projectForm.siteHeightExplain', 'Site height is required for IRATA logbook entries. Technicians need this to track work at height for certification progression.')
+                                    : t('dashboard.projectForm.buildingHeightExplain', 'Building height is required for IRATA logbook entries. Technicians need this to track work at height for certification progression.')
+                                  }
                                 </FormDescription>
-                                {floorCount && parseInt(floorCount) > 0 && (
+                                {!isRockScaling && floorCount && parseInt(floorCount) > 0 && (
                                   <FormDescription className="text-xs">
                                     {t('dashboard.projectForm.buildingHeightCalcHint', 'Click Calculate to estimate height from floor count (floors × 9ft)')}
                                   </FormDescription>
@@ -9336,9 +9328,9 @@ export default function Dashboard() {
       <AlertDialog open={showSaveAsClientDialog} onOpenChange={setShowSaveAsClientDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('dashboard.saveAsClient.title', 'Save Building as Client?')}</AlertDialogTitle>
+            <AlertDialogTitle>{t('dashboard.saveAsClient.title', 'Save as Client?')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t('dashboard.saveAsClient.description', 'Would you like to save this building information in your client database? This will make it easier to create future projects for this property.')}
+              {t('dashboard.saveAsClient.description', 'Would you like to save this information in your client database? This will make it easier to create future projects for this site.')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
