@@ -472,6 +472,23 @@ export const gearItems = pgTable("gear_items", {
   index("IDX_gear_items_type").on(table.equipmentType),
 ]);
 
+// Equipment catalog table - shared database of gear models that builds over time
+// Pre-populated with industry-standard equipment, grows when users add custom items
+export const equipmentCatalog = pgTable("equipment_catalog", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  equipmentType: varchar("equipment_type").notNull(), // descender, ascender, harness, etc.
+  brand: varchar("brand").notNull(),
+  model: varchar("model").notNull(),
+  isPrePopulated: boolean("is_pre_populated").notNull().default(false), // True for industry-standard items
+  addedByCompanyId: varchar("added_by_company_id").references(() => users.id, { onDelete: "set null" }), // Company that added this (null for pre-populated)
+  usageCount: integer("usage_count").notNull().default(0), // How many times this has been selected
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_equipment_catalog_type").on(table.equipmentType),
+  index("IDX_equipment_catalog_brand").on(table.brand),
+  sql`UNIQUE ("equipment_type", "brand", "model")`,
+]);
+
 // Gear assignments table - tracks which employees have which gear and how many
 export const gearAssignments = pgTable("gear_assignments", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -1596,6 +1613,11 @@ export const insertGearItemSchema = createInsertSchema(gearItems).omit({
   updatedAt: true,
 });
 
+export const insertEquipmentCatalogSchema = createInsertSchema(equipmentCatalog).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const insertGearAssignmentSchema = createInsertSchema(gearAssignments).omit({
   id: true,
   createdAt: true,
@@ -1841,6 +1863,9 @@ export type InsertNonBillableWorkSession = z.infer<typeof insertNonBillableWorkS
 
 export type GearItem = typeof gearItems.$inferSelect;
 export type InsertGearItem = z.infer<typeof insertGearItemSchema>;
+
+export type EquipmentCatalog = typeof equipmentCatalog.$inferSelect;
+export type InsertEquipmentCatalog = z.infer<typeof insertEquipmentCatalogSchema>;
 
 export type GearAssignment = typeof gearAssignments.$inferSelect;
 export type InsertGearAssignment = z.infer<typeof insertGearAssignmentSchema>;

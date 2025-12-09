@@ -125,6 +125,12 @@ export default function Inventory() {
   const [correctiveAction, setCorrectiveAction] = useState("");
   const [damageNotes, setDamageNotes] = useState("");
 
+  // Equipment catalog state - for smart gear picker
+  const [selectedCatalogItem, setSelectedCatalogItem] = useState<{ id: string; brand: string; model: string } | null>(null);
+  const [showOtherDescender, setShowOtherDescender] = useState(false);
+  const [customBrand, setCustomBrand] = useState("");
+  const [customModel, setCustomModel] = useState("");
+
   // Fetch current user
   const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
@@ -196,6 +202,15 @@ export default function Inventory() {
   // Fetch equipment damage reports
   const { data: damageReportsData, isLoading: damageReportsLoading } = useQuery<{ reports: any[] }>({
     queryKey: ["/api/equipment-damage-reports"],
+  });
+
+  // Fetch equipment catalog for smart gear picker (currently only for Descenders)
+  const { data: catalogData } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
+    queryKey: ["/api/equipment-catalog", { type: "Descender" }],
+    queryFn: async () => {
+      const res = await fetch("/api/equipment-catalog?type=Descender");
+      return res.json();
+    },
   });
 
   // Create damage report mutation
@@ -567,6 +582,11 @@ export default function Inventory() {
       setCurrentDateInService("");
       setAssignEmployeeId("");
       setAssignQuantity("1");
+      // Reset descender picker state
+      setSelectedCatalogItem(null);
+      setShowOtherDescender(false);
+      setCustomBrand("");
+      setCustomModel("");
     },
     onError: (error: any) => {
       toast({
@@ -626,7 +646,22 @@ export default function Inventory() {
     },
   });
 
-  const handleAddItem = (data: Partial<InsertGearItem>) => {
+  const handleAddItem = async (data: Partial<InsertGearItem>) => {
+    // If adding a custom descender, save it to the shared catalog first
+    if (data.equipmentType === "Descender" && showOtherDescender && data.brand && data.model) {
+      try {
+        await apiRequest("POST", "/api/equipment-catalog", {
+          equipmentType: "Descender",
+          brand: data.brand,
+          model: data.model,
+        });
+        // Invalidate catalog cache so new item appears next time
+        queryClient.invalidateQueries({ queryKey: ["/api/equipment-catalog"] });
+      } catch (err) {
+        console.log("Descender added to catalog or already exists");
+      }
+    }
+    
     // Extract just the serial number strings for legacy compatibility
     const serialNumberStrings = serialEntries.map(e => e.serialNumber);
     const finalData: any = {
@@ -2347,33 +2382,173 @@ export default function Inventory() {
                 <>
                   <div className="flex-1 min-h-0 overflow-y-auto px-1 space-y-4">
 
-              <FormField
-                control={form.control}
-                name="brand"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('inventory.brand', 'Brand')}</FormLabel>
-                    <FormControl>
-                      <Input placeholder={t('inventory.placeholders.brand', 'e.g., Petzl')} {...field} value={field.value || ""} data-testid="input-brand" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Smart Descender Picker - shows list of common descenders */}
+              {form.watch("equipmentType") === "Descender" && !showOtherDescender && (
+                <div className="space-y-3">
+                  <FormLabel>{t('inventory.selectDescender', 'Select Descender')}</FormLabel>
+                  <div className="grid grid-cols-1 gap-2 max-h-[40vh] overflow-y-auto pr-1">
+                    {catalogData?.items?.map((item) => (
+                      <Card
+                        key={item.id}
+                        className={`cursor-pointer hover-elevate active-elevate-2 transition-all ${
+                          selectedCatalogItem?.id === item.id ? "bg-primary/10 border-primary border-2" : ""
+                        }`}
+                        onClick={() => {
+                          setSelectedCatalogItem(item);
+                          form.setValue("brand", item.brand);
+                          form.setValue("model", item.model);
+                          // Track usage
+                          apiRequest("PATCH", `/api/equipment-catalog/${item.id}/use`);
+                        }}
+                        data-testid={`card-descender-${item.brand.toLowerCase()}-${item.model.toLowerCase().replace(/\s+/g, "-")}`}
+                      >
+                        <CardContent className="p-3 flex items-center gap-3">
+                          <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${
+                            selectedCatalogItem?.id === item.id ? "bg-primary text-primary-foreground" : "bg-muted"
+                          }`}>
+                            <Gauge className="h-5 w-5" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium text-sm">{item.brand}</div>
+                            <div className="text-xs text-muted-foreground truncate">{item.model}</div>
+                          </div>
+                          {selectedCatalogItem?.id === item.id && (
+                            <div className="text-primary">
+                              <span className="material-icons text-lg">check_circle</span>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                    {/* Other option */}
+                    <Card
+                      className={`cursor-pointer hover-elevate active-elevate-2 transition-all border-dashed ${
+                        showOtherDescender ? "bg-primary/10 border-primary border-2" : ""
+                      }`}
+                      onClick={() => {
+                        setShowOtherDescender(true);
+                        setSelectedCatalogItem(null);
+                        form.setValue("brand", "");
+                        form.setValue("model", "");
+                      }}
+                      data-testid="card-descender-other"
+                    >
+                      <CardContent className="p-3 flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-lg flex items-center justify-center bg-muted">
+                          <Plus className="h-5 w-5" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-medium text-sm">{t('inventory.otherDescender', 'Other / Not Listed')}</div>
+                          <div className="text-xs text-muted-foreground">{t('inventory.addNewDescender', 'Add a new descender to the database')}</div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              )}
 
-              <FormField
-                control={form.control}
-                name="model"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('inventory.model', 'Model')}</FormLabel>
-                    <FormControl>
-                      <Input placeholder={t('inventory.placeholders.model', "e.g., I'D S")} {...field} value={field.value || ""} data-testid="input-model" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Custom Descender Entry - when "Other" is selected */}
+              {form.watch("equipmentType") === "Descender" && showOtherDescender && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setShowOtherDescender(false);
+                        setCustomBrand("");
+                        setCustomModel("");
+                      }}
+                      data-testid="button-back-to-descender-list"
+                    >
+                      <ArrowLeft className="h-4 w-4 mr-1" />
+                      {t('common.back', 'Back')}
+                    </Button>
+                    <span className="text-sm text-muted-foreground">{t('inventory.addCustomDescender', 'Add Custom Descender')}</span>
+                  </div>
+                  <FormField
+                    control={form.control}
+                    name="brand"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('inventory.brand', 'Brand')}</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder={t('inventory.placeholders.brand', 'e.g., Petzl')} 
+                            {...field} 
+                            value={field.value || ""} 
+                            onChange={(e) => {
+                              field.onChange(e);
+                              setCustomBrand(e.target.value);
+                            }}
+                            data-testid="input-brand" 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="model"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('inventory.model', 'Model')}</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder={t('inventory.placeholders.model', "e.g., I'D S")} 
+                            {...field} 
+                            value={field.value || ""} 
+                            onChange={(e) => {
+                              field.onChange(e);
+                              setCustomModel(e.target.value);
+                            }}
+                            data-testid="input-model" 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {t('inventory.catalogNote', 'This descender will be saved to the shared database for all companies to use.')}
+                  </p>
+                </div>
+              )}
+
+              {/* Standard Brand/Model fields for non-Descender items */}
+              {form.watch("equipmentType") !== "Descender" && (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="brand"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('inventory.brand', 'Brand')}</FormLabel>
+                        <FormControl>
+                          <Input placeholder={t('inventory.placeholders.brand', 'e.g., Petzl')} {...field} value={field.value || ""} data-testid="input-brand" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="model"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('inventory.model', 'Model')}</FormLabel>
+                        <FormControl>
+                          <Input placeholder={t('inventory.placeholders.model', "e.g., I'D S")} {...field} value={field.value || ""} data-testid="input-model" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              )}
 
               <FormField
                 control={form.control}

@@ -24,6 +24,7 @@ The platform is built with a React 18 frontend (TypeScript, Wouter for routing),
 *   **Client Relationship Management (CRM):** Manages client and building records with autofill intelligence and streamlines client-to-project workflows.
 *   **Scheduling & Resource Allocation:** Dual-calendar system with color-coding, drag-and-drop assignment, and conflict detection.
 *   **Safety & Compliance:** Digitizes harness inspections, toolbox meeting documentation, FLHA forms, incident reports, gear inventory management, digital signatures, and professional PDF export. Includes detailed incident report classification and tracking.
+*   **Smart Gear Inventory System:** When adding gear to inventory, users can select from a pre-populated list of industry-standard equipment (starting with descenders). Selecting "Other" allows adding custom gear that gets permanently saved to a shared database (`equipment_catalog` table) for all companies to use. Pre-populated descenders include popular models from Petzl (I'D S, I'D L, RIG, Maestro), CMC (Clutch, MPD), Rock Exotica (Totem, Akimbo), Skylotec (Deus, Sirius), ISC, Kong, and more.
 *   **Document Review & Signature System:** Employees review and digitally sign company documents with audit trails.
 *   **Company Safety Rating (CSR):** A penalty-based compliance rating system viewable by property managers.
 *   **Resident Portal & Communication:** Complaint management with two-way communication, photo galleries, and notifications, secured by unique resident codes.
