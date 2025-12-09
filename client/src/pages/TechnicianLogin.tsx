@@ -893,17 +893,17 @@ export default function TechnicianLogin() {
       {showProblemsColumn ? (
         <div className="hidden lg:block lg:w-[30%] bg-muted/50 border-l h-screen sticky top-0 overflow-hidden transition-all duration-300">
           <div className="h-full flex flex-col">
-            <div className="shrink-0 bg-muted/50 border-b p-4 relative">
+            <div className="shrink-0 bg-muted/50 border-b p-4 flex items-center justify-between gap-2">
               <Button
                 size="icon"
                 variant="ghost"
-                className="absolute right-2 top-2"
                 onClick={() => setShowProblemsColumn(false)}
                 data-testid="button-close-problems"
               >
                 <X className="w-4 h-4" />
               </Button>
-              <p className="text-base font-medium text-muted-foreground text-center">Sound familiar?</p>
+              <p className="text-base font-medium text-muted-foreground flex-1 text-center">Sound familiar?</p>
+              <div className="w-9" />
             </div>
           <div className="flex-1 flex flex-col justify-evenly py-6">
             {problemRows.map((row, index) => (
