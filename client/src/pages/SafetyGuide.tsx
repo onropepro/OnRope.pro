@@ -48,7 +48,7 @@ export default function SafetyGuide() {
           <div className="flex items-center gap-3">
             <BackButton to="/changelog" />
             <div>
-              <h1 className="text-xl font-bold">Safety & Compliance Guide</h1>
+              <h1 className="text-2xl md:text-3xl font-bold">Safety & Compliance Guide</h1>
               <p className="text-xs text-muted-foreground">Complete documentation for safety systems</p>
             </div>
           </div>
@@ -62,7 +62,7 @@ export default function SafetyGuide() {
         {/* Overview */}
         <section className="space-y-4">
           <div>
-            <h2 className="text-2xl font-bold flex items-center gap-2 mb-2">
+            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
               <Shield className="w-6 h-6 text-red-600 dark:text-red-400" />
               Safety & Compliance Overview
             </h2>
@@ -76,16 +76,16 @@ export default function SafetyGuide() {
 
         {/* THE GOLDEN RULE */}
         <section className="space-y-4">
-          <Card className="border-2 border-red-500 bg-red-50 dark:bg-red-950">
+          <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2 text-red-900 dark:text-red-100">
+              <CardTitle className="text-xl md:text-2xl flex items-center gap-2 text-amber-900 dark:text-amber-100">
                 <AlertTriangle className="w-5 h-5" />
                 The Golden Rule: No Inspection, No Work
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-red-900 dark:text-red-100 space-y-4">
-              <div className="bg-white dark:bg-red-900 rounded-lg p-4 text-center">
-                <p className="text-xl font-mono font-bold">
+            <CardContent className="text-amber-900 dark:text-amber-100 space-y-4">
+              <div className="bg-white dark:bg-amber-900 rounded-lg p-4 text-center">
+                <p className="text-xl md:text-2xl font-mono font-bold">
                   Harness Inspection Required Before Starting Work Session
                 </p>
               </div>
@@ -99,25 +99,25 @@ export default function SafetyGuide() {
                 </ul>
               </div>
 
-              <div className="bg-red-100 dark:bg-red-800 rounded-lg p-3 text-sm">
+              <div className="bg-amber-100 dark:bg-amber-800 rounded-lg p-3 text-sm">
                 <p className="font-semibold flex items-center gap-2">
-                  <Shield className="w-4 h-4" />
+                  <AlertTriangle className="w-4 h-4" />
                   Safety Critical
                 </p>
                 <p className="mt-1">This is a <strong>hard gate</strong> - not a warning. Workers physically cannot start clocking time without a valid inspection for the current date. This protects workers and ensures compliance.</p>
               </div>
 
               <div className="grid md:grid-cols-3 gap-3 text-sm">
-                <div className="bg-white dark:bg-red-900 rounded p-3 text-center">
-                  <HardHat className="w-8 h-8 mx-auto mb-2 text-red-600" />
+                <div className="bg-white dark:bg-amber-900 rounded p-3 text-center">
+                  <HardHat className="w-8 h-8 mx-auto mb-2 text-amber-600" />
                   <p className="font-bold">Step 1</p>
                   <p className="text-xs">Complete Harness Inspection</p>
                 </div>
-                <div className="bg-white dark:bg-red-900 rounded p-3 text-center flex flex-col items-center justify-center">
-                  <ArrowRight className="w-8 h-8 text-red-600 mb-2" />
+                <div className="bg-white dark:bg-amber-900 rounded p-3 text-center flex flex-col items-center justify-center">
+                  <ArrowRight className="w-8 h-8 text-amber-600 mb-2" />
                   <p className="text-xs">Then...</p>
                 </div>
-                <div className="bg-white dark:bg-red-900 rounded p-3 text-center">
+                <div className="bg-white dark:bg-amber-900 rounded p-3 text-center">
                   <Clock className="w-8 h-8 mx-auto mb-2 text-green-600" />
                   <p className="font-bold">Step 2</p>
                   <p className="text-xs">Start Work Session</p>
@@ -133,7 +133,7 @@ export default function SafetyGuide() {
         <section className="space-y-4">
           <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2 text-green-900 dark:text-green-100">
+              <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2 text-green-900 dark:text-green-100">
                 <CheckCircle2 className="w-5 h-5" />
                 Problems Solved
               </CardTitle>
@@ -169,7 +169,7 @@ export default function SafetyGuide() {
 
         {/* TWO ENTRY POINTS - Critical Architecture */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Target className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             Two Entry Points: Understanding the Dual-Path System
           </h2>
@@ -183,7 +183,7 @@ export default function SafetyGuide() {
               <CardHeader className="pb-2">
                 <div className="flex items-center gap-2">
                   <Package className="w-6 h-6 text-purple-600" />
-                  <CardTitle className="text-lg text-purple-900 dark:text-purple-100">
+                  <CardTitle className="text-xl md:text-2xl font-semibold text-purple-900 dark:text-purple-100">
                     Path A: Equipment Area
                   </CardTitle>
                 </div>
@@ -213,8 +213,8 @@ export default function SafetyGuide() {
             <Card className="border-2 border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950">
               <CardHeader className="pb-2">
                 <div className="flex items-center gap-2">
-                  <FileText className="w-6 h-6 text-blue-600" />
-                  <CardTitle className="text-lg text-blue-900 dark:text-blue-100">
+                  <FileText className="w-6 h-6 text-action-600" />
+                  <CardTitle className="text-xl md:text-2xl font-semibold text-action-900 dark:text-action-100">
                     Path B: Safety Forms Section
                   </CardTitle>
                 </div>
@@ -256,7 +256,7 @@ export default function SafetyGuide() {
 
         {/* 7-Day Coverage Window */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Calendar className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
             The 7-Day Toolbox Meeting Coverage Window
           </h2>
@@ -305,7 +305,7 @@ export default function SafetyGuide() {
 
         {/* Five Safety Document Types */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <FileText className="w-5 h-5 text-orange-600 dark:text-orange-400" />
             Five Safety Document Types
           </h2>
@@ -354,11 +354,11 @@ export default function SafetyGuide() {
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between gap-2 flex-wrap">
                   <CardTitle className="text-base flex items-center gap-2">
-                    <Users className="w-5 h-5 text-blue-600" />
+                    <Users className="w-5 h-5 text-action-600" />
                     2. Toolbox Meeting
                   </CardTitle>
                   <div className="flex gap-2">
-                    <Badge className="bg-blue-600">Team Document</Badge>
+                    <Badge className="bg-action-600">Team Document</Badge>
                     <Badge variant="outline">7-Day Coverage</Badge>
                   </div>
                 </div>
@@ -442,7 +442,7 @@ export default function SafetyGuide() {
 
         {/* CSR Breakdown */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Gauge className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
             Company Safety Rating (CSR) Breakdown
           </h2>
@@ -452,7 +452,7 @@ export default function SafetyGuide() {
 
           <Card className="border-2 border-cyan-500">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg text-center">CSR Calculation Formula</CardTitle>
+              <CardTitle className="text-xl md:text-2xl font-semibold text-center">CSR Calculation Formula</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="bg-muted rounded-lg p-4 text-center">
@@ -477,10 +477,10 @@ export default function SafetyGuide() {
 
                   <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-950 rounded border border-blue-200 dark:border-blue-800">
                     <div className="flex items-center gap-2">
-                      <Users className="w-4 h-4 text-blue-600" />
+                      <Users className="w-4 h-4 text-action-600" />
                       <span className="text-sm font-medium">Toolbox Meeting Coverage</span>
                     </div>
-                    <Badge className="bg-blue-600">Up to 25%</Badge>
+                    <Badge className="bg-action-600">Up to 25%</Badge>
                   </div>
                   <p className="text-xs text-muted-foreground ml-6">Work sessions without meeting coverage within 7-day window</p>
 
@@ -521,7 +521,7 @@ export default function SafetyGuide() {
 
         {/* Digital Signatures */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <PenTool className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             Digital Signature System
           </h2>
@@ -530,7 +530,7 @@ export default function SafetyGuide() {
             <Card>
               <CardContent className="pt-4 text-sm space-y-3">
                 <div className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
                   <div>
                     <p className="font-semibold">Legally Binding</p>
                     <p className="text-muted-foreground">All signatures are captured as base64 data URLs with timestamps, creating an immutable audit trail.</p>
@@ -546,7 +546,7 @@ export default function SafetyGuide() {
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <Download className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Download className="w-5 h-5 text-action-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="font-semibold">PDF Generation</p>
                     <p className="text-muted-foreground">All safety documents can be exported as professional PDFs with embedded signatures for audit purposes.</p>
@@ -571,7 +571,7 @@ export default function SafetyGuide() {
 
         {/* Step-by-Step Workflows */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Zap className="w-5 h-5 text-amber-600 dark:text-amber-400" />
             Step-by-Step Workflows
           </h2>
@@ -699,7 +699,7 @@ export default function SafetyGuide() {
 
         {/* Customer Journeys */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <UserCheck className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             Customer Journeys
           </h2>
@@ -764,7 +764,7 @@ export default function SafetyGuide() {
                     </div>
                   </div>
 
-                  <ArrowRight className="h-5 w-5 text-blue-600 dark:text-blue-400 md:mx-2 rotate-90 md:rotate-0" />
+                  <ArrowRight className="h-5 w-5 text-action-600 dark:text-action-400 md:mx-2 rotate-90 md:rotate-0" />
 
                   <div className="flex flex-col items-center gap-2 flex-1">
                     <div className="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold">2</div>
@@ -774,7 +774,7 @@ export default function SafetyGuide() {
                     </div>
                   </div>
 
-                  <ArrowRight className="h-5 w-5 text-blue-600 dark:text-blue-400 md:mx-2 rotate-90 md:rotate-0" />
+                  <ArrowRight className="h-5 w-5 text-action-600 dark:text-action-400 md:mx-2 rotate-90 md:rotate-0" />
 
                   <div className="flex flex-col items-center gap-2 flex-1">
                     <div className="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold">3</div>
@@ -784,7 +784,7 @@ export default function SafetyGuide() {
                     </div>
                   </div>
 
-                  <ArrowRight className="h-5 w-5 text-blue-600 dark:text-blue-400 md:mx-2 rotate-90 md:rotate-0" />
+                  <ArrowRight className="h-5 w-5 text-action-600 dark:text-action-400 md:mx-2 rotate-90 md:rotate-0" />
 
                   <div className="flex flex-col items-center gap-2 flex-1">
                     <div className="bg-green-600 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold">4</div>
@@ -803,7 +803,7 @@ export default function SafetyGuide() {
 
         {/* Complete Example Scenario */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Activity className="w-5 h-5 text-green-600 dark:text-green-400" />
             Complete Example Scenario
           </h2>
@@ -883,7 +883,7 @@ export default function SafetyGuide() {
 
         {/* Permission Model */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Lock className="w-5 h-5 text-red-600 dark:text-red-400" />
             Permission Model
           </h2>
@@ -913,7 +913,7 @@ export default function SafetyGuide() {
               <CardContent className="pt-4">
                 <div className="flex items-start gap-3">
                   <div className="bg-blue-100 dark:bg-blue-900 rounded-full p-2">
-                    <Gauge className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                    <Gauge className="w-4 h-4 text-action-600 dark:text-action-400" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
@@ -953,7 +953,7 @@ export default function SafetyGuide() {
 
         {/* Key Features Summary */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />
             Key Features Summary
           </h2>
@@ -992,7 +992,7 @@ export default function SafetyGuide() {
             </div>
 
             <div className="flex gap-3">
-              <Download className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+              <Download className="w-5 h-5 text-action-600 dark:text-action-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">PDF Export</p>
                 <p className="text-sm text-muted-foreground">Professional PDFs with embedded signatures for audits.</p>
@@ -1029,7 +1029,7 @@ export default function SafetyGuide() {
 
         {/* Important Notes */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
             Important Technical Notes
           </h2>
@@ -1076,7 +1076,7 @@ export default function SafetyGuide() {
 
         {/* Quick Links */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold">Quick Links</h2>
+          <h2 className="text-3xl md:text-4xl font-bold">Quick Links</h2>
           
           <div className="grid md:grid-cols-2 gap-4">
             <Button 

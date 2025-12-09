@@ -40,7 +40,7 @@ export default function PropertyManagerGuide() {
           <div className="flex items-center gap-3">
             <BackButton to="/changelog" />
             <div>
-              <h1 className="text-xl font-bold">Property Manager Interface Guide</h1>
+              <h1 className="text-2xl md:text-3xl font-bold">Property Manager Interface Guide</h1>
               <p className="text-xs text-muted-foreground">Vendor management and safety compliance viewing</p>
             </div>
           </div>
@@ -52,7 +52,7 @@ export default function PropertyManagerGuide() {
         
         <section className="space-y-4">
           <div>
-            <h2 className="text-2xl font-bold flex items-center gap-2 mb-2">
+            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
               <Building2 className="w-6 h-6 text-teal-600 dark:text-teal-400" />
               Property Manager Interface Overview
             </h2>
@@ -67,14 +67,14 @@ export default function PropertyManagerGuide() {
         <section className="space-y-4">
           <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2 text-amber-900 dark:text-amber-100">
+              <CardTitle className="text-xl md:text-2xl flex items-center gap-2 text-amber-900 dark:text-amber-100">
                 <Eye className="w-5 h-5" />
                 The Golden Rule: Read-Only Access
               </CardTitle>
             </CardHeader>
             <CardContent className="text-amber-900 dark:text-amber-100 space-y-4">
               <div className="bg-white dark:bg-amber-900 rounded-lg p-4 text-center">
-                <p className="text-2xl font-mono font-bold">
+                <p className="text-xl md:text-2xl font-mono font-bold">
                   View Only - No Modifications
                 </p>
               </div>
@@ -121,7 +121,7 @@ export default function PropertyManagerGuide() {
         <section className="space-y-4">
           <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2 text-green-900 dark:text-green-100">
+              <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2 text-green-900 dark:text-green-100">
                 <CheckCircle2 className="w-5 h-5" />
                 Problems Solved
               </CardTitle>
@@ -156,7 +156,7 @@ export default function PropertyManagerGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Layers className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             System Architecture
           </h2>
@@ -165,8 +165,8 @@ export default function PropertyManagerGuide() {
           <div className="space-y-3">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Home className="w-4 h-4 text-blue-600" />
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
+                  <Home className="w-4 h-4 text-action-600" />
                   1. My Vendors Dashboard
                 </CardTitle>
               </CardHeader>
@@ -186,7 +186,7 @@ export default function PropertyManagerGuide() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                   <Star className="w-4 h-4 text-amber-600" />
                   2. Company Safety Rating (CSR)
                 </CardTitle>
@@ -207,7 +207,7 @@ export default function PropertyManagerGuide() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                   <FileText className="w-4 h-4 text-green-600" />
                   3. Read-Only Company View
                 </CardTitle>
@@ -231,17 +231,17 @@ export default function PropertyManagerGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Star className="w-5 h-5 text-amber-600 dark:text-amber-400" />
             Company Safety Rating (CSR) Details
           </h2>
           <p className="text-sm text-muted-foreground">Understanding the penalty-based rating system:</p>
 
-          <Card className="border-l-4 border-l-amber-500">
+          <Card>
             <CardContent className="pt-4 space-y-4">
               <div className="bg-muted p-4 rounded text-sm">
                 <p className="font-semibold mb-2">CSR Calculation Formula:</p>
-                <p className="font-mono text-center text-lg">CSR = 100 - Total Penalties</p>
+                <p className="text-xl md:text-2xl font-mono font-bold text-center">CSR = 100 - Total Penalties</p>
               </div>
 
               <div className="space-y-3">
@@ -287,14 +287,14 @@ export default function PropertyManagerGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Lock className="w-5 h-5 text-red-600 dark:text-red-400" />
             Access Control
           </h2>
           <p className="text-sm text-muted-foreground">Property Manager role and access boundaries:</p>
 
           <div className="space-y-3">
-            <Card className="border-l-4 border-l-teal-500">
+            <Card>
               <CardContent className="pt-4">
                 <div className="flex items-start gap-3">
                   <div className="bg-teal-100 dark:bg-teal-900 rounded-full p-2">
@@ -316,7 +316,7 @@ export default function PropertyManagerGuide() {
               </CardContent>
             </Card>
 
-            <Card className="border-l-4 border-l-gray-500">
+            <Card>
               <CardContent className="pt-4">
                 <div className="flex items-start gap-3">
                   <div className="bg-gray-100 dark:bg-gray-800 rounded-full p-2">
@@ -344,8 +344,8 @@ export default function PropertyManagerGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
-            <Settings className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
+            <Settings className="w-5 h-5 text-action-600 dark:text-action-400" />
             Workflows
           </h2>
 
@@ -354,7 +354,7 @@ export default function PropertyManagerGuide() {
               <CardHeader className="pb-2 bg-muted/50">
                 <div className="flex items-center gap-2">
                   <Badge variant="outline">Workflow 1</Badge>
-                  <CardTitle className="text-base">View Vendor CSR</CardTitle>
+                  <CardTitle className="text-xl md:text-2xl font-semibold">View Vendor CSR</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="pt-4">
@@ -395,7 +395,7 @@ export default function PropertyManagerGuide() {
               <CardHeader className="pb-2 bg-muted/50">
                 <div className="flex items-center gap-2">
                   <Badge variant="outline">Workflow 2</Badge>
-                  <CardTitle className="text-base">Compare Vendors</CardTitle>
+                  <CardTitle className="text-xl md:text-2xl font-semibold">Compare Vendors</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="pt-4">
@@ -430,7 +430,7 @@ export default function PropertyManagerGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Users className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             Customer Journeys
           </h2>
@@ -486,14 +486,14 @@ export default function PropertyManagerGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />
             Key Features Summary
           </h2>
 
           <div className="grid md:grid-cols-2 gap-4">
             <div className="flex gap-3">
-              <Home className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+              <Home className="w-5 h-5 text-action-600 dark:text-action-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">My Vendors Dashboard</p>
                 <p className="text-sm text-muted-foreground">Central hub for all contracted vendors.</p>
@@ -529,7 +529,7 @@ export default function PropertyManagerGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold">Quick Links</h2>
+          <h2 className="text-3xl md:text-4xl font-bold">Quick Links</h2>
           
           <div className="grid md:grid-cols-2 gap-4">
             <Button 

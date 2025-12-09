@@ -42,7 +42,7 @@ export default function DocumentManagementGuide() {
           <div className="flex items-center gap-3">
             <BackButton to="/changelog" />
             <div>
-              <h1 className="text-xl font-bold">Document Management Guide</h1>
+              <h1 className="text-2xl md:text-3xl font-bold">Document Management Guide</h1>
               <p className="text-xs text-muted-foreground">Centralized document storage and compliance tracking</p>
             </div>
           </div>
@@ -54,8 +54,8 @@ export default function DocumentManagementGuide() {
         
         <section className="space-y-4">
           <div>
-            <h2 className="text-2xl font-bold flex items-center gap-2 mb-2">
-              <FileText className="w-6 h-6 text-teal-600 dark:text-teal-400" />
+            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
+              <FileText className="w-6 h-6 text-action-600 dark:text-action-400" />
               Document Management Overview
             </h2>
             <p className="text-muted-foreground">
@@ -69,14 +69,14 @@ export default function DocumentManagementGuide() {
         <section className="space-y-4">
           <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2 text-amber-900 dark:text-amber-100">
+              <CardTitle className="text-xl md:text-2xl flex items-center gap-2 text-amber-900 dark:text-amber-100">
                 <Signature className="w-5 h-5" />
                 The Golden Rule: Signatures Create Accountability
               </CardTitle>
             </CardHeader>
             <CardContent className="text-amber-900 dark:text-amber-100 space-y-4">
               <div className="bg-white dark:bg-amber-900 rounded-lg p-4 text-center">
-                <p className="text-2xl font-mono font-bold">
+                <p className="text-xl md:text-2xl font-mono font-bold">
                   Document + Signature = Compliance Record
                 </p>
               </div>
@@ -107,7 +107,7 @@ export default function DocumentManagementGuide() {
         <section className="space-y-4">
           <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2 text-green-900 dark:text-green-100">
+              <CardTitle className="text-xl md:text-2xl flex items-center gap-2 text-green-900 dark:text-green-100">
                 <CheckCircle2 className="w-5 h-5" />
                 Problems Solved
               </CardTitle>
@@ -142,8 +142,8 @@ export default function DocumentManagementGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
-            <FolderOpen className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
+            <FolderOpen className="w-5 h-5 text-action-600 dark:text-action-400" />
             Document Categories
           </h2>
           <p className="text-muted-foreground text-sm">
@@ -153,8 +153,8 @@ export default function DocumentManagementGuide() {
           <div className="grid gap-4">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <BookOpen className="w-4 h-4 text-blue-600" />
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-action-600" />
                   Health & Safety Manual
                 </CardTitle>
                 <CardDescription>Core safety documentation requiring employee acknowledgment</CardDescription>
@@ -180,7 +180,7 @@ export default function DocumentManagementGuide() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                   <FileCheck className="w-4 h-4 text-purple-600" />
                   Company Policies
                 </CardTitle>
@@ -207,7 +207,7 @@ export default function DocumentManagementGuide() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                   <Lock className="w-4 h-4 text-red-600" />
                   Certificate of Insurance
                 </CardTitle>
@@ -234,7 +234,7 @@ export default function DocumentManagementGuide() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                   <ClipboardCheck className="w-4 h-4 text-orange-600" />
                   Safe Work Procedures
                 </CardTitle>
@@ -261,7 +261,7 @@ export default function DocumentManagementGuide() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                   <Shield className="w-4 h-4 text-green-600" />
                   Safe Work Practices
                 </CardTitle>
@@ -288,7 +288,7 @@ export default function DocumentManagementGuide() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                   <FileWarning className="w-4 h-4 text-amber-600" />
                   Damage Reports
                 </CardTitle>
@@ -318,8 +318,8 @@ export default function DocumentManagementGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
-            <PenTool className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
+            <PenTool className="w-5 h-5 text-action-600 dark:text-action-400" />
             Document Review Workflow
           </h2>
 
@@ -327,7 +327,7 @@ export default function DocumentManagementGuide() {
             <Card className="bg-muted/30">
               <CardContent className="pt-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-teal-100 dark:bg-teal-900 flex items-center justify-center text-teal-600 dark:text-teal-400 font-bold shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-action-100 dark:bg-action-900 flex items-center justify-center text-action-600 dark:text-action-400 font-bold shrink-0">
                     1
                   </div>
                   <div>
@@ -347,7 +347,7 @@ export default function DocumentManagementGuide() {
             <Card className="bg-muted/30">
               <CardContent className="pt-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-teal-100 dark:bg-teal-900 flex items-center justify-center text-teal-600 dark:text-teal-400 font-bold shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-action-100 dark:bg-action-900 flex items-center justify-center text-action-600 dark:text-action-400 font-bold shrink-0">
                     2
                   </div>
                   <div>
@@ -367,7 +367,7 @@ export default function DocumentManagementGuide() {
             <Card className="bg-muted/30">
               <CardContent className="pt-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-teal-100 dark:bg-teal-900 flex items-center justify-center text-teal-600 dark:text-teal-400 font-bold shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-action-100 dark:bg-action-900 flex items-center justify-center text-action-600 dark:text-action-400 font-bold shrink-0">
                     3
                   </div>
                   <div>
@@ -405,15 +405,15 @@ export default function DocumentManagementGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
-            <Download className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
+            <Download className="w-5 h-5 text-action-600 dark:text-action-400" />
             Export & Reporting
           </h2>
 
           <div className="grid md:grid-cols-2 gap-4">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base">Compliance Reports</CardTitle>
+                <CardTitle className="text-xl md:text-2xl font-semibold">Compliance Reports</CardTitle>
               </CardHeader>
               <CardContent className="text-sm space-y-2">
                 <div className="flex items-center gap-2">
@@ -433,7 +433,7 @@ export default function DocumentManagementGuide() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base">Bulk Export</CardTitle>
+                <CardTitle className="text-xl md:text-2xl font-semibold">Bulk Export</CardTitle>
               </CardHeader>
               <CardContent className="text-sm space-y-2">
                 <div className="flex items-center gap-2">
@@ -456,15 +456,15 @@ export default function DocumentManagementGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
-            <Eye className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
+            <Eye className="w-5 h-5 text-action-600 dark:text-action-400" />
             Role-Based Access
           </h2>
 
           <Card className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
             <CardContent className="pt-6">
               <div className="flex items-start gap-3">
-                <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
+                <Info className="w-5 h-5 text-action-600 dark:text-action-400 mt-0.5 shrink-0" />
                 <div className="space-y-3 text-sm">
                   <p className="font-semibold text-blue-900 dark:text-blue-100">
                     Document Visibility Rules
@@ -496,7 +496,7 @@ export default function DocumentManagementGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <CheckCircle2 className="w-5 h-5 text-emerald-600" />
             Quick Reference
           </h2>

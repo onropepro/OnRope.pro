@@ -39,7 +39,7 @@ export default function BrandingGuide() {
           <div className="flex items-center gap-3">
             <BackButton to="/changelog" />
             <div>
-              <h1 className="text-xl font-bold">White-Label Branding Guide</h1>
+              <h1 className="text-2xl md:text-3xl font-bold">White-Label Branding Guide</h1>
               <p className="text-xs text-muted-foreground">Custom logos and brand color customization</p>
             </div>
           </div>
@@ -53,7 +53,7 @@ export default function BrandingGuide() {
         {/* Overview */}
         <section className="space-y-4">
           <div>
-            <h2 className="text-2xl font-bold flex items-center gap-2 mb-2">
+            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
               <Palette className="w-6 h-6 text-sky-600 dark:text-sky-400" />
               White-Label Branding Overview
             </h2>
@@ -69,14 +69,14 @@ export default function BrandingGuide() {
         <section className="space-y-4">
           <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2 text-amber-900 dark:text-amber-100">
+              <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2 text-amber-900 dark:text-amber-100">
                 <CreditCard className="w-5 h-5" />
                 The Golden Rule: Branding Requires Subscription
               </CardTitle>
             </CardHeader>
             <CardContent className="text-amber-900 dark:text-amber-100 space-y-4">
               <div className="bg-white dark:bg-amber-900 rounded-lg p-4 text-center">
-                <p className="text-2xl font-mono font-bold">
+                <p className="text-xl md:text-2xl font-mono font-bold">
                   Active Add-on = Full Customization
                 </p>
               </div>
@@ -123,7 +123,7 @@ export default function BrandingGuide() {
         <section className="space-y-4">
           <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2 text-green-900 dark:text-green-100">
+              <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2 text-green-900 dark:text-green-100">
                 <CheckCircle2 className="w-5 h-5" />
                 Problems Solved
               </CardTitle>
@@ -159,7 +159,7 @@ export default function BrandingGuide() {
 
         {/* Branding Features */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
             What's Included
           </h2>
@@ -168,8 +168,8 @@ export default function BrandingGuide() {
           <div className="grid md:grid-cols-2 gap-4">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Image className="w-4 h-4 text-blue-600" />
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
+                  <Image className="w-4 h-4 text-action-600" />
                   Custom Company Logo
                 </CardTitle>
               </CardHeader>
@@ -180,7 +180,7 @@ export default function BrandingGuide() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                   <Paintbrush className="w-4 h-4 text-purple-600" />
                   Brand Color Palette
                 </CardTitle>
@@ -192,7 +192,7 @@ export default function BrandingGuide() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                   <Monitor className="w-4 h-4 text-green-600" />
                   Global CSS Application
                 </CardTitle>
@@ -204,7 +204,7 @@ export default function BrandingGuide() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                   <FileText className="w-4 h-4 text-orange-600" />
                   PDF Document Branding
                 </CardTitle>
@@ -220,7 +220,7 @@ export default function BrandingGuide() {
 
         {/* Setup Workflow */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Settings className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             Branding Setup Workflow
           </h2>
@@ -312,7 +312,7 @@ export default function BrandingGuide() {
 
         {/* Color Management */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Paintbrush className="w-5 h-5 text-pink-600 dark:text-pink-400" />
             Managing Brand Colors
           </h2>
@@ -370,7 +370,7 @@ export default function BrandingGuide() {
 
         {/* Color Application */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Monitor className="w-5 h-5 text-green-600 dark:text-green-400" />
             Where Colors Apply
           </h2>
@@ -420,14 +420,14 @@ export default function BrandingGuide() {
 
         {/* Subscription Gate */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Lock className="w-5 h-5 text-red-600 dark:text-red-400" />
             Subscription Requirements
           </h2>
           <p className="text-sm text-muted-foreground">White-label branding requires an active subscription add-on:</p>
 
           <div className="space-y-3">
-            <Card className="border-l-4 border-l-green-500">
+            <Card>
               <CardContent className="pt-4">
                 <div className="flex items-start gap-3">
                   <div className="bg-green-100 dark:bg-green-900 rounded-full p-2">
@@ -444,7 +444,7 @@ export default function BrandingGuide() {
               </CardContent>
             </Card>
 
-            <Card className="border-l-4 border-l-gray-400">
+            <Card>
               <CardContent className="pt-4">
                 <div className="flex items-start gap-3">
                   <div className="bg-gray-100 dark:bg-gray-800 rounded-full p-2">
@@ -467,8 +467,8 @@ export default function BrandingGuide() {
 
         {/* Quick Reference */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
-            <Info className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
+            <Info className="w-5 h-5 text-action-600 dark:text-action-400" />
             Quick Reference
           </h2>
 
@@ -520,7 +520,7 @@ export default function BrandingGuide() {
 
         {/* Customer Journeys */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Palette className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             Customer Journeys
           </h2>
@@ -577,14 +577,14 @@ export default function BrandingGuide() {
 
         {/* Key Features Summary */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />
             Key Features Summary
           </h2>
 
           <div className="grid md:grid-cols-2 gap-4">
             <div className="flex gap-3">
-              <Image className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+              <Image className="w-5 h-5 text-action-600 dark:text-action-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Custom Logo</p>
                 <p className="text-sm text-muted-foreground">Upload and display your company logo.</p>
@@ -621,7 +621,7 @@ export default function BrandingGuide() {
 
         {/* Quick Links */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold">Quick Links</h2>
+          <h2 className="text-3xl md:text-4xl font-bold">Quick Links</h2>
           
           <div className="grid md:grid-cols-2 gap-4">
             <Button 

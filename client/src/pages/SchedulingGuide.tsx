@@ -42,7 +42,7 @@ export default function SchedulingGuide() {
           <div className="flex items-center gap-3">
             <BackButton to="/changelog" />
             <div>
-              <h1 className="text-xl font-bold">Scheduling & Time-Off Guide</h1>
+              <h1 className="text-2xl md:text-3xl font-bold">Scheduling & Time-Off Guide</h1>
               <p className="text-xs text-muted-foreground">Calendar management and leave request workflows</p>
             </div>
           </div>
@@ -54,7 +54,7 @@ export default function SchedulingGuide() {
         
         <section className="space-y-4">
           <div>
-            <h2 className="text-2xl font-bold flex items-center gap-2 mb-2">
+            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
               <Calendar className="w-6 h-6 text-orange-600 dark:text-orange-400" />
               Scheduling System Overview
             </h2>
@@ -69,14 +69,14 @@ export default function SchedulingGuide() {
         <section className="space-y-4">
           <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2 text-amber-900 dark:text-amber-100">
+              <CardTitle className="text-xl md:text-2xl flex items-center gap-2 text-amber-900 dark:text-amber-100">
                 <AlertTriangle className="w-5 h-5" />
                 The Golden Rule: Conflicts Block Assignments
               </CardTitle>
             </CardHeader>
             <CardContent className="text-amber-900 dark:text-amber-100 space-y-4">
               <div className="bg-white dark:bg-amber-900 rounded-lg p-4 text-center">
-                <p className="text-2xl font-mono font-bold">
+                <p className="text-xl md:text-2xl font-mono font-bold">
                   One Employee = One Location at a Time
                 </p>
               </div>
@@ -105,7 +105,7 @@ export default function SchedulingGuide() {
         <section className="space-y-4">
           <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2 text-green-900 dark:text-green-100">
+              <CardTitle className="text-xl md:text-2xl flex items-center gap-2 text-green-900 dark:text-green-100">
                 <CheckCircle2 className="w-5 h-5" />
                 Problems Solved
               </CardTitle>
@@ -140,7 +140,7 @@ export default function SchedulingGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Layers className="w-5 h-5 text-orange-600 dark:text-orange-400" />
             Dual Calendar Views
           </h2>
@@ -152,7 +152,7 @@ export default function SchedulingGuide() {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
-                  <CalendarDays className="w-4 h-4 text-blue-600" />
+                  <CalendarDays className="w-4 h-4 text-action-600" />
                   Project Calendar
                 </CardTitle>
                 <CardDescription>View assignments by project</CardDescription>
@@ -210,7 +210,7 @@ export default function SchedulingGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <GripVertical className="w-5 h-5 text-orange-600 dark:text-orange-400" />
             Drag-and-Drop Assignment
           </h2>
@@ -223,7 +223,7 @@ export default function SchedulingGuide() {
                     1
                   </div>
                   <div>
-                    <h3 className="font-semibold">Select Employee</h3>
+                    <h3 className="text-xl md:text-2xl font-semibold">Select Employee</h3>
                     <p className="text-sm text-muted-foreground mt-1">
                       From the employee list panel, click and hold on an employee name to start dragging.
                     </p>
@@ -235,7 +235,7 @@ export default function SchedulingGuide() {
                     2
                   </div>
                   <div>
-                    <h3 className="font-semibold">Drop on Project/Date</h3>
+                    <h3 className="text-xl md:text-2xl font-semibold">Drop on Project/Date</h3>
                     <p className="text-sm text-muted-foreground mt-1">
                       Drag the employee to the project calendar on the desired date. The system highlights valid drop zones.
                     </p>
@@ -247,7 +247,7 @@ export default function SchedulingGuide() {
                     3
                   </div>
                   <div>
-                    <h3 className="font-semibold">Assignment Created</h3>
+                    <h3 className="text-xl md:text-2xl font-semibold">Assignment Created</h3>
                     <p className="text-sm text-muted-foreground mt-1">
                       Release to create the assignment. If conflicts exist, you'll see a warning with options to proceed or cancel.
                     </p>
@@ -261,7 +261,7 @@ export default function SchedulingGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Palmtree className="w-5 h-5 text-orange-600 dark:text-orange-400" />
             Time-Off Request Types
           </h2>
@@ -277,7 +277,7 @@ export default function SchedulingGuide() {
                     <Palmtree className="w-5 h-5 text-green-600 dark:text-green-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Vacation</h3>
+                    <h3 className="text-xl md:text-2xl font-semibold">Vacation</h3>
                     <p className="text-xs text-muted-foreground">Planned time off</p>
                   </div>
                 </div>
@@ -294,7 +294,7 @@ export default function SchedulingGuide() {
                     <Stethoscope className="w-5 h-5 text-red-600 dark:text-red-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Sick Leave</h3>
+                    <h3 className="text-xl md:text-2xl font-semibold">Sick Leave</h3>
                     <p className="text-xs text-muted-foreground">Illness or injury</p>
                   </div>
                 </div>
@@ -307,11 +307,11 @@ export default function SchedulingGuide() {
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                    <CalendarClock className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                  <div className="w-10 h-10 rounded-full bg-action-100 dark:bg-action-900 flex items-center justify-center">
+                    <CalendarClock className="w-5 h-5 text-action-600 dark:text-action-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Personal</h3>
+                    <h3 className="text-xl md:text-2xl font-semibold">Personal</h3>
                     <p className="text-xs text-muted-foreground">Personal matters</p>
                   </div>
                 </div>
@@ -328,7 +328,7 @@ export default function SchedulingGuide() {
                     <Heart className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Bereavement</h3>
+                    <h3 className="text-xl md:text-2xl font-semibold">Bereavement</h3>
                     <p className="text-xs text-muted-foreground">Loss of family member</p>
                   </div>
                 </div>
@@ -345,7 +345,7 @@ export default function SchedulingGuide() {
                     <Stethoscope className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Medical</h3>
+                    <h3 className="text-xl md:text-2xl font-semibold">Medical</h3>
                     <p className="text-xs text-muted-foreground">Medical appointments</p>
                   </div>
                 </div>
@@ -360,7 +360,7 @@ export default function SchedulingGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <RefreshCw className="w-5 h-5 text-orange-600 dark:text-orange-400" />
             Time-Off Request Workflow
           </h2>
@@ -373,7 +373,7 @@ export default function SchedulingGuide() {
                     1
                   </div>
                   <div>
-                    <h3 className="font-semibold flex items-center gap-2">
+                    <h3 className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                       Employee Submits Request
                       <Send className="w-4 h-4 text-muted-foreground" />
                     </h3>
@@ -396,7 +396,7 @@ export default function SchedulingGuide() {
                     2
                   </div>
                   <div>
-                    <h3 className="font-semibold flex items-center gap-2">
+                    <h3 className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                       Request Pending Review
                       <Clock className="w-4 h-4 text-amber-500" />
                     </h3>
@@ -419,7 +419,7 @@ export default function SchedulingGuide() {
                     3
                   </div>
                   <div>
-                    <h3 className="font-semibold flex items-center gap-2">
+                    <h3 className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                       Manager Reviews Request
                       <Eye className="w-4 h-4 text-muted-foreground" />
                     </h3>
@@ -448,7 +448,7 @@ export default function SchedulingGuide() {
                   <div className="flex items-start gap-4">
                     <ThumbsUp className="w-6 h-6 text-emerald-600 dark:text-emerald-400 shrink-0" />
                     <div>
-                      <h3 className="font-semibold text-emerald-900 dark:text-emerald-100">Approved</h3>
+                      <h3 className="text-xl md:text-2xl font-semibold text-emerald-900 dark:text-emerald-100">Approved</h3>
                       <p className="text-sm text-emerald-800 dark:text-emerald-200 mt-1">
                         Time-off is added to calendar. Employee is blocked from scheduling during these dates.
                       </p>
@@ -462,7 +462,7 @@ export default function SchedulingGuide() {
                   <div className="flex items-start gap-4">
                     <XCircle className="w-6 h-6 text-red-600 dark:text-red-400 shrink-0" />
                     <div>
-                      <h3 className="font-semibold text-red-900 dark:text-red-100">Denied</h3>
+                      <h3 className="text-xl md:text-2xl font-semibold text-red-900 dark:text-red-100">Denied</h3>
                       <p className="text-sm text-red-800 dark:text-red-200 mt-1">
                         Employee is notified with reason. They can submit a modified request if desired.
                       </p>
@@ -477,20 +477,20 @@ export default function SchedulingGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <CalendarDays className="w-5 h-5 text-orange-600 dark:text-orange-400" />
             Calendar Color Coding
           </h2>
 
-          <Card className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
+          <Card className="bg-action-50 dark:bg-action-950 border-action-200 dark:border-action-800">
             <CardContent className="pt-6">
               <div className="flex items-start gap-3">
-                <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
+                <Info className="w-5 h-5 text-action-600 dark:text-action-400 mt-0.5 shrink-0" />
                 <div className="space-y-3 text-sm">
-                  <p className="font-semibold text-blue-900 dark:text-blue-100">
+                  <p className="font-semibold text-action-900 dark:text-action-100">
                     Visual Identification System
                   </p>
-                  <div className="space-y-2 text-blue-800 dark:text-blue-200">
+                  <div className="space-y-2 text-action-800 dark:text-action-200">
                     <p>Projects are color-coded for quick identification:</p>
                     <ul className="list-disc list-inside space-y-1 ml-2">
                       <li><strong>Project Colors</strong>: Each project type has a consistent color across all views</li>
@@ -507,7 +507,7 @@ export default function SchedulingGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <CheckCircle2 className="w-5 h-5 text-emerald-600" />
             Quick Reference
           </h2>

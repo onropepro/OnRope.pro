@@ -29,7 +29,8 @@ import {
   Target,
   Calculator,
   ClipboardCheck,
-  Smartphone
+  Smartphone,
+  Key
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -44,7 +45,7 @@ export default function TimeTrackingGuide() {
           <div className="flex items-center gap-3">
             <BackButton to="/changelog" />
             <div>
-              <h1 className="text-xl font-bold">Work Session & Time Tracking Guide</h1>
+              <h1 className="text-2xl md:text-3xl font-bold">Work Session & Time Tracking Guide</h1>
               <p className="text-xs text-muted-foreground">Clock in/out, GPS tracking, and payroll integration</p>
             </div>
           </div>
@@ -56,7 +57,7 @@ export default function TimeTrackingGuide() {
         
         <section className="space-y-4">
           <div>
-            <h2 className="text-2xl font-bold flex items-center gap-2 mb-2">
+            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
               <Clock className="w-6 h-6 text-orange-600 dark:text-orange-400" />
               Work Session Overview
             </h2>
@@ -69,16 +70,16 @@ export default function TimeTrackingGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <Card className="border-2 border-orange-500 bg-orange-50 dark:bg-orange-950">
+          <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2 text-orange-900 dark:text-orange-100">
-                <Shield className="w-5 h-5" />
+              <CardTitle className="text-xl md:text-2xl flex items-center gap-2 text-amber-900 dark:text-amber-100">
+                <Key className="w-5 h-5" />
                 The Golden Rule: Inspection Before Work
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-orange-900 dark:text-orange-100 space-y-4">
-              <div className="bg-white dark:bg-orange-900 rounded-lg p-4 text-center">
-                <p className="text-xl font-mono font-bold">
+            <CardContent className="text-amber-900 dark:text-amber-100 space-y-4">
+              <div className="bg-white dark:bg-amber-900 rounded-lg p-4 text-center">
+                <p className="text-xl md:text-2xl font-mono font-bold">
                   Harness Inspection Required Before Clock-In
                 </p>
               </div>
@@ -95,19 +96,18 @@ export default function TimeTrackingGuide() {
                     <span>Redirected to complete harness inspection form first.</span>
                   </div>
                   <div className="flex items-start gap-2">
-                    <Badge variant="outline" className="shrink-0 mt-0.5 border-orange-600 text-orange-900 dark:text-orange-100">Not Applicable</Badge>
+                    <Badge variant="outline" className="shrink-0 mt-0.5 border-amber-600 text-amber-900 dark:text-amber-100">Not Applicable</Badge>
                     <span>For non-rope-access work (ground tasks, office work, equipment transport). Records N/A status and proceeds.</span>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-orange-100 dark:bg-orange-800 rounded-lg p-3 text-sm space-y-2">
+              <div className="bg-amber-100 dark:bg-amber-800 rounded-lg p-3 text-sm">
                 <p className="font-semibold flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4" />
+                  <Info className="w-4 h-4" />
                   Honor System with Auditing
                 </p>
-                <p>Employees can select "Yes" even without completing an inspection, but the system knows. The inspection database is checked independently, and any discrepancy (claiming "Yes" without a matching inspection record) is reflected in the Company Safety Rating (CSR).</p>
-                <p className="text-xs mt-2"><strong>Result:</strong> Honest employees build trust. Dishonest answers create an audit trail that affects company compliance scores visible to property managers.</p>
+                <p className="mt-1">Employees can select "Yes" even without completing an inspection, but the system knows. The inspection database is checked independently, and any discrepancy (claiming "Yes" without a matching inspection record) is reflected in the Company Safety Rating (CSR). Honest employees build trust. Dishonest answers create an audit trail that affects company compliance scores visible to property managers.</p>
               </div>
             </CardContent>
           </Card>
@@ -119,7 +119,7 @@ export default function TimeTrackingGuide() {
         <section className="space-y-4">
           <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2 text-green-900 dark:text-green-100">
+              <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2 text-green-900 dark:text-green-100">
                 <CheckCircle2 className="w-5 h-5" />
                 Problems Solved
               </CardTitle>
@@ -154,7 +154,7 @@ export default function TimeTrackingGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Play className="w-5 h-5 text-green-600 dark:text-green-400" />
             Starting a Work Session (Clock In)
           </h2>
@@ -177,7 +177,7 @@ export default function TimeTrackingGuide() {
                   <p className="font-semibold">Data Captured:</p>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 p-2 bg-muted rounded">
-                      <Clock className="w-4 h-4 text-blue-600" />
+                      <Clock className="w-4 h-4 text-action-600" />
                       <div>
                         <p className="font-medium text-xs">Start Time</p>
                         <p className="text-xs text-muted-foreground">Precise timestamp</p>
@@ -215,16 +215,16 @@ export default function TimeTrackingGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Square className="w-5 h-5 text-red-600 dark:text-red-400" />
             Ending a Work Session (Clock Out)
           </h2>
 
           <div className="space-y-4">
-            <Card className="border-l-4 border-l-blue-500">
+            <Card>
               <CardHeader className="pb-2">
                 <div className="flex items-center gap-2">
-                  <Badge className="bg-blue-600">Drop-Based Jobs</Badge>
+                  <Badge className="bg-action-600">Drop-Based Jobs</Badge>
                   <CardTitle className="text-base">End Day Form</CardTitle>
                 </div>
               </CardHeader>
@@ -263,7 +263,7 @@ export default function TimeTrackingGuide() {
               </CardContent>
             </Card>
 
-            <Card className="border-l-4 border-l-green-500">
+            <Card>
               <CardHeader className="pb-2">
                 <div className="flex items-center gap-2">
                   <Badge className="bg-green-600">Hours-Based Jobs</Badge>
@@ -318,7 +318,7 @@ export default function TimeTrackingGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Calculator className="w-5 h-5 text-purple-600 dark:text-purple-400" />
             Hours Calculation & Overtime
           </h2>
@@ -367,7 +367,7 @@ export default function TimeTrackingGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <DollarSign className="w-5 h-5 text-green-600 dark:text-green-400" />
             Payroll Integration
           </h2>
@@ -424,8 +424,8 @@ export default function TimeTrackingGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
-            <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
+            <Users className="w-5 h-5 text-action-600 dark:text-action-400" />
             Active Workers Tracking
           </h2>
 
@@ -483,7 +483,7 @@ export default function TimeTrackingGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <ClipboardCheck className="w-5 h-5 text-teal-600 dark:text-teal-400" />
             IRATA Hours Logging
           </h2>
@@ -527,7 +527,7 @@ export default function TimeTrackingGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <BarChart3 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             Session Editing (Manager Override)
           </h2>
@@ -572,7 +572,7 @@ export default function TimeTrackingGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Zap className="w-5 h-5 text-amber-600 dark:text-amber-400" />
             Session Workflow Summary
           </h2>
@@ -593,8 +593,8 @@ export default function TimeTrackingGuide() {
             </div>
             <ArrowRight className="w-5 h-5 text-muted-foreground flex-shrink-0 rotate-90 md:rotate-0" />
             <div className="flex flex-col items-center min-w-[90px]">
-              <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-2">
-                <Clock className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 rounded-full bg-action-100 dark:bg-action-900 flex items-center justify-center mb-2">
+                <Clock className="w-6 h-6 text-action-600" />
               </div>
               <p className="text-xs font-semibold text-center">Work Session</p>
             </div>
@@ -625,7 +625,7 @@ export default function TimeTrackingGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />
             Quick Reference: Session Data Fields
           </h2>

@@ -43,7 +43,7 @@ export default function EmployeeManagementGuide() {
           <div className="flex items-center gap-3">
             <BackButton to="/changelog" />
             <div>
-              <h1 className="text-xl font-bold">Employee Management Guide</h1>
+              <h1 className="text-2xl md:text-3xl font-bold">Employee Management Guide</h1>
               <p className="text-xs text-muted-foreground">Workforce administration and certification tracking</p>
             </div>
           </div>
@@ -55,7 +55,7 @@ export default function EmployeeManagementGuide() {
         
         <section className="space-y-4">
           <div>
-            <h2 className="text-2xl font-bold flex items-center gap-2 mb-2">
+            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
               <Users className="w-6 h-6 text-cyan-600 dark:text-cyan-400" />
               Employee Management Overview
             </h2>
@@ -70,14 +70,14 @@ export default function EmployeeManagementGuide() {
         <section className="space-y-4">
           <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2 text-amber-900 dark:text-amber-100">
+              <CardTitle className="text-xl md:text-2xl flex items-center gap-2 text-amber-900 dark:text-amber-100">
                 <Award className="w-5 h-5" />
                 The Golden Rule: Certifications Drive Compliance
               </CardTitle>
             </CardHeader>
             <CardContent className="text-amber-900 dark:text-amber-100 space-y-4">
               <div className="bg-white dark:bg-amber-900 rounded-lg p-4 text-center">
-                <p className="text-2xl font-mono font-bold">
+                <p className="text-xl md:text-2xl font-mono font-bold">
                   Expired Cert = Work Restriction
                 </p>
               </div>
@@ -126,7 +126,7 @@ export default function EmployeeManagementGuide() {
         <section className="space-y-4">
           <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2 text-green-900 dark:text-green-100">
+              <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2 text-green-900 dark:text-green-100">
                 <CheckCircle2 className="w-5 h-5" />
                 Problems Solved
               </CardTitle>
@@ -161,7 +161,7 @@ export default function EmployeeManagementGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <UserPlus className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
             Adding New Employees
           </h2>
@@ -174,7 +174,7 @@ export default function EmployeeManagementGuide() {
                     1
                   </div>
                   <div>
-                    <h3 className="font-semibold">Basic Information</h3>
+                    <h3 className="text-xl md:text-2xl font-semibold">Basic Information</h3>
                     <p className="text-sm text-muted-foreground mt-1">
                       Enter employee name, email address, and phone number. The email will be used for login credentials.
                     </p>
@@ -194,7 +194,7 @@ export default function EmployeeManagementGuide() {
                     2
                   </div>
                   <div>
-                    <h3 className="font-semibold">Role Assignment</h3>
+                    <h3 className="text-xl md:text-2xl font-semibold">Role Assignment</h3>
                     <p className="text-sm text-muted-foreground mt-1">
                       Select the employee's role: Rope Access Technician, Supervisor, or Operations Manager. This determines their system permissions and dashboard access.
                     </p>
@@ -214,7 +214,7 @@ export default function EmployeeManagementGuide() {
                     3
                   </div>
                   <div>
-                    <h3 className="font-semibold">Certification Details</h3>
+                    <h3 className="text-xl md:text-2xl font-semibold">Certification Details</h3>
                     <p className="text-sm text-muted-foreground mt-1">
                       Enter IRATA certification level (1, 2, or 3) and expiration date. Optionally add driver's license information for vehicle assignments.
                     </p>
@@ -234,7 +234,7 @@ export default function EmployeeManagementGuide() {
                     4
                   </div>
                   <div>
-                    <h3 className="font-semibold">Compensation Setup</h3>
+                    <h3 className="text-xl md:text-2xl font-semibold">Compensation Setup</h3>
                     <p className="text-sm text-muted-foreground mt-1">
                       Configure hourly rate for payroll calculations. Toggle between hourly and peace work compensation types as needed.
                     </p>
@@ -254,7 +254,7 @@ export default function EmployeeManagementGuide() {
                     5
                   </div>
                   <div>
-                    <h3 className="font-semibold">Employee Created</h3>
+                    <h3 className="text-xl md:text-2xl font-semibold">Employee Created</h3>
                     <p className="text-sm text-muted-foreground mt-1">
                       The employee receives login credentials and can access the system based on their assigned role. They'll appear in scheduling and assignment lists.
                     </p>
@@ -268,7 +268,7 @@ export default function EmployeeManagementGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <BadgeCheck className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
             Employee Profile Fields
           </h2>
@@ -279,8 +279,8 @@ export default function EmployeeManagementGuide() {
           <div className="grid md:grid-cols-2 gap-4">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <UserCheck className="w-4 h-4 text-blue-600" />
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
+                  <UserCheck className="w-4 h-4 text-action-600" />
                   Personal Information
                 </CardTitle>
               </CardHeader>
@@ -302,7 +302,7 @@ export default function EmployeeManagementGuide() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                   <Award className="w-4 h-4 text-purple-600" />
                   Certifications
                 </CardTitle>
@@ -325,7 +325,7 @@ export default function EmployeeManagementGuide() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                   <Heart className="w-4 h-4 text-red-600" />
                   Emergency Contact
                 </CardTitle>
@@ -348,7 +348,7 @@ export default function EmployeeManagementGuide() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                   <DollarSign className="w-4 h-4 text-green-600" />
                   Compensation
                 </CardTitle>
@@ -374,7 +374,7 @@ export default function EmployeeManagementGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Shield className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
             Role Hierarchy & Permissions
           </h2>
@@ -399,7 +399,7 @@ export default function EmployeeManagementGuide() {
                 </div>
 
                 <div className="flex items-start gap-4 p-3 rounded-lg bg-muted/50">
-                  <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 shrink-0">Supervisor</Badge>
+                  <Badge className="bg-action-100 text-action-800 dark:bg-action-900 dark:text-action-200 shrink-0">Supervisor</Badge>
                   <div className="text-sm">
                     <p className="font-medium">Team oversight</p>
                     <p className="text-muted-foreground">Project management, scheduling, safety forms, and team coordination. Limited employee management.</p>
@@ -421,7 +421,7 @@ export default function EmployeeManagementGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Settings className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
             Administrative Actions
           </h2>
@@ -429,7 +429,7 @@ export default function EmployeeManagementGuide() {
           <div className="grid md:grid-cols-2 gap-4">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                   <Key className="w-4 h-4 text-amber-600" />
                   Password Reset
                 </CardTitle>
@@ -446,7 +446,7 @@ export default function EmployeeManagementGuide() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                   <UserX className="w-4 h-4 text-red-600" />
                   Employee Termination
                 </CardTitle>
@@ -462,15 +462,15 @@ export default function EmployeeManagementGuide() {
             </Card>
           </div>
 
-          <Card className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
+          <Card className="bg-action-50 dark:bg-action-950 border-action-200 dark:border-action-800">
             <CardContent className="pt-6">
               <div className="flex items-start gap-3">
-                <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
+                <Info className="w-5 h-5 text-action-600 dark:text-action-400 mt-0.5 shrink-0" />
                 <div className="space-y-2 text-sm">
-                  <p className="font-semibold text-blue-900 dark:text-blue-100">
+                  <p className="font-semibold text-action-900 dark:text-action-100">
                     Data Preservation Policy
                   </p>
-                  <p className="text-blue-800 dark:text-blue-200">
+                  <p className="text-action-800 dark:text-action-200">
                     When an employee is terminated, their account is deactivated but all associated records are preserved. This includes work sessions, safety form submissions, equipment assignments, and payroll history. This ensures compliance with regulatory requirements and maintains accurate historical records.
                   </p>
                 </div>
@@ -482,7 +482,7 @@ export default function EmployeeManagementGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <CheckCircle2 className="w-5 h-5 text-emerald-600" />
             Quick Reference
           </h2>

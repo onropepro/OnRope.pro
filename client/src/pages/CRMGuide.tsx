@@ -41,7 +41,7 @@ export default function CRMGuide() {
           <div className="flex items-center gap-3">
             <BackButton to="/changelog" />
             <div>
-              <h1 className="text-xl font-bold">Client Relationship Management Guide</h1>
+              <h1 className="text-2xl md:text-3xl font-bold">Client Relationship Management Guide</h1>
               <p className="text-xs text-muted-foreground">Managing clients, buildings, and property relationships</p>
             </div>
           </div>
@@ -55,8 +55,8 @@ export default function CRMGuide() {
         {/* Overview */}
         <section className="space-y-4">
           <div>
-            <h2 className="text-2xl font-bold flex items-center gap-2 mb-2">
-              <Users className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
+              <Users className="w-6 h-6 text-action-600 dark:text-action-400" />
               Client Management Overview
             </h2>
             <p className="text-muted-foreground">
@@ -71,14 +71,14 @@ export default function CRMGuide() {
         <section className="space-y-4">
           <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2 text-amber-900 dark:text-amber-100">
+              <CardTitle className="text-xl md:text-2xl flex items-center gap-2 text-amber-900 dark:text-amber-100">
                 <Database className="w-5 h-5" />
                 The Golden Rule: Clients Carry Building Data
               </CardTitle>
             </CardHeader>
             <CardContent className="text-amber-900 dark:text-amber-100 space-y-4">
               <div className="bg-white dark:bg-amber-900 rounded-lg p-4 text-center">
-                <p className="text-2xl font-mono font-bold">
+                <p className="text-xl md:text-2xl font-mono font-bold">
                   One Client = Multiple Buildings
                 </p>
               </div>
@@ -125,7 +125,7 @@ export default function CRMGuide() {
         <section className="space-y-4">
           <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2 text-green-900 dark:text-green-100">
+              <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2 text-green-900 dark:text-green-100">
                 <CheckCircle2 className="w-5 h-5" />
                 Problems Solved
               </CardTitle>
@@ -161,7 +161,7 @@ export default function CRMGuide() {
 
         {/* Client Data Structure */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Layers className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             Client Data Structure
           </h2>
@@ -170,8 +170,8 @@ export default function CRMGuide() {
           <div className="space-y-3">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Users className="w-4 h-4 text-blue-600" />
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
+                  <Users className="w-4 h-4 text-action-600" />
                   Contact Information
                 </CardTitle>
               </CardHeader>
@@ -203,7 +203,7 @@ export default function CRMGuide() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                   <Building2 className="w-4 h-4 text-green-600" />
                   LMS Numbers (Building Portfolio)
                 </CardTitle>
@@ -232,7 +232,7 @@ export default function CRMGuide() {
 
         {/* Client Creation Workflow */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <UserPlus className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
             Adding a New Client
           </h2>
@@ -241,7 +241,7 @@ export default function CRMGuide() {
             <Card className="bg-muted/30">
               <CardContent className="pt-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-action-100 dark:bg-action-900 flex items-center justify-center text-action-600 dark:text-action-400 font-bold shrink-0">
                     1
                   </div>
                   <div>
@@ -261,7 +261,7 @@ export default function CRMGuide() {
             <Card className="bg-muted/30">
               <CardContent className="pt-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-action-100 dark:bg-action-900 flex items-center justify-center text-action-600 dark:text-action-400 font-bold shrink-0">
                     2
                   </div>
                   <div>
@@ -281,7 +281,7 @@ export default function CRMGuide() {
             <Card className="bg-muted/30">
               <CardContent className="pt-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-action-100 dark:bg-action-900 flex items-center justify-center text-action-600 dark:text-action-400 font-bold shrink-0">
                     3
                   </div>
                   <div>
@@ -318,7 +318,7 @@ export default function CRMGuide() {
 
         {/* Autofill Feature */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Zap className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
             Autofill Intelligence
           </h2>
@@ -392,18 +392,18 @@ export default function CRMGuide() {
 
         {/* Permission Hierarchy */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Lock className="w-5 h-5 text-red-600 dark:text-red-400" />
             Permission Requirements
           </h2>
           <p className="text-sm text-muted-foreground">Access to CRM features requires specific permissions:</p>
 
           <div className="space-y-3">
-            <Card className="border-l-4 border-l-blue-500">
+            <Card>
               <CardContent className="pt-4">
                 <div className="flex items-start gap-3">
-                  <div className="bg-blue-100 dark:bg-blue-900 rounded-full p-2">
-                    <Eye className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  <div className="bg-action-100 dark:bg-action-900 rounded-full p-2">
+                    <Eye className="w-4 h-4 text-action-600 dark:text-action-400" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
@@ -416,7 +416,7 @@ export default function CRMGuide() {
               </CardContent>
             </Card>
 
-            <Card className="border-l-4 border-l-green-500">
+            <Card>
               <CardContent className="pt-4">
                 <div className="flex items-start gap-3">
                   <div className="bg-green-100 dark:bg-green-900 rounded-full p-2">
@@ -439,8 +439,8 @@ export default function CRMGuide() {
 
         {/* Quick Reference */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
-            <Info className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
+            <Info className="w-5 h-5 text-action-600 dark:text-action-400" />
             Quick Reference
           </h2>
 
@@ -497,7 +497,7 @@ export default function CRMGuide() {
 
         {/* Customer Journeys */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Users className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             Customer Journeys
           </h2>
@@ -515,7 +515,7 @@ export default function CRMGuide() {
                     </div>
                   </div>
 
-                  <ArrowRight className="h-5 w-5 text-blue-600 dark:text-blue-400 md:mx-2 rotate-90 md:rotate-0" />
+                  <ArrowRight className="h-5 w-5 text-action-600 dark:text-action-400 md:mx-2 rotate-90 md:rotate-0" />
 
                   <div className="flex flex-col items-center gap-2 flex-1">
                     <div className="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold">2</div>
@@ -525,7 +525,7 @@ export default function CRMGuide() {
                     </div>
                   </div>
 
-                  <ArrowRight className="h-5 w-5 text-blue-600 dark:text-blue-400 md:mx-2 rotate-90 md:rotate-0" />
+                  <ArrowRight className="h-5 w-5 text-action-600 dark:text-action-400 md:mx-2 rotate-90 md:rotate-0" />
 
                   <div className="flex flex-col items-center gap-2 flex-1">
                     <div className="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold">3</div>
@@ -535,7 +535,7 @@ export default function CRMGuide() {
                     </div>
                   </div>
 
-                  <ArrowRight className="h-5 w-5 text-blue-600 dark:text-blue-400 md:mx-2 rotate-90 md:rotate-0" />
+                  <ArrowRight className="h-5 w-5 text-action-600 dark:text-action-400 md:mx-2 rotate-90 md:rotate-0" />
 
                   <div className="flex flex-col items-center gap-2 flex-1">
                     <div className="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold">4</div>
@@ -554,14 +554,14 @@ export default function CRMGuide() {
 
         {/* Key Features Summary */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />
             Key Features Summary
           </h2>
 
           <div className="grid md:grid-cols-2 gap-4">
             <div className="flex gap-3">
-              <Building2 className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+              <Building2 className="w-5 h-5 text-action-600 dark:text-action-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Multi-Building Support</p>
                 <p className="text-sm text-muted-foreground">One client can manage unlimited buildings.</p>
@@ -598,7 +598,7 @@ export default function CRMGuide() {
 
         {/* Quick Links */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold">Quick Links</h2>
+          <h2 className="text-3xl md:text-4xl font-bold">Quick Links</h2>
           
           <div className="grid md:grid-cols-2 gap-4">
             <Button 

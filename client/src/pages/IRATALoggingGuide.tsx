@@ -39,7 +39,7 @@ export default function IRATALoggingGuide() {
           <div className="flex items-center gap-3">
             <BackButton to="/changelog" />
             <div>
-              <h1 className="text-xl font-bold">IRATA Task Logging Guide</h1>
+              <h1 className="text-2xl md:text-3xl font-bold">IRATA Task Logging Guide</h1>
               <p className="text-xs text-muted-foreground">Track rope access hours for certification progression</p>
             </div>
           </div>
@@ -51,7 +51,7 @@ export default function IRATALoggingGuide() {
         
         <section className="space-y-4">
           <div>
-            <h2 className="text-2xl font-bold flex items-center gap-2 mb-2">
+            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
               <ClipboardCheck className="w-6 h-6 text-purple-600 dark:text-purple-400" />
               IRATA Task Logging Overview
             </h2>
@@ -66,19 +66,19 @@ export default function IRATALoggingGuide() {
         <section className="space-y-4">
           <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2 text-amber-900 dark:text-amber-100">
+              <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2 text-amber-900 dark:text-amber-100">
                 <Award className="w-5 h-5" />
                 The Golden Rule: Hours Build Your IRATA Portfolio
               </CardTitle>
             </CardHeader>
             <CardContent className="text-amber-900 dark:text-amber-100 space-y-4">
               <div className="bg-white dark:bg-amber-900 rounded-lg p-4 text-center">
-                <p className="text-2xl font-mono font-bold">
+                <p className="text-xl md:text-2xl font-mono font-bold">
                   Total Hours = Baseline + Logged Sessions
                 </p>
               </div>
               
-              <div className="space-y-2 text-sm">
+              <div className="space-y-2 text-base">
                 <p><strong>Your IRATA hours accumulate automatically.</strong> The system tracks:</p>
                 <ul className="list-disc list-inside space-y-1 ml-2">
                   <li><strong>Baseline Hours</strong>: Pre-existing logbook hours you enter manually</li>
@@ -121,7 +121,7 @@ export default function IRATALoggingGuide() {
         <section className="space-y-4">
           <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2 text-green-900 dark:text-green-100">
+              <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2 text-green-900 dark:text-green-100">
                 <CheckCircle2 className="w-5 h-5" />
                 Problems Solved
               </CardTitle>
@@ -156,7 +156,7 @@ export default function IRATALoggingGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <ListChecks className="w-5 h-5 text-purple-600 dark:text-purple-400" />
             Rope Access Task Types
           </h2>
@@ -167,8 +167,8 @@ export default function IRATALoggingGuide() {
           <div className="grid md:grid-cols-2 gap-4">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Target className="w-4 h-4 text-blue-600" />
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
+                  <Target className="w-4 h-4 text-action-600 dark:text-action-400" />
                   Movement & Positioning
                 </CardTitle>
               </CardHeader>
@@ -202,7 +202,7 @@ export default function IRATALoggingGuide() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                   <Target className="w-4 h-4 text-orange-600" />
                   Rigging & Setup
                 </CardTitle>
@@ -233,7 +233,7 @@ export default function IRATALoggingGuide() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                   <Target className="w-4 h-4 text-red-600" />
                   Rescue & Emergency
                 </CardTitle>
@@ -260,7 +260,7 @@ export default function IRATALoggingGuide() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                   <Target className="w-4 h-4 text-green-600" />
                   Work Tasks
                 </CardTitle>
@@ -294,7 +294,7 @@ export default function IRATALoggingGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Timer className="w-5 h-5 text-purple-600 dark:text-purple-400" />
             How Task Logging Works
           </h2>
@@ -307,7 +307,7 @@ export default function IRATALoggingGuide() {
                     1
                   </div>
                   <div>
-                    <h3 className="font-semibold">Complete Your Work Session</h3>
+                    <h3 className="text-xl md:text-2xl font-semibold">Complete Your Work Session</h3>
                     <p className="text-sm text-muted-foreground mt-1">
                       Clock in, perform your rope access work, and end your session normally through the standard workflow.
                     </p>
@@ -327,7 +327,7 @@ export default function IRATALoggingGuide() {
                     2
                   </div>
                   <div>
-                    <h3 className="font-semibold">Task Selection Dialog Appears</h3>
+                    <h3 className="text-xl md:text-2xl font-semibold">Task Selection Dialog Appears</h3>
                     <p className="text-sm text-muted-foreground mt-1">
                       After ending your session, a dialog prompts you to select which rope access tasks you performed. This only appears for IRATA-certified technicians.
                     </p>
@@ -347,7 +347,7 @@ export default function IRATALoggingGuide() {
                     3
                   </div>
                   <div>
-                    <h3 className="font-semibold">Select Tasks & Allocate Hours</h3>
+                    <h3 className="text-xl md:text-2xl font-semibold">Select Tasks & Allocate Hours</h3>
                     <p className="text-sm text-muted-foreground mt-1">
                       Choose the task types you performed and distribute your session hours across them. The system validates that hours don't exceed the session duration.
                     </p>
@@ -367,7 +367,7 @@ export default function IRATALoggingGuide() {
                     4
                   </div>
                   <div>
-                    <h3 className="font-semibold">Hours Added to Your Portfolio</h3>
+                    <h3 className="text-xl md:text-2xl font-semibold">Hours Added to Your Portfolio</h3>
                     <p className="text-sm text-muted-foreground mt-1">
                       Your logged hours are automatically added to your IRATA portfolio. View your complete history on the "My Logged Hours" page.
                     </p>
@@ -381,7 +381,7 @@ export default function IRATALoggingGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <History className="w-5 h-5 text-purple-600 dark:text-purple-400" />
             My Logged Hours Page
           </h2>
@@ -392,7 +392,7 @@ export default function IRATALoggingGuide() {
           <div className="grid md:grid-cols-2 gap-4">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base">Statistics Overview</CardTitle>
+                <CardTitle className="text-xl md:text-2xl font-semibold">Statistics Overview</CardTitle>
               </CardHeader>
               <CardContent className="text-sm space-y-2">
                 <div className="flex items-center gap-2">
@@ -412,7 +412,7 @@ export default function IRATALoggingGuide() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base">History Features</CardTitle>
+                <CardTitle className="text-xl md:text-2xl font-semibold">History Features</CardTitle>
               </CardHeader>
               <CardContent className="text-sm space-y-2">
                 <div className="flex items-center gap-2">
@@ -435,23 +435,23 @@ export default function IRATALoggingGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <BookOpen className="w-5 h-5 text-purple-600 dark:text-purple-400" />
             Baseline Hours Entry
           </h2>
 
-          <Card className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
+          <Card className="bg-action-50 dark:bg-action-950 border-action-200 dark:border-action-800">
             <CardContent className="pt-6">
               <div className="flex items-start gap-3">
-                <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
+                <Info className="w-5 h-5 text-action-600 dark:text-action-400 mt-0.5 shrink-0" />
                 <div className="space-y-2 text-sm">
-                  <p className="font-semibold text-blue-900 dark:text-blue-100">
+                  <p className="font-semibold text-action-900 dark:text-action-100">
                     Already Have IRATA Experience?
                   </p>
-                  <p className="text-blue-800 dark:text-blue-200">
+                  <p className="text-action-800 dark:text-action-200">
                     If you have pre-existing hours in your IRATA logbook from previous employment, you can enter these as baseline hours. This ensures your total portfolio reflects your complete career experience.
                   </p>
-                  <p className="text-blue-800 dark:text-blue-200">
+                  <p className="text-action-800 dark:text-action-200">
                     Access baseline hour entry from the "My Logged Hours" page. Once entered, these hours combine with your new logged sessions for accurate certification tracking.
                   </p>
                 </div>
@@ -463,7 +463,7 @@ export default function IRATALoggingGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <CheckCircle2 className="w-5 h-5 text-emerald-600" />
             Quick Reference
           </h2>

@@ -40,7 +40,7 @@ export default function PlatformAdminGuide() {
           <div className="flex items-center gap-3">
             <BackButton to="/changelog" />
             <div>
-              <h1 className="text-xl font-bold">Platform Administration Guide</h1>
+              <h1 className="text-2xl md:text-3xl font-bold">Platform Administration Guide</h1>
               <p className="text-xs text-muted-foreground">SuperUser management and platform oversight</p>
             </div>
           </div>
@@ -52,7 +52,7 @@ export default function PlatformAdminGuide() {
         
         <section className="space-y-4">
           <div>
-            <h2 className="text-2xl font-bold flex items-center gap-2 mb-2">
+            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
               <Crown className="w-6 h-6 text-amber-600 dark:text-amber-400" />
               Platform Administration Overview
             </h2>
@@ -67,14 +67,14 @@ export default function PlatformAdminGuide() {
         <section className="space-y-4">
           <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2 text-amber-900 dark:text-amber-100">
+              <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2 text-amber-900 dark:text-amber-100">
                 <Crown className="w-5 h-5" />
                 The Golden Rule: SuperUser Separation
               </CardTitle>
             </CardHeader>
             <CardContent className="text-amber-900 dark:text-amber-100 space-y-4">
               <div className="bg-white dark:bg-amber-900 rounded-lg p-4 text-center">
-                <p className="text-2xl font-mono font-bold">
+                <p className="text-xl md:text-2xl font-mono font-bold">
                   SuperUser ≠ Company User
                 </p>
               </div>
@@ -121,7 +121,7 @@ export default function PlatformAdminGuide() {
         <section className="space-y-4">
           <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2 text-green-900 dark:text-green-100">
+              <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2 text-green-900 dark:text-green-100">
                 <CheckCircle2 className="w-5 h-5" />
                 Problems Solved
               </CardTitle>
@@ -156,7 +156,7 @@ export default function PlatformAdminGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Layers className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             System Architecture
           </h2>
@@ -165,8 +165,8 @@ export default function PlatformAdminGuide() {
           <div className="space-y-3">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Building2 className="w-4 h-4 text-blue-600" />
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
+                  <Building2 className="w-4 h-4 text-action-600" />
                   1. Company Registry
                 </CardTitle>
               </CardHeader>
@@ -186,7 +186,7 @@ export default function PlatformAdminGuide() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                   <Key className="w-4 h-4 text-green-600" />
                   2. License Management
                 </CardTitle>
@@ -207,7 +207,7 @@ export default function PlatformAdminGuide() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                   <Activity className="w-4 h-4 text-purple-600" />
                   3. Platform Metrics
                 </CardTitle>
@@ -231,14 +231,14 @@ export default function PlatformAdminGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Lock className="w-5 h-5 text-red-600 dark:text-red-400" />
             Access Hierarchy
           </h2>
           <p className="text-sm text-muted-foreground">Platform administration uses a strict access model:</p>
 
           <div className="space-y-3">
-            <Card className="border-l-4 border-l-amber-500">
+            <Card>
               <CardContent className="pt-4">
                 <div className="flex items-start gap-3">
                   <div className="bg-amber-100 dark:bg-amber-900 rounded-full p-2">
@@ -261,11 +261,11 @@ export default function PlatformAdminGuide() {
               </CardContent>
             </Card>
 
-            <Card className="border-l-4 border-l-blue-500">
+            <Card>
               <CardContent className="pt-4">
                 <div className="flex items-start gap-3">
-                  <div className="bg-blue-100 dark:bg-blue-900 rounded-full p-2">
-                    <Building2 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  <div className="bg-action-100 dark:bg-action-900 rounded-full p-2">
+                    <Building2 className="w-4 h-4 text-action-600 dark:text-action-400" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
@@ -278,7 +278,7 @@ export default function PlatformAdminGuide() {
               </CardContent>
             </Card>
 
-            <Card className="border-l-4 border-l-gray-500">
+            <Card>
               <CardContent className="pt-4">
                 <div className="flex items-start gap-3">
                   <div className="bg-gray-100 dark:bg-gray-800 rounded-full p-2">
@@ -300,8 +300,8 @@ export default function PlatformAdminGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
-            <Settings className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
+            <Settings className="w-5 h-5 text-action-600 dark:text-action-400" />
             Workflows
           </h2>
 
@@ -427,14 +427,14 @@ export default function PlatformAdminGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Users className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             Customer Journeys
           </h2>
 
           <div className="space-y-6">
             <div className="space-y-3">
-              <h3 className="font-semibold text-sm text-amber-700 dark:text-amber-300">SuperUser Journey</h3>
+              <h3 className="text-xl md:text-2xl font-semibold text-amber-700 dark:text-amber-300">SuperUser Journey</h3>
               <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950 dark:to-orange-950 rounded-lg p-6 border border-amber-200 dark:border-amber-800">
                 <div className="flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-0">
                   <div className="flex flex-col items-center gap-2 flex-1">
@@ -483,14 +483,14 @@ export default function PlatformAdminGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />
             Key Features Summary
           </h2>
 
           <div className="grid md:grid-cols-2 gap-4">
             <div className="flex gap-3">
-              <Building2 className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+              <Building2 className="w-5 h-5 text-action-600 dark:text-action-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Company Registry</p>
                 <p className="text-sm text-muted-foreground">View and search all registered companies.</p>
@@ -526,7 +526,7 @@ export default function PlatformAdminGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold">Quick Links</h2>
+          <h2 className="text-3xl md:text-4xl font-bold">Quick Links</h2>
           
           <div className="grid md:grid-cols-2 gap-4">
             <Button 

@@ -47,7 +47,7 @@ export default function InventoryGuide() {
           <div className="flex items-center gap-3">
             <BackButton to="/changelog" />
             <div>
-              <h1 className="text-xl font-bold">Inventory System Guide</h1>
+              <h1 className="text-2xl md:text-3xl font-bold">Inventory System Guide</h1>
               <p className="text-xs text-muted-foreground">Complete documentation for equipment tracking</p>
             </div>
           </div>
@@ -61,7 +61,7 @@ export default function InventoryGuide() {
         {/* Overview */}
         <section className="space-y-4">
           <div>
-            <h2 className="text-2xl font-bold flex items-center gap-2 mb-2">
+            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
               <Package className="w-6 h-6 text-purple-600 dark:text-purple-400" />
               Inventory System Overview
             </h2>
@@ -77,14 +77,14 @@ export default function InventoryGuide() {
         <section className="space-y-4">
           <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2 text-amber-900 dark:text-amber-100">
+              <CardTitle className="text-xl md:text-2xl flex items-center gap-2 text-amber-900 dark:text-amber-100">
                 <Calculator className="w-5 h-5" />
                 The Golden Rule: Slot-Based Availability
               </CardTitle>
             </CardHeader>
             <CardContent className="text-amber-900 dark:text-amber-100 space-y-4">
               <div className="bg-white dark:bg-amber-900 rounded-lg p-4 text-center">
-                <p className="text-2xl font-mono font-bold">
+                <p className="text-xl md:text-2xl font-mono font-bold">
                   Available = Quantity - Assigned
                 </p>
               </div>
@@ -132,7 +132,7 @@ export default function InventoryGuide() {
         <section className="space-y-4">
           <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2 text-green-900 dark:text-green-100">
+              <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2 text-green-900 dark:text-green-100">
                 <CheckCircle2 className="w-5 h-5" />
                 Problems Solved
               </CardTitle>
@@ -168,7 +168,7 @@ export default function InventoryGuide() {
 
         {/* Three Tables Architecture */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Layers className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             System Architecture: Three Tables
           </h2>
@@ -178,7 +178,7 @@ export default function InventoryGuide() {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Database className="w-4 h-4 text-blue-600" />
+                  <Database className="w-4 h-4 text-action-600" />
                   1. Gear Items (Inventory Catalog)
                 </CardTitle>
               </CardHeader>
@@ -244,7 +244,7 @@ export default function InventoryGuide() {
 
         {/* Permission Hierarchy */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Lock className="w-5 h-5 text-red-600 dark:text-red-400" />
             Permission Hierarchy (Four Levels)
           </h2>
@@ -252,11 +252,11 @@ export default function InventoryGuide() {
 
           <div className="space-y-3">
             {/* Level 1 */}
-            <Card className="border-l-4 border-l-blue-500">
+            <Card>
               <CardContent className="pt-4">
                 <div className="flex items-start gap-3">
                   <div className="bg-blue-100 dark:bg-blue-900 rounded-full p-2">
-                    <Eye className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                    <Eye className="w-4 h-4 text-action-600 dark:text-action-400" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
@@ -271,7 +271,7 @@ export default function InventoryGuide() {
             </Card>
 
             {/* Level 2 */}
-            <Card className="border-l-4 border-l-green-500">
+            <Card>
               <CardContent className="pt-4">
                 <div className="flex items-start gap-3">
                   <div className="bg-green-100 dark:bg-green-900 rounded-full p-2">
@@ -290,7 +290,7 @@ export default function InventoryGuide() {
             </Card>
 
             {/* Level 3 */}
-            <Card className="border-l-4 border-l-purple-500">
+            <Card>
               <CardContent className="pt-4">
                 <div className="flex items-start gap-3">
                   <div className="bg-purple-100 dark:bg-purple-900 rounded-full p-2">
@@ -309,7 +309,7 @@ export default function InventoryGuide() {
             </Card>
 
             {/* Level 4 */}
-            <Card className="border-l-4 border-l-orange-500">
+            <Card>
               <CardContent className="pt-4">
                 <div className="flex items-start gap-3">
                   <div className="bg-orange-100 dark:bg-orange-900 rounded-full p-2">
@@ -328,7 +328,7 @@ export default function InventoryGuide() {
             </Card>
 
             {/* Special: Self-Assign */}
-            <Card className="border-l-4 border-l-cyan-500 bg-cyan-50 dark:bg-cyan-950">
+            <Card className="bg-cyan-50 dark:bg-cyan-950">
               <CardContent className="pt-4">
                 <div className="flex items-start gap-3">
                   <div className="bg-cyan-100 dark:bg-cyan-900 rounded-full p-2">
@@ -352,7 +352,7 @@ export default function InventoryGuide() {
 
         {/* DUAL-PATH SERIAL ASSIGNMENT */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Hash className="w-5 h-5 text-violet-600 dark:text-violet-400" />
             Dual-Path Serial Assignment
           </h2>
@@ -434,7 +434,7 @@ export default function InventoryGuide() {
 
         {/* Assignment Methods */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Share2 className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
             Two Assignment Methods
           </h2>
@@ -443,7 +443,7 @@ export default function InventoryGuide() {
             {/* Manager Assign */}
             <Card className="border-2 border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-950">
               <CardHeader>
-                <CardTitle className="text-lg text-green-900 dark:text-green-100">
+                <CardTitle className="text-xl md:text-2xl font-semibold text-green-900 dark:text-green-100">
                   Manager Assigns to Others
                 </CardTitle>
                 <CardDescription className="text-green-800 dark:text-green-200">
@@ -467,7 +467,7 @@ export default function InventoryGuide() {
             {/* Self-Assign */}
             <Card className="border-2 border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950">
               <CardHeader>
-                <CardTitle className="text-lg text-blue-900 dark:text-blue-100">
+                <CardTitle className="text-xl md:text-2xl font-semibold text-action-900 dark:text-action-100">
                   Self-Assignment
                 </CardTitle>
                 <CardDescription className="text-blue-800 dark:text-blue-200">
@@ -494,7 +494,7 @@ export default function InventoryGuide() {
 
         {/* Step-by-Step Workflows */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Zap className="w-5 h-5 text-amber-600 dark:text-amber-400" />
             Step-by-Step Workflows
           </h2>
@@ -626,7 +626,7 @@ export default function InventoryGuide() {
 
         {/* Customer Journeys */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <LogIn className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             Customer Journeys
           </h2>
@@ -681,7 +681,7 @@ export default function InventoryGuide() {
                     </div>
                   </div>
 
-                  <ArrowRight className="h-5 w-5 text-blue-600 dark:text-blue-400 md:mx-2 rotate-90 md:rotate-0" />
+                  <ArrowRight className="h-5 w-5 text-action-600 dark:text-action-400 md:mx-2 rotate-90 md:rotate-0" />
 
                   <div className="flex flex-col items-center gap-2 flex-1">
                     <div className="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold">2</div>
@@ -691,7 +691,7 @@ export default function InventoryGuide() {
                     </div>
                   </div>
 
-                  <ArrowRight className="h-5 w-5 text-blue-600 dark:text-blue-400 md:mx-2 rotate-90 md:rotate-0" />
+                  <ArrowRight className="h-5 w-5 text-action-600 dark:text-action-400 md:mx-2 rotate-90 md:rotate-0" />
 
                   <div className="flex flex-col items-center gap-2 flex-1">
                     <div className="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold">3</div>
@@ -710,7 +710,7 @@ export default function InventoryGuide() {
 
         {/* Detailed Example */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <FileText className="w-5 h-5 text-teal-600 dark:text-teal-400" />
             Complete Example Scenario
           </h2>
@@ -721,7 +721,7 @@ export default function InventoryGuide() {
               <CardDescription>Follow this end-to-end example to understand the complete flow.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 text-sm">
-              <div className="space-y-2 border-l-4 border-green-500 pl-4">
+              <div className="space-y-2 pl-4 bg-green-50 dark:bg-green-950 rounded-lg p-3">
                 <p className="font-semibold text-green-700 dark:text-green-300">Day 1: Add to Inventory</p>
                 <p>Manager goes to Inventory, clicks "Add Item":</p>
                 <ul className="list-disc list-inside ml-2 text-muted-foreground">
@@ -734,7 +734,7 @@ export default function InventoryGuide() {
                 <p className="text-xs bg-muted p-2 rounded">Status: 10 total, 0 assigned, <strong>10 available</strong></p>
               </div>
 
-              <div className="space-y-2 border-l-4 border-blue-500 pl-4">
+              <div className="space-y-2 pl-4 bg-action-50 dark:bg-action-950 rounded-lg p-3">
                 <p className="font-semibold text-blue-700 dark:text-blue-300">Day 2: Manager Assigns to Team</p>
                 <p>Manager assigns equipment to technicians:</p>
                 <ul className="list-disc list-inside ml-2 text-muted-foreground">
@@ -744,7 +744,7 @@ export default function InventoryGuide() {
                 <p className="text-xs bg-muted p-2 rounded">Status: 10 total, 3 assigned, <strong>7 available</strong></p>
               </div>
 
-              <div className="space-y-2 border-l-4 border-purple-500 pl-4">
+              <div className="space-y-2 pl-4 bg-purple-50 dark:bg-purple-950 rounded-lg p-3">
                 <p className="font-semibold text-purple-700 dark:text-purple-300">Day 3: Employee Self-Assigns</p>
                 <p>Employee C goes to My Gear, clicks "Add from Inventory":</p>
                 <ul className="list-disc list-inside ml-2 text-muted-foreground">
@@ -755,7 +755,7 @@ export default function InventoryGuide() {
                 <p className="text-xs bg-muted p-2 rounded">Status: 10 total, 4 assigned, <strong>6 available</strong></p>
               </div>
 
-              <div className="space-y-2 border-l-4 border-orange-500 pl-4">
+              <div className="space-y-2 pl-4 bg-orange-50 dark:bg-orange-950 rounded-lg p-3">
                 <p className="font-semibold text-orange-700 dark:text-orange-300">Day 4: New Serial on the Fly</p>
                 <p>Manager assigns to Employee D with a new serial:</p>
                 <ul className="list-disc list-inside ml-2 text-muted-foreground">
@@ -766,7 +766,7 @@ export default function InventoryGuide() {
                 <p className="text-xs bg-muted p-2 rounded">Status: 10 total, 5 assigned, <strong>5 available</strong>. Serial count: 6 registered.</p>
               </div>
 
-              <div className="space-y-2 border-l-4 border-red-500 pl-4">
+              <div className="space-y-2 pl-4 bg-red-50 dark:bg-red-950 rounded-lg p-3">
                 <p className="font-semibold text-red-700 dark:text-red-300">Day 5: Return Equipment</p>
                 <p>Employee A returns 1 harness (HR-002):</p>
                 <ul className="list-disc list-inside ml-2 text-muted-foreground">
@@ -784,7 +784,7 @@ export default function InventoryGuide() {
 
         {/* Key Features */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />
             Key Features Summary
           </h2>
@@ -860,7 +860,7 @@ export default function InventoryGuide() {
 
         {/* Important Notes */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
             Important Technical Notes
           </h2>
@@ -907,7 +907,7 @@ export default function InventoryGuide() {
 
         {/* Quick Links */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold">Quick Links</h2>
+          <h2 className="text-3xl md:text-4xl font-bold">Quick Links</h2>
           
           <div className="grid md:grid-cols-2 gap-4">
             <Button 

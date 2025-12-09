@@ -40,7 +40,7 @@ export default function GPSGuide() {
           <div className="flex items-center gap-3">
             <BackButton to="/changelog" />
             <div>
-              <h1 className="text-xl font-bold">GPS & Location Services Guide</h1>
+              <h1 className="text-2xl md:text-3xl font-bold">GPS & Location Services Guide</h1>
               <p className="text-xs text-muted-foreground">Location tracking and geofencing features</p>
             </div>
           </div>
@@ -52,7 +52,7 @@ export default function GPSGuide() {
         
         <section className="space-y-4">
           <div>
-            <h2 className="text-2xl font-bold flex items-center gap-2 mb-2">
+            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
               <MapPin className="w-6 h-6 text-red-600 dark:text-red-400" />
               GPS & Location Services Overview
             </h2>
@@ -67,14 +67,14 @@ export default function GPSGuide() {
         <section className="space-y-4">
           <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2 text-amber-900 dark:text-amber-100">
+              <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2 text-amber-900 dark:text-amber-100">
                 <Shield className="w-5 h-5" />
                 The Golden Rule: Location = Verification
               </CardTitle>
             </CardHeader>
             <CardContent className="text-amber-900 dark:text-amber-100 space-y-4">
               <div className="bg-white dark:bg-amber-900 rounded-lg p-4 text-center">
-                <p className="text-2xl font-mono font-bold">
+                <p className="text-xl md:text-2xl font-mono font-bold">
                   GPS Data is Non-Editable
                 </p>
               </div>
@@ -116,7 +116,7 @@ export default function GPSGuide() {
         <section className="space-y-4">
           <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2 text-green-900 dark:text-green-100">
+              <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2 text-green-900 dark:text-green-100">
                 <CheckCircle2 className="w-5 h-5" />
                 Problems Solved
               </CardTitle>
@@ -151,7 +151,7 @@ export default function GPSGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Layers className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             System Architecture
           </h2>
@@ -160,8 +160,8 @@ export default function GPSGuide() {
           <div className="space-y-3">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Smartphone className="w-4 h-4 text-blue-600" />
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
+                  <Smartphone className="w-4 h-4 text-action-600" />
                   1. Browser Geolocation API
                 </CardTitle>
               </CardHeader>
@@ -181,7 +181,7 @@ export default function GPSGuide() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                   <Database className="w-4 h-4 text-green-600" />
                   2. Location Storage
                 </CardTitle>
@@ -202,7 +202,7 @@ export default function GPSGuide() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                   <Map className="w-4 h-4 text-purple-600" />
                   3. Map Visualization (Leaflet)
                 </CardTitle>
@@ -226,18 +226,18 @@ export default function GPSGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Lock className="w-5 h-5 text-red-600 dark:text-red-400" />
             Permission Requirements
           </h2>
           <p className="text-sm text-muted-foreground">GPS feature access is controlled at multiple levels:</p>
 
           <div className="space-y-3">
-            <Card className="border-l-4 border-l-blue-500">
+            <Card>
               <CardContent className="pt-4">
                 <div className="flex items-start gap-3">
                   <div className="bg-blue-100 dark:bg-blue-900 rounded-full p-2">
-                    <Smartphone className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                    <Smartphone className="w-4 h-4 text-action-600 dark:text-action-400" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
@@ -250,7 +250,7 @@ export default function GPSGuide() {
               </CardContent>
             </Card>
 
-            <Card className="border-l-4 border-l-green-500">
+            <Card>
               <CardContent className="pt-4">
                 <div className="flex items-start gap-3">
                   <div className="bg-green-100 dark:bg-green-900 rounded-full p-2">
@@ -267,7 +267,7 @@ export default function GPSGuide() {
               </CardContent>
             </Card>
 
-            <Card className="border-l-4 border-l-amber-500">
+            <Card>
               <CardContent className="pt-4">
                 <div className="flex items-start gap-3">
                   <div className="bg-amber-100 dark:bg-amber-900 rounded-full p-2">
@@ -289,8 +289,8 @@ export default function GPSGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
-            <Settings className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
+            <Settings className="w-5 h-5 text-action-600 dark:text-action-400" />
             Workflows
           </h2>
 
@@ -299,7 +299,7 @@ export default function GPSGuide() {
               <CardHeader className="pb-2 bg-muted/50">
                 <div className="flex items-center gap-2">
                   <Badge variant="outline">Workflow 1</Badge>
-                  <CardTitle className="text-base">Clock In with GPS</CardTitle>
+                  <CardTitle className="text-xl md:text-2xl font-semibold">Clock In with GPS</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="pt-4">
@@ -340,7 +340,7 @@ export default function GPSGuide() {
               <CardHeader className="pb-2 bg-muted/50">
                 <div className="flex items-center gap-2">
                   <Badge variant="outline">Workflow 2</Badge>
-                  <CardTitle className="text-base">View Employee Locations</CardTitle>
+                  <CardTitle className="text-xl md:text-2xl font-semibold">View Employee Locations</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="pt-4">
@@ -375,14 +375,14 @@ export default function GPSGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Navigation className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             Customer Journeys
           </h2>
 
           <div className="space-y-6">
             <div className="space-y-3">
-              <h3 className="font-semibold text-sm text-red-700 dark:text-red-300">Field Technician Journey</h3>
+              <h3 className="text-xl md:text-2xl font-semibold text-red-700 dark:text-red-300">Field Technician Journey</h3>
               <div className="bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-950 dark:to-orange-950 rounded-lg p-6 border border-red-200 dark:border-red-800">
                 <div className="flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-0">
                   <div className="flex flex-col items-center gap-2 flex-1">
@@ -427,41 +427,41 @@ export default function GPSGuide() {
             </div>
 
             <div className="space-y-3">
-              <h3 className="font-semibold text-sm text-blue-700 dark:text-blue-300">Manager Review Journey</h3>
+              <h3 className="text-xl md:text-2xl font-semibold text-action-700 dark:text-action-300">Manager Review Journey</h3>
               <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 rounded-lg p-6 border border-blue-200 dark:border-blue-800">
                 <div className="flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-0">
                   <div className="flex flex-col items-center gap-2 flex-1">
-                    <div className="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold">1</div>
+                    <div className="bg-action-600 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold">1</div>
                     <div className="text-center text-sm">
                       <p className="font-semibold">Review Entries</p>
                       <p className="text-xs text-muted-foreground">Time tracking page</p>
                     </div>
                   </div>
 
-                  <ArrowRight className="h-5 w-5 text-blue-600 dark:text-blue-400 md:mx-2 rotate-90 md:rotate-0" />
+                  <ArrowRight className="h-5 w-5 text-action-600 dark:text-action-400 md:mx-2 rotate-90 md:rotate-0" />
 
                   <div className="flex flex-col items-center gap-2 flex-1">
-                    <div className="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold">2</div>
+                    <div className="bg-action-600 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold">2</div>
                     <div className="text-center text-sm">
                       <p className="font-semibold">Click Map Icon</p>
                       <p className="text-xs text-muted-foreground">View location</p>
                     </div>
                   </div>
 
-                  <ArrowRight className="h-5 w-5 text-blue-600 dark:text-blue-400 md:mx-2 rotate-90 md:rotate-0" />
+                  <ArrowRight className="h-5 w-5 text-action-600 dark:text-action-400 md:mx-2 rotate-90 md:rotate-0" />
 
                   <div className="flex flex-col items-center gap-2 flex-1">
-                    <div className="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold">3</div>
+                    <div className="bg-action-600 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold">3</div>
                     <div className="text-center text-sm">
                       <p className="font-semibold">Verify Site</p>
                       <p className="text-xs text-muted-foreground">Compare to building</p>
                     </div>
                   </div>
 
-                  <ArrowRight className="h-5 w-5 text-blue-600 dark:text-blue-400 md:mx-2 rotate-90 md:rotate-0" />
+                  <ArrowRight className="h-5 w-5 text-action-600 dark:text-action-400 md:mx-2 rotate-90 md:rotate-0" />
 
                   <div className="flex flex-col items-center gap-2 flex-1">
-                    <div className="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold">4</div>
+                    <div className="bg-action-600 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold">4</div>
                     <div className="text-center text-sm">
                       <p className="font-semibold">Approve/Flag</p>
                       <p className="text-xs text-muted-foreground">Take action</p>
@@ -476,7 +476,7 @@ export default function GPSGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />
             Key Features Summary
           </h2>
@@ -491,7 +491,7 @@ export default function GPSGuide() {
             </div>
 
             <div className="flex gap-3">
-              <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+              <Shield className="w-5 h-5 text-action-600 dark:text-action-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Privacy Focused</p>
                 <p className="text-sm text-muted-foreground">Only captured at clock events.</p>
@@ -519,7 +519,7 @@ export default function GPSGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold">Quick Links</h2>
+          <h2 className="text-3xl md:text-4xl font-bold">Quick Links</h2>
           
           <div className="grid md:grid-cols-2 gap-4">
             <Button 

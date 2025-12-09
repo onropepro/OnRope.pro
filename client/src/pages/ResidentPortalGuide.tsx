@@ -40,7 +40,7 @@ export default function ResidentPortalGuide() {
           <div className="flex items-center gap-3">
             <BackButton to="/changelog" />
             <div>
-              <h1 className="text-xl font-bold">Resident Portal Guide</h1>
+              <h1 className="text-2xl md:text-3xl font-bold">Resident Portal Guide</h1>
               <p className="text-xs text-muted-foreground">Resident access, feedback, and communication</p>
             </div>
           </div>
@@ -54,7 +54,7 @@ export default function ResidentPortalGuide() {
         {/* Overview */}
         <section className="space-y-4">
           <div>
-            <h2 className="text-2xl font-bold flex items-center gap-2 mb-2">
+            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
               <Home className="w-6 h-6 text-cyan-600 dark:text-cyan-400" />
               Resident Portal Overview
             </h2>
@@ -70,14 +70,14 @@ export default function ResidentPortalGuide() {
         <section className="space-y-4">
           <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2 text-amber-900 dark:text-amber-100">
+              <CardTitle className="text-xl md:text-2xl flex items-center gap-2 text-amber-900 dark:text-amber-100">
                 <Key className="w-5 h-5" />
                 The Golden Rule: Codes Link Residents
               </CardTitle>
             </CardHeader>
             <CardContent className="text-amber-900 dark:text-amber-100 space-y-4">
               <div className="bg-white dark:bg-amber-900 rounded-lg p-4 text-center">
-                <p className="text-2xl font-mono font-bold">
+                <p className="text-xl md:text-2xl font-mono font-bold">
                   Resident Code = Building Access
                 </p>
               </div>
@@ -124,7 +124,7 @@ export default function ResidentPortalGuide() {
         <section className="space-y-4">
           <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2 text-green-900 dark:text-green-100">
+              <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2 text-green-900 dark:text-green-100">
                 <CheckCircle2 className="w-5 h-5" />
                 Problems Solved
               </CardTitle>
@@ -160,8 +160,8 @@ export default function ResidentPortalGuide() {
 
         {/* Resident Features */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
-            <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
+            <Users className="w-5 h-5 text-action-600 dark:text-action-400" />
             What Residents Can Do
           </h2>
           <p className="text-sm text-muted-foreground">Once linked, residents have access to several features:</p>
@@ -170,7 +170,7 @@ export default function ResidentPortalGuide() {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Eye className="w-4 h-4 text-blue-600" />
+                  <Eye className="w-4 h-4 text-action-600" />
                   View Project Progress
                 </CardTitle>
               </CardHeader>
@@ -222,7 +222,7 @@ export default function ResidentPortalGuide() {
         {/* FEEDBACK MANAGEMENT SYSTEM - Comprehensive Section */}
         <section className="space-y-6">
           <div>
-            <h2 className="text-2xl font-bold flex items-center gap-2 mb-2">
+            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
               <MessageSquare className="w-6 h-6 text-orange-600 dark:text-orange-400" />
               Feedback Management System
             </h2>
@@ -234,7 +234,7 @@ export default function ResidentPortalGuide() {
           {/* Problems Solved */}
           <Card className="border-2 border-orange-300 dark:border-orange-700 bg-orange-50/50 dark:bg-orange-950/30">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2">
+              <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                 <AlertTriangle className="w-5 h-5 text-orange-600 dark:text-orange-400" />
                 Problems This System Solves
               </CardTitle>
@@ -283,8 +283,8 @@ export default function ResidentPortalGuide() {
 
           {/* Access & Oversight Hierarchy */}
           <div className="space-y-4">
-            <h3 className="text-xl font-bold flex items-center gap-2">
-              <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <h3 className="text-xl md:text-2xl font-semibold flex items-center gap-2">
+              <Users className="w-5 h-5 text-action-600 dark:text-action-400" />
               Who Can See What: Access Hierarchy
             </h3>
             <p className="text-sm text-muted-foreground">
@@ -321,13 +321,13 @@ export default function ResidentPortalGuide() {
               <Card>
                 <CardContent className="pt-6">
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0">
-                      <Users className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                    <div className="w-12 h-12 rounded-full bg-action-100 dark:bg-action-900 flex items-center justify-center shrink-0">
+                      <Users className="w-6 h-6 text-action-600 dark:text-action-400" />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
                         <h4 className="font-semibold">Company Staff</h4>
-                        <Badge variant="secondary" className="text-xs bg-blue-500/10 text-blue-700 dark:text-blue-400">Full Access</Badge>
+                        <Badge variant="secondary" className="text-xs bg-action-500/10 text-action-700 dark:text-action-400">Full Access</Badge>
                       </div>
                       <p className="text-xs text-muted-foreground mt-1">Technicians, Supervisors, Operations Managers, Company Owner</p>
                       <div className="mt-2 text-sm text-muted-foreground space-y-1">
@@ -372,7 +372,7 @@ export default function ResidentPortalGuide() {
 
           {/* Two-Track Communication System */}
           <div className="space-y-4">
-            <h3 className="text-xl font-bold flex items-center gap-2">
+            <h3 className="text-xl md:text-2xl font-semibold flex items-center gap-2">
               <FileText className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
               Two-Track Communication System
             </h3>
@@ -431,7 +431,7 @@ export default function ResidentPortalGuide() {
 
           {/* Feedback Workflow - Enhanced */}
           <div className="space-y-4">
-            <h3 className="text-xl font-bold flex items-center gap-2">
+            <h3 className="text-xl md:text-2xl font-semibold flex items-center gap-2">
               <Clock className="w-5 h-5 text-orange-600 dark:text-orange-400" />
               Feedback Lifecycle
             </h3>
@@ -516,8 +516,8 @@ export default function ResidentPortalGuide() {
                 <span className="text-xs text-emerald-600 mt-1">Resolve</span>
               </div>
               <div className="flex flex-col items-center">
-                <ArrowRight className="w-5 h-5 text-blue-500 rotate-45" />
-                <span className="text-xs text-blue-600 mt-1">Reply</span>
+                <ArrowRight className="w-5 h-5 text-action-500 rotate-45" />
+                <span className="text-xs text-action-600 mt-1">Reply</span>
               </div>
             </div>
 
@@ -536,13 +536,13 @@ export default function ResidentPortalGuide() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
+              <Card className="bg-action-50 dark:bg-action-950 border-action-200 dark:border-action-800">
                 <CardContent className="pt-6">
                   <div className="flex items-start gap-4">
-                    <MessageSquare className="w-6 h-6 text-blue-600 dark:text-blue-400 shrink-0" />
+                    <MessageSquare className="w-6 h-6 text-action-600 dark:text-action-400 shrink-0" />
                     <div>
-                      <h3 className="font-semibold text-blue-900 dark:text-blue-100">Ongoing Communication</h3>
-                      <p className="text-sm text-blue-800 dark:text-blue-200 mt-1">
+                      <h3 className="font-semibold text-action-900 dark:text-action-100">Ongoing Communication</h3>
+                      <p className="text-sm text-action-800 dark:text-action-200 mt-1">
                         Two-way messaging continues until issue is resolved.
                       </p>
                     </div>
@@ -580,7 +580,7 @@ export default function ResidentPortalGuide() {
 
         {/* Linking Process */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <LinkIcon className="w-5 h-5 text-purple-600 dark:text-purple-400" />
             Account Linking Process
           </h2>
@@ -625,7 +625,7 @@ export default function ResidentPortalGuide() {
 
         {/* Notification System */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Bell className="w-5 h-5 text-red-600 dark:text-red-400" />
             Notification Badges
           </h2>
@@ -669,8 +669,8 @@ export default function ResidentPortalGuide() {
 
         {/* Quick Reference */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
-            <Info className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
+            <Info className="w-5 h-5 text-action-600 dark:text-action-400" />
             Quick Reference
           </h2>
 
@@ -722,7 +722,7 @@ export default function ResidentPortalGuide() {
 
         {/* Customer Journeys */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Users className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             Customer Journeys
           </h2>
@@ -824,7 +824,7 @@ export default function ResidentPortalGuide() {
 
         {/* Key Features Summary */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />
             Key Features Summary
           </h2>
@@ -839,7 +839,7 @@ export default function ResidentPortalGuide() {
             </div>
 
             <div className="flex gap-3">
-              <MessageSquare className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+              <MessageSquare className="w-5 h-5 text-action-600 dark:text-action-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Two-Way Communication</p>
                 <p className="text-sm text-muted-foreground">Residents and staff exchange messages with full history.</p>

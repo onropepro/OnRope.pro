@@ -58,8 +58,8 @@ export default function UserAccessGuide() {
           <div className="flex items-center gap-3">
             <BackButton to="/changelog" />
             <div>
-              <h1 className="text-xl font-bold" style={{ fontFamily: "Outfit, sans-serif" }}>User Access & Authentication Guide</h1>
-              <p className="text-sm text-muted-foreground" style={{ fontFamily: "Outfit, sans-serif" }}>Version 2.1 - Updated December 5, 2025</p>
+              <h1 className="text-2xl md:text-3xl font-bold">User Access & Authentication Guide</h1>
+              <p className="text-sm text-muted-foreground">Version 2.1 - Updated December 5, 2025</p>
             </div>
           </div>
           <MainMenuButton />
@@ -70,14 +70,14 @@ export default function UserAccessGuide() {
         
         <section className="space-y-4">
           <div>
-            <h2 className="text-2xl font-bold flex items-center gap-2 mb-2" style={{ fontFamily: "Outfit, sans-serif" }}>
-              <Users className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
+              <Users className="w-6 h-6 text-action-600 dark:text-action-400" />
               User Access Overview
             </h2>
-            <p className="text-muted-foreground leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
+            <p className="text-muted-foreground leading-relaxed text-base">
               OnRopePro implements a sophisticated role-based access control system with <strong>company-scoped multi-tenant architecture</strong>. Each company's data remains completely isolated, and users can only access information relevant to their assigned company and role permissions.
             </p>
-            <p className="text-muted-foreground mt-2 leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
+            <p className="text-muted-foreground mt-2 leading-relaxed text-base">
               The platform supports three distinct user categories with <strong>granular, customizable permissions</strong> to accommodate diverse organizational structures across the rope access industry.
             </p>
           </div>
@@ -86,76 +86,47 @@ export default function UserAccessGuide() {
         <Separator />
 
         <section className="space-y-6">
-          <div className="rounded-lg border-l-4 border-amber-500 bg-card p-6">
-            <h3 className="text-lg font-semibold flex items-center gap-2 mb-4" style={{ fontFamily: "Outfit, sans-serif", fontSize: "18px" }}>
-              <Key className="w-5 h-5 text-amber-500" />
-              The Golden Rule: Role + Permissions = Access
-            </h3>
-            
-            <div className="bg-muted/50 rounded-lg p-4 mb-6">
-              <p className="text-base font-mono text-center leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
-                Access = Base Role (Organizational Structure) + Granular Permissions (Actual Capabilities)
-              </p>
-            </div>
-            
-            <div className="space-y-4">
-              <div>
-                <h4 className="font-medium mb-3" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>Key Principles</h4>
-                <ul className="space-y-2 text-muted-foreground leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
-                  <li className="flex gap-2">
-                    <span className="text-amber-500 mt-1">1.</span>
-                    <span>Each user has exactly one base role (Company Owner, Operations Manager, Supervisor, Technician, etc.)</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="text-amber-500 mt-1">2.</span>
-                    <span>Base roles provide organizational structure — they suggest typical access patterns but do NOT determine permissions</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="text-amber-500 mt-1">3.</span>
-                    <span>Permissions are customized per employee by the company owner, regardless of role title</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="text-amber-500 mt-1">4.</span>
-                    <span>Permissions define what users can actually do with the data they can access</span>
-                  </li>
+          <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-xl md:text-2xl flex items-center gap-2 text-amber-900 dark:text-amber-100">
+                <Key className="w-5 h-5" />
+                The Golden Rule: Role + Permissions = Access
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-amber-900 dark:text-amber-100 space-y-4">
+              <div className="bg-white dark:bg-amber-900 rounded-lg p-4 text-center">
+                <p className="text-xl md:text-2xl font-mono font-bold">
+                  Access = Base Role + Granular Permissions
+                </p>
+              </div>
+              
+              <div className="space-y-2 text-base">
+                <p><strong>Key Principles:</strong></p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li><strong>1.</strong> Each user has exactly one base role (Company Owner, Operations Manager, Supervisor, Technician, etc.)</li>
+                  <li><strong>2.</strong> Base roles provide organizational structure — they suggest typical access patterns but do NOT determine permissions</li>
+                  <li><strong>3.</strong> Permissions are customized per employee by the company owner, regardless of role title</li>
+                  <li><strong>4.</strong> Permissions define what users can actually do with the data they can access</li>
                 </ul>
               </div>
 
-              <div className="border rounded-lg p-4 mt-4">
-                <p className="font-medium flex items-center gap-2 mb-4" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
-                  <Info className="w-4 h-4 text-muted-foreground" />
+              <div className="bg-amber-100 dark:bg-amber-800 rounded-lg p-3 text-sm">
+                <p className="font-semibold flex items-center gap-2">
+                  <Info className="w-4 h-4" />
                   Same Role, Different Capabilities
                 </p>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium" style={{ fontFamily: "Outfit, sans-serif" }}>Company A - Operations Manager</p>
-                    <div className="space-y-1 text-sm" style={{ fontFamily: "Outfit, sans-serif" }}>
-                      <p className="flex items-center gap-2 text-muted-foreground"><CheckCircle2 className="w-4 h-4 text-green-500" /> Financial permissions</p>
-                      <p className="flex items-center gap-2 text-muted-foreground"><CheckCircle2 className="w-4 h-4 text-green-500" /> Create projects</p>
-                      <p className="flex items-center gap-2 text-muted-foreground"><XCircle className="w-4 h-4 text-red-400" /> Inventory management</p>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium" style={{ fontFamily: "Outfit, sans-serif" }}>Company B - Operations Manager</p>
-                    <div className="space-y-1 text-sm" style={{ fontFamily: "Outfit, sans-serif" }}>
-                      <p className="flex items-center gap-2 text-muted-foreground"><XCircle className="w-4 h-4 text-red-400" /> Financial permissions</p>
-                      <p className="flex items-center gap-2 text-muted-foreground"><XCircle className="w-4 h-4 text-red-400" /> Create projects</p>
-                      <p className="flex items-center gap-2 text-muted-foreground"><CheckCircle2 className="w-4 h-4 text-green-500" /> Inventory management</p>
-                    </div>
-                  </div>
-                </div>
-                <p className="text-sm text-center text-muted-foreground mt-4 pt-3 border-t" style={{ fontFamily: "Outfit, sans-serif" }}>Same role title, completely different capabilities</p>
+                <p className="mt-1">Two Operations Managers at different companies can have completely different permissions. Role titles are organizational labels, not permission sets.</p>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </section>
 
         <Separator />
 
         <section className="space-y-8">
           <div>
-            <h2 className="text-2xl font-semibold mb-2" style={{ fontFamily: "Outfit, sans-serif" }}>Problems Solved</h2>
-            <p className="text-muted-foreground leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
+            <h2 className="text-3xl md:text-4xl font-bold mb-2">Problems Solved</h2>
+            <p className="text-muted-foreground leading-relaxed text-base">
               Real challenges addressed by OnRopePro's User Access & Authentication module.
             </p>
           </div>
@@ -164,16 +135,16 @@ export default function UserAccessGuide() {
           <div className="space-y-4">
             <div className="flex items-center gap-3 pb-2 border-b">
               <Crown className="w-5 h-5 text-amber-500" />
-              <h3 className="text-lg font-medium" style={{ fontFamily: "Outfit, sans-serif", fontSize: "18px" }}>For Rope Access Company Owners</h3>
+              <h3 className="text-xl md:text-2xl font-semibold">For Rope Access Company Owners</h3>
             </div>
             
             <Accordion type="single" collapsible className="space-y-3">
               <AccordionItem value="owner-1" className="border rounded-lg px-4">
                 <AccordionTrigger className="hover:no-underline py-4">
-                  <span className="text-left font-medium" style={{ fontFamily: "Outfit, sans-serif", fontSize: "18px" }}>Supervisors accidentally seeing everyone's pay rates</span>
+                  <span className="text-left font-medium text-base">Supervisors accidentally seeing everyone's pay rates</span>
                 </AccordionTrigger>
                 <AccordionContent className="pb-4">
-                  <div className="space-y-4 text-muted-foreground leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
+                  <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>You need your supervisor to create projects and assign technicians, but the moment you give them access, they can see what every technician earns. Generic construction software forces you to choose: operational efficiency or payroll privacy.</p>
                     <p><span className="font-medium text-foreground">Example:</span> Your operations manager needs to review project budgets to ensure profitability, but you don't want them seeing individual hourly rates. Traditional systems make this impossible—budget access automatically includes rate visibility.</p>
                     <p><span className="font-medium text-foreground">Solution:</span> OnRopePro's flexible permission system separates operational capabilities from financial visibility. Grant your supervisor project creation rights, employee assignment capabilities, and schedule management—while keeping hourly rates, labor costs, and payroll data owner-only.</p>
@@ -184,10 +155,10 @@ export default function UserAccessGuide() {
 
               <AccordionItem value="owner-2" className="border rounded-lg px-4">
                 <AccordionTrigger className="hover:no-underline py-4">
-                  <span className="text-left font-medium" style={{ fontFamily: "Outfit, sans-serif", fontSize: "18px" }}>Financial data visible to people who shouldn't see it</span>
+                  <span className="text-left font-medium text-base">Financial data visible to people who shouldn't see it</span>
                 </AccordionTrigger>
                 <AccordionContent className="pb-4">
-                  <div className="space-y-4 text-muted-foreground leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
+                  <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>Your bookkeeper needs access to generate reports. Your field supervisor needs to check if projects are on budget. But once they're in the system, they can see everything—company-wide profitability, individual employee rates, sensitive client billing margins.</p>
                     <p><span className="font-medium text-foreground">Example:</span> You hire a new administrative assistant to help with invoicing. Within a week, they know exactly how much profit you make on each client, what your best technicians earn, and which jobs are money-losers.</p>
                     <p><span className="font-medium text-foreground">Solution:</span> Granular permission controls let you grant exactly what each employee needs. Your bookkeeper sees aggregate labor costs but not individual rates. Your supervisor sees project budgets but not company-wide profitability.</p>
@@ -198,10 +169,10 @@ export default function UserAccessGuide() {
 
               <AccordionItem value="owner-3" className="border rounded-lg px-4">
                 <AccordionTrigger className="hover:no-underline py-4">
-                  <span className="text-left font-medium" style={{ fontFamily: "Outfit, sans-serif", fontSize: "18px" }}>Can't track IRATA certifications</span>
+                  <span className="text-left font-medium text-base">Can't track IRATA certifications</span>
                 </AccordionTrigger>
                 <AccordionContent className="pb-4">
-                  <div className="space-y-4 text-muted-foreground leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
+                  <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>You've got 15 technicians with different IRATA levels. Client contracts require Level 2 or higher for certain buildings. Insurance audits demand proof of certification levels. But you're tracking this in a spreadsheet that's always outdated.</p>
                     <p><span className="font-medium text-foreground">Example:</span> A client asks: "Which of your technicians are Level 2 or 3 and available next week?" You're digging through certification files, checking expiry dates, cross-referencing the schedule. This takes 30 minutes.</p>
                     <p><span className="font-medium text-foreground">Solution:</span> Each employee profile includes IRATA level (Level 1, 2, or 3) tracked in the system. When you need to assign work or respond to client requirements, you see certification levels instantly.</p>
@@ -212,10 +183,10 @@ export default function UserAccessGuide() {
 
               <AccordionItem value="owner-4" className="border rounded-lg px-4">
                 <AccordionTrigger className="hover:no-underline py-4">
-                  <span className="text-left font-medium" style={{ fontFamily: "Outfit, sans-serif", fontSize: "18px" }}>No control over who can edit/delete projects</span>
+                  <span className="text-left font-medium text-base">No control over who can edit/delete projects</span>
                 </AccordionTrigger>
                 <AccordionContent className="pb-4">
-                  <div className="space-y-4 text-muted-foreground leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
+                  <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>Everyone with system access can modify or delete projects—including your newest technician who accidentally deleted last month's completed job when trying to log today's drops.</p>
                     <p><span className="font-medium text-foreground">Example:</span> A technician accidentally changes the North elevation from 120 drops to 12 drops. The error isn't discovered until the client questions why you only invoiced for 12 drops.</p>
                     <p><span className="font-medium text-foreground">Solution:</span> Project management permissions control who can create, edit, and delete projects. Restrict these capabilities to supervisors and managers while technicians can only log work for assigned projects.</p>
@@ -226,10 +197,10 @@ export default function UserAccessGuide() {
 
               <AccordionItem value="owner-5" className="border rounded-lg px-4">
                 <AccordionTrigger className="hover:no-underline py-4">
-                  <span className="text-left font-medium" style={{ fontFamily: "Outfit, sans-serif", fontSize: "18px" }}>Crew members changing data they shouldn't access</span>
+                  <span className="text-left font-medium text-base">Crew members changing data they shouldn't access</span>
                 </AccordionTrigger>
                 <AccordionContent className="pb-4">
-                  <div className="space-y-4 text-muted-foreground leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
+                  <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>A technician logs into the system and edits their own hourly rate from $32 to $42 per hour. They change last week's drop counts. You discover this during payroll processing.</p>
                     <p><span className="font-medium text-foreground">Example:</span> Your most experienced tech goes into past projects and adds extra drops to his record for his upcoming performance review. The client complains when photos don't match invoiced drop counts.</p>
                     <p><span className="font-medium text-foreground">Solution:</span> Permission-based access controls what each employee can view and modify. Technicians see only their own work records. Only owners can modify rates and historical records.</p>
@@ -240,10 +211,10 @@ export default function UserAccessGuide() {
 
               <AccordionItem value="owner-6" className="border rounded-lg px-4">
                 <AccordionTrigger className="hover:no-underline py-4">
-                  <span className="text-left font-medium" style={{ fontFamily: "Outfit, sans-serif", fontSize: "18px" }}>Subscription limit monitoring</span>
+                  <span className="text-left font-medium text-base">Subscription limit monitoring</span>
                 </AccordionTrigger>
                 <AccordionContent className="pb-4">
-                  <div className="space-y-4 text-muted-foreground leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
+                  <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>You're on the Tier 1 plan with 8 included seats. You hire two people thinking you had space, but discover you're now at 9 seats and being charged extra per seat.</p>
                     <p><span className="font-medium text-foreground">Example:</span> Peak season hits. You need to hire 3 temporary technicians but can't remember your plan's seat limit. You delay hiring while trying to figure out your subscription status.</p>
                     <p><span className="font-medium text-foreground">Solution:</span> Employee management dashboard displays subscription tier limits clearly: "Using 7 of 8 seats" with visual indicators showing capacity.</p>
@@ -257,17 +228,17 @@ export default function UserAccessGuide() {
           {/* Operations Managers Section */}
           <div className="space-y-4">
             <div className="flex items-center gap-3 pb-2 border-b">
-              <Briefcase className="w-5 h-5 text-blue-500" />
-              <h3 className="text-lg font-medium" style={{ fontFamily: "Outfit, sans-serif", fontSize: "18px" }}>For Operations Managers & Supervisors</h3>
+              <Briefcase className="w-5 h-5 text-action-500" />
+              <h3 className="text-xl md:text-2xl font-semibold">For Operations Managers & Supervisors</h3>
             </div>
             
             <Accordion type="single" collapsible className="space-y-3">
               <AccordionItem value="ops-1" className="border rounded-lg px-4">
                 <AccordionTrigger className="hover:no-underline py-4">
-                  <span className="text-left font-medium" style={{ fontFamily: "Outfit, sans-serif", fontSize: "18px" }}>Need to delegate responsibility but can't give full access</span>
+                  <span className="text-left font-medium text-base">Need to delegate responsibility but can't give full access</span>
                 </AccordionTrigger>
                 <AccordionContent className="pb-4">
-                  <div className="space-y-4 text-muted-foreground leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
+                  <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>You're coordinating 3-4 concurrent projects. You want your field supervisors to create projects and adjust schedules. But you can't give them access without exposing pay rates and company profitability.</p>
                     <p><span className="font-medium text-foreground">Example:</span> Your most trusted supervisor handles the North Shore territory. When clients call, he has to call you to create projects. This creates bottlenecks—clients wait hours for simple project setup.</p>
                     <p><span className="font-medium text-foreground">Solution:</span> Grant supervisors project creation and management permissions without financial data access. They create projects and manage schedules while rates and margins remain visible only to owners.</p>
@@ -282,16 +253,16 @@ export default function UserAccessGuide() {
           <div className="space-y-4">
             <div className="flex items-center gap-3 pb-2 border-b">
               <Building2 className="w-5 h-5 text-violet-500" />
-              <h3 className="text-lg font-medium" style={{ fontFamily: "Outfit, sans-serif", fontSize: "18px" }}>For Building Managers & Property Managers</h3>
+              <h3 className="text-xl md:text-2xl font-semibold">For Building Managers & Property Managers</h3>
             </div>
             
             <Accordion type="single" collapsible className="space-y-3">
               <AccordionItem value="bm-1" className="border rounded-lg px-4">
                 <AccordionTrigger className="hover:no-underline py-4">
-                  <span className="text-left font-medium" style={{ fontFamily: "Outfit, sans-serif", fontSize: "18px" }}>Administrative burden from tenant turnover</span>
+                  <span className="text-left font-medium text-base">Administrative burden from tenant turnover</span>
                 </AccordionTrigger>
                 <AccordionContent className="pb-4">
-                  <div className="space-y-4 text-muted-foreground leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
+                  <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>Your property management company manages 40 buildings. Building managers turnover every 6-12 months. Every time someone leaves, you contact every vendor to deactivate the old account and create a new one. This takes 2-3 days per manager change.</p>
                     <p><span className="font-medium text-foreground">Example:</span> Sarah managed Tower One for 8 months then transferred. Mike takes over. You send emails to 12 vendors. Only 4 respond within a week. Three weeks later, Sarah still has access and Mike can't log in.</p>
                     <p><span className="font-medium text-foreground">Solution:</span> Building-level accounts eliminate individual manager account management. Each building has one permanent account. When managers change, update the password—access instantly transfers. No vendor coordination.</p>
@@ -302,10 +273,10 @@ export default function UserAccessGuide() {
 
               <AccordionItem value="bm-2" className="border rounded-lg px-4">
                 <AccordionTrigger className="hover:no-underline py-4">
-                  <span className="text-left font-medium" style={{ fontFamily: "Outfit, sans-serif", fontSize: "18px" }}>Residents calling constantly during maintenance work</span>
+                  <span className="text-left font-medium text-base">Residents calling constantly during maintenance work</span>
                 </AccordionTrigger>
                 <AccordionContent className="pb-4">
-                  <div className="space-y-4 text-muted-foreground leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
+                  <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>During window cleaning season, your office phone never stops. "When are they coming to my side?" Your staff spends 15-20 hours per week answering progress questions.</p>
                     <p><span className="font-medium text-foreground">Example:</span> It's Wednesday during a 2-week cleaning project. You've received 47 calls since Monday. Your admin is on call #48. She has to call the maintenance company, wait for callback, then call the resident back. One question consumed 25 minutes.</p>
                     <p><span className="font-medium text-foreground">Solution:</span> Resident portal gives building occupants real-time visibility. They see which sides are complete, view progress photos, and check the project schedule.</p>
@@ -316,10 +287,10 @@ export default function UserAccessGuide() {
 
               <AccordionItem value="bm-3" className="border rounded-lg px-4">
                 <AccordionTrigger className="hover:no-underline py-4">
-                  <span className="text-left font-medium" style={{ fontFamily: "Outfit, sans-serif", fontSize: "18px" }}>Feedback escalating to building managers instead of vendors</span>
+                  <span className="text-left font-medium text-base">Feedback escalating to building managers instead of vendors</span>
                 </AccordionTrigger>
                 <AccordionContent className="pb-4">
-                  <div className="space-y-4 text-muted-foreground leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
+                  <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>Residents encounter issues during maintenance—missed windows, water damage, scheduling conflicts. But there's no direct way to report to the maintenance company. So residents call you, and you become the middleman.</p>
                     <p><span className="font-medium text-foreground">Example:</span> Mrs. Chen emails you photos of streaky windows. You forward to the rope access company. Three days pass with no response. Meanwhile, Mrs. Chen files strata council complaints about management responsiveness.</p>
                     <p><span className="font-medium text-foreground">Solution:</span> Centralized feedback system with building-level visibility. Residents submit feedback directly to the maintenance company. You see all feedback in real-time without being the middleman.</p>
@@ -330,10 +301,10 @@ export default function UserAccessGuide() {
 
               <AccordionItem value="bm-4" className="border rounded-lg px-4">
                 <AccordionTrigger className="hover:no-underline py-4">
-                  <span className="text-left font-medium" style={{ fontFamily: "Outfit, sans-serif", fontSize: "18px" }}>Building managers don't see your value - scattered communication</span>
+                  <span className="text-left font-medium text-base">Building managers don't see your value - scattered communication</span>
                 </AccordionTrigger>
                 <AccordionContent className="pb-4">
-                  <div className="space-y-4 text-muted-foreground leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
+                  <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>Your maintenance vendors communicate through text messages, personal emails, phone calls, sticky notes. When you need to compile a report for the strata council, you're digging through months of texts and emails.</p>
                     <p><span className="font-medium text-foreground">Example:</span> The strata council questions why they should renew the rope access contract. "How do we know they're responsive?" You're scrolling through texts from March. You can't provide concrete data.</p>
                     <p><span className="font-medium text-foreground">Solution:</span> Professional vendor portal provides complete visibility: real-time progress, photo galleries, all feedback with response times tracked, and downloadable reports for council presentations.</p>
@@ -348,16 +319,16 @@ export default function UserAccessGuide() {
           <div className="space-y-4">
             <div className="flex items-center gap-3 pb-2 border-b">
               <Home className="w-5 h-5 text-rose-500" />
-              <h3 className="text-lg font-medium" style={{ fontFamily: "Outfit, sans-serif", fontSize: "18px" }}>For Building Residents</h3>
+              <h3 className="text-xl md:text-2xl font-semibold">For Building Residents</h3>
             </div>
             
             <Accordion type="single" collapsible className="space-y-3">
               <AccordionItem value="res-1" className="border rounded-lg px-4">
                 <AccordionTrigger className="hover:no-underline py-4">
-                  <span className="text-left font-medium" style={{ fontFamily: "Outfit, sans-serif", fontSize: "18px" }}>No transparency into work progress</span>
+                  <span className="text-left font-medium text-base">No transparency into work progress</span>
                 </AccordionTrigger>
                 <AccordionContent className="pb-4">
-                  <div className="space-y-4 text-muted-foreground leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
+                  <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>You see maintenance equipment on the roof. Scaffolding goes up on the west side. You have no idea what's being done, when it will be done, or if it will affect your unit. So you call the building manager. So does everyone else.</p>
                     <p><span className="font-medium text-foreground">Example:</span> You're in Unit 1847 on the east side. Monday morning you see technicians on the west side. Are they coming to your side? You need to move plants on your balcony before cleaning. You call the building manager. They don't know—they have to contact the vendor.</p>
                     <p><span className="font-medium text-foreground">Solution:</span> Resident portal shows your building's project in real-time. You see which elevations are complete, view the schedule showing east elevation starts Wednesday. You move your plants Tuesday night. No calls necessary.</p>
@@ -368,10 +339,10 @@ export default function UserAccessGuide() {
 
               <AccordionItem value="res-2" className="border rounded-lg px-4">
                 <AccordionTrigger className="hover:no-underline py-4">
-                  <span className="text-left font-medium" style={{ fontFamily: "Outfit, sans-serif", fontSize: "18px" }}>No record of feedback resolution</span>
+                  <span className="text-left font-medium text-base">No record of feedback resolution</span>
                 </AccordionTrigger>
                 <AccordionContent className="pb-4">
-                  <div className="space-y-4 text-muted-foreground leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
+                  <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>You notice streaks on your windows after the cleaning crew left. You email the building manager with photos. Days pass with no acknowledgment. A week later, you email again. No response. You don't know if anyone saw your complaint.</p>
                     <p><span className="font-medium text-foreground">Example:</span> Your windows have water damage stains after pressure washing. You email Monday. By Friday you've heard nothing. Wednesday you finally get a call: "I forwarded that last week, I think they're planning to come back." No timeline, no accountability.</p>
                     <p><span className="font-medium text-foreground">Solution:</span> Submit feedback directly through the portal with photos. System timestamps your submission. You see status change from "Open" to "In Progress" when acknowledged, then "Closed" when fixed with photos of corrected work.</p>
@@ -382,10 +353,10 @@ export default function UserAccessGuide() {
 
               <AccordionItem value="res-3" className="border rounded-lg px-4">
                 <AccordionTrigger className="hover:no-underline py-4">
-                  <span className="text-left font-medium" style={{ fontFamily: "Outfit, sans-serif", fontSize: "18px" }}>3-day resolution times from phone tag</span>
+                  <span className="text-left font-medium text-base">3-day resolution times from phone tag</span>
                 </AccordionTrigger>
                 <AccordionContent className="pb-4">
-                  <div className="space-y-4 text-muted-foreground leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
+                  <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>The communication chain is broken: resident to building manager to maintenance company back to building manager back to resident. Each handoff adds 12-24 hours of delay.</p>
                     <p><span className="font-medium text-foreground">Example:</span> Unit 3205 has a broken window screen. Resident emails building manager Tuesday. Manager forwards Tuesday afternoon. Company schedules repair for Thursday. Resident isn't home Thursday because nobody told them. Repair happens Friday—3 days for a 15-minute fix.</p>
                     <p><span className="font-medium text-foreground">Solution:</span> Direct resident-to-vendor feedback system cuts out the middleman while keeping building managers informed. Resident submits issue Tuesday 9am. Company sees it Tuesday 9:05am, responds at 10am. Issue resolved Wednesday 2pm.</p>
@@ -400,16 +371,16 @@ export default function UserAccessGuide() {
           <div className="space-y-4">
             <div className="flex items-center gap-3 pb-2 border-b">
               <Shield className="w-5 h-5 text-emerald-500" />
-              <h3 className="text-lg font-medium" style={{ fontFamily: "Outfit, sans-serif", fontSize: "18px" }}>Security & Data Protection</h3>
+              <h3 className="text-xl md:text-2xl font-semibold">Security & Data Protection</h3>
             </div>
             
             <Accordion type="single" collapsible className="space-y-3">
               <AccordionItem value="sec-1" className="border rounded-lg px-4">
                 <AccordionTrigger className="hover:no-underline py-4">
-                  <span className="text-left font-medium" style={{ fontFamily: "Outfit, sans-serif", fontSize: "18px" }}>Multi-tenant data isolation</span>
+                  <span className="text-left font-medium text-base">Multi-tenant data isolation</span>
                 </AccordionTrigger>
                 <AccordionContent className="pb-4">
-                  <div className="space-y-4 text-muted-foreground leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
+                  <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>You're a small rope access company. You can't afford enterprise-grade IT security. But you handle sensitive information: employee SINs, hourly rates, client billing data, building access codes, resident feedback.</p>
                     <p><span className="font-medium text-foreground">Example:</span> You're evaluating a construction software platform. Their security documentation is vague. You ask: "Can other companies see my data?" The answer is concerning: "Our system uses role-based permissions." That doesn't answer the question.</p>
                     <p><span className="font-medium text-foreground">Solution:</span> Complete multi-tenant isolation architecture. Your company's data exists in a completely separate partition from every other company. A security flaw in another company's account cannot expose your data.</p>
@@ -420,10 +391,10 @@ export default function UserAccessGuide() {
 
               <AccordionItem value="sec-2" className="border rounded-lg px-4">
                 <AccordionTrigger className="hover:no-underline py-4">
-                  <span className="text-left font-medium" style={{ fontFamily: "Outfit, sans-serif", fontSize: "18px" }}>Password security</span>
+                  <span className="text-left font-medium text-base">Password security</span>
                 </AccordionTrigger>
                 <AccordionContent className="pb-4">
-                  <div className="space-y-4 text-muted-foreground leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
+                  <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>You require employees to create strong passwords, but you have no way to enforce it. Technicians use "password123" or their birthdate. When someone leaves, if their password was stored in plain text, it could be used on other systems.</p>
                     <p><span className="font-medium text-foreground">Example:</span> A technician creates his account with password "Rope2024". Six months later he leaves to work for a competitor. His password was stored in plain text. If someone breaches your system, they could try those passwords on your email and other platforms.</p>
                     <p><span className="font-medium text-foreground">Solution:</span> Industry-standard bcrypt password hashing with salt rounds. Passwords are never stored in plain text—not even you can see them. Even if someone gained database access, they would see only irreversible hashes.</p>
@@ -438,11 +409,11 @@ export default function UserAccessGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2" style={{ fontFamily: "Outfit, sans-serif" }}>
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Layers className="w-5 h-5 text-purple-600 dark:text-purple-400" />
             Three User Categories
           </h2>
-          <p className="text-muted-foreground leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>Users fall into one of three distinct categories with different authentication and data access patterns:</p>
+          <p className="text-muted-foreground leading-relaxed text-base">Users fall into one of three distinct categories with different authentication and data access patterns:</p>
 
           <div className="grid md:grid-cols-3 gap-4">
             <Card className="border-2 border-amber-200 dark:border-amber-900">
@@ -476,7 +447,7 @@ export default function UserAccessGuide() {
             <Card className="border-2 border-blue-200 dark:border-blue-900">
               <CardHeader className="pb-2">
                 <div className="flex items-center gap-2">
-                  <HardHat className="w-5 h-5 text-blue-600" />
+                  <HardHat className="w-5 h-5 text-action-600" />
                   <CardTitle className="text-base">Employee Accounts</CardTitle>
                 </div>
               </CardHeader>
@@ -534,11 +505,11 @@ export default function UserAccessGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2" style={{ fontFamily: "Outfit, sans-serif" }}>
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Briefcase className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             Employee Roles & Flexible Permissions
           </h2>
-          <p className="text-muted-foreground leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
+          <p className="text-muted-foreground leading-relaxed text-base">
             Company owners select from predefined base roles OR create custom roles. <strong>Base roles organize your team structure but do NOT dictate permissions.</strong>
           </p>
 
@@ -592,7 +563,7 @@ export default function UserAccessGuide() {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Clipboard className="w-4 h-4 text-blue-600" />
+                  <Clipboard className="w-4 h-4 text-action-600" />
                   Field Leadership
                 </CardTitle>
               </CardHeader>
@@ -669,8 +640,8 @@ export default function UserAccessGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2" style={{ fontFamily: "Outfit, sans-serif" }}>
-            <Settings className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
+            <Settings className="w-5 h-5 text-action-600 dark:text-action-400" />
             How Permission Assignment Works
           </h2>
 
@@ -774,7 +745,7 @@ export default function UserAccessGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2" style={{ fontFamily: "Outfit, sans-serif" }}>
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Shield className="w-5 h-5 text-red-600 dark:text-red-400" />
             Granular Permissions
           </h2>
@@ -816,7 +787,7 @@ export default function UserAccessGuide() {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Clipboard className="w-4 h-4 text-blue-600" />
+                  <Clipboard className="w-4 h-4 text-action-600" />
                   Project Management
                 </CardTitle>
               </CardHeader>
@@ -959,7 +930,7 @@ export default function UserAccessGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2" style={{ fontFamily: "Outfit, sans-serif" }}>
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Home className="w-5 h-5 text-teal-600 dark:text-teal-400" />
             External User Roles
           </h2>
@@ -1053,7 +1024,7 @@ export default function UserAccessGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2" style={{ fontFamily: "Outfit, sans-serif" }}>
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <LogIn className="w-5 h-5 text-green-600 dark:text-green-400" />
             Authentication Flow
           </h2>
@@ -1164,7 +1135,7 @@ export default function UserAccessGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2" style={{ fontFamily: "Outfit, sans-serif" }}>
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Lock className="w-5 h-5 text-red-600 dark:text-red-400" />
             Security Architecture
           </h2>
@@ -1291,7 +1262,7 @@ export default function UserAccessGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2" style={{ fontFamily: "Outfit, sans-serif" }}>
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Settings className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             Account Management
           </h2>
@@ -1300,10 +1271,10 @@ export default function UserAccessGuide() {
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-start gap-3">
-                  <KeyRound className="w-5 h-5 text-blue-600 mt-0.5" />
+                  <KeyRound className="w-5 h-5 text-action-600 mt-0.5" />
                   <div>
-                    <p className="font-medium" style={{ fontFamily: "Outfit, sans-serif" }}>Password Changes</p>
-                    <p className="text-sm text-muted-foreground" style={{ fontFamily: "Outfit, sans-serif" }}>Users can change their passwords with current password verification. Company owners can reset employee passwords when needed.</p>
+                    <p className="font-medium">Password Changes</p>
+                    <p className="text-sm text-muted-foreground">Users can change their passwords with current password verification. Company owners can reset employee passwords when needed.</p>
                   </div>
                 </div>
               </CardContent>
@@ -1314,8 +1285,8 @@ export default function UserAccessGuide() {
                 <div className="flex items-start gap-3">
                   <User className="w-5 h-5 text-amber-600 mt-0.5" />
                   <div>
-                    <p className="font-medium" style={{ fontFamily: "Outfit, sans-serif" }}>Account Deletion</p>
-                    <p className="text-sm text-muted-foreground" style={{ fontFamily: "Outfit, sans-serif" }}>Account deletion available with appropriate permissions. Data retention policies ensure compliance while removing sensitive information. Historical work records are preserved for audit purposes.</p>
+                    <p className="font-medium">Account Deletion</p>
+                    <p className="text-sm text-muted-foreground">Account deletion available with appropriate permissions. Data retention policies ensure compliance while removing sensitive information. Historical work records are preserved for audit purposes.</p>
                   </div>
                 </div>
               </CardContent>
@@ -1326,8 +1297,8 @@ export default function UserAccessGuide() {
                 <div className="flex items-start gap-3">
                   <LogIn className="w-5 h-5 text-green-600 mt-0.5" />
                   <div>
-                    <p className="font-medium" style={{ fontFamily: "Outfit, sans-serif" }}>Session Management</p>
-                    <p className="text-sm text-muted-foreground" style={{ fontFamily: "Outfit, sans-serif" }}>Automatic session expiration after 30 days of inactivity. Secure logout functionality clears all session data. Users remain logged in across browser sessions until explicit logout or expiration.</p>
+                    <p className="font-medium">Session Management</p>
+                    <p className="text-sm text-muted-foreground">Automatic session expiration after 30 days of inactivity. Secure logout functionality clears all session data. Users remain logged in across browser sessions until explicit logout or expiration.</p>
                   </div>
                 </div>
               </CardContent>
@@ -1338,7 +1309,7 @@ export default function UserAccessGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2" style={{ fontFamily: "Outfit, sans-serif" }}>
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />
             Quick Reference: Who Can Do What
           </h2>
@@ -1495,8 +1466,8 @@ export default function UserAccessGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2" style={{ fontFamily: "Outfit, sans-serif" }}>
-            <Clock className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
+            <Clock className="w-5 h-5 text-action-600 dark:text-action-400" />
             Upcoming Features
           </h2>
 
@@ -1555,8 +1526,8 @@ export default function UserAccessGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2" style={{ fontFamily: "Outfit, sans-serif" }}>
-            <Info className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
+            <Info className="w-5 h-5 text-action-600 dark:text-action-400" />
             Terminology & Naming
           </h2>
 
