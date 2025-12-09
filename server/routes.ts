@@ -4329,6 +4329,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         employeeCountry: tech.employeeCountry,
         referralCode: tech.referralCode,
         referralCount: referralCounts.get(tech.id) || 0,
+        hasPlusAccess: tech.hasPlusAccess || false,
       }));
 
       res.json({ 
@@ -4422,6 +4423,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         createdAt: technician.createdAt,
         lastActivityAt: technician.lastActivityAt,
         irataBaselineHours: technician.irataBaselineHours,
+        
+        // PLUS Access
+        hasPlusAccess: technician.hasPlusAccess || false,
+        referralCount: await storage.getReferralCount(technicianId),
       };
 
       // Company info (if linked)
@@ -4440,6 +4445,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('[SuperUser] Get technician details error:', error);
       res.status(500).json({ message: "Failed to fetch technician details" });
+    }
+  });
+
+  // Toggle PLUS access for a technician (SuperUser only)
+  app.put("/api/superuser/technicians/:technicianId/plus-access", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const { technicianId } = req.params;
+      const { hasPlusAccess } = req.body;
+
+      if (typeof hasPlusAccess !== 'boolean') {
+        return res.status(400).json({ message: "hasPlusAccess must be a boolean" });
+      }
+
+      // Find the technician
+      const technician = await storage.getUserById(technicianId);
+      if (!technician) {
+        return res.status(404).json({ message: "Technician not found" });
+      }
+
+      // Only allow for technician role users
+      if (technician.role !== 'technician') {
+        return res.status(400).json({ message: "PLUS access can only be granted to technicians" });
+      }
+
+      // Update the hasPlusAccess field
+      await db.update(users).set({
+        hasPlusAccess: hasPlusAccess,
+      }).where(eq(users.id, technicianId));
+
+      console.log(`[SuperUser] ${hasPlusAccess ? 'Granted' : 'Revoked'} PLUS access for technician ${technicianId}`);
+
+      res.json({ 
+        success: true, 
+        message: `PLUS access ${hasPlusAccess ? 'granted' : 'revoked'} successfully` 
+      });
+    } catch (error) {
+      console.error('[SuperUser] Toggle PLUS access error:', error);
+      res.status(500).json({ message: "Failed to update PLUS access" });
     }
   });
 
