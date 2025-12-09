@@ -179,35 +179,56 @@ export default function Login() {
     <div className="min-h-screen bg-gradient-to-b from-primary/5 via-background to-background flex flex-col">
       {/* Header */}
       <header className="flex items-center justify-between px-6 md:px-8 py-4 border-b bg-background/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="flex items-center gap-8">
+        {/* Logo - Left */}
+        <div className="flex items-center">
           <img src={onRopeProLogo} alt="OnRopePro" className="h-16 object-contain" />
-          <nav className="hidden md:flex items-center gap-1">
-            <Button
-              variant="ghost"
-              className="text-sm font-medium"
-              onClick={() => setLocation("#")}
-              data-testid="nav-employer"
-            >
-              Employer
-            </Button>
-            <Button
-              variant="ghost"
-              className="text-sm font-medium"
-              onClick={() => setLocation("/technician-login")}
-              data-testid="nav-technician"
-            >
-              Technician
-            </Button>
-            <Button
-              variant="ghost"
-              className="text-sm font-medium"
-              onClick={() => setLocation("#")}
-              data-testid="nav-property-manager"
-            >
-              Property Manager
-            </Button>
-          </nav>
         </div>
+        
+        {/* Navigation - Center */}
+        <nav className="hidden lg:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
+          <Button
+            variant="ghost"
+            className="text-sm font-medium"
+            onClick={() => setLocation("/employer")}
+            data-testid="nav-employer"
+          >
+            Employer
+          </Button>
+          <Button
+            variant="ghost"
+            className="text-sm font-medium"
+            onClick={() => setLocation("/technician-login")}
+            data-testid="nav-technician"
+          >
+            Technician
+          </Button>
+          <Button
+            variant="ghost"
+            className="text-sm font-medium"
+            onClick={() => setLocation("#")}
+            data-testid="nav-property-manager"
+          >
+            Property Manager
+          </Button>
+          <Button
+            variant="ghost"
+            className="text-sm font-medium"
+            onClick={() => setLocation("/link")}
+            data-testid="nav-resident"
+          >
+            Resident
+          </Button>
+          <Button
+            variant="ghost"
+            className="text-sm font-medium"
+            onClick={() => setLocation("/building-portal")}
+            data-testid="nav-building-manager"
+          >
+            Building Manager
+          </Button>
+        </nav>
+        
+        {/* Actions - Right */}
         <div className="flex items-center gap-3">
           <Button 
             variant="ghost"

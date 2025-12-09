@@ -73,6 +73,7 @@ import Pricing from "@/pages/Pricing";
 import ROICalculator from "@/pages/ROICalculator";
 import TechnicianLogin from "@/pages/TechnicianLogin";
 import TechnicianPortal from "@/pages/TechnicianPortal";
+import Employer from "@/pages/Employer";
 import TechnicianLoggedHours from "@/pages/TechnicianLoggedHours";
 import TechnicianJobBoard from "@/pages/TechnicianJobBoard";
 import CompanyJobBoard from "@/pages/CompanyJobBoard";
@@ -95,6 +96,7 @@ function Router() {
       <Route path="/" component={Login} />
       <Route path="/register" component={Register} />
       <Route path="/login" component={Login} />
+      <Route path="/employer" component={Employer} />
       <Route path="/pricing" component={GetLicense} />
       <Route path="/get-license" component={GetLicense} />
       <Route path="/complete-registration" component={CompleteRegistration} />
