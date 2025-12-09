@@ -312,14 +312,14 @@ export default function TechnicianLogin() {
 
   const plusFeatures = [
     "Everything in Standard",
+    "Job board access (rope access-specific postings, no more endless Indeed searches)",
+    "Resume/CV storage",
     "PLUS badge on your profile",
     "Unlimited employer connections (plug into multiple companies simultaneously)",
     "30-day certification expiry alerts (you AND your employer notified)",
     "Safety Rating score (0-100) with improvement recommendations",
     "Exportable work history PDF (178 rope transfers, 3,500 deviations - actual proof)",
-    "Work history analytics (lifetime totals by task type)",
-    "Resume storage",
-    "Job board access (rope access-specific postings, no more endless Indeed searches)"
+    "Work history analytics (lifetime totals by task type)"
   ];
 
   const steps = [
