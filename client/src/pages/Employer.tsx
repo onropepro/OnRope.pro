@@ -1,22 +1,14 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
-import { queryClient } from "@/lib/queryClient";
-import { trackLogin } from "@/lib/analytics";
-import { Rocket, Play, Building2, Clock, DollarSign, Users, Shield, FileText, Calculator, FileSpreadsheet, Radio, ClipboardCheck, MessageSquare, Home, Award, Calendar, FolderOpen, Globe, TrendingUp, ArrowRight, HardHat } from "lucide-react";
+import { Rocket, Play, Building2, Clock, DollarSign, Users, Shield, MessageSquare, Globe, ArrowRight } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 export default function Employer() {
   const { t, i18n } = useTranslation();
-  const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [landingLanguage, setLandingLanguage] = useState<'en' | 'fr'>('en');
@@ -116,7 +108,7 @@ export default function Employer() {
           </Button>
           <Button 
             onClick={() => setLocation("/pricing")}
-            className="bg-[#A3320B]"
+            className="bg-rust-500 hover:bg-rust-600 focus:ring-4 focus:ring-action-500/50"
             data-testid="button-get-started-header"
           >
             {t('login.header.getStarted', 'Get Started')}
@@ -125,27 +117,25 @@ export default function Employer() {
       </header>
 
       {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center text-center px-6 py-16 md:py-24" style={{ backgroundColor: '#F3F3F3' }}>
+      <section className="flex flex-col items-center justify-center text-center px-6 py-16 md:py-24 bg-neutral-100 dark:bg-navy-950">
         <h1 className="text-xs md:text-sm font-semibold tracking-widest text-muted-foreground uppercase mb-1.5">
           {t('login.hero.subtitle', 'Building Maintenance Management Software')}
         </h1>
-        <p className="text-xs md:text-sm font-semibold tracking-widest text-muted-foreground uppercase" style={{ marginBottom: '60px' }}>
+        <p className="text-xs md:text-sm font-semibold tracking-widest text-muted-foreground uppercase mb-16">
           {t('login.hero.builtBy', 'Built by a Level 3 IRATA Tech & Operations Manager')}
         </p>
         
-        <p className="text-2xl md:text-4xl font-medium mb-0 text-[#3B3B3B]" style={{ color: '#3B3B3B' }}>
+        <p className="text-2xl md:text-4xl font-medium mb-0 text-foreground">
           {t('login.hero.tagline', "Your competitors think they're organized.")}
         </p>
         
-        <div className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight mb-4" style={{ color: '#3B3B3B' }}>
+        <div className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-4 text-foreground">
           {t('login.hero.taglineBold', "THEY'RE NOT")}
         </div>
         
-        <p className="text-base md:text-lg max-w-xl mb-8" style={{ color: '#3B3B3B' }}>
+        <p className="text-base md:text-lg max-w-xl mb-8 text-foreground">
           {t('login.hero.description', 'You track every')}{" "}
-          <span 
-            className="inline-block transition-all duration-300 opacity-100 translate-y-0 text-[#3B3B3B] font-bold"
-          >
+          <span className="inline-block transition-all duration-300 opacity-100 translate-y-0 font-bold text-foreground">
             {rotatingWords[currentWordIndex]}
           </span>
           {t('login.hero.descriptionEnd', ', from a single platform that actually speaks rope access.')}
@@ -155,7 +145,7 @@ export default function Employer() {
           <Button 
             size="lg"
             onClick={() => setLocation("/pricing")}
-            className="gap-2 px-6 bg-[#A3320B]"
+            className="gap-2 px-6 bg-rust-500 hover:bg-rust-600 focus:ring-4 focus:ring-action-500/50"
             data-testid="button-get-started-free"
           >
             <Rocket className="w-4 h-4" />
@@ -164,7 +154,7 @@ export default function Employer() {
           <Button 
             variant="outline"
             size="lg"
-            className="gap-2 px-6"
+            className="gap-2 px-6 focus:ring-4 focus:ring-action-500/50"
             data-testid="button-watch-demo"
           >
             <Play className="w-4 h-4" />
@@ -174,7 +164,7 @@ export default function Employer() {
       </section>
 
       {/* ROI Calculator Section */}
-      <section className="py-16 md:py-24 px-6 bg-primary/5">
+      <section className="py-16 md:py-24 px-6 bg-action-500/10 dark:bg-navy-900">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-2xl md:text-4xl font-bold mb-4">
             Calculate Your Hidden Costs<br />
@@ -216,7 +206,7 @@ export default function Employer() {
               <Button 
                 size="lg"
                 onClick={() => setLocation(`/roi-calculator?employees=${roiEmployeeCount}&step=2`)}
-                className="w-full gap-2"
+                className="w-full gap-2 focus:ring-4 focus:ring-action-500/50"
                 data-testid="button-roi-calculator-next"
               >
                 {t('roi.navigation.next', 'Next')}
@@ -251,7 +241,7 @@ export default function Employer() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 md:py-24 px-6 bg-muted/30">
+      <section className="py-16 md:py-24 px-6 bg-muted/30 dark:bg-navy-950">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-2xl md:text-4xl font-bold mb-4">
             {t('login.cta.title', 'Ready to Streamline Your Rope Access Operations?')}
@@ -263,7 +253,7 @@ export default function Employer() {
             <Button 
               size="lg"
               onClick={() => setLocation("/register")}
-              className="gap-2 px-6"
+              className="gap-2 px-6 focus:ring-4 focus:ring-action-500/50"
               data-testid="button-start-free-trial"
             >
               <Rocket className="w-4 h-4" />
@@ -272,7 +262,7 @@ export default function Employer() {
             <Button 
               variant="outline"
               size="lg"
-              className="gap-2 px-6"
+              className="gap-2 px-6 focus:ring-4 focus:ring-action-500/50"
               data-testid="button-schedule-demo"
             >
               <span className="material-icons text-lg">calendar_today</span>
