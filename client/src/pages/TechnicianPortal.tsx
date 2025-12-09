@@ -4302,8 +4302,20 @@ export default function TechnicianPortal() {
       </Dialog>
 
       {/* My Feedback Dialog */}
-      <Dialog open={showMyFeedbackDialog} onOpenChange={(open) => {
+      <Dialog open={showMyFeedbackDialog} onOpenChange={async (open) => {
         setShowMyFeedbackDialog(open);
+        if (open && myFeedbackData?.requests) {
+          // Mark all unread feedback as read when dialog opens
+          for (const feedback of myFeedbackData.requests) {
+            if (feedback.unreadCount > 0) {
+              await fetch(`/api/my-feedback/${feedback.id}/mark-read`, {
+                method: 'POST',
+                credentials: 'include',
+              });
+            }
+          }
+          refetchMyFeedback();
+        }
         if (!open) {
           setSelectedFeedbackId(null);
           setFeedbackReply("");
