@@ -422,123 +422,90 @@ export default function TechnicianLogin() {
           </div>
         </header>
 
-        {/* Hero Section */}
-        <section className="container mx-auto px-6 py-16 lg:py-24">
-          <div className="max-w-3xl">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="p-2 rounded-full bg-primary/10">
-                <HardHat className="w-5 h-5 text-primary" />
+        {/* Hero Section - Flowbite Style */}
+        <section className="py-20 lg:py-32">
+          <div className="container mx-auto px-6 lg:px-8">
+            <div className="max-w-4xl mx-auto text-center">
+              {/* Pill Badge */}
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8">
+                <HardHat className="w-4 h-4 text-primary" />
+                <span className="text-sm font-medium text-primary">For IRATA & SPRAT Technicians</span>
               </div>
-              <span className="text-sm font-medium text-muted-foreground">For IRATA & SPRAT Technicians / Employees Working In Rope Access</span>
-            </div>
-            
-            <h1 className="text-4xl lg:text-5xl font-bold tracking-tight mb-6">
-              You Work.{" "}
-              <span className="text-primary">Everything Else Is Automatic.</span>
-            </h1>
-            
-            <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-              One profile. Any employer using OnRopePro. Hours submit themselves. Certs already verified. 
-              Logbook entries you didn't have to make up. Onboarding done before you arrive.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 mb-6">
-              <Button 
-                size="lg" 
-                className="gap-2 text-lg px-8"
-                onClick={() => setShowRegistration(true)}
-                data-testid="button-hero-cta"
-              >
-                Create Your Free Profile
-                <ChevronRight className="w-5 h-5" />
-              </Button>
-            </div>
-            
-            <p className="text-sm text-muted-foreground">
-              Free forever. No credit card. Takes 2 minutes.
-            </p>
-          </div>
-        </section>
-
-        {/* Problem Section */}
-        <section className="bg-muted/30 py-16 lg:py-20">
-          <div className="container mx-auto px-6">
-            <div className="max-w-3xl">
-              <h2 className="text-3xl font-bold mb-8">
-                Same forms. Same timesheets. Same logbook you're making up.
-              </h2>
               
-              <div className="space-y-6 text-muted-foreground leading-relaxed">
-                <p>
-                  New employer. New banking forms. New emergency contact sheet. New void cheque request. Again.
-                </p>
-                <p>
-                  Every Friday: text your hours to the office. Hope they log them right. Dispute the paycheck when they don't.
-                </p>
-                <p>
-                  And your logbook? You're filling it out two weeks late, staring at your phone trying to remember what building you were at, what tasks you did, making stuff up because who actually remembers.
-                </p>
-                <p className="text-lg font-medium text-foreground">
-                  Eight years on rope. Level 3 IRATA. Hundreds of buildings.
-                </p>
-                <p>
-                  And you're still filling out the same forms, still texting timesheets, still guessing at logbook entries like it's your first month.
-                </p>
-                <p className="text-lg font-semibold text-foreground pt-4">
-                  There's a better way.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Solution Section */}
-        <section className="py-16 lg:py-20">
-          <div className="container mx-auto px-6">
-            <div className="max-w-3xl">
-              <h2 className="text-3xl font-bold mb-8">
-                Set up once. Plug into any employer. Done.
-              </h2>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
+                You Work.{" "}
+                <span className="bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent">Everything Else Is Automatic.</span>
+              </h1>
               
-              <p className="text-lg text-muted-foreground mb-10">
-                OnRopePro gives you a portable professional identity that <strong className="text-foreground">connects</strong> to any company using the platform.
+              <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
+                One profile. Any employer using OnRopePro. Hours submit themselves. Certs already verified. 
+                Logbook entries you didn't have to make up. Onboarding done before you arrive.
               </p>
               
-              <p className="font-semibold mb-4">Here's what that means:</p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+                <Button 
+                  size="lg" 
+                  className="gap-2 rounded-full bg-gradient-to-r from-primary to-blue-500 shadow-lg shadow-primary/25"
+                  onClick={() => setShowRegistration(true)}
+                  data-testid="button-hero-cta"
+                >
+                  Create Your Free Profile
+                  <ChevronRight className="w-5 h-5" />
+                </Button>
+                <Button 
+                  variant="outline"
+                  size="lg" 
+                  className="gap-2 rounded-full"
+                  onClick={() => setShowLoginDialog(true)}
+                  data-testid="button-hero-signin"
+                >
+                  Sign In
+                </Button>
+              </div>
               
-              <div className="grid gap-8">
-                <div>
-                  <h3 className="font-semibold mb-2 text-foreground">Day 1 at a new job?</h3>
-                  <p className="text-muted-foreground">
-                    You plug in. They instantly have your IRATA/SPRAT certs, first aid, driver's abstract, banking info, emergency contact—verified and ready. The only thing your employer has to do is enter your salary and permissions. That's it. No forms. No "bring a void cheque." No half-day orientation.
+              <p className="text-sm text-muted-foreground">
+                Free forever. No credit card. Takes 2 minutes.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Problem Section - Flowbite Style */}
+        <section className="py-20 lg:py-28 bg-muted/20">
+          <div className="container mx-auto px-6 lg:px-8">
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mb-12">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-destructive/10 border border-destructive/20 mb-6">
+                  <span className="text-xs font-semibold text-destructive uppercase tracking-wider">The Problem</span>
+                </div>
+                <h2 className="text-3xl md:text-4xl font-extrabold mb-6">
+                  Same forms. Same timesheets. Same logbook you're making up.
+                </h2>
+              </div>
+              
+              <div className="grid md:grid-cols-2 gap-8 text-muted-foreground">
+                <div className="space-y-6">
+                  <p className="leading-relaxed">
+                    New employer. New banking forms. New emergency contact sheet. New void cheque request. Again.
+                  </p>
+                  <p className="leading-relaxed">
+                    Every Friday: text your hours to the office. Hope they log them right. Dispute the paycheck when they don't.
+                  </p>
+                  <p className="leading-relaxed">
+                    And your logbook? You're filling it out two weeks late, staring at your phone trying to remember what building you were at.
                   </p>
                 </div>
-                
-                <div>
-                  <h3 className="font-semibold mb-2 text-foreground">Every day after that?</h3>
-                  <p className="text-muted-foreground">
-                    Your work hours, buildings, tasks—logged automatically. Clock in, do your work, clock out. Hours submitted. No timesheets. No texts to the office. No "I swear I worked 9 hours" disputes.
-                  </p>
-                </div>
-                
-                <div>
-                  <h3 className="font-semibold mb-2 text-foreground">When you fill out your logbook?</h3>
-                  <p className="text-muted-foreground">
-                    Every session is recorded. Building address, tasks, height, hours. Fill out your IRATA logbook from actual records—not fuzzy memory two weeks later.
-                  </p>
-                </div>
-                
-                <div>
-                  <h3 className="font-semibold mb-2 text-foreground">Change employers?</h3>
-                  <p className="text-muted-foreground">
-                    Unplug from Company A. Plug into Company B. Same instant onboarding. Same automatic logging. Your profile stays yours.
-                  </p>
-                </div>
-                
-                <div>
-                  <h3 className="font-semibold mb-2 text-foreground">Work multiple companies?</h3>
-                  <p className="text-muted-foreground">
-                    With Plus, connect to unlimited employers simultaneously. Four days at Company A, weekends at Company B, your own clients on the side. One profile handles it all.
+                <div className="space-y-6">
+                  <div className="p-6 rounded-2xl bg-background border">
+                    <p className="text-lg font-semibold text-foreground mb-2">
+                      Eight years on rope. Level 3 IRATA. Hundreds of buildings.
+                    </p>
+                    <p className="leading-relaxed">
+                      And you're still filling out the same forms, still texting timesheets, still guessing at logbook entries like it's your first month.
+                    </p>
+                  </div>
+                  <p className="text-xl font-bold text-primary text-center pt-4">
+                    There's a better way.
                   </p>
                 </div>
               </div>
@@ -546,114 +513,203 @@ export default function TechnicianLogin() {
           </div>
         </section>
 
-        {/* Features Grid */}
-        <section className="bg-muted/30 py-16 lg:py-20">
-          <div className="container mx-auto px-6">
-            <h2 className="text-3xl font-bold mb-4">The system that works while you work</h2>
-            <p className="text-muted-foreground mb-10 max-w-2xl">
-              Everything you need to own your professional identity and take it with you.
-            </p>
+        {/* Solution Section - Flowbite Style */}
+        <section className="py-20 lg:py-28">
+          <div className="container mx-auto px-6 lg:px-8">
+            <div className="max-w-5xl mx-auto">
+              <div className="text-center mb-16">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 mb-6">
+                  <span className="text-xs font-semibold text-green-600 dark:text-green-400 uppercase tracking-wider">The Solution</span>
+                </div>
+                <h2 className="text-3xl md:text-4xl font-extrabold mb-6">
+                  Set up once. Plug into any employer. Done.
+                </h2>
+                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                  OnRopePro gives you a portable professional identity that <strong className="text-foreground">connects</strong> to any company using the platform.
+                </p>
+              </div>
+              
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="p-6 rounded-2xl border bg-card hover:shadow-lg transition-shadow">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                    <span className="text-lg font-bold text-primary">1</span>
+                  </div>
+                  <h3 className="font-bold text-lg mb-2">Day 1 at a new job?</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    You plug in. They instantly have your certs, banking, emergency contact—verified and ready. No forms. No "bring a void cheque."
+                  </p>
+                </div>
+                
+                <div className="p-6 rounded-2xl border bg-card hover:shadow-lg transition-shadow">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                    <span className="text-lg font-bold text-primary">2</span>
+                  </div>
+                  <h3 className="font-bold text-lg mb-2">Every day after that?</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Hours, buildings, tasks—logged automatically. Clock in, do your work, clock out. No timesheets. No disputes.
+                  </p>
+                </div>
+                
+                <div className="p-6 rounded-2xl border bg-card hover:shadow-lg transition-shadow">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                    <span className="text-lg font-bold text-primary">3</span>
+                  </div>
+                  <h3 className="font-bold text-lg mb-2">Fill out your logbook?</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Every session recorded. Building, tasks, height, hours. Use actual records—not fuzzy memory two weeks later.
+                  </p>
+                </div>
+                
+                <div className="p-6 rounded-2xl border bg-card hover:shadow-lg transition-shadow">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                    <span className="text-lg font-bold text-primary">4</span>
+                  </div>
+                  <h3 className="font-bold text-lg mb-2">Change employers?</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Unplug from Company A. Plug into Company B. Same instant onboarding. Your profile stays yours.
+                  </p>
+                </div>
+                
+                <div className="p-6 rounded-2xl border bg-card hover:shadow-lg transition-shadow">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                    <span className="text-lg font-bold text-primary">5</span>
+                  </div>
+                  <h3 className="font-bold text-lg mb-2">Work multiple companies?</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    With Plus, connect to unlimited employers. Weekdays, weekends, your own clients—one profile handles it all.
+                  </p>
+                </div>
+                
+                <div className="p-6 rounded-2xl border-2 border-primary bg-primary/5 hover:shadow-lg transition-shadow flex flex-col justify-center">
+                  <p className="text-sm font-medium text-primary mb-3">Ready to simplify your career?</p>
+                  <Button 
+                    size="sm"
+                    className="rounded-full"
+                    onClick={() => setShowRegistration(true)}
+                  >
+                    Get Started Free
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Features Grid - Flowbite Style */}
+        <section className="py-20 lg:py-28 bg-gradient-to-b from-muted/30 to-background">
+          <div className="container mx-auto px-6 lg:px-8">
+            <div className="text-center max-w-3xl mx-auto mb-16">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-6">
+                <span className="text-xs font-semibold text-primary uppercase tracking-wider">Features</span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-extrabold mb-4">The system that works while you work</h2>
+              <p className="text-lg text-muted-foreground">
+                Everything you need to own your professional identity and take it with you.
+              </p>
+            </div>
             
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {features.map((feature, index) => (
-                <Card key={index} className="border-border/50">
-                  <CardContent className="pt-6">
-                    <div className="flex flex-col gap-3">
-                      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <feature.icon className="w-5 h-5 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold mb-1">{feature.title}</h3>
-                        <p className="text-sm text-muted-foreground">{feature.description}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                <div key={index} className="group text-center p-6">
+                  <div className="mx-auto w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/20 transition-colors">
+                    <feature.icon className="w-7 h-7 text-primary" />
+                  </div>
+                  <h3 className="font-bold text-lg mb-2">{feature.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
+                </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Free vs Plus */}
-        <section className="py-16 lg:py-20">
-          <div className="container mx-auto px-6">
-            <h2 className="text-3xl font-bold mb-4">Free forever. Plus when you share.</h2>
-            <p className="text-muted-foreground mb-10 max-w-2xl">
-              Get started for free. Share with one tech to unlock Plus for both of you.
-            </p>
+        {/* Free vs Plus - Flowbite Style */}
+        <section className="py-20 lg:py-28">
+          <div className="container mx-auto px-6 lg:px-8">
+            <div className="text-center max-w-3xl mx-auto mb-16">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 mb-6">
+                <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Pricing</span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-extrabold mb-4">Free forever. Plus when you share.</h2>
+              <p className="text-lg text-muted-foreground">
+                Get started for free. Share with one tech to unlock Plus for both of you.
+              </p>
+            </div>
             
-            <div className="grid md:grid-cols-2 gap-6 max-w-4xl">
+            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
               {/* Standard */}
-              <Card className="border-border/50">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <HardHat className="w-5 h-5" />
-                    Tech Standard
-                  </CardTitle>
-                  <CardDescription>
-                    <span className="text-3xl font-bold text-foreground">$0</span>
-                    <span className="text-muted-foreground"> forever</span>
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Everything you need to own your professional identity:
-                  </p>
-                  <ul className="space-y-2">
-                    {standardFeatures.map((feature, index) => (
-                      <li key={index} className="flex items-start gap-2 text-sm">
-                        <CheckCircle2 className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
+              <div className="p-8 rounded-3xl border-2 border-border bg-card">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center">
+                    <HardHat className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-xl">Tech Standard</h3>
+                    <p className="text-sm text-muted-foreground">Everything to get started</p>
+                  </div>
+                </div>
+                <div className="mb-6">
+                  <span className="text-4xl font-extrabold">$0</span>
+                  <span className="text-muted-foreground ml-2">forever</span>
+                </div>
+                <ul className="space-y-3 mb-8">
+                  {standardFeatures.map((feature, index) => (
+                    <li key={index} className="flex items-start gap-3 text-sm">
+                      <CheckCircle2 className="w-5 h-5 text-muted-foreground mt-0.5 flex-shrink-0" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Button 
+                  variant="outline" 
+                  size="lg"
+                  className="w-full rounded-full"
+                  onClick={() => setShowRegistration(true)}
+                >
+                  Get Started Free
+                </Button>
+              </div>
 
               {/* Plus */}
-              <Card className="border-primary/50 bg-primary/5 relative">
-                <div className="absolute -top-3 left-4">
-                  <span className="bg-primary text-primary-foreground text-xs font-medium px-3 py-1 rounded-full">
+              <div className="p-8 rounded-3xl border-2 border-primary bg-gradient-to-b from-primary/5 to-primary/10 relative">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                  <span className="bg-gradient-to-r from-primary to-blue-500 text-primary-foreground text-xs font-semibold px-4 py-1.5 rounded-full shadow-lg">
                     Most Popular
                   </span>
                 </div>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Star className="w-5 h-5 text-primary" />
-                    Tech Plus
-                  </CardTitle>
-                  <CardDescription>
-                    <span className="text-3xl font-bold text-foreground">$0</span>
-                    <span className="text-muted-foreground"> with 1 referral</span>
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Share your code with one tech. When they sign up, you both unlock Plus:
-                  </p>
-                  <ul className="space-y-2">
-                    {plusFeatures.map((feature, index) => (
-                      <li key={index} className="flex items-start gap-2 text-sm">
-                        <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span className={index === 0 ? "font-medium" : ""}>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center">
+                    <Star className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-xl">Tech Plus</h3>
+                    <p className="text-sm text-muted-foreground">Unlocked via referral</p>
+                  </div>
+                </div>
+                <div className="mb-6">
+                  <span className="text-4xl font-extrabold">$0</span>
+                  <span className="text-muted-foreground ml-2">with 1 referral</span>
+                </div>
+                <ul className="space-y-3 mb-8">
+                  {plusFeatures.map((feature, index) => (
+                    <li key={index} className="flex items-start gap-3 text-sm">
+                      <CheckCircle2 className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                      <span className={index === 0 ? "font-semibold" : ""}>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Button 
+                  size="lg"
+                  className="w-full rounded-full bg-gradient-to-r from-primary to-blue-500"
+                  onClick={() => setShowRegistration(true)}
+                  data-testid="button-plans-cta"
+                >
+                  Get Started Free
+                </Button>
+              </div>
             </div>
 
-            <div className="mt-8 flex flex-col sm:flex-row gap-4 items-start">
-              <Button 
-                size="lg" 
-                className="gap-2"
-                onClick={() => setShowRegistration(true)}
-                data-testid="button-plans-cta"
-              >
-                Get Your Free Profile
-                <ChevronRight className="w-5 h-5" />
-              </Button>
-              <p className="text-sm text-muted-foreground flex items-center gap-2">
+            <div className="mt-12 text-center">
+              <p className="text-sm text-muted-foreground flex items-center justify-center gap-2">
                 <Share2 className="w-4 h-4" />
                 Share with one tech. You both get Plus. It's that simple.
               </p>
@@ -661,35 +717,44 @@ export default function TechnicianLogin() {
           </div>
         </section>
 
-        {/* How It Works */}
-        <section className="bg-muted/30 py-16 lg:py-20">
-          <div className="container mx-auto px-6">
-            <h2 className="text-3xl font-bold mb-4">2 minutes to set up. Automatic from there.</h2>
-            <p className="text-muted-foreground mb-10 max-w-2xl">
-              Getting started is simple. Here's how it works:
-            </p>
+        {/* How It Works - Flowbite Style */}
+        <section className="py-20 lg:py-28 bg-gradient-to-b from-muted/30 to-background">
+          <div className="container mx-auto px-6 lg:px-8">
+            <div className="text-center max-w-3xl mx-auto mb-16">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-6">
+                <span className="text-xs font-semibold text-primary uppercase tracking-wider">How It Works</span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-extrabold mb-4">2 minutes to set up. Automatic from there.</h2>
+              <p className="text-lg text-muted-foreground">
+                Getting started is simple. Here's how it works:
+              </p>
+            </div>
             
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl">
-              {steps.map((step, index) => (
-                <div key={index} className="relative">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
-                      {step.number}
+            <div className="max-w-4xl mx-auto">
+              <div className="relative">
+                {/* Vertical line connector */}
+                <div className="absolute left-6 top-10 bottom-10 w-px bg-border hidden md:block" />
+                
+                <div className="space-y-8">
+                  {steps.map((step, index) => (
+                    <div key={index} className="relative flex gap-6">
+                      <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-r from-primary to-blue-500 text-primary-foreground flex items-center justify-center font-bold text-lg z-10">
+                        {step.number}
+                      </div>
+                      <div className="pt-2">
+                        <h3 className="font-bold text-lg mb-2">{step.title}</h3>
+                        <p className="text-muted-foreground leading-relaxed">{step.description}</p>
+                      </div>
                     </div>
-                    {index < steps.length - 1 && (
-                      <div className="hidden lg:block absolute top-4 left-10 w-[calc(100%-2.5rem)] h-px bg-border" />
-                    )}
-                  </div>
-                  <h3 className="font-semibold mb-2">{step.title}</h3>
-                  <p className="text-sm text-muted-foreground">{step.description}</p>
+                  ))}
                 </div>
-              ))}
+              </div>
             </div>
 
-            <div className="mt-10">
+            <div className="mt-16 text-center">
               <Button 
                 size="lg" 
-                className="gap-2"
+                className="gap-2 rounded-full bg-gradient-to-r from-primary to-blue-500"
                 onClick={() => setShowRegistration(true)}
                 data-testid="button-steps-cta"
               >
@@ -700,39 +765,44 @@ export default function TechnicianLogin() {
           </div>
         </section>
 
-        {/* FAQ */}
-        <section className="py-16 lg:py-20">
-          <div className="container mx-auto px-6">
-            <h2 className="text-3xl font-bold mb-4">"What's the catch?"</h2>
-            <p className="text-muted-foreground mb-10 max-w-2xl">
-              Great question. Here are the answers to what you're probably wondering:
-            </p>
+        {/* FAQ - Flowbite Style */}
+        <section className="py-20 lg:py-28">
+          <div className="container mx-auto px-6 lg:px-8">
+            <div className="text-center max-w-3xl mx-auto mb-16">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-muted border border-border mb-6">
+                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">FAQ</span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-extrabold mb-4">"What's the catch?"</h2>
+              <p className="text-lg text-muted-foreground">
+                Great question. Here are the answers to what you're probably wondering:
+              </p>
+            </div>
             
-            <div className="max-w-3xl space-y-6">
+            <div className="max-w-3xl mx-auto space-y-4">
               {faqs.map((faq, index) => (
-                <div key={index} className="border-b border-border pb-6 last:border-0">
-                  <h3 className="font-semibold mb-2">{faq.question}</h3>
-                  <p className="text-muted-foreground">{faq.answer}</p>
+                <div key={index} className="p-6 rounded-2xl border bg-card">
+                  <h3 className="font-bold text-lg mb-3">{faq.question}</h3>
+                  <p className="text-muted-foreground leading-relaxed">{faq.answer}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Final CTA */}
-        <section className="bg-primary/5 border-t py-16 lg:py-20">
-          <div className="container mx-auto px-6 text-center">
-            <h2 className="text-3xl font-bold mb-4">
+        {/* Final CTA - Flowbite Style */}
+        <section className="py-20 lg:py-28 bg-gradient-to-r from-primary/10 via-blue-500/10 to-primary/10">
+          <div className="container mx-auto px-6 lg:px-8 text-center">
+            <h2 className="text-3xl md:text-4xl font-extrabold mb-6">
               Set up once. That's it.
             </h2>
-            <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
               Your certs. Your banking info. Your hours. Your logbook reference. Enter them once. Plug into any employer. Automatic from there.
             </p>
             
-            <div className="flex flex-col items-center gap-4">
+            <div className="flex flex-col items-center gap-6">
               <Button 
                 size="lg" 
-                className="gap-2 text-lg px-8"
+                className="gap-2 rounded-full bg-gradient-to-r from-primary to-blue-500 shadow-lg shadow-primary/25"
                 onClick={() => setShowRegistration(true)}
                 data-testid="button-final-cta"
               >
