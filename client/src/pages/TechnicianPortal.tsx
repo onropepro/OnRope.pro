@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -74,7 +75,12 @@ import {
   Gift,
   Lock,
   Crown,
-  MessageSquare
+  MessageSquare,
+  Home,
+  MoreHorizontal,
+  ChevronDown,
+  ChevronUp,
+  FileCheck
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
@@ -386,6 +392,17 @@ const translations = {
     feedbackError: "Failed to submit feedback",
     viewMyFeedback: "View My Feedback",
     myFeedbackTitle: "My Feedback",
+    tabHome: "Home",
+    tabProfile: "Profile",
+    tabWork: "Work",
+    tabMore: "More",
+    quickActions: "Quick Actions",
+    documents: "Documents",
+    certifications: "Certifications",
+    personalInfo: "Personal Info",
+    contactInfo: "Contact",
+    payrollInfo: "Payroll",
+    medicalInfo: "Medical",
     myFeedbackDesc: "View your submitted feedback and responses from OnRopePro",
     noFeedbackYet: "You haven't submitted any feedback yet",
     feedbackStatus: "Status",
@@ -702,6 +719,17 @@ const translations = {
     feedbackError: "Échec de la soumission des commentaires",
     viewMyFeedback: "Voir mes commentaires",
     myFeedbackTitle: "Mes commentaires",
+    tabHome: "Accueil",
+    tabProfile: "Profil",
+    tabWork: "Travail",
+    tabMore: "Plus",
+    quickActions: "Actions rapides",
+    documents: "Documents",
+    certifications: "Certifications",
+    personalInfo: "Infos personnelles",
+    contactInfo: "Contact",
+    payrollInfo: "Paie",
+    medicalInfo: "Médical",
     myFeedbackDesc: "Consultez vos commentaires soumis et les réponses de OnRopePro",
     noFeedbackYet: "Vous n'avez pas encore soumis de commentaires",
     feedbackStatus: "Statut",
@@ -968,6 +996,10 @@ export default function TechnicianPortal() {
   
   // State for PLUS benefits dialog
   const [showPlusBenefits, setShowPlusBenefits] = useState(false);
+  
+  // Mobile-friendly tab navigation
+  type TabType = 'home' | 'profile' | 'work' | 'more';
+  const [activeTab, setActiveTab] = useState<TabType>('home');
   
   // Feedback state
   const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
@@ -1670,120 +1702,182 @@ export default function TechnicianPortal() {
         );
       })()}
 
-      <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
-        {/* Work Dashboard Quick Access - Show for all technicians */}
-        {user && user.role === 'rope_access_tech' && (
-          <Card className={user.companyId && !user.terminatedDate ? "border-primary bg-primary/5" : "border-muted bg-muted/30"}>
-            <CardContent className="p-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-full ${user.companyId && !user.terminatedDate ? "bg-primary/10" : "bg-muted"}`}>
-                    <Briefcase className={`w-5 h-5 ${user.companyId && !user.terminatedDate ? "text-primary" : "text-muted-foreground"}`} />
+      <main className="max-w-4xl mx-auto px-4 py-6 space-y-6 pb-24">
+        {/* HOME TAB - Quick actions and overview */}
+        {activeTab === 'home' && (
+          <>
+            {/* Work Dashboard Quick Access */}
+            {user && user.role === 'rope_access_tech' && (
+              <Card className={user.companyId && !user.terminatedDate ? "border-primary bg-primary/5" : "border-muted bg-muted/30"}>
+                <CardContent className="p-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className={`p-3 rounded-full ${user.companyId && !user.terminatedDate ? "bg-primary/10" : "bg-muted"}`}>
+                        <Briefcase className={`w-6 h-6 ${user.companyId && !user.terminatedDate ? "text-primary" : "text-muted-foreground"}`} />
+                      </div>
+                      <div>
+                        <p className={`font-medium ${!user.companyId || user.terminatedDate ? "text-muted-foreground" : ""}`}>{t.goToWorkDashboard}</p>
+                        <p className="text-sm text-muted-foreground">{t.accessProjects}</p>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={() => {
+                        if (hasMultipleEmployers) {
+                          setShowEmployerSelectDialog(true);
+                        } else {
+                          setLocation("/dashboard");
+                        }
+                      }}
+                      className="gap-2 h-12 text-base"
+                      disabled={!user.companyId || !!user.terminatedDate}
+                      data-testid="button-go-to-dashboard"
+                    >
+                      {t.goToWorkDashboard}
+                      <ArrowRight className="w-5 h-5" />
+                    </Button>
                   </div>
-                  <div>
-                    <p className={`font-medium ${!user.companyId || user.terminatedDate ? "text-muted-foreground" : ""}`}>{t.goToWorkDashboard}</p>
-                    <p className="text-sm text-muted-foreground">{t.accessProjects}</p>
+                  {(!user.companyId || user.terminatedDate) && (
+                    <p className="text-sm text-muted-foreground mt-3 pt-3 border-t">
+                      {user.terminatedDate ? t.dashboardDisabledTerminated : t.dashboardDisabledNoCompany}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Quick Actions Grid */}
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => setLocation("/technician-job-board")}
+                className="p-4 rounded-lg border bg-gradient-to-br from-blue-500/10 to-purple-500/10 hover-elevate text-left"
+                data-testid="quick-action-jobs"
+              >
+                <Briefcase className="w-8 h-8 text-blue-500 mb-2" />
+                <p className="font-medium text-sm">{t.jobBoard}</p>
+                <p className="text-xs text-muted-foreground">{t.browseJobs}</p>
+              </button>
+              
+              <button
+                onClick={() => setActiveTab('profile')}
+                className="p-4 rounded-lg border bg-card hover-elevate text-left"
+                data-testid="quick-action-profile"
+              >
+                <User className="w-8 h-8 text-primary mb-2" />
+                <p className="font-medium text-sm">{t.tabProfile}</p>
+                <p className="text-xs text-muted-foreground">{t.editProfile}</p>
+              </button>
+              
+              <button
+                onClick={() => setShowFeedbackDialog(true)}
+                className="p-4 rounded-lg border bg-gradient-to-br from-purple-500/5 to-pink-500/5 hover-elevate text-left relative"
+                data-testid="quick-action-feedback"
+              >
+                <MessageSquare className="w-8 h-8 text-purple-500 mb-2" />
+                <p className="font-medium text-sm">{t.feedback}</p>
+                <p className="text-xs text-muted-foreground">{t.sendFeedback}</p>
+                {totalUnreadFeedback > 0 && (
+                  <Badge variant="destructive" className="absolute top-2 right-2 text-xs">
+                    {totalUnreadFeedback}
+                  </Badge>
+                )}
+              </button>
+              
+              <button
+                onClick={() => setActiveTab('more')}
+                className="p-4 rounded-lg border bg-primary/5 hover-elevate text-left"
+                data-testid="quick-action-referral"
+              >
+                <Share2 className="w-8 h-8 text-primary mb-2" />
+                <p className="font-medium text-sm">{t.yourReferralCode}</p>
+                <p className="text-xs text-muted-foreground">{t.shareReferralCode.split(' ').slice(0, 3).join(' ')}...</p>
+              </button>
+            </div>
+          </>
+        )}
+        
+        {/* WORK TAB - Job board, invitations, employer */}
+        {activeTab === 'work' && (
+          <>
+            {/* Job Board Card */}
+            {user && (
+              <Card className="border-blue-500/50 bg-gradient-to-r from-blue-500/10 to-purple-500/10">
+                <CardContent className="p-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 rounded-full bg-blue-500/20">
+                        <Briefcase className="w-6 h-6 text-blue-500" />
+                      </div>
+                      <div>
+                        <p className="font-medium">{t.jobBoard}</p>
+                        <p className="text-sm text-muted-foreground">{t.jobBoardDesc}</p>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={() => setLocation("/technician-job-board")}
+                      className="gap-2 bg-blue-600 hover:bg-blue-700 h-12"
+                      data-testid="button-browse-jobs"
+                    >
+                      {t.browseJobs}
+                      <ArrowRight className="w-5 h-5" />
+                    </Button>
                   </div>
-                </div>
-                <Button
-                  onClick={() => {
-                    if (hasMultipleEmployers) {
-                      setShowEmployerSelectDialog(true);
-                    } else {
-                      setLocation("/dashboard");
-                    }
-                  }}
-                  className="gap-2"
-                  disabled={!user.companyId || !!user.terminatedDate}
-                  data-testid="button-go-to-dashboard"
-                >
-                  {t.goToWorkDashboard}
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              </div>
-              {/* Explanation when disabled */}
-              {(!user.companyId || user.terminatedDate) && (
-                <p className="text-sm text-muted-foreground mt-3 pt-3 border-t">
-                  {user.terminatedDate ? t.dashboardDisabledTerminated : t.dashboardDisabledNoCompany}
-                </p>
-              )}
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
+            )}
+          </>
+        )}
+        
+        {/* MORE TAB - Feedback, referral, settings */}
+        {activeTab === 'more' && (
+          <>
+            {/* Feedback Card */}
+            {user && (
+              <Card className="border-purple-500/30 bg-gradient-to-r from-purple-500/5 to-pink-500/5">
+                <CardContent className="p-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 rounded-full bg-purple-500/20">
+                        <MessageSquare className="w-6 h-6 text-purple-500" />
+                      </div>
+                      <div>
+                        <p className="font-medium">{t.feedback}</p>
+                        <p className="text-sm text-muted-foreground">{t.feedbackDesc}</p>
+                      </div>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowMyFeedbackDialog(true)}
+                        className="gap-2 relative h-11"
+                        data-testid="button-view-my-feedback"
+                      >
+                        <Mail className="w-4 h-4" />
+                        {t.viewMyFeedback}
+                        {totalUnreadFeedback > 0 && (
+                          <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 min-w-5 text-xs">
+                            {totalUnreadFeedback}
+                          </Badge>
+                        )}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowFeedbackDialog(true)}
+                        className="gap-2 h-11"
+                        data-testid="button-send-feedback"
+                      >
+                        <MessageSquare className="w-4 h-4" />
+                        {t.sendFeedback}
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </>
         )}
 
-        {/* Job Board Card - Prominent placement */}
-        {user && (
-          <Card className="border-blue-500/50 bg-gradient-to-r from-blue-500/10 to-purple-500/10">
-            <CardContent className="p-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-full bg-blue-500/20">
-                    <Briefcase className="w-5 h-5 text-blue-500" />
-                  </div>
-                  <div>
-                    <p className="font-medium">{t.jobBoard}</p>
-                    <p className="text-sm text-muted-foreground">{t.jobBoardDesc}</p>
-                  </div>
-                </div>
-                <Button
-                  onClick={() => setLocation("/technician-job-board")}
-                  className="gap-2 bg-blue-600 hover:bg-blue-700"
-                  data-testid="button-browse-jobs"
-                >
-                  {t.browseJobs}
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Feedback Card */}
-        {user && (
-          <Card className="border-purple-500/30 bg-gradient-to-r from-purple-500/5 to-pink-500/5">
-            <CardContent className="p-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-full bg-purple-500/20">
-                    <MessageSquare className="w-5 h-5 text-purple-500" />
-                  </div>
-                  <div>
-                    <p className="font-medium">{t.feedback}</p>
-                    <p className="text-sm text-muted-foreground">{t.feedbackDesc}</p>
-                  </div>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowMyFeedbackDialog(true)}
-                    className="gap-2 relative"
-                    data-testid="button-view-my-feedback"
-                  >
-                    <Mail className="w-4 h-4" />
-                    {t.viewMyFeedback}
-                    {totalUnreadFeedback > 0 && (
-                      <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 min-w-5 text-xs">
-                        {totalUnreadFeedback}
-                      </Badge>
-                    )}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowFeedbackDialog(true)}
-                    className="gap-2"
-                    data-testid="button-send-feedback"
-                  >
-                    <MessageSquare className="w-4 h-4" />
-                    {t.sendFeedback}
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Team Invitations Section - Show for unlinked technicians OR self-resigned technicians */}
-        {user && user.role === 'rope_access_tech' && (!user.companyId || user.terminatedDate) && (
+        {/* Team Invitations Section - Show for unlinked technicians OR self-resigned technicians (WORK TAB) */}
+        {activeTab === 'work' && user && user.role === 'rope_access_tech' && (!user.companyId || user.terminatedDate) && (
           <Card className="border-primary/30 bg-primary/5">
             <CardHeader>
               <div className="flex items-center gap-3">
@@ -1878,8 +1972,8 @@ export default function TechnicianPortal() {
           </Card>
         )}
 
-        {/* Your Referral Code Section - Show for technicians and company owners */}
-        {user && (user.role === 'rope_access_tech' || user.role === 'company') && (
+        {/* Your Referral Code Section - Show for technicians and company owners (MORE TAB) */}
+        {activeTab === 'more' && user && (user.role === 'rope_access_tech' || user.role === 'company') && (
           <Card className="border-2 border-primary/30 bg-primary/5">
             <CardHeader className="pb-2">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -1957,8 +2051,8 @@ export default function TechnicianPortal() {
           </Card>
         )}
 
-        {/* Performance & Safety Rating Card - Show for technicians and company owners */}
-        {user && (user.role === 'rope_access_tech' || user.role === 'company') && (
+        {/* Performance & Safety Rating Card - Show for technicians and company owners (HOME TAB) */}
+        {activeTab === 'home' && user && (user.role === 'rope_access_tech' || user.role === 'company') && (
           <Card className="border-muted overflow-visible">
             <CardHeader className="pb-2">
               <div className="flex items-center gap-3">
@@ -2055,8 +2149,8 @@ export default function TechnicianPortal() {
           </Card>
         )}
 
-        {/* Current Employer Section - Show for linked technicians (not terminated) */}
-        {user && user.role === 'rope_access_tech' && user.companyId && !user.terminatedDate && (
+        {/* Current Employer Section - Show for linked technicians (not terminated) (WORK TAB) */}
+        {activeTab === 'work' && user && user.role === 'rope_access_tech' && user.companyId && !user.terminatedDate && (
           <Card className="border-muted">
             <CardHeader>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -2138,15 +2232,17 @@ export default function TechnicianPortal() {
           </Card>
         )}
 
-        <Card>
-          <CardHeader className="space-y-4">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3 sm:gap-4">
-                <div className="p-2 sm:p-3 rounded-full bg-primary/10">
-                  <HardHat className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
-                </div>
-                <div>
-                  <CardTitle className="text-lg sm:text-xl">{user.name}</CardTitle>
+        {/* PROFILE TAB - Personal information and certifications */}
+        {activeTab === 'profile' && (
+          <Card>
+            <CardHeader className="space-y-4">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="p-2 sm:p-3 rounded-full bg-primary/10">
+                    <HardHat className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg sm:text-xl">{user.name}</CardTitle>
                   <CardDescription className="flex flex-wrap items-center gap-2 mt-1">
                     {user.irataLevel && (
                       <Badge variant="secondary" className="gap-1">
@@ -3719,8 +3815,73 @@ export default function TechnicianPortal() {
               </div>
             )}
           </CardContent>
-        </Card>
+          </Card>
+        )}
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-lg border-t z-50 safe-area-inset-bottom">
+        <div className="max-w-4xl mx-auto flex items-center justify-around py-2">
+          <button
+            onClick={() => setActiveTab('home')}
+            className={`flex flex-col items-center gap-1 px-4 py-2 min-w-[64px] rounded-lg transition-colors ${
+              activeTab === 'home' 
+                ? 'text-primary bg-primary/10' 
+                : 'text-muted-foreground'
+            }`}
+            data-testid="tab-home"
+          >
+            <Home className="w-5 h-5" />
+            <span className="text-xs font-medium">{t.tabHome}</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('profile')}
+            className={`flex flex-col items-center gap-1 px-4 py-2 min-w-[64px] rounded-lg transition-colors ${
+              activeTab === 'profile' 
+                ? 'text-primary bg-primary/10' 
+                : 'text-muted-foreground'
+            }`}
+            data-testid="tab-profile"
+          >
+            <User className="w-5 h-5" />
+            <span className="text-xs font-medium">{t.tabProfile}</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('work')}
+            className={`flex flex-col items-center gap-1 px-4 py-2 min-w-[64px] rounded-lg transition-colors relative ${
+              activeTab === 'work' 
+                ? 'text-primary bg-primary/10' 
+                : 'text-muted-foreground'
+            }`}
+            data-testid="tab-work"
+          >
+            <Briefcase className="w-5 h-5" />
+            <span className="text-xs font-medium">{t.tabWork}</span>
+            {pendingInvitations.length > 0 && (
+              <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
+                {pendingInvitations.length}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('more')}
+            className={`flex flex-col items-center gap-1 px-4 py-2 min-w-[64px] rounded-lg transition-colors relative ${
+              activeTab === 'more' 
+                ? 'text-primary bg-primary/10' 
+                : 'text-muted-foreground'
+            }`}
+            data-testid="tab-more"
+          >
+            <MoreHorizontal className="w-5 h-5" />
+            <span className="text-xs font-medium">{t.tabMore}</span>
+            {totalUnreadFeedback > 0 && (
+              <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
+                {totalUnreadFeedback}
+              </span>
+            )}
+          </button>
+        </div>
+      </nav>
 
       {/* Experience Start Date Edit Dialog */}
       <Dialog open={editingExperience} onOpenChange={(open) => {
