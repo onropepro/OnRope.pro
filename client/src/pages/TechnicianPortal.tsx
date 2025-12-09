@@ -1824,20 +1824,35 @@ export default function TechnicianPortal() {
                 )}
               </button>
               
-              <button
-                onClick={() => setActiveTab('more')}
-                className="p-4 rounded-lg border bg-primary/5 hover-elevate text-left"
+              <div
+                className="p-4 rounded-lg border bg-primary/5 text-left"
                 data-testid="quick-action-referral"
               >
                 <Share2 className="w-8 h-8 text-primary mb-2" />
                 <p className="font-medium text-sm">{t.yourReferralCode}</p>
                 {user?.referralCode && (
-                  <p className="text-lg font-mono font-bold text-primary tracking-wider" data-testid="quick-referral-code">
-                    {user.referralCode}
-                  </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <p className="text-lg font-mono font-bold text-primary tracking-wider" data-testid="quick-referral-code">
+                      {user.referralCode}
+                    </p>
+                    <Button
+                      variant={codeCopied ? "default" : "outline"}
+                      size="sm"
+                      onClick={handleCopyReferralCode}
+                      className="gap-1 h-7 px-2"
+                      data-testid="button-quick-copy-code"
+                    >
+                      {codeCopied ? (
+                        <CheckCircle2 className="w-3 h-3" />
+                      ) : (
+                        <Copy className="w-3 h-3" />
+                      )}
+                      <span className="text-xs">{codeCopied ? t.codeCopied : t.copyCode}</span>
+                    </Button>
+                  </div>
                 )}
                 <p className="text-xs text-muted-foreground mt-1">{t.shareReferralCode.split(' ').slice(0, 3).join(' ')}...</p>
-              </button>
+              </div>
             </div>
           </>
         )}
