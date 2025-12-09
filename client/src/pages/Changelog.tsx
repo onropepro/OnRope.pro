@@ -88,8 +88,14 @@ type RecentChange = {
 const recentChangesData: RecentChange[] = [
   {
     date: "December 9, 2025",
+    title: "Platform Focus: Building Maintenance",
+    description: "Refocused platform exclusively on building maintenance services to maintain product clarity and target market precision. Removed experimental NDT, Rock Scaling, Wind Turbine, and Oil Field categories. Platform now features 10 specialized building maintenance job types plus custom services",
+    type: "improvement"
+  },
+  {
+    date: "December 9, 2025",
     title: "Changelog Accuracy Update",
-    description: "Comprehensive changelog update: Added 5 job categories (Building Maintenance, NDT, Rock Scaling, Wind Turbine, Oil Field) with 20 service types. Added Technician Portal, Building Manager Portal, and Landing Pages categories. Expanded SuperUser Administration to 11 pages. Added Technician Self-Registration section with referral system and PLUS access tier. Updated Employee Management with team invitation workflow and multi-employer connections",
+    description: "Comprehensive changelog update: Added Technician Portal, Building Manager Portal, and Landing Pages categories. Expanded SuperUser Administration to 11 pages. Added Technician Self-Registration section with referral system and PLUS access tier. Updated Employee Management with team invitation workflow and multi-employer connections",
     type: "improvement"
   },
   {
@@ -337,42 +343,6 @@ const servicesData: ServiceCategory[] = [
       { name: "Ground Window Cleaning", description: "Ground-level and low-rise window cleaning", icon: "storefront", trackingType: "Hours-based" },
       { name: "Painting", description: "Rope access painting and coating services", icon: "format_paint", trackingType: "Hours-based" },
       { name: "Inspection", description: "Building facade inspection and assessment", icon: "fact_check", trackingType: "Hours-based" },
-    ]
-  },
-  {
-    category: "NDT (Non-Destructive Testing)",
-    description: "Specialized inspection and testing services requiring rope access",
-    services: [
-      { name: "Ultrasonic Testing", description: "Thickness measurement and flaw detection using ultrasound", icon: "sensors", trackingType: "Hours-based" },
-      { name: "Visual Inspection", description: "Detailed visual examination of structures and components", icon: "visibility", trackingType: "Hours-based" },
-      { name: "Magnetic Particle Testing", description: "Surface and near-surface flaw detection", icon: "grain", trackingType: "Hours-based" },
-    ]
-  },
-  {
-    category: "Rock Scaling",
-    description: "Rock face stabilization and hazard mitigation",
-    services: [
-      { name: "Manual Scaling", description: "Hand tool removal of loose rock material", icon: "landscape", trackingType: "Hours-based" },
-      { name: "Mechanical Scaling", description: "Power tool rock removal operations", icon: "construction", trackingType: "Hours-based" },
-      { name: "Rock Bolting", description: "Installation of rock reinforcement systems", icon: "build", trackingType: "Hours-based" },
-    ]
-  },
-  {
-    category: "Wind Turbine",
-    description: "Wind turbine inspection, maintenance, and repair services",
-    services: [
-      { name: "Blade Inspection", description: "Visual and NDT inspection of turbine blades", icon: "air", trackingType: "Hours-based" },
-      { name: "Blade Repair", description: "Composite repair and leading edge protection", icon: "build", trackingType: "Hours-based" },
-      { name: "Tower Maintenance", description: "Tower cleaning, painting, and maintenance", icon: "domain", trackingType: "Hours-based" },
-    ]
-  },
-  {
-    category: "Oil Field",
-    description: "Petrochemical and industrial rope access services",
-    services: [
-      { name: "Tank Inspection", description: "Storage tank inspection and maintenance", icon: "propane_tank", trackingType: "Hours-based" },
-      { name: "Flare Stack Work", description: "Flare tip inspection and maintenance", icon: "local_fire_department", trackingType: "Hours-based" },
-      { name: "Pipeline Inspection", description: "Elevated pipeline inspection and coating", icon: "timeline", trackingType: "Hours-based" },
     ]
   },
   {
@@ -1060,8 +1030,8 @@ export default function Changelog() {
                     <Wrench className="h-5 w-5 text-warning-600" />
                   </div>
                   <div>
-                    <div className="text-2xl font-bold">{servicesData.length}</div>
-                    <div className="text-sm text-muted-foreground">Job Categories</div>
+                    <div className="text-2xl font-bold">{servicesData.reduce((acc, cat) => acc + cat.services.length, 0)}</div>
+                    <div className="text-sm text-muted-foreground">Service Types</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -1131,7 +1101,7 @@ export default function Changelog() {
               <div>
                 <CardTitle className="text-xl">Services Managed</CardTitle>
                 <CardDescription>
-                  {servicesData.length} job categories with {servicesData.reduce((acc, cat) => acc + cat.services.length, 0)} service types
+                  Building maintenance focus with {servicesData.reduce((acc, cat) => acc + cat.services.length, 0)} specialized service types
                 </CardDescription>
               </div>
             </div>
