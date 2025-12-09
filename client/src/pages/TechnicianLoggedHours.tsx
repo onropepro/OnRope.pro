@@ -31,7 +31,8 @@ import {
   Camera,
   Scan,
   Check,
-  FileDown
+  FileDown,
+  Lock
 } from "lucide-react";
 import { jsPDF } from "jspdf";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -148,6 +149,7 @@ const translations = {
     previousHoursCount: "Previous Hours Entries",
     detailedLog: "Detailed Log",
     plusFeature: "PLUS Feature",
+    plusLockedDesc: "Refer a technician to unlock",
     sessionDetails: "Session Details",
     viewDetails: "Tap to view details",
     projectInfo: "Project Information",
@@ -261,6 +263,7 @@ const translations = {
     previousHoursCount: "Entrées d'heures précédentes",
     detailedLog: "Journal détaillé",
     plusFeature: "Fonctionnalité PLUS",
+    plusLockedDesc: "Parrainez un technicien pour débloquer",
     sessionDetails: "Détails de la session",
     viewDetails: "Appuyez pour voir les détails",
     projectInfo: "Informations du projet",
@@ -355,8 +358,23 @@ export default function TechnicianLoggedHours() {
     queryKey: ["/api/user"],
   });
 
-  const { data: logsData, isLoading: logsLoading } = useQuery<{ logs: IrataTaskLog[] }>({
-    queryKey: ["/api/my-irata-task-logs"],
+  const { data: logsData, isLoading: logsLoading } = useQuery<{ sessions: Array<{
+    id: string;
+    workDate: string;
+    hoursWorked: string;
+    buildingName: string | null;
+    buildingAddress: string | null;
+    buildingHeight: string | null;
+    companyName: string | null;
+    totalDrops: number;
+    dropsNorth: number;
+    dropsEast: number;
+    dropsSouth: number;
+    dropsWest: number;
+    startTime: string;
+    endTime: string;
+  }> }>({
+    queryKey: ["/api/my-work-sessions"],
   });
 
   const { data: historicalData, isLoading: historicalLoading } = useQuery<{ historicalHours: HistoricalHours[] }>({
@@ -364,15 +382,15 @@ export default function TechnicianLoggedHours() {
   });
 
   const user = userData?.user;
-  const logs = logsData?.logs || [];
+  const sessions = logsData?.sessions || [];
   const historicalHours = historicalData?.historicalHours || [];
 
   // Baseline hours from user profile
   const baselineHours = user?.irataBaselineHours ? parseFloat(user.irataBaselineHours) || 0 : 0;
   
   // Hours from work sessions
-  const totalLoggedHours = logs.reduce((sum: number, log: IrataTaskLog) => {
-    return sum + parseFloat(log.hoursWorked || "0");
+  const totalLoggedHours = sessions.reduce((sum: number, session: any) => {
+    return sum + parseFloat(session.hoursWorked || "0");
   }, 0);
 
   // Previous/historical hours (not counted in certification totals)
@@ -498,9 +516,9 @@ export default function TechnicianLoggedHours() {
       const endDate = parseLocalDate(exportEndDate);
 
       // Filter work sessions by date range
-      const filteredLogs = logs.filter(log => {
-        const logDate = parseLocalDate(log.workDate);
-        return logDate >= startDate && logDate <= endDate;
+      const filteredSessions = sessions.filter(session => {
+        const sessionDate = parseLocalDate(session.workDate);
+        return sessionDate >= startDate && sessionDate <= endDate;
       });
 
       // Filter historical hours by date range (include if date ranges overlap)
@@ -511,7 +529,7 @@ export default function TechnicianLoggedHours() {
         return entryEndDate >= startDate && entryStartDate <= endDate;
       });
 
-      if (filteredLogs.length === 0 && filteredHistorical.length === 0) {
+      if (filteredSessions.length === 0 && filteredHistorical.length === 0) {
         toast({
           title: t.noDataInRange,
           description: t.noDataInRangeDesc,
@@ -522,7 +540,7 @@ export default function TechnicianLoggedHours() {
       }
 
       // Calculate totals for filtered data
-      const filteredWorkHours = filteredLogs.reduce((sum, log) => sum + parseFloat(log.hoursWorked || "0"), 0);
+      const filteredWorkHours = filteredSessions.reduce((sum, session) => sum + parseFloat(session.hoursWorked || "0"), 0);
       const filteredHistoricalTotal = filteredHistorical.reduce((sum, entry) => sum + parseFloat(entry.hoursWorked || "0"), 0);
 
       // Create PDF
@@ -571,7 +589,7 @@ export default function TechnicianLoggedHours() {
       // Summary table
       const summaryData = [
         [t.totalWorkHours, `${(filteredWorkHours + filteredHistoricalTotal).toFixed(1)} ${t.hr}`],
-        [t.workSessionsCount, `${filteredLogs.length}`],
+        [t.workSessionsCount, `${filteredSessions.length}`],
         [t.previousHoursCount, `${filteredHistorical.length}`],
       ];
 
@@ -598,13 +616,13 @@ export default function TechnicianLoggedHours() {
       yPos += 10;
 
       // Work Sessions
-      if (filteredLogs.length > 0) {
+      if (filteredSessions.length > 0) {
         doc.setFontSize(12);
         doc.setTextColor(60, 60, 60);
         doc.text(t.workSessions, margin, yPos);
         yPos += 8;
 
-        filteredLogs.forEach((log) => {
+        filteredSessions.forEach((session) => {
           // Check if we need a new page
           if (yPos > 260) {
             doc.addPage();
@@ -613,31 +631,14 @@ export default function TechnicianLoggedHours() {
 
           doc.setFontSize(9);
           doc.setTextColor(0, 0, 0);
-          const logDate = format(parseLocalDate(log.workDate), 'PP', { locale: dateLocale });
-          doc.text(`${logDate} - ${parseFloat(log.hoursWorked).toFixed(1)} ${t.hr}`, margin + 5, yPos);
+          const sessionDate = format(parseLocalDate(session.workDate), 'PP', { locale: dateLocale });
+          doc.text(`${sessionDate} - ${parseFloat(session.hoursWorked).toFixed(1)} ${t.hr}`, margin + 5, yPos);
           yPos += 5;
 
-          if (log.buildingName) {
+          if (session.buildingName) {
             doc.setTextColor(100, 100, 100);
-            doc.text(`${log.buildingName}${log.buildingHeight ? ` (${log.buildingHeight})` : ''}`, margin + 5, yPos);
+            doc.text(`${session.buildingName}${session.buildingHeight ? ` (${session.buildingHeight})` : ''}`, margin + 5, yPos);
             yPos += 5;
-          }
-
-          if (log.tasksPerformed && log.tasksPerformed.length > 0) {
-            doc.setTextColor(120, 120, 120);
-            const tasks = log.tasksPerformed.map(taskId => getTaskLabel(taskId, language)).join(', ');
-            const taskLines = doc.splitTextToSize(tasks, pageWidth - margin * 2 - 10);
-            doc.text(taskLines, margin + 5, yPos);
-            yPos += taskLines.length * 4;
-          }
-
-          if (log.notes) {
-            doc.setTextColor(140, 140, 140);
-            doc.setFontStyle('italic');
-            const noteLines = doc.splitTextToSize(log.notes, pageWidth - margin * 2 - 10);
-            doc.text(noteLines, margin + 5, yPos);
-            doc.setFontStyle('normal');
-            yPos += noteLines.length * 4;
           }
 
           yPos += 5;
@@ -945,54 +946,37 @@ export default function TechnicianLoggedHours() {
     buildingAddress: string; 
     buildingHeight: string;
     companyName: string;
-    logs: IrataTaskLog[];
+    sessions: any[];
     totalHours: number;
     totalDrops: number;
-    allTasks: string[];
   }> = {};
   
-  logs.forEach((log: any) => {
-    const projectKey = log.projectId || log.buildingName || t.unknownProject;
+  sessions.forEach((session: any) => {
+    const projectKey = session.projectId || session.buildingName || t.unknownProject;
     if (!groupedByProject[projectKey]) {
       groupedByProject[projectKey] = {
-        buildingName: log.buildingName || t.unknownProject,
-        buildingAddress: log.buildingAddress || "",
-        buildingHeight: log.buildingHeight || "",
-        companyName: log.companyName || "",
-        logs: [],
+        buildingName: session.buildingName || t.unknownProject,
+        buildingAddress: session.buildingAddress || "",
+        buildingHeight: session.buildingHeight || "",
+        companyName: session.companyName || "",
+        sessions: [],
         totalHours: 0,
         totalDrops: 0,
-        allTasks: [],
       };
     }
-    groupedByProject[projectKey].logs.push(log);
-    groupedByProject[projectKey].totalHours += parseFloat(log.hoursWorked || "0");
-    groupedByProject[projectKey].totalDrops += (log.totalDrops || 0);
-    // Collect unique tasks across all sessions
-    (log.tasksPerformed || []).forEach((taskId: string) => {
-      if (!groupedByProject[projectKey].allTasks.includes(taskId)) {
-        groupedByProject[projectKey].allTasks.push(taskId);
-      }
-    });
+    groupedByProject[projectKey].sessions.push(session);
+    groupedByProject[projectKey].totalHours += parseFloat(session.hoursWorked || "0");
+    groupedByProject[projectKey].totalDrops += (session.totalDrops || 0);
   });
   
   // Calculate grand total drops across all sessions
-  const grandTotalDrops = logs.reduce((sum: number, log: any) => sum + (log.totalDrops || 0), 0);
+  const grandTotalDrops = sessions.reduce((sum: number, session: any) => sum + (session.totalDrops || 0), 0);
   
-  // Calculate all-time task counts
-  const allTimeTaskCounts: Record<string, number> = {};
-  logs.forEach((log: any) => {
-    (log.tasksPerformed || []).forEach((taskId: string) => {
-      allTimeTaskCounts[taskId] = (allTimeTaskCounts[taskId] || 0) + 1;
-    });
-  });
-  
-  // Sort tasks by count (highest first)
-  const sortedTaskCounts = Object.entries(allTimeTaskCounts)
-    .sort(([, a], [, b]) => b - a);
+  // Sort tasks by count (highest first) - not applicable for work sessions without task logging
+  const sortedTaskCounts: [string, number][] = [];
 
   Object.values(groupedByProject).forEach((project) => {
-    project.logs.sort((a, b) => {
+    project.sessions.sort((a, b) => {
       const dateA = parseLocalDate(a.workDate);
       const dateB = parseLocalDate(b.workDate);
       return dateB.getTime() - dateA.getTime();
@@ -1030,16 +1014,29 @@ export default function TechnicianLoggedHours() {
               <h1 className="font-semibold text-lg">{t.title}</h1>
             </div>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowExportDialog(true)}
-            className="gap-2"
-            data-testid="button-export-pdf"
-          >
-            <FileDown className="w-4 h-4" />
-            <span className="hidden sm:inline">{t.exportPdf}</span>
-          </Button>
+          {user?.hasPlusAccess ? (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowExportDialog(true)}
+              className="gap-2"
+              data-testid="button-export-pdf"
+            >
+              <FileDown className="w-4 h-4" />
+              <span className="hidden sm:inline">{t.exportPdf}</span>
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2 opacity-70"
+              disabled
+              data-testid="button-export-pdf-locked"
+            >
+              <Lock className="w-4 h-4" />
+              <span className="hidden sm:inline">{t.plusFeature}</span>
+            </Button>
+          )}
         </div>
       </header>
 
@@ -1081,8 +1078,8 @@ export default function TechnicianLoggedHours() {
                     <p className="text-sm text-muted-foreground">{t.totalDrops}</p>
                   </div>
                   <div>
-                    <p className="text-lg font-medium">{logs.length}</p>
-                    <p className="text-sm text-muted-foreground">{logs.length === 1 ? t.session : t.sessions}</p>
+                    <p className="text-lg font-medium">{sessions.length}</p>
+                    <p className="text-sm text-muted-foreground">{sessions.length === 1 ? t.session : t.sessions}</p>
                   </div>
                 </div>
               </div>
@@ -1146,7 +1143,7 @@ export default function TechnicianLoggedHours() {
         <Tabs defaultValue="work-sessions" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="work-sessions" data-testid="tab-work-sessions">
-              {t.workSessions} ({logs.length})
+              {t.workSessions} ({sessions.length})
             </TabsTrigger>
             <TabsTrigger value="previous-hours" data-testid="tab-previous-hours">
               {t.previousHours} ({historicalHours.length})
@@ -1154,7 +1151,7 @@ export default function TechnicianLoggedHours() {
           </TabsList>
 
           <TabsContent value="work-sessions" className="mt-4">
-            {logs.length === 0 ? (
+            {sessions.length === 0 ? (
               <Card>
                 <CardContent className="p-8 text-center">
                   <Clock className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" />
@@ -1193,23 +1190,15 @@ export default function TechnicianLoggedHours() {
                           <div className="text-right flex-shrink-0">
                             <p className="font-semibold">{project.totalHours.toFixed(1)} {t.hr}</p>
                             <p className="text-sm text-muted-foreground">
-                              {project.logs.length} {project.logs.length === 1 ? t.session : t.sessions}
+                              {project.sessions.length} {project.sessions.length === 1 ? t.session : t.sessions}
                             </p>
                           </div>
                         </div>
-                        {project.allTasks.length > 0 && (
+                        {project.totalDrops > 0 && (
                           <div className="flex flex-wrap gap-1 ml-8">
-                            {project.allTasks.slice(0, 5).map((taskId) => (
-                              <Badge key={taskId} variant="outline" className="text-xs">
-                                <span className="material-icons text-xs mr-1">{getTaskIcon(taskId)}</span>
-                                {getTaskLabel(taskId, language)}
-                              </Badge>
-                            ))}
-                            {project.allTasks.length > 5 && (
-                              <Badge variant="secondary" className="text-xs">
-                                +{project.allTasks.length - 5}
-                              </Badge>
-                            )}
+                            <Badge variant="secondary" className="text-xs">
+                              {project.totalDrops} {t.drops}
+                            </Badge>
                           </div>
                         )}
                       </div>
@@ -1217,36 +1206,35 @@ export default function TechnicianLoggedHours() {
                     <AccordionContent>
                       <ScrollArea className="max-h-[400px]">
                         <div className="space-y-3 pb-4">
-                          {project.logs.map((log) => (
+                          {project.sessions.map((session) => (
                             <div 
-                              key={log.id}
+                              key={session.id}
                               className="p-3 bg-muted/50 rounded-lg cursor-pointer hover-elevate active-elevate-2"
                               onClick={() => {
-                                setSelectedLog(log);
+                                setSelectedLog(session);
                                 setShowLogDetailsDialog(true);
                               }}
-                              data-testid={`log-entry-${log.id}`}
+                              data-testid={`session-entry-${session.id}`}
                             >
                               <div className="flex items-start justify-between mb-2">
                                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                   <Calendar className="w-4 h-4" />
-                                  {format(parseLocalDate(log.workDate), 'PPP', { locale: dateLocale })}
+                                  {format(parseLocalDate(session.workDate), 'PPP', { locale: dateLocale })}
                                 </div>
                                 <div className="flex items-center gap-2">
                                   <Badge variant="secondary">
-                                    {parseFloat(log.hoursWorked).toFixed(1)} {t.hr}
+                                    {parseFloat(session.hoursWorked).toFixed(1)} {t.hr}
                                   </Badge>
                                   <ChevronRight className="w-4 h-4 text-muted-foreground" />
                                 </div>
                               </div>
-                              <div className="flex flex-wrap gap-1">
-                                {(log.tasksPerformed || []).map((taskId) => (
-                                  <Badge key={taskId} variant="outline" className="text-xs">
-                                    <span className="material-icons text-xs mr-1">{getTaskIcon(taskId)}</span>
-                                    {getTaskLabel(taskId, language)}
+                              {session.totalDrops > 0 && (
+                                <div className="flex flex-wrap gap-1">
+                                  <Badge variant="outline" className="text-xs">
+                                    {session.totalDrops} {t.drops}
                                   </Badge>
-                                ))}
-                              </div>
+                                </div>
+                              )}
                             </div>
                           ))}
                         </div>

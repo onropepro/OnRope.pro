@@ -8634,6 +8634,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get all completed work sessions for the current user (across all projects)
+  app.get("/api/my-work-sessions", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Get all work sessions for this user
+      const allSessions = await storage.getAllWorkSessionsByEmployee(currentUser.id);
+      
+      // Filter to only completed sessions and enrich with project info
+      const completedSessions = await Promise.all(
+        allSessions
+          .filter(session => session.endTime)
+          .map(async (session) => {
+            // Get project info
+            const project = await storage.getProjectById(session.projectId);
+            
+            // Calculate hours worked
+            const startTime = new Date(session.startTime);
+            const endTime = new Date(session.endTime!);
+            const hoursWorked = ((endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60)).toFixed(2);
+            
+            // Get company name
+            let companyName = null;
+            if (session.companyId) {
+              const company = await storage.getUserById(session.companyId);
+              companyName = company?.companyName || company?.name || null;
+            }
+            
+            // Calculate total drops
+            const totalDrops = (session.dropsCompletedNorth || 0) + 
+                              (session.dropsCompletedEast || 0) + 
+                              (session.dropsCompletedSouth || 0) + 
+                              (session.dropsCompletedWest || 0);
+            
+            return {
+              ...session,
+              hoursWorked,
+              totalDrops,
+              dropsNorth: session.dropsCompletedNorth || 0,
+              dropsEast: session.dropsCompletedEast || 0,
+              dropsSouth: session.dropsCompletedSouth || 0,
+              dropsWest: session.dropsCompletedWest || 0,
+              buildingName: project?.buildingName || null,
+              buildingAddress: project?.buildingAddress || null,
+              buildingHeight: project?.buildingHeight || null,
+              companyName,
+            };
+          })
+      );
+      
+      // Sort by work date descending (most recent first)
+      completedSessions.sort((a, b) => {
+        const dateA = new Date(a.workDate).getTime();
+        const dateB = new Date(b.workDate).getTime();
+        return dateB - dateA;
+      });
+      
+      res.json({ sessions: completedSessions });
+    } catch (error) {
+      console.error("Get my work sessions error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
   // Get employee's own work sessions for a project
   app.get("/api/projects/:projectId/my-work-sessions", requireAuth, async (req: Request, res: Response) => {
     try {

@@ -71,7 +71,8 @@ import {
   Pencil,
   Star,
   Gift,
-  Lock
+  Lock,
+  Crown
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
@@ -1332,22 +1333,24 @@ export default function TechnicianPortal() {
               <h1 className="font-semibold text-sm">{t.technicianPortal}</h1>
               <div className="flex items-center gap-1.5">
                 <p className="text-xs text-muted-foreground">{user.name}</p>
-                {/* PRO Badge - Always shown for now, will be gated behind PLUS access later */}
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Badge 
-                      variant="default" 
-                      className="bg-gradient-to-r from-amber-500 to-yellow-400 text-white text-[10px] px-1.5 py-0 h-4 font-bold border-0" 
-                      data-testid="badge-pro"
-                    >
-                      <Star className="w-2.5 h-2.5 mr-0.5 fill-current" />
-                      {t.proBadge}
-                    </Badge>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{t.proBadgeTooltip}</p>
-                  </TooltipContent>
-                </Tooltip>
+                {/* PLUS Badge - Only shown for users with PLUS access */}
+                {user.hasPlusAccess && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Badge 
+                        variant="default" 
+                        className="bg-gradient-to-r from-amber-500 to-yellow-400 text-white text-[10px] px-1.5 py-0 h-4 font-bold border-0" 
+                        data-testid="badge-pro"
+                      >
+                        <Crown className="w-2.5 h-2.5 mr-0.5 fill-current" />
+                        {t.proBadge}
+                      </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{t.proBadgeTooltip}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                )}
               </div>
             </div>
           </div>
