@@ -10,7 +10,7 @@ import {
   User, ArrowRight, ArrowLeft, Award, Loader2, 
   Check, Upload, Shield, Copy, Mail, MessageSquare,
   Briefcase, FileText, Clock, Bell, ChevronRight,
-  HardHat, X, CheckCircle, Eye, EyeOff
+  HardHat, X, CheckCircle, Eye, EyeOff, Building
 } from "lucide-react";
 
 type RegistrationStep = "welcome" | "accountDetails" | "certification" | "success";
@@ -35,6 +35,8 @@ interface TechnicianData {
   spratLevel: string;
   spratLicenseNumber: string;
   certificationCardFile: File | null;
+  employerCompanyName: string;
+  employerEmail: string;
 }
 
 interface TechnicianRegistrationProps {
@@ -68,6 +70,8 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
     spratLevel: "",
     spratLicenseNumber: "",
     certificationCardFile: null,
+    employerCompanyName: "",
+    employerEmail: "",
   });
   const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -93,6 +97,8 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
       spratLevel: "",
       spratLicenseNumber: "",
       certificationCardFile: null,
+      employerCompanyName: "",
+      employerEmail: "",
     });
     setError("");
     setGeneratedReferralCode("");
@@ -745,6 +751,42 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                     </div>
                   )}
 
+                  {/* Employer Connection (Optional) */}
+                  <div className="space-y-3 mb-4 p-4 rounded-lg bg-muted/50">
+                    <h4 className="font-medium flex items-center gap-2">
+                      <Building className="w-4 h-4 text-[#0369A1]" />
+                      Employer Connection (Optional)
+                    </h4>
+                    <p className="text-xs text-muted-foreground">
+                      We will search to see if your employer already has an OnRopePro account and will initiate a connection if they do.
+                    </p>
+                    <div className="space-y-3">
+                      <div>
+                        <Label htmlFor="employerCompanyName">Employer Company Name</Label>
+                        <Input
+                          id="employerCompanyName"
+                          placeholder="Acme Rope Access Inc."
+                          value={data.employerCompanyName || ""}
+                          onChange={(e) => setData({ ...data, employerCompanyName: e.target.value })}
+                          className="mt-1"
+                          data-testid="input-employer-company-name"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="employerEmail">Employer Email Address</Label>
+                        <Input
+                          id="employerEmail"
+                          type="email"
+                          placeholder="office@acmerope.com"
+                          value={data.employerEmail || ""}
+                          onChange={(e) => setData({ ...data, employerEmail: e.target.value })}
+                          className="mt-1"
+                          data-testid="input-employer-email"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
                   {error && (
                     <div className="mt-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
                       {error}
@@ -810,7 +852,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                       </div>
                       
                       <p className="text-center text-sm text-muted-foreground mb-4">
-                        Share with 1 other tech. You BOTH get free upgrade to Plus
+                        Share with 1 other tech and you get a free upgrade to Plus
                       </p>
                       
                       <div className="flex justify-center gap-2">
