@@ -458,7 +458,7 @@ export default function TechnicianLogin() {
         </header>
 
         {/* Hero Section - Flowbite Style */}
-        <section className="py-20 lg:py-32">
+        <section className="py-20 lg:py-32 font-['Outfit',sans-serif]">
           <div className="container mx-auto px-6 lg:px-8">
             <div className="max-w-4xl mx-auto text-center">
               {/* Pill Badge */}
