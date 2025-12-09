@@ -19,6 +19,41 @@ export default {
         '22': '5.5rem', /* 88px */
       },
       colors: {
+        // Design System - Navy (backgrounds, headers, nav)
+        navy: {
+          950: "#0F1629",
+          900: "#141C33",
+          800: "#193A63",
+        },
+        // Design System - Action Blue (buttons, links, interactive)
+        action: {
+          600: "#0B64A3",
+          500: "#0369A1",
+          400: "#0C7DC2",
+        },
+        // Design System - Neutral Gray
+        neutral: {
+          400: "#989C94",
+          200: "#D1D5DB",
+          100: "#F3F4F6",
+          50: "#FAFAFA",
+        },
+        // Design System - Rust (destructive, alerts)
+        rust: {
+          600: "#AB4521",
+          500: "#C14E25",
+          100: "#FEE2E2",
+        },
+        // Design System - Semantic
+        success: {
+          600: "#059669",
+          100: "#D1FAE5",
+        },
+        // Design System - Warning (Plus/Premium features)
+        "warning-ds": {
+          600: "#D97706",
+          100: "#FEF3C7",
+        },
         // Flat / base colors (regular buttons)
         background: "hsl(var(--background) / <alpha-value>)",
         foreground: "hsl(var(--foreground) / <alpha-value>)",
@@ -93,9 +128,9 @@ export default {
         },
       },
       fontFamily: {
-        sans: ["var(--font-sans)"],
+        sans: ["Outfit", "system-ui", "sans-serif"],
         serif: ["var(--font-serif)"],
-        mono: ["var(--font-mono)"],
+        mono: ["Roboto Mono", "var(--font-mono)"],
       },
       keyframes: {
         "accordion-down": {

@@ -458,7 +458,7 @@ export default function TechnicianLogin() {
         </header>
 
         {/* Hero Section - Flowbite Style */}
-        <section className="py-20 lg:py-32 font-['Outfit',sans-serif]">
+        <section className="py-20 lg:py-32">
           <div className="container mx-auto px-6 lg:px-8">
             <div className="max-w-4xl mx-auto text-center">
               {/* Pill Badge */}
@@ -469,7 +469,7 @@ export default function TechnicianLogin() {
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
                 You Work.{" "}
-                <span className="text-[#0369A1]">Everything Else Is Already Done.</span>
+                <span className="text-action-500">Everything Else Is Already Done.</span>
               </h1>
               
               <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
@@ -480,7 +480,7 @@ export default function TechnicianLogin() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
                 <Button 
                   size="lg" 
-                  className="gap-2 rounded-full bg-[#0369A1] shadow-lg shadow-primary/25"
+                  className="gap-2 rounded-full bg-action-500 hover:bg-action-600 shadow-lg shadow-action-500/25 focus:ring-4 focus:ring-action-500/50"
                   onClick={() => setShowRegistration(true)}
                   data-testid="button-hero-cta"
                 >
@@ -506,14 +506,14 @@ export default function TechnicianLogin() {
         </section>
 
         {/* Problem Section - Flowbite Style */}
-        <section className="py-20 lg:py-28 bg-[#F3F4F6] dark:bg-muted/30">
+        <section className="py-20 lg:py-28 bg-neutral-100 dark:bg-navy-950">
           <div className="container mx-auto px-6 lg:px-8">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-12">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-destructive/10 border border-destructive/20 mb-6">
                   <span className="text-xs font-semibold text-destructive uppercase tracking-wider">The Problem</span>
                 </div>
-                <h2 className="text-3xl md:text-4xl font-extrabold mb-6">
+                <h2 className="text-3xl md:text-4xl font-bold mb-6">
                   Same forms. Same timesheets. Same logbook you're making up.
                 </h2>
               </div>
@@ -531,7 +531,7 @@ export default function TechnicianLogin() {
                   </p>
                 </div>
                 <div className="space-y-6">
-                  <div className="p-6 rounded-2xl bg-background border">
+                  <div className="p-6 rounded-lg bg-background border">
                     <p className="text-lg font-semibold text-foreground mb-2">
                       Eight years on rope. Level 3 IRATA. Hundreds of buildings.
                     </p>
@@ -553,10 +553,10 @@ export default function TechnicianLogin() {
           <div className="container mx-auto px-6 lg:px-8">
             <div className="max-w-5xl mx-auto">
               <div className="text-center mb-16">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 mb-6">
-                  <span className="text-xs font-semibold text-green-600 dark:text-green-400 uppercase tracking-wider">The Solution</span>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-success-100 border border-success-600/20 mb-6">
+                  <span className="text-xs font-semibold text-success-600 uppercase tracking-wider">The Solution</span>
                 </div>
-                <h2 className="text-3xl md:text-4xl font-extrabold mb-6">
+                <h2 className="text-3xl md:text-4xl font-bold mb-6">
                   Set up once. Plug into any employer. Done.
                 </h2>
                 <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -565,7 +565,7 @@ export default function TechnicianLogin() {
               </div>
               
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className="p-6 rounded-2xl border bg-card hover:shadow-lg transition-shadow">
+                <div className="p-6 rounded-lg border bg-card hover:shadow-lg transition-shadow">
                   <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
                     <span className="text-lg font-bold text-primary">1</span>
                   </div>
@@ -575,7 +575,7 @@ export default function TechnicianLogin() {
                   </p>
                 </div>
                 
-                <div className="p-6 rounded-2xl border bg-card hover:shadow-lg transition-shadow">
+                <div className="p-6 rounded-lg border bg-card hover:shadow-lg transition-shadow">
                   <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
                     <span className="text-lg font-bold text-primary">2</span>
                   </div>
@@ -585,7 +585,7 @@ export default function TechnicianLogin() {
                   </p>
                 </div>
                 
-                <div className="p-6 rounded-2xl border bg-card hover:shadow-lg transition-shadow">
+                <div className="p-6 rounded-lg border bg-card hover:shadow-lg transition-shadow">
                   <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
                     <span className="text-lg font-bold text-primary">3</span>
                   </div>
@@ -595,7 +595,7 @@ export default function TechnicianLogin() {
                   </p>
                 </div>
                 
-                <div className="p-6 rounded-2xl border bg-card hover:shadow-lg transition-shadow">
+                <div className="p-6 rounded-lg border bg-card hover:shadow-lg transition-shadow">
                   <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
                     <span className="text-lg font-bold text-primary">4</span>
                   </div>
@@ -605,7 +605,7 @@ export default function TechnicianLogin() {
                   </p>
                 </div>
                 
-                <div className="p-6 rounded-2xl border bg-card hover:shadow-lg transition-shadow">
+                <div className="p-6 rounded-lg border bg-card hover:shadow-lg transition-shadow">
                   <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
                     <span className="text-lg font-bold text-primary">5</span>
                   </div>
@@ -615,7 +615,7 @@ export default function TechnicianLogin() {
                   </p>
                 </div>
                 
-                <div className="p-6 rounded-2xl border-2 border-primary bg-primary/5 hover:shadow-lg transition-shadow flex flex-col justify-center">
+                <div className="p-6 rounded-lg border-2 border-primary bg-primary/5 hover:shadow-lg transition-shadow flex flex-col justify-center">
                   <p className="text-sm font-medium text-primary mb-3">Ready to simplify your career?</p>
                   <Button 
                     size="sm"
@@ -637,7 +637,7 @@ export default function TechnicianLogin() {
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-6">
                 <span className="text-xs font-semibold text-primary uppercase tracking-wider">Features</span>
               </div>
-              <h2 className="text-3xl md:text-4xl font-extrabold mb-4">The system that works while you work</h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">The system that works while you work</h2>
               <p className="text-lg text-muted-foreground">
                 Everything you need to own your professional identity and take it with you.
               </p>
@@ -661,10 +661,10 @@ export default function TechnicianLogin() {
         <section className="py-20 lg:py-28">
           <div className="container mx-auto px-6 lg:px-8">
             <div className="text-center max-w-3xl mx-auto mb-16">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 mb-6">
-                <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Pricing</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-warning-ds-100 border border-warning-ds-600/20 mb-6">
+                <span className="text-xs font-semibold text-warning-ds-600 uppercase tracking-wider">Pricing</span>
               </div>
-              <h2 className="text-3xl md:text-4xl font-extrabold mb-4">Free forever. Plus when you share.</h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Free forever. Plus when you share.</h2>
               <p className="text-lg text-muted-foreground">
                 Get started for free. Share with one tech to unlock Plus for both of you.
               </p>
@@ -672,7 +672,7 @@ export default function TechnicianLogin() {
             
             <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
               {/* Standard */}
-              <div className="p-8 rounded-3xl border-2 border-border bg-card">
+              <div className="p-8 rounded-lg border-2 border-border bg-card">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center">
                     <HardHat className="w-6 h-6" />
@@ -705,9 +705,9 @@ export default function TechnicianLogin() {
               </div>
 
               {/* Plus */}
-              <div className="p-8 rounded-3xl border-2 border-primary bg-gradient-to-b from-primary/5 to-primary/10 relative">
+              <div className="p-8 rounded-lg border-2 border-primary bg-gradient-to-b from-primary/5 to-primary/10 relative">
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <span className="bg-[#0369A1] text-primary-foreground text-xs font-semibold px-4 py-1.5 rounded-full shadow-lg">
+                  <span className="bg-action-500 text-white text-xs font-semibold px-4 py-1.5 rounded-full shadow-lg">
                     Most Popular
                   </span>
                 </div>
@@ -734,7 +734,7 @@ export default function TechnicianLogin() {
                 </ul>
                 <Button 
                   size="lg"
-                  className="w-full rounded-full bg-[#0369A1]"
+                  className="w-full rounded-full bg-action-500 hover:bg-action-600 focus:ring-4 focus:ring-action-500/50"
                   onClick={() => setShowRegistration(true)}
                   data-testid="button-plans-cta"
                 >
@@ -756,22 +756,22 @@ export default function TechnicianLogin() {
         <section className="py-20 lg:py-28 bg-gradient-to-b from-muted/30 to-background">
           <div className="container mx-auto px-6 lg:px-8">
             <div className="text-center max-w-3xl mx-auto mb-12">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 mb-6">
-                <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Plus Value</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-warning-ds-100 border border-warning-ds-600/20 mb-6">
+                <span className="text-xs font-semibold text-warning-ds-600 uppercase tracking-wider">Plus Value</span>
               </div>
-              <h2 className="text-3xl md:text-4xl font-extrabold mb-4">Plus grows with your career</h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Plus grows with your career</h2>
               <p className="text-lg text-muted-foreground">
                 Great standalone value. Even better when your employer joins.
               </p>
             </div>
 
             {/* Comparison Table */}
-            <div className="max-w-5xl mx-auto overflow-hidden rounded-2xl border border-border bg-card">
+            <div className="max-w-5xl mx-auto overflow-hidden rounded-lg border border-border bg-card">
               {/* Table Header */}
               <div className="grid grid-cols-3 bg-muted/50 border-b border-border">
                 <div className="p-4 font-semibold text-sm">Feature</div>
                 <div className="p-4 font-semibold text-sm text-center border-l border-border">
-                  <span className="text-amber-600 dark:text-amber-400">Plus</span> - Standalone
+                  <span className="text-warning-ds-600">Plus</span> - Standalone
                 </div>
                 <div className="p-4 font-semibold text-sm text-center border-l border-border bg-primary/5">
                   <span className="text-primary">Plus</span> - Employer Connected
@@ -788,13 +788,13 @@ export default function TechnicianLogin() {
                   </div>
                   <div className="p-4 text-sm border-l border-border">
                     <div className="flex items-start gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-success-600 mt-0.5 flex-shrink-0" />
                       <span className="text-muted-foreground">Full access. Browse real rope access jobs from real companies.</span>
                     </div>
                   </div>
                   <div className="p-4 text-sm border-l border-border bg-primary/5">
                     <div className="flex items-start gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-success-600 mt-0.5 flex-shrink-0" />
                       <span className="text-muted-foreground">Same + employers can see your verified profile and reach out directly.</span>
                     </div>
                   </div>
@@ -808,13 +808,13 @@ export default function TechnicianLogin() {
                   </div>
                   <div className="p-4 text-sm border-l border-border">
                     <div className="flex items-start gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-success-600 mt-0.5 flex-shrink-0" />
                       <span className="text-muted-foreground">Store certs, banking info, void cheque, SIN. Encrypted, organized.</span>
                     </div>
                   </div>
                   <div className="p-4 text-sm border-l border-border bg-primary/5">
                     <div className="flex items-start gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-success-600 mt-0.5 flex-shrink-0" />
                       <span className="text-muted-foreground">One-click share to employer on connection. Zero re-entry.</span>
                     </div>
                   </div>
@@ -828,13 +828,13 @@ export default function TechnicianLogin() {
                   </div>
                   <div className="p-4 text-sm border-l border-border">
                     <div className="flex items-start gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-success-600 mt-0.5 flex-shrink-0" />
                       <span className="text-muted-foreground">Photo scan your physical logbook pages. Converted to text and saved.</span>
                     </div>
                   </div>
                   <div className="p-4 text-sm border-l border-border bg-primary/5">
                     <div className="flex items-start gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-success-600 mt-0.5 flex-shrink-0" />
                       <span className="text-muted-foreground">Scanning + automatic detailed logging. No more trying to remember.</span>
                     </div>
                   </div>
@@ -848,13 +848,13 @@ export default function TechnicianLogin() {
                   </div>
                   <div className="p-4 text-sm border-l border-border">
                     <div className="flex items-start gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-success-600 mt-0.5 flex-shrink-0" />
                       <span className="text-muted-foreground">From scanned logbook data. Useful for job apps.</span>
                     </div>
                   </div>
                   <div className="p-4 text-sm border-l border-border bg-primary/5">
                     <div className="flex items-start gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-success-600 mt-0.5 flex-shrink-0" />
                       <span className="text-muted-foreground">Rich data: rope transfers, deviations, drops with dates and buildings.</span>
                     </div>
                   </div>
@@ -868,13 +868,13 @@ export default function TechnicianLogin() {
                   </div>
                   <div className="p-4 text-sm border-l border-border">
                     <div className="flex items-start gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-success-600 mt-0.5 flex-shrink-0" />
                       <span className="text-muted-foreground">You get notified before IRATA/SPRAT lapses.</span>
                     </div>
                   </div>
                   <div className="p-4 text-sm border-l border-border bg-primary/5">
                     <div className="flex items-start gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-success-600 mt-0.5 flex-shrink-0" />
                       <span className="text-muted-foreground">You AND employer get notified. No surprises.</span>
                     </div>
                   </div>
@@ -894,7 +894,7 @@ export default function TechnicianLogin() {
                   </div>
                   <div className="p-4 text-sm border-l border-border bg-primary/5">
                     <div className="flex items-start gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-success-600 mt-0.5 flex-shrink-0" />
                       <span className="text-muted-foreground">CSR score builds from compliance. Visible to future employers.</span>
                     </div>
                   </div>
@@ -914,7 +914,7 @@ export default function TechnicianLogin() {
                   </div>
                   <div className="p-4 text-sm border-l border-border bg-primary/5">
                     <div className="flex items-start gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-success-600 mt-0.5 flex-shrink-0" />
                       <span className="text-muted-foreground">Clock in/out. Hours submit themselves. No timesheets.</span>
                     </div>
                   </div>
@@ -934,7 +934,7 @@ export default function TechnicianLogin() {
                   </div>
                   <div className="p-4 text-sm border-l border-border bg-primary/5">
                     <div className="flex items-start gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-success-600 mt-0.5 flex-shrink-0" />
                       <span className="text-muted-foreground">Plug in. Employer enters salary + permissions. Day 1 ready.</span>
                     </div>
                   </div>
@@ -954,7 +954,7 @@ export default function TechnicianLogin() {
                   </div>
                   <div className="p-4 text-sm border-l border-border bg-primary/5">
                     <div className="flex items-start gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-success-600 mt-0.5 flex-shrink-0" />
                       <span className="text-muted-foreground">Verified hours = no disputes. Transparent pay.</span>
                     </div>
                   </div>
@@ -964,10 +964,10 @@ export default function TechnicianLogin() {
 
             {/* Summary Cards */}
             <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto mt-12">
-              <div className="p-6 rounded-2xl border border-border bg-card">
+              <div className="p-6 rounded-lg border border-border bg-card">
                 <div className="flex items-center gap-2 mb-3">
-                  <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
-                    <Star className="w-4 h-4 text-amber-500" />
+                  <div className="w-8 h-8 rounded-lg bg-warning-ds-100 flex items-center justify-center">
+                    <Star className="w-4 h-4 text-warning-ds-600" />
                   </div>
                   <h3 className="font-bold">Plus Standalone</h3>
                 </div>
@@ -975,7 +975,7 @@ export default function TechnicianLogin() {
                   Your professional home base. Certs organized. Logbook digitized. Job board access. Ready for when employers join.
                 </p>
               </div>
-              <div className="p-6 rounded-2xl border border-primary bg-primary/5">
+              <div className="p-6 rounded-lg border border-primary bg-primary/5">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
                     <Zap className="w-4 h-4 text-primary" />
@@ -997,7 +997,7 @@ export default function TechnicianLogin() {
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-6">
                 <span className="text-xs font-semibold text-primary uppercase tracking-wider">How It Works</span>
               </div>
-              <h2 className="text-3xl md:text-4xl font-extrabold mb-4">2 minutes to set up. Automatic from there.</h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">2 minutes to set up. Automatic from there.</h2>
               <p className="text-lg text-muted-foreground">
                 Getting started is simple. Here's how it works:
               </p>
@@ -1011,7 +1011,7 @@ export default function TechnicianLogin() {
                 <div className="space-y-8">
                   {steps.map((step, index) => (
                     <div key={index} className="relative flex gap-6">
-                      <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#0369A1] text-primary-foreground flex items-center justify-center font-bold text-lg z-10">
+                      <div className="flex-shrink-0 w-12 h-12 rounded-full bg-action-500 text-white flex items-center justify-center font-bold text-lg z-10">
                         {step.number}
                       </div>
                       <div className="pt-2">
@@ -1027,7 +1027,7 @@ export default function TechnicianLogin() {
             <div className="mt-16 text-center">
               <Button 
                 size="lg" 
-                className="gap-2 rounded-full bg-[#0369A1]"
+                className="gap-2 rounded-full bg-action-500 hover:bg-action-600 focus:ring-4 focus:ring-action-500/50"
                 onClick={() => setShowRegistration(true)}
                 data-testid="button-steps-cta"
               >
@@ -1045,7 +1045,7 @@ export default function TechnicianLogin() {
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-muted border border-border mb-6">
                 <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">FAQ</span>
               </div>
-              <h2 className="text-3xl md:text-4xl font-extrabold mb-4">"What's the catch?"</h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">"What's the catch?"</h2>
               <p className="text-lg text-muted-foreground">
                 Great question. Here are the answers to what you're probably wondering:
               </p>
@@ -1053,7 +1053,7 @@ export default function TechnicianLogin() {
             
             <div className="max-w-3xl mx-auto space-y-4">
               {faqs.map((faq, index) => (
-                <div key={index} className="p-6 rounded-2xl border bg-card">
+                <div key={index} className="p-6 rounded-lg border bg-card">
                   <h3 className="font-bold text-lg mb-3">{faq.question}</h3>
                   <p className="text-muted-foreground leading-relaxed">{faq.answer}</p>
                 </div>
@@ -1063,9 +1063,9 @@ export default function TechnicianLogin() {
         </section>
 
         {/* Final CTA - Flowbite Style */}
-        <section className="py-20 lg:py-28 bg-[#0369A1]/10">
+        <section className="py-20 lg:py-28 bg-action-500/10 dark:bg-navy-900">
           <div className="container mx-auto px-6 lg:px-8 text-center">
-            <h2 className="text-3xl md:text-4xl font-extrabold mb-6">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">
               Set up once. That's it.
             </h2>
             <p className="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
@@ -1075,7 +1075,7 @@ export default function TechnicianLogin() {
             <div className="flex flex-col items-center gap-6">
               <Button 
                 size="lg" 
-                className="gap-2 rounded-full bg-[#0369A1] shadow-lg shadow-primary/25"
+                className="gap-2 rounded-full bg-action-500 hover:bg-action-600 shadow-lg shadow-action-500/25 focus:ring-4 focus:ring-action-500/50"
                 onClick={() => setShowRegistration(true)}
                 data-testid="button-final-cta"
               >
