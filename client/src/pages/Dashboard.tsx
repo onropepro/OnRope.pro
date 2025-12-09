@@ -59,7 +59,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 
-import { JOB_CATEGORIES, JOB_TYPES, getJobTypesByCategory, getJobTypeConfig, getDefaultElevation, isElevationConfigurable, isDropBasedJobType, getAllJobTypeValues, type JobCategory } from "@shared/jobTypes";
+import { JOB_CATEGORIES, JOB_TYPES, getJobTypesByCategory, getJobTypeConfig, getDefaultElevation, isElevationConfigurable, isDropBasedJobType, getAllJobTypeValues, getProgressType, getCategoryForJobType, type JobCategory } from "@shared/jobTypes";
 
 // Use helper function to get all job type values for validation
 const ALL_JOB_TYPE_VALUES = getAllJobTypeValues() as [string, ...string[]];
@@ -3459,7 +3459,9 @@ export default function Dashboard() {
                         {(() => {
                           const currentJobType = projectForm.watch("jobType");
                           const config = getJobTypeConfig(currentJobType);
-                          const category = projectForm.watch("jobCategory");
+                          // Get category from the job type configuration if not available from form
+                          const formCategory = projectForm.watch("jobCategory");
+                          const category = formCategory || (currentJobType ? getCategoryForJobType(currentJobType) : 'building_maintenance');
                           
                           // Rock scaling: elevation is always required but don't show any indicator
                           if (category === 'rock_scaling') {
@@ -4162,23 +4164,42 @@ export default function Dashboard() {
                     filteredProjects.filter((p: Project) => p.status === "active").map((project: Project) => {
                       const isInSuite = project.jobType === "in_suite_dryer_vent_cleaning";
                       const isParkade = project.jobType === "parkade_pressure_cleaning";
-                      const isHoursBased = project.jobType === "general_pressure_washing" || project.jobType === "ground_window_cleaning";
+                      // Use getProgressType to correctly identify hours-based jobs (NDT, Rock Scaling, etc.)
+                      const progressType = getProgressType(project.jobType);
+                      const isHoursBased = progressType === 'hours';
                       
                       let completed: number, total: number, progressPercent: number, unitLabel: string;
                       
+                      // Calculate total hours worked for hours-based projects
+                      const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id && s.endTime);
+                      const totalHoursWorked = projectSessions.reduce((sum: number, s: any) => {
+                        const regular = parseFloat(s.regularHours) || 0;
+                        const overtime = parseFloat(s.overtimeHours) || 0;
+                        const doubleTime = parseFloat(s.doubleTimeHours) || 0;
+                        return sum + regular + overtime + doubleTime;
+                      }, 0);
+                      
                       if (isHoursBased) {
-                        // Percentage-based tracking (General Pressure Washing, Ground Window)
-                        // Get the latest completion percentage from work sessions
-                        const projectSessions = allWorkSessions.filter((s: any) => 
-                          s.projectId === project.id && s.endTime && s.manualCompletionPercentage !== null
-                        );
-                        const latestSession = projectSessions.sort((a: any, b: any) => 
-                          new Date(b.endTime).getTime() - new Date(a.endTime).getTime()
-                        )[0];
-                        progressPercent = latestSession?.manualCompletionPercentage || 0;
-                        completed = progressPercent;
-                        total = 100;
-                        unitLabel = "%";
+                        // Hours-based tracking for NDT, Rock Scaling, General Pressure Washing, Ground Window
+                        // Show hours worked vs estimated hours if available, otherwise use completion percentage
+                        if (project.estimatedHours && project.estimatedHours > 0) {
+                          completed = Math.round(totalHoursWorked * 10) / 10;
+                          total = project.estimatedHours;
+                          progressPercent = Math.min((totalHoursWorked / project.estimatedHours) * 100, 100);
+                          unitLabel = t('dashboard.projects.hours', 'hrs');
+                        } else {
+                          // Fall back to completion percentage if no estimated hours
+                          const sessionsWithPercentage = allWorkSessions.filter((s: any) => 
+                            s.projectId === project.id && s.endTime && s.manualCompletionPercentage !== null
+                          );
+                          const latestSession = sessionsWithPercentage.sort((a: any, b: any) => 
+                            new Date(b.endTime).getTime() - new Date(a.endTime).getTime()
+                          )[0];
+                          progressPercent = latestSession?.manualCompletionPercentage || 0;
+                          completed = progressPercent;
+                          total = 100;
+                          unitLabel = "%";
+                        }
                       } else if (isInSuite) {
                         // Suite-based tracking (In-Suite Dryer Vent)
                         completed = project.completedDrops || 0;
@@ -4223,8 +4244,8 @@ export default function Dashboard() {
                                 )}
                               </div>
                               <div className="flex flex-col items-end gap-2">
-                                {/* Hide floor count badge for hours-based projects (General Pressure Washing, Ground Window) */}
-                                {!isHoursBased && (
+                                {/* Hide floor count badge for hours-based projects (NDT, Rock Scaling, General Pressure Washing, Ground Window) */}
+                                {!isHoursBased && !isInSuite && !isParkade && project.floorCount && (
                                   <Badge variant="secondary" className="text-sm px-3 py-1">
                                     <span className="material-icons text-xs mr-1">layers</span>
                                     {project.floorCount}
@@ -8375,7 +8396,8 @@ export default function Dashboard() {
             <DialogDescription>
               {(() => {
                 const activeProject = projects.find(p => p.id === activeSession?.projectId);
-                const isHoursBased = activeProject?.jobType === "general_pressure_washing" || activeProject?.jobType === "ground_window_cleaning";
+                const progressType = activeProject?.jobType ? getProgressType(activeProject.jobType) : 'drops';
+                const isHoursBased = progressType === 'hours';
                 if (isHoursBased) {
                   return t('dashboard.endDay.completionPercentage', 'Enter how much of the job YOU completed today. This will be added to the total project progress.');
                 } else if (activeProject?.jobType === "parkade_pressure_cleaning") {
@@ -8393,7 +8415,8 @@ export default function Dashboard() {
             <form onSubmit={endDayForm.handleSubmit(onEndDaySubmit)} className="space-y-4">
               {(() => {
                 const activeProject = projects.find(p => p.id === activeSession?.projectId);
-                const isHoursBased = activeProject?.jobType === "general_pressure_washing" || activeProject?.jobType === "ground_window_cleaning";
+                const progressType = activeProject?.jobType ? getProgressType(activeProject.jobType) : 'drops';
+                const isHoursBased = progressType === 'hours';
                 const isParkade = activeProject?.jobType === "parkade_pressure_cleaning";
                 const isInSuite = activeProject?.jobType === "in_suite_dryer_vent_cleaning";
                 
