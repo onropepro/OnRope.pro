@@ -1111,10 +1111,10 @@ export default function Changelog() {
               {servicesData.map((category, catIndex) => (
                 <div key={catIndex}>
                   <div className="flex items-center gap-2 mb-3">
-                    <h3 className="font-semibold text-sm">{category.category}</h3>
+                    <h3 className="font-semibold text-base">{category.category}</h3>
                     <Badge variant="secondary" className="text-xs">{category.services.length}</Badge>
                   </div>
-                  <p className="text-xs text-muted-foreground mb-3">{category.description}</p>
+                  <p className="text-sm text-muted-foreground mb-3">{category.description}</p>
                   <div className="grid gap-2 sm:grid-cols-2">
                     {category.services.map((service, index) => (
                       <div 
@@ -1126,10 +1126,10 @@ export default function Changelog() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-medium text-sm">{service.name}</span>
+                            <span className="font-medium text-base">{service.name}</span>
                             <Badge variant="secondary" className="text-xs">{service.trackingType}</Badge>
                           </div>
-                          <p className="text-xs text-muted-foreground mt-0.5">
+                          <p className="text-sm text-muted-foreground mt-0.5">
                             {service.description}
                           </p>
                         </div>
@@ -1164,7 +1164,7 @@ export default function Changelog() {
                   <div key={catIndex}>
                     <div className="flex items-center gap-2 mb-3">
                       <CatIcon className={`h-4 w-4 ${category.iconColor}`} />
-                      <h3 className="font-semibold text-sm">{category.category}</h3>
+                      <h3 className="font-semibold text-base">{category.category}</h3>
                       <Badge variant="secondary" className="text-xs">{category.pages.length}</Badge>
                     </div>
                     <div className="grid gap-2">
@@ -1179,12 +1179,12 @@ export default function Changelog() {
                               <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 flex-wrap">
-                                  <span className="font-medium text-sm">{page.name}</span>
+                                  <span className="font-medium text-base">{page.name}</span>
                                   <code className="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
                                     {page.path}
                                   </code>
                                 </div>
-                                <p className="text-xs text-muted-foreground mt-0.5 truncate">
+                                <p className="text-sm text-muted-foreground mt-0.5 truncate">
                                   {page.description}
                                 </p>
                               </div>
@@ -1222,7 +1222,7 @@ export default function Changelog() {
           </CardContent>
         </Card>
 
-        <h2 className="text-xl font-bold mb-4">Feature Changelog</h2>
+        <h2 className="text-2xl md:text-3xl font-bold mb-6">Feature Changelog</h2>
 
         <div className="space-y-4">
           {changelogData.map((section, index) => {
@@ -1408,7 +1408,7 @@ export default function Changelog() {
                   </div>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <ul className="grid gap-2 text-sm">
+                  <ul className="grid gap-2.5 text-base">
                     {section.features.map((feature, featureIndex) => (
                       <li key={featureIndex} className="flex items-start gap-2">
                         <CheckCircle2 className="h-4 w-4 text-success-600 mt-0.5 flex-shrink-0" />
@@ -1426,7 +1426,7 @@ export default function Changelog() {
           <CardContent className="pt-6">
             <div className="text-center">
               <h3 className="text-lg font-semibold mb-2">Rope Access Management Platform</h3>
-              <p className="text-sm text-muted-foreground mb-4">
+              <p className="text-base text-muted-foreground mb-4">
                 Enterprise-grade, mobile-first web application for high-rise building maintenance operations
               </p>
               <div className="flex flex-wrap justify-center gap-2">
