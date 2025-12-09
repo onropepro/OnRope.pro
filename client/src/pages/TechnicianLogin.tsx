@@ -469,7 +469,7 @@ export default function TechnicianLogin() {
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
                 You Work.{" "}
-                <span className="text-[#0369A1]">Everything Else Is Automatic.</span>
+                <span className="text-[#0369A1]">Everything Else Is Already Done.</span>
               </h1>
               
               <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
