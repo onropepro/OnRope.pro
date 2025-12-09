@@ -4381,7 +4381,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const instructions = await storage.upsertBuildingInstructions({
             buildingId,
             ...req.body,
-            createdByUserId: req.session.buildingId,
+            createdByUserId: null, // Building managers don't have user IDs
             createdByRole: 'building_manager',
           });
           return res.json(instructions);
