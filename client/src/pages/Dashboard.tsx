@@ -3685,19 +3685,20 @@ export default function Dashboard() {
                           )}
                         />
 
-                        {/* Show drops fields for drop-based jobs when elevation is required */}
+                        {/* Show elevation fields when requiresElevation is true (regardless of job type) */}
                         {(() => {
                           const currentJobType = projectForm.watch("jobType");
                           const requiresElevation = projectForm.watch("requiresElevation");
                           const jobConfig = getJobTypeConfig(currentJobType);
                           
-                          // Show drops fields if:
-                          // 1. Job type is drop-based AND
-                          // 2. Either elevation is always required OR (configurable AND toggle is ON)
-                          if (!isDropBasedJobType(currentJobType)) return false;
+                          // Show elevation tracking fields if:
+                          // 1. Elevation is always required (job type)
+                          // 2. OR elevation is configurable AND toggle is ON
+                          // 3. OR custom job type with showOtherElevationFields
+                          // Never show for jobs with elevationRequirement: 'never'
+                          if (jobConfig?.elevationRequirement === 'never') return false;
                           if (jobConfig?.elevationRequirement === 'always') return true;
-                          if (jobConfig?.elevationRequirement === 'configurable' && requiresElevation) return true;
-                          // For 'other' job type with showOtherElevationFields
+                          if (requiresElevation) return true;
                           if ((currentJobType === "other" || currentJobType === "ndt_other") && showOtherElevationFields) return true;
                           return false;
                         })() && (
