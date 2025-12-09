@@ -2016,7 +2016,7 @@ export default function TechnicianPortal() {
         )}
 
         {/* EMPLOYER VIEW TAB - What employers see */}
-        {activeTab === 'employer' && user && user.role === 'rope_access_tech' && (
+        {activeTab === 'employer' && user && (
           <>
             {/* Back to Home button */}
             <Button
