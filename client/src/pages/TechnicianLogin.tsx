@@ -667,7 +667,7 @@ export default function TechnicianLogin() {
               </div>
               <h2 className="text-3xl md:text-4xl font-bold mb-4">Free forever. Plus when you share.</h2>
               <p className="text-lg text-muted-foreground">
-                Get started for free. Share with one tech to unlock Plus for both of you.
+                Get started for free. Share your code with one tech to unlock Plus for yourself.
               </p>
             </div>
             
