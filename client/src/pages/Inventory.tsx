@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
@@ -70,7 +70,7 @@ export default function Inventory() {
   const [itemToDelete, setItemToDelete] = useState<GearItem | null>(null);
   const [customType, setCustomType] = useState("");
   const [addItemStep, setAddItemStep] = useState(1);
-  const [activeTab, setActiveTab] = useState("my-gear");
+  const [activeTab, setActiveTab] = useState("");
   const [inspectionFilter, setInspectionFilter] = useState<"week" | "month" | "all" | "combined">("week");
   
   // Assignment dialog state
@@ -142,6 +142,17 @@ export default function Inventory() {
   const currentUser = userData?.user;
   const canViewFinancials = hasFinancialAccess(currentUser);
   const hasInventoryAccess = canAccessInventory(currentUser);
+
+  // Set default tab based on user role - company owners go directly to manage gear
+  useEffect(() => {
+    if (currentUser && !activeTab) {
+      if (currentUser.role === 'company') {
+        setActiveTab("manage");
+      } else {
+        setActiveTab("my-gear");
+      }
+    }
+  }, [currentUser, activeTab]);
 
   // Redirect users without inventory access permission
   if (userData && !hasInventoryAccess) {
