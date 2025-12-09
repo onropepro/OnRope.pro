@@ -2459,7 +2459,7 @@ export default function Inventory() {
                           </SelectTrigger>
                           <SelectContent>
                             {activeEmployees
-                              .filter((emp: any) => emp.name && emp.name.trim() !== "" && emp.role !== 'company')
+                              .filter((emp: any) => emp.name && emp.name.trim() !== "")
                               .map((emp: any) => (
                                 <SelectItem key={emp.id} value={emp.id}>
                                   {emp.name} {emp.email ? `(${emp.email})` : ''}
@@ -2527,7 +2527,7 @@ export default function Inventory() {
                           </SelectTrigger>
                           <SelectContent>
                             {activeEmployees
-                              .filter((emp: any) => emp.name && emp.name.trim() !== "" && emp.role !== 'company')
+                              .filter((emp: any) => emp.name && emp.name.trim() !== "")
                               .map((emp: any) => (
                                 <SelectItem key={emp.id} value={emp.id}>
                                   {emp.name} {emp.email ? `(${emp.email})` : ''}
@@ -3150,7 +3150,7 @@ export default function Inventory() {
                       </SelectTrigger>
                       <SelectContent>
                         {activeEmployees
-                          .filter((emp: any) => emp.name && emp.name.trim() !== "" && emp.role !== 'company')
+                          .filter((emp: any) => emp.name && emp.name.trim() !== "")
                           .map((emp: any) => (
                             <SelectItem key={emp.id} value={emp.id}>
                               {emp.name} {emp.email ? `(${emp.email})` : ''}
