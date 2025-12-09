@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications } from "@shared/schema";
 import { eq, sql, and, or, isNull, gt, desc, inArray } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -16734,6 +16734,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .where(eq(jobApplications.id, req.params.id))
         .returning();
 
+      // Get job posting to find the company owner
+      const [job] = await db.select()
+        .from(jobPostings)
+        .where(eq(jobPostings.id, application.jobPostingId));
+
+      if (job) {
+        // Create notification for company owner
+        await db.insert(notifications).values({
+          companyId: job.companyId,
+          actorId: currentUser.id,
+          type: "job_offer_refused",
+          payload: {
+            applicationId: application.id,
+            jobPostingId: job.id,
+            jobTitle: job.title,
+            technicianId: currentUser.id,
+            technicianName: currentUser.name || "Unknown Technician",
+          },
+          isRead: false,
+        });
+      }
+
       res.json({ application: updatedApplication });
     } catch (error) {
       console.error("Refuse offer error:", error);
@@ -16962,6 +16984,117 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ technicians: visibleTechs });
     } catch (error) {
       console.error("Get visible technicians error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get notifications for company owner
+  app.get("/api/notifications", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const unreadOnly = req.query.unread === "true";
+
+      let query = db.select()
+        .from(notifications)
+        .where(eq(notifications.companyId, currentUser.id))
+        .orderBy(desc(notifications.createdAt));
+
+      if (unreadOnly) {
+        query = db.select()
+          .from(notifications)
+          .where(and(
+            eq(notifications.companyId, currentUser.id),
+            eq(notifications.isRead, false)
+          ))
+          .orderBy(desc(notifications.createdAt));
+      }
+
+      const results = await query;
+
+      res.json({ notifications: results });
+    } catch (error) {
+      console.error("Get notifications error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get unread notification count
+  app.get("/api/notifications/unread-count", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const result = await db.select({ count: sql<number>`count(*)` })
+        .from(notifications)
+        .where(and(
+          eq(notifications.companyId, currentUser.id),
+          eq(notifications.isRead, false)
+        ));
+
+      res.json({ count: Number(result[0]?.count || 0) });
+    } catch (error) {
+      console.error("Get unread count error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Mark notification as read
+  app.patch("/api/notifications/:id/read", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const [notification] = await db.select()
+        .from(notifications)
+        .where(eq(notifications.id, req.params.id));
+
+      if (!notification) {
+        return res.status(404).json({ message: "Notification not found" });
+      }
+
+      // Only the company owner can mark their own notifications as read
+      if (notification.companyId !== currentUser.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const [updated] = await db.update(notifications)
+        .set({ isRead: true })
+        .where(eq(notifications.id, req.params.id))
+        .returning();
+
+      res.json({ notification: updated });
+    } catch (error) {
+      console.error("Mark notification read error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Mark all notifications as read
+  app.patch("/api/notifications/read-all", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      await db.update(notifications)
+        .set({ isRead: true })
+        .where(and(
+          eq(notifications.companyId, currentUser.id),
+          eq(notifications.isRead, false)
+        ));
+
+      res.json({ message: "All notifications marked as read" });
+    } catch (error) {
+      console.error("Mark all read error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

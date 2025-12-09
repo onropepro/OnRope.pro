@@ -1766,6 +1766,28 @@ export const insertEmployeeTimeOffSchema = createInsertSchema(employeeTimeOff).o
 export type EmployeeTimeOff = typeof employeeTimeOff.$inferSelect;
 export type InsertEmployeeTimeOff = z.infer<typeof insertEmployeeTimeOffSchema>;
 
+// Notifications table for in-app notifications
+export const notifications = pgTable("notifications", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  actorId: varchar("actor_id").references(() => users.id, { onDelete: "set null" }),
+  type: varchar("type").notNull(),
+  payload: jsonb("payload"),
+  isRead: boolean("is_read").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_notifications_company").on(table.companyId),
+  index("IDX_notifications_read").on(table.isRead),
+]);
+
+export const insertNotificationSchema = createInsertSchema(notifications).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = z.infer<typeof insertNotificationSchema>;
+
 // Type exports
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
