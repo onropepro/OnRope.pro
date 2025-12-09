@@ -3138,11 +3138,17 @@ export default function TechnicianPortal() {
                         <Button
                           variant="outline"
                           className="w-full"
-                          onClick={() => window.open('https://techconnect.irata.org/verify/tech', '_blank')}
+                          asChild
                           data-testid="button-open-irata-portal"
                         >
-                          <ExternalLink className="w-4 h-4 mr-2" />
-                          {t.openIrataPortal}
+                          <a 
+                            href="https://techconnect.irata.org/verify/tech" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                          >
+                            <ExternalLink className="w-4 h-4 mr-2" />
+                            {t.openIrataPortal}
+                          </a>
                         </Button>
                         
                         <input
@@ -3343,11 +3349,17 @@ export default function TechnicianPortal() {
                         <Button
                           variant="outline"
                           className="w-full"
-                          onClick={() => window.open('https://sprat.org/technician-verification-system/', '_blank')}
+                          asChild
                           data-testid="button-open-sprat-portal"
                         >
-                          <ExternalLink className="w-4 h-4 mr-2" />
-                          {t.openSpratPortal}
+                          <a 
+                            href="https://sprat.org/technician-verification-system/" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                          >
+                            <ExternalLink className="w-4 h-4 mr-2" />
+                            {t.openSpratPortal}
+                          </a>
                         </Button>
                         
                         <input
