@@ -474,7 +474,7 @@ export default function TechnicianLogin() {
         </section>
 
         {/* Problem Section - Flowbite Style */}
-        <section className="py-20 lg:py-28 bg-muted/20">
+        <section className="py-20 lg:py-28 bg-[#F9FAFB] dark:bg-muted/20">
           <div className="container mx-auto px-6 lg:px-8">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-12">
