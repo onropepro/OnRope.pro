@@ -1779,13 +1779,21 @@ export default function TechnicianPortal() {
               </button>
               
               <button
-                onClick={() => setShowFeedbackDialog(true)}
+                onClick={() => {
+                  if (totalUnreadFeedback > 0) {
+                    setShowMyFeedbackDialog(true);
+                  } else {
+                    setShowFeedbackDialog(true);
+                  }
+                }}
                 className="p-4 rounded-lg border bg-gradient-to-br from-purple-500/5 to-pink-500/5 hover-elevate text-left relative"
                 data-testid="quick-action-feedback"
               >
                 <MessageSquare className="w-8 h-8 text-purple-500 mb-2" />
                 <p className="font-medium text-sm">{t.feedback}</p>
-                <p className="text-xs text-muted-foreground">{t.sendFeedback}</p>
+                <p className="text-xs text-muted-foreground">
+                  {totalUnreadFeedback > 0 ? t.viewMyFeedback : t.sendFeedback}
+                </p>
                 {totalUnreadFeedback > 0 && (
                   <Badge variant="destructive" className="absolute top-2 right-2 text-xs">
                     {totalUnreadFeedback}
