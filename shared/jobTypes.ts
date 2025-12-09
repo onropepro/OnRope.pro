@@ -84,3 +84,31 @@ export function getProgressType(jobType: string): 'drops' | 'hours' | 'suites' |
   const config = getJobTypeConfig(jobType);
   return config?.progressType || 'hours';
 }
+
+// Get all valid job type values for validation
+export function getAllJobTypeValues(): string[] {
+  return JOB_TYPES.map(jt => jt.value);
+}
+
+// Check if a job type is valid (exists in the configuration)
+export function isValidJobType(jobType: string): boolean {
+  return JOB_TYPES.some(jt => jt.value === jobType);
+}
+
+// Check if a job type uses drop-based progress tracking
+export function isDropBasedJobType(jobType: string): boolean {
+  const config = getJobTypeConfig(jobType);
+  return config?.progressType === 'drops';
+}
+
+// Check if a job type requires suites per day
+export function isSuiteBasedJobType(jobType: string): boolean {
+  const config = getJobTypeConfig(jobType);
+  return config?.progressType === 'suites';
+}
+
+// Check if a job type requires stalls per day
+export function isStallBasedJobType(jobType: string): boolean {
+  const config = getJobTypeConfig(jobType);
+  return config?.progressType === 'stalls';
+}

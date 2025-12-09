@@ -1,5 +1,5 @@
 // GPS Location Tracking - v2.0 - CACHE BUST
-import { useState, useEffect, useMemo, useRef, useContext } from "react";
+import { useState, useEffect, useLayoutEffect, useMemo, useRef, useContext } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { BrandingContext } from "@/App";
@@ -12,7 +12,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
@@ -59,16 +59,19 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 
-import { JOB_CATEGORIES, JOB_TYPES, getJobTypesByCategory, getJobTypeConfig, getDefaultElevation, isElevationConfigurable, type JobCategory } from "@shared/jobTypes";
+import { JOB_CATEGORIES, JOB_TYPES, getJobTypesByCategory, getJobTypeConfig, getDefaultElevation, isElevationConfigurable, getAllJobTypeValues, type JobCategory } from "@shared/jobTypes";
 
-const ALL_JOB_TYPE_VALUES = JOB_TYPES.map(jt => jt.value) as [string, ...string[]];
+// Use helper function to get all job type values for validation
+const ALL_JOB_TYPE_VALUES = getAllJobTypeValues() as [string, ...string[]];
 
 const projectSchema = z.object({
   strataPlanNumber: z.string().optional(),
   buildingName: z.string().optional(),
   buildingAddress: z.string().optional(),
   jobCategory: z.enum(['building_maintenance', 'ndt']).default('building_maintenance'),
-  jobType: z.string(),
+  jobType: z.enum(ALL_JOB_TYPE_VALUES, {
+    errorMap: () => ({ message: "Please select a valid job type" })
+  }),
   customJobType: z.string().optional(),
   requiresElevation: z.boolean().default(true),
   totalDropsNorth: z.string().optional(),
@@ -1182,42 +1185,53 @@ export default function Dashboard() {
     },
   });
 
-  // Reset elevation fields flag when job type changes, and update elevation default based on job type
+  // Use useWatch for reactive updates to category and jobType
+  const watchedCategory = useWatch({ control: projectForm.control, name: "jobCategory" });
+  const watchedJobType = useWatch({ control: projectForm.control, name: "jobType" });
+  
+  // Track previous values to determine what changed and avoid double-firing
+  const prevCategoryRef = useRef<string | undefined>(watchedCategory);
+  const prevJobTypeRef = useRef<string | undefined>(watchedJobType);
+  
+  // Single unified effect handles both category and jobType changes
   useEffect(() => {
-    const subscription = projectForm.watch((value, { name }) => {
-      if (name === "jobType") {
-        if (value.jobType !== "other" && value.jobType !== "ndt_other") {
+    const categoryChanged = watchedCategory !== prevCategoryRef.current;
+    const jobTypeChanged = watchedJobType !== prevJobTypeRef.current;
+    
+    // Update refs immediately to track current values
+    prevCategoryRef.current = watchedCategory;
+    prevJobTypeRef.current = watchedJobType;
+    
+    if (categoryChanged && watchedCategory) {
+      // Category changed - set jobType to first type in category and update elevation
+      const types = getJobTypesByCategory(watchedCategory as JobCategory);
+      if (types.length > 0) {
+        const nextJobType = types[0].value;
+        const elevationDefault = getDefaultElevation(nextJobType);
+        
+        // Update jobType if it doesn't match the expected first type
+        if (nextJobType !== watchedJobType) {
+          prevJobTypeRef.current = nextJobType; // Pre-update ref to prevent jobType branch from firing
+          projectForm.setValue("jobType", nextJobType, { shouldDirty: true, shouldValidate: true });
+        }
+        
+        // Always update elevation when category changes
+        projectForm.setValue("requiresElevation", elevationDefault, { shouldDirty: true, shouldValidate: true });
+        
+        if (nextJobType !== "other" && nextJobType !== "ndt_other") {
           setShowOtherElevationFields(false);
         }
-        const config = getJobTypeConfig(value.jobType || '');
-        if (config) {
-          if (config.elevationRequirement === 'always') {
-            projectForm.setValue('requiresElevation', true);
-          } else if (config.elevationRequirement === 'never') {
-            projectForm.setValue('requiresElevation', false);
-          } else {
-            // For configurable types, set default based on getDefaultElevation
-            projectForm.setValue('requiresElevation', getDefaultElevation(value.jobType || ''));
-          }
-        }
       }
-      if (name === "jobCategory") {
-        const categoryJobTypes = getJobTypesByCategory(value.jobCategory as JobCategory || 'building_maintenance');
-        if (categoryJobTypes.length > 0) {
-          projectForm.setValue('jobType', categoryJobTypes[0].value);
-          const config = categoryJobTypes[0];
-          if (config.elevationRequirement === 'always') {
-            projectForm.setValue('requiresElevation', true);
-          } else if (config.elevationRequirement === 'never') {
-            projectForm.setValue('requiresElevation', false);
-          } else {
-            projectForm.setValue('requiresElevation', getDefaultElevation(categoryJobTypes[0].value));
-          }
-        }
+    } else if (jobTypeChanged && watchedJobType && !categoryChanged) {
+      // JobType changed directly (not from category change) - update elevation
+      const elevationDefault = getDefaultElevation(watchedJobType);
+      projectForm.setValue("requiresElevation", elevationDefault, { shouldDirty: true, shouldValidate: true });
+      
+      if (watchedJobType !== "other" && watchedJobType !== "ndt_other") {
+        setShowOtherElevationFields(false);
       }
-    });
-    return () => subscription.unsubscribe();
-  }, [projectForm]);
+    }
+  }, [watchedCategory, watchedJobType]);
 
   // Auto-set target completion date when end date is selected
   useEffect(() => {

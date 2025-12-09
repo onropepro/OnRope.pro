@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import { relations } from "drizzle-orm";
+import { isDropBasedJobType, isSuiteBasedJobType, isStallBasedJobType, getAllJobTypeValues, getCategoryForJobType } from './jobTypes';
 import {
   pgTable,
   varchar,
@@ -1497,6 +1498,9 @@ export const insertClientSchema = createInsertSchema(clients).omit({
 export type InsertClient = z.infer<typeof insertClientSchema>;
 export type Client = typeof clients.$inferSelect;
 
+// Valid job type values for schema validation
+const validJobTypeValues = getAllJobTypeValues() as [string, ...string[]];
+
 export const insertProjectSchema = createInsertSchema(projects)
   .omit({
     id: true,
@@ -1506,38 +1510,39 @@ export const insertProjectSchema = createInsertSchema(projects)
   })
   .extend({
     dailyDropTarget: z.number().optional(),
-    jobType: z.string(), // Accept any string to support custom and NDT job types
-    jobCategory: z.string().optional().default('building_maintenance'),
+    jobType: z.enum(validJobTypeValues, {
+      errorMap: () => ({ message: "Invalid job type selected" })
+    }),
+    jobCategory: z.enum(['building_maintenance', 'ndt']).optional().default('building_maintenance'),
     requiresElevation: z.boolean().optional().default(true),
   })
   .superRefine((data, ctx) => {
-    // Helper to check if job type uses drop-based tracking
-    const isDropBasedJob = (jobType: string): boolean => {
-      // NDT jobs are never drop-based
-      if (jobType.startsWith('ndt_')) return false;
-      // Custom "other" types are hours-based
-      if (jobType === 'other' || jobType === 'ndt_other') return false;
-      // Ground-level and suite-based jobs are not drop-based
-      if (['ground_window_cleaning', 'general_pressure_washing', 'inspection', 
-           'in_suite_dryer_vent_cleaning', 'parkade_pressure_cleaning'].includes(jobType)) return false;
-      // Building maintenance jobs with elevation use drops
-      return ['window_cleaning', 'dryer_vent_cleaning', 'building_wash', 
-              'gutter_cleaning', 'painting', 'caulking'].includes(jobType);
-    };
+    // Validate jobType belongs to the selected category (only if category is explicitly provided)
+    // Skip validation if jobCategory is undefined/null (will use default value)
+    if (data.jobCategory) {
+      const expectedCategory = getCategoryForJobType(data.jobType);
+      if (expectedCategory && data.jobCategory !== expectedCategory) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Job type "${data.jobType}" does not belong to category "${data.jobCategory}"`,
+          path: ["jobType"],
+        });
+      }
+    }
     
     // Only require dailyDropTarget for drop-based jobs that require elevation
-    if (isDropBasedJob(data.jobType) && data.requiresElevation !== false) {
+    if (isDropBasedJobType(data.jobType) && data.requiresElevation !== false) {
       if (!data.dailyDropTarget || data.dailyDropTarget <= 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Daily drop target is required",
+          message: "Daily drop target is required for drop-based jobs",
           path: ["dailyDropTarget"],
         });
       }
     }
     
-    // Job-specific validations for non-drop jobs
-    if (data.jobType === 'in_suite_dryer_vent_cleaning') {
+    // Suite-based job validation
+    if (isSuiteBasedJobType(data.jobType)) {
       if (!data.suitesPerDay && !data.floorsPerDay) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -1547,7 +1552,8 @@ export const insertProjectSchema = createInsertSchema(projects)
       }
     }
     
-    if (data.jobType === 'parkade_pressure_cleaning') {
+    // Stall-based job validation
+    if (isStallBasedJobType(data.jobType)) {
       if (!data.stallsPerDay) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
