@@ -2527,14 +2527,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Include licenseKey for company users so they can view it in their subscription page
       const { passwordHash, ...userWithoutPassword } = user;
       
-      // For technicians: compute PLUS status based on referral count
+      // For technicians: compute PLUS status based on database OR referral count
       let hasPlusAccess = user.hasPlusAccess || false;
       let referralCount = 0;
       if (user.role === 'rope_access_tech') {
         try {
           referralCount = await storage.getReferralCount(user.id);
-          // PLUS access is granted if user has at least 1 referral
-          hasPlusAccess = referralCount >= 1;
+          // PLUS access is granted if: manually granted by SuperUser OR has at least 1 referral
+          hasPlusAccess = user.hasPlusAccess || referralCount >= 1;
         } catch (err) {
           console.error('[/api/user] Failed to get referral count:', err);
         }

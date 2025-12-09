@@ -365,7 +365,7 @@ export default function SuperUserTechnicians() {
                           <div className="font-medium flex items-center gap-2 flex-wrap">
                             {tech.name}
                             {tech.hasPlusAccess && (
-                              <Badge className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs">PRO</Badge>
+                              <Badge className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs">PLUS</Badge>
                             )}
                             {getStatusBadge(tech)}
                           </div>
@@ -662,7 +662,7 @@ export default function SuperUserTechnicians() {
                           <div className="flex items-center gap-2">
                             <p className="font-medium">Technician PLUS</p>
                             {technicianDetailData.technician.hasPlusAccess && (
-                              <Badge className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white">PRO</Badge>
+                              <Badge className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white">PLUS</Badge>
                             )}
                           </div>
                           <p className="text-sm text-muted-foreground">
