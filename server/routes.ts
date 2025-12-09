@@ -4468,9 +4468,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Technician not found" });
       }
 
-      // Only allow for technician role users
-      if (technician.role !== 'technician') {
-        return res.status(400).json({ message: "PLUS access can only be granted to technicians" });
+      // Only allow for technician or employee role users
+      if (technician.role !== 'technician' && technician.role !== 'employee') {
+        return res.status(400).json({ message: "PLUS access can only be granted to technicians or employees" });
       }
 
       // Update the hasPlusAccess field
