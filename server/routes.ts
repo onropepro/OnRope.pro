@@ -3,8 +3,8 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments } from "@shared/schema";
-import { eq, sql, and } from "drizzle-orm";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications } from "@shared/schema";
+import { eq, sql, and, or, isNull, gt, desc } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import multer from "multer";
@@ -2524,6 +2524,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Include licenseKey for company users so they can view it in their subscription page
       const { passwordHash, ...userWithoutPassword } = user;
       
+      // For technicians: compute PLUS status based on referral count
+      let hasPlusAccess = user.hasPlusAccess || false;
+      let referralCount = 0;
+      if (user.role === 'rope_access_tech') {
+        try {
+          referralCount = await storage.getReferralCount(user.id);
+          // PLUS access is granted if user has at least 1 referral
+          hasPlusAccess = referralCount >= 1;
+        } catch (err) {
+          console.error('[/api/user] Failed to get referral count:', err);
+        }
+      }
+      
       // Disable caching to ensure fresh data
       res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
       
@@ -2532,7 +2545,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           ...userWithoutPassword,
           ...(companyLicenseVerified !== undefined && { companyLicenseVerified }),
           ...(companyResidentCode && { residentCode: companyResidentCode }),
-          ...(employerCompanyName && { companyName: employerCompanyName })
+          ...(employerCompanyName && { companyName: employerCompanyName }),
+          ...(user.role === 'rope_access_tech' && { hasPlusAccess, referralCount })
         }
       });
     } catch (error) {
@@ -2817,6 +2831,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("[Technician] Error leaving company:", error);
       res.status(500).json({ message: error.message || "Failed to leave company" });
+    }
+  });
+
+  // Generate referral code for users who don't have one
+  // This allows company owners and other users to get a referral code
+  app.post("/api/user/generate-referral-code", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // If user already has a referral code, return it
+      if (user.referralCode) {
+        return res.json({ 
+          referralCode: user.referralCode,
+          message: "Referral code already exists"
+        });
+      }
+
+      // Generate a new referral code
+      const newReferralCode = await generateReferralCode();
+      
+      // Update the user with the new referral code
+      await storage.updateUser(userId, { referralCode: newReferralCode });
+
+      console.log(`[Referral] Generated referral code ${newReferralCode} for user ${userId} (${user.role})`);
+
+      res.json({ 
+        referralCode: newReferralCode,
+        message: "Referral code generated successfully"
+      });
+    } catch (error: any) {
+      console.error("[Referral] Error generating referral code:", error);
+      res.status(500).json({ message: error.message || "Failed to generate referral code" });
     }
   });
 
@@ -7392,6 +7446,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         endDate: req.body.endDate || null,
       };
       
+      // Add building height fields (for IRATA logbook tracking)
+      if (req.body.buildingHeight !== undefined) allowedUpdates.buildingHeight = req.body.buildingHeight || null;
+      if (req.body.floorCount !== undefined) allowedUpdates.floorCount = req.body.floorCount;
+      if (req.body.buildingFloors !== undefined) allowedUpdates.buildingFloors = req.body.buildingFloors;
+      
       // Add job-type specific fields
       if (req.body.totalDropsNorth !== undefined) allowedUpdates.totalDropsNorth = req.body.totalDropsNorth;
       if (req.body.totalDropsEast !== undefined) allowedUpdates.totalDropsEast = req.body.totalDropsEast;
@@ -8575,6 +8634,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get all completed work sessions for the current user (across all projects)
+  app.get("/api/my-work-sessions", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Get all work sessions for this user
+      const allSessions = await storage.getAllWorkSessionsByEmployee(currentUser.id);
+      
+      // Filter to only completed sessions and enrich with project info
+      const completedSessions = await Promise.all(
+        allSessions
+          .filter(session => session.endTime)
+          .map(async (session) => {
+            // Get project info
+            const project = await storage.getProjectById(session.projectId);
+            
+            // Calculate hours worked
+            const startTime = new Date(session.startTime);
+            const endTime = new Date(session.endTime!);
+            const hoursWorked = ((endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60)).toFixed(2);
+            
+            // Get company name
+            let companyName = null;
+            if (session.companyId) {
+              const company = await storage.getUserById(session.companyId);
+              companyName = company?.companyName || company?.name || null;
+            }
+            
+            // Calculate total drops
+            const totalDrops = (session.dropsCompletedNorth || 0) + 
+                              (session.dropsCompletedEast || 0) + 
+                              (session.dropsCompletedSouth || 0) + 
+                              (session.dropsCompletedWest || 0);
+            
+            return {
+              ...session,
+              hoursWorked,
+              totalDrops,
+              dropsNorth: session.dropsCompletedNorth || 0,
+              dropsEast: session.dropsCompletedEast || 0,
+              dropsSouth: session.dropsCompletedSouth || 0,
+              dropsWest: session.dropsCompletedWest || 0,
+              buildingName: project?.buildingName || null,
+              buildingAddress: project?.buildingAddress || null,
+              buildingHeight: project?.buildingHeight || null,
+              companyName,
+            };
+          })
+      );
+      
+      // Sort by work date descending (most recent first)
+      completedSessions.sort((a, b) => {
+        const dateA = new Date(a.workDate).getTime();
+        const dateB = new Date(b.workDate).getTime();
+        return dateB - dateA;
+      });
+      
+      res.json({ sessions: completedSessions });
+    } catch (error) {
+      console.error("Get my work sessions error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
   // Get employee's own work sessions for a project
   app.get("/api/projects/:projectId/my-work-sessions", requireAuth, async (req: Request, res: Response) => {
     try {
@@ -8720,14 +8847,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const docScore = documentCompliance;
         
         // Calculate overall score (weighted average)
-        // Weights: Drops 35%, Harness 25%, Hours 20%, Document Compliance 20%
-        // If no drop target, redistribute: Harness 35%, Hours 30%, Docs 35%
+        // Rating is based ONLY on safety compliance: Harness Inspection 50%, Document Review 50%
+        // Performance metrics (drops, hours) are tracked but not included in the rating
         let overallScore: number;
-        if (dailyDropTarget && dailyDropTarget > 0) {
-          overallScore = (dropPerformance * 0.35) + (harnessScore * 0.25) + (hoursScore * 0.20) + (docScore * 0.20);
-        } else {
-          overallScore = (harnessScore * 0.35) + (hoursScore * 0.30) + (docScore * 0.35);
-        }
+        overallScore = (harnessScore * 0.50) + (docScore * 0.50);
         overallScore = Math.min(Math.round(overallScore), 100);
         
         // Overall rating
@@ -9027,7 +9150,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const project = await storage.getProjectById(workSession.projectId);
       const derivedBuildingName = project?.buildingName || null;
       const derivedBuildingAddress = project?.buildingAddress || null;
-      const derivedBuildingHeight = project?.buildingHeight || null;
+      
+      // Derive building height from buildingHeight field, or calculate from buildingFloors if available
+      let derivedBuildingHeight = project?.buildingHeight || null;
+      if (!derivedBuildingHeight && project?.buildingFloors) {
+        const floors = project.buildingFloors;
+        const heightFeet = floors * 9;
+        const heightMeters = Math.round(heightFeet / 3.281);
+        derivedBuildingHeight = `${heightFeet}ft (${heightMeters}m)`;
+      }
       
       // Get company ID from work session (authoritative source)
       const companyId = workSession.companyId;
@@ -9071,7 +9202,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const logs = await storage.getIrataTaskLogsByEmployee(currentUser.id);
-      res.json({ logs });
+      
+      // Enrich logs with building height, company name, and drop counts from work session
+      const enrichedLogs = await Promise.all(logs.map(async (log) => {
+        let enrichedLog: any = { ...log };
+        
+        // Get company name from companyId
+        if (log.companyId) {
+          const company = await storage.getUserById(log.companyId);
+          if (company) {
+            enrichedLog.companyName = company.companyName || company.name || null;
+          }
+        }
+        
+        // Get drop counts from the associated work session
+        if (log.workSessionId) {
+          const workSession = await storage.getWorkSessionById(log.workSessionId);
+          if (workSession) {
+            const dropsNorth = workSession.dropsCompletedNorth || 0;
+            const dropsEast = workSession.dropsCompletedEast || 0;
+            const dropsSouth = workSession.dropsCompletedSouth || 0;
+            const dropsWest = workSession.dropsCompletedWest || 0;
+            enrichedLog.totalDrops = dropsNorth + dropsEast + dropsSouth + dropsWest;
+            enrichedLog.dropsNorth = dropsNorth;
+            enrichedLog.dropsEast = dropsEast;
+            enrichedLog.dropsSouth = dropsSouth;
+            enrichedLog.dropsWest = dropsWest;
+          }
+        }
+        
+        // If log already has building height, skip height derivation
+        if (!log.buildingHeight && log.projectId) {
+          // Try to get building height from the associated project
+          const project = await storage.getProjectById(log.projectId);
+          if (project) {
+            let derivedHeight = project.buildingHeight || null;
+            
+            // Calculate from floors if no explicit height
+            if (!derivedHeight && project.buildingFloors) {
+              const floors = project.buildingFloors;
+              const heightFeet = floors * 9;
+              const heightMeters = Math.round(heightFeet / 3.281);
+              derivedHeight = `${heightFeet}ft (${heightMeters}m)`;
+            }
+            
+            if (derivedHeight) {
+              enrichedLog.buildingHeight = derivedHeight;
+            }
+          }
+        }
+        
+        return enrichedLog;
+      }));
+      
+      res.json({ logs: enrichedLogs });
     } catch (error) {
       console.error("Get my IRATA task logs error:", error);
       res.status(500).json({ message: "Internal server error" });
@@ -15459,6 +15643,732 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ preferences });
     } catch (error) {
       console.error("Update user preferences error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // ============================================================================
+  // JOB BOARD ROUTES
+  // ============================================================================
+
+  // List all job postings (different views for different roles)
+  app.get("/api/job-postings", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      let result;
+      
+      if (currentUser.role === "superuser") {
+        // SuperUser sees all job postings (platform-wide)
+        result = await db.select().from(jobPostings).orderBy(sql`${jobPostings.createdAt} DESC`);
+      } else if (currentUser.role === "company") {
+        // Company owners see their own postings
+        result = await db.select().from(jobPostings)
+          .where(eq(jobPostings.companyId, currentUser.id))
+          .orderBy(sql`${jobPostings.createdAt} DESC`);
+      } else {
+        // Technicians/employees see all active job postings (platform + company)
+        // Also filter out expired postings
+        result = await db.select({
+          job: jobPostings,
+          companyName: users.companyName,
+        }).from(jobPostings)
+          .leftJoin(users, eq(jobPostings.companyId, users.id))
+          .where(and(
+            eq(jobPostings.status, "active"),
+            sql`(${jobPostings.expiresAt} IS NULL OR ${jobPostings.expiresAt} > NOW())`
+          ))
+          .orderBy(sql`${jobPostings.createdAt} DESC`);
+        
+        // Flatten the result for technicians
+        result = result.map(r => ({
+          ...r.job,
+          companyName: r.companyName || "Platform",
+        }));
+      }
+
+      res.json({ jobPostings: result });
+    } catch (error) {
+      console.error("Get job postings error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Public job postings - for technicians to browse (only active jobs)
+  // IMPORTANT: This route must come BEFORE /api/job-postings/:id to avoid "public" being treated as an ID
+  app.get("/api/job-postings/public", requireAuth, async (req: Request, res: Response) => {
+    try {
+      // Get only active, non-expired job postings
+      const now = new Date();
+      
+      const activeJobs = await db.select({
+        job: jobPostings,
+        companyName: users.companyName,
+      }).from(jobPostings)
+        .leftJoin(users, eq(jobPostings.companyId, users.id))
+        .where(
+          and(
+            eq(jobPostings.status, "active"),
+            or(
+              isNull(jobPostings.expiresAt),
+              gt(jobPostings.expiresAt, now)
+            )
+          )
+        )
+        .orderBy(desc(jobPostings.createdAt));
+
+      const jobsWithCompany = activeJobs.map(item => ({
+        ...item.job,
+        companyName: item.job.isPlatformPost ? "OnRopePro Platform" : (item.companyName || "Unknown Company"),
+      }));
+
+      res.json({ jobPostings: jobsWithCompany });
+    } catch (error) {
+      console.error("Fetch public job postings error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get single job posting
+  app.get("/api/job-postings/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const [job] = await db.select({
+        job: jobPostings,
+        companyName: users.companyName,
+      }).from(jobPostings)
+        .leftJoin(users, eq(jobPostings.companyId, users.id))
+        .where(eq(jobPostings.id, req.params.id));
+
+      if (!job) {
+        return res.status(404).json({ message: "Job posting not found" });
+      }
+
+      res.json({ 
+        jobPosting: {
+          ...job.job,
+          companyName: job.companyName || "Platform",
+        }
+      });
+    } catch (error) {
+      console.error("Get job posting error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Create job posting (SuperUser or Company owner)
+  app.post("/api/job-postings", requireAuth, requireRole("company", "superuser"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const isPlatformPost = currentUser.role === "superuser";
+      
+      // Convert date strings to Date objects if provided
+      const bodyWithParsedDates = {
+        ...req.body,
+        expiresAt: req.body.expiresAt ? new Date(req.body.expiresAt) : null,
+        startDate: req.body.startDate ? new Date(req.body.startDate) : null,
+      };
+      
+      const jobData = insertJobPostingSchema.parse({
+        ...bodyWithParsedDates,
+        companyId: isPlatformPost ? null : currentUser.id,
+        isPlatformPost,
+      });
+
+      const [newJob] = await db.insert(jobPostings).values(jobData).returning();
+      
+      res.json({ jobPosting: newJob });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Create job posting error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Update job posting (SuperUser or owning Company)
+  app.patch("/api/job-postings/:id", requireAuth, requireRole("company", "superuser"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Get existing job to verify ownership
+      const [existingJob] = await db.select().from(jobPostings).where(eq(jobPostings.id, req.params.id));
+      if (!existingJob) {
+        return res.status(404).json({ message: "Job posting not found" });
+      }
+
+      // Verify ownership (company can only edit their own, superuser can edit platform posts)
+      if (currentUser.role === "company" && existingJob.companyId !== currentUser.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      if (currentUser.role === "superuser" && !existingJob.isPlatformPost) {
+        return res.status(403).json({ message: "SuperUser can only edit platform posts" });
+      }
+
+      const allowedUpdates: any = {
+        title: req.body.title,
+        description: req.body.description,
+        requirements: req.body.requirements,
+        location: req.body.location,
+        isRemote: req.body.isRemote,
+        jobType: req.body.jobType,
+        employmentType: req.body.employmentType,
+        salaryMin: req.body.salaryMin,
+        salaryMax: req.body.salaryMax,
+        salaryPeriod: req.body.salaryPeriod,
+        requiredIrataLevel: req.body.requiredIrataLevel,
+        requiredSpratLevel: req.body.requiredSpratLevel,
+        status: req.body.status,
+        expiresAt: req.body.expiresAt ? new Date(req.body.expiresAt) : req.body.expiresAt,
+        startDate: req.body.startDate ? new Date(req.body.startDate) : req.body.startDate,
+        benefits: req.body.benefits,
+        workDays: req.body.workDays,
+        experienceRequired: req.body.experienceRequired,
+        updatedAt: new Date(),
+      };
+
+      // Remove undefined values
+      Object.keys(allowedUpdates).forEach(key => {
+        if (allowedUpdates[key] === undefined) {
+          delete allowedUpdates[key];
+        }
+      });
+
+      const [updatedJob] = await db.update(jobPostings)
+        .set(allowedUpdates)
+        .where(eq(jobPostings.id, req.params.id))
+        .returning();
+
+      res.json({ jobPosting: updatedJob });
+    } catch (error) {
+      console.error("Update job posting error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Delete job posting (SuperUser or owning Company)
+  app.delete("/api/job-postings/:id", requireAuth, requireRole("company", "superuser"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Get existing job to verify ownership
+      const [existingJob] = await db.select().from(jobPostings).where(eq(jobPostings.id, req.params.id));
+      if (!existingJob) {
+        return res.status(404).json({ message: "Job posting not found" });
+      }
+
+      // Verify ownership
+      if (currentUser.role === "company" && existingJob.companyId !== currentUser.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      if (currentUser.role === "superuser" && !existingJob.isPlatformPost) {
+        return res.status(403).json({ message: "SuperUser can only delete platform posts" });
+      }
+
+      await db.delete(jobPostings).where(eq(jobPostings.id, req.params.id));
+
+      res.json({ message: "Job posting deleted successfully" });
+    } catch (error) {
+      console.error("Delete job posting error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // =====================================================================
+  // JOB APPLICATIONS ENDPOINTS
+  // =====================================================================
+
+  // Get applications for a technician (their own applications)
+  app.get("/api/job-applications/my", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const applications = await db.select()
+        .from(jobApplications)
+        .where(eq(jobApplications.technicianId, currentUser.id))
+        .orderBy(desc(jobApplications.appliedAt));
+
+      // Fetch job posting details for each application
+      const applicationsWithJobs = await Promise.all(
+        applications.map(async (app) => {
+          const [job] = await db.select().from(jobPostings).where(eq(jobPostings.id, app.jobPostingId));
+          return { ...app, jobPosting: job };
+        })
+      );
+
+      res.json({ applications: applicationsWithJobs });
+    } catch (error) {
+      console.error("Get my applications error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get application counts for company's job postings
+  app.get("/api/job-applications/counts", requireAuth, requireRole("company", "superuser"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Get the company's job postings
+      let companyJobs;
+      if (currentUser.role === "superuser") {
+        // SuperUser sees platform posts
+        companyJobs = await db.select({ id: jobPostings.id })
+          .from(jobPostings)
+          .where(eq(jobPostings.isPlatformPost, true));
+      } else {
+        // Company sees their own posts
+        companyJobs = await db.select({ id: jobPostings.id })
+          .from(jobPostings)
+          .where(eq(jobPostings.companyId, currentUser.id));
+      }
+
+      const jobIds = companyJobs.map(j => j.id);
+      if (jobIds.length === 0) {
+        return res.json({ counts: [] });
+      }
+
+      // Count only UNVIEWED applications per job (for notification badge)
+      const counts = await Promise.all(
+        jobIds.map(async (jobId) => {
+          const apps = await db.select()
+            .from(jobApplications)
+            .where(
+              and(
+                eq(jobApplications.jobPostingId, jobId),
+                isNull(jobApplications.viewedByEmployerAt)
+              )
+            );
+          return { jobPostingId: jobId, count: apps.length };
+        })
+      );
+
+      res.json({ counts });
+    } catch (error) {
+      console.error("Get application counts error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get applications for a job posting (for company/superuser)
+  app.get("/api/job-applications/job/:jobId", requireAuth, requireRole("company", "superuser"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Verify ownership of job posting
+      const [job] = await db.select().from(jobPostings).where(eq(jobPostings.id, req.params.jobId));
+      if (!job) {
+        return res.status(404).json({ message: "Job posting not found" });
+      }
+
+      if (currentUser.role === "company" && job.companyId !== currentUser.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const applications = await db.select()
+        .from(jobApplications)
+        .where(eq(jobApplications.jobPostingId, req.params.jobId))
+        .orderBy(desc(jobApplications.appliedAt));
+
+      // Fetch technician details for each application
+      const applicationsWithTechnicians = await Promise.all(
+        applications.map(async (app) => {
+          const technician = await storage.getUserById(app.technicianId);
+          if (!technician) return { ...app, technician: null };
+          return {
+            ...app,
+            technician: {
+              id: technician.id,
+              firstName: technician.firstName,
+              lastName: technician.lastName,
+              name: technician.name,
+              photoUrl: technician.photoUrl,
+              irataLevel: technician.irataLevel,
+              spratLevel: technician.spratLevel,
+              employeeCity: technician.employeeCity,
+              employeeProvinceState: technician.employeeProvinceState,
+              ropeAccessStartDate: technician.ropeAccessStartDate,
+              resumeDocuments: technician.resumeDocuments,
+            },
+          };
+        })
+      );
+
+      // Send response first with original viewedByEmployerAt values
+      res.json({ applications: applicationsWithTechnicians });
+
+      // Then asynchronously mark unviewed applications as viewed (fire-and-forget)
+      const hasUnviewed = applications.some(app => !app.viewedByEmployerAt);
+      if (hasUnviewed) {
+        db.update(jobApplications)
+          .set({ viewedByEmployerAt: new Date() })
+          .where(
+            and(
+              eq(jobApplications.jobPostingId, req.params.jobId),
+              isNull(jobApplications.viewedByEmployerAt)
+            )
+          )
+          .catch(err => console.error("Failed to mark applications as viewed:", err));
+      }
+    } catch (error) {
+      console.error("Get job applications error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Apply to a job (technician)
+  app.post("/api/job-applications", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Only technician roles can apply
+      const EMPLOYEE_ROLES = ["rope_access_tech", "ground_crew", "ground_crew_supervisor", "supervisor", "operations_manager", "manager"];
+      if (!EMPLOYEE_ROLES.includes(currentUser.role)) {
+        return res.status(403).json({ message: "Only technicians can apply to jobs" });
+      }
+
+      const { jobPostingId, coverMessage } = req.body;
+      if (!jobPostingId) {
+        return res.status(400).json({ message: "Job posting ID is required" });
+      }
+
+      // Check if job exists and is active
+      const [job] = await db.select().from(jobPostings).where(eq(jobPostings.id, jobPostingId));
+      if (!job) {
+        return res.status(404).json({ message: "Job posting not found" });
+      }
+      if (job.status !== "active") {
+        return res.status(400).json({ message: "This job is no longer accepting applications" });
+      }
+
+      // Check if already applied
+      const existingApplication = await db.select()
+        .from(jobApplications)
+        .where(and(
+          eq(jobApplications.jobPostingId, jobPostingId),
+          eq(jobApplications.technicianId, currentUser.id)
+        ));
+
+      if (existingApplication.length > 0) {
+        return res.status(400).json({ message: "You have already applied to this job" });
+      }
+
+      const [newApplication] = await db.insert(jobApplications)
+        .values({
+          jobPostingId,
+          technicianId: currentUser.id,
+          coverMessage: coverMessage || null,
+          status: "applied",
+        })
+        .returning();
+
+      res.json({ application: newApplication, message: "Application submitted successfully" });
+    } catch (error) {
+      console.error("Apply to job error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Update application status (company/superuser)
+  app.patch("/api/job-applications/:id", requireAuth, requireRole("company", "superuser"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const [application] = await db.select()
+        .from(jobApplications)
+        .where(eq(jobApplications.id, req.params.id));
+
+      if (!application) {
+        return res.status(404).json({ message: "Application not found" });
+      }
+
+      // Verify ownership via job posting
+      const [job] = await db.select().from(jobPostings).where(eq(jobPostings.id, application.jobPostingId));
+      if (!job) {
+        return res.status(404).json({ message: "Job posting not found" });
+      }
+
+      if (currentUser.role === "company" && job.companyId !== currentUser.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const { status, employerNotes } = req.body;
+      const validStatuses = ["applied", "reviewing", "interviewed", "offered", "hired", "rejected"];
+      if (status && !validStatuses.includes(status)) {
+        return res.status(400).json({ message: "Invalid status" });
+      }
+
+      const updates: any = {
+        statusUpdatedAt: new Date(),
+      };
+      if (status) updates.status = status;
+      if (employerNotes !== undefined) updates.employerNotes = employerNotes;
+      if (status === "reviewing" && !application.reviewedAt) {
+        updates.reviewedAt = new Date();
+      }
+
+      const [updatedApplication] = await db.update(jobApplications)
+        .set(updates)
+        .where(eq(jobApplications.id, req.params.id))
+        .returning();
+
+      res.json({ application: updatedApplication });
+    } catch (error) {
+      console.error("Update application error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Withdraw/Delete application (technician or employer)
+  app.delete("/api/job-applications/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const [application] = await db.select()
+        .from(jobApplications)
+        .where(eq(jobApplications.id, req.params.id));
+
+      if (!application) {
+        return res.status(404).json({ message: "Application not found" });
+      }
+
+      // Check if user is the technician who applied
+      const isTechnician = application.technicianId === currentUser.id;
+
+      // Check if user is the employer who owns the job posting
+      let isEmployer = false;
+      if (currentUser.role === "company") {
+        const [job] = await db.select()
+          .from(jobPostings)
+          .where(eq(jobPostings.id, application.jobPostingId));
+        if (job && job.companyId === currentUser.companyId) {
+          isEmployer = true;
+        }
+      }
+
+      if (!isTechnician && !isEmployer) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      await db.delete(jobApplications).where(eq(jobApplications.id, req.params.id));
+
+      res.json({ message: "Application deleted successfully" });
+    } catch (error) {
+      console.error("Delete application error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Send job offer to technician (employer-initiated)
+  app.post("/api/job-applications/offer", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Only company owners can send job offers
+      if (currentUser.role !== "company") {
+        return res.status(403).json({ message: "Only employers can send job offers" });
+      }
+
+      // Validate request body
+      const offerSchema = z.object({
+        technicianId: z.string().min(1),
+        jobPostingId: z.string().min(1),
+        message: z.string().optional(),
+      });
+
+      const parseResult = offerSchema.safeParse(req.body);
+      if (!parseResult.success) {
+        return res.status(400).json({ message: "technicianId and jobPostingId are required" });
+      }
+
+      const { technicianId, jobPostingId, message } = parseResult.data;
+
+      // Verify the job posting belongs to this company and is active
+      const [job] = await db.select()
+        .from(jobPostings)
+        .where(
+          and(
+            eq(jobPostings.id, jobPostingId),
+            eq(jobPostings.companyId, currentUser.id)
+          )
+        );
+
+      if (!job) {
+        return res.status(404).json({ message: "Job posting not found" });
+      }
+
+      if (job.status !== "active") {
+        return res.status(400).json({ message: "Job posting is not active" });
+      }
+
+      // Verify the technician exists
+      const technician = await storage.getUserById(technicianId);
+      if (!technician) {
+        return res.status(404).json({ message: "Technician not found" });
+      }
+
+      // Verify the technician has opted into visibility (privacy requirement)
+      const EMPLOYEE_ROLES = ["rope_access_tech", "ground_crew", "ground_crew_supervisor", "supervisor", "operations_manager", "manager"];
+      if (!EMPLOYEE_ROLES.includes(technician.role)) {
+        return res.status(403).json({ message: "Target user is not a technician" });
+      }
+
+      if (!technician.isVisibleToEmployers) {
+        return res.status(403).json({ message: "This technician is no longer available" });
+      }
+
+      // Check if an application/offer already exists
+      const [existingApplication] = await db.select()
+        .from(jobApplications)
+        .where(
+          and(
+            eq(jobApplications.technicianId, technicianId),
+            eq(jobApplications.jobPostingId, jobPostingId)
+          )
+        );
+
+      if (existingApplication) {
+        // If already exists, just update status to 'offered'
+        const [updatedApplication] = await db.update(jobApplications)
+          .set({
+            status: "offered",
+            employerNotes: message || existingApplication.employerNotes,
+            statusUpdatedAt: new Date(),
+          })
+          .where(eq(jobApplications.id, existingApplication.id))
+          .returning();
+
+        return res.json({ application: updatedApplication, message: "Job offer sent" });
+      }
+
+      // Create new application with 'offered' status (employer-initiated)
+      const [newApplication] = await db.insert(jobApplications).values({
+        technicianId,
+        jobPostingId,
+        status: "offered",
+        employerNotes: message || null,
+        appliedAt: new Date(),
+        statusUpdatedAt: new Date(),
+      }).returning();
+
+      res.status(201).json({ application: newApplication, message: "Job offer sent" });
+    } catch (error) {
+      console.error("Send job offer error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // =====================================================================
+  // END JOB APPLICATIONS ENDPOINTS
+  // =====================================================================
+
+  // Toggle technician visibility to employers
+  app.patch("/api/technician/visibility", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Only technicians can toggle their visibility
+      const EMPLOYEE_ROLES = ["rope_access_tech", "ground_crew", "ground_crew_supervisor", "supervisor", "operations_manager", "manager"];
+      if (!EMPLOYEE_ROLES.includes(currentUser.role)) {
+        return res.status(403).json({ message: "Only technicians can update visibility" });
+      }
+
+      const { isVisible } = req.body;
+      
+      const updates: any = {
+        isVisibleToEmployers: isVisible,
+      };
+      
+      // Set timestamp when visibility is enabled
+      if (isVisible) {
+        updates.visibilityEnabledAt = new Date();
+      }
+
+      const [updatedUser] = await db.update(users)
+        .set(updates)
+        .where(eq(users.id, currentUser.id))
+        .returning();
+
+      res.json({ 
+        isVisibleToEmployers: updatedUser.isVisibleToEmployers,
+        visibilityEnabledAt: updatedUser.visibilityEnabledAt,
+      });
+    } catch (error) {
+      console.error("Update technician visibility error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get visible technicians (for companies browsing)
+  app.get("/api/visible-technicians", requireAuth, requireRole("company", "superuser"), async (req: Request, res: Response) => {
+    try {
+      const EMPLOYEE_ROLES = ["rope_access_tech", "ground_crew", "ground_crew_supervisor", "supervisor", "operations_manager", "manager"];
+      
+      // Get technicians who opted in to visibility
+      const visibleTechs = await db.select({
+        id: users.id,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        name: users.name,
+        photoUrl: users.photoUrl,
+        irataLevel: users.irataLevel,
+        irataLicenseNumber: users.irataLicenseNumber,
+        irataExpirationDate: users.irataExpirationDate,
+        spratLevel: users.spratLevel,
+        spratLicenseNumber: users.spratLicenseNumber,
+        spratExpirationDate: users.spratExpirationDate,
+        ropeAccessStartDate: users.ropeAccessStartDate,
+        resumeDocuments: users.resumeDocuments,
+        employeeCity: users.employeeCity,
+        employeeProvinceState: users.employeeProvinceState,
+        employeeCountry: users.employeeCountry,
+        visibilityEnabledAt: users.visibilityEnabledAt,
+      }).from(users)
+        .where(and(
+          eq(users.isVisibleToEmployers, true),
+          sql`${users.role} = ANY(ARRAY['rope_access_tech', 'ground_crew', 'ground_crew_supervisor', 'supervisor', 'operations_manager', 'manager'])`
+        ))
+        .orderBy(sql`${users.visibilityEnabledAt} DESC`);
+
+      res.json({ technicians: visibleTechs });
+    } catch (error) {
+      console.error("Get visible technicians error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

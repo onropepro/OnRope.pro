@@ -70,7 +70,10 @@ import {
   Users,
   Pencil,
   Star,
-  Gift
+  Gift,
+  Lock,
+  Crown,
+  MessageSquare
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
@@ -144,7 +147,7 @@ const translations = {
     expiringIn30Days: "Urgent: 30 days",
     certificationExpiryBannerTitle: "Certification Expiring Soon!",
     certificationExpiryBannerMessage: "Your {cert} certification expires on {date}. Renew now to avoid work interruption.",
-    proBadge: "PRO",
+    proBadge: "PLUS",
     proBadgeTooltip: "PLUS Member",
     verified: "Verified",
     firstAidCertificate: "First Aid Certificate",
@@ -293,6 +296,9 @@ const translations = {
     deleteConfirm: "Delete",
     cancelDelete: "Cancel",
     logbookDisclaimer: "This is a personal tracking tool only. You must still record all hours in your official IRATA/SPRAT logbook - this digital log does not replace it.",
+    jobBoard: "Job Board",
+    jobBoardDesc: "Browse opportunities and make your profile visible to employers",
+    browseJobs: "Browse Jobs",
     yourReferralCode: "Your Referral Code",
     shareReferralCode: "Share this code with fellow technicians to invite them to OnRopePro",
     referralPremiumBenefit: "You'll get PLUS access when your code is used!",
@@ -305,6 +311,8 @@ const translations = {
     plusBenefit5: "60-day certification expiry alerts",
     plusBenefit6: "Rope access company profile visibility (opt-in)",
     plusUnlockInfo: "Unlock: Refer 1 verified tech who completes account creation",
+    plusLockedFeature: "PLUS Feature",
+    plusLockedDesc: "Refer a technician to unlock",
     copyCode: "Copy Code",
     codeCopied: "Copied!",
     referredTimes: "Referred {count} technician(s)",
@@ -321,8 +329,8 @@ const translations = {
     whenDidYouStart: "When did you start your rope access career?",
     addExperience: "Add your experience start date",
     referralCodeGenerating: "Your referral code will be generated when you complete registration",
-    // Performance & Safety Rating
-    performanceSafetyRating: "Performance & Safety Rating",
+    // Safety Rating
+    performanceSafetyRating: "Safety Rating",
     overallScore: "Overall Score",
     harnessCompliance: "Harness Inspections",
     documentCompliance: "Documents Signed",
@@ -343,6 +351,31 @@ const translations = {
     improvementNeeded: "Areas to improve:",
     improveHarness: "Complete harness inspection before clocking in",
     improveDocs: "Sign all assigned safety documents",
+    // Feedback
+    feedback: "Feedback",
+    feedbackDesc: "Share suggestions or report issues with the OnRopePro team",
+    sendFeedback: "Send Feedback",
+    feedbackTitle: "Title",
+    feedbackTitlePlaceholder: "Brief summary of your feedback",
+    feedbackCategory: "Category",
+    feedbackCategoryFeature: "New Feature",
+    feedbackCategoryImprovement: "Improvement",
+    feedbackCategoryBug: "Bug Report",
+    feedbackCategoryOther: "Other",
+    feedbackDescription: "Description",
+    feedbackDescriptionPlaceholder: "Please describe your feedback in detail...",
+    feedbackPriority: "Priority",
+    feedbackPriorityLow: "Low",
+    feedbackPriorityNormal: "Normal",
+    feedbackPriorityHigh: "High",
+    feedbackPriorityUrgent: "Urgent",
+    feedbackScreenshot: "Screenshot (Optional)",
+    feedbackScreenshotAdd: "Add Screenshot",
+    feedbackSubmit: "Submit Feedback",
+    feedbackSubmitting: "Submitting...",
+    feedbackSuccess: "Thank You!",
+    feedbackSuccessDesc: "Your feedback has been submitted. We appreciate your input and will review it carefully.",
+    feedbackError: "Failed to submit feedback",
   },
   fr: {
     technicianPortal: "Portail du technicien",
@@ -411,7 +444,7 @@ const translations = {
     expiringIn30Days: "Urgent: 30 jours",
     certificationExpiryBannerTitle: "Certification expire bientôt!",
     certificationExpiryBannerMessage: "Votre certification {cert} expire le {date}. Renouvelez maintenant pour éviter une interruption de travail.",
-    proBadge: "PRO",
+    proBadge: "PLUS",
     proBadgeTooltip: "Membre PLUS",
     verified: "Vérifié",
     firstAidCertificate: "Certificat de premiers soins",
@@ -560,6 +593,9 @@ const translations = {
     deleteConfirm: "Supprimer",
     cancelDelete: "Annuler",
     logbookDisclaimer: "Ceci est un outil de suivi personnel uniquement. Vous devez toujours enregistrer toutes vos heures dans votre carnet IRATA/SPRAT officiel - ce journal numérique ne le remplace pas.",
+    jobBoard: "Offres d'emploi",
+    jobBoardDesc: "Parcourir les opportunites et rendre votre profil visible aux employeurs",
+    browseJobs: "Parcourir les offres",
     yourReferralCode: "Votre code de parrainage",
     shareReferralCode: "Partagez ce code avec d'autres techniciens pour les inviter sur OnRopePro",
     referralPremiumBenefit: "Vous obtiendrez un accès PLUS lorsque votre code sera utilisé!",
@@ -572,6 +608,8 @@ const translations = {
     plusBenefit5: "Alertes d'expiration de certification à 60 jours",
     plusBenefit6: "Visibilité du profil d'entreprise de travaux sur cordes (opt-in)",
     plusUnlockInfo: "Débloquer: Parrainez 1 technicien vérifié qui complète la création de son compte",
+    plusLockedFeature: "Fonctionnalité PLUS",
+    plusLockedDesc: "Parrainez un technicien pour débloquer",
     copyCode: "Copier le code",
     codeCopied: "Copié!",
     referredTimes: "Parrainé {count} technicien(s)",
@@ -588,8 +626,8 @@ const translations = {
     whenDidYouStart: "Quand avez-vous commencé votre carrière d'accès sur corde?",
     addExperience: "Ajouter votre date de début d'expérience",
     referralCodeGenerating: "Votre code de parrainage sera généré lorsque vous terminerez l'inscription",
-    // Performance & Safety Rating
-    performanceSafetyRating: "Évaluation Performance & Sécurité",
+    // Safety Rating
+    performanceSafetyRating: "Évaluation Sécurité",
     overallScore: "Score Global",
     harnessCompliance: "Inspections Harnais",
     documentCompliance: "Documents Signés",
@@ -610,6 +648,31 @@ const translations = {
     improvementNeeded: "Points à améliorer:",
     improveHarness: "Effectuer l'inspection du harnais avant de pointer",
     improveDocs: "Signer tous les documents de sécurité assignés",
+    // Feedback
+    feedback: "Commentaires",
+    feedbackDesc: "Partagez vos suggestions ou signalez des problèmes à l'équipe OnRopePro",
+    sendFeedback: "Envoyer des commentaires",
+    feedbackTitle: "Titre",
+    feedbackTitlePlaceholder: "Résumé bref de vos commentaires",
+    feedbackCategory: "Catégorie",
+    feedbackCategoryFeature: "Nouvelle fonctionnalité",
+    feedbackCategoryImprovement: "Amélioration",
+    feedbackCategoryBug: "Rapport de bogue",
+    feedbackCategoryOther: "Autre",
+    feedbackDescription: "Description",
+    feedbackDescriptionPlaceholder: "Veuillez décrire vos commentaires en détail...",
+    feedbackPriority: "Priorité",
+    feedbackPriorityLow: "Faible",
+    feedbackPriorityNormal: "Normale",
+    feedbackPriorityHigh: "Haute",
+    feedbackPriorityUrgent: "Urgente",
+    feedbackScreenshot: "Capture d'écran (Optionnel)",
+    feedbackScreenshotAdd: "Ajouter une capture d'écran",
+    feedbackSubmit: "Soumettre les commentaires",
+    feedbackSubmitting: "Soumission...",
+    feedbackSuccess: "Merci!",
+    feedbackSuccessDesc: "Vos commentaires ont été soumis. Nous apprécions votre contribution et les examinerons attentivement.",
+    feedbackError: "Échec de la soumission des commentaires",
   }
 };
 
@@ -823,13 +886,13 @@ export default function TechnicianPortal() {
   // Fetch logged hours for display on portal
   const { data: loggedHoursData } = useQuery<{ logs: Array<{ hoursWorked: string }> }>({
     queryKey: ["/api/my-irata-task-logs"],
-    enabled: !!user && user.role === 'rope_access_tech',
+    enabled: !!user && (user.role === 'rope_access_tech' || user.role === 'company'),
   });
   
   // Fetch referral count for the technician
   const { data: referralCountData } = useQuery<{ count: number }>({
     queryKey: ["/api/my-referral-count"],
-    enabled: !!user && user.role === 'rope_access_tech',
+    enabled: !!user && (user.role === 'rope_access_tech' || user.role === 'company'),
   });
   
   // Fetch performance metrics for the technician
@@ -858,7 +921,7 @@ export default function TechnicianPortal() {
     };
   }>({
     queryKey: ["/api/my-performance-metrics"],
-    enabled: !!user && user.role === 'rope_access_tech',
+    enabled: !!user && (user.role === 'rope_access_tech' || user.role === 'company'),
   });
   
   // State for copy button
@@ -866,6 +929,15 @@ export default function TechnicianPortal() {
   
   // State for PLUS benefits dialog
   const [showPlusBenefits, setShowPlusBenefits] = useState(false);
+  
+  // Feedback state
+  const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
+  const [feedbackTitle, setFeedbackTitle] = useState("");
+  const [feedbackCategory, setFeedbackCategory] = useState("improvement");
+  const [feedbackDescription, setFeedbackDescription] = useState("");
+  const [feedbackPriority, setFeedbackPriority] = useState("normal");
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
+  const [showFeedbackSuccess, setShowFeedbackSuccess] = useState(false);
   
   // Handle copy referral code
   const handleCopyReferralCode = () => {
@@ -974,6 +1046,26 @@ export default function TechnicianPortal() {
     },
   });
 
+  // Mutation to generate referral code for users who don't have one
+  const generateReferralCodeMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest("POST", "/api/user/generate-referral-code");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+    },
+    onError: (error: any) => {
+      console.error("Failed to generate referral code:", error);
+    },
+  });
+
+  // Auto-generate referral code if user doesn't have one
+  useEffect(() => {
+    if (user && !user.referralCode && !generateReferralCodeMutation.isPending) {
+      generateReferralCodeMutation.mutate();
+    }
+  }, [user?.id, user?.referralCode]);
+
   const handleLogout = async () => {
     try {
       await fetch("/api/logout", {
@@ -984,6 +1076,51 @@ export default function TechnicianPortal() {
       setLocation("/technician-login");
     } catch (error) {
       console.error("Logout error:", error);
+    }
+  };
+
+  // Handle feedback submission
+  const handleSubmitFeedback = async () => {
+    if (!feedbackTitle.trim() || !feedbackDescription.trim()) {
+      toast({
+        title: language === 'en' ? "Missing Information" : "Information manquante",
+        description: language === 'en' ? "Please fill in all required fields" : "Veuillez remplir tous les champs requis",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsSubmittingFeedback(true);
+    try {
+      const response = await fetch('/api/feature-requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          title: feedbackTitle,
+          category: feedbackCategory,
+          description: feedbackDescription,
+          priority: feedbackPriority,
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to submit feedback');
+      }
+      
+      setShowFeedbackDialog(false);
+      setFeedbackTitle("");
+      setFeedbackCategory("improvement");
+      setFeedbackDescription("");
+      setFeedbackPriority("normal");
+      setShowFeedbackSuccess(true);
+    } catch (error) {
+      toast({
+        title: t.feedbackError,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmittingFeedback(false);
     }
   };
 
@@ -1301,26 +1438,41 @@ export default function TechnicianPortal() {
               <h1 className="font-semibold text-sm">{t.technicianPortal}</h1>
               <div className="flex items-center gap-1.5">
                 <p className="text-xs text-muted-foreground">{user.name}</p>
-                {/* PRO Badge - Always shown for now, will be gated behind PLUS access later */}
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Badge 
-                      variant="default" 
-                      className="bg-gradient-to-r from-amber-500 to-yellow-400 text-white text-[10px] px-1.5 py-0 h-4 font-bold border-0" 
-                      data-testid="badge-pro"
-                    >
-                      <Star className="w-2.5 h-2.5 mr-0.5 fill-current" />
-                      {t.proBadge}
-                    </Badge>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{t.proBadgeTooltip}</p>
-                  </TooltipContent>
-                </Tooltip>
+                {/* PLUS Badge - Only shown for technicians with PLUS access */}
+                {user.role === 'rope_access_tech' && user.hasPlusAccess && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Badge 
+                        variant="default" 
+                        className="bg-gradient-to-r from-amber-500 to-yellow-400 text-white text-[10px] px-1.5 py-0 h-4 font-bold border-0" 
+                        data-testid="badge-pro"
+                      >
+                        <Crown className="w-2.5 h-2.5 mr-0.5 fill-current" />
+                        {t.proBadge}
+                      </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{t.proBadgeTooltip}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                )}
               </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {/* Return to Dashboard button - Only show for company owners */}
+            {user.role === 'company' && (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => setLocation('/dashboard')}
+                className="gap-1.5"
+                data-testid="button-return-dashboard"
+              >
+                <span className="material-icons text-base">dashboard</span>
+                <span className="hidden sm:inline">{language === 'en' ? 'Dashboard' : 'Tableau de bord'}</span>
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="sm"
@@ -1345,7 +1497,7 @@ export default function TechnicianPortal() {
         </div>
       </header>
 
-      {/* Certification Expiry Warning Banner - Shows when cert expires within 30 days */}
+      {/* Certification Expiry Warning Banner - Shows when cert expires within 30 days (PLUS feature) */}
       {(() => {
         const urgentCerts: { type: string; expiryDate: string }[] = [];
         const today = new Date();
@@ -1372,6 +1524,29 @@ export default function TechnicianPortal() {
         }
         
         if (urgentCerts.length === 0) return null;
+        
+        // PLUS users see full warning, non-PLUS users see locked teaser
+        if (!user.hasPlusAccess) {
+          return (
+            <div className="bg-amber-500/20 border-b border-amber-500/30" data-testid="banner-certification-expiry-locked">
+              <div className="max-w-4xl mx-auto px-4 py-3">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <Lock className="w-5 h-5 text-amber-600 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm text-amber-700 dark:text-amber-400 flex items-center gap-2">
+                      {t.certificationExpiryBannerTitle}
+                      <Badge variant="secondary" className="gap-1">
+                        <Star className="w-3 h-3" />
+                        PLUS
+                      </Badge>
+                    </p>
+                    <p className="text-xs text-amber-600/80 dark:text-amber-400/80 mt-0.5">{t.plusLockedDesc}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        }
         
         return (
           <div className="bg-red-600 dark:bg-red-700 text-white" data-testid="banner-certification-expiry">
@@ -1427,6 +1602,61 @@ export default function TechnicianPortal() {
                   {user.terminatedDate ? t.dashboardDisabledTerminated : t.dashboardDisabledNoCompany}
                 </p>
               )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Job Board Card - Prominent placement */}
+        {user && (
+          <Card className="border-blue-500/50 bg-gradient-to-r from-blue-500/10 to-purple-500/10">
+            <CardContent className="p-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-blue-500/20">
+                    <Briefcase className="w-5 h-5 text-blue-500" />
+                  </div>
+                  <div>
+                    <p className="font-medium">{t.jobBoard}</p>
+                    <p className="text-sm text-muted-foreground">{t.jobBoardDesc}</p>
+                  </div>
+                </div>
+                <Button
+                  onClick={() => setLocation("/technician-job-board")}
+                  className="gap-2 bg-blue-600 hover:bg-blue-700"
+                  data-testid="button-browse-jobs"
+                >
+                  {t.browseJobs}
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Feedback Card */}
+        {user && (
+          <Card className="border-purple-500/30 bg-gradient-to-r from-purple-500/5 to-pink-500/5">
+            <CardContent className="p-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-purple-500/20">
+                    <MessageSquare className="w-5 h-5 text-purple-500" />
+                  </div>
+                  <div>
+                    <p className="font-medium">{t.feedback}</p>
+                    <p className="text-sm text-muted-foreground">{t.feedbackDesc}</p>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowFeedbackDialog(true)}
+                  className="gap-2"
+                  data-testid="button-send-feedback"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  {t.sendFeedback}
+                </Button>
+              </div>
             </CardContent>
           </Card>
         )}
@@ -1527,8 +1757,8 @@ export default function TechnicianPortal() {
           </Card>
         )}
 
-        {/* Your Referral Code Section - Show for all technicians */}
-        {user && user.role === 'rope_access_tech' && (
+        {/* Your Referral Code Section - Show for technicians and company owners */}
+        {user && (user.role === 'rope_access_tech' || user.role === 'company') && (
           <Card className="border-2 border-primary/30 bg-primary/5">
             <CardHeader className="pb-2">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -1606,8 +1836,8 @@ export default function TechnicianPortal() {
           </Card>
         )}
 
-        {/* Performance & Safety Rating Card */}
-        {user && user.role === 'rope_access_tech' && (
+        {/* Performance & Safety Rating Card - Show for technicians and company owners */}
+        {user && (user.role === 'rope_access_tech' || user.role === 'company') && (
           <Card className="border-muted overflow-visible">
             <CardHeader className="pb-2">
               <div className="flex items-center gap-3">
@@ -3283,71 +3513,87 @@ export default function TechnicianPortal() {
                   <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
                     <FileText className="w-4 h-4" />
                     {t.resume}
+                    {!user.hasPlusAccess && (
+                      <Badge variant="secondary" className="ml-2 gap-1">
+                        <Lock className="w-3 h-3" />
+                        PLUS
+                      </Badge>
+                    )}
                   </h3>
                   
-                  {user.resumeDocuments && user.resumeDocuments.filter((u: string) => u && u.trim()).length > 0 && (
-                    <div className="space-y-3">
-                      {user.resumeDocuments.filter((u: string) => u && u.trim()).map((url: string, index: number) => {
-                        const lowerUrl = url.toLowerCase();
-                        const isPdf = lowerUrl.endsWith('.pdf');
-                        const isImage = lowerUrl.match(/\.(jpg|jpeg|png|gif|webp|bmp)(\?|$)/i) || 
-                                      lowerUrl.includes('image') || 
-                                      (!isPdf && !lowerUrl.endsWith('.doc') && !lowerUrl.endsWith('.docx'));
-                        
-                        return (
-                          <a 
-                            key={index} 
-                            href={url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity bg-muted/30"
-                            data-testid={`link-resume-${index}`}
-                          >
-                            {isPdf ? (
-                              <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
-                                <FileText className="w-12 h-12 text-muted-foreground" />
-                                <span className="text-sm text-muted-foreground font-medium">{t.tapToViewPdf}</span>
-                              </div>
-                            ) : isImage ? (
-                              <img 
-                                src={url} 
-                                alt={`Resume ${index + 1}`}
-                                className="w-full h-auto max-h-64 object-contain"
-                                data-testid={`img-resume-${index}`}
-                              />
-                            ) : (
-                              <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
-                                <FileText className="w-12 h-12 text-muted-foreground" />
-                                <span className="text-sm text-muted-foreground font-medium">{t.tapToViewDocument}</span>
-                              </div>
-                            )}
-                          </a>
-                        );
-                      })}
+                  {user.hasPlusAccess ? (
+                    <>
+                      {user.resumeDocuments && user.resumeDocuments.filter((u: string) => u && u.trim()).length > 0 && (
+                        <div className="space-y-3">
+                          {user.resumeDocuments.filter((u: string) => u && u.trim()).map((url: string, index: number) => {
+                            const lowerUrl = url.toLowerCase();
+                            const isPdf = lowerUrl.endsWith('.pdf');
+                            const isImage = lowerUrl.match(/\.(jpg|jpeg|png|gif|webp|bmp)(\?|$)/i) || 
+                                          lowerUrl.includes('image') || 
+                                          (!isPdf && !lowerUrl.endsWith('.doc') && !lowerUrl.endsWith('.docx'));
+                            
+                            return (
+                              <a 
+                                key={index} 
+                                href={url} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity bg-muted/30"
+                                data-testid={`link-resume-${index}`}
+                              >
+                                {isPdf ? (
+                                  <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
+                                    <FileText className="w-12 h-12 text-muted-foreground" />
+                                    <span className="text-sm text-muted-foreground font-medium">{t.tapToViewPdf}</span>
+                                  </div>
+                                ) : isImage ? (
+                                  <img 
+                                    src={url} 
+                                    alt={`Resume ${index + 1}`}
+                                    className="w-full h-auto max-h-64 object-contain"
+                                    data-testid={`img-resume-${index}`}
+                                  />
+                                ) : (
+                                  <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
+                                    <FileText className="w-12 h-12 text-muted-foreground" />
+                                    <span className="text-sm text-muted-foreground font-medium">{t.tapToViewDocument}</span>
+                                  </div>
+                                )}
+                              </a>
+                            );
+                          })}
+                        </div>
+                      )}
+                      
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => triggerDocumentUpload('resume')}
+                        disabled={uploadingDocType === 'resume'}
+                        data-testid="button-upload-resume"
+                      >
+                        {uploadingDocType === 'resume' ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            {t.uploading}
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-4 h-4 mr-2" />
+                            {user.resumeDocuments && user.resumeDocuments.filter((u: string) => u && u.trim()).length > 0 
+                              ? t.addResume 
+                              : t.uploadResume}
+                          </>
+                        )}
+                      </Button>
+                    </>
+                  ) : (
+                    <div className="p-4 rounded-lg border border-dashed border-muted-foreground/30 bg-muted/30 text-center">
+                      <Lock className="w-6 h-6 mx-auto text-muted-foreground mb-2" />
+                      <p className="text-sm text-muted-foreground">{t.plusLockedFeature}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{t.plusLockedDesc}</p>
                     </div>
                   )}
-                  
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => triggerDocumentUpload('resume')}
-                    disabled={uploadingDocType === 'resume'}
-                    data-testid="button-upload-resume"
-                  >
-                    {uploadingDocType === 'resume' ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        {t.uploading}
-                      </>
-                    ) : (
-                      <>
-                        <Upload className="w-4 h-4 mr-2" />
-                        {user.resumeDocuments && user.resumeDocuments.filter((u: string) => u && u.trim()).length > 0 
-                          ? t.addResume 
-                          : t.uploadResume}
-                      </>
-                    )}
-                  </Button>
                 </div>
               </div>
             )}
@@ -3527,6 +3773,120 @@ export default function TechnicianPortal() {
           </div>
           <DialogFooter>
             <Button onClick={() => setShowPlusBenefits(false)} data-testid="button-close-plus-benefits">
+              {t.cancel}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Feedback Dialog */}
+      <Dialog open={showFeedbackDialog} onOpenChange={setShowFeedbackDialog}>
+        <DialogContent className="sm:max-w-lg" data-testid="dialog-feedback">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <MessageSquare className="w-5 h-5 text-purple-500" />
+              {t.feedback}
+            </DialogTitle>
+            <DialogDescription>
+              {t.feedbackDesc}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="feedback-title">{t.feedbackTitle}</Label>
+              <Input
+                id="feedback-title"
+                placeholder={t.feedbackTitlePlaceholder}
+                value={feedbackTitle}
+                onChange={(e) => setFeedbackTitle(e.target.value)}
+                data-testid="input-feedback-title"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="feedback-category">{t.feedbackCategory}</Label>
+              <select
+                id="feedback-category"
+                value={feedbackCategory}
+                onChange={(e) => setFeedbackCategory(e.target.value)}
+                className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                data-testid="select-feedback-category"
+              >
+                <option value="feature">{t.feedbackCategoryFeature}</option>
+                <option value="improvement">{t.feedbackCategoryImprovement}</option>
+                <option value="bug">{t.feedbackCategoryBug}</option>
+                <option value="other">{t.feedbackCategoryOther}</option>
+              </select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="feedback-priority">{t.feedbackPriority}</Label>
+              <select
+                id="feedback-priority"
+                value={feedbackPriority}
+                onChange={(e) => setFeedbackPriority(e.target.value)}
+                className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                data-testid="select-feedback-priority"
+              >
+                <option value="low">{t.feedbackPriorityLow}</option>
+                <option value="normal">{t.feedbackPriorityNormal}</option>
+                <option value="high">{t.feedbackPriorityHigh}</option>
+                <option value="urgent">{t.feedbackPriorityUrgent}</option>
+              </select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="feedback-description">{t.feedbackDescription}</Label>
+              <Textarea
+                id="feedback-description"
+                placeholder={t.feedbackDescriptionPlaceholder}
+                value={feedbackDescription}
+                onChange={(e) => setFeedbackDescription(e.target.value)}
+                rows={4}
+                data-testid="input-feedback-description"
+              />
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowFeedbackDialog(false)}
+              data-testid="button-cancel-feedback"
+            >
+              {t.cancel}
+            </Button>
+            <Button
+              onClick={handleSubmitFeedback}
+              disabled={isSubmittingFeedback || !feedbackTitle.trim() || !feedbackDescription.trim()}
+              data-testid="button-submit-feedback"
+            >
+              {isSubmittingFeedback ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {t.feedbackSubmitting}
+                </>
+              ) : (
+                t.feedbackSubmit
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Feedback Success Dialog */}
+      <Dialog open={showFeedbackSuccess} onOpenChange={setShowFeedbackSuccess}>
+        <DialogContent className="sm:max-w-md" data-testid="dialog-feedback-success">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-green-600">
+              <CheckCircle2 className="w-5 h-5" />
+              {t.feedbackSuccess}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-muted-foreground">{t.feedbackSuccessDesc}</p>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setShowFeedbackSuccess(false)} data-testid="button-close-feedback-success">
               {t.cancel}
             </Button>
           </DialogFooter>

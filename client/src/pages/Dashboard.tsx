@@ -357,7 +357,7 @@ function StaticCard({ card, colorIndex, brandColors }: { card: any; colorIndex: 
     >
       <div className="p-4 flex flex-col items-center gap-3">
         <div 
-          className="w-14 h-14 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 border-2"
+          className="w-14 h-14 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 border-2 relative"
           style={{ 
             backgroundColor: `${iconColor}15`, 
             color: iconColor, 
@@ -365,6 +365,15 @@ function StaticCard({ card, colorIndex, brandColors }: { card: any; colorIndex: 
           }}
         >
           <span className="material-icons text-4xl">{card.icon}</span>
+          {card.notificationCount > 0 && (
+            <Badge 
+              variant="destructive" 
+              className="absolute -top-2 -right-2 min-w-[20px] h-[20px] flex items-center justify-center text-[10px] px-1.5 pointer-events-none"
+              data-testid={`badge-notification-${card.id}`}
+            >
+              {card.notificationCount > 99 ? '99+' : card.notificationCount}
+            </Badge>
+          )}
         </div>
         <div className="text-center">
           <div className="text-base font-bold mb-0.5 text-foreground">
@@ -431,7 +440,7 @@ function SortableCard({ card, isRearranging, colorIndex, brandColors }: { card: 
         )}
         
         <div 
-          className="w-14 h-14 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 border-2"
+          className="w-14 h-14 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 border-2 relative"
           style={{ 
             backgroundColor: `${iconColor}15`, 
             color: iconColor, 
@@ -439,6 +448,15 @@ function SortableCard({ card, isRearranging, colorIndex, brandColors }: { card: 
           }}
         >
           <span className="material-icons text-4xl">{card.icon}</span>
+          {card.notificationCount > 0 && (
+            <Badge 
+              variant="destructive" 
+              className="absolute -top-2 -right-2 min-w-[20px] h-[20px] flex items-center justify-center text-[10px] px-1.5 pointer-events-none"
+              data-testid={`badge-notification-${card.id}`}
+            >
+              {card.notificationCount > 99 ? '99+' : card.notificationCount}
+            </Badge>
+          )}
         </div>
         <div className="text-center">
           <div className="text-base font-bold mb-0.5 text-foreground">
@@ -670,6 +688,15 @@ export default function Dashboard() {
     enabled: userData?.user?.role === 'company',
     refetchInterval: 30000, // Refresh every 30 seconds
   });
+
+  // Fetch job application counts for company owners
+  const { data: jobApplicationCountsData } = useQuery<{ counts: { jobPostingId: string; count: number }[] }>({
+    queryKey: ["/api/job-applications/counts"],
+    enabled: userData?.user?.role === 'company',
+    refetchInterval: 60000, // Refresh every 60 seconds
+  });
+
+  const totalJobApplications = jobApplicationCountsData?.counts?.reduce((sum, item) => sum + item.count, 0) || 0;
 
   // Fetch user preferences
   const { data: preferencesData } = useQuery({
@@ -2357,6 +2384,17 @@ export default function Dashboard() {
   // Dashboard card configuration with permission filtering
   const dashboardCards = useMemo(() => [
     {
+      id: "owner-profile",
+      label: t('dashboard.cards.myProfile.label', 'My Profile'),
+      description: t('dashboard.cards.myProfile.description', 'Hours & certifications'),
+      icon: "person",
+      onClick: () => setLocation("/technician-portal"),
+      testId: "button-nav-owner-profile",
+      isVisible: (user: any) => user?.role === 'company', // Company owners who work on buildings
+      borderColor: "#8b5cf6",
+      category: "team",
+    },
+    {
       id: "projects",
       label: t('dashboard.cards.projects.label', 'Projects'),
       description: t('dashboard.cards.projects.description', 'Active projects'),
@@ -2399,6 +2437,18 @@ export default function Dashboard() {
       isVisible: (user: any) => canManageEmployees(user), // Management only
       borderColor: "#a855f7",
       category: "team",
+    },
+    {
+      id: "job-board",
+      label: t('dashboard.cards.jobBoard.label', 'Job Board'),
+      description: t('dashboard.cards.jobBoard.description', 'Jobs & talent'),
+      icon: "work",
+      onClick: () => setLocation("/job-board"),
+      testId: "button-nav-job-board",
+      isVisible: (user: any) => user?.role === 'company', // Company owners only
+      borderColor: "#059669",
+      category: "team",
+      notificationCount: totalJobApplications,
     },
     {
       id: "clients",
@@ -5370,15 +5420,15 @@ export default function Dashboard() {
                               <div className="flex-1">
                                 <div className="flex items-center gap-2">
                                   <div className="font-medium text-lg">{employee.name || employee.companyName || employee.email}</div>
-                                  {/* PRO Badge - Always shown for now, will be gated behind PLUS access later */}
-                                  {employee.role === 'rope_access_tech' && (
+                                  {/* PLUS Badge - Only shown for rope_access_tech with hasPlusAccess */}
+                                  {employee.role === 'rope_access_tech' && employee.hasPlusAccess && (
                                     <Badge 
                                       variant="default" 
                                       className="bg-gradient-to-r from-amber-500 to-yellow-400 text-white text-[10px] px-1.5 py-0 h-4 font-bold border-0" 
-                                      data-testid={`badge-pro-${employee.id}`}
+                                      data-testid={`badge-plus-${employee.id}`}
                                     >
                                       <Star className="w-2.5 h-2.5 mr-0.5 fill-current" />
-                                      PRO
+                                      PLUS
                                     </Badge>
                                   )}
                                   {irataStatus === 'expired' && (

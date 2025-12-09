@@ -32,7 +32,7 @@ import {
   Scan,
   Check,
   FileDown,
-  Star
+  Lock
 } from "lucide-react";
 import { jsPDF } from "jspdf";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -127,6 +127,15 @@ const translations = {
     selectDateRange: "Select Date Range",
     from: "From",
     exportingPdf: "Generating PDF...",
+    totalDrops: "Total Drops",
+    drops: "drops",
+    dropsCompleted: "Drops Completed",
+    north: "North",
+    east: "East",
+    south: "South",
+    west: "West",
+    allTimeTasks: "All-Time Tasks",
+    times: "times",
     pdfExported: "PDF Exported",
     pdfExportedDesc: "Your work history has been downloaded",
     noDataInRange: "No Data Found",
@@ -140,6 +149,12 @@ const translations = {
     previousHoursCount: "Previous Hours Entries",
     detailedLog: "Detailed Log",
     plusFeature: "PLUS Feature",
+    plusLockedDesc: "Refer a technician to unlock",
+    sessionDetails: "Session Details",
+    viewDetails: "Tap to view details",
+    projectInfo: "Project Information",
+    workInfo: "Work Information",
+    close: "Close",
   },
   fr: {
     title: "Mes heures enregistrées",
@@ -226,6 +241,15 @@ const translations = {
     selectDateRange: "Sélectionner la période",
     from: "Du",
     exportingPdf: "Génération du PDF...",
+    totalDrops: "Descentes totales",
+    drops: "descentes",
+    dropsCompleted: "Descentes effectuées",
+    north: "Nord",
+    east: "Est",
+    south: "Sud",
+    west: "Ouest",
+    allTimeTasks: "Tâches totales",
+    times: "fois",
     pdfExported: "PDF exporté",
     pdfExportedDesc: "Votre historique de travail a été téléchargé",
     noDataInRange: "Aucune donnée trouvée",
@@ -239,6 +263,12 @@ const translations = {
     previousHoursCount: "Entrées d'heures précédentes",
     detailedLog: "Journal détaillé",
     plusFeature: "Fonctionnalité PLUS",
+    plusLockedDesc: "Parrainez un technicien pour débloquer",
+    sessionDetails: "Détails de la session",
+    viewDetails: "Appuyez pour voir les détails",
+    projectInfo: "Informations du projet",
+    workInfo: "Informations de travail",
+    close: "Fermer",
   }
 };
 
@@ -319,13 +349,32 @@ export default function TechnicianLoggedHours() {
   const [exportStartDate, setExportStartDate] = useState("");
   const [exportEndDate, setExportEndDate] = useState("");
   const [isExporting, setIsExporting] = useState(false);
+  
+  // Session details dialog state
+  const [selectedLog, setSelectedLog] = useState<IrataTaskLog | null>(null);
+  const [showLogDetailsDialog, setShowLogDetailsDialog] = useState(false);
 
   const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
   });
 
-  const { data: logsData, isLoading: logsLoading } = useQuery<{ logs: IrataTaskLog[] }>({
-    queryKey: ["/api/my-irata-task-logs"],
+  const { data: logsData, isLoading: logsLoading } = useQuery<{ sessions: Array<{
+    id: string;
+    workDate: string;
+    hoursWorked: string;
+    buildingName: string | null;
+    buildingAddress: string | null;
+    buildingHeight: string | null;
+    companyName: string | null;
+    totalDrops: number;
+    dropsNorth: number;
+    dropsEast: number;
+    dropsSouth: number;
+    dropsWest: number;
+    startTime: string;
+    endTime: string;
+  }> }>({
+    queryKey: ["/api/my-work-sessions"],
   });
 
   const { data: historicalData, isLoading: historicalLoading } = useQuery<{ historicalHours: HistoricalHours[] }>({
@@ -333,15 +382,15 @@ export default function TechnicianLoggedHours() {
   });
 
   const user = userData?.user;
-  const logs = logsData?.logs || [];
+  const sessions = logsData?.sessions || [];
   const historicalHours = historicalData?.historicalHours || [];
 
   // Baseline hours from user profile
   const baselineHours = user?.irataBaselineHours ? parseFloat(user.irataBaselineHours) || 0 : 0;
   
   // Hours from work sessions
-  const totalLoggedHours = logs.reduce((sum: number, log: IrataTaskLog) => {
-    return sum + parseFloat(log.hoursWorked || "0");
+  const totalLoggedHours = sessions.reduce((sum: number, session: any) => {
+    return sum + parseFloat(session.hoursWorked || "0");
   }, 0);
 
   // Previous/historical hours (not counted in certification totals)
@@ -467,9 +516,9 @@ export default function TechnicianLoggedHours() {
       const endDate = parseLocalDate(exportEndDate);
 
       // Filter work sessions by date range
-      const filteredLogs = logs.filter(log => {
-        const logDate = parseLocalDate(log.workDate);
-        return logDate >= startDate && logDate <= endDate;
+      const filteredSessions = sessions.filter(session => {
+        const sessionDate = parseLocalDate(session.workDate);
+        return sessionDate >= startDate && sessionDate <= endDate;
       });
 
       // Filter historical hours by date range (include if date ranges overlap)
@@ -480,7 +529,7 @@ export default function TechnicianLoggedHours() {
         return entryEndDate >= startDate && entryStartDate <= endDate;
       });
 
-      if (filteredLogs.length === 0 && filteredHistorical.length === 0) {
+      if (filteredSessions.length === 0 && filteredHistorical.length === 0) {
         toast({
           title: t.noDataInRange,
           description: t.noDataInRangeDesc,
@@ -491,7 +540,7 @@ export default function TechnicianLoggedHours() {
       }
 
       // Calculate totals for filtered data
-      const filteredWorkHours = filteredLogs.reduce((sum, log) => sum + parseFloat(log.hoursWorked || "0"), 0);
+      const filteredWorkHours = filteredSessions.reduce((sum, session) => sum + parseFloat(session.hoursWorked || "0"), 0);
       const filteredHistoricalTotal = filteredHistorical.reduce((sum, entry) => sum + parseFloat(entry.hoursWorked || "0"), 0);
 
       // Create PDF
@@ -540,7 +589,7 @@ export default function TechnicianLoggedHours() {
       // Summary table
       const summaryData = [
         [t.totalWorkHours, `${(filteredWorkHours + filteredHistoricalTotal).toFixed(1)} ${t.hr}`],
-        [t.workSessionsCount, `${filteredLogs.length}`],
+        [t.workSessionsCount, `${filteredSessions.length}`],
         [t.previousHoursCount, `${filteredHistorical.length}`],
       ];
 
@@ -567,13 +616,13 @@ export default function TechnicianLoggedHours() {
       yPos += 10;
 
       // Work Sessions
-      if (filteredLogs.length > 0) {
+      if (filteredSessions.length > 0) {
         doc.setFontSize(12);
         doc.setTextColor(60, 60, 60);
         doc.text(t.workSessions, margin, yPos);
         yPos += 8;
 
-        filteredLogs.forEach((log) => {
+        filteredSessions.forEach((session) => {
           // Check if we need a new page
           if (yPos > 260) {
             doc.addPage();
@@ -582,31 +631,14 @@ export default function TechnicianLoggedHours() {
 
           doc.setFontSize(9);
           doc.setTextColor(0, 0, 0);
-          const logDate = format(parseLocalDate(log.workDate), 'PP', { locale: dateLocale });
-          doc.text(`${logDate} - ${parseFloat(log.hoursWorked).toFixed(1)} ${t.hr}`, margin + 5, yPos);
+          const sessionDate = format(parseLocalDate(session.workDate), 'PP', { locale: dateLocale });
+          doc.text(`${sessionDate} - ${parseFloat(session.hoursWorked).toFixed(1)} ${t.hr}`, margin + 5, yPos);
           yPos += 5;
 
-          if (log.buildingName) {
+          if (session.buildingName) {
             doc.setTextColor(100, 100, 100);
-            doc.text(`${log.buildingName}${log.buildingHeight ? ` (${log.buildingHeight})` : ''}`, margin + 5, yPos);
+            doc.text(`${session.buildingName}${session.buildingHeight ? ` (${session.buildingHeight})` : ''}`, margin + 5, yPos);
             yPos += 5;
-          }
-
-          if (log.tasksPerformed && log.tasksPerformed.length > 0) {
-            doc.setTextColor(120, 120, 120);
-            const tasks = log.tasksPerformed.map(taskId => getTaskLabel(taskId, language)).join(', ');
-            const taskLines = doc.splitTextToSize(tasks, pageWidth - margin * 2 - 10);
-            doc.text(taskLines, margin + 5, yPos);
-            yPos += taskLines.length * 4;
-          }
-
-          if (log.notes) {
-            doc.setTextColor(140, 140, 140);
-            doc.setFontStyle('italic');
-            const noteLines = doc.splitTextToSize(log.notes, pageWidth - margin * 2 - 10);
-            doc.text(noteLines, margin + 5, yPos);
-            doc.setFontStyle('normal');
-            yPos += noteLines.length * 4;
           }
 
           yPos += 5;
@@ -913,27 +945,38 @@ export default function TechnicianLoggedHours() {
     buildingName: string; 
     buildingAddress: string; 
     buildingHeight: string;
-    logs: IrataTaskLog[];
+    companyName: string;
+    sessions: any[];
     totalHours: number;
+    totalDrops: number;
   }> = {};
   
-  logs.forEach((log: IrataTaskLog) => {
-    const projectKey = log.buildingName || t.unknownProject;
+  sessions.forEach((session: any) => {
+    const projectKey = session.projectId || session.buildingName || t.unknownProject;
     if (!groupedByProject[projectKey]) {
       groupedByProject[projectKey] = {
-        buildingName: log.buildingName || t.unknownProject,
-        buildingAddress: log.buildingAddress || "",
-        buildingHeight: log.buildingHeight || "",
-        logs: [],
+        buildingName: session.buildingName || t.unknownProject,
+        buildingAddress: session.buildingAddress || "",
+        buildingHeight: session.buildingHeight || "",
+        companyName: session.companyName || "",
+        sessions: [],
         totalHours: 0,
+        totalDrops: 0,
       };
     }
-    groupedByProject[projectKey].logs.push(log);
-    groupedByProject[projectKey].totalHours += parseFloat(log.hoursWorked || "0");
+    groupedByProject[projectKey].sessions.push(session);
+    groupedByProject[projectKey].totalHours += parseFloat(session.hoursWorked || "0");
+    groupedByProject[projectKey].totalDrops += (session.totalDrops || 0);
   });
+  
+  // Calculate grand total drops across all sessions
+  const grandTotalDrops = sessions.reduce((sum: number, session: any) => sum + (session.totalDrops || 0), 0);
+  
+  // Sort tasks by count (highest first) - not applicable for work sessions without task logging
+  const sortedTaskCounts: [string, number][] = [];
 
   Object.values(groupedByProject).forEach((project) => {
-    project.logs.sort((a, b) => {
+    project.sessions.sort((a, b) => {
       const dateA = parseLocalDate(a.workDate);
       const dateB = parseLocalDate(b.workDate);
       return dateB.getTime() - dateA.getTime();
@@ -971,23 +1014,29 @@ export default function TechnicianLoggedHours() {
               <h1 className="font-semibold text-lg">{t.title}</h1>
             </div>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowExportDialog(true)}
-            className="gap-2"
-            data-testid="button-export-pdf"
-          >
-            <FileDown className="w-4 h-4" />
-            <span className="hidden sm:inline">{t.exportPdf}</span>
-            <Badge 
-              variant="secondary" 
-              className="bg-gradient-to-r from-amber-500 to-yellow-400 text-white border-0 text-[10px] px-1.5 py-0 hidden sm:flex"
+          {user?.hasPlusAccess ? (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowExportDialog(true)}
+              className="gap-2"
+              data-testid="button-export-pdf"
             >
-              <Star className="w-2.5 h-2.5 mr-0.5" />
-              PRO
-            </Badge>
-          </Button>
+              <FileDown className="w-4 h-4" />
+              <span className="hidden sm:inline">{t.exportPdf}</span>
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2 opacity-70"
+              disabled
+              data-testid="button-export-pdf-locked"
+            >
+              <Lock className="w-4 h-4" />
+              <span className="hidden sm:inline">{t.plusFeature}</span>
+            </Button>
+          )}
         </div>
       </header>
 
@@ -1023,9 +1072,15 @@ export default function TechnicianLoggedHours() {
                     <p className="text-sm text-muted-foreground">{t.combinedTotal}</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-lg font-medium">{logs.length}</p>
-                  <p className="text-sm text-muted-foreground">{logs.length === 1 ? t.session : t.sessions}</p>
+                <div className="text-right flex items-center gap-6">
+                  <div>
+                    <p className="text-lg font-medium" data-testid="text-total-drops">{grandTotalDrops}</p>
+                    <p className="text-sm text-muted-foreground">{t.totalDrops}</p>
+                  </div>
+                  <div>
+                    <p className="text-lg font-medium">{sessions.length}</p>
+                    <p className="text-sm text-muted-foreground">{sessions.length === 1 ? t.session : t.sessions}</p>
+                  </div>
                 </div>
               </div>
               
@@ -1040,6 +1095,47 @@ export default function TechnicianLoggedHours() {
                   <p className="text-xs text-muted-foreground">{t.fromWorkSessions}</p>
                 </div>
               </div>
+              
+              {/* All-Time Stats */}
+              {(sortedTaskCounts.length > 0 || grandTotalDrops > 0) && (
+                <div className="pt-3 border-t space-y-3">
+                  {/* Total Drops - Prominent Display */}
+                  {grandTotalDrops > 0 && (
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-primary/5 border border-primary/20">
+                      <div className="p-2 rounded-full bg-primary/10">
+                        <span className="material-icons text-primary text-lg">trending_down</span>
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold text-primary" data-testid="text-alltime-drops">{grandTotalDrops}</p>
+                        <p className="text-sm text-muted-foreground">{t.totalDrops}</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* All-Time Tasks */}
+                  {sortedTaskCounts.length > 0 && (
+                    <div>
+                      <p className="text-sm font-medium mb-2">{t.allTimeTasks}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {sortedTaskCounts.map(([taskId, count]) => (
+                          <Badge 
+                            key={taskId} 
+                            variant="outline" 
+                            className="text-xs py-1"
+                            data-testid={`badge-task-count-${taskId}`}
+                          >
+                            <span className="material-icons text-xs mr-1">{getTaskIcon(taskId)}</span>
+                            {getTaskLabel(taskId, language)}
+                            <span className="ml-1.5 px-1.5 py-0.5 rounded bg-primary/10 text-primary font-semibold">
+                              {count}
+                            </span>
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -1047,7 +1143,7 @@ export default function TechnicianLoggedHours() {
         <Tabs defaultValue="work-sessions" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="work-sessions" data-testid="tab-work-sessions">
-              {t.workSessions} ({logs.length})
+              {t.workSessions} ({sessions.length})
             </TabsTrigger>
             <TabsTrigger value="previous-hours" data-testid="tab-previous-hours">
               {t.previousHours} ({historicalHours.length})
@@ -1055,7 +1151,7 @@ export default function TechnicianLoggedHours() {
           </TabsList>
 
           <TabsContent value="work-sessions" className="mt-4">
-            {logs.length === 0 ? (
+            {sessions.length === 0 ? (
               <Card>
                 <CardContent className="p-8 text-center">
                   <Clock className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" />
@@ -1072,56 +1168,72 @@ export default function TechnicianLoggedHours() {
                     className="border rounded-lg px-4"
                   >
                     <AccordionTrigger className="py-4">
-                      <div className="flex items-center justify-between w-full pr-4">
-                        <div className="flex items-center gap-3">
-                          <Building className="w-5 h-5 text-muted-foreground" />
-                          <div className="text-left">
-                            <p className="font-medium">{project.buildingName}</p>
-                            {project.buildingAddress && (
-                              <p className="text-sm text-muted-foreground">{project.buildingAddress}</p>
-                            )}
-                            {project.buildingHeight && (
-                              <p className="text-sm text-muted-foreground">{t.buildingHeight}: {project.buildingHeight}</p>
-                            )}
+                      <div className="flex flex-col w-full pr-4 gap-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <Building className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                            <div className="text-left">
+                              <p className="font-medium">{project.buildingName}</p>
+                              {project.buildingAddress && (
+                                <p className="text-sm text-muted-foreground">{project.buildingAddress}</p>
+                              )}
+                              <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
+                                {project.buildingHeight && (
+                                  <span>{project.buildingHeight}</span>
+                                )}
+                                {project.companyName && (
+                                  <span>{t.employer}: {project.companyName}</span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-right flex-shrink-0">
+                            <p className="font-semibold">{project.totalHours.toFixed(1)} {t.hr}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {project.sessions.length} {project.sessions.length === 1 ? t.session : t.sessions}
+                            </p>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <p className="font-semibold">{project.totalHours.toFixed(1)} {t.hr}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {project.logs.length} {project.logs.length === 1 ? t.session : t.sessions}
-                          </p>
-                        </div>
+                        {project.totalDrops > 0 && (
+                          <div className="flex flex-wrap gap-1 ml-8">
+                            <Badge variant="secondary" className="text-xs">
+                              {project.totalDrops} {t.drops}
+                            </Badge>
+                          </div>
+                        )}
                       </div>
                     </AccordionTrigger>
                     <AccordionContent>
                       <ScrollArea className="max-h-[400px]">
                         <div className="space-y-3 pb-4">
-                          {project.logs.map((log) => (
+                          {project.sessions.map((session) => (
                             <div 
-                              key={log.id}
-                              className="p-3 bg-muted/50 rounded-lg"
+                              key={session.id}
+                              className="p-3 bg-muted/50 rounded-lg cursor-pointer hover-elevate active-elevate-2"
+                              onClick={() => {
+                                setSelectedLog(session);
+                                setShowLogDetailsDialog(true);
+                              }}
+                              data-testid={`session-entry-${session.id}`}
                             >
                               <div className="flex items-start justify-between mb-2">
                                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                   <Calendar className="w-4 h-4" />
-                                  {format(parseLocalDate(log.workDate), 'PPP', { locale: dateLocale })}
+                                  {format(parseLocalDate(session.workDate), 'PPP', { locale: dateLocale })}
                                 </div>
-                                <Badge variant="secondary">
-                                  {parseFloat(log.hoursWorked).toFixed(1)} {t.hr}
-                                </Badge>
-                              </div>
-                              <div className="flex flex-wrap gap-1">
-                                {(log.tasksPerformed || []).map((taskId) => (
-                                  <Badge key={taskId} variant="outline" className="text-xs">
-                                    <span className="material-icons text-xs mr-1">{getTaskIcon(taskId)}</span>
-                                    {getTaskLabel(taskId, language)}
+                                <div className="flex items-center gap-2">
+                                  <Badge variant="secondary">
+                                    {parseFloat(session.hoursWorked).toFixed(1)} {t.hr}
                                   </Badge>
-                                ))}
+                                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                                </div>
                               </div>
-                              {log.notes && (
-                                <p className="text-sm text-muted-foreground mt-2 italic">
-                                  {log.notes}
-                                </p>
+                              {session.totalDrops > 0 && (
+                                <div className="flex flex-wrap gap-1">
+                                  <Badge variant="outline" className="text-xs">
+                                    {session.totalDrops} {t.drops}
+                                  </Badge>
+                                </div>
                               )}
                             </div>
                           ))}
@@ -1638,16 +1750,7 @@ export default function TechnicianLoggedHours() {
       <Dialog open={showExportDialog} onOpenChange={setShowExportDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <div className="flex items-center gap-2">
-              <DialogTitle>{t.exportWorkHistory}</DialogTitle>
-              <Badge 
-                variant="secondary" 
-                className="bg-gradient-to-r from-amber-500 to-yellow-400 text-white border-0 text-[10px] px-1.5 py-0"
-              >
-                <Star className="w-2.5 h-2.5 mr-0.5" />
-                PRO
-              </Badge>
-            </div>
+            <DialogTitle>{t.exportWorkHistory}</DialogTitle>
             <DialogDescription>
               {t.exportWorkHistoryDesc}
             </DialogDescription>
@@ -1705,6 +1808,133 @@ export default function TechnicianLoggedHours() {
                   {t.exportPdf}
                 </>
               )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Session Details Dialog */}
+      <Dialog open={showLogDetailsDialog} onOpenChange={setShowLogDetailsDialog}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Clock className="w-5 h-5" />
+              {t.sessionDetails}
+            </DialogTitle>
+            <DialogDescription>
+              {selectedLog && format(parseLocalDate(selectedLog.workDate), 'PPP', { locale: dateLocale })}
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedLog && (
+            <div className="space-y-4">
+              {/* Project Information */}
+              <div className="space-y-3">
+                <h4 className="font-medium text-sm flex items-center gap-2">
+                  <Building className="w-4 h-4" />
+                  {t.projectInfo}
+                </h4>
+                <div className="bg-muted/50 rounded-lg p-3 space-y-2">
+                  <div>
+                    <p className="text-xs text-muted-foreground">{t.buildingName}</p>
+                    <p className="font-medium">{selectedLog.buildingName || '-'}</p>
+                  </div>
+                  {selectedLog.buildingAddress && (
+                    <div>
+                      <p className="text-xs text-muted-foreground">{t.buildingAddress}</p>
+                      <p className="text-sm">{selectedLog.buildingAddress}</p>
+                    </div>
+                  )}
+                  {selectedLog.buildingHeight && (
+                    <div>
+                      <p className="text-xs text-muted-foreground">{t.buildingHeight}</p>
+                      <p className="text-sm font-medium text-primary">{selectedLog.buildingHeight}</p>
+                    </div>
+                  )}
+                  {(selectedLog as any).companyName && (
+                    <div>
+                      <p className="text-xs text-muted-foreground">{t.employer}</p>
+                      <p className="text-sm font-medium">{(selectedLog as any).companyName}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Work Information */}
+              <div className="space-y-3">
+                <h4 className="font-medium text-sm flex items-center gap-2">
+                  <Clock className="w-4 h-4" />
+                  {t.workInfo}
+                </h4>
+                <div className="bg-muted/50 rounded-lg p-3 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-muted-foreground">{t.hoursWorked}</p>
+                      <p className="text-xl font-bold text-primary">{parseFloat(selectedLog.hoursWorked).toFixed(1)} {t.hr}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">{t.date}</p>
+                      <p className="font-medium">{format(parseLocalDate(selectedLog.workDate), 'PPP', { locale: dateLocale })}</p>
+                    </div>
+                  </div>
+                  
+                  {/* Drops Completed */}
+                  {((selectedLog as any).totalDrops > 0) && (
+                    <div className="pt-2 border-t">
+                      <p className="text-xs text-muted-foreground mb-2">{t.dropsCompleted}</p>
+                      <div className="grid grid-cols-4 gap-2">
+                        <div className="text-center p-2 rounded bg-background">
+                          <p className="text-lg font-bold">{(selectedLog as any).dropsNorth || 0}</p>
+                          <p className="text-xs text-muted-foreground">{t.north}</p>
+                        </div>
+                        <div className="text-center p-2 rounded bg-background">
+                          <p className="text-lg font-bold">{(selectedLog as any).dropsEast || 0}</p>
+                          <p className="text-xs text-muted-foreground">{t.east}</p>
+                        </div>
+                        <div className="text-center p-2 rounded bg-background">
+                          <p className="text-lg font-bold">{(selectedLog as any).dropsSouth || 0}</p>
+                          <p className="text-xs text-muted-foreground">{t.south}</p>
+                        </div>
+                        <div className="text-center p-2 rounded bg-background">
+                          <p className="text-lg font-bold">{(selectedLog as any).dropsWest || 0}</p>
+                          <p className="text-xs text-muted-foreground">{t.west}</p>
+                        </div>
+                      </div>
+                      <div className="text-center mt-2">
+                        <p className="text-sm font-medium">{t.totalDrops}: {(selectedLog as any).totalDrops}</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-2">{t.tasksPerformed}</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {(selectedLog.tasksPerformed || []).map((taskId) => (
+                        <Badge key={taskId} variant="outline" className="text-xs">
+                          <span className="material-icons text-xs mr-1">{getTaskIcon(taskId)}</span>
+                          {getTaskLabel(taskId, language)}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  {selectedLog.notes && (
+                    <div>
+                      <p className="text-xs text-muted-foreground">{t.notes}</p>
+                      <p className="text-sm italic mt-1">{selectedLog.notes}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button 
+              onClick={() => setShowLogDetailsDialog(false)}
+              data-testid="button-close-log-details"
+            >
+              {t.close}
             </Button>
           </DialogFooter>
         </DialogContent>

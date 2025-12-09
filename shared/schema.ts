@@ -180,6 +180,10 @@ export const users = pgTable("users", {
   // Technician PLUS access (premium tier)
   hasPlusAccess: boolean("has_plus_access").default(false), // Whether technician has PLUS benefits (from referrals or subscription)
   
+  // Technician job board visibility (allows employers to see their profile)
+  isVisibleToEmployers: boolean("is_visible_to_employers").default(false), // Whether technician's profile is visible on job board
+  visibilityEnabledAt: timestamp("visibility_enabled_at"), // When visibility was last enabled
+  
   // White label branding (company role only)
   brandingLogoUrl: text("branding_logo_url"), // Custom logo URL for resident portal
   brandingColors: text("branding_colors").array().default(sql`ARRAY[]::text[]`), // Array of brand colors (hex codes)
@@ -2336,3 +2340,101 @@ export const insertTeamInvitationSchema = createInsertSchema(teamInvitations).om
 
 export type TeamInvitation = typeof teamInvitations.$inferSelect;
 export type InsertTeamInvitation = z.infer<typeof insertTeamInvitationSchema>;
+
+// Job Postings - Employment opportunities posted by companies and SuperUsers
+export const jobPostings = pgTable("job_postings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  
+  // Poster information
+  companyId: varchar("company_id").references(() => users.id, { onDelete: "cascade" }), // null for platform-wide posts
+  isPlatformPost: boolean("is_platform_post").default(false).notNull(), // true if posted by SuperUser
+  
+  // Job details
+  title: varchar("title").notNull(),
+  description: text("description").notNull(),
+  requirements: text("requirements"), // Job requirements/qualifications
+  
+  // Location
+  location: varchar("location"), // City, Province/State
+  isRemote: boolean("is_remote").default(false),
+  
+  // Job type
+  jobType: varchar("job_type").notNull(), // full_time | part_time | contract | temporary | seasonal
+  employmentType: varchar("employment_type"), // permanent | fixed_term | casual
+  
+  // Compensation (optional)
+  salaryMin: numeric("salary_min", { precision: 12, scale: 2 }),
+  salaryMax: numeric("salary_max", { precision: 12, scale: 2 }),
+  salaryPeriod: varchar("salary_period"), // hourly | daily | weekly | monthly | annually
+  
+  // Required certifications
+  requiredIrataLevel: varchar("required_irata_level"), // Level 1 | Level 2 | Level 3
+  requiredSpratLevel: varchar("required_sprat_level"), // Level 1 | Level 2 | Level 3
+  
+  // Additional job details
+  startDate: timestamp("start_date"), // Expected job start date
+  benefits: text("benefits"), // Benefits offered (health insurance, vacation, etc.)
+  workDays: varchar("work_days"), // e.g., "Monday to Friday", "Rotating shifts"
+  experienceRequired: varchar("experience_required"), // e.g., "1-2 years", "3-5 years", "5+ years"
+  
+  // Status and visibility
+  status: varchar("status").notNull().default("active"), // draft | active | paused | closed | expired
+  
+  // Timestamps
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  expiresAt: timestamp("expires_at"), // Optional expiration date
+}, (table) => [
+  index("IDX_job_postings_company").on(table.companyId),
+  index("IDX_job_postings_status").on(table.status),
+  index("IDX_job_postings_job_type").on(table.jobType),
+  index("IDX_job_postings_platform").on(table.isPlatformPost),
+]);
+
+export const insertJobPostingSchema = createInsertSchema(jobPostings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type JobPosting = typeof jobPostings.$inferSelect;
+export type InsertJobPosting = z.infer<typeof insertJobPostingSchema>;
+
+// Job Applications - Technicians applying to job postings
+export const jobApplications = pgTable("job_applications", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  
+  // References
+  jobPostingId: varchar("job_posting_id").notNull().references(() => jobPostings.id, { onDelete: "cascade" }),
+  technicianId: varchar("technician_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  
+  // Application details
+  coverMessage: text("cover_message"), // Optional message from technician
+  
+  // Status tracking
+  status: varchar("status").notNull().default("applied"), // applied | reviewing | interviewed | offered | hired | rejected | withdrawn
+  
+  // Employer notes (only visible to employer)
+  employerNotes: text("employer_notes"),
+  
+  // Timestamps
+  appliedAt: timestamp("applied_at").defaultNow().notNull(),
+  reviewedAt: timestamp("reviewed_at"),
+  statusUpdatedAt: timestamp("status_updated_at"),
+  viewedByEmployerAt: timestamp("viewed_by_employer_at"), // When employer first saw this application in the dashboard
+}, (table) => [
+  index("IDX_job_applications_job").on(table.jobPostingId),
+  index("IDX_job_applications_technician").on(table.technicianId),
+  index("IDX_job_applications_status").on(table.status),
+]);
+
+export const insertJobApplicationSchema = createInsertSchema(jobApplications).omit({
+  id: true,
+  appliedAt: true,
+  reviewedAt: true,
+  statusUpdatedAt: true,
+  viewedByEmployerAt: true,
+});
+
+export type JobApplication = typeof jobApplications.$inferSelect;
+export type InsertJobApplication = z.infer<typeof insertJobApplicationSchema>;

@@ -43,6 +43,7 @@ import BuildingPortal from "@/pages/BuildingPortal";
 import SuperUserBuildings from "@/pages/SuperUserBuildings";
 import SuperUserTechnicians from "@/pages/SuperUserTechnicians";
 import SuperUserTasks from "@/pages/SuperUserTasks";
+import SuperUserJobBoard from "@/pages/SuperUserJobBoard";
 import ResidentsManagement from "@/pages/ResidentsManagement";
 import Documents from "@/pages/Documents";
 import ResidentLink from "@/pages/ResidentLink";
@@ -73,6 +74,9 @@ import ROICalculator from "@/pages/ROICalculator";
 import TechnicianLogin from "@/pages/TechnicianLogin";
 import TechnicianPortal from "@/pages/TechnicianPortal";
 import TechnicianLoggedHours from "@/pages/TechnicianLoggedHours";
+import TechnicianJobBoard from "@/pages/TechnicianJobBoard";
+import CompanyJobBoard from "@/pages/CompanyJobBoard";
+import VisibleTechniciansBrowser from "@/pages/VisibleTechniciansBrowser";
 import NotFound from "@/pages/not-found";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { EMPLOYEE_ROLES } from "@/lib/permissions";
@@ -150,16 +154,26 @@ function Router() {
           <SuperUserTasks />
         </ProtectedRoute>
       </Route>
+      <Route path="/superuser/job-board">
+        <ProtectedRoute allowedRoles={["superuser"]}>
+          <SuperUserJobBoard />
+        </ProtectedRoute>
+      </Route>
       <Route path="/building-portal" component={BuildingPortal} />
       <Route path="/technician-login" component={TechnicianLogin} />
       <Route path="/technician-portal">
-        <ProtectedRoute allowedRoles={["rope_access_tech"]}>
+        <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
           <TechnicianPortal />
         </ProtectedRoute>
       </Route>
       <Route path="/technician-logged-hours">
-        <ProtectedRoute allowedRoles={["rope_access_tech"]}>
+        <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
           <TechnicianLoggedHours />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/technician-job-board">
+        <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
+          <TechnicianJobBoard />
         </ProtectedRoute>
       </Route>
       <Route path="/resident">
@@ -175,6 +189,16 @@ function Router() {
       <Route path="/dashboard">
         <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
           <Dashboard />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/job-board">
+        <ProtectedRoute allowedRoles={["company"]}>
+          <CompanyJobBoard />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/talent-browser">
+        <ProtectedRoute allowedRoles={["company", "superuser"]}>
+          <VisibleTechniciansBrowser />
         </ProtectedRoute>
       </Route>
       <Route path="/complaints/:id">

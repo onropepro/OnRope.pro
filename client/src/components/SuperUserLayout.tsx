@@ -106,6 +106,11 @@ const menuGroups: MenuGroup[] = [
         path: "/superuser/buildings",
       },
       {
+        title: "Job Board",
+        icon: "work",
+        path: "/superuser/job-board",
+      },
+      {
         title: "Task List",
         icon: "checklist",
         path: "/superuser/tasks",
