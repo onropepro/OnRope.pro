@@ -1800,7 +1800,12 @@ export default function TechnicianPortal() {
               >
                 <Share2 className="w-8 h-8 text-primary mb-2" />
                 <p className="font-medium text-sm">{t.yourReferralCode}</p>
-                <p className="text-xs text-muted-foreground">{t.shareReferralCode.split(' ').slice(0, 3).join(' ')}...</p>
+                {user?.referralCode && (
+                  <p className="text-lg font-mono font-bold text-primary tracking-wider" data-testid="quick-referral-code">
+                    {user.referralCode}
+                  </p>
+                )}
+                <p className="text-xs text-muted-foreground mt-1">{t.shareReferralCode.split(' ').slice(0, 3).join(' ')}...</p>
               </button>
             </div>
           </>

@@ -15728,12 +15728,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get messages for each request
       const requestsWithMessages = await Promise.all(requests.map(async (req) => {
         const messages = await db.select().from(featureRequestMessages)
-          .where(eq(featureRequestMessages.featureRequestId, req.id))
+          .where(eq(featureRequestMessages.requestId, req.id))
           .orderBy(featureRequestMessages.createdAt);
         
         // Count unread messages from superuser
         const unreadCount = messages.filter(m => 
-          m.senderRole === 'superuser' && !m.readAt
+          m.senderRole === 'superuser' && !m.isRead
         ).length;
         
         return {
@@ -15765,11 +15765,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Mark all messages from superuser as read
       await db.update(featureRequestMessages)
-        .set({ readAt: new Date() })
+        .set({ isRead: true })
         .where(and(
-          eq(featureRequestMessages.featureRequestId, req.params.id),
+          eq(featureRequestMessages.requestId, req.params.id),
           eq(featureRequestMessages.senderRole, 'superuser'),
-          isNull(featureRequestMessages.readAt)
+          eq(featureRequestMessages.isRead, false)
         ));
 
       res.json({ success: true });
@@ -15798,9 +15798,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const messageData = insertFeatureRequestMessageSchema.parse({
-        featureRequestId: req.params.id,
+        requestId: req.params.id,
         senderId: currentUser.id,
         senderRole: currentUser.role,
+        senderName: currentUser.name || currentUser.email || 'User',
         message: message.trim(),
       });
 
