@@ -299,8 +299,10 @@ export const projects = pgTable("projects", {
   buildingName: varchar("building_name"), // Building name for display
   strataPlanNumber: varchar("strata_plan_number"),
   buildingAddress: text("building_address"), // Building address visible to all employees
-  jobType: varchar("job_type").notNull(), // window_cleaning | dryer_vent_cleaning | building_wash | in_suite_dryer_vent_cleaning | parkade_pressure_cleaning | ground_window_cleaning | other
+  jobType: varchar("job_type").notNull(), // window_cleaning | dryer_vent_cleaning | building_wash | in_suite_dryer_vent_cleaning | parkade_pressure_cleaning | ground_window_cleaning | ndt_* | other
   customJobType: varchar("custom_job_type"), // Custom job type when jobType is "other"
+  jobCategory: varchar("job_category").notNull().default('building_maintenance'), // building_maintenance | ndt | rock_scaling | wind_turbine | welding
+  requiresElevation: boolean("requires_elevation").notNull().default(true), // Whether job involves rope access at height
   
   // Elevation-specific drop totals
   totalDropsNorth: integer("total_drops_north").default(0),
