@@ -5420,8 +5420,8 @@ export default function Dashboard() {
                               <div className="flex-1">
                                 <div className="flex items-center gap-2">
                                   <div className="font-medium text-lg">{employee.name || employee.companyName || employee.email}</div>
-                                  {/* PLUS Badge - Always shown for now, will be gated behind PLUS access later */}
-                                  {employee.role === 'rope_access_tech' && (
+                                  {/* PLUS Badge - Only shown for rope_access_tech with hasPlusAccess */}
+                                  {employee.role === 'rope_access_tech' && employee.hasPlusAccess && (
                                     <Badge 
                                       variant="default" 
                                       className="bg-gradient-to-r from-amber-500 to-yellow-400 text-white text-[10px] px-1.5 py-0 h-4 font-bold border-0" 
