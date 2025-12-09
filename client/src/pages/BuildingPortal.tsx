@@ -215,13 +215,13 @@ export default function BuildingPortal() {
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="strataPlanNumber">Strata Plan Number</Label>
+                <Label htmlFor="strataPlanNumber">Strata Plan / Job Number</Label>
                 <div className="relative">
                   <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="strataPlanNumber"
                     type="text"
-                    placeholder="Enter your strata plan number"
+                    placeholder="Enter your strata or job number"
                     value={strataPlanNumber}
                     onChange={(e) => setStrataPlanNumber(e.target.value)}
                     className="pl-10 h-12"

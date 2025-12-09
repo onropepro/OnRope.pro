@@ -3192,7 +3192,7 @@ export default function Dashboard() {
                     search
                   </span>
                   <Input
-                    placeholder={t('dashboard.projects.searchPlaceholder', 'Search by strata plan number...')}
+                    placeholder={t('dashboard.projects.search.placeholder', 'Search by strata or job number...')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="h-14 pl-12 text-base shadow-sm border-2 focus-visible:ring-2"
