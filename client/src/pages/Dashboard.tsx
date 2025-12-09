@@ -59,12 +59,18 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 
+import { JOB_CATEGORIES, JOB_TYPES, getJobTypesByCategory, getJobTypeConfig, getDefaultElevation, isElevationConfigurable, type JobCategory } from "@shared/jobTypes";
+
+const ALL_JOB_TYPE_VALUES = JOB_TYPES.map(jt => jt.value) as [string, ...string[]];
+
 const projectSchema = z.object({
   strataPlanNumber: z.string().optional(),
   buildingName: z.string().optional(),
   buildingAddress: z.string().optional(),
-  jobType: z.enum(["window_cleaning", "dryer_vent_cleaning", "building_wash", "general_pressure_washing", "gutter_cleaning", "in_suite_dryer_vent_cleaning", "parkade_pressure_cleaning", "ground_window_cleaning", "painting", "inspection", "other"]),
+  jobCategory: z.enum(['building_maintenance', 'ndt']).default('building_maintenance'),
+  jobType: z.string(),
   customJobType: z.string().optional(),
+  requiresElevation: z.boolean().default(true),
   totalDropsNorth: z.string().optional(),
   totalDropsEast: z.string().optional(),
   totalDropsSouth: z.string().optional(),
@@ -87,7 +93,7 @@ const projectSchema = z.object({
   peaceWork: z.boolean().default(false),
   pricePerDrop: z.string().optional(),
 }).refine((data) => {
-  if (data.jobType === "other") {
+  if (data.jobType === "other" || data.jobType === "ndt_other") {
     return data.customJobType && data.customJobType.trim().length > 0;
   }
   return true;
@@ -1154,8 +1160,10 @@ export default function Dashboard() {
       strataPlanNumber: "",
       buildingName: "",
       buildingAddress: "",
+      jobCategory: "building_maintenance",
       jobType: "window_cleaning",
       customJobType: "",
+      requiresElevation: true,
       totalDropsNorth: "",
       totalDropsEast: "",
       totalDropsSouth: "",
@@ -1174,11 +1182,38 @@ export default function Dashboard() {
     },
   });
 
-  // Reset elevation fields flag when job type changes from "other" to something else
+  // Reset elevation fields flag when job type changes, and update elevation default based on job type
   useEffect(() => {
     const subscription = projectForm.watch((value, { name }) => {
-      if (name === "jobType" && value.jobType !== "other") {
-        setShowOtherElevationFields(false);
+      if (name === "jobType") {
+        if (value.jobType !== "other" && value.jobType !== "ndt_other") {
+          setShowOtherElevationFields(false);
+        }
+        const config = getJobTypeConfig(value.jobType || '');
+        if (config) {
+          if (config.elevationRequirement === 'always') {
+            projectForm.setValue('requiresElevation', true);
+          } else if (config.elevationRequirement === 'never') {
+            projectForm.setValue('requiresElevation', false);
+          } else {
+            // For configurable types, set default based on getDefaultElevation
+            projectForm.setValue('requiresElevation', getDefaultElevation(value.jobType || ''));
+          }
+        }
+      }
+      if (name === "jobCategory") {
+        const categoryJobTypes = getJobTypesByCategory(value.jobCategory as JobCategory || 'building_maintenance');
+        if (categoryJobTypes.length > 0) {
+          projectForm.setValue('jobType', categoryJobTypes[0].value);
+          const config = categoryJobTypes[0];
+          if (config.elevationRequirement === 'always') {
+            projectForm.setValue('requiresElevation', true);
+          } else if (config.elevationRequirement === 'never') {
+            projectForm.setValue('requiresElevation', false);
+          } else {
+            projectForm.setValue('requiresElevation', getDefaultElevation(categoryJobTypes[0].value));
+          }
+        }
       }
     });
     return () => subscription.unsubscribe();
@@ -1514,6 +1549,8 @@ export default function Dashboard() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...data,
+          jobCategory: data.jobCategory || 'building_maintenance',
+          requiresElevation: data.requiresElevation ?? true,
           totalDropsNorth: data.totalDropsNorth ? parseInt(data.totalDropsNorth) : 0,
           totalDropsEast: data.totalDropsEast ? parseInt(data.totalDropsEast) : 0,
           totalDropsSouth: data.totalDropsSouth ? parseInt(data.totalDropsSouth) : 0,
@@ -3331,42 +3368,31 @@ export default function Dashboard() {
                           )}
                         />
 
+                        {/* Job Category Selection */}
                         <FormField
                           control={projectForm.control}
-                          name="jobType"
+                          name="jobCategory"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t('dashboard.createProject.jobType', 'Job Type')}</FormLabel>
+                              <FormLabel>{t('dashboard.createProject.jobCategory', 'Job Category')}</FormLabel>
                               <FormControl>
-                                <div className="grid grid-cols-4 sm:grid-cols-6 gap-3">
-                                  {[
-                                    { value: "window_cleaning", labelKey: "dashboard.jobTypes.window_cleaning", label: "Window Cleaning", icon: "window" },
-                                    { value: "dryer_vent_cleaning", labelKey: "dashboard.jobTypes.dryer_vent_cleaning_exterior", label: "Exterior Dryer Vent", icon: "air" },
-                                    { value: "building_wash", labelKey: "dashboard.jobTypes.building_wash_pressure", label: "Building Wash - Pressure washing", icon: "water_drop" },
-                                    { value: "general_pressure_washing", labelKey: "dashboard.jobTypes.general_pressure_washing", label: "General Pressure Washing", icon: "cleaning_services" },
-                                    { value: "gutter_cleaning", labelKey: "dashboard.jobTypes.gutter_cleaning", label: "Gutter Cleaning", icon: "home_repair_service" },
-                                    { value: "in_suite_dryer_vent_cleaning", labelKey: "dashboard.jobTypes.in_suite_dryer_vent_cleaning", label: "In-Suite Dryer Vent", icon: "meeting_room" },
-                                    { value: "parkade_pressure_cleaning", labelKey: "dashboard.jobTypes.parkade_pressure_cleaning", label: "Parkade Pressure", icon: "local_parking" },
-                                    { value: "ground_window_cleaning", labelKey: "dashboard.jobTypes.ground_window_cleaning", label: "Ground Window", icon: "storefront" },
-                                    { value: "painting", labelKey: "dashboard.jobTypes.painting", label: "Painting", icon: "format_paint" },
-                                    { value: "inspection", labelKey: "dashboard.jobTypes.inspection", label: "Inspection", icon: "fact_check" },
-                                    { value: "other", labelKey: "dashboard.jobTypes.other", label: "Other", icon: "more_horiz" },
-                                  ].map((jobType) => (
+                                <div className="flex gap-2 flex-wrap">
+                                  {JOB_CATEGORIES.map((category) => (
                                     <button
-                                      key={jobType.value}
+                                      key={category.value}
                                       type="button"
-                                      onClick={() => field.onChange(jobType.value)}
-                                      data-testid={`button-job-type-${jobType.value}`}
+                                      onClick={() => field.onChange(category.value)}
+                                      data-testid={`button-category-${category.value}`}
                                       className={`
-                                        flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all
-                                        ${field.value === jobType.value 
-                                          ? 'border-primary bg-primary/10 shadow-lg' 
+                                        flex items-center gap-2 px-4 py-2 rounded-lg border-2 transition-all
+                                        ${field.value === category.value 
+                                          ? 'border-primary bg-primary/10 shadow-md' 
                                           : 'border-border bg-card hover:border-primary/50 hover:bg-muted'
                                         }
                                       `}
                                     >
-                                      <span className="material-icons text-3xl">{jobType.icon}</span>
-                                      <span className="text-xs font-medium text-center leading-tight">{t(jobType.labelKey, jobType.label)}</span>
+                                      <span className="material-icons text-xl">{category.icon}</span>
+                                      <span className="text-sm font-medium">{t(category.labelKey, category.label)}</span>
                                     </button>
                                   ))}
                                 </div>
@@ -3376,7 +3402,108 @@ export default function Dashboard() {
                           )}
                         />
 
-                        {projectForm.watch("jobType") === "other" && (
+                        {/* Job Type Selection - filtered by category */}
+                        <FormField
+                          control={projectForm.control}
+                          name="jobType"
+                          render={({ field }) => {
+                            const selectedCategory = projectForm.watch("jobCategory") as JobCategory || 'building_maintenance';
+                            const categoryJobTypes = getJobTypesByCategory(selectedCategory);
+                            
+                            return (
+                              <FormItem>
+                                <FormLabel>{t('dashboard.createProject.jobType', 'Job Type')}</FormLabel>
+                                <FormControl>
+                                  <div className="grid grid-cols-4 sm:grid-cols-6 gap-3">
+                                    {categoryJobTypes.map((jobType) => (
+                                      <button
+                                        key={jobType.value}
+                                        type="button"
+                                        onClick={() => field.onChange(jobType.value)}
+                                        data-testid={`button-job-type-${jobType.value}`}
+                                        className={`
+                                          flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all
+                                          ${field.value === jobType.value 
+                                            ? 'border-primary bg-primary/10 shadow-lg' 
+                                            : 'border-border bg-card hover:border-primary/50 hover:bg-muted'
+                                          }
+                                        `}
+                                      >
+                                        <span className="material-icons text-3xl">{jobType.icon}</span>
+                                        <span className="text-xs font-medium text-center leading-tight">{t(jobType.labelKey, jobType.label)}</span>
+                                      </button>
+                                    ))}
+                                  </div>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            );
+                          }}
+                        />
+
+                        {/* Elevation Toggle - shown for configurable job types */}
+                        {(() => {
+                          const currentJobType = projectForm.watch("jobType");
+                          const config = getJobTypeConfig(currentJobType);
+                          const isConfigurable = config?.elevationRequirement === 'configurable';
+                          const isAlways = config?.elevationRequirement === 'always';
+                          const isNever = config?.elevationRequirement === 'never';
+                          
+                          if (isConfigurable) {
+                            return (
+                              <FormField
+                                control={projectForm.control}
+                                name="requiresElevation"
+                                render={({ field }) => (
+                                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                                    <div className="space-y-0.5">
+                                      <FormLabel className="text-base flex items-center gap-2">
+                                        <span className="material-icons text-xl">height</span>
+                                        {t('dashboard.createProject.workAtHeight', 'Work at Height (Rope Access)')}
+                                      </FormLabel>
+                                      <FormDescription>
+                                        {t('dashboard.createProject.workAtHeightDesc', 'Enable for rope access work requiring elevation tracking')}
+                                      </FormDescription>
+                                    </div>
+                                    <FormControl>
+                                      <Switch
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                        data-testid="switch-requires-elevation"
+                                      />
+                                    </FormControl>
+                                  </FormItem>
+                                )}
+                              />
+                            );
+                          } else if (isAlways || isNever) {
+                            return (
+                              <div className="flex flex-row items-center justify-between rounded-lg border p-4 bg-muted/50">
+                                <div className="space-y-0.5">
+                                  <p className="text-base font-medium flex items-center gap-2">
+                                    <span className="material-icons text-xl">{isAlways ? 'height' : 'horizontal_rule'}</span>
+                                    {isAlways 
+                                      ? t('dashboard.createProject.elevationRequired', 'Elevation Work Required')
+                                      : t('dashboard.createProject.groundLevel', 'Ground Level Work')
+                                    }
+                                  </p>
+                                  <p className="text-sm text-muted-foreground">
+                                    {isAlways 
+                                      ? t('dashboard.createProject.elevationRequiredDesc', 'This job type always requires rope access at height')
+                                      : t('dashboard.createProject.groundLevelDesc', 'This job type is performed at ground level')
+                                    }
+                                  </p>
+                                </div>
+                                <span className={`material-icons text-2xl ${isAlways ? 'text-primary' : 'text-muted-foreground'}`}>
+                                  {isAlways ? 'check_circle' : 'cancel'}
+                                </span>
+                              </div>
+                            );
+                          }
+                          return null;
+                        })()}
+
+                        {(projectForm.watch("jobType") === "other" || projectForm.watch("jobType") === "ndt_other") && (
                           <>
                             <FormField
                               control={projectForm.control}

@@ -1506,13 +1506,24 @@ export const insertProjectSchema = createInsertSchema(projects)
   })
   .extend({
     dailyDropTarget: z.number().optional(),
+    jobType: z.string(), // Accept any string to support custom and NDT job types
+    jobCategory: z.string().optional().default('building_maintenance'),
+    requiresElevation: z.boolean().optional().default(true),
   })
   .superRefine((data, ctx) => {
-    // Job types that use drop-based tracking
-    const dropBasedJobTypes = ['window_cleaning', 'dryer_vent_cleaning', 'building_wash'];
+    // Job types that use drop-based tracking (building maintenance with elevation)
+    const dropBasedJobTypes = ['window_cleaning', 'dryer_vent_cleaning', 'building_wash', 'gutter_cleaning', 'painting', 'caulking'];
     
-    if (dropBasedJobTypes.includes(data.jobType)) {
-      // For drop-based jobs, dailyDropTarget is required
+    // NDT job types and other hours-based types don't require dailyDropTarget
+    const hoursBasedJobTypes = [
+      'ground_window_cleaning', 'general_pressure_washing', 'inspection', 'other',
+      'ndt_visual_inspection', 'ndt_ultrasonic_testing', 'ndt_magnetic_particle',
+      'ndt_dye_penetrant', 'ndt_radiographic', 'ndt_eddy_current', 'ndt_thermographic',
+      'ndt_acoustic_emission', 'ndt_phased_array', 'ndt_time_of_flight', 'ndt_other'
+    ];
+    
+    // Only require dailyDropTarget for drop-based jobs that require elevation
+    if (dropBasedJobTypes.includes(data.jobType) && data.requiresElevation !== false) {
       if (!data.dailyDropTarget || data.dailyDropTarget <= 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,

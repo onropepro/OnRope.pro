@@ -20,8 +20,8 @@ export const JOB_CATEGORIES: { value: JobCategory; labelKey: string; label: stri
 export const JOB_TYPES: JobTypeConfig[] = [
   // Building Maintenance - Drops-based (elevation always required)
   { value: 'window_cleaning', category: 'building_maintenance', labelKey: 'dashboard.jobTypes.window_cleaning', label: 'Window Cleaning', icon: 'window', elevationRequirement: 'configurable', progressType: 'drops' },
-  { value: 'dryer_vent_cleaning', category: 'building_maintenance', labelKey: 'dashboard.jobTypes.dryer_vent_cleaning_exterior', label: 'Exterior Dryer Vent', icon: 'air', elevationRequirement: 'configurable', progressType: 'drops' },
-  { value: 'building_wash', category: 'building_maintenance', labelKey: 'dashboard.jobTypes.building_wash_pressure', label: 'Building Wash - Pressure Washing', icon: 'water_drop', elevationRequirement: 'configurable', progressType: 'drops' },
+  { value: 'dryer_vent_cleaning', category: 'building_maintenance', labelKey: 'dashboard.jobTypes.dryer_vent_cleaning', label: 'Exterior Dryer Vent', icon: 'air', elevationRequirement: 'configurable', progressType: 'drops' },
+  { value: 'building_wash', category: 'building_maintenance', labelKey: 'dashboard.jobTypes.building_wash', label: 'Building Wash', icon: 'water_drop', elevationRequirement: 'configurable', progressType: 'drops' },
   { value: 'gutter_cleaning', category: 'building_maintenance', labelKey: 'dashboard.jobTypes.gutter_cleaning', label: 'Gutter Cleaning', icon: 'home_repair_service', elevationRequirement: 'configurable', progressType: 'drops' },
   { value: 'painting', category: 'building_maintenance', labelKey: 'dashboard.jobTypes.painting', label: 'Painting', icon: 'format_paint', elevationRequirement: 'configurable', progressType: 'drops' },
   { value: 'caulking', category: 'building_maintenance', labelKey: 'dashboard.jobTypes.caulking', label: 'Caulking', icon: 'plumbing', elevationRequirement: 'configurable', progressType: 'drops' },

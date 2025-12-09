@@ -595,10 +595,17 @@
       "buildingAddress": "Building Address",
       "buildingAddressPlaceholder": "123 Main St, Vancouver, BC",
       "visibleToEmployees": "Visible to all employees",
+      "jobCategory": "Job Category",
       "jobType": "Job Type",
       "selectJobType": "Select a job type",
       "customJobType": "Custom Job Type",
-      "customJobTypePlaceholder": "Enter custom job type name"
+      "customJobTypePlaceholder": "Enter custom job type name",
+      "workAtHeight": "Work at Height (Rope Access)",
+      "workAtHeightDesc": "Enable for rope access work requiring elevation tracking",
+      "elevationRequired": "Elevation Work Required",
+      "elevationRequiredDesc": "This job type always requires rope access at height",
+      "groundLevel": "Ground Level Work",
+      "groundLevelDesc": "This job type is performed at ground level"
     },
     "roles": {
       "owner_ceo": "Owner/CEO",
@@ -654,6 +661,10 @@
       "viewAnalytics": "View Analytics",
       "viewFinancialData": "View Financial Data (Labor Costs, Wages)"
     },
+    "jobCategories": {
+      "building_maintenance": "Building Maintenance",
+      "ndt": "NDT - Non-Destructive Testing"
+    },
     "jobTypes": {
       "window_cleaning": "Window Cleaning",
       "dryer_vent_cleaning": "Dryer Vent Cleaning",
@@ -666,8 +677,20 @@
       "parkade_pressure_cleaning": "Parkade Pressure",
       "ground_window_cleaning": "Ground Window",
       "painting": "Painting",
+      "caulking": "Caulking",
       "inspection": "Inspection",
-      "other": "Other"
+      "other": "Other",
+      "ndt_visual_inspection": "Visual Inspection (VT)",
+      "ndt_ultrasonic_testing": "Ultrasonic Testing (UT)",
+      "ndt_magnetic_particle": "Magnetic Particle Testing (MT)",
+      "ndt_dye_penetrant": "Dye Penetrant Testing (PT)",
+      "ndt_radiographic": "Radiographic Testing (RT)",
+      "ndt_eddy_current": "Eddy Current Testing (ET)",
+      "ndt_thermographic": "Thermographic Inspection",
+      "ndt_acoustic_emission": "Acoustic Emission Testing (AE)",
+      "ndt_phased_array": "Phased Array Ultrasonic (PAUT)",
+      "ndt_time_of_flight": "Time of Flight Diffraction (TOFD)",
+      "ndt_other": "Other NDT"
     },
     "toast": {
       "projectCreated": "Project created successfully",

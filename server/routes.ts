@@ -7669,14 +7669,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Unable to determine company" });
       }
       
-      // Job types that don't use drop-based tracking
+      // Job types that don't use drop-based tracking (hours-based or non-elevation jobs)
       const nonDropJobTypes = ['in_suite_dryer_vent_cleaning', 'parkade_pressure_cleaning', 'ground_window_cleaning', 'general_pressure_washing'];
-      const isNonDropJob = nonDropJobTypes.includes(req.body.jobType);
+      const isNdtJob = req.body.jobType?.startsWith('ndt_');
+      const isNonDropJob = nonDropJobTypes.includes(req.body.jobType) || isNdtJob || req.body.requiresElevation === false;
       
       const projectData = insertProjectSchema.parse({
         ...req.body,
         strataPlanNumber: normalizeStrataPlan(req.body.strataPlanNumber),
         companyId,
+        jobCategory: req.body.jobCategory || 'building_maintenance',
+        requiresElevation: req.body.requiresElevation ?? true,
         targetCompletionDate: req.body.targetCompletionDate || null,
         // Default dailyDropTarget to 0 for non-drop job types
         dailyDropTarget: isNonDropJob ? 0 : req.body.dailyDropTarget,
@@ -7708,7 +7711,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // If this is a custom job type, save it to the company's custom job types list (if not already exists)
-      if (project.jobType === "other" && project.customJobType) {
+      if ((project.jobType === "other" || project.jobType === "ndt_other") && project.customJobType) {
         const existingCustomJobType = await storage.getCustomJobTypeByName(companyId, project.customJobType);
         if (!existingCustomJobType) {
           await storage.createCustomJobType({

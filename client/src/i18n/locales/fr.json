@@ -595,10 +595,17 @@
       "buildingAddress": "Adresse du bâtiment",
       "buildingAddressPlaceholder": "123 rue Principale, Vancouver, BC",
       "visibleToEmployees": "Visible par tous les employés",
+      "jobCategory": "Catégorie de travail",
       "jobType": "Type de travail",
       "selectJobType": "Sélectionner un type de travail",
       "customJobType": "Type de travail personnalisé",
-      "customJobTypePlaceholder": "Entrer le nom du type de travail personnalisé"
+      "customJobTypePlaceholder": "Entrer le nom du type de travail personnalisé",
+      "workAtHeight": "Travail en hauteur (Accès sur corde)",
+      "workAtHeightDesc": "Activer pour les travaux sur corde nécessitant un suivi d'élévation",
+      "elevationRequired": "Travail en élévation requis",
+      "elevationRequiredDesc": "Ce type de travail nécessite toujours un accès sur corde en hauteur",
+      "groundLevel": "Travail au niveau du sol",
+      "groundLevelDesc": "Ce type de travail est effectué au niveau du sol"
     },
     "roles": {
       "owner_ceo": "Propriétaire/PDG",
@@ -654,6 +661,10 @@
       "viewAnalytics": "Voir les analyses",
       "viewFinancialData": "Voir les données financières (Coûts de main-d'œuvre, Salaires)"
     },
+    "jobCategories": {
+      "building_maintenance": "Entretien de bâtiment",
+      "ndt": "CND - Contrôle Non Destructif"
+    },
     "jobTypes": {
       "window_cleaning": "Nettoyage de vitres",
       "dryer_vent_cleaning": "Nettoyage de conduits de sécheuse",
@@ -666,8 +677,20 @@
       "parkade_pressure_cleaning": "Stationnement à pression",
       "ground_window_cleaning": "Vitres au sol",
       "painting": "Peinture",
+      "caulking": "Calfeutrage",
       "inspection": "Inspection",
-      "other": "Autre"
+      "other": "Autre",
+      "ndt_visual_inspection": "Inspection visuelle (VT)",
+      "ndt_ultrasonic_testing": "Contrôle par ultrasons (UT)",
+      "ndt_magnetic_particle": "Magnétoscopie (MT)",
+      "ndt_dye_penetrant": "Ressuage (PT)",
+      "ndt_radiographic": "Radiographie industrielle (RT)",
+      "ndt_eddy_current": "Courants de Foucault (ET)",
+      "ndt_thermographic": "Thermographie infrarouge",
+      "ndt_acoustic_emission": "Émission acoustique (AE)",
+      "ndt_phased_array": "Ultrasons multiéléments (PAUT)",
+      "ndt_time_of_flight": "Diffraction en temps de vol (TOFD)",
+      "ndt_other": "Autre CND"
     },
     "toast": {
       "projectCreated": "Projet créé avec succès",
