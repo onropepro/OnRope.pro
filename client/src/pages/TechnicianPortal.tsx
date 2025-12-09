@@ -29,6 +29,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import {
@@ -2029,44 +2030,67 @@ export default function TechnicianPortal() {
               {t.backToHome}
             </Button>
 
-            {/* Header with edit button */}
-            <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-full bg-primary/20">
-                      <Eye className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-lg">{t.employerProfileTitle}</CardTitle>
-                      <p className="text-sm text-muted-foreground">{t.employerProfileDesc}</p>
-                    </div>
+            {/* Show message for non-technician users */}
+            {user.role !== 'rope_access_tech' && (
+              <Card className="border-amber-500/50 bg-amber-500/5">
+                <CardContent className="p-6 text-center space-y-4">
+                  <div className="p-4 rounded-full bg-amber-500/20 w-fit mx-auto">
+                    <Eye className="w-8 h-8 text-amber-500" />
                   </div>
-                  {!isEditingEmployerProfile ? (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setIsEditingEmployerProfile(true)}
-                      data-testid="button-edit-employer-profile"
-                    >
-                      <Pencil className="w-4 h-4 mr-1" />
-                      {t.editEmployerProfile}
-                    </Button>
-                  ) : (
-                    <div className="flex gap-2">
+                  <div>
+                    <h3 className="text-lg font-semibold">
+                      {language === 'en' ? 'Technician Feature' : 'Fonctionnalité Technicien'}
+                    </h3>
+                    <p className="text-muted-foreground mt-2">
+                      {language === 'en' 
+                        ? 'This feature allows technicians to preview and edit how their profile appears to potential employers. Log in with a technician account to use this feature.'
+                        : 'Cette fonctionnalité permet aux techniciens de prévisualiser et modifier l\'apparence de leur profil pour les employeurs potentiels. Connectez-vous avec un compte technicien pour utiliser cette fonctionnalité.'}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Header with edit button - only for technicians */}
+            {user.role === 'rope_access_tech' && (
+              <>
+              <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-full bg-primary/20">
+                        <Eye className="w-5 h-5 text-primary" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-lg">{t.employerProfileTitle}</CardTitle>
+                        <p className="text-sm text-muted-foreground">{t.employerProfileDesc}</p>
+                      </div>
+                    </div>
+                    {!isEditingEmployerProfile ? (
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => setIsEditingEmployerProfile(false)}
-                        data-testid="button-cancel-employer-edit"
+                        onClick={() => setIsEditingEmployerProfile(true)}
+                        data-testid="button-edit-employer-profile"
                       >
-                        {t.cancelEdit}
+                        <Pencil className="w-4 h-4 mr-1" />
+                        {t.editEmployerProfile}
                       </Button>
-                    </div>
-                  )}
-                </div>
-              </CardHeader>
-            </Card>
+                    ) : (
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setIsEditingEmployerProfile(false)}
+                          data-testid="button-cancel-employer-edit"
+                        >
+                          {t.cancelEdit}
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </CardHeader>
+              </Card>
 
             {/* Visibility Status Card */}
             <Card className={user.isVisibleToEmployers ? "border-green-500/50 bg-green-500/5" : "border-amber-500/50 bg-amber-500/5"}>
@@ -2125,7 +2149,7 @@ export default function TechnicianPortal() {
                       <AvatarImage src={user.profilePhotoUrl} alt={user.name || ""} />
                     ) : (
                       <AvatarFallback className="text-2xl bg-primary/10 text-primary">
-                        {user.name?.split(" ").map(n => n[0]).join("").toUpperCase() || "?"}
+                        {user.name?.split(" ").map((n: string) => n[0]).join("").toUpperCase() || "?"}
                       </AvatarFallback>
                     )}
                   </Avatar>
@@ -2252,7 +2276,7 @@ export default function TechnicianPortal() {
                             className="w-full mt-1 px-3 py-2 border rounded-md bg-background text-sm"
                             value={specialtyCategory}
                             onChange={(e) => {
-                              setSpecialtyCategory(e.target.value);
+                              setSpecialtyCategory(e.target.value as "" | "building_maintenance");
                               setSelectedSpecialtyJobType("");
                             }}
                             data-testid="select-specialty-category"
@@ -2368,6 +2392,8 @@ export default function TechnicianPortal() {
                 )}
               </CardContent>
             </Card>
+              </>
+            )}
           </>
         )}
         
