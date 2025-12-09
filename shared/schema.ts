@@ -2346,6 +2346,30 @@ export const insertTeamInvitationSchema = createInsertSchema(teamInvitations).om
 export type TeamInvitation = typeof teamInvitations.$inferSelect;
 export type InsertTeamInvitation = z.infer<typeof insertTeamInvitationSchema>;
 
+// Technician Employer Connections - For PLUS members to connect with multiple employers
+export const technicianEmployerConnections = pgTable("technician_employer_connections", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  technicianId: varchar("technician_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  isPrimary: boolean("is_primary").default(false).notNull(), // Is this the primary/default employer
+  status: varchar("status").notNull().default("active"), // active | terminated
+  connectedAt: timestamp("connected_at").defaultNow().notNull(),
+  terminatedAt: timestamp("terminated_at"),
+  invitationId: varchar("invitation_id").references(() => teamInvitations.id, { onDelete: "set null" }), // Link to original invitation
+}, (table) => [
+  index("IDX_tech_employer_conn_technician").on(table.technicianId),
+  index("IDX_tech_employer_conn_company").on(table.companyId),
+  index("IDX_tech_employer_conn_status").on(table.status),
+]);
+
+export const insertTechnicianEmployerConnectionSchema = createInsertSchema(technicianEmployerConnections).omit({
+  id: true,
+  connectedAt: true,
+});
+
+export type TechnicianEmployerConnection = typeof technicianEmployerConnections.$inferSelect;
+export type InsertTechnicianEmployerConnection = z.infer<typeof insertTechnicianEmployerConnectionSchema>;
+
 // Job Postings - Employment opportunities posted by companies and SuperUsers
 export const jobPostings = pgTable("job_postings", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
