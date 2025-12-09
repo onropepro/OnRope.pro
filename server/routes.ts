@@ -4280,7 +4280,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/buildings/by-strata/:strataPlanNumber", requireAuth, async (req: Request, res: Response) => {
     try {
       const { strataPlanNumber } = req.params;
-      const user = await storage.getUser(req.session.userId!);
+      const user = await storage.getUserById(req.session.userId!);
       
       if (!user) {
         return res.status(401).json({ message: "Not authenticated" });
@@ -4304,14 +4304,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get building instructions by building ID (accessible to building managers, companies with projects, and superuser)
-  app.get("/api/buildings/:buildingId/instructions", requireAuth, async (req: Request, res: Response) => {
+  app.get("/api/buildings/:buildingId/instructions", async (req: Request, res: Response) => {
     try {
       const { buildingId } = req.params;
-      const user = await storage.getUser(req.session.userId!);
-      
-      if (!user) {
-        return res.status(401).json({ message: "Not authenticated" });
-      }
 
       // SuperUser can access all
       if (req.session.userId === 'superuser') {
@@ -4319,14 +4314,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json(instructions || null);
       }
 
-      // Building manager can only access their own building
-      if (user.role === 'building_manager') {
-        const building = await storage.getBuildingById(buildingId);
-        if (!building || building.strataPlanNumber !== user.strataPlanNumber) {
-          return res.status(403).json({ message: "Access denied" });
+      // Building manager session (uses buildingId, not userId)
+      if (req.session.role === 'building' && req.session.buildingId) {
+        // Building managers can only access their own building's instructions
+        if (req.session.buildingId === buildingId) {
+          const instructions = await storage.getBuildingInstructions(buildingId);
+          return res.json(instructions || null);
         }
-        const instructions = await storage.getBuildingInstructions(buildingId);
-        return res.json(instructions || null);
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      // Regular user session
+      if (!req.session.userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      const user = await storage.getUserById(req.session.userId);
+      if (!user) {
+        return res.status(401).json({ message: "Not authenticated" });
       }
 
       // Company owners can access buildings they have projects for
@@ -4354,14 +4359,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create or update building instructions
-  app.post("/api/buildings/:buildingId/instructions", requireAuth, async (req: Request, res: Response) => {
+  app.post("/api/buildings/:buildingId/instructions", async (req: Request, res: Response) => {
     try {
       const { buildingId } = req.params;
-      const user = await storage.getUser(req.session.userId!);
-      
-      if (!user) {
-        return res.status(401).json({ message: "Not authenticated" });
-      }
 
       // SuperUser can update any building
       if (req.session.userId === 'superuser') {
@@ -4374,19 +4374,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json(instructions);
       }
 
-      // Building manager can only update their own building
-      if (user.role === 'building_manager') {
-        const building = await storage.getBuildingById(buildingId);
-        if (!building || building.strataPlanNumber !== user.strataPlanNumber) {
-          return res.status(403).json({ message: "Access denied" });
+      // Building manager session (uses buildingId, not userId)
+      if (req.session.role === 'building' && req.session.buildingId) {
+        // Building managers can only update their own building's instructions
+        if (req.session.buildingId === buildingId) {
+          const instructions = await storage.upsertBuildingInstructions({
+            buildingId,
+            ...req.body,
+            createdByUserId: req.session.buildingId,
+            createdByRole: 'building_manager',
+          });
+          return res.json(instructions);
         }
-        const instructions = await storage.upsertBuildingInstructions({
-          buildingId,
-          ...req.body,
-          createdByUserId: user.id,
-          createdByRole: 'building_manager',
-        });
-        return res.json(instructions);
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      // Regular user session
+      if (!req.session.userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      const user = await storage.getUserById(req.session.userId);
+      if (!user) {
+        return res.status(401).json({ message: "Not authenticated" });
       }
 
       // Company owners can update buildings they have projects for
@@ -4419,14 +4429,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete building instructions (SuperUser and building managers only)
-  app.delete("/api/buildings/:buildingId/instructions", requireAuth, async (req: Request, res: Response) => {
+  app.delete("/api/buildings/:buildingId/instructions", async (req: Request, res: Response) => {
     try {
       const { buildingId } = req.params;
-      const user = await storage.getUser(req.session.userId!);
-      
-      if (!user) {
-        return res.status(401).json({ message: "Not authenticated" });
-      }
 
       // SuperUser can delete any
       if (req.session.userId === 'superuser') {
@@ -4434,14 +4439,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json({ success: true });
       }
 
-      // Building manager can only delete their own
-      if (user.role === 'building_manager') {
-        const building = await storage.getBuildingById(buildingId);
-        if (!building || building.strataPlanNumber !== user.strataPlanNumber) {
-          return res.status(403).json({ message: "Access denied" });
+      // Building manager session (uses buildingId, not userId)
+      if (req.session.role === 'building' && req.session.buildingId) {
+        // Building managers can only delete their own building's instructions
+        if (req.session.buildingId === buildingId) {
+          await storage.deleteBuildingInstructions(buildingId);
+          return res.json({ success: true });
         }
-        await storage.deleteBuildingInstructions(buildingId);
-        return res.json({ success: true });
+        return res.status(403).json({ message: "Access denied" });
       }
 
       return res.status(403).json({ message: "Access denied" });
