@@ -145,7 +145,7 @@ function ScrollingProblems({ problems, direction }: { problems: string[], direct
         {duplicatedProblems.map((problem, index) => (
           <span 
             key={index} 
-            className="text-lg text-muted-foreground/80 flex items-center gap-3"
+            className="text-2xl text-muted-foreground/80 flex items-center gap-4"
           >
             {problem}
             <span className="text-muted-foreground/40">•</span>
