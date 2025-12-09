@@ -164,7 +164,7 @@ export default function ResidentPortalGuide() {
             <Users className="w-5 h-5 text-action-600 dark:text-action-400" />
             What Residents Can Do
           </h2>
-          <p className="text-sm text-muted-foreground">Once linked, residents have access to several features:</p>
+          <p className="text-base text-muted-foreground">Once linked, residents have access to several features:</p>
 
           <div className="grid md:grid-cols-2 gap-4">
             <Card>
@@ -174,7 +174,7 @@ export default function ResidentPortalGuide() {
                   View Project Progress
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">
+              <CardContent className="text-base text-muted-foreground">
                 See the current status of maintenance work on their building, including job type, progress percentage, and scheduled dates.
               </CardContent>
             </Card>
@@ -186,7 +186,7 @@ export default function ResidentPortalGuide() {
                   Submit Feedback
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">
+              <CardContent className="text-base text-muted-foreground">
                 Report issues or concerns about the work. Include their name, unit number, and detailed description of the problem.
               </CardContent>
             </Card>
@@ -198,7 +198,7 @@ export default function ResidentPortalGuide() {
                   View Photo Gallery
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">
+              <CardContent className="text-base text-muted-foreground">
                 Browse before/after photos and progress images uploaded by technicians during the project.
               </CardContent>
             </Card>
@@ -210,7 +210,7 @@ export default function ResidentPortalGuide() {
                   Communicate with Management
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">
+              <CardContent className="text-base text-muted-foreground">
                 Post comments and receive replies from the management team through the job comments section.
               </CardContent>
             </Card>
@@ -287,7 +287,7 @@ export default function ResidentPortalGuide() {
               <Users className="w-5 h-5 text-action-600 dark:text-action-400" />
               Who Can See What: Access Hierarchy
             </h3>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-base text-muted-foreground">
               The feedback system has carefully designed access levels to ensure privacy while maintaining oversight.
             </p>
 
@@ -376,7 +376,7 @@ export default function ResidentPortalGuide() {
               <FileText className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
               Two-Track Communication System
             </h3>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-base text-muted-foreground">
               Staff can add two types of notes to feedback. This allows internal coordination without exposing sensitive discussions to residents.
             </p>
 
@@ -389,7 +389,7 @@ export default function ResidentPortalGuide() {
                     <Badge variant="secondary" className="text-xs">Staff Only</Badge>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="text-sm space-y-2">
+                <CardContent className="text-base space-y-2">
                   <p className="text-muted-foreground">Private notes visible only to company staff. Use for:</p>
                   <ul className="text-muted-foreground space-y-1">
                     <li className="flex items-center gap-2"><ArrowRight className="w-3 h-3" /> Coordination between team members</li>
@@ -411,7 +411,7 @@ export default function ResidentPortalGuide() {
                     <Badge variant="secondary" className="text-xs bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">Resident Sees</Badge>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="text-sm space-y-2">
+                <CardContent className="text-base space-y-2">
                   <p className="text-muted-foreground">Responses the resident can read. Use for:</p>
                   <ul className="text-muted-foreground space-y-1">
                     <li className="flex items-center gap-2"><ArrowRight className="w-3 h-3" /> Acknowledging the feedback</li>
@@ -435,7 +435,7 @@ export default function ResidentPortalGuide() {
               <Clock className="w-5 h-5 text-orange-600 dark:text-orange-400" />
               Feedback Lifecycle
             </h3>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-base text-muted-foreground">
               Every feedback item goes through a defined lifecycle with clear status indicators at each stage.
             </p>
           </div>
@@ -834,7 +834,7 @@ export default function ResidentPortalGuide() {
               <Key className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Code-Based Linking</p>
-                <p className="text-sm text-muted-foreground">Secure building access via unique codes.</p>
+                <p className="text-base text-muted-foreground">Secure building access via unique codes.</p>
               </div>
             </div>
 
@@ -842,7 +842,7 @@ export default function ResidentPortalGuide() {
               <MessageSquare className="w-5 h-5 text-action-600 dark:text-action-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Two-Way Communication</p>
-                <p className="text-sm text-muted-foreground">Residents and staff exchange messages with full history.</p>
+                <p className="text-base text-muted-foreground">Residents and staff exchange messages with full history.</p>
               </div>
             </div>
 
@@ -850,7 +850,7 @@ export default function ResidentPortalGuide() {
               <Image className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Photo Evidence</p>
-                <p className="text-sm text-muted-foreground">Attach photos to feedback for documentation.</p>
+                <p className="text-base text-muted-foreground">Attach photos to feedback for documentation.</p>
               </div>
             </div>
 
@@ -858,7 +858,7 @@ export default function ResidentPortalGuide() {
               <Bell className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Status Tracking</p>
-                <p className="text-sm text-muted-foreground">New, Viewed, Closed status badges.</p>
+                <p className="text-base text-muted-foreground">New, Viewed, Closed status badges.</p>
               </div>
             </div>
 
@@ -866,7 +866,7 @@ export default function ResidentPortalGuide() {
               <Lock className="w-5 h-5 text-slate-600 dark:text-slate-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Internal Notes</p>
-                <p className="text-sm text-muted-foreground">Staff-only notes hidden from residents.</p>
+                <p className="text-base text-muted-foreground">Staff-only notes hidden from residents.</p>
               </div>
             </div>
 
@@ -874,7 +874,7 @@ export default function ResidentPortalGuide() {
               <ArrowRight className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5 rotate-180" />
               <div>
                 <p className="font-semibold">Reopen Feedback</p>
-                <p className="text-sm text-muted-foreground">Residents can reopen closed issues by replying.</p>
+                <p className="text-base text-muted-foreground">Residents can reopen closed issues by replying.</p>
               </div>
             </div>
 
@@ -882,7 +882,7 @@ export default function ResidentPortalGuide() {
               <Clock className="w-5 h-5 text-cyan-600 dark:text-cyan-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Audit Trail</p>
-                <p className="text-sm text-muted-foreground">Timestamps for submissions, views, and responses.</p>
+                <p className="text-base text-muted-foreground">Timestamps for submissions, views, and responses.</p>
               </div>
             </div>
 
@@ -890,7 +890,7 @@ export default function ResidentPortalGuide() {
               <Building2 className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Multi-Level Visibility</p>
-                <p className="text-sm text-muted-foreground">Staff see all, residents see their own.</p>
+                <p className="text-base text-muted-foreground">Staff see all, residents see their own.</p>
               </div>
             </div>
           </div>
@@ -933,7 +933,7 @@ export default function ResidentPortalGuide() {
 
         {/* Footer */}
         <Card className="border-muted bg-muted/50">
-          <CardContent className="pt-6 text-sm text-muted-foreground">
+          <CardContent className="pt-6 text-base text-muted-foreground">
             <p><strong>Last updated:</strong> December 3, 2024 | <strong>Version:</strong> 1.0</p>
             <p className="mt-1">This document serves as the authoritative reference for the Resident Portal System.</p>
           </CardContent>

@@ -167,7 +167,7 @@ export default function QuotingGuide() {
             <Layers className="w-5 h-5 text-action-600 dark:text-action-400" />
             Available Service Types
           </h2>
-          <p className="text-sm text-muted-foreground">Select from pre-configured service types when building a quote:</p>
+          <p className="text-base text-muted-foreground">Select from pre-configured service types when building a quote:</p>
 
           <div className="grid md:grid-cols-2 gap-3">
             <Card>
@@ -177,7 +177,7 @@ export default function QuotingGuide() {
                   Window Cleaning
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm">
+              <CardContent className="text-base">
                 <p className="text-muted-foreground">Rope access window cleaning with elevation-based tracking.</p>
                 <div className="mt-2 text-xs bg-muted p-2 rounded">
                   <strong>Tracks:</strong> Drops per elevation (N/E/S/W), daily target
@@ -192,7 +192,7 @@ export default function QuotingGuide() {
                   Building Wash
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm">
+              <CardContent className="text-base">
                 <p className="text-muted-foreground">Exterior building washing via rope access.</p>
                 <div className="mt-2 text-xs bg-muted p-2 rounded">
                   <strong>Tracks:</strong> Drops per elevation (N/E/S/W), daily target
@@ -207,7 +207,7 @@ export default function QuotingGuide() {
                   Dryer Vent Cleaning
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm">
+              <CardContent className="text-base">
                 <p className="text-muted-foreground">In-suite dryer vent service with unit tracking.</p>
                 <div className="mt-2 text-xs bg-muted p-2 rounded">
                   <strong>Pricing:</strong> Per unit OR hourly rate
@@ -222,7 +222,7 @@ export default function QuotingGuide() {
                   Parkade Cleaning
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm">
+              <CardContent className="text-base">
                 <p className="text-muted-foreground">Parking structure pressure washing.</p>
                 <div className="mt-2 text-xs bg-muted p-2 rounded">
                   <strong>Pricing:</strong> Price per stall x total stalls
@@ -237,7 +237,7 @@ export default function QuotingGuide() {
                   Ground Windows
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm">
+              <CardContent className="text-base">
                 <p className="text-muted-foreground">Ground-level window cleaning service.</p>
                 <div className="mt-2 text-xs bg-muted p-2 rounded">
                   <strong>Tracks:</strong> Estimated hours, hourly rate
@@ -252,7 +252,7 @@ export default function QuotingGuide() {
                   Custom Service
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm">
+              <CardContent className="text-base">
                 <p className="text-muted-foreground">Define your own service with custom name.</p>
                 <div className="mt-2 text-xs bg-muted p-2 rounded">
                   <strong>Options:</strong> Rope access or ground work tracking
@@ -270,7 +270,7 @@ export default function QuotingGuide() {
             <Kanban className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             Sales Pipeline (Kanban View)
           </h2>
-          <p className="text-sm text-muted-foreground">Track quotes through your sales process with drag-and-drop stage management:</p>
+          <p className="text-base text-muted-foreground">Track quotes through your sales process with drag-and-drop stage management:</p>
 
           <div className="space-y-3">
             {/* Pipeline Stages */}
@@ -431,7 +431,7 @@ export default function QuotingGuide() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">Email Quotes</CardTitle>
               </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">
+              <CardContent className="text-base text-muted-foreground">
                 Send professional quote emails directly to clients from the quote detail view. Includes all service details and pricing.
               </CardContent>
             </Card>
@@ -440,7 +440,7 @@ export default function QuotingGuide() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">Building Photos</CardTitle>
               </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">
+              <CardContent className="text-base text-muted-foreground">
                 Attach building photos to quotes for reference. Photos are stored securely and displayed in quote details.
               </CardContent>
             </Card>
@@ -449,7 +449,7 @@ export default function QuotingGuide() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">Pipeline Analytics</CardTitle>
               </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">
+              <CardContent className="text-base text-muted-foreground">
                 View total quote values, win rates, and stage distribution in the Analytics tab. Track conversion metrics over time.
               </CardContent>
             </Card>
@@ -458,7 +458,7 @@ export default function QuotingGuide() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">My Quotes View</CardTitle>
               </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">
+              <CardContent className="text-base text-muted-foreground">
                 Workers can access "My Quotes" tab to see quotes they created. Managers see all company quotes.
               </CardContent>
             </Card>
@@ -473,7 +473,7 @@ export default function QuotingGuide() {
             <Lock className="w-5 h-5 text-red-600 dark:text-red-400" />
             Permission Requirements
           </h2>
-          <p className="text-sm text-muted-foreground">Access to quoting features requires specific permissions:</p>
+          <p className="text-base text-muted-foreground">Access to quoting features requires specific permissions:</p>
 
           <div className="space-y-3">
             <Card>
@@ -658,7 +658,7 @@ export default function QuotingGuide() {
               <Calculator className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Automatic Cost Calculation</p>
-                <p className="text-sm text-muted-foreground">Labor costs computed from hours and rates.</p>
+                <p className="text-base text-muted-foreground">Labor costs computed from hours and rates.</p>
               </div>
             </div>
 
@@ -666,7 +666,7 @@ export default function QuotingGuide() {
               <Kanban className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Kanban Pipeline</p>
-                <p className="text-sm text-muted-foreground">Drag-and-drop stage management.</p>
+                <p className="text-base text-muted-foreground">Drag-and-drop stage management.</p>
               </div>
             </div>
 
@@ -674,7 +674,7 @@ export default function QuotingGuide() {
               <Mail className="w-5 h-5 text-action-600 dark:text-action-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Email Integration</p>
-                <p className="text-sm text-muted-foreground">Send quotes directly to clients.</p>
+                <p className="text-base text-muted-foreground">Send quotes directly to clients.</p>
               </div>
             </div>
 
@@ -682,7 +682,7 @@ export default function QuotingGuide() {
               <DollarSign className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Financial Protection</p>
-                <p className="text-sm text-muted-foreground">Pricing only visible to authorized users.</p>
+                <p className="text-base text-muted-foreground">Pricing only visible to authorized users.</p>
               </div>
             </div>
           </div>
@@ -725,7 +725,7 @@ export default function QuotingGuide() {
 
         {/* Footer */}
         <Card className="border-muted bg-muted/50">
-          <CardContent className="pt-6 text-sm text-muted-foreground">
+          <CardContent className="pt-6 text-base text-muted-foreground">
             <p><strong>Last updated:</strong> December 3, 2024 | <strong>Version:</strong> 1.0</p>
             <p className="mt-1">This document serves as the authoritative reference for the Quoting & Sales Pipeline System.</p>
           </CardContent>

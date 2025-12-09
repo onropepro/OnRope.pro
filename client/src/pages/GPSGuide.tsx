@@ -155,7 +155,7 @@ export default function GPSGuide() {
             <Layers className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             System Architecture
           </h2>
-          <p className="text-sm text-muted-foreground">The GPS system consists of these components:</p>
+          <p className="text-base text-muted-foreground">The GPS system consists of these components:</p>
 
           <div className="space-y-3">
             <Card>
@@ -165,9 +165,9 @@ export default function GPSGuide() {
                   1. Browser Geolocation API
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p>Uses the device's built-in location services via HTML5 Geolocation.</p>
-                <div className="bg-muted p-3 rounded text-xs space-y-1">
+                <div className="bg-muted p-3 rounded text-sm space-y-1">
                   <p><strong>Technical Details:</strong></p>
                   <ul className="list-disc list-inside space-y-0.5">
                     <li>High accuracy mode for precise coordinates</li>
@@ -186,9 +186,9 @@ export default function GPSGuide() {
                   2. Location Storage
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p>GPS coordinates stored with time entries in the database.</p>
-                <div className="bg-muted p-3 rounded text-xs space-y-1">
+                <div className="bg-muted p-3 rounded text-sm space-y-1">
                   <p><strong>Stored Data:</strong></p>
                   <ul className="list-disc list-inside space-y-0.5">
                     <li><code>clockInLatitude</code>, <code>clockInLongitude</code></li>
@@ -207,9 +207,9 @@ export default function GPSGuide() {
                   3. Map Visualization (Leaflet)
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p>Interactive maps display employee locations for managers.</p>
-                <div className="bg-muted p-3 rounded text-xs space-y-1">
+                <div className="bg-muted p-3 rounded text-sm space-y-1">
                   <p><strong>Features:</strong></p>
                   <ul className="list-disc list-inside space-y-0.5">
                     <li>Pin markers for each time entry</li>
@@ -230,7 +230,7 @@ export default function GPSGuide() {
             <Lock className="w-5 h-5 text-red-600 dark:text-red-400" />
             Permission Requirements
           </h2>
-          <p className="text-sm text-muted-foreground">GPS feature access is controlled at multiple levels:</p>
+          <p className="text-base text-muted-foreground">GPS feature access is controlled at multiple levels:</p>
 
           <div className="space-y-3">
             <Card>
@@ -308,28 +308,28 @@ export default function GPSGuide() {
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">1</div>
                     <div>
                       <p className="font-medium">Navigate to Clock In</p>
-                      <p className="text-sm text-muted-foreground">Access from dashboard or quick action</p>
+                      <p className="text-base text-muted-foreground">Access from dashboard or quick action</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">2</div>
                     <div>
                       <p className="font-medium">Grant location permission (first time)</p>
-                      <p className="text-sm text-muted-foreground">Browser prompts for location access</p>
+                      <p className="text-base text-muted-foreground">Browser prompts for location access</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">3</div>
                     <div>
                       <p className="font-medium">Select project and confirm</p>
-                      <p className="text-sm text-muted-foreground">GPS coordinates captured automatically</p>
+                      <p className="text-base text-muted-foreground">GPS coordinates captured automatically</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">4</div>
                     <div>
                       <p className="font-medium">Location stored with time entry</p>
-                      <p className="text-sm text-muted-foreground">Viewable on time entry details and reports</p>
+                      <p className="text-base text-muted-foreground">Viewable on time entry details and reports</p>
                     </div>
                   </div>
                 </div>
@@ -349,21 +349,21 @@ export default function GPSGuide() {
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">1</div>
                     <div>
                       <p className="font-medium">Navigate to Time Entries</p>
-                      <p className="text-sm text-muted-foreground">Access via Dashboard or Time Tracking section</p>
+                      <p className="text-base text-muted-foreground">Access via Dashboard or Time Tracking section</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">2</div>
                     <div>
                       <p className="font-medium">Select time entry with GPS data</p>
-                      <p className="text-sm text-muted-foreground">Entries with location show map icon</p>
+                      <p className="text-base text-muted-foreground">Entries with location show map icon</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">3</div>
                     <div>
                       <p className="font-medium">View location on map</p>
-                      <p className="text-sm text-muted-foreground">Interactive map shows exact clock-in/out positions</p>
+                      <p className="text-base text-muted-foreground">Interactive map shows exact clock-in/out positions</p>
                     </div>
                   </div>
                 </div>
@@ -486,7 +486,7 @@ export default function GPSGuide() {
               <Target className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">High Accuracy</p>
-                <p className="text-sm text-muted-foreground">Precise GPS coordinates captured.</p>
+                <p className="text-base text-muted-foreground">Precise GPS coordinates captured.</p>
               </div>
             </div>
 
@@ -494,7 +494,7 @@ export default function GPSGuide() {
               <Shield className="w-5 h-5 text-action-600 dark:text-action-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Privacy Focused</p>
-                <p className="text-sm text-muted-foreground">Only captured at clock events.</p>
+                <p className="text-base text-muted-foreground">Only captured at clock events.</p>
               </div>
             </div>
 
@@ -502,7 +502,7 @@ export default function GPSGuide() {
               <Map className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Interactive Maps</p>
-                <p className="text-sm text-muted-foreground">Visual location verification.</p>
+                <p className="text-base text-muted-foreground">Visual location verification.</p>
               </div>
             </div>
 
@@ -510,7 +510,7 @@ export default function GPSGuide() {
               <Lock className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Immutable Records</p>
-                <p className="text-sm text-muted-foreground">Location data cannot be edited.</p>
+                <p className="text-base text-muted-foreground">Location data cannot be edited.</p>
               </div>
             </div>
           </div>
@@ -551,7 +551,7 @@ export default function GPSGuide() {
         </section>
 
         <Card className="border-muted bg-muted/50">
-          <CardContent className="pt-6 text-sm text-muted-foreground">
+          <CardContent className="pt-6 text-base text-muted-foreground">
             <p><strong>Last updated:</strong> December 3, 2024 | <strong>Version:</strong> 1.0</p>
             <p className="mt-1">This document serves as the authoritative reference for GPS & Location Services.</p>
           </CardContent>

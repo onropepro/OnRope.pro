@@ -67,7 +67,7 @@ export default function ProjectsGuide() {
             <BackButton to="/changelog" />
             <div>
               <h1 className="text-2xl md:text-3xl font-bold">Project Management Guide</h1>
-              <p className="text-sm text-muted-foreground">Version 2.0 - Updated December 5, 2025</p>
+              <p className="text-base text-muted-foreground">Version 2.0 - Updated December 5, 2025</p>
             </div>
           </div>
           <MainMenuButton />
@@ -460,7 +460,7 @@ export default function ProjectsGuide() {
                   <CardTitle className="text-base">Elevation Tracking Jobs</CardTitle>
                 </div>
               </CardHeader>
-              <CardContent className="text-sm space-y-3">
+              <CardContent className="text-base space-y-3">
                 <p className="text-muted-foreground">Progress is tracked by counting "drops" (vertical passes down the building) for each compass direction.</p>
                 
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -523,7 +523,7 @@ export default function ProjectsGuide() {
                   <CardTitle className="text-base">Time Tracking Jobs</CardTitle>
                 </div>
               </CardHeader>
-              <CardContent className="text-sm space-y-3">
+              <CardContent className="text-base space-y-3">
                 <p className="text-muted-foreground">Progress is tracked by hours worked plus a manual completion percentage entered at the end of each session.</p>
                 
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -564,7 +564,7 @@ export default function ProjectsGuide() {
                   <CardTitle className="text-base">Unit/Stall Tracking Jobs</CardTitle>
                 </div>
               </CardHeader>
-              <CardContent className="text-sm space-y-3">
+              <CardContent className="text-base space-y-3">
                 <p className="text-muted-foreground">Progress is tracked by counting individual units (suites) or stalls completed each day.</p>
                 
                 <div className="grid grid-cols-2 gap-3">
@@ -598,7 +598,7 @@ export default function ProjectsGuide() {
                   <CardTitle className="text-base">Custom Job Types</CardTitle>
                 </div>
               </CardHeader>
-              <CardContent className="text-sm space-y-3">
+              <CardContent className="text-base space-y-3">
                 <p className="text-muted-foreground">Create company-specific job types for specialized work. Custom types are saved and reusable.</p>
                 
                 <div className="flex items-center gap-2 p-2 bg-muted rounded">
@@ -628,7 +628,7 @@ export default function ProjectsGuide() {
                 <Badge variant="outline">Requires: Company or Ops Manager</Badge>
               </div>
             </CardHeader>
-            <CardContent className="text-sm space-y-4">
+            <CardContent className="text-base space-y-4">
               <ol className="list-decimal list-inside space-y-3">
                 <li>
                   <strong>Navigate to Dashboard</strong>
@@ -687,7 +687,7 @@ export default function ProjectsGuide() {
                   Drop-Based Progress
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-3">
+              <CardContent className="text-base space-y-3">
                 <div className="bg-blue-50 dark:bg-blue-950 p-3 rounded space-y-2">
                   <p className="font-semibold text-xs">Example Calculation:</p>
                   <div className="text-xs space-y-1">
@@ -711,7 +711,7 @@ export default function ProjectsGuide() {
                   Hours-Based Progress
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-3">
+              <CardContent className="text-base space-y-3">
                 <div className="bg-green-50 dark:bg-green-950 p-3 rounded space-y-2">
                   <p className="font-semibold text-xs">End-of-Session Entry:</p>
                   <div className="text-xs space-y-1">
@@ -733,7 +733,7 @@ export default function ProjectsGuide() {
                   Unit-Based Progress
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-3">
+              <CardContent className="text-base space-y-3">
                 <div className="bg-amber-50 dark:bg-amber-950 p-3 rounded space-y-2">
                   <p className="font-semibold text-xs">Example: Dryer Vent Cleaning</p>
                   <div className="text-xs space-y-1">
@@ -756,7 +756,7 @@ export default function ProjectsGuide() {
                   Target Achievement
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-3">
+              <CardContent className="text-base space-y-3">
                 <div className="bg-violet-50 dark:bg-violet-950 p-3 rounded space-y-2">
                   <p className="font-semibold text-xs">Performance Tracking:</p>
                   <div className="text-xs space-y-1">
@@ -790,14 +790,14 @@ export default function ProjectsGuide() {
                     <CalendarCheck className="w-4 h-4 text-action-600" />
                     Automatic Scheduling
                   </h4>
-                  <p className="text-sm text-muted-foreground">When you create a project with start/end dates, it automatically appears on the company calendar as a colored bar spanning those days.</p>
+                  <p className="text-base text-muted-foreground">When you create a project with start/end dates, it automatically appears on the company calendar as a colored bar spanning those days.</p>
                 </div>
                 <div className="space-y-2">
                   <h4 className="font-semibold flex items-center gap-2">
                     <Users className="w-4 h-4 text-action-600" />
                     Crew Visibility
                   </h4>
-                  <p className="text-sm text-muted-foreground">Assigned employees see their scheduled projects on their personal calendar view. No more texting to ask "Where am I working tomorrow?"</p>
+                  <p className="text-base text-muted-foreground">Assigned employees see their scheduled projects on their personal calendar view. No more texting to ask "Where am I working tomorrow?"</p>
                 </div>
               </div>
 
@@ -839,7 +839,7 @@ export default function ProjectsGuide() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">Safety Documents</CardTitle>
               </CardHeader>
-              <CardContent className="text-sm text-muted-foreground space-y-2">
+              <CardContent className="text-base text-muted-foreground space-y-2">
                 <p>Each project can have linked safety documentation:</p>
                 <ul className="list-disc list-inside space-y-1">
                   <li>Rope Access Plans (RAP)</li>
@@ -854,7 +854,7 @@ export default function ProjectsGuide() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">Work Session Logs</CardTitle>
               </CardHeader>
-              <CardContent className="text-sm text-muted-foreground space-y-2">
+              <CardContent className="text-base text-muted-foreground space-y-2">
                 <p>Complete history of work performed:</p>
                 <ul className="list-disc list-inside space-y-1">
                   <li>Date, time, duration of each session</li>
@@ -880,7 +880,7 @@ export default function ProjectsGuide() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">Status Transitions</CardTitle>
               </CardHeader>
-              <CardContent className="text-sm">
+              <CardContent className="text-base">
                 <div className="flex flex-wrap items-center gap-2">
                   <Badge variant="outline">Draft</Badge>
                   <ArrowRight className="w-4 h-4" />
@@ -900,7 +900,7 @@ export default function ProjectsGuide() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">Editing Projects</CardTitle>
               </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">
+              <CardContent className="text-base text-muted-foreground">
                 <p>After creation, you can modify:</p>
                 <ul className="list-disc list-inside space-y-1 mt-2">
                   <li>Schedule dates (affects calendar)</li>
@@ -919,7 +919,7 @@ export default function ProjectsGuide() {
                   Soft Delete
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">
+              <CardContent className="text-base text-muted-foreground">
                 <p>Deleted projects are soft-deleted (marked as inactive) rather than permanently removed. This preserves historical data for reporting and payroll. Admins can restore accidentally deleted projects.</p>
               </CardContent>
             </Card>
@@ -988,21 +988,21 @@ export default function ProjectsGuide() {
                 <div className="text-center p-4 bg-muted rounded-lg">
                   <TrendingUp className="w-8 h-8 mx-auto mb-2 text-action-600" />
                   <p className="font-semibold">Live Progress</p>
-                  <p className="text-sm text-muted-foreground">4-direction completion visualization</p>
+                  <p className="text-base text-muted-foreground">4-direction completion visualization</p>
                 </div>
                 <div className="text-center p-4 bg-muted rounded-lg">
                   <Calendar className="w-8 h-8 mx-auto mb-2 text-action-600" />
                   <p className="font-semibold">Schedule View</p>
-                  <p className="text-sm text-muted-foreground">Upcoming work dates</p>
+                  <p className="text-base text-muted-foreground">Upcoming work dates</p>
                 </div>
                 <div className="text-center p-4 bg-muted rounded-lg">
                   <MessageSquare className="w-8 h-8 mx-auto mb-2 text-action-600" />
                   <p className="font-semibold">Feedback</p>
-                  <p className="text-sm text-muted-foreground">Submit comments directly</p>
+                  <p className="text-base text-muted-foreground">Submit comments directly</p>
                 </div>
               </div>
 
-              <p className="text-sm text-muted-foreground">This transparency reduces status calls by 80% and improves client satisfaction scores significantly.</p>
+              <p className="text-base text-muted-foreground">This transparency reduces status calls by 80% and improves client satisfaction scores significantly.</p>
             </CardContent>
           </Card>
         </section>

@@ -157,7 +157,7 @@ export default function SchedulingGuide() {
                 </CardTitle>
                 <CardDescription>View assignments by project</CardDescription>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   <span>See all projects on timeline</span>
@@ -185,7 +185,7 @@ export default function SchedulingGuide() {
                 </CardTitle>
                 <CardDescription>View assignments by employee</CardDescription>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   <span>Each row = one employee</span>
@@ -281,7 +281,7 @@ export default function SchedulingGuide() {
                     <p className="text-xs text-muted-foreground">Planned time off</p>
                   </div>
                 </div>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-base text-muted-foreground">
                   Pre-planned vacation days. Requires advance notice and manager approval.
                 </p>
               </CardContent>
@@ -298,7 +298,7 @@ export default function SchedulingGuide() {
                     <p className="text-xs text-muted-foreground">Illness or injury</p>
                   </div>
                 </div>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-base text-muted-foreground">
                   Unplanned absence due to illness. Can be submitted same-day.
                 </p>
               </CardContent>
@@ -315,7 +315,7 @@ export default function SchedulingGuide() {
                     <p className="text-xs text-muted-foreground">Personal matters</p>
                   </div>
                 </div>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-base text-muted-foreground">
                   Personal appointments or obligations requiring time away.
                 </p>
               </CardContent>
@@ -332,7 +332,7 @@ export default function SchedulingGuide() {
                     <p className="text-xs text-muted-foreground">Loss of family member</p>
                   </div>
                 </div>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-base text-muted-foreground">
                   Time off following the death of a family member or close friend.
                 </p>
               </CardContent>
@@ -349,7 +349,7 @@ export default function SchedulingGuide() {
                     <p className="text-xs text-muted-foreground">Medical appointments</p>
                   </div>
                 </div>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-base text-muted-foreground">
                   Scheduled medical appointments, procedures, or treatments.
                 </p>
               </CardContent>

@@ -172,7 +172,7 @@ export default function InventoryGuide() {
             <Layers className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             System Architecture: Three Tables
           </h2>
-          <p className="text-sm text-muted-foreground">The inventory system uses three interconnected database tables:</p>
+          <p className="text-base text-muted-foreground">The inventory system uses three interconnected database tables:</p>
 
           <div className="space-y-3">
             <Card>
@@ -182,9 +182,9 @@ export default function InventoryGuide() {
                   1. Gear Items (Inventory Catalog)
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p>The master list of equipment your company owns.</p>
-                <div className="bg-muted p-3 rounded text-xs space-y-1">
+                <div className="bg-muted p-3 rounded text-sm space-y-1">
                   <p><strong>Key Fields:</strong></p>
                   <ul className="list-disc list-inside space-y-0.5">
                     <li><code>quantity</code> - Total count of this item type (the "slots")</li>
@@ -204,9 +204,9 @@ export default function InventoryGuide() {
                   2. Gear Assignments (Who Has What)
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p>Records of which employees have which equipment. Each assignment "consumes" slots from the gear item's quantity.</p>
-                <div className="bg-muted p-3 rounded text-xs space-y-1">
+                <div className="bg-muted p-3 rounded text-sm space-y-1">
                   <p><strong>Key Fields:</strong></p>
                   <ul className="list-disc list-inside space-y-0.5">
                     <li><code>employeeId</code> - Who has the gear</li>
@@ -225,9 +225,9 @@ export default function InventoryGuide() {
                   3. Gear Serial Numbers (Optional Registry)
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p>A registry of individual serial numbers for high-value or regulated equipment. <strong>Completely optional</strong> - the system works without any serial numbers.</p>
-                <div className="bg-muted p-3 rounded text-xs space-y-1">
+                <div className="bg-muted p-3 rounded text-sm space-y-1">
                   <p><strong>Key Fields:</strong></p>
                   <ul className="list-disc list-inside space-y-0.5">
                     <li><code>serialNumber</code> - Unique identifier for the unit</li>
@@ -248,7 +248,7 @@ export default function InventoryGuide() {
             <Lock className="w-5 h-5 text-red-600 dark:text-red-400" />
             Permission Hierarchy (Four Levels)
           </h2>
-          <p className="text-sm text-muted-foreground">Access to inventory features is controlled by four distinct permissions:</p>
+          <p className="text-base text-muted-foreground">Access to inventory features is controlled by four distinct permissions:</p>
 
           <div className="space-y-3">
             {/* Level 1 */}
@@ -356,7 +356,7 @@ export default function InventoryGuide() {
             <Hash className="w-5 h-5 text-violet-600 dark:text-violet-400" />
             Dual-Path Serial Assignment
           </h2>
-          <p className="text-sm text-muted-foreground">When assigning gear with a serial number, users have two options:</p>
+          <p className="text-base text-muted-foreground">When assigning gear with a serial number, users have two options:</p>
 
           <div className="grid md:grid-cols-2 gap-4">
             {/* Path A: Pick Existing */}
@@ -367,12 +367,12 @@ export default function InventoryGuide() {
                   Pick Existing Serial
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-3">
+              <CardContent className="text-base space-y-3">
                 <p>Select from a dropdown of <strong>already-registered</strong> serial numbers that aren't currently assigned to anyone.</p>
                 
                 <div className="bg-violet-50 dark:bg-violet-950 p-3 rounded space-y-2">
                   <p className="font-semibold text-xs">How it works:</p>
-                  <ol className="list-decimal list-inside space-y-1 text-xs">
+                  <ol className="list-decimal list-inside space-y-1 text-base">
                     <li>System shows dropdown of unassigned serials</li>
                     <li>User picks one from the list</li>
                     <li>Assignment is created with that serial</li>
@@ -391,12 +391,12 @@ export default function InventoryGuide() {
                   Enter New Serial
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-3">
+              <CardContent className="text-base space-y-3">
                 <p>Type in a <strong>new serial number</strong> that isn't in the system yet. The system will automatically register it.</p>
                 
                 <div className="bg-emerald-50 dark:bg-emerald-950 p-3 rounded space-y-2">
                   <p className="font-semibold text-xs">How it works (Atomic Registration):</p>
-                  <ol className="list-decimal list-inside space-y-1 text-xs">
+                  <ol className="list-decimal list-inside space-y-1 text-base">
                     <li>User types new serial number</li>
                     <li>System checks it doesn't already exist</li>
                     <li>System <strong>automatically registers</strong> the serial</li>
@@ -410,7 +410,7 @@ export default function InventoryGuide() {
           </div>
 
           <Card className="border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950">
-            <CardContent className="pt-4 text-sm text-blue-900 dark:text-blue-100">
+            <CardContent className="pt-4 text-base text-blue-900 dark:text-blue-100">
               <p className="flex items-center gap-2 font-semibold">
                 <Info className="w-4 h-4" />
                 Why This Matters
@@ -420,7 +420,7 @@ export default function InventoryGuide() {
           </Card>
 
           <Card className="border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950">
-            <CardContent className="pt-4 text-sm text-amber-900 dark:text-amber-100">
+            <CardContent className="pt-4 text-base text-amber-900 dark:text-amber-100">
               <p className="flex items-center gap-2 font-semibold">
                 <AlertTriangle className="w-4 h-4" />
                 Serial Normalization
@@ -450,7 +450,7 @@ export default function InventoryGuide() {
                   Requires: canAssignGear permission
                 </CardDescription>
               </CardHeader>
-              <CardContent className="text-sm text-green-900 dark:text-green-100 space-y-3">
+              <CardContent className="text-base text-green-900 dark:text-green-100 space-y-3">
                 <p><strong>Where:</strong> Inventory page, click gear item, "Assign to Employee" button</p>
                 <ul className="list-disc list-inside space-y-1">
                   <li>Select target employee from dropdown</li>
@@ -474,7 +474,7 @@ export default function InventoryGuide() {
                   Available to: All employees (no permission needed)
                 </CardDescription>
               </CardHeader>
-              <CardContent className="text-sm text-blue-900 dark:text-blue-100 space-y-3">
+              <CardContent className="text-base text-blue-900 dark:text-blue-100 space-y-3">
                 <p><strong>Where:</strong> My Gear page, "Add Gear from Inventory" button</p>
                 <ul className="list-disc list-inside space-y-1">
                   <li>Browse available gear items</li>
@@ -511,7 +511,7 @@ export default function InventoryGuide() {
                   <Badge variant="outline">Requires: canManageInventory</Badge>
                 </div>
               </CardHeader>
-              <CardContent className="text-sm space-y-3">
+              <CardContent className="text-base space-y-3">
                 <ol className="list-decimal list-inside space-y-2">
                   <li>Navigate to <strong>Inventory</strong> page</li>
                   <li>Click <strong>"Add Item"</strong> button</li>
@@ -526,7 +526,7 @@ export default function InventoryGuide() {
                   <li>(Optional) Add serial numbers with their manufacture/service dates</li>
                   <li>Click <strong>Save</strong></li>
                 </ol>
-                <div className="bg-muted p-3 rounded text-xs">
+                <div className="bg-muted p-3 rounded text-sm">
                   <strong>Result:</strong> Item appears in inventory with [Quantity] available slots for assignment.
                 </div>
               </CardContent>
@@ -543,7 +543,7 @@ export default function InventoryGuide() {
                   <Badge variant="outline">Requires: canAssignGear</Badge>
                 </div>
               </CardHeader>
-              <CardContent className="text-sm space-y-3">
+              <CardContent className="text-base space-y-3">
                 <ol className="list-decimal list-inside space-y-2">
                   <li>Navigate to <strong>Inventory</strong> page</li>
                   <li>Find the gear item (shows "X of Y available")</li>
@@ -554,7 +554,7 @@ export default function InventoryGuide() {
                   <li>(Optional) Select existing serial or enter new one</li>
                   <li>Click <strong>Assign</strong></li>
                 </ol>
-                <div className="bg-muted p-3 rounded text-xs">
+                <div className="bg-muted p-3 rounded text-sm">
                   <strong>Result:</strong> Assignment created. Available slots decrease. Employee sees gear in their "My Gear" view.
                 </div>
               </CardContent>
@@ -571,7 +571,7 @@ export default function InventoryGuide() {
                   <Badge variant="outline">Any Employee</Badge>
                 </div>
               </CardHeader>
-              <CardContent className="text-sm space-y-3">
+              <CardContent className="text-base space-y-3">
                 <ol className="list-decimal list-inside space-y-2">
                   <li>Navigate to <strong>My Gear</strong> page (or Inventory)</li>
                   <li>Click <strong>"Add Gear from Inventory"</strong></li>
@@ -579,7 +579,7 @@ export default function InventoryGuide() {
                   <li>Select item, quantity, and optional serial</li>
                   <li>Click <strong>Add to My Kit</strong></li>
                 </ol>
-                <div className="bg-muted p-3 rounded text-xs">
+                <div className="bg-muted p-3 rounded text-sm">
                   <strong>Result:</strong> Gear assigned to yourself. Appears in "My Gear" immediately.
                 </div>
               </CardContent>
@@ -596,7 +596,7 @@ export default function InventoryGuide() {
                   <Badge variant="outline">Owner or canAssignGear</Badge>
                 </div>
               </CardHeader>
-              <CardContent className="text-sm space-y-3">
+              <CardContent className="text-base space-y-3">
                 <div className="space-y-2">
                   <p><strong>For your own gear:</strong></p>
                   <ol className="list-decimal list-inside space-y-1 ml-2">
@@ -614,7 +614,7 @@ export default function InventoryGuide() {
                     <li>Click <strong>Remove Assignment</strong></li>
                   </ol>
                 </div>
-                <div className="bg-muted p-3 rounded text-xs">
+                <div className="bg-muted p-3 rounded text-sm">
                   <strong>Result:</strong> Assignment deleted. Slot becomes available again for new assignments.
                 </div>
               </CardContent>
@@ -794,7 +794,7 @@ export default function InventoryGuide() {
               <Calculator className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Slot-Based Availability</p>
-                <p className="text-sm text-muted-foreground">Available = Quantity - Assigned. Independent of serial registration.</p>
+                <p className="text-base text-muted-foreground">Available = Quantity - Assigned. Independent of serial registration.</p>
               </div>
             </div>
 
@@ -802,7 +802,7 @@ export default function InventoryGuide() {
               <Barcode className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Optional Serial Tracking</p>
-                <p className="text-sm text-muted-foreground">Track individual units when needed; works without serials too.</p>
+                <p className="text-base text-muted-foreground">Track individual units when needed; works without serials too.</p>
               </div>
             </div>
 
@@ -810,7 +810,7 @@ export default function InventoryGuide() {
               <Zap className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Atomic Serial Registration</p>
-                <p className="text-sm text-muted-foreground">Enter new serials during assignment; auto-registered instantly.</p>
+                <p className="text-base text-muted-foreground">Enter new serials during assignment; auto-registered instantly.</p>
               </div>
             </div>
 
@@ -818,7 +818,7 @@ export default function InventoryGuide() {
               <Users className="w-5 h-5 text-cyan-600 dark:text-cyan-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Flexible Assignment</p>
-                <p className="text-sm text-muted-foreground">Manager-driven or employee self-service based on permissions.</p>
+                <p className="text-base text-muted-foreground">Manager-driven or employee self-service based on permissions.</p>
               </div>
             </div>
 
@@ -826,7 +826,7 @@ export default function InventoryGuide() {
               <Clock className="w-5 h-5 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Date Tracking</p>
-                <p className="text-sm text-muted-foreground">Date of manufacture and in-service dates per assignment.</p>
+                <p className="text-base text-muted-foreground">Date of manufacture and in-service dates per assignment.</p>
               </div>
             </div>
 
@@ -834,7 +834,7 @@ export default function InventoryGuide() {
               <Shield className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Financial Protection</p>
-                <p className="text-sm text-muted-foreground">Item prices only visible to users with financial permissions.</p>
+                <p className="text-base text-muted-foreground">Item prices only visible to users with financial permissions.</p>
               </div>
             </div>
 
@@ -842,7 +842,7 @@ export default function InventoryGuide() {
               <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Out of Service</p>
-                <p className="text-sm text-muted-foreground">Mark items as out of service to prevent new assignments.</p>
+                <p className="text-base text-muted-foreground">Mark items as out of service to prevent new assignments.</p>
               </div>
             </div>
 
@@ -850,7 +850,7 @@ export default function InventoryGuide() {
               <Lock className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Four Permission Levels</p>
-                <p className="text-sm text-muted-foreground">Granular control: view, manage, assign, view team gear.</p>
+                <p className="text-base text-muted-foreground">Granular control: view, manage, assign, view team gear.</p>
               </div>
             </div>
           </div>
@@ -867,35 +867,35 @@ export default function InventoryGuide() {
 
           <div className="space-y-3">
             <Card className="border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950">
-              <CardContent className="pt-4 text-sm text-amber-900 dark:text-amber-100 space-y-2">
+              <CardContent className="pt-4 text-base text-amber-900 dark:text-amber-100 space-y-2">
                 <p className="font-semibold">Serial Independence from Availability</p>
                 <p>You can have 10 items, 0 registered serials, and still have 10 available slots. Serial numbers are metadata, not gatekeepers.</p>
               </CardContent>
             </Card>
 
             <Card className="border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950">
-              <CardContent className="pt-4 text-sm text-blue-900 dark:text-blue-100 space-y-2">
+              <CardContent className="pt-4 text-base text-blue-900 dark:text-blue-100 space-y-2">
                 <p className="font-semibold">Unique Serials Per Item</p>
                 <p>Each serial number must be unique within its gear item. The same serial can exist on different item types (e.g., harness HR-001 and rope HR-001 are allowed).</p>
               </CardContent>
             </Card>
 
             <Card className="border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-950">
-              <CardContent className="pt-4 text-sm text-green-900 dark:text-green-100 space-y-2">
+              <CardContent className="pt-4 text-base text-green-900 dark:text-green-100 space-y-2">
                 <p className="font-semibold">Multiple Assignments per Employee</p>
                 <p>An employee can have multiple assignments for the same gear item type (e.g., two separate harness assignments with different serials).</p>
               </CardContent>
             </Card>
 
             <Card className="border-purple-200 dark:border-purple-900 bg-purple-50 dark:bg-purple-950">
-              <CardContent className="pt-4 text-sm text-purple-900 dark:text-purple-100 space-y-2">
+              <CardContent className="pt-4 text-base text-purple-900 dark:text-purple-100 space-y-2">
                 <p className="font-semibold">Cannot Delete Assigned Serials</p>
                 <p>When editing a gear item, you cannot remove a serial number that is currently assigned to someone. Return the gear first.</p>
               </CardContent>
             </Card>
 
             <Card className="border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950">
-              <CardContent className="pt-4 text-sm text-red-900 dark:text-red-100 space-y-2">
+              <CardContent className="pt-4 text-base text-red-900 dark:text-red-100 space-y-2">
                 <p className="font-semibold">Quantity Cannot Go Below Assigned</p>
                 <p>If 5 items are assigned, you cannot reduce the item quantity to less than 5. Return assignments first.</p>
               </CardContent>
@@ -940,7 +940,7 @@ export default function InventoryGuide() {
 
         {/* Footer */}
         <Card className="border-muted bg-muted/50">
-          <CardContent className="pt-6 text-sm text-muted-foreground">
+          <CardContent className="pt-6 text-base text-muted-foreground">
             <p><strong>Last updated:</strong> December 2, 2024 | <strong>Version:</strong> 3.0</p>
             <p className="mt-1">This document serves as the authoritative reference for the Inventory System. For technical implementation details, see <code>gear-inventory-instructions-v1.0.md</code> in the instructions folder.</p>
           </CardContent>

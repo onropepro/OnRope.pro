@@ -165,7 +165,7 @@ export default function CRMGuide() {
             <Layers className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             Client Data Structure
           </h2>
-          <p className="text-sm text-muted-foreground">Each client record contains contact information and building portfolio:</p>
+          <p className="text-base text-muted-foreground">Each client record contains contact information and building portfolio:</p>
 
           <div className="space-y-3">
             <Card>
@@ -175,9 +175,9 @@ export default function CRMGuide() {
                   Contact Information
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p>Primary contact details for the client relationship.</p>
-                <div className="bg-muted p-3 rounded text-xs space-y-1">
+                <div className="bg-muted p-3 rounded text-sm space-y-1">
                   <p><strong>Fields:</strong></p>
                   <div className="grid md:grid-cols-2 gap-2">
                     <div className="flex items-center gap-2">
@@ -208,9 +208,9 @@ export default function CRMGuide() {
                   LMS Numbers (Building Portfolio)
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p>Each LMS number represents a building the client manages. Store detailed building specs for autofill.</p>
-                <div className="bg-muted p-3 rounded text-xs space-y-1">
+                <div className="bg-muted p-3 rounded text-sm space-y-1">
                   <p><strong>Per-Building Fields:</strong></p>
                   <ul className="list-disc list-inside space-y-0.5">
                     <li><code>number</code> - Strata plan / LMS number</li>
@@ -322,7 +322,7 @@ export default function CRMGuide() {
             <Zap className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
             Autofill Intelligence
           </h2>
-          <p className="text-sm text-muted-foreground">Streamline project creation with automatic field population:</p>
+          <p className="text-base text-muted-foreground">Streamline project creation with automatic field population:</p>
 
           <Card className="bg-yellow-50 dark:bg-yellow-950 border-yellow-200 dark:border-yellow-800">
             <CardContent className="pt-6">
@@ -396,7 +396,7 @@ export default function CRMGuide() {
             <Lock className="w-5 h-5 text-red-600 dark:text-red-400" />
             Permission Requirements
           </h2>
-          <p className="text-sm text-muted-foreground">Access to CRM features requires specific permissions:</p>
+          <p className="text-base text-muted-foreground">Access to CRM features requires specific permissions:</p>
 
           <div className="space-y-3">
             <Card>
@@ -564,7 +564,7 @@ export default function CRMGuide() {
               <Building2 className="w-5 h-5 text-action-600 dark:text-action-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Multi-Building Support</p>
-                <p className="text-sm text-muted-foreground">One client can manage unlimited buildings.</p>
+                <p className="text-base text-muted-foreground">One client can manage unlimited buildings.</p>
               </div>
             </div>
 
@@ -572,7 +572,7 @@ export default function CRMGuide() {
               <Zap className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Autofill Intelligence</p>
-                <p className="text-sm text-muted-foreground">Auto-populate project details from client.</p>
+                <p className="text-base text-muted-foreground">Auto-populate project details from client.</p>
               </div>
             </div>
 
@@ -580,7 +580,7 @@ export default function CRMGuide() {
               <Hash className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">LMS Tracking</p>
-                <p className="text-sm text-muted-foreground">Strata plan numbers linked to buildings.</p>
+                <p className="text-base text-muted-foreground">Strata plan numbers linked to buildings.</p>
               </div>
             </div>
 
@@ -588,7 +588,7 @@ export default function CRMGuide() {
               <Layers className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Building Specifications</p>
-                <p className="text-sm text-muted-foreground">Store floors, units, parking stalls.</p>
+                <p className="text-base text-muted-foreground">Store floors, units, parking stalls.</p>
               </div>
             </div>
           </div>
@@ -631,7 +631,7 @@ export default function CRMGuide() {
 
         {/* Footer */}
         <Card className="border-muted bg-muted/50">
-          <CardContent className="pt-6 text-sm text-muted-foreground">
+          <CardContent className="pt-6 text-base text-muted-foreground">
             <p><strong>Last updated:</strong> December 3, 2024 | <strong>Version:</strong> 1.0</p>
             <p className="mt-1">This document serves as the authoritative reference for the Client Relationship Management System.</p>
           </CardContent>

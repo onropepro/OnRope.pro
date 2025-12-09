@@ -153,7 +153,7 @@ export default function LanguageGuide() {
             <Layers className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             System Architecture
           </h2>
-          <p className="text-sm text-muted-foreground">The internationalization system consists of these components:</p>
+          <p className="text-base text-muted-foreground">The internationalization system consists of these components:</p>
 
           <div className="space-y-3">
             <Card>
@@ -163,9 +163,9 @@ export default function LanguageGuide() {
                   1. Translation Files
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p>JSON files containing all translatable strings organized by namespace.</p>
-                <div className="bg-muted p-3 rounded text-xs space-y-1">
+                <div className="bg-muted p-3 rounded text-sm space-y-1">
                   <p><strong>File Structure:</strong></p>
                   <ul className="list-disc list-inside space-y-0.5">
                     <li><code>en.json</code> - English translations (default)</li>
@@ -183,9 +183,9 @@ export default function LanguageGuide() {
                   2. i18next Configuration
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p>React-i18next library handles translation loading and language switching.</p>
-                <div className="bg-muted p-3 rounded text-xs space-y-1">
+                <div className="bg-muted p-3 rounded text-sm space-y-1">
                   <p><strong>Features:</strong></p>
                   <ul className="list-disc list-inside space-y-0.5">
                     <li>Automatic browser language detection</li>
@@ -204,9 +204,9 @@ export default function LanguageGuide() {
                   3. User Preference Storage
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p>Language preference is stored in the user's profile for persistence across sessions.</p>
-                <div className="bg-muted p-3 rounded text-xs space-y-1">
+                <div className="bg-muted p-3 rounded text-sm space-y-1">
                   <p><strong>Storage Locations:</strong></p>
                   <ul className="list-disc list-inside space-y-0.5">
                     <li><code>preferredLanguage</code> - User profile field</li>
@@ -226,7 +226,7 @@ export default function LanguageGuide() {
             <Languages className="w-5 h-5 text-action-600 dark:text-action-400" />
             Supported Languages
           </h2>
-          <p className="text-sm text-muted-foreground">Currently available languages and their coverage:</p>
+          <p className="text-base text-muted-foreground">Currently available languages and their coverage:</p>
 
           <div className="space-y-3">
             <Card>
@@ -288,28 +288,28 @@ export default function LanguageGuide() {
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">1</div>
                     <div>
                       <p className="font-medium">Click language toggle</p>
-                      <p className="text-sm text-muted-foreground">Located in header or settings page</p>
+                      <p className="text-base text-muted-foreground">Located in header or settings page</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">2</div>
                     <div>
                       <p className="font-medium">Select desired language</p>
-                      <p className="text-sm text-muted-foreground">Choose from available options (EN, FR)</p>
+                      <p className="text-base text-muted-foreground">Choose from available options (EN, FR)</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">3</div>
                     <div>
                       <p className="font-medium">Interface updates immediately</p>
-                      <p className="text-sm text-muted-foreground">All text switches to selected language without page reload</p>
+                      <p className="text-base text-muted-foreground">All text switches to selected language without page reload</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">4</div>
                     <div>
                       <p className="font-medium">Preference saved</p>
-                      <p className="text-sm text-muted-foreground">Choice persists across sessions and devices</p>
+                      <p className="text-base text-muted-foreground">Choice persists across sessions and devices</p>
                     </div>
                   </div>
                 </div>
@@ -329,21 +329,21 @@ export default function LanguageGuide() {
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">1</div>
                     <div>
                       <p className="font-medium">Navigate to Profile Settings</p>
-                      <p className="text-sm text-muted-foreground">Access via profile menu or settings page</p>
+                      <p className="text-base text-muted-foreground">Access via profile menu or settings page</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">2</div>
                     <div>
                       <p className="font-medium">Find Language Preference</p>
-                      <p className="text-sm text-muted-foreground">Located in preferences or display settings section</p>
+                      <p className="text-base text-muted-foreground">Located in preferences or display settings section</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">3</div>
                     <div>
                       <p className="font-medium">Select and save</p>
-                      <p className="text-sm text-muted-foreground">Choose language and save profile changes</p>
+                      <p className="text-base text-muted-foreground">Choose language and save profile changes</p>
                     </div>
                   </div>
                 </div>
@@ -421,7 +421,7 @@ export default function LanguageGuide() {
               <ToggleLeft className="w-5 h-5 text-action-600 dark:text-action-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Instant Switching</p>
-                <p className="text-sm text-muted-foreground">No page reload required.</p>
+                <p className="text-base text-muted-foreground">No page reload required.</p>
               </div>
             </div>
 
@@ -429,7 +429,7 @@ export default function LanguageGuide() {
               <Calendar className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Localized Dates</p>
-                <p className="text-sm text-muted-foreground">Date/time formats match locale.</p>
+                <p className="text-base text-muted-foreground">Date/time formats match locale.</p>
               </div>
             </div>
 
@@ -437,7 +437,7 @@ export default function LanguageGuide() {
               <User className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">User Preferences</p>
-                <p className="text-sm text-muted-foreground">Choice saved to profile.</p>
+                <p className="text-base text-muted-foreground">Choice saved to profile.</p>
               </div>
             </div>
 
@@ -445,7 +445,7 @@ export default function LanguageGuide() {
               <Smartphone className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Mobile Optimized</p>
-                <p className="text-sm text-muted-foreground">Works seamlessly on all devices.</p>
+                <p className="text-base text-muted-foreground">Works seamlessly on all devices.</p>
               </div>
             </div>
           </div>
@@ -486,7 +486,7 @@ export default function LanguageGuide() {
         </section>
 
         <Card className="border-muted bg-muted/50">
-          <CardContent className="pt-6 text-sm text-muted-foreground">
+          <CardContent className="pt-6 text-base text-muted-foreground">
             <p><strong>Last updated:</strong> December 3, 2024 | <strong>Version:</strong> 1.0</p>
             <p className="mt-1">This document serves as the authoritative reference for Multi-Language Support.</p>
           </CardContent>

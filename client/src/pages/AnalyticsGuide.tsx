@@ -161,7 +161,7 @@ export default function AnalyticsGuide() {
             <Layers className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             Analytics Categories
           </h2>
-          <p className="text-sm text-muted-foreground">The platform provides analytics across these key areas:</p>
+          <p className="text-base text-muted-foreground">The platform provides analytics across these key areas:</p>
 
           <div className="space-y-3">
             <Card>
@@ -171,9 +171,9 @@ export default function AnalyticsGuide() {
                   1. Time Tracking Analytics
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p>Insights into workforce time allocation and productivity.</p>
-                <div className="bg-muted p-3 rounded text-xs space-y-1">
+                <div className="bg-muted p-3 rounded text-sm space-y-1">
                   <p><strong>Key Metrics:</strong></p>
                   <ul className="list-disc list-inside space-y-0.5">
                     <li><strong>Billable vs Non-Billable</strong>: Ratio of revenue-generating work</li>
@@ -192,9 +192,9 @@ export default function AnalyticsGuide() {
                   2. Project Analytics
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p>Performance metrics for active and completed projects.</p>
-                <div className="bg-muted p-3 rounded text-xs space-y-1">
+                <div className="bg-muted p-3 rounded text-sm space-y-1">
                   <p><strong>Key Metrics:</strong></p>
                   <ul className="list-disc list-inside space-y-0.5">
                     <li><strong>Labor Costs</strong>: Total cost per project (requires financial permission)</li>
@@ -213,9 +213,9 @@ export default function AnalyticsGuide() {
                   3. Workforce Analytics
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p>Employee performance and certification tracking.</p>
-                <div className="bg-muted p-3 rounded text-xs space-y-1">
+                <div className="bg-muted p-3 rounded text-sm space-y-1">
                   <p><strong>Key Metrics:</strong></p>
                   <ul className="list-disc list-inside space-y-0.5">
                     <li><strong>IRATA Certification Status</strong>: Expiration tracking</li>
@@ -234,9 +234,9 @@ export default function AnalyticsGuide() {
                   4. Financial Analytics
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p>Revenue and cost tracking (requires canAccessFinancials permission).</p>
-                <div className="bg-muted p-3 rounded text-xs space-y-1">
+                <div className="bg-muted p-3 rounded text-sm space-y-1">
                   <p><strong>Key Metrics:</strong></p>
                   <ul className="list-disc list-inside space-y-0.5">
                     <li><strong>Payroll Summary</strong>: Total labor costs by period</li>
@@ -257,7 +257,7 @@ export default function AnalyticsGuide() {
             <Lock className="w-5 h-5 text-red-600 dark:text-red-400" />
             Permission Requirements
           </h2>
-          <p className="text-sm text-muted-foreground">Analytics access is controlled by these permissions:</p>
+          <p className="text-base text-muted-foreground">Analytics access is controlled by these permissions:</p>
 
           <div className="space-y-3">
             <Card>
@@ -335,21 +335,21 @@ export default function AnalyticsGuide() {
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">1</div>
                     <div>
                       <p className="font-medium">Navigate to Dashboard</p>
-                      <p className="text-sm text-muted-foreground">Access main dashboard from sidebar</p>
+                      <p className="text-base text-muted-foreground">Access main dashboard from sidebar</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">2</div>
                     <div>
                       <p className="font-medium">View Active Workers widget</p>
-                      <p className="text-sm text-muted-foreground">See real-time clock-in status and billable hours</p>
+                      <p className="text-base text-muted-foreground">See real-time clock-in status and billable hours</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">3</div>
                     <div>
                       <p className="font-medium">Click for detailed reports</p>
-                      <p className="text-sm text-muted-foreground">Drill into time entries by project or employee</p>
+                      <p className="text-base text-muted-foreground">Drill into time entries by project or employee</p>
                     </div>
                   </div>
                 </div>
@@ -369,28 +369,28 @@ export default function AnalyticsGuide() {
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">1</div>
                     <div>
                       <p className="font-medium">Navigate to Financials</p>
-                      <p className="text-sm text-muted-foreground">Requires canAccessFinancials permission</p>
+                      <p className="text-base text-muted-foreground">Requires canAccessFinancials permission</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">2</div>
                     <div>
                       <p className="font-medium">Select date range</p>
-                      <p className="text-sm text-muted-foreground">Choose pay period for report</p>
+                      <p className="text-base text-muted-foreground">Choose pay period for report</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">3</div>
                     <div>
                       <p className="font-medium">View breakdown by employee</p>
-                      <p className="text-sm text-muted-foreground">Hours, rates, and total compensation</p>
+                      <p className="text-base text-muted-foreground">Hours, rates, and total compensation</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">4</div>
                     <div>
                       <p className="font-medium">Export if needed</p>
-                      <p className="text-sm text-muted-foreground">Download for accounting software</p>
+                      <p className="text-base text-muted-foreground">Download for accounting software</p>
                     </div>
                   </div>
                 </div>
@@ -468,7 +468,7 @@ export default function AnalyticsGuide() {
               <Clock className="w-5 h-5 text-action-600 dark:text-action-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Real-Time Tracking</p>
-                <p className="text-sm text-muted-foreground">Live active worker status and billable hours.</p>
+                <p className="text-base text-muted-foreground">Live active worker status and billable hours.</p>
               </div>
             </div>
 
@@ -476,7 +476,7 @@ export default function AnalyticsGuide() {
               <PieChart className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Visual Charts</p>
-                <p className="text-sm text-muted-foreground">Interactive graphs and distribution charts.</p>
+                <p className="text-base text-muted-foreground">Interactive graphs and distribution charts.</p>
               </div>
             </div>
 
@@ -484,7 +484,7 @@ export default function AnalyticsGuide() {
               <DollarSign className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Financial Insights</p>
-                <p className="text-sm text-muted-foreground">Payroll and project cost analytics.</p>
+                <p className="text-base text-muted-foreground">Payroll and project cost analytics.</p>
               </div>
             </div>
 
@@ -492,7 +492,7 @@ export default function AnalyticsGuide() {
               <Target className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Permission Filtering</p>
-                <p className="text-sm text-muted-foreground">Data shown based on user access level.</p>
+                <p className="text-base text-muted-foreground">Data shown based on user access level.</p>
               </div>
             </div>
           </div>
@@ -533,7 +533,7 @@ export default function AnalyticsGuide() {
         </section>
 
         <Card className="border-muted bg-muted/50">
-          <CardContent className="pt-6 text-sm text-muted-foreground">
+          <CardContent className="pt-6 text-base text-muted-foreground">
             <p><strong>Last updated:</strong> December 3, 2024 | <strong>Version:</strong> 1.0</p>
             <p className="mt-1">This document serves as the authoritative reference for Analytics & Reporting.</p>
           </CardContent>

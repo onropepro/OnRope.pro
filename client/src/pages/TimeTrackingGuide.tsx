@@ -160,7 +160,7 @@ export default function TimeTrackingGuide() {
           </h2>
 
           <Card>
-            <CardContent className="pt-6 text-sm space-y-4">
+            <CardContent className="pt-6 text-base space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-3">
                   <p className="font-semibold">What Happens:</p>
@@ -228,7 +228,7 @@ export default function TimeTrackingGuide() {
                   <CardTitle className="text-base">End Day Form</CardTitle>
                 </div>
               </CardHeader>
-              <CardContent className="text-sm space-y-3">
+              <CardContent className="text-base space-y-3">
                 <p className="text-muted-foreground">For window cleaning, building wash, and similar jobs:</p>
                 
                 <div className="grid grid-cols-4 gap-2 text-center">
@@ -254,7 +254,7 @@ export default function TimeTrackingGuide() {
                   </div>
                 </div>
 
-                <div className="bg-amber-50 dark:bg-amber-950 p-2 rounded text-xs">
+                <div className="bg-amber-50 dark:bg-amber-950 p-2 rounded text-sm">
                   <p className="flex items-center gap-1">
                     <AlertTriangle className="w-3 h-3" />
                     <strong>Shortfall Reason:</strong> If total drops are less than daily target, a reason is required.
@@ -270,7 +270,7 @@ export default function TimeTrackingGuide() {
                   <CardTitle className="text-base">End Day Form</CardTitle>
                 </div>
               </CardHeader>
-              <CardContent className="text-sm space-y-3">
+              <CardContent className="text-base space-y-3">
                 <p className="text-muted-foreground">For general pressure washing, ground windows, painting:</p>
                 
                 <div className="bg-muted p-4 rounded text-center">
@@ -292,7 +292,7 @@ export default function TimeTrackingGuide() {
             <CardHeader className="pb-2">
               <CardTitle className="text-base">Data Captured at Clock Out</CardTitle>
             </CardHeader>
-            <CardContent className="text-sm">
+            <CardContent className="text-base">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <div className="p-2 bg-muted rounded text-center">
                   <Clock className="w-4 h-4 mx-auto mb-1" />
@@ -330,7 +330,7 @@ export default function TimeTrackingGuide() {
                 Automatic Overtime Calculation
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-sm space-y-4">
+            <CardContent className="text-base space-y-4">
               <p className="text-muted-foreground">When a session ends, the system automatically calculates hours breakdown based on company settings:</p>
               
               <div className="grid md:grid-cols-3 gap-3">
@@ -357,7 +357,7 @@ export default function TimeTrackingGuide() {
                 <p className="text-xs">14-hour shift = 8 regular + 4 overtime + 2 double time</p>
               </div>
 
-              <div className="bg-muted p-2 rounded text-xs">
+              <div className="bg-muted p-2 rounded text-sm">
                 <strong>Note:</strong> These thresholds are configurable per company in settings.
               </div>
             </CardContent>
@@ -377,13 +377,13 @@ export default function TimeTrackingGuide() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">Hourly Employees</CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-3">
+              <CardContent className="text-base space-y-3">
                 <div className="bg-muted p-3 rounded space-y-2">
                   <p className="font-mono text-xs">
                     Pay = (Regular × Rate) + (OT × Rate × 1.5) + (DT × Rate × 2)
                   </p>
                 </div>
-                <ul className="list-disc list-inside space-y-1 text-xs">
+                <ul className="list-disc list-inside space-y-1 text-base">
                   <li>Each session's hours are summed by type</li>
                   <li>Rate pulled from employee profile</li>
                   <li>Payroll page shows detailed breakdown</li>
@@ -395,13 +395,13 @@ export default function TimeTrackingGuide() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">Peace Work Projects</CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-3">
+              <CardContent className="text-base space-y-3">
                 <div className="bg-muted p-3 rounded space-y-2">
                   <p className="font-mono text-xs">
                     Pay = Total Drops × Price Per Drop
                   </p>
                 </div>
-                <ul className="list-disc list-inside space-y-1 text-xs">
+                <ul className="list-disc list-inside space-y-1 text-base">
                   <li>Enabled per-project in settings</li>
                   <li>Hours still tracked for records</li>
                   <li>Payment based on output, not time</li>
@@ -411,7 +411,7 @@ export default function TimeTrackingGuide() {
           </div>
 
           <Card className="border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950">
-            <CardContent className="pt-4 text-sm text-amber-900 dark:text-amber-100">
+            <CardContent className="pt-4 text-base text-amber-900 dark:text-amber-100">
               <p className="flex items-center gap-2 font-semibold">
                 <Info className="w-4 h-4" />
                 Billable vs Non-Billable
@@ -430,7 +430,7 @@ export default function TimeTrackingGuide() {
           </h2>
 
           <Card>
-            <CardContent className="pt-6 text-sm space-y-4">
+            <CardContent className="pt-6 text-base space-y-4">
               <p className="text-muted-foreground">Managers can see who's currently working in real-time:</p>
               
               <div className="bg-muted p-4 rounded space-y-3">
@@ -459,7 +459,7 @@ export default function TimeTrackingGuide() {
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <p className="font-semibold text-xs">Features:</p>
-                  <ul className="list-disc list-inside space-y-1 text-xs">
+                  <ul className="list-disc list-inside space-y-1 text-base">
                     <li>Real-time status updates</li>
                     <li>Click to see GPS location</li>
                     <li>View session start time</li>
@@ -468,7 +468,7 @@ export default function TimeTrackingGuide() {
                 </div>
                 <div className="space-y-2">
                   <p className="font-semibold text-xs">Access:</p>
-                  <ul className="list-disc list-inside space-y-1 text-xs">
+                  <ul className="list-disc list-inside space-y-1 text-base">
                     <li>Company owners: All workers</li>
                     <li>Ops managers: All workers</li>
                     <li>Supervisors: Their team</li>
@@ -495,7 +495,7 @@ export default function TimeTrackingGuide() {
                 Certification Progression Tracking
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-sm space-y-4">
+            <CardContent className="text-base space-y-4">
               <p className="text-muted-foreground">After ending a work session, technicians are prompted to log their IRATA task hours for certification progression:</p>
               
               <div className="bg-teal-50 dark:bg-teal-950 p-3 rounded space-y-2">
@@ -510,7 +510,7 @@ export default function TimeTrackingGuide() {
 
               <div className="bg-muted p-3 rounded">
                 <p className="font-semibold text-xs">How It Works:</p>
-                <ol className="list-decimal list-inside space-y-1 text-xs mt-2">
+                <ol className="list-decimal list-inside space-y-1 text-base mt-2">
                   <li>End work session normally</li>
                   <li>Prompt appears: "Log your IRATA hours?"</li>
                   <li>Enter hours by task category</li>
@@ -533,13 +533,13 @@ export default function TimeTrackingGuide() {
           </h2>
 
           <Card>
-            <CardContent className="pt-6 text-sm space-y-4">
+            <CardContent className="pt-6 text-base space-y-4">
               <p className="text-muted-foreground">Users with financial permission can edit completed sessions:</p>
               
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <p className="font-semibold text-xs">Editable Fields:</p>
-                  <ul className="list-disc list-inside space-y-1 text-xs">
+                  <ul className="list-disc list-inside space-y-1 text-base">
                     <li>Start time</li>
                     <li>End time</li>
                     <li>Drops completed (per elevation)</li>
@@ -549,7 +549,7 @@ export default function TimeTrackingGuide() {
                 </div>
                 <div className="space-y-2">
                   <p className="font-semibold text-xs">Auto-Recalculated:</p>
-                  <ul className="list-disc list-inside space-y-1 text-xs">
+                  <ul className="list-disc list-inside space-y-1 text-base">
                     <li>Total hours worked</li>
                     <li>Overtime breakdown</li>
                     <li>Peace work pay (if applicable)</li>

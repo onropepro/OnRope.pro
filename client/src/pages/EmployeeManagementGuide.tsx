@@ -284,7 +284,7 @@ export default function EmployeeManagementGuide() {
                   Personal Information
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   <span>Full name</span>
@@ -307,7 +307,7 @@ export default function EmployeeManagementGuide() {
                   Certifications
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   <span>IRATA Level (1, 2, or 3)</span>
@@ -330,7 +330,7 @@ export default function EmployeeManagementGuide() {
                   Emergency Contact
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   <span>Contact name</span>
@@ -353,7 +353,7 @@ export default function EmployeeManagementGuide() {
                   Compensation
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   <span>Hourly rate</span>
@@ -434,7 +434,7 @@ export default function EmployeeManagementGuide() {
                   Password Reset
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p className="text-muted-foreground">
                   Administrators can reset employee passwords when needed. A temporary password is generated and must be changed on first login.
                 </p>
@@ -451,7 +451,7 @@ export default function EmployeeManagementGuide() {
                   Employee Termination
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p className="text-muted-foreground">
                   Terminated employees lose system access but their historical data (work sessions, safety forms) is preserved for compliance records.
                 </p>

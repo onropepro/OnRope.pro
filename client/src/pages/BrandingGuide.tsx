@@ -163,7 +163,7 @@ export default function BrandingGuide() {
             <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
             What's Included
           </h2>
-          <p className="text-sm text-muted-foreground">White-label branding customizes multiple areas of the platform:</p>
+          <p className="text-base text-muted-foreground">White-label branding customizes multiple areas of the platform:</p>
 
           <div className="grid md:grid-cols-2 gap-4">
             <Card>
@@ -173,7 +173,7 @@ export default function BrandingGuide() {
                   Custom Company Logo
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">
+              <CardContent className="text-base text-muted-foreground">
                 Upload your company logo to display in headers. Supports PNG and JPG formats. Logo appears on all authenticated pages.
               </CardContent>
             </Card>
@@ -185,7 +185,7 @@ export default function BrandingGuide() {
                   Brand Color Palette
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">
+              <CardContent className="text-base text-muted-foreground">
                 Select unlimited brand colors. Primary color applies to buttons, links, and accent elements throughout the platform.
               </CardContent>
             </Card>
@@ -197,7 +197,7 @@ export default function BrandingGuide() {
                   Global CSS Application
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">
+              <CardContent className="text-base text-muted-foreground">
                 Colors are converted to CSS variables and applied globally. Affects charts, progress bars, buttons, and interactive elements.
               </CardContent>
             </Card>
@@ -209,7 +209,7 @@ export default function BrandingGuide() {
                   PDF Document Branding
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">
+              <CardContent className="text-base text-muted-foreground">
                 Your company name appears on exported safety documents including harness inspections, toolbox meetings, and incident reports.
               </CardContent>
             </Card>
@@ -424,7 +424,7 @@ export default function BrandingGuide() {
             <Lock className="w-5 h-5 text-red-600 dark:text-red-400" />
             Subscription Requirements
           </h2>
-          <p className="text-sm text-muted-foreground">White-label branding requires an active subscription add-on:</p>
+          <p className="text-base text-muted-foreground">White-label branding requires an active subscription add-on:</p>
 
           <div className="space-y-3">
             <Card>
@@ -587,7 +587,7 @@ export default function BrandingGuide() {
               <Image className="w-5 h-5 text-action-600 dark:text-action-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Custom Logo</p>
-                <p className="text-sm text-muted-foreground">Upload and display your company logo.</p>
+                <p className="text-base text-muted-foreground">Upload and display your company logo.</p>
               </div>
             </div>
 
@@ -595,7 +595,7 @@ export default function BrandingGuide() {
               <Paintbrush className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Unlimited Colors</p>
-                <p className="text-sm text-muted-foreground">Select unlimited brand colors.</p>
+                <p className="text-base text-muted-foreground">Select unlimited brand colors.</p>
               </div>
             </div>
 
@@ -603,7 +603,7 @@ export default function BrandingGuide() {
               <Monitor className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Global Application</p>
-                <p className="text-sm text-muted-foreground">CSS variables apply platform-wide.</p>
+                <p className="text-base text-muted-foreground">CSS variables apply platform-wide.</p>
               </div>
             </div>
 
@@ -611,7 +611,7 @@ export default function BrandingGuide() {
               <FileText className="w-5 h-5 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">PDF Branding</p>
-                <p className="text-sm text-muted-foreground">Company name on safety documents.</p>
+                <p className="text-base text-muted-foreground">Company name on safety documents.</p>
               </div>
             </div>
           </div>
@@ -654,7 +654,7 @@ export default function BrandingGuide() {
 
         {/* Footer */}
         <Card className="border-muted bg-muted/50">
-          <CardContent className="pt-6 text-sm text-muted-foreground">
+          <CardContent className="pt-6 text-base text-muted-foreground">
             <p><strong>Last updated:</strong> December 3, 2024 | <strong>Version:</strong> 1.0</p>
             <p className="mt-1">This document serves as the authoritative reference for the White-Label Branding System.</p>
           </CardContent>

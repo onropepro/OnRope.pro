@@ -160,7 +160,7 @@ export default function PropertyManagerGuide() {
             <Layers className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             System Architecture
           </h2>
-          <p className="text-sm text-muted-foreground">The Property Manager Interface consists of these components:</p>
+          <p className="text-base text-muted-foreground">The Property Manager Interface consists of these components:</p>
 
           <div className="space-y-3">
             <Card>
@@ -170,9 +170,9 @@ export default function PropertyManagerGuide() {
                   1. My Vendors Dashboard
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p>Central hub displaying all contracted rope access companies.</p>
-                <div className="bg-muted p-3 rounded text-xs space-y-1">
+                <div className="bg-muted p-3 rounded text-sm space-y-1">
                   <p><strong>Dashboard Features:</strong></p>
                   <ul className="list-disc list-inside space-y-0.5">
                     <li>Company cards with summary information</li>
@@ -191,9 +191,9 @@ export default function PropertyManagerGuide() {
                   2. Company Safety Rating (CSR)
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p>Penalty-based rating system showing compliance status.</p>
-                <div className="bg-muted p-3 rounded text-xs space-y-1">
+                <div className="bg-muted p-3 rounded text-sm space-y-1">
                   <p><strong>CSR Components:</strong></p>
                   <ul className="list-disc list-inside space-y-0.5">
                     <li><strong>Base Score</strong>: Starts at 100 points</li>
@@ -212,9 +212,9 @@ export default function PropertyManagerGuide() {
                   3. Read-Only Company View
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p>Detailed company information accessible without edit capabilities.</p>
-                <div className="bg-muted p-3 rounded text-xs space-y-1">
+                <div className="bg-muted p-3 rounded text-sm space-y-1">
                   <p><strong>Viewable Information:</strong></p>
                   <ul className="list-disc list-inside space-y-0.5">
                     <li>Company profile and contact details</li>
@@ -235,7 +235,7 @@ export default function PropertyManagerGuide() {
             <Star className="w-5 h-5 text-amber-600 dark:text-amber-400" />
             Company Safety Rating (CSR) Details
           </h2>
-          <p className="text-sm text-muted-foreground">Understanding the penalty-based rating system:</p>
+          <p className="text-base text-muted-foreground">Understanding the penalty-based rating system:</p>
 
           <Card>
             <CardContent className="pt-4 space-y-4">
@@ -291,7 +291,7 @@ export default function PropertyManagerGuide() {
             <Lock className="w-5 h-5 text-red-600 dark:text-red-400" />
             Access Control
           </h2>
-          <p className="text-sm text-muted-foreground">Property Manager role and access boundaries:</p>
+          <p className="text-base text-muted-foreground">Property Manager role and access boundaries:</p>
 
           <div className="space-y-3">
             <Card>
@@ -363,28 +363,28 @@ export default function PropertyManagerGuide() {
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">1</div>
                     <div>
                       <p className="font-medium">Navigate to My Vendors</p>
-                      <p className="text-sm text-muted-foreground">Access from dashboard or sidebar</p>
+                      <p className="text-base text-muted-foreground">Access from dashboard or sidebar</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">2</div>
                     <div>
                       <p className="font-medium">Select vendor company</p>
-                      <p className="text-sm text-muted-foreground">Click on company card to view details</p>
+                      <p className="text-base text-muted-foreground">Click on company card to view details</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">3</div>
                     <div>
                       <p className="font-medium">View CSR breakdown</p>
-                      <p className="text-sm text-muted-foreground">See overall score and penalty details</p>
+                      <p className="text-base text-muted-foreground">See overall score and penalty details</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">4</div>
                     <div>
                       <p className="font-medium">Review compliance categories</p>
-                      <p className="text-sm text-muted-foreground">Drill into specific penalty sources</p>
+                      <p className="text-base text-muted-foreground">Drill into specific penalty sources</p>
                     </div>
                   </div>
                 </div>
@@ -404,21 +404,21 @@ export default function PropertyManagerGuide() {
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">1</div>
                     <div>
                       <p className="font-medium">View all vendors</p>
-                      <p className="text-sm text-muted-foreground">My Vendors dashboard shows all contracted companies</p>
+                      <p className="text-base text-muted-foreground">My Vendors dashboard shows all contracted companies</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">2</div>
                     <div>
                       <p className="font-medium">Compare CSR scores</p>
-                      <p className="text-sm text-muted-foreground">Scores visible on each vendor card</p>
+                      <p className="text-base text-muted-foreground">Scores visible on each vendor card</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">3</div>
                     <div>
                       <p className="font-medium">Sort by rating</p>
-                      <p className="text-sm text-muted-foreground">Identify top-performing vendors</p>
+                      <p className="text-base text-muted-foreground">Identify top-performing vendors</p>
                     </div>
                   </div>
                 </div>
@@ -496,7 +496,7 @@ export default function PropertyManagerGuide() {
               <Home className="w-5 h-5 text-action-600 dark:text-action-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">My Vendors Dashboard</p>
-                <p className="text-sm text-muted-foreground">Central hub for all contracted vendors.</p>
+                <p className="text-base text-muted-foreground">Central hub for all contracted vendors.</p>
               </div>
             </div>
 
@@ -504,7 +504,7 @@ export default function PropertyManagerGuide() {
               <Star className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">CSR Visibility</p>
-                <p className="text-sm text-muted-foreground">Detailed safety rating breakdowns.</p>
+                <p className="text-base text-muted-foreground">Detailed safety rating breakdowns.</p>
               </div>
             </div>
 
@@ -512,7 +512,7 @@ export default function PropertyManagerGuide() {
               <Eye className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Read-Only Access</p>
-                <p className="text-sm text-muted-foreground">Transparent view without edit rights.</p>
+                <p className="text-base text-muted-foreground">Transparent view without edit rights.</p>
               </div>
             </div>
 
@@ -520,7 +520,7 @@ export default function PropertyManagerGuide() {
               <ClipboardCheck className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Compliance Monitoring</p>
-                <p className="text-sm text-muted-foreground">Track vendor safety performance.</p>
+                <p className="text-base text-muted-foreground">Track vendor safety performance.</p>
               </div>
             </div>
           </div>
@@ -561,7 +561,7 @@ export default function PropertyManagerGuide() {
         </section>
 
         <Card className="border-muted bg-muted/50">
-          <CardContent className="pt-6 text-sm text-muted-foreground">
+          <CardContent className="pt-6 text-base text-muted-foreground">
             <p><strong>Last updated:</strong> December 3, 2024 | <strong>Version:</strong> 1.0</p>
             <p className="mt-1">This document serves as the authoritative reference for the Property Manager Interface.</p>
           </CardContent>

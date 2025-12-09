@@ -160,7 +160,7 @@ export default function PlatformAdminGuide() {
             <Layers className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             System Architecture
           </h2>
-          <p className="text-sm text-muted-foreground">The platform administration system consists of these core components:</p>
+          <p className="text-base text-muted-foreground">The platform administration system consists of these core components:</p>
 
           <div className="space-y-3">
             <Card>
@@ -170,9 +170,9 @@ export default function PlatformAdminGuide() {
                   1. Company Registry
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p>Central database of all registered companies on the platform.</p>
-                <div className="bg-muted p-3 rounded text-xs space-y-1">
+                <div className="bg-muted p-3 rounded text-sm space-y-1">
                   <p><strong>Key Fields:</strong></p>
                   <ul className="list-disc list-inside space-y-0.5">
                     <li><code>companyName</code> - Business name</li>
@@ -191,9 +191,9 @@ export default function PlatformAdminGuide() {
                   2. License Management
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p>Tracks subscription status, billing, and feature access for each company.</p>
-                <div className="bg-muted p-3 rounded text-xs space-y-1">
+                <div className="bg-muted p-3 rounded text-sm space-y-1">
                   <p><strong>License Tiers:</strong></p>
                   <ul className="list-disc list-inside space-y-0.5">
                     <li><strong>Basic</strong>: 2 projects, 4 seats</li>
@@ -212,9 +212,9 @@ export default function PlatformAdminGuide() {
                   3. Platform Metrics
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p>Real-time analytics and business intelligence across all companies.</p>
-                <div className="bg-muted p-3 rounded text-xs space-y-1">
+                <div className="bg-muted p-3 rounded text-sm space-y-1">
                   <p><strong>Tracked Metrics:</strong></p>
                   <ul className="list-disc list-inside space-y-0.5">
                     <li>MRR/ARR - Monthly and Annual Recurring Revenue</li>
@@ -235,7 +235,7 @@ export default function PlatformAdminGuide() {
             <Lock className="w-5 h-5 text-red-600 dark:text-red-400" />
             Access Hierarchy
           </h2>
-          <p className="text-sm text-muted-foreground">Platform administration uses a strict access model:</p>
+          <p className="text-base text-muted-foreground">Platform administration uses a strict access model:</p>
 
           <div className="space-y-3">
             <Card>
@@ -319,21 +319,21 @@ export default function PlatformAdminGuide() {
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">1</div>
                     <div>
                       <p className="font-medium">Navigate to SuperUser Dashboard</p>
-                      <p className="text-sm text-muted-foreground">Access via /superuser route after SuperUser login</p>
+                      <p className="text-base text-muted-foreground">Access via /superuser route after SuperUser login</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">2</div>
                     <div>
                       <p className="font-medium">Click "View All Companies"</p>
-                      <p className="text-sm text-muted-foreground">Opens company registry with search and filtering</p>
+                      <p className="text-base text-muted-foreground">Opens company registry with search and filtering</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">3</div>
                     <div>
                       <p className="font-medium">View company details</p>
-                      <p className="text-sm text-muted-foreground">See license status, subscription tier, employee count, and usage metrics</p>
+                      <p className="text-base text-muted-foreground">See license status, subscription tier, employee count, and usage metrics</p>
                     </div>
                   </div>
                 </div>
@@ -353,28 +353,28 @@ export default function PlatformAdminGuide() {
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">1</div>
                     <div>
                       <p className="font-medium">Click "Gift Company Account"</p>
-                      <p className="text-sm text-muted-foreground">Opens provisioning dialog</p>
+                      <p className="text-base text-muted-foreground">Opens provisioning dialog</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">2</div>
                     <div>
                       <p className="font-medium">Enter company details</p>
-                      <p className="text-sm text-muted-foreground">Company name, admin email, password, and subscription tier</p>
+                      <p className="text-base text-muted-foreground">Company name, admin email, password, and subscription tier</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">3</div>
                     <div>
                       <p className="font-medium">Review license key</p>
-                      <p className="text-sm text-muted-foreground">Auto-generated GIFT-XXXXX key is shown for reference</p>
+                      <p className="text-base text-muted-foreground">Auto-generated GIFT-XXXXX key is shown for reference</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">4</div>
                     <div>
                       <p className="font-medium">Create account</p>
-                      <p className="text-sm text-muted-foreground">Company is immediately provisioned with full access - no payment required</p>
+                      <p className="text-base text-muted-foreground">Company is immediately provisioned with full access - no payment required</p>
                     </div>
                   </div>
                 </div>
@@ -394,28 +394,28 @@ export default function PlatformAdminGuide() {
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">1</div>
                     <div>
                       <p className="font-medium">Select company from list</p>
-                      <p className="text-sm text-muted-foreground">Find target company in registry</p>
+                      <p className="text-base text-muted-foreground">Find target company in registry</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">2</div>
                     <div>
                       <p className="font-medium">Click "View as Company"</p>
-                      <p className="text-sm text-muted-foreground">Enters impersonation mode with company context</p>
+                      <p className="text-base text-muted-foreground">Enters impersonation mode with company context</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">3</div>
                     <div>
                       <p className="font-medium">Navigate platform as company</p>
-                      <p className="text-sm text-muted-foreground">See exactly what company users see for troubleshooting</p>
+                      <p className="text-base text-muted-foreground">See exactly what company users see for troubleshooting</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">4</div>
                     <div>
                       <p className="font-medium">Exit impersonation</p>
-                      <p className="text-sm text-muted-foreground">Return to SuperUser dashboard</p>
+                      <p className="text-base text-muted-foreground">Return to SuperUser dashboard</p>
                     </div>
                   </div>
                 </div>
@@ -493,7 +493,7 @@ export default function PlatformAdminGuide() {
               <Building2 className="w-5 h-5 text-action-600 dark:text-action-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Company Registry</p>
-                <p className="text-sm text-muted-foreground">View and search all registered companies.</p>
+                <p className="text-base text-muted-foreground">View and search all registered companies.</p>
               </div>
             </div>
 
@@ -501,7 +501,7 @@ export default function PlatformAdminGuide() {
               <Gift className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Gift Accounts</p>
-                <p className="text-sm text-muted-foreground">Provision free company accounts instantly.</p>
+                <p className="text-base text-muted-foreground">Provision free company accounts instantly.</p>
               </div>
             </div>
 
@@ -509,7 +509,7 @@ export default function PlatformAdminGuide() {
               <BarChart3 className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Platform Metrics</p>
-                <p className="text-sm text-muted-foreground">MRR, ARR, churn, and business analytics.</p>
+                <p className="text-base text-muted-foreground">MRR, ARR, churn, and business analytics.</p>
               </div>
             </div>
 
@@ -517,7 +517,7 @@ export default function PlatformAdminGuide() {
               <Eye className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Impersonation Mode</p>
-                <p className="text-sm text-muted-foreground">View platform as any company for support.</p>
+                <p className="text-base text-muted-foreground">View platform as any company for support.</p>
               </div>
             </div>
           </div>
@@ -558,7 +558,7 @@ export default function PlatformAdminGuide() {
         </section>
 
         <Card className="border-muted bg-muted/50">
-          <CardContent className="pt-6 text-sm text-muted-foreground">
+          <CardContent className="pt-6 text-base text-muted-foreground">
             <p><strong>Last updated:</strong> December 3, 2024 | <strong>Version:</strong> 1.0</p>
             <p className="mt-1">This document serves as the authoritative reference for Platform Administration.</p>
           </CardContent>

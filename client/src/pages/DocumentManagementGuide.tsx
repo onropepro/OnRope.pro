@@ -159,7 +159,7 @@ export default function DocumentManagementGuide() {
                 </CardTitle>
                 <CardDescription>Core safety documentation requiring employee acknowledgment</CardDescription>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   <span>Upload company health and safety manual</span>
@@ -186,7 +186,7 @@ export default function DocumentManagementGuide() {
                 </CardTitle>
                 <CardDescription>Policy documents with signature tracking</CardDescription>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   <span>Multiple policy document support</span>
@@ -213,7 +213,7 @@ export default function DocumentManagementGuide() {
                 </CardTitle>
                 <CardDescription>Restricted access for sensitive documents</CardDescription>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   <span>Upload insurance certificates</span>
@@ -240,7 +240,7 @@ export default function DocumentManagementGuide() {
                 </CardTitle>
                 <CardDescription>10 pre-built templates with PDF generation</CardDescription>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   <span>10 industry-standard procedure templates</span>
@@ -267,7 +267,7 @@ export default function DocumentManagementGuide() {
                 </CardTitle>
                 <CardDescription>10 daily safety topics with acknowledgment</CardDescription>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   <span>10 daily safety practice topics</span>
@@ -294,7 +294,7 @@ export default function DocumentManagementGuide() {
                 </CardTitle>
                 <CardDescription>Equipment damage documentation with serial number linking</CardDescription>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   <span>Link to specific equipment serial numbers</span>
@@ -415,7 +415,7 @@ export default function DocumentManagementGuide() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-xl md:text-2xl font-semibold">Compliance Reports</CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   <span>Employee signature status overview</span>
@@ -435,7 +435,7 @@ export default function DocumentManagementGuide() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-xl md:text-2xl font-semibold">Bulk Export</CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <div className="flex items-center gap-2">
                   <Archive className="w-4 h-4 text-teal-500" />
                   <span>Date range selection</span>

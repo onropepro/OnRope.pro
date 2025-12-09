@@ -59,7 +59,7 @@ export default function UserAccessGuide() {
             <BackButton to="/changelog" />
             <div>
               <h1 className="text-2xl md:text-3xl font-bold">User Access & Authentication Guide</h1>
-              <p className="text-sm text-muted-foreground">Version 2.1 - Updated December 5, 2025</p>
+              <p className="text-base text-muted-foreground">Version 2.1 - Updated December 5, 2025</p>
             </div>
           </div>
           <MainMenuButton />
@@ -423,9 +423,9 @@ export default function UserAccessGuide() {
                   <CardTitle className="text-base">Company Accounts</CardTitle>
                 </div>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p className="text-muted-foreground">Company owners and staff employees (operations managers, supervisors, technicians, administrative staff).</p>
-                <div className="bg-amber-50 dark:bg-amber-950 p-2 rounded text-xs space-y-1">
+                <div className="bg-amber-50 dark:bg-amber-950 p-2 rounded text-sm space-y-1">
                   <p className="font-semibold">Authentication:</p>
                   <ul className="list-disc list-inside space-y-0.5">
                     <li>Email-based username</li>
@@ -433,7 +433,7 @@ export default function UserAccessGuide() {
                     <li>Company-scoped access</li>
                   </ul>
                 </div>
-                <div className="text-xs">
+                <div className="text-sm">
                   <span className="font-semibold">Characteristics:</span>
                   <ul className="list-disc list-inside mt-1 space-y-0.5 text-muted-foreground">
                     <li>Full internal system access based on permissions</li>
@@ -451,9 +451,9 @@ export default function UserAccessGuide() {
                   <CardTitle className="text-base">Employee Accounts</CardTitle>
                 </div>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p className="text-muted-foreground">Field technicians, supervisors, managers, specialized roles (HR, accounting, inventory).</p>
-                <div className="bg-blue-50 dark:bg-blue-950 p-2 rounded text-xs space-y-1">
+                <div className="bg-blue-50 dark:bg-blue-950 p-2 rounded text-sm space-y-1">
                   <p className="font-semibold">Authentication:</p>
                   <ul className="list-disc list-inside space-y-0.5">
                     <li>Created by company owner</li>
@@ -461,7 +461,7 @@ export default function UserAccessGuide() {
                     <li>Individual permission assignment</li>
                   </ul>
                 </div>
-                <div className="text-xs">
+                <div className="text-sm">
                   <span className="font-semibold">Characteristics:</span>
                   <ul className="list-disc list-inside mt-1 space-y-0.5 text-muted-foreground">
                     <li>Access determined by permission grants</li>
@@ -479,9 +479,9 @@ export default function UserAccessGuide() {
                   <CardTitle className="text-base">External Accounts</CardTitle>
                 </div>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p className="text-muted-foreground">Building residents, property managers, building-level accounts.</p>
-                <div className="bg-green-50 dark:bg-green-950 p-2 rounded text-xs space-y-1">
+                <div className="bg-green-50 dark:bg-green-950 p-2 rounded text-sm space-y-1">
                   <p className="font-semibold">Authentication:</p>
                   <ul className="list-disc list-inside space-y-0.5">
                     <li>Unique company linking codes</li>
@@ -489,7 +489,7 @@ export default function UserAccessGuide() {
                     <li>Limited to building data only</li>
                   </ul>
                 </div>
-                <div className="text-xs">
+                <div className="text-sm">
                   <span className="font-semibold">Characteristics:</span>
                   <ul className="list-disc list-inside mt-1 space-y-0.5 text-muted-foreground">
                     <li>Read-only or limited write access</li>
@@ -521,7 +521,7 @@ export default function UserAccessGuide() {
                   Executive/Management
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <div className="space-y-1">
                   <div className="flex items-center justify-between p-2 bg-muted rounded">
                     <span className="font-medium">Company Owner</span>
@@ -546,7 +546,7 @@ export default function UserAccessGuide() {
                   Administrative
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <div className="space-y-1">
                   <div className="flex items-center justify-between p-2 bg-muted rounded">
                     <span className="font-medium">Human Resources</span>
@@ -567,7 +567,7 @@ export default function UserAccessGuide() {
                   Field Leadership
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <div className="space-y-1">
                   <div className="flex items-center justify-between p-2 bg-muted rounded">
                     <span className="font-medium">General Supervisor</span>
@@ -596,7 +596,7 @@ export default function UserAccessGuide() {
                   Field Workers
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <div className="space-y-1">
                   <div className="flex items-center justify-between p-2 bg-muted rounded">
                     <span className="font-medium">Rope Access Technician</span>
@@ -622,7 +622,7 @@ export default function UserAccessGuide() {
                 Custom Roles
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-sm text-purple-900 dark:text-purple-100">
+            <CardContent className="text-base text-purple-900 dark:text-purple-100">
               <p>For specialized organizational needs, company owners can create custom role titles:</p>
               <div className="flex flex-wrap gap-1 mt-2">
                 <Badge variant="outline">Inventory Manager</Badge>
@@ -715,11 +715,11 @@ export default function UserAccessGuide() {
             <CardHeader className="pb-2">
               <CardTitle className="text-base text-blue-900 dark:text-blue-100">Real-World Example: Technician Promotion</CardTitle>
             </CardHeader>
-            <CardContent className="text-sm text-blue-900 dark:text-blue-100">
+            <CardContent className="text-base text-blue-900 dark:text-blue-100">
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="bg-white/50 dark:bg-blue-900/50 rounded-lg p-3">
                   <p className="font-semibold mb-2">Before (Rope Access Technician):</p>
-                  <ul className="space-y-1 text-xs">
+                  <ul className="space-y-1 text-base">
                     <li className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3 text-green-600" /> Clock in/out</li>
                     <li className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3 text-green-600" /> Log drops</li>
                     <li className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3 text-green-600" /> Upload photos</li>
@@ -728,7 +728,7 @@ export default function UserAccessGuide() {
                 </div>
                 <div className="bg-white/50 dark:bg-blue-900/50 rounded-lg p-3">
                   <p className="font-semibold mb-2">After (Supervisor):</p>
-                  <ul className="space-y-1 text-xs">
+                  <ul className="space-y-1 text-base">
                     <li className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3 text-green-600" /> Create projects</li>
                     <li className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3 text-green-600" /> Assign employees</li>
                     <li className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3 text-green-600" /> Review feedback</li>
@@ -751,12 +751,12 @@ export default function UserAccessGuide() {
           </h2>
           
           <Card className="border-amber-200 dark:border-amber-900 bg-amber-50/50 dark:bg-amber-950/50">
-            <CardContent className="pt-4 text-sm text-amber-900 dark:text-amber-100">
+            <CardContent className="pt-4 text-base text-amber-900 dark:text-amber-100">
               <p className="flex items-center gap-2 font-semibold">
                 <AlertTriangle className="w-4 h-4" />
                 Important: Permissions are NOT determined by role alone
               </p>
-              <ul className="mt-2 space-y-1 text-xs list-disc list-inside">
+              <ul className="mt-2 space-y-1 text-base list-disc list-inside">
                 <li>Company owners select base roles for organizational clarity</li>
                 <li>Then assign granular permissions individually per employee</li>
                 <li>Same role can have different permissions across companies</li>
@@ -773,13 +773,13 @@ export default function UserAccessGuide() {
                   Financial Permissions
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
-                <p className="text-sm text-muted-foreground">Control access to sensitive cost and rate information:</p>
+              <CardContent className="text-base space-y-2">
+                <p className="text-base text-muted-foreground">Control access to sensitive cost and rate information:</p>
                 <div className="space-y-1">
-                  <div className="p-2 bg-muted rounded text-xs">View Financial Data - Labor costs, project budgets, hourly rates</div>
-                  <div className="p-2 bg-muted rounded text-xs">View Employee Rates - Specific technician hourly wages</div>
-                  <div className="p-2 bg-muted rounded text-xs">Edit Pricing - Quote values, project estimates, billing rates</div>
-                  <div className="p-2 bg-muted rounded text-xs">Access Payroll Reports - Aggregated payroll summaries</div>
+                  <div className="p-2 bg-muted rounded">View Financial Data - Labor costs, project budgets, hourly rates</div>
+                  <div className="p-2 bg-muted rounded">View Employee Rates - Specific technician hourly wages</div>
+                  <div className="p-2 bg-muted rounded">Edit Pricing - Quote values, project estimates, billing rates</div>
+                  <div className="p-2 bg-muted rounded">Access Payroll Reports - Aggregated payroll summaries</div>
                 </div>
               </CardContent>
             </Card>
@@ -791,13 +791,13 @@ export default function UserAccessGuide() {
                   Project Management
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
-                <p className="text-sm text-muted-foreground">Control project lifecycle and coordination:</p>
+              <CardContent className="text-base space-y-2">
+                <p className="text-base text-muted-foreground">Control project lifecycle and coordination:</p>
                 <div className="space-y-1">
-                  <div className="p-2 bg-muted rounded text-xs">Create Projects - Set up new building maintenance projects</div>
-                  <div className="p-2 bg-muted rounded text-xs">Edit Projects - Modify details, targets, completion dates</div>
-                  <div className="p-2 bg-muted rounded text-xs">Delete Projects - Remove from system (with warnings)</div>
-                  <div className="p-2 bg-muted rounded text-xs">Mark Complete / View All / Assign Employees</div>
+                  <div className="p-2 bg-muted rounded">Create Projects - Set up new building maintenance projects</div>
+                  <div className="p-2 bg-muted rounded">Edit Projects - Modify details, targets, completion dates</div>
+                  <div className="p-2 bg-muted rounded">Delete Projects - Remove from system (with warnings)</div>
+                  <div className="p-2 bg-muted rounded">Mark Complete / View All / Assign Employees</div>
                 </div>
               </CardContent>
             </Card>
@@ -809,13 +809,13 @@ export default function UserAccessGuide() {
                   Employee Management
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
-                <p className="text-sm text-muted-foreground">Control team administration and sensitive data:</p>
+              <CardContent className="text-base space-y-2">
+                <p className="text-base text-muted-foreground">Control team administration and sensitive data:</p>
                 <div className="space-y-1">
-                  <div className="p-2 bg-muted rounded text-xs">Create Employees - Onboard new team members</div>
-                  <div className="p-2 bg-muted rounded text-xs">Edit Employees - Modify roles, rates, permissions</div>
-                  <div className="p-2 bg-muted rounded text-xs">Deactivate Employees - Remove access for departed staff</div>
-                  <div className="p-2 bg-muted rounded text-xs">View All / Assign Roles / Manage Permissions</div>
+                  <div className="p-2 bg-muted rounded">Create Employees - Onboard new team members</div>
+                  <div className="p-2 bg-muted rounded">Edit Employees - Modify roles, rates, permissions</div>
+                  <div className="p-2 bg-muted rounded">Deactivate Employees - Remove access for departed staff</div>
+                  <div className="p-2 bg-muted rounded">View All / Assign Roles / Manage Permissions</div>
                 </div>
               </CardContent>
             </Card>
@@ -827,13 +827,13 @@ export default function UserAccessGuide() {
                   Inventory Permissions
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
-                <p className="text-sm text-muted-foreground">Control equipment and asset management:</p>
+              <CardContent className="text-base space-y-2">
+                <p className="text-base text-muted-foreground">Control equipment and asset management:</p>
                 <div className="space-y-1">
-                  <div className="p-2 bg-muted rounded text-xs">View Inventory - Access equipment lists and tracking</div>
-                  <div className="p-2 bg-muted rounded text-xs">Add Inventory - Create new equipment records</div>
-                  <div className="p-2 bg-muted rounded text-xs">Edit Inventory - Update details, status, assignments</div>
-                  <div className="p-2 bg-muted rounded text-xs">Assign Equipment / Track Inspections</div>
+                  <div className="p-2 bg-muted rounded">View Inventory - Access equipment lists and tracking</div>
+                  <div className="p-2 bg-muted rounded">Add Inventory - Create new equipment records</div>
+                  <div className="p-2 bg-muted rounded">Edit Inventory - Update details, status, assignments</div>
+                  <div className="p-2 bg-muted rounded">Assign Equipment / Track Inspections</div>
                 </div>
               </CardContent>
             </Card>
@@ -845,13 +845,13 @@ export default function UserAccessGuide() {
                   Feedback Management
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
-                <p className="text-sm text-muted-foreground">Control resident and client communication:</p>
+              <CardContent className="text-base space-y-2">
+                <p className="text-base text-muted-foreground">Control resident and client communication:</p>
                 <div className="space-y-1">
-                  <div className="p-2 bg-muted rounded text-xs">View Feedback - Access submitted feedback from residents</div>
-                  <div className="p-2 bg-muted rounded text-xs">Respond to Feedback - Add public responses</div>
-                  <div className="p-2 bg-muted rounded text-xs">Add Internal Notes - Private team coordination</div>
-                  <div className="p-2 bg-muted rounded text-xs">Close Feedback / Delete Feedback / View Analytics</div>
+                  <div className="p-2 bg-muted rounded">View Feedback - Access submitted feedback from residents</div>
+                  <div className="p-2 bg-muted rounded">Respond to Feedback - Add public responses</div>
+                  <div className="p-2 bg-muted rounded">Add Internal Notes - Private team coordination</div>
+                  <div className="p-2 bg-muted rounded">Close Feedback / Delete Feedback / View Analytics</div>
                 </div>
               </CardContent>
             </Card>
@@ -863,13 +863,13 @@ export default function UserAccessGuide() {
                   Safety & Compliance
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
-                <p className="text-sm text-muted-foreground">Control documentation and regulatory oversight:</p>
+              <CardContent className="text-base space-y-2">
+                <p className="text-base text-muted-foreground">Control documentation and regulatory oversight:</p>
                 <div className="space-y-1">
-                  <div className="p-2 bg-muted rounded text-xs">Submit Inspections - Complete daily harness/equipment checks</div>
-                  <div className="p-2 bg-muted rounded text-xs">View Inspections - Access inspection history</div>
-                  <div className="p-2 bg-muted rounded text-xs">Approve Inspections - Supervisor review and sign-off</div>
-                  <div className="p-2 bg-muted rounded text-xs">Create Toolbox Meetings / View Safety Docs / Manage Compliance</div>
+                  <div className="p-2 bg-muted rounded">Submit Inspections - Complete daily harness/equipment checks</div>
+                  <div className="p-2 bg-muted rounded">View Inspections - Access inspection history</div>
+                  <div className="p-2 bg-muted rounded">Approve Inspections - Supervisor review and sign-off</div>
+                  <div className="p-2 bg-muted rounded">Create Toolbox Meetings / View Safety Docs / Manage Compliance</div>
                 </div>
               </CardContent>
             </Card>
@@ -881,13 +881,13 @@ export default function UserAccessGuide() {
                   Document Permissions
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
-                <p className="text-sm text-muted-foreground">Control file uploads and access:</p>
+              <CardContent className="text-base space-y-2">
+                <p className="text-base text-muted-foreground">Control file uploads and access:</p>
                 <div className="space-y-1">
-                  <div className="p-2 bg-muted rounded text-xs">Upload Documents - Add PDFs, photos, certificates</div>
-                  <div className="p-2 bg-muted rounded text-xs">View Documents - Access project or company-wide files</div>
-                  <div className="p-2 bg-muted rounded text-xs">Delete Documents - Remove files from system</div>
-                  <div className="p-2 bg-muted rounded text-xs">Download Documents - Export files for offline use</div>
+                  <div className="p-2 bg-muted rounded">Upload Documents - Add PDFs, photos, certificates</div>
+                  <div className="p-2 bg-muted rounded">View Documents - Access project or company-wide files</div>
+                  <div className="p-2 bg-muted rounded">Delete Documents - Remove files from system</div>
+                  <div className="p-2 bg-muted rounded">Download Documents - Export files for offline use</div>
                 </div>
               </CardContent>
             </Card>
@@ -899,26 +899,26 @@ export default function UserAccessGuide() {
                   Reporting & Analytics
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
-                <p className="text-sm text-muted-foreground">Control business intelligence access:</p>
+              <CardContent className="text-base space-y-2">
+                <p className="text-base text-muted-foreground">Control business intelligence access:</p>
                 <div className="space-y-1">
-                  <div className="p-2 bg-muted rounded text-xs">View Analytics Dashboard - Performance metrics, productivity</div>
-                  <div className="p-2 bg-muted rounded text-xs">Export Reports - Generate CSV/PDF summaries</div>
-                  <div className="p-2 bg-muted rounded text-xs">View Historical Data - Access past project archives</div>
-                  <div className="p-2 bg-muted rounded text-xs">Financial Reporting - Revenue, cost, profitability analyses</div>
+                  <div className="p-2 bg-muted rounded">View Analytics Dashboard - Performance metrics, productivity</div>
+                  <div className="p-2 bg-muted rounded">Export Reports - Generate CSV/PDF summaries</div>
+                  <div className="p-2 bg-muted rounded">View Historical Data - Access past project archives</div>
+                  <div className="p-2 bg-muted rounded">Financial Reporting - Revenue, cost, profitability analyses</div>
                 </div>
               </CardContent>
             </Card>
           </div>
 
           <Card className="border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950">
-            <CardContent className="pt-4 text-sm text-amber-900 dark:text-amber-100">
+            <CardContent className="pt-4 text-base text-amber-900 dark:text-amber-100">
               <p className="flex items-center gap-2 font-semibold">
                 <AlertTriangle className="w-4 h-4" />
                 Permission Assignment Best Practices
               </p>
               <p className="mt-2 text-xs"><strong>Best Practice:</strong> Grant minimum necessary permissions. You can always add more later.</p>
-              <div className="mt-2 space-y-1 text-xs">
+              <div className="mt-2 space-y-1 text-base">
                 <p className="flex items-center gap-1"><XCircle className="w-3 h-3 text-red-600" /> Giving all supervisors financial access (only budget managers need it)</p>
                 <p className="flex items-center gap-1"><XCircle className="w-3 h-3 text-red-600" /> Restricting project creation to owners only (supervisors often need this)</p>
                 <p className="flex items-center gap-1"><XCircle className="w-3 h-3 text-red-600" /> Giving technicians access to all employee data (privacy concern)</p>
@@ -944,17 +944,17 @@ export default function UserAccessGuide() {
                 </CardTitle>
                 <CardDescription>Building occupants monitoring work progress</CardDescription>
               </CardHeader>
-              <CardContent className="text-sm space-y-3">
+              <CardContent className="text-base space-y-3">
                 <div className="bg-teal-50 dark:bg-teal-950 p-2 rounded space-y-1">
                   <p className="font-semibold text-xs">Authentication:</p>
-                  <ul className="list-disc list-inside text-xs space-y-0.5">
+                  <ul className="list-disc list-inside text-sm space-y-0.5">
                     <li>Self-registration with company access code</li>
                     <li>Unit-specific codes (e.g., "BLD2024-U207")</li>
                     <li>Each unit has permanent access code</li>
                   </ul>
                 </div>
 
-                <div className="space-y-1 text-xs">
+                <div className="space-y-1 text-base">
                   <p className="font-semibold flex items-center gap-1"><CheckCircle2 className="w-3 h-3 text-green-600" /> What they can do:</p>
                   <ul className="list-disc list-inside ml-3 space-y-0.5 text-muted-foreground">
                     <li>View their building's active projects</li>
@@ -965,7 +965,7 @@ export default function UserAccessGuide() {
                   </ul>
                 </div>
 
-                <div className="space-y-1 text-xs">
+                <div className="space-y-1 text-base">
                   <p className="font-semibold flex items-center gap-1"><XCircle className="w-3 h-3 text-red-500" /> What they cannot do:</p>
                   <ul className="list-disc list-inside ml-3 space-y-0.5 text-muted-foreground">
                     <li>View other buildings or company data</li>
@@ -985,10 +985,10 @@ export default function UserAccessGuide() {
                 </CardTitle>
                 <CardDescription>Property management personnel</CardDescription>
               </CardHeader>
-              <CardContent className="text-sm space-y-3">
+              <CardContent className="text-base space-y-3">
                 <div className="bg-indigo-50 dark:bg-indigo-950 p-2 rounded space-y-1">
                   <p className="font-semibold text-xs">Building-Level Accounts:</p>
-                  <ul className="list-disc list-inside text-xs space-y-0.5">
+                  <ul className="list-disc list-inside text-sm space-y-0.5">
                     <li>Each building gets ONE permanent account</li>
                     <li>Current manager uses those credentials</li>
                     <li>When manager changes: Just update password</li>
@@ -996,7 +996,7 @@ export default function UserAccessGuide() {
                   </ul>
                 </div>
 
-                <div className="space-y-1 text-xs">
+                <div className="space-y-1 text-base">
                   <p className="font-semibold flex items-center gap-1"><CheckCircle2 className="w-3 h-3 text-green-600" /> What they can do:</p>
                   <ul className="list-disc list-inside ml-3 space-y-0.5 text-muted-foreground">
                     <li>View all projects for their building(s)</li>
@@ -1007,7 +1007,7 @@ export default function UserAccessGuide() {
                   </ul>
                 </div>
 
-                <div className="space-y-1 text-xs">
+                <div className="space-y-1 text-base">
                   <p className="font-semibold flex items-center gap-1"><XCircle className="w-3 h-3 text-red-500" /> What they cannot do:</p>
                   <ul className="list-disc list-inside ml-3 space-y-0.5 text-muted-foreground">
                     <li>View financial data (costs, rates, budgets)</li>
@@ -1039,7 +1039,7 @@ export default function UserAccessGuide() {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="text-sm space-y-3">
+              <CardContent className="text-base space-y-3">
                 <ol className="list-decimal list-inside space-y-2">
                   <li>User navigates to registration page</li>
                   <li>Enters company details (name, email, initial password)</li>
@@ -1047,7 +1047,7 @@ export default function UserAccessGuide() {
                   <li>Creates first user account with ultimate permissions</li>
                   <li>User receives confirmation and can log in</li>
                 </ol>
-                <div className="bg-amber-50 dark:bg-amber-950 p-2 rounded text-xs">
+                <div className="bg-amber-50 dark:bg-amber-950 p-2 rounded text-sm">
                   <strong>Result:</strong> New company tenant created with isolated data space
                 </div>
               </CardContent>
@@ -1062,7 +1062,7 @@ export default function UserAccessGuide() {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="text-sm space-y-3">
+              <CardContent className="text-base space-y-3">
                 <ol className="list-decimal list-inside space-y-2">
                   <li>Company owner navigates to employee management</li>
                   <li>Enters employee details: name, email, temporary password</li>
@@ -1071,7 +1071,7 @@ export default function UserAccessGuide() {
                   <li>Assigns granular permissions across all categories</li>
                   <li>Employee can immediately log in and change password</li>
                 </ol>
-                <div className="bg-blue-50 dark:bg-blue-950 p-2 rounded text-xs">
+                <div className="bg-blue-50 dark:bg-blue-950 p-2 rounded text-sm">
                   <strong>Note:</strong> No email verification required. Company owner is trusted to onboard legitimate employees.
                 </div>
               </CardContent>
@@ -1086,14 +1086,14 @@ export default function UserAccessGuide() {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="text-sm space-y-3">
+              <CardContent className="text-base space-y-3">
                 <ol className="list-decimal list-inside space-y-2">
                   <li>User registers as Resident or Building Manager</li>
                   <li>Receives linking code from company (email, notice, or QR code)</li>
                   <li>Enters code on linking page during registration</li>
                   <li>System validates code and links user to specific building/unit</li>
                 </ol>
-                <div className="bg-green-50 dark:bg-green-950 p-2 rounded text-xs space-y-1">
+                <div className="bg-green-50 dark:bg-green-950 p-2 rounded text-sm space-y-1">
                   <p><strong>Code Types:</strong></p>
                   <ul className="list-disc list-inside">
                     <li>Resident codes: Unit-specific (e.g., "BLD2024-U207")</li>
@@ -1112,14 +1112,14 @@ export default function UserAccessGuide() {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="text-sm space-y-3">
+              <CardContent className="text-base space-y-3">
                 <ol className="list-decimal list-inside space-y-2">
                   <li>Property manager registers with email and password</li>
                   <li>Receives property manager code from rope access company</li>
                   <li>Enters code to link account to vendor company</li>
                   <li>Gains read-only access to vendor's company summary and CSR</li>
                 </ol>
-                <div className="bg-violet-50 dark:bg-violet-950 p-2 rounded text-xs space-y-1">
+                <div className="bg-violet-50 dark:bg-violet-950 p-2 rounded text-sm space-y-1">
                   <p><strong>Access Granted:</strong></p>
                   <ul className="list-disc list-inside">
                     <li>Read-only access to vendor company summaries</li>
@@ -1178,7 +1178,7 @@ export default function UserAccessGuide() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">Session Management</CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <ul className="list-disc list-inside space-y-1">
                   <li>Server-side sessions for all authenticated users</li>
                   <li>HTTP-only secure cookies prevent XSS attacks</li>
@@ -1192,7 +1192,7 @@ export default function UserAccessGuide() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">Password Security</CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <ul className="list-disc list-inside space-y-1">
                   <li>Bcrypt password hashing with salt rounds</li>
                   <li>No plain-text password storage anywhere</li>
@@ -1206,7 +1206,7 @@ export default function UserAccessGuide() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">Request Security</CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <ul className="list-disc list-inside space-y-1">
                   <li><strong>CSRF Protection:</strong> Token-based validation for state-changing requests</li>
                   <li><strong>Rate Limiting:</strong> 10-15 login attempts per minute per IP</li>
@@ -1220,7 +1220,7 @@ export default function UserAccessGuide() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">Data Isolation</CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <ul className="list-disc list-inside space-y-1">
                   <li>Company-scoped data access: Every API filtered by company ID</li>
                   <li>Residents only see their building's data</li>
@@ -1232,7 +1232,7 @@ export default function UserAccessGuide() {
           </div>
 
           <Card className="border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950">
-            <CardContent className="pt-4 text-sm text-red-900 dark:text-red-100">
+            <CardContent className="pt-4 text-base text-red-900 dark:text-red-100">
               <p className="flex items-center gap-2 font-semibold">
                 <Shield className="w-4 h-4" />
                 API Protection
@@ -1245,7 +1245,7 @@ export default function UserAccessGuide() {
             <CardHeader className="pb-2">
               <CardTitle className="text-base">Audit Trails</CardTitle>
             </CardHeader>
-            <CardContent className="text-sm space-y-2">
+            <CardContent className="text-base space-y-2">
               <p className="text-muted-foreground">What's logged:</p>
               <div className="flex flex-wrap gap-1">
                 <Badge variant="outline" className="text-xs">Employee permission changes</Badge>
@@ -1274,7 +1274,7 @@ export default function UserAccessGuide() {
                   <KeyRound className="w-5 h-5 text-action-600 mt-0.5" />
                   <div>
                     <p className="font-medium">Password Changes</p>
-                    <p className="text-sm text-muted-foreground">Users can change their passwords with current password verification. Company owners can reset employee passwords when needed.</p>
+                    <p className="text-base text-muted-foreground">Users can change their passwords with current password verification. Company owners can reset employee passwords when needed.</p>
                   </div>
                 </div>
               </CardContent>
@@ -1286,7 +1286,7 @@ export default function UserAccessGuide() {
                   <User className="w-5 h-5 text-amber-600 mt-0.5" />
                   <div>
                     <p className="font-medium">Account Deletion</p>
-                    <p className="text-sm text-muted-foreground">Account deletion available with appropriate permissions. Data retention policies ensure compliance while removing sensitive information. Historical work records are preserved for audit purposes.</p>
+                    <p className="text-base text-muted-foreground">Account deletion available with appropriate permissions. Data retention policies ensure compliance while removing sensitive information. Historical work records are preserved for audit purposes.</p>
                   </div>
                 </div>
               </CardContent>
@@ -1298,7 +1298,7 @@ export default function UserAccessGuide() {
                   <LogIn className="w-5 h-5 text-green-600 mt-0.5" />
                   <div>
                     <p className="font-medium">Session Management</p>
-                    <p className="text-sm text-muted-foreground">Automatic session expiration after 30 days of inactivity. Secure logout functionality clears all session data. Users remain logged in across browser sessions until explicit logout or expiration.</p>
+                    <p className="text-base text-muted-foreground">Automatic session expiration after 30 days of inactivity. Secure logout functionality clears all session data. Users remain logged in across browser sessions until explicit logout or expiration.</p>
                   </div>
                 </div>
               </CardContent>
@@ -1315,7 +1315,7 @@ export default function UserAccessGuide() {
           </h2>
 
           <Card className="border-amber-200 dark:border-amber-900 bg-amber-50/50 dark:bg-amber-950/50">
-            <CardContent className="pt-4 text-sm text-amber-900 dark:text-amber-100">
+            <CardContent className="pt-4 text-base text-amber-900 dark:text-amber-100">
               <p className="flex items-center gap-2 font-semibold">
                 <AlertTriangle className="w-4 h-4" />
                 Important Disclaimer
@@ -1479,9 +1479,9 @@ export default function UserAccessGuide() {
                   <CardTitle className="text-base">Feedback Response Time Tracking</CardTitle>
                 </div>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p className="text-muted-foreground text-xs">Planned metrics:</p>
-                <ul className="list-disc list-inside text-xs space-y-0.5">
+                <ul className="list-disc list-inside text-sm space-y-0.5">
                   <li>Time from submission to first view</li>
                   <li>Time from submission to first response</li>
                   <li>Time from submission to closure</li>
@@ -1498,9 +1498,9 @@ export default function UserAccessGuide() {
                   <CardTitle className="text-base">Building Manager Document Upload</CardTitle>
                 </div>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p className="text-muted-foreground text-xs">Planned capabilities:</p>
-                <ul className="list-disc list-inside text-xs space-y-0.5">
+                <ul className="list-disc list-inside text-sm space-y-0.5">
                   <li>Building managers upload building-specific docs</li>
                   <li>Certificate of Insurance management</li>
                   <li>Building access instructions</li>
@@ -1516,7 +1516,7 @@ export default function UserAccessGuide() {
                   <CardTitle className="text-base">Custom Permission Templates</CardTitle>
                 </div>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p className="text-muted-foreground text-xs">Save common permission configurations as templates for quick-apply when creating similar roles. Example templates: "Field Supervisor," "Office Admin," "Safety Officer"</p>
               </CardContent>
             </Card>
@@ -1535,10 +1535,10 @@ export default function UserAccessGuide() {
             <CardHeader className="pb-2">
               <CardTitle className="text-base">"Feedback" vs "Complaints"</CardTitle>
             </CardHeader>
-            <CardContent className="text-sm space-y-2">
+            <CardContent className="text-base space-y-2">
               <p className="text-muted-foreground">The platform uses <strong>"Feedback"</strong> terminology because:</p>
               <div className="grid md:grid-cols-2 gap-3 mt-2">
-                <div className="space-y-1 text-xs">
+                <div className="space-y-1 text-base">
                   <p className="font-semibold flex items-center gap-1"><CheckCircle2 className="w-3 h-3 text-green-600" /> Why "Feedback":</p>
                   <ul className="list-disc list-inside space-y-0.5 text-muted-foreground">
                     <li>Encompasses both positive and negative input</li>
@@ -1547,7 +1547,7 @@ export default function UserAccessGuide() {
                     <li>Opens door for positive comments</li>
                   </ul>
                 </div>
-                <div className="space-y-1 text-xs">
+                <div className="space-y-1 text-base">
                   <p className="font-semibold flex items-center gap-1"><XCircle className="w-3 h-3 text-red-500" /> Why not "Complaints":</p>
                   <ul className="list-disc list-inside space-y-0.5 text-muted-foreground">
                     <li>Has 100% negative connotation</li>

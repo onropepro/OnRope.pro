@@ -173,7 +173,7 @@ export default function SafetyGuide() {
             <Target className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             Two Entry Points: Understanding the Dual-Path System
           </h2>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-base text-muted-foreground">
             Safety compliance is tracked through <strong>two distinct pathways</strong> that both impact your Company Safety Rating. Understanding where to go for each task is critical.
           </p>
 
@@ -191,12 +191,12 @@ export default function SafetyGuide() {
                   Physical gear inspection before work
                 </CardDescription>
               </CardHeader>
-              <CardContent className="text-sm text-purple-900 dark:text-purple-100 space-y-3">
+              <CardContent className="text-base text-purple-900 dark:text-purple-100 space-y-3">
                 <div className="bg-purple-100 dark:bg-purple-800 rounded p-2">
                   <p className="font-semibold">What happens here:</p>
                   <p className="text-xs mt-1">Harness Inspections</p>
                 </div>
-                <ul className="list-disc list-inside space-y-1 text-xs">
+                <ul className="list-disc list-inside space-y-1 text-base">
                   <li>Triggered when starting work session</li>
                   <li>Links to your assigned personal gear kit</li>
                   <li>Inspects 11 equipment categories</li>
@@ -222,12 +222,12 @@ export default function SafetyGuide() {
                   Team documentation and hazard assessment
                 </CardDescription>
               </CardHeader>
-              <CardContent className="text-sm text-blue-900 dark:text-blue-100 space-y-3">
+              <CardContent className="text-base text-blue-900 dark:text-blue-100 space-y-3">
                 <div className="bg-blue-100 dark:bg-blue-800 rounded p-2">
                   <p className="font-semibold">What happens here:</p>
                   <p className="text-xs mt-1">Toolbox Meetings, FLHA, Incidents, Method Statements</p>
                 </div>
-                <ul className="list-disc list-inside space-y-1 text-xs">
+                <ul className="list-disc list-inside space-y-1 text-base">
                   <li>Team safety briefings with all attendee signatures</li>
                   <li>Field-level hazard assessments</li>
                   <li>Incident reporting and investigation</li>
@@ -242,7 +242,7 @@ export default function SafetyGuide() {
           </div>
 
           <Card className="border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950">
-            <CardContent className="pt-4 text-sm text-amber-900 dark:text-amber-100">
+            <CardContent className="pt-4 text-base text-amber-900 dark:text-amber-100">
               <p className="flex items-center gap-2 font-semibold">
                 <Info className="w-4 h-4" />
                 Why Two Paths?
@@ -309,7 +309,7 @@ export default function SafetyGuide() {
             <FileText className="w-5 h-5 text-orange-600 dark:text-orange-400" />
             Five Safety Document Types
           </h2>
-          <p className="text-sm text-muted-foreground">Each document type serves a specific purpose in the safety workflow:</p>
+          <p className="text-base text-muted-foreground">Each document type serves a specific purpose in the safety workflow:</p>
 
           <div className="space-y-3">
             {/* Harness Inspection */}
@@ -326,9 +326,9 @@ export default function SafetyGuide() {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p><strong>Purpose:</strong> Pre-work verification of personal protective equipment condition.</p>
-                <div className="bg-muted p-3 rounded text-xs space-y-1">
+                <div className="bg-muted p-3 rounded text-sm space-y-1">
                   <p><strong>11 Equipment Categories:</strong></p>
                   <div className="flex flex-wrap gap-1">
                     <Badge variant="secondary">Harness</Badge>
@@ -363,9 +363,9 @@ export default function SafetyGuide() {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p><strong>Purpose:</strong> Pre-work safety briefing covering hazards, procedures, and emergency plans.</p>
-                <div className="bg-muted p-3 rounded text-xs">
+                <div className="bg-muted p-3 rounded text-sm">
                   <p><strong>Key Fields:</strong> Meeting topic, safety topics discussed, attendee list, signatures from all attendees</p>
                 </div>
                 <p><strong>Signature:</strong> All attendees must sign (enforced by system)</p>
@@ -384,9 +384,9 @@ export default function SafetyGuide() {
                   <Badge variant="outline">Optional</Badge>
                 </div>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p><strong>Purpose:</strong> Site-specific hazard identification and control measures before work begins.</p>
-                <div className="bg-muted p-3 rounded text-xs">
+                <div className="bg-muted p-3 rounded text-sm">
                   <p><strong>Key Fields:</strong> Location, work description, identified hazards, control measures, weather conditions</p>
                 </div>
                 <p><strong>Signature:</strong> Assessor signature required</p>
@@ -405,9 +405,9 @@ export default function SafetyGuide() {
                   <Badge variant="outline">As Needed</Badge>
                 </div>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p><strong>Purpose:</strong> Documentation of safety incidents, near-misses, injuries, or property damage.</p>
-                <div className="bg-muted p-3 rounded text-xs">
+                <div className="bg-muted p-3 rounded text-sm">
                   <p><strong>Key Fields:</strong> Incident type, severity, injured persons, witnesses, root cause analysis, corrective actions, regulatory reporting</p>
                 </div>
                 <p><strong>Signature:</strong> Reporter, supervisor, and management signatures supported</p>
@@ -426,9 +426,9 @@ export default function SafetyGuide() {
                   <Badge variant="outline">As Needed</Badge>
                 </div>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <p><strong>Purpose:</strong> Detailed safe work procedures for specific tasks or projects.</p>
-                <div className="bg-muted p-3 rounded text-xs">
+                <div className="bg-muted p-3 rounded text-sm">
                   <p><strong>Key Fields:</strong> Work description, step-by-step procedures, equipment required, safety measures, emergency procedures</p>
                 </div>
                 <p><strong>Signature:</strong> Author and approver signatures</p>
@@ -446,7 +446,7 @@ export default function SafetyGuide() {
             <Gauge className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
             Company Safety Rating (CSR) Breakdown
           </h2>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-base text-muted-foreground">
             The CSR is a penalty-based rating visible to property managers. Starting at 100%, penalties reduce the score based on compliance gaps.
           </p>
 
@@ -505,7 +505,7 @@ export default function SafetyGuide() {
               </div>
 
               <Card className="border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950">
-                <CardContent className="pt-4 text-sm text-amber-900 dark:text-amber-100">
+                <CardContent className="pt-4 text-base text-amber-900 dark:text-amber-100">
                   <p className="flex items-center gap-2 font-semibold">
                     <Building2 className="w-4 h-4" />
                     Property Manager Visibility
@@ -528,7 +528,7 @@ export default function SafetyGuide() {
 
           <div className="space-y-3">
             <Card>
-              <CardContent className="pt-4 text-sm space-y-3">
+              <CardContent className="pt-4 text-base space-y-3">
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
                   <div>
@@ -556,7 +556,7 @@ export default function SafetyGuide() {
             </Card>
 
             <Card className="border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950">
-              <CardContent className="pt-4 text-sm text-red-900 dark:text-red-100">
+              <CardContent className="pt-4 text-base text-red-900 dark:text-red-100">
                 <p className="flex items-center gap-2 font-semibold">
                   <AlertTriangle className="w-4 h-4" />
                   Toolbox Meeting Signature Enforcement
@@ -588,7 +588,7 @@ export default function SafetyGuide() {
                   <Badge variant="outline">Required</Badge>
                 </div>
               </CardHeader>
-              <CardContent className="text-sm space-y-3">
+              <CardContent className="text-base space-y-3">
                 <ol className="list-decimal list-inside space-y-2">
                   <li>Go to <strong>Dashboard</strong> and click <strong>Start Day</strong> on a project</li>
                   <li>If no inspection today, system shows harness inspection prompt</li>
@@ -604,7 +604,7 @@ export default function SafetyGuide() {
                   <li>Provide your <strong>digital signature</strong></li>
                   <li>Click <strong>Submit Inspection</strong></li>
                 </ol>
-                <div className="bg-muted p-3 rounded text-xs">
+                <div className="bg-muted p-3 rounded text-sm">
                   <strong>Result:</strong> Inspection saved. You can now start work sessions for the rest of the day.
                 </div>
               </CardContent>
@@ -621,7 +621,7 @@ export default function SafetyGuide() {
                   <Badge variant="outline">Covers 7 Days</Badge>
                 </div>
               </CardHeader>
-              <CardContent className="text-sm space-y-3">
+              <CardContent className="text-base space-y-3">
                 <ol className="list-decimal list-inside space-y-2">
                   <li>Navigate to <strong>Toolbox Meeting</strong> page (or project page safety button)</li>
                   <li>Select the <strong>Project</strong> this meeting covers</li>
@@ -631,7 +631,7 @@ export default function SafetyGuide() {
                   <li>Verify all attendees have signed (system will block if missing)</li>
                   <li>Click <strong>Submit Meeting</strong></li>
                 </ol>
-                <div className="bg-muted p-3 rounded text-xs">
+                <div className="bg-muted p-3 rounded text-sm">
                   <strong>Result:</strong> Meeting saved. All work sessions within 7 days (before and after) are now covered for this project.
                 </div>
               </CardContent>
@@ -648,7 +648,7 @@ export default function SafetyGuide() {
                   <Badge variant="outline">Best Practice</Badge>
                 </div>
               </CardHeader>
-              <CardContent className="text-sm space-y-3">
+              <CardContent className="text-base space-y-3">
                 <ol className="list-decimal list-inside space-y-2">
                   <li>Navigate to <strong>FLHA Form</strong> page</li>
                   <li>Select the <strong>Project</strong> and <strong>Location</strong></li>
@@ -658,7 +658,7 @@ export default function SafetyGuide() {
                   <li>Provide your <strong>digital signature</strong></li>
                   <li>Click <strong>Submit FLHA</strong></li>
                 </ol>
-                <div className="bg-muted p-3 rounded text-xs">
+                <div className="bg-muted p-3 rounded text-sm">
                   <strong>Result:</strong> FLHA saved and available for PDF export. Documents site-specific safety planning.
                 </div>
               </CardContent>
@@ -675,7 +675,7 @@ export default function SafetyGuide() {
                   <Badge variant="outline">As Needed</Badge>
                 </div>
               </CardHeader>
-              <CardContent className="text-sm space-y-3">
+              <CardContent className="text-base space-y-3">
                 <ol className="list-decimal list-inside space-y-2">
                   <li>Navigate to <strong>Incident Report</strong> page</li>
                   <li>Select <strong>Incident Type</strong>: Injury, Near-Miss, Property Damage, etc.</li>
@@ -687,7 +687,7 @@ export default function SafetyGuide() {
                   <li>Obtain required signatures (reporter, supervisor, management)</li>
                   <li>Click <strong>Submit Report</strong></li>
                 </ol>
-                <div className="bg-muted p-3 rounded text-xs">
+                <div className="bg-muted p-3 rounded text-sm">
                   <strong>Result:</strong> Incident documented with full audit trail. Available for regulatory reporting if required.
                 </div>
               </CardContent>
@@ -887,7 +887,7 @@ export default function SafetyGuide() {
             <Lock className="w-5 h-5 text-red-600 dark:text-red-400" />
             Permission Model
           </h2>
-          <p className="text-sm text-muted-foreground">Access to safety features is controlled by role and specific permissions:</p>
+          <p className="text-base text-muted-foreground">Access to safety features is controlled by role and specific permissions:</p>
 
           <div className="space-y-3">
             <Card className="border-l-4 border-l-green-500">
@@ -963,7 +963,7 @@ export default function SafetyGuide() {
               <Shield className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Pre-Work Enforcement</p>
-                <p className="text-sm text-muted-foreground">Harness inspection required before work sessions begin.</p>
+                <p className="text-base text-muted-foreground">Harness inspection required before work sessions begin.</p>
               </div>
             </div>
 
@@ -971,7 +971,7 @@ export default function SafetyGuide() {
               <Calendar className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">7-Day Coverage Window</p>
-                <p className="text-sm text-muted-foreground">One toolbox meeting covers work within 7 days either direction.</p>
+                <p className="text-base text-muted-foreground">One toolbox meeting covers work within 7 days either direction.</p>
               </div>
             </div>
 
@@ -979,7 +979,7 @@ export default function SafetyGuide() {
               <PenTool className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Digital Signatures</p>
-                <p className="text-sm text-muted-foreground">Legally binding signatures captured with audit timestamps.</p>
+                <p className="text-base text-muted-foreground">Legally binding signatures captured with audit timestamps.</p>
               </div>
             </div>
 
@@ -987,7 +987,7 @@ export default function SafetyGuide() {
               <Lock className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Immutable Records</p>
-                <p className="text-sm text-muted-foreground">Once signed, safety documents cannot be modified.</p>
+                <p className="text-base text-muted-foreground">Once signed, safety documents cannot be modified.</p>
               </div>
             </div>
 
@@ -995,7 +995,7 @@ export default function SafetyGuide() {
               <Download className="w-5 h-5 text-action-600 dark:text-action-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">PDF Export</p>
-                <p className="text-sm text-muted-foreground">Professional PDFs with embedded signatures for audits.</p>
+                <p className="text-base text-muted-foreground">Professional PDFs with embedded signatures for audits.</p>
               </div>
             </div>
 
@@ -1003,7 +1003,7 @@ export default function SafetyGuide() {
               <Gauge className="w-5 h-5 text-cyan-600 dark:text-cyan-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">CSR Visibility</p>
-                <p className="text-sm text-muted-foreground">Property managers can view your compliance rating.</p>
+                <p className="text-base text-muted-foreground">Property managers can view your compliance rating.</p>
               </div>
             </div>
 
@@ -1011,7 +1011,7 @@ export default function SafetyGuide() {
               <Package className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Personal Kit Integration</p>
-                <p className="text-sm text-muted-foreground">Link inspections to your assigned equipment by serial.</p>
+                <p className="text-base text-muted-foreground">Link inspections to your assigned equipment by serial.</p>
               </div>
             </div>
 
@@ -1019,7 +1019,7 @@ export default function SafetyGuide() {
               <Building2 className="w-5 h-5 text-gray-600 dark:text-gray-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">White-Label Branding</p>
-                <p className="text-sm text-muted-foreground">Company name appears on PDF headers when branding active.</p>
+                <p className="text-base text-muted-foreground">Company name appears on PDF headers when branding active.</p>
               </div>
             </div>
           </div>
@@ -1036,35 +1036,35 @@ export default function SafetyGuide() {
 
           <div className="space-y-3">
             <Card className="border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950">
-              <CardContent className="pt-4 text-sm text-red-900 dark:text-red-100 space-y-2">
+              <CardContent className="pt-4 text-base text-red-900 dark:text-red-100 space-y-2">
                 <p className="font-semibold">Harness Inspection is a Hard Gate</p>
                 <p>The system will not allow starting a work session without a same-day harness inspection. This is enforced in code and cannot be bypassed.</p>
               </CardContent>
             </Card>
 
             <Card className="border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950">
-              <CardContent className="pt-4 text-sm text-blue-900 dark:text-blue-100 space-y-2">
+              <CardContent className="pt-4 text-base text-blue-900 dark:text-blue-100 space-y-2">
                 <p className="font-semibold">All Attendees Must Sign</p>
                 <p>Toolbox meetings require signatures from every selected attendee. The API validates that each attendee ID has a corresponding signature before saving.</p>
               </CardContent>
             </Card>
 
             <Card className="border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-950">
-              <CardContent className="pt-4 text-sm text-emerald-900 dark:text-emerald-100 space-y-2">
+              <CardContent className="pt-4 text-base text-emerald-900 dark:text-emerald-100 space-y-2">
                 <p className="font-semibold">Bi-Directional 7-Day Coverage</p>
                 <p>A toolbox meeting covers work sessions 7 days <em>before</em> and 7 days <em>after</em> the meeting date. A meeting on Dec 2 covers Nov 25 - Dec 9.</p>
               </CardContent>
             </Card>
 
             <Card className="border-purple-200 dark:border-purple-900 bg-purple-50 dark:bg-purple-950">
-              <CardContent className="pt-4 text-sm text-purple-900 dark:text-purple-100 space-y-2">
+              <CardContent className="pt-4 text-base text-purple-900 dark:text-purple-100 space-y-2">
                 <p className="font-semibold">Signatures are Immutable</p>
                 <p>Once a safety document is signed and submitted, the signature data (base64 image) is stored permanently. No edit endpoints exist for safety documents.</p>
               </CardContent>
             </Card>
 
             <Card className="border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950">
-              <CardContent className="pt-4 text-sm text-amber-900 dark:text-amber-100 space-y-2">
+              <CardContent className="pt-4 text-base text-amber-900 dark:text-amber-100 space-y-2">
                 <p className="font-semibold">CSR Minimum is 20%</p>
                 <p>Maximum penalty is 80% (25% + 25% + 25% + 5% for document reviews). Project completion status is informational only and doesn't penalize CSR.</p>
               </CardContent>
@@ -1135,7 +1135,7 @@ export default function SafetyGuide() {
 
         {/* Footer */}
         <Card className="border-muted bg-muted/50">
-          <CardContent className="pt-6 text-sm text-muted-foreground">
+          <CardContent className="pt-6 text-base text-muted-foreground">
             <p><strong>Last updated:</strong> December 2, 2024 | <strong>Version:</strong> 1.0</p>
             <p className="mt-1">This document serves as the authoritative reference for the Safety & Compliance System. For technical implementation details, see <code>safety-documentation-instructions-v1.0.md</code> in the instructions folder.</p>
           </CardContent>

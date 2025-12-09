@@ -172,7 +172,7 @@ export default function IRATALoggingGuide() {
                   Movement & Positioning
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   <span>Ascending</span>
@@ -207,7 +207,7 @@ export default function IRATALoggingGuide() {
                   Rigging & Setup
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   <span>Rigging</span>
@@ -238,7 +238,7 @@ export default function IRATALoggingGuide() {
                   Rescue & Emergency
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   <span>Rescue Techniques</span>
@@ -265,7 +265,7 @@ export default function IRATALoggingGuide() {
                   Work Tasks
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   <span>Window Cleaning</span>
@@ -394,7 +394,7 @@ export default function IRATALoggingGuide() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-xl md:text-2xl font-semibold">Statistics Overview</CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <div className="flex items-center gap-2">
                   <TrendingUp className="w-4 h-4 text-purple-500" />
                   <span>Total accumulated hours</span>
@@ -414,7 +414,7 @@ export default function IRATALoggingGuide() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-xl md:text-2xl font-semibold">History Features</CardTitle>
               </CardHeader>
-              <CardContent className="text-sm space-y-2">
+              <CardContent className="text-base space-y-2">
                 <div className="flex items-center gap-2">
                   <FileText className="w-4 h-4 text-purple-500" />
                   <span>Full session history with details</span>
