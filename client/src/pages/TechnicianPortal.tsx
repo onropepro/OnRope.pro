@@ -70,7 +70,8 @@ import {
   Users,
   Pencil,
   Star,
-  Gift
+  Gift,
+  Lock
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
@@ -308,6 +309,8 @@ const translations = {
     plusBenefit5: "60-day certification expiry alerts",
     plusBenefit6: "Rope access company profile visibility (opt-in)",
     plusUnlockInfo: "Unlock: Refer 1 verified tech who completes account creation",
+    plusLockedFeature: "PLUS Feature",
+    plusLockedDesc: "Refer a technician to unlock",
     copyCode: "Copy Code",
     codeCopied: "Copied!",
     referredTimes: "Referred {count} technician(s)",
@@ -578,6 +581,8 @@ const translations = {
     plusBenefit5: "Alertes d'expiration de certification à 60 jours",
     plusBenefit6: "Visibilité du profil d'entreprise de travaux sur cordes (opt-in)",
     plusUnlockInfo: "Débloquer: Parrainez 1 technicien vérifié qui complète la création de son compte",
+    plusLockedFeature: "Fonctionnalité PLUS",
+    plusLockedDesc: "Parrainez un technicien pour débloquer",
     copyCode: "Copier le code",
     codeCopied: "Copié!",
     referredTimes: "Parrainé {count} technicien(s)",
@@ -1384,7 +1389,7 @@ export default function TechnicianPortal() {
         </div>
       </header>
 
-      {/* Certification Expiry Warning Banner - Shows when cert expires within 30 days */}
+      {/* Certification Expiry Warning Banner - Shows when cert expires within 30 days (PLUS feature) */}
       {(() => {
         const urgentCerts: { type: string; expiryDate: string }[] = [];
         const today = new Date();
@@ -1411,6 +1416,29 @@ export default function TechnicianPortal() {
         }
         
         if (urgentCerts.length === 0) return null;
+        
+        // PLUS users see full warning, non-PLUS users see locked teaser
+        if (!user.hasPlusAccess) {
+          return (
+            <div className="bg-amber-500/20 border-b border-amber-500/30" data-testid="banner-certification-expiry-locked">
+              <div className="max-w-4xl mx-auto px-4 py-3">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <Lock className="w-5 h-5 text-amber-600 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm text-amber-700 dark:text-amber-400 flex items-center gap-2">
+                      {t.certificationExpiryBannerTitle}
+                      <Badge variant="secondary" className="gap-1">
+                        <Star className="w-3 h-3" />
+                        PLUS
+                      </Badge>
+                    </p>
+                    <p className="text-xs text-amber-600/80 dark:text-amber-400/80 mt-0.5">{t.plusLockedDesc}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        }
         
         return (
           <div className="bg-red-600 dark:bg-red-700 text-white" data-testid="banner-certification-expiry">
@@ -3349,71 +3377,87 @@ export default function TechnicianPortal() {
                   <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
                     <FileText className="w-4 h-4" />
                     {t.resume}
+                    {!user.hasPlusAccess && (
+                      <Badge variant="secondary" className="ml-2 gap-1">
+                        <Lock className="w-3 h-3" />
+                        PLUS
+                      </Badge>
+                    )}
                   </h3>
                   
-                  {user.resumeDocuments && user.resumeDocuments.filter((u: string) => u && u.trim()).length > 0 && (
-                    <div className="space-y-3">
-                      {user.resumeDocuments.filter((u: string) => u && u.trim()).map((url: string, index: number) => {
-                        const lowerUrl = url.toLowerCase();
-                        const isPdf = lowerUrl.endsWith('.pdf');
-                        const isImage = lowerUrl.match(/\.(jpg|jpeg|png|gif|webp|bmp)(\?|$)/i) || 
-                                      lowerUrl.includes('image') || 
-                                      (!isPdf && !lowerUrl.endsWith('.doc') && !lowerUrl.endsWith('.docx'));
-                        
-                        return (
-                          <a 
-                            key={index} 
-                            href={url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity bg-muted/30"
-                            data-testid={`link-resume-${index}`}
-                          >
-                            {isPdf ? (
-                              <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
-                                <FileText className="w-12 h-12 text-muted-foreground" />
-                                <span className="text-sm text-muted-foreground font-medium">{t.tapToViewPdf}</span>
-                              </div>
-                            ) : isImage ? (
-                              <img 
-                                src={url} 
-                                alt={`Resume ${index + 1}`}
-                                className="w-full h-auto max-h-64 object-contain"
-                                data-testid={`img-resume-${index}`}
-                              />
-                            ) : (
-                              <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
-                                <FileText className="w-12 h-12 text-muted-foreground" />
-                                <span className="text-sm text-muted-foreground font-medium">{t.tapToViewDocument}</span>
-                              </div>
-                            )}
-                          </a>
-                        );
-                      })}
+                  {user.hasPlusAccess ? (
+                    <>
+                      {user.resumeDocuments && user.resumeDocuments.filter((u: string) => u && u.trim()).length > 0 && (
+                        <div className="space-y-3">
+                          {user.resumeDocuments.filter((u: string) => u && u.trim()).map((url: string, index: number) => {
+                            const lowerUrl = url.toLowerCase();
+                            const isPdf = lowerUrl.endsWith('.pdf');
+                            const isImage = lowerUrl.match(/\.(jpg|jpeg|png|gif|webp|bmp)(\?|$)/i) || 
+                                          lowerUrl.includes('image') || 
+                                          (!isPdf && !lowerUrl.endsWith('.doc') && !lowerUrl.endsWith('.docx'));
+                            
+                            return (
+                              <a 
+                                key={index} 
+                                href={url} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity bg-muted/30"
+                                data-testid={`link-resume-${index}`}
+                              >
+                                {isPdf ? (
+                                  <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
+                                    <FileText className="w-12 h-12 text-muted-foreground" />
+                                    <span className="text-sm text-muted-foreground font-medium">{t.tapToViewPdf}</span>
+                                  </div>
+                                ) : isImage ? (
+                                  <img 
+                                    src={url} 
+                                    alt={`Resume ${index + 1}`}
+                                    className="w-full h-auto max-h-64 object-contain"
+                                    data-testid={`img-resume-${index}`}
+                                  />
+                                ) : (
+                                  <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
+                                    <FileText className="w-12 h-12 text-muted-foreground" />
+                                    <span className="text-sm text-muted-foreground font-medium">{t.tapToViewDocument}</span>
+                                  </div>
+                                )}
+                              </a>
+                            );
+                          })}
+                        </div>
+                      )}
+                      
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => triggerDocumentUpload('resume')}
+                        disabled={uploadingDocType === 'resume'}
+                        data-testid="button-upload-resume"
+                      >
+                        {uploadingDocType === 'resume' ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            {t.uploading}
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-4 h-4 mr-2" />
+                            {user.resumeDocuments && user.resumeDocuments.filter((u: string) => u && u.trim()).length > 0 
+                              ? t.addResume 
+                              : t.uploadResume}
+                          </>
+                        )}
+                      </Button>
+                    </>
+                  ) : (
+                    <div className="p-4 rounded-lg border border-dashed border-muted-foreground/30 bg-muted/30 text-center">
+                      <Lock className="w-6 h-6 mx-auto text-muted-foreground mb-2" />
+                      <p className="text-sm text-muted-foreground">{t.plusLockedFeature}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{t.plusLockedDesc}</p>
                     </div>
                   )}
-                  
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => triggerDocumentUpload('resume')}
-                    disabled={uploadingDocType === 'resume'}
-                    data-testid="button-upload-resume"
-                  >
-                    {uploadingDocType === 'resume' ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        {t.uploading}
-                      </>
-                    ) : (
-                      <>
-                        <Upload className="w-4 h-4 mr-2" />
-                        {user.resumeDocuments && user.resumeDocuments.filter((u: string) => u && u.trim()).length > 0 
-                          ? t.addResume 
-                          : t.uploadResume}
-                      </>
-                    )}
-                  </Button>
                 </div>
               </div>
             )}

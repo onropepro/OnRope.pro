@@ -29,7 +29,10 @@ import {
   AlertCircle,
   Loader2,
   Calendar,
-  FileText
+  FileText,
+  Lock,
+  Star,
+  Gift
 } from "lucide-react";
 import { format } from "date-fns";
 import type { JobPosting, User, JobApplication } from "@shared/schema";
@@ -133,6 +136,22 @@ const translations = {
     statusRejected: "Not Selected",
     jobOfferReceived: "You received a job offer!",
     receivedOn: "Received",
+    plusRequired: "PLUS Required",
+    plusRequiredDesc: "Job browsing is a PLUS feature. Refer a technician to unlock!",
+    unlockWithReferral: "Unlock with Referral",
+    referFriend: "Refer a Friend",
+    plusBenefits: "PLUS Benefits",
+    plusBenefitsList: [
+      "Browse job opportunities",
+      "Be visible to employers",
+      "Upload resume/CV",
+      "Export work history",
+      "30-day license expiry alerts"
+    ],
+    yourReferralCode: "Your Referral Code",
+    shareCode: "Share this code with fellow technicians",
+    copyCode: "Copy Code",
+    codeCopied: "Code copied!",
   },
   fr: {
     title: "Offres d'emploi",
@@ -227,6 +246,22 @@ const translations = {
     statusRejected: "Non selectionne",
     jobOfferReceived: "Vous avez recu une offre d'emploi!",
     receivedOn: "Recu le",
+    plusRequired: "PLUS Requis",
+    plusRequiredDesc: "La navigation d'emploi est une fonctionnalite PLUS. Referez un technicien pour debloquer!",
+    unlockWithReferral: "Debloquer avec une reference",
+    referFriend: "Referer un ami",
+    plusBenefits: "Avantages PLUS",
+    plusBenefitsList: [
+      "Parcourir les opportunites d'emploi",
+      "Etre visible par les employeurs",
+      "Telecharger CV/resume",
+      "Exporter l'historique de travail",
+      "Alertes d'expiration de licence 30 jours"
+    ],
+    yourReferralCode: "Votre code de reference",
+    shareCode: "Partagez ce code avec d'autres techniciens",
+    copyCode: "Copier le code",
+    codeCopied: "Code copie!",
   }
 };
 
@@ -433,6 +468,67 @@ export default function TechnicianJobBoard() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+        {/* PLUS Required Gate */}
+        {user && !(user as any).hasPlusAccess && (
+          <Card className="border-amber-500/50 bg-gradient-to-r from-amber-500/10 to-transparent">
+            <CardContent className="pt-6">
+              <div className="flex flex-col items-center text-center space-y-4">
+                <div className="p-4 rounded-full bg-amber-500/20">
+                  <Lock className="w-8 h-8 text-amber-600" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold flex items-center justify-center gap-2">
+                    <Star className="w-5 h-5 text-amber-500" />
+                    {t.plusRequired}
+                  </h2>
+                  <p className="text-muted-foreground mt-1">{t.plusRequiredDesc}</p>
+                </div>
+                
+                <div className="bg-muted/50 rounded-lg p-4 w-full max-w-md">
+                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                    <Gift className="w-4 h-4 text-primary" />
+                    {t.plusBenefits}
+                  </h3>
+                  <ul className="text-sm text-left space-y-2">
+                    {t.plusBenefitsList.map((benefit, i) => (
+                      <li key={i} className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
+                        <span>{benefit}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {user?.referralCode && (
+                  <div className="bg-card border rounded-lg p-4 w-full max-w-md">
+                    <h4 className="font-medium mb-2">{t.yourReferralCode}</h4>
+                    <div className="flex items-center gap-2">
+                      <code className="flex-1 bg-muted px-3 py-2 rounded font-mono text-lg tracking-wider">
+                        {user.referralCode}
+                      </code>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          navigator.clipboard.writeText(user.referralCode || "");
+                          toast({ title: t.codeCopied });
+                        }}
+                        data-testid="button-copy-referral-code"
+                      >
+                        {t.copyCode}
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">{t.shareCode}</p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Main content - only shown for PLUS users */}
+        {(user as any)?.hasPlusAccess && (
+          <>
         {/* Visibility Settings Card */}
         <Card className="border-primary/30 bg-gradient-to-r from-primary/5 to-transparent">
           <CardHeader>
@@ -684,6 +780,8 @@ export default function TechnicianJobBoard() {
             </div>
           )}
         </div>
+          </>
+        )}
       </main>
 
       {/* Job Details Dialog */}
