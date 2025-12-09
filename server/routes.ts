@@ -6509,10 +6509,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log(`[IRATA-Verify] Extracted level: Level ${result.irataLevel}`);
         }
         
-        // Save extracted license number if available
-        if (result.irataNumber) {
+        // Save extracted license number if available, but preserve the level/number format
+        // IMPORTANT: Don't overwrite if user already has a properly formatted license number
+        // The stored format is "level/number" (e.g., "3/123456") which is used for login
+        if (result.irataNumber && result.irataLevel) {
+          // Format as "level/number" to match registration format for login compatibility
+          const formattedLicense = `${result.irataLevel}/${result.irataNumber}`;
+          updateData.irataLicenseNumber = formattedLicense;
+          console.log(`[IRATA-Verify] Extracted and formatted license: ${formattedLicense}`);
+        } else if (result.irataNumber && !user.irataLicenseNumber) {
+          // Only set if user doesn't have one yet (shouldn't happen normally)
           updateData.irataLicenseNumber = result.irataNumber;
           console.log(`[IRATA-Verify] Extracted license number: ${result.irataNumber}`);
+        } else {
+          console.log(`[IRATA-Verify] Preserving existing license number: ${user.irataLicenseNumber}`);
         }
         
         await storage.updateUser(user.id, updateData);
