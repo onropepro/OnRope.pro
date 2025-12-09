@@ -2355,7 +2355,10 @@ export const jobPostings = pgTable("job_postings", {
   requirements: text("requirements"), // Job requirements/qualifications
   
   // Location
-  location: varchar("location"), // City, Province/State
+  location: varchar("location"), // City, Province/State (legacy field)
+  jobCity: varchar("job_city"), // City for filtering
+  jobProvinceState: varchar("job_province_state"), // Province/State for filtering
+  jobCountry: varchar("job_country"), // Country for filtering
   isRemote: boolean("is_remote").default(false),
   
   // Job type
