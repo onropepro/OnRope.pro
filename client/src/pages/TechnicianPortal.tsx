@@ -2030,29 +2030,8 @@ export default function TechnicianPortal() {
               {t.backToHome}
             </Button>
 
-            {/* Show message for non-technician users */}
-            {user.role !== 'rope_access_tech' && (
-              <Card className="border-amber-500/50 bg-amber-500/5">
-                <CardContent className="p-6 text-center space-y-4">
-                  <div className="p-4 rounded-full bg-amber-500/20 w-fit mx-auto">
-                    <Eye className="w-8 h-8 text-amber-500" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold">
-                      {language === 'en' ? 'Technician Feature' : 'Fonctionnalité Technicien'}
-                    </h3>
-                    <p className="text-muted-foreground mt-2">
-                      {language === 'en' 
-                        ? 'This feature allows technicians to preview and edit how their profile appears to potential employers. Log in with a technician account to use this feature.'
-                        : 'Cette fonctionnalité permet aux techniciens de prévisualiser et modifier l\'apparence de leur profil pour les employeurs potentiels. Connectez-vous avec un compte technicien pour utiliser cette fonctionnalité.'}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Header with edit button - only for technicians */}
-            {user.role === 'rope_access_tech' && (
+            {/* Header with edit button - for technicians and company owners (who often work as techs) */}
+            {(user.role === 'rope_access_tech' || user.role === 'company') && (
               <>
               <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
                 <CardHeader className="pb-2">

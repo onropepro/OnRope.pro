@@ -16901,10 +16901,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
-      // Only technicians can toggle their visibility
-      const EMPLOYEE_ROLES = ["rope_access_tech", "ground_crew", "ground_crew_supervisor", "supervisor", "operations_manager", "manager"];
-      if (!EMPLOYEE_ROLES.includes(currentUser.role)) {
-        return res.status(403).json({ message: "Only technicians can update visibility" });
+      // Technicians and company owners (who often also work as techs) can toggle their visibility
+      const ALLOWED_ROLES = ["rope_access_tech", "ground_crew", "ground_crew_supervisor", "supervisor", "operations_manager", "manager", "company"];
+      if (!ALLOWED_ROLES.includes(currentUser.role)) {
+        return res.status(403).json({ message: "Only technicians and company owners can update visibility" });
       }
 
       const { isVisible } = req.body;
@@ -16941,10 +16941,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
-      // Only technicians can update their specialties
-      const EMPLOYEE_ROLES = ["rope_access_tech", "ground_crew", "ground_crew_supervisor", "supervisor", "operations_manager", "manager"];
-      if (!EMPLOYEE_ROLES.includes(currentUser.role)) {
-        return res.status(403).json({ message: "Only technicians can update specialties" });
+      // Technicians and company owners (who often also work as techs) can update their specialties
+      const ALLOWED_ROLES = ["rope_access_tech", "ground_crew", "ground_crew_supervisor", "supervisor", "operations_manager", "manager", "company"];
+      if (!ALLOWED_ROLES.includes(currentUser.role)) {
+        return res.status(403).json({ message: "Only technicians and company owners can update specialties" });
       }
 
       const { specialties } = req.body;
@@ -16975,10 +16975,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
-      // Only technicians can update their expected salary
-      const EMPLOYEE_ROLES = ["rope_access_tech", "ground_crew", "ground_crew_supervisor", "supervisor", "operations_manager", "manager"];
-      if (!EMPLOYEE_ROLES.includes(currentUser.role)) {
-        return res.status(403).json({ message: "Only technicians can update expected salary" });
+      // Technicians and company owners (who often also work as techs) can update their expected salary
+      const ALLOWED_ROLES = ["rope_access_tech", "ground_crew", "ground_crew_supervisor", "supervisor", "operations_manager", "manager", "company"];
+      if (!ALLOWED_ROLES.includes(currentUser.role)) {
+        return res.status(403).json({ message: "Only technicians and company owners can update expected salary" });
       }
 
       const { minSalary, maxSalary, salaryPeriod } = req.body;
