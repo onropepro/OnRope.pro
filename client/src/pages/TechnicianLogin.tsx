@@ -400,20 +400,48 @@ export default function TechnicianLogin() {
         {/* Header */}
         <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
           <div className="container mx-auto px-6 py-4 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setLocation("/")}
-                data-testid="button-back-home"
-              >
-                <ArrowLeft className="w-4 h-4" />
-              </Button>
-              <img 
-                src={onRopeProLogo} 
-                alt="OnRopePro" 
-                className="h-8 object-contain"
-              />
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setLocation("/")}
+                  data-testid="button-back-home"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                </Button>
+                <img 
+                  src={onRopeProLogo} 
+                  alt="OnRopePro" 
+                  className="h-8 object-contain"
+                />
+              </div>
+              <nav className="hidden md:flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  className="text-sm font-medium"
+                  onClick={() => setLocation("#")}
+                  data-testid="nav-employer"
+                >
+                  Employer
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="text-sm font-medium"
+                  onClick={() => setLocation("/technician-login")}
+                  data-testid="nav-technician"
+                >
+                  Technician
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="text-sm font-medium"
+                  onClick={() => setLocation("#")}
+                  data-testid="nav-property-manager"
+                >
+                  Property Manager
+                </Button>
+              </nav>
             </div>
             <Button
               variant="outline"
