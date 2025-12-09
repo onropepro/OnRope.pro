@@ -5753,6 +5753,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get list of users referred by the logged-in user
+  app.get("/api/my-referrals", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Allow technicians and company owners to see their referrals
+      if (user.role !== 'rope_access_tech' && user.role !== 'company') {
+        return res.status(403).json({ message: "Only technicians and company owners can view referrals" });
+      }
+      
+      const referrals = await storage.getReferredUsers(user.id);
+      return res.json({ referrals });
+    } catch (error) {
+      console.error('[Referral] Error getting referrals:', error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Get pending invitations for the logged-in technician
   app.get("/api/my-invitations", requireAuth, async (req: Request, res: Response) => {
     try {

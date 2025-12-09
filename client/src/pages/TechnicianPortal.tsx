@@ -331,6 +331,9 @@ const translations = {
     copyCode: "Copy Code",
     codeCopied: "Copied!",
     referredTimes: "Referred {count} technician(s)",
+    yourReferrals: "Your Referrals",
+    noReferralsYet: "No referrals yet. Share your code to get started!",
+    joinedOn: "Joined",
     noReferralCodeYet: "No referral code yet",
     editExpirationDate: "Edit Expiration Date",
     setExpirationDate: "Set Expiration Date",
@@ -653,6 +656,9 @@ const translations = {
     copyCode: "Copier le code",
     codeCopied: "Copié!",
     referredTimes: "Parrainé {count} technicien(s)",
+    yourReferrals: "Vos parrainages",
+    noReferralsYet: "Pas encore de parrainages. Partagez votre code pour commencer!",
+    joinedOn: "Inscrit le",
     noReferralCodeYet: "Pas encore de code de parrainage",
     editExpirationDate: "Modifier la date d'expiration",
     setExpirationDate: "Définir la date d'expiration",
@@ -950,6 +956,20 @@ export default function TechnicianPortal() {
   // Fetch referral count for the technician
   const { data: referralCountData } = useQuery<{ count: number }>({
     queryKey: ["/api/my-referral-count"],
+    enabled: !!user && (user.role === 'rope_access_tech' || user.role === 'company'),
+  });
+
+  // Fetch list of referred users
+  const { data: referralsData } = useQuery<{
+    referrals: Array<{
+      id: string;
+      name: string | null;
+      email: string | null;
+      createdAt: string | null;
+      role: string;
+    }>;
+  }>({
+    queryKey: ["/api/my-referrals"],
     enabled: !!user && (user.role === 'rope_access_tech' || user.role === 'company'),
   });
   
@@ -2060,6 +2080,45 @@ export default function TechnicianPortal() {
                   </div>
                 )}
               </div>
+
+              {/* List of referred users */}
+              {user.referralCode && (
+                <div className="mt-6 pt-4 border-t">
+                  <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                    <Users className="w-4 h-4" />
+                    {t.yourReferrals}
+                  </h4>
+                  {referralsData?.referrals && referralsData.referrals.length > 0 ? (
+                    <div className="space-y-2">
+                      {referralsData.referrals.map((referral) => (
+                        <div
+                          key={referral.id}
+                          className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
+                          data-testid={`referral-item-${referral.id}`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                              <User className="w-4 h-4 text-primary" />
+                            </div>
+                            <div>
+                              <p className="font-medium text-sm">{referral.name || referral.email || 'User'}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {t.joinedOn} {referral.createdAt ? formatLocalDate(referral.createdAt) : '-'}
+                              </p>
+                            </div>
+                          </div>
+                          <Badge variant="secondary" className="text-xs">
+                            {referral.role === 'rope_access_tech' ? 'Technician' : 
+                             referral.role === 'company' ? 'Company' : referral.role}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">{t.noReferralsYet}</p>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
         )}

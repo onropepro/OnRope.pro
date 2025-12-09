@@ -39,6 +39,17 @@ export class Storage {
     return result.length;
   }
 
+  async getReferredUsers(userId: string): Promise<Pick<User, 'id' | 'name' | 'email' | 'createdAt' | 'role'>[]> {
+    const result = await db.select({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      createdAt: users.createdAt,
+      role: users.role,
+    }).from(users).where(eq(users.referredByUserId, userId)).orderBy(users.createdAt);
+    return result;
+  }
+
   async getUserByLicenseKey(licenseKey: string): Promise<User | undefined> {
     const result = await db.select().from(users).where(eq(users.licenseKey, licenseKey)).limit(1);
     return result[0] ? decryptSensitiveFields(result[0]) : undefined;
