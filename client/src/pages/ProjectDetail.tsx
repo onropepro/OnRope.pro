@@ -608,6 +608,7 @@ export default function ProjectDetail() {
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
       queryClient.invalidateQueries({ queryKey: ["/api/projects", id] });
       toast({ title: t('projectDetail.toasts.projectCompleted', 'Project completed successfully') });
+      setLocation("/dashboard?tab=projects");
     },
     onError: (error: Error) => {
       toast({ title: t('projectDetail.toasts.error', 'Error'), description: error.message, variant: "destructive" });
