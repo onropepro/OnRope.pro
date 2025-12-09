@@ -15693,6 +15693,106 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get my feedback requests (for technicians)
+  app.get("/api/my-feedback", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Get all feature requests submitted by this user
+      const requests = await db.select().from(featureRequests)
+        .where(eq(featureRequests.companyId, currentUser.id))
+        .orderBy(desc(featureRequests.createdAt));
+
+      // Get messages for each request
+      const requestsWithMessages = await Promise.all(requests.map(async (req) => {
+        const messages = await db.select().from(featureRequestMessages)
+          .where(eq(featureRequestMessages.featureRequestId, req.id))
+          .orderBy(featureRequestMessages.createdAt);
+        
+        // Count unread messages from superuser
+        const unreadCount = messages.filter(m => 
+          m.senderRole === 'superuser' && !m.readAt
+        ).length;
+        
+        return {
+          ...req,
+          messages,
+          unreadCount
+        };
+      }));
+
+      res.json({ requests: requestsWithMessages });
+    } catch (error) {
+      console.error("Get my feedback error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Mark feedback messages as read (for technicians)
+  app.post("/api/my-feedback/:id/mark-read", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const request = await storage.getFeatureRequestById(req.params.id);
+      if (!request || request.companyId !== currentUser.id) {
+        return res.status(404).json({ message: "Feedback not found" });
+      }
+
+      // Mark all messages from superuser as read
+      await db.update(featureRequestMessages)
+        .set({ readAt: new Date() })
+        .where(and(
+          eq(featureRequestMessages.featureRequestId, req.params.id),
+          eq(featureRequestMessages.senderRole, 'superuser'),
+          isNull(featureRequestMessages.readAt)
+        ));
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Mark feedback read error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Technician reply to feedback (for two-way communication)
+  app.post("/api/my-feedback/:id/reply", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const request = await storage.getFeatureRequestById(req.params.id);
+      if (!request || request.companyId !== currentUser.id) {
+        return res.status(404).json({ message: "Feedback not found" });
+      }
+
+      const { message } = req.body;
+      if (!message?.trim()) {
+        return res.status(400).json({ message: "Message is required" });
+      }
+
+      const messageData = insertFeatureRequestMessageSchema.parse({
+        featureRequestId: req.params.id,
+        senderId: currentUser.id,
+        senderRole: currentUser.role,
+        message: message.trim(),
+      });
+
+      const newMessage = await storage.createFeatureRequestMessage(messageData);
+      res.json({ message: newMessage });
+    } catch (error) {
+      console.error("Reply to feedback error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Create new feature request (company owners and technicians)
   app.post("/api/feature-requests", requireAuth, requireRole("company", "rope_access_tech"), async (req: Request, res: Response) => {
     try {

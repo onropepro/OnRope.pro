@@ -384,6 +384,18 @@ const translations = {
     feedbackSuccess: "Thank You!",
     feedbackSuccessDesc: "Your feedback has been submitted. We appreciate your input and will review it carefully.",
     feedbackError: "Failed to submit feedback",
+    viewMyFeedback: "View My Feedback",
+    myFeedbackTitle: "My Feedback",
+    myFeedbackDesc: "View your submitted feedback and responses from OnRopePro",
+    noFeedbackYet: "You haven't submitted any feedback yet",
+    feedbackStatus: "Status",
+    feedbackResponses: "Responses",
+    fromTeam: "OnRopePro Team",
+    fromYou: "You",
+    replyToFeedback: "Reply",
+    sendReply: "Send Reply",
+    replyPlaceholder: "Type your reply...",
+    newResponse: "New Response",
   },
   fr: {
     technicianPortal: "Portail du technicien",
@@ -688,6 +700,18 @@ const translations = {
     feedbackSuccess: "Merci!",
     feedbackSuccessDesc: "Vos commentaires ont été soumis. Nous apprécions votre contribution et les examinerons attentivement.",
     feedbackError: "Échec de la soumission des commentaires",
+    viewMyFeedback: "Voir mes commentaires",
+    myFeedbackTitle: "Mes commentaires",
+    myFeedbackDesc: "Consultez vos commentaires soumis et les réponses de OnRopePro",
+    noFeedbackYet: "Vous n'avez pas encore soumis de commentaires",
+    feedbackStatus: "Statut",
+    feedbackResponses: "Réponses",
+    fromTeam: "Équipe OnRopePro",
+    fromYou: "Vous",
+    replyToFeedback: "Répondre",
+    sendReply: "Envoyer la réponse",
+    replyPlaceholder: "Tapez votre réponse...",
+    newResponse: "Nouvelle réponse",
   }
 };
 
@@ -953,6 +977,36 @@ export default function TechnicianPortal() {
   const [feedbackPriority, setFeedbackPriority] = useState("normal");
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
   const [showFeedbackSuccess, setShowFeedbackSuccess] = useState(false);
+  const [showMyFeedbackDialog, setShowMyFeedbackDialog] = useState(false);
+  const [selectedFeedbackId, setSelectedFeedbackId] = useState<string | null>(null);
+  const [feedbackReply, setFeedbackReply] = useState("");
+  const [isSubmittingReply, setIsSubmittingReply] = useState(false);
+  
+  // Query for user's feedback
+  const { data: myFeedbackData, refetch: refetchMyFeedback } = useQuery<{
+    requests: Array<{
+      id: string;
+      title: string;
+      description: string;
+      category: string;
+      priority: string;
+      status: string;
+      createdAt: string;
+      messages: Array<{
+        id: string;
+        message: string;
+        senderRole: string;
+        createdAt: string;
+        readAt: string | null;
+      }>;
+      unreadCount: number;
+    }>;
+  }>({
+    queryKey: ["/api/my-feedback"],
+    enabled: !!user,
+  });
+  
+  const totalUnreadFeedback = myFeedbackData?.requests?.reduce((sum, r) => sum + r.unreadCount, 0) ?? 0;
   
   // Employer selection state (for PLUS members with multiple employers)
   const [showEmployerSelectDialog, setShowEmployerSelectDialog] = useState(false);
@@ -1698,15 +1752,31 @@ export default function TechnicianPortal() {
                     <p className="text-sm text-muted-foreground">{t.feedbackDesc}</p>
                   </div>
                 </div>
-                <Button
-                  variant="outline"
-                  onClick={() => setShowFeedbackDialog(true)}
-                  className="gap-2"
-                  data-testid="button-send-feedback"
-                >
-                  <MessageSquare className="w-4 h-4" />
-                  {t.sendFeedback}
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowMyFeedbackDialog(true)}
+                    className="gap-2 relative"
+                    data-testid="button-view-my-feedback"
+                  >
+                    <Mail className="w-4 h-4" />
+                    {t.viewMyFeedback}
+                    {totalUnreadFeedback > 0 && (
+                      <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 min-w-5 text-xs">
+                        {totalUnreadFeedback}
+                      </Badge>
+                    )}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowFeedbackDialog(true)}
+                    className="gap-2"
+                    data-testid="button-send-feedback"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    {t.sendFeedback}
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -3905,6 +3975,177 @@ export default function TechnicianPortal() {
             >
               {t.continueToEmployer}
               <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* My Feedback Dialog */}
+      <Dialog open={showMyFeedbackDialog} onOpenChange={(open) => {
+        setShowMyFeedbackDialog(open);
+        if (!open) {
+          setSelectedFeedbackId(null);
+          setFeedbackReply("");
+        }
+      }}>
+        <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto" data-testid="dialog-my-feedback">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <MessageSquare className="w-5 h-5 text-purple-500" />
+              {t.myFeedbackTitle}
+            </DialogTitle>
+            <DialogDescription>{t.myFeedbackDesc}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            {myFeedbackData?.requests && myFeedbackData.requests.length > 0 ? (
+              myFeedbackData.requests.map((feedback) => (
+                <div 
+                  key={feedback.id} 
+                  className={`border rounded-lg p-4 space-y-3 ${
+                    selectedFeedbackId === feedback.id ? 'ring-2 ring-primary' : ''
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h4 className="font-medium">{feedback.title}</h4>
+                        {feedback.unreadCount > 0 && (
+                          <Badge variant="destructive" className="text-xs">
+                            {feedback.unreadCount} {t.newResponse}
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1">{feedback.description}</p>
+                    </div>
+                    <Badge variant={
+                      feedback.status === 'completed' ? 'default' :
+                      feedback.status === 'in_progress' ? 'secondary' :
+                      feedback.status === 'reviewing' ? 'secondary' :
+                      'outline'
+                    }>
+                      {feedback.status.replace('_', ' ')}
+                    </Badge>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Badge variant="outline" className="text-xs">{feedback.category}</Badge>
+                    <span>{formatDateTime(new Date(feedback.createdAt))}</span>
+                  </div>
+                  
+                  {feedback.messages && feedback.messages.length > 0 && (
+                    <div className="pt-3 border-t space-y-2">
+                      <p className="text-sm font-medium">{t.feedbackResponses}:</p>
+                      {feedback.messages.map((msg) => (
+                        <div 
+                          key={msg.id}
+                          className={`p-3 rounded-md text-sm ${
+                            msg.senderRole === 'superuser'
+                              ? 'bg-primary/10 border-l-2 border-primary'
+                              : 'bg-muted'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-2 mb-1">
+                            <span className="font-medium text-xs">
+                              {msg.senderRole === 'superuser' ? t.fromTeam : t.fromYou}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              {formatDateTime(new Date(msg.createdAt))}
+                            </span>
+                          </div>
+                          <p className="whitespace-pre-wrap">{msg.message}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {selectedFeedbackId === feedback.id ? (
+                    <div className="pt-3 border-t space-y-2">
+                      <Textarea
+                        placeholder={t.replyPlaceholder}
+                        value={feedbackReply}
+                        onChange={(e) => setFeedbackReply(e.target.value)}
+                        className="min-h-[80px]"
+                        data-testid="input-feedback-reply"
+                      />
+                      <div className="flex justify-end gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            setSelectedFeedbackId(null);
+                            setFeedbackReply("");
+                          }}
+                        >
+                          {t.cancel}
+                        </Button>
+                        <Button 
+                          size="sm"
+                          disabled={!feedbackReply.trim() || isSubmittingReply}
+                          onClick={async () => {
+                            if (!feedbackReply.trim()) return;
+                            setIsSubmittingReply(true);
+                            try {
+                              const response = await fetch(`/api/my-feedback/${feedback.id}/reply`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                credentials: 'include',
+                                body: JSON.stringify({ message: feedbackReply }),
+                              });
+                              if (response.ok) {
+                                setFeedbackReply("");
+                                setSelectedFeedbackId(null);
+                                refetchMyFeedback();
+                                toast({
+                                  title: language === 'en' ? "Reply sent" : "Réponse envoyée",
+                                });
+                              }
+                            } catch (error) {
+                              toast({
+                                title: language === 'en' ? "Failed to send reply" : "Échec de l'envoi de la réponse",
+                                variant: "destructive",
+                              });
+                            } finally {
+                              setIsSubmittingReply(false);
+                            }
+                          }}
+                          data-testid="button-send-reply"
+                        >
+                          {isSubmittingReply ? <Loader2 className="w-4 h-4 animate-spin" /> : t.sendReply}
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={async () => {
+                        setSelectedFeedbackId(feedback.id);
+                        if (feedback.unreadCount > 0) {
+                          await fetch(`/api/my-feedback/${feedback.id}/mark-read`, {
+                            method: 'POST',
+                            credentials: 'include',
+                          });
+                          refetchMyFeedback();
+                        }
+                      }}
+                      data-testid={`button-reply-feedback-${feedback.id}`}
+                    >
+                      <MessageSquare className="w-4 h-4 mr-2" />
+                      {t.replyToFeedback}
+                    </Button>
+                  )}
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-8">
+                <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                <p className="text-muted-foreground">{t.noFeedbackYet}</p>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setShowMyFeedbackDialog(false)} data-testid="button-close-my-feedback">
+              {t.cancel}
             </Button>
           </DialogFooter>
         </DialogContent>
