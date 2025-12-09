@@ -717,12 +717,12 @@ export default function TechnicianLogin() {
                   </div>
                   <div>
                     <h3 className="font-bold text-xl">Tech Plus</h3>
-                    <p className="text-sm text-muted-foreground">Unlocked via referral</p>
+                    <p className="text-sm text-muted-foreground">Unlock by referring OnRopePro to 1 other tech</p>
                   </div>
                 </div>
                 <div className="mb-6">
                   <span className="text-4xl font-extrabold">$0</span>
-                  <span className="text-muted-foreground ml-2">with 1 referral</span>
+                  <span className="text-muted-foreground ml-2">also forever</span>
                 </div>
                 <ul className="space-y-3 mb-8">
                   {plusFeatures.map((feature, index) => (
