@@ -2600,6 +2600,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         irataBaselineHours,
         irataExpirationDate,
         spratExpirationDate,
+        ropeAccessSpecialties,
       } = req.body;
 
       // Validate required fields
@@ -2641,6 +2642,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (irataBaselineHours !== undefined) updateData.irataBaselineHours = irataBaselineHours || "0";
       if (irataExpirationDate !== undefined) updateData.irataExpirationDate = irataExpirationDate || null;
       if (spratExpirationDate !== undefined) updateData.spratExpirationDate = spratExpirationDate || null;
+      if (ropeAccessSpecialties !== undefined) updateData.ropeAccessSpecialties = Array.isArray(ropeAccessSpecialties) ? ropeAccessSpecialties : [];
 
       // Sensitive fields - these are encrypted by storage.updateUser via encryptSensitiveFields
       if (socialInsuranceNumber !== undefined) updateData.socialInsuranceNumber = socialInsuranceNumber || null;
