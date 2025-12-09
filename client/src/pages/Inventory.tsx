@@ -17,7 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertGearItemSchema, type InsertGearItem, type GearItem, type GearAssignment, type GearSerialNumber } from "@shared/schema";
-import { ArrowLeft, Plus, Pencil, X, Trash2, Shield, Cable, Link2, Gauge, TrendingUp, HardHat, Hand, Fuel, Scissors, PaintBucket, Droplets, CircleDot, Lock, Anchor, MoreHorizontal, Users, ShieldAlert, AlertTriangle, FileWarning, FileDown, Wrench } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, X, Trash2, Shield, Cable, Link2, Gauge, TrendingUp, HardHat, Hand, Fuel, Scissors, PaintBucket, Droplets, CircleDot, Lock, Anchor, Zap, MoreHorizontal, Users, ShieldAlert, AlertTriangle, FileWarning, FileDown, Wrench } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { hasFinancialAccess, canViewCSR, canAccessInventory, canManageInventory, canAssignGear, canViewGearAssignments } from "@/lib/permissions";
 import HarnessInspectionForm from "./HarnessInspectionForm";
@@ -46,6 +46,7 @@ const gearTypes = [
   { name: "Suction cup", icon: CircleDot },
   { name: "Back up device", icon: Lock },
   { name: "Lanyard", icon: Anchor },
+  { name: "Shock absorber", icon: Zap },
   { name: "Other", icon: MoreHorizontal }
 ];
 
@@ -210,7 +211,7 @@ export default function Inventory() {
   const CATALOG_SUPPORTED_TYPES = [
     "Descender", "Harness", "Rope", "Carabiner - Steel", "Carabiner - Aluminum",
     "Ascender", "Helmet", "Gloves", "Work positioning device", "Squeegee rubbers",
-    "Applicators", "Suction cup", "Back up device", "Lanyard"
+    "Applicators", "Suction cup", "Back up device", "Lanyard", "Shock absorber"
   ];
 
   // Fetch equipment catalogs for smart gear picker
@@ -269,6 +270,10 @@ export default function Inventory() {
   const { data: lanyardCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
     queryKey: ["/api/equipment-catalog", { type: "Lanyard" }],
     queryFn: async () => (await fetch("/api/equipment-catalog?type=Lanyard")).json(),
+  });
+  const { data: shockAbsorberCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
+    queryKey: ["/api/equipment-catalog", { type: "Shock absorber" }],
+    queryFn: async () => (await fetch("/api/equipment-catalog?type=Shock%20absorber")).json(),
   });
 
   // Create damage report mutation
@@ -612,6 +617,7 @@ export default function Inventory() {
       case "Suction cup": return suctionCupCatalog?.items || [];
       case "Back up device": return backupDeviceCatalog?.items || [];
       case "Lanyard": return lanyardCatalog?.items || [];
+      case "Shock absorber": return shockAbsorberCatalog?.items || [];
       default: return [];
     }
   };
