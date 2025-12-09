@@ -108,7 +108,7 @@ export default function Employer() {
           </Button>
           <Button 
             onClick={() => setLocation("/pricing")}
-            className="bg-rust-500 hover:bg-rust-600 focus:ring-4 focus:ring-action-500/50"
+            className="bg-action-600 hover:bg-action-500 focus:ring-4 focus:ring-action-500/50"
             data-testid="button-get-started-header"
           >
             {t('login.header.getStarted', 'Get Started')}
@@ -145,7 +145,7 @@ export default function Employer() {
           <Button 
             size="lg"
             onClick={() => setLocation("/pricing")}
-            className="gap-2 px-6 bg-rust-500 hover:bg-rust-600 focus:ring-4 focus:ring-action-500/50"
+            className="gap-2 px-6 bg-action-600 hover:bg-action-500 focus:ring-4 focus:ring-action-500/50"
             data-testid="button-get-started-free"
           >
             <Rocket className="w-4 h-4" />
