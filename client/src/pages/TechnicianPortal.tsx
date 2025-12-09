@@ -1051,6 +1051,29 @@ export default function TechnicianPortal() {
   
   const totalUnreadFeedback = myFeedbackData?.requests?.reduce((sum, r) => sum + r.unreadCount, 0) ?? 0;
   
+  // Mark all feedback as read when the dialog opens
+  useEffect(() => {
+    const markAllAsRead = async () => {
+      if (showMyFeedbackDialog && myFeedbackData?.requests) {
+        const unreadRequests = myFeedbackData.requests.filter(r => r.unreadCount > 0);
+        if (unreadRequests.length > 0) {
+          try {
+            await Promise.all(unreadRequests.map(feedback => 
+              fetch(`/api/my-feedback/${feedback.id}/mark-read`, {
+                method: 'POST',
+                credentials: 'include',
+              })
+            ));
+            refetchMyFeedback();
+          } catch (error) {
+            console.error('Failed to mark feedback as read:', error);
+          }
+        }
+      }
+    };
+    markAllAsRead();
+  }, [showMyFeedbackDialog, myFeedbackData?.requests?.length]);
+  
   // Employer selection state (for PLUS members with multiple employers)
   const [showEmployerSelectDialog, setShowEmployerSelectDialog] = useState(false);
   const [selectedEmployerId, setSelectedEmployerId] = useState<string | null>(null);
@@ -4302,20 +4325,8 @@ export default function TechnicianPortal() {
       </Dialog>
 
       {/* My Feedback Dialog */}
-      <Dialog open={showMyFeedbackDialog} onOpenChange={async (open) => {
+      <Dialog open={showMyFeedbackDialog} onOpenChange={(open) => {
         setShowMyFeedbackDialog(open);
-        if (open && myFeedbackData?.requests) {
-          // Mark all unread feedback as read when dialog opens
-          for (const feedback of myFeedbackData.requests) {
-            if (feedback.unreadCount > 0) {
-              await fetch(`/api/my-feedback/${feedback.id}/mark-read`, {
-                method: 'POST',
-                credentials: 'include',
-              });
-            }
-          }
-          refetchMyFeedback();
-        }
         if (!open) {
           setSelectedFeedbackId(null);
           setFeedbackReply("");
