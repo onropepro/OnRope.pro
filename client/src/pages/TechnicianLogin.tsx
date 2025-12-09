@@ -112,8 +112,8 @@ const problemRows = [
       "IRATA expiring next week",
       "Nobody told me",
       "Scrambling for recert",
-      "Almost got caught on site",
-      "Why isn't there an alert?",
+      "Almost got caught on site with expired SPRAT",
+      "Why isn't there a renewal alert?",
       "This could have been prevented",
     ]
   },
