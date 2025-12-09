@@ -4274,6 +4274,156 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==================== BUILDING INSTRUCTIONS ====================
+
+  // Get building instructions by building ID (accessible to building managers, companies with projects, and superuser)
+  app.get("/api/buildings/:buildingId/instructions", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { buildingId } = req.params;
+      const user = await storage.getUser(req.session.userId!);
+      
+      if (!user) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      // SuperUser can access all
+      if (req.session.userId === 'superuser') {
+        const instructions = await storage.getBuildingInstructions(buildingId);
+        return res.json(instructions || null);
+      }
+
+      // Building manager can only access their own building
+      if (user.role === 'building_manager') {
+        const building = await storage.getBuildingById(buildingId);
+        if (!building || building.strataPlanNumber !== user.strataPlanNumber) {
+          return res.status(403).json({ message: "Access denied" });
+        }
+        const instructions = await storage.getBuildingInstructions(buildingId);
+        return res.json(instructions || null);
+      }
+
+      // Company owners can access buildings they have projects for
+      if (user.role === 'company') {
+        const building = await storage.getBuildingById(buildingId);
+        if (building) {
+          const projects = await storage.getProjectsByCompany(user.id);
+          const hasProjectForBuilding = projects.some(p => 
+            p.strataPlanNumber && 
+            p.strataPlanNumber.toUpperCase().replace(/\s/g, '') === 
+            building.strataPlanNumber.toUpperCase().replace(/\s/g, '')
+          );
+          if (hasProjectForBuilding) {
+            const instructions = await storage.getBuildingInstructions(buildingId);
+            return res.json(instructions || null);
+          }
+        }
+      }
+
+      return res.status(403).json({ message: "Access denied" });
+    } catch (error) {
+      console.error('[BuildingInstructions] Get error:', error);
+      res.status(500).json({ message: "Failed to get building instructions" });
+    }
+  });
+
+  // Create or update building instructions
+  app.post("/api/buildings/:buildingId/instructions", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { buildingId } = req.params;
+      const user = await storage.getUser(req.session.userId!);
+      
+      if (!user) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      // SuperUser can update any building
+      if (req.session.userId === 'superuser') {
+        const instructions = await storage.upsertBuildingInstructions({
+          buildingId,
+          ...req.body,
+          createdByUserId: 'superuser',
+          createdByRole: 'superuser',
+        });
+        return res.json(instructions);
+      }
+
+      // Building manager can only update their own building
+      if (user.role === 'building_manager') {
+        const building = await storage.getBuildingById(buildingId);
+        if (!building || building.strataPlanNumber !== user.strataPlanNumber) {
+          return res.status(403).json({ message: "Access denied" });
+        }
+        const instructions = await storage.upsertBuildingInstructions({
+          buildingId,
+          ...req.body,
+          createdByUserId: user.id,
+          createdByRole: 'building_manager',
+        });
+        return res.json(instructions);
+      }
+
+      // Company owners can update buildings they have projects for
+      if (user.role === 'company') {
+        const building = await storage.getBuildingById(buildingId);
+        if (building) {
+          const projects = await storage.getProjectsByCompany(user.id);
+          const hasProjectForBuilding = projects.some(p => 
+            p.strataPlanNumber && 
+            p.strataPlanNumber.toUpperCase().replace(/\s/g, '') === 
+            building.strataPlanNumber.toUpperCase().replace(/\s/g, '')
+          );
+          if (hasProjectForBuilding) {
+            const instructions = await storage.upsertBuildingInstructions({
+              buildingId,
+              ...req.body,
+              createdByUserId: user.id,
+              createdByRole: 'company',
+            });
+            return res.json(instructions);
+          }
+        }
+      }
+
+      return res.status(403).json({ message: "Access denied" });
+    } catch (error) {
+      console.error('[BuildingInstructions] Upsert error:', error);
+      res.status(500).json({ message: "Failed to save building instructions" });
+    }
+  });
+
+  // Delete building instructions (SuperUser and building managers only)
+  app.delete("/api/buildings/:buildingId/instructions", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { buildingId } = req.params;
+      const user = await storage.getUser(req.session.userId!);
+      
+      if (!user) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      // SuperUser can delete any
+      if (req.session.userId === 'superuser') {
+        await storage.deleteBuildingInstructions(buildingId);
+        return res.json({ success: true });
+      }
+
+      // Building manager can only delete their own
+      if (user.role === 'building_manager') {
+        const building = await storage.getBuildingById(buildingId);
+        if (!building || building.strataPlanNumber !== user.strataPlanNumber) {
+          return res.status(403).json({ message: "Access denied" });
+        }
+        await storage.deleteBuildingInstructions(buildingId);
+        return res.json({ success: true });
+      }
+
+      return res.status(403).json({ message: "Access denied" });
+    } catch (error) {
+      console.error('[BuildingInstructions] Delete error:', error);
+      res.status(500).json({ message: "Failed to delete building instructions" });
+    }
+  });
+
   // ==================== SUPERUSER TECHNICIAN DATABASE ====================
 
   // Get all technicians (SuperUser only)
