@@ -437,7 +437,7 @@ export default function TechnicianLogin() {
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
                 You Work.{" "}
-                <span className="bg-gradient-to-r from-primary to-[#0369A1] bg-clip-text text-transparent">Everything Else Is Automatic.</span>
+                <span className="text-[#0369A1]">Everything Else Is Automatic.</span>
               </h1>
               
               <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
@@ -448,7 +448,7 @@ export default function TechnicianLogin() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
                 <Button 
                   size="lg" 
-                  className="gap-2 rounded-full bg-gradient-to-r from-primary to-[#0369A1] shadow-lg shadow-primary/25"
+                  className="gap-2 rounded-full bg-[#0369A1] shadow-lg shadow-primary/25"
                   onClick={() => setShowRegistration(true)}
                   data-testid="button-hero-cta"
                 >
@@ -675,7 +675,7 @@ export default function TechnicianLogin() {
               {/* Plus */}
               <div className="p-8 rounded-3xl border-2 border-primary bg-gradient-to-b from-primary/5 to-primary/10 relative">
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <span className="bg-gradient-to-r from-primary to-[#0369A1] text-primary-foreground text-xs font-semibold px-4 py-1.5 rounded-full shadow-lg">
+                  <span className="bg-[#0369A1] text-primary-foreground text-xs font-semibold px-4 py-1.5 rounded-full shadow-lg">
                     Most Popular
                   </span>
                 </div>
@@ -702,7 +702,7 @@ export default function TechnicianLogin() {
                 </ul>
                 <Button 
                   size="lg"
-                  className="w-full rounded-full bg-gradient-to-r from-primary to-[#0369A1]"
+                  className="w-full rounded-full bg-[#0369A1]"
                   onClick={() => setShowRegistration(true)}
                   data-testid="button-plans-cta"
                 >
@@ -741,7 +741,7 @@ export default function TechnicianLogin() {
                 <div className="space-y-8">
                   {steps.map((step, index) => (
                     <div key={index} className="relative flex gap-6">
-                      <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-r from-primary to-[#0369A1] text-primary-foreground flex items-center justify-center font-bold text-lg z-10">
+                      <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#0369A1] text-primary-foreground flex items-center justify-center font-bold text-lg z-10">
                         {step.number}
                       </div>
                       <div className="pt-2">
@@ -757,7 +757,7 @@ export default function TechnicianLogin() {
             <div className="mt-16 text-center">
               <Button 
                 size="lg" 
-                className="gap-2 rounded-full bg-gradient-to-r from-primary to-[#0369A1]"
+                className="gap-2 rounded-full bg-[#0369A1]"
                 onClick={() => setShowRegistration(true)}
                 data-testid="button-steps-cta"
               >
@@ -793,7 +793,7 @@ export default function TechnicianLogin() {
         </section>
 
         {/* Final CTA - Flowbite Style */}
-        <section className="py-20 lg:py-28 bg-gradient-to-r from-primary/10 via-[#0369A1]/10 to-primary/10">
+        <section className="py-20 lg:py-28 bg-[#0369A1]/10">
           <div className="container mx-auto px-6 lg:px-8 text-center">
             <h2 className="text-3xl md:text-4xl font-extrabold mb-6">
               Set up once. That's it.
@@ -805,7 +805,7 @@ export default function TechnicianLogin() {
             <div className="flex flex-col items-center gap-6">
               <Button 
                 size="lg" 
-                className="gap-2 rounded-full bg-gradient-to-r from-primary to-[#0369A1] shadow-lg shadow-primary/25"
+                className="gap-2 rounded-full bg-[#0369A1] shadow-lg shadow-primary/25"
                 onClick={() => setShowRegistration(true)}
                 data-testid="button-final-cta"
               >
