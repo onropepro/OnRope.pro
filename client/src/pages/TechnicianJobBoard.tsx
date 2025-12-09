@@ -35,7 +35,9 @@ import {
   Lock,
   Star,
   Gift,
-  Save
+  Save,
+  X,
+  Trash2
 } from "lucide-react";
 import { format } from "date-fns";
 import type { JobPosting, User, JobApplication } from "@shared/schema";
@@ -137,8 +139,18 @@ const translations = {
     statusOffered: "Job Offer Received",
     statusHired: "Hired",
     statusRejected: "Not Selected",
+    statusRefused: "Offer Declined",
     jobOfferReceived: "You received a job offer!",
     receivedOn: "Received",
+    refuseOffer: "Decline Offer",
+    deleteApplication: "Delete",
+    offerRefused: "Offer Declined",
+    offerRefusedDesc: "The job offer has been declined",
+    applicationDeleted: "Application Deleted",
+    applicationDeletedDesc: "Your application has been removed",
+    refuseFailed: "Failed to decline offer",
+    deleteFailed: "Failed to delete application",
+    viewedOffers: "Viewed/Past Offers",
     plusRequired: "PLUS Required",
     plusRequiredDesc: "Job browsing is a PLUS feature. Refer a technician to unlock!",
     unlockWithReferral: "Unlock with Referral",
@@ -275,8 +287,18 @@ const translations = {
     statusOffered: "Offre d'emploi recue",
     statusHired: "Embauche",
     statusRejected: "Non selectionne",
+    statusRefused: "Offre refusee",
     jobOfferReceived: "Vous avez recu une offre d'emploi!",
     receivedOn: "Recu le",
+    refuseOffer: "Refuser l'offre",
+    deleteApplication: "Supprimer",
+    offerRefused: "Offre refusee",
+    offerRefusedDesc: "L'offre d'emploi a ete refusee",
+    applicationDeleted: "Candidature supprimee",
+    applicationDeletedDesc: "Votre candidature a ete supprimee",
+    refuseFailed: "Echec du refus de l'offre",
+    deleteFailed: "Echec de la suppression",
+    viewedOffers: "Offres consultees/passees",
     plusRequired: "PLUS Requis",
     plusRequiredDesc: "La navigation d'emploi est une fonctionnalite PLUS. Referez un technicien pour debloquer!",
     unlockWithReferral: "Debloquer avec une reference",
@@ -425,6 +447,44 @@ export default function TechnicianJobBoard() {
     onError: () => {
       toast({
         title: t.withdrawFailed,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const refuseMutation = useMutation({
+    mutationFn: async (applicationId: string) => {
+      return apiRequest("POST", `/api/job-applications/${applicationId}/refuse`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/job-applications/my"] });
+      toast({
+        title: t.offerRefused,
+        description: t.offerRefusedDesc,
+      });
+    },
+    onError: () => {
+      toast({
+        title: t.refuseFailed,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (applicationId: string) => {
+      return apiRequest("DELETE", `/api/job-applications/${applicationId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/job-applications/my"] });
+      toast({
+        title: t.applicationDeleted,
+        description: t.applicationDeletedDesc,
+      });
+    },
+    onError: () => {
+      toast({
+        title: t.deleteFailed,
         variant: "destructive",
       });
     },
@@ -808,6 +868,7 @@ export default function TechnicianJobBoard() {
               <div className="grid gap-3">
                 {myApplications.map((app) => {
                   const isOffer = app.status === "offered";
+                  const isRefused = app.status === "refused";
                   const statusLabel = {
                     applied: t.statusApplied,
                     reviewing: t.statusReviewing,
@@ -815,6 +876,7 @@ export default function TechnicianJobBoard() {
                     offered: t.statusOffered,
                     hired: t.statusHired,
                     rejected: t.statusRejected,
+                    refused: t.statusRefused,
                   }[app.status] || app.status;
 
                   const statusVariant = {
@@ -824,6 +886,7 @@ export default function TechnicianJobBoard() {
                     offered: "default" as const,
                     hired: "default" as const,
                     rejected: "destructive" as const,
+                    refused: "outline" as const,
                   }[app.status] || "secondary" as const;
 
                   return (
@@ -847,7 +910,7 @@ export default function TechnicianJobBoard() {
                               </h3>
                             </div>
                             <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                              <Badge variant={statusVariant}>{statusLabel}</Badge>
+                              {!isOffer && <Badge variant={statusVariant}>{statusLabel}</Badge>}
                               {app.jobPosting?.location && (
                                 <span className="flex items-center gap-1">
                                   <MapPin className="w-3 h-3" />
@@ -860,10 +923,45 @@ export default function TechnicianJobBoard() {
                               </span>
                             </div>
                           </div>
-                          <Button variant="ghost" size="sm" className="gap-1">
-                            {t.viewDetails}
-                            <ChevronRight className="w-4 h-4" />
-                          </Button>
+                          <div className="flex items-center gap-2">
+                            {isOffer && (
+                              <>
+                                <Button
+                                  variant="destructive"
+                                  size="sm"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    refuseMutation.mutate(app.id);
+                                  }}
+                                  disabled={refuseMutation.isPending}
+                                  data-testid={`button-refuse-offer-${app.id}`}
+                                >
+                                  {refuseMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4 mr-1" />}
+                                  {t.refuseOffer}
+                                </Button>
+                              </>
+                            )}
+                            {(isRefused || app.status === "rejected" || app.status === "withdrawn") && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteMutation.mutate(app.id);
+                                }}
+                                disabled={deleteMutation.isPending}
+                                className="text-destructive"
+                                data-testid={`button-delete-app-${app.id}`}
+                              >
+                                {deleteMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4 mr-1" />}
+                                {t.deleteApplication}
+                              </Button>
+                            )}
+                            <Button variant="ghost" size="sm" className="gap-1">
+                              {t.viewDetails}
+                              <ChevronRight className="w-4 h-4" />
+                            </Button>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>

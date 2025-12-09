@@ -1,9 +1,28 @@
-import { useState, useRef, useMemo, useEffect } from "react";
+import { useState, useRef, useMemo, useEffect, useCallback } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+
+// Helper to detect iOS PWA standalone mode
+const isIOSPWA = (): boolean => {
+  return (
+    'standalone' in window.navigator && 
+    (window.navigator as any).standalone === true
+  );
+};
+
+// Helper to open external links reliably on iOS PWA
+const openExternalLink = (url: string): void => {
+  if (isIOSPWA()) {
+    // In iOS PWA mode, use location.href to force Safari to open
+    window.location.href = url;
+  } else {
+    // Normal browser behavior
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+};
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -331,6 +350,9 @@ const translations = {
     copyCode: "Copy Code",
     codeCopied: "Copied!",
     referredTimes: "Referred {count} technician(s)",
+    yourReferrals: "Your Referrals",
+    noReferralsYet: "No referrals yet. Share your code to get started!",
+    joinedOn: "Joined",
     noReferralCodeYet: "No referral code yet",
     editExpirationDate: "Edit Expiration Date",
     setExpirationDate: "Set Expiration Date",
@@ -653,6 +675,9 @@ const translations = {
     copyCode: "Copier le code",
     codeCopied: "Copié!",
     referredTimes: "Parrainé {count} technicien(s)",
+    yourReferrals: "Vos parrainages",
+    noReferralsYet: "Pas encore de parrainages. Partagez votre code pour commencer!",
+    joinedOn: "Inscrit le",
     noReferralCodeYet: "Pas encore de code de parrainage",
     editExpirationDate: "Modifier la date d'expiration",
     setExpirationDate: "Définir la date d'expiration",
@@ -952,6 +977,20 @@ export default function TechnicianPortal() {
     queryKey: ["/api/my-referral-count"],
     enabled: !!user && (user.role === 'rope_access_tech' || user.role === 'company'),
   });
+
+  // Fetch list of referred users
+  const { data: referralsData } = useQuery<{
+    referrals: Array<{
+      id: string;
+      name: string | null;
+      email: string | null;
+      createdAt: string | null;
+      role: string;
+    }>;
+  }>({
+    queryKey: ["/api/my-referrals"],
+    enabled: !!user && (user.role === 'rope_access_tech' || user.role === 'company'),
+  });
   
   // Fetch performance metrics for the technician
   const { data: performanceData } = useQuery<{
@@ -1031,6 +1070,29 @@ export default function TechnicianPortal() {
   
   const totalUnreadFeedback = myFeedbackData?.requests?.reduce((sum, r) => sum + r.unreadCount, 0) ?? 0;
   
+  // Mark all feedback as read when the dialog opens
+  useEffect(() => {
+    const markAllAsRead = async () => {
+      if (showMyFeedbackDialog && myFeedbackData?.requests) {
+        const unreadRequests = myFeedbackData.requests.filter(r => r.unreadCount > 0);
+        if (unreadRequests.length > 0) {
+          try {
+            await Promise.all(unreadRequests.map(feedback => 
+              fetch(`/api/my-feedback/${feedback.id}/mark-read`, {
+                method: 'POST',
+                credentials: 'include',
+              })
+            ));
+            refetchMyFeedback();
+          } catch (error) {
+            console.error('Failed to mark feedback as read:', error);
+          }
+        }
+      }
+    };
+    markAllAsRead();
+  }, [showMyFeedbackDialog, myFeedbackData?.requests?.length]);
+  
   // Employer selection state (for PLUS members with multiple employers)
   const [showEmployerSelectDialog, setShowEmployerSelectDialog] = useState(false);
   const [selectedEmployerId, setSelectedEmployerId] = useState<string | null>(null);
@@ -1088,6 +1150,39 @@ export default function TechnicianPortal() {
   
   // Combined total = baseline + work sessions
   const combinedTotalHours = baselineHours + workSessionHours;
+
+  // Calculate profile completion - includes fields already filled during registration
+  const profileCompletion = useMemo(() => {
+    if (!user) return { percentage: 0, incompleteFields: [], isComplete: false };
+    
+    const profileFields = [
+      // Fields typically filled during registration
+      { label: language === 'en' ? 'Full Name' : 'Nom complet', complete: !!user.name },
+      { label: language === 'en' ? 'Email' : 'Courriel', complete: !!user.email },
+      { label: language === 'en' ? 'Phone Number' : 'Numéro de téléphone', complete: !!user.phone },
+      { label: language === 'en' ? 'IRATA/SPRAT Cert' : 'Certification IRATA/SPRAT', complete: !!user.irataLicenseNumber || !!user.spratLicenseNumber },
+      // Additional profile fields
+      { label: language === 'en' ? 'Emergency Contact' : 'Contact d\'urgence', complete: !!user.emergencyContactName && !!user.emergencyContactPhone },
+      { label: language === 'en' ? 'Banking Info' : 'Info bancaire', complete: !!user.bankAccountNumber },
+      { label: language === 'en' ? 'Birthday' : 'Date de naissance', complete: !!user.birthday },
+      { label: language === 'en' ? 'First Aid' : 'Premiers soins', complete: !!user.hasFirstAid },
+      { label: language === 'en' ? 'Driver\'s License' : 'Permis de conduire', complete: !!user.driversLicenseNumber },
+      { label: language === 'en' ? 'Address' : 'Adresse', complete: !!user.streetAddress },
+    ];
+    
+    const completedCount = profileFields.filter(f => f.complete).length;
+    const totalFields = profileFields.length;
+    const percentage = Math.round((completedCount / totalFields) * 100);
+    const incompleteFields = profileFields.filter(f => !f.complete);
+    
+    return {
+      percentage,
+      incompleteFields,
+      isComplete: percentage === 100,
+      completedCount,
+      totalFields
+    };
+  }, [user, language]);
 
   const acceptInvitationMutation = useMutation({
     mutationFn: async (invitationId: string) => {
@@ -1736,6 +1831,57 @@ export default function TechnicianPortal() {
               </Card>
             )}
 
+            {/* Profile Completion Widget on Home Tab - Show until complete */}
+            {user && user.role === 'rope_access_tech' && !profileCompletion.isComplete && (
+              <Card 
+                className="border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20 cursor-pointer hover-elevate" 
+                onClick={() => setActiveTab('profile')}
+                data-testid="card-profile-completion-home"
+              >
+                <CardContent className="pt-4 pb-4">
+                  <div className="flex items-start gap-4">
+                    <div className="p-2 rounded-full bg-amber-100 dark:bg-amber-900/50">
+                      <User className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <h3 className="font-semibold text-sm">
+                          {language === 'en' ? 'Complete Your Profile' : 'Complétez votre profil'}
+                        </h3>
+                        <span className="text-sm font-medium text-amber-600 dark:text-amber-400">{profileCompletion.percentage}%</span>
+                      </div>
+                      <div className="w-full bg-amber-200 dark:bg-amber-800 rounded-full h-2 mb-3">
+                        <div 
+                          className="bg-amber-500 h-2 rounded-full transition-all" 
+                          style={{ width: `${profileCompletion.percentage}%` }}
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground mb-2">
+                        {language === 'en' 
+                          ? 'Complete your profile to connect with employers instantly' 
+                          : 'Complétez votre profil pour vous connecter instantanément avec les employeurs'}
+                      </p>
+                      {profileCompletion.incompleteFields.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5">
+                          {profileCompletion.incompleteFields.slice(0, 3).map((field, i) => (
+                            <Badge key={i} variant="outline" className="text-xs bg-background">
+                              {field.label}
+                            </Badge>
+                          ))}
+                          {profileCompletion.incompleteFields.length > 3 && (
+                            <Badge variant="outline" className="text-xs bg-background">
+                              +{profileCompletion.incompleteFields.length - 3} {language === 'en' ? 'more' : 'de plus'}
+                            </Badge>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    <ArrowRight className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Quick Actions Grid */}
             <div className="grid grid-cols-2 gap-3">
               <button
@@ -1759,13 +1905,21 @@ export default function TechnicianPortal() {
               </button>
               
               <button
-                onClick={() => setShowFeedbackDialog(true)}
+                onClick={() => {
+                  if (totalUnreadFeedback > 0) {
+                    setShowMyFeedbackDialog(true);
+                  } else {
+                    setShowFeedbackDialog(true);
+                  }
+                }}
                 className="p-4 rounded-lg border bg-gradient-to-br from-purple-500/5 to-pink-500/5 hover-elevate text-left relative"
                 data-testid="quick-action-feedback"
               >
                 <MessageSquare className="w-8 h-8 text-purple-500 mb-2" />
                 <p className="font-medium text-sm">{t.feedback}</p>
-                <p className="text-xs text-muted-foreground">{t.sendFeedback}</p>
+                <p className="text-xs text-muted-foreground">
+                  {totalUnreadFeedback > 0 ? t.viewMyFeedback : t.sendFeedback}
+                </p>
                 {totalUnreadFeedback > 0 && (
                   <Badge variant="destructive" className="absolute top-2 right-2 text-xs">
                     {totalUnreadFeedback}
@@ -1773,15 +1927,35 @@ export default function TechnicianPortal() {
                 )}
               </button>
               
-              <button
-                onClick={() => setActiveTab('more')}
-                className="p-4 rounded-lg border bg-primary/5 hover-elevate text-left"
+              <div
+                className="p-4 rounded-lg border bg-primary/5 text-left"
                 data-testid="quick-action-referral"
               >
                 <Share2 className="w-8 h-8 text-primary mb-2" />
                 <p className="font-medium text-sm">{t.yourReferralCode}</p>
-                <p className="text-xs text-muted-foreground">{t.shareReferralCode.split(' ').slice(0, 3).join(' ')}...</p>
-              </button>
+                {user?.referralCode && (
+                  <div className="flex items-center gap-2 mt-1">
+                    <p className="text-lg font-mono font-bold text-primary tracking-wider" data-testid="quick-referral-code">
+                      {user.referralCode}
+                    </p>
+                    <Button
+                      variant={codeCopied ? "default" : "outline"}
+                      size="sm"
+                      onClick={handleCopyReferralCode}
+                      className="gap-1 h-7 px-2"
+                      data-testid="button-quick-copy-code"
+                    >
+                      {codeCopied ? (
+                        <CheckCircle2 className="w-3 h-3" />
+                      ) : (
+                        <Copy className="w-3 h-3" />
+                      )}
+                      <span className="text-xs">{codeCopied ? t.codeCopied : t.copyCode}</span>
+                    </Button>
+                  </div>
+                )}
+                <p className="text-xs text-muted-foreground mt-1">{t.shareReferralCode.split(' ').slice(0, 3).join(' ')}...</p>
+              </div>
             </div>
           </>
         )}
@@ -2060,6 +2234,45 @@ export default function TechnicianPortal() {
                   </div>
                 )}
               </div>
+
+              {/* List of referred users */}
+              {user.referralCode && (
+                <div className="mt-6 pt-4 border-t">
+                  <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                    <Users className="w-4 h-4" />
+                    {t.yourReferrals}
+                  </h4>
+                  {referralsData?.referrals && referralsData.referrals.length > 0 ? (
+                    <div className="space-y-2">
+                      {referralsData.referrals.map((referral) => (
+                        <div
+                          key={referral.id}
+                          className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
+                          data-testid={`referral-item-${referral.id}`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                              <User className="w-4 h-4 text-primary" />
+                            </div>
+                            <div>
+                              <p className="font-medium text-sm">{referral.name || referral.email || 'User'}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {t.joinedOn} {referral.createdAt ? formatLocalDate(referral.createdAt) : '-'}
+                              </p>
+                            </div>
+                          </div>
+                          <Badge variant="secondary" className="text-xs">
+                            {referral.role === 'rope_access_tech' ? 'Technician' : 
+                             referral.role === 'company' ? 'Company' : referral.role}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">{t.noReferralsYet}</p>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
         )}
@@ -2260,66 +2473,50 @@ export default function TechnicianPortal() {
             </Button>
             
             {/* Profile Completion Widget */}
-            {(() => {
-              const profileFields = [
-                { label: language === 'en' ? 'Emergency Contact' : 'Contact d\'urgence', complete: !!user.emergencyContactName && !!user.emergencyContactPhone },
-                { label: language === 'en' ? 'Banking Info' : 'Info bancaire', complete: !!user.bankAccountNumber },
-                { label: language === 'en' ? 'Birthday' : 'Anniversaire', complete: !!user.birthday },
-                { label: language === 'en' ? 'First Aid' : 'Premiers soins', complete: !!user.hasFirstAid },
-                { label: language === 'en' ? 'Driver\'s License' : 'Permis de conduire', complete: !!user.driversLicenseNumber },
-              ];
-              const completedCount = profileFields.filter(f => f.complete).length;
-              const totalFields = profileFields.length;
-              const percentage = Math.round((completedCount / totalFields) * 100);
-              const incompleteFields = profileFields.filter(f => !f.complete);
-              
-              if (percentage === 100) return null;
-              
-              return (
-                <Card className="mb-4 border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20" data-testid="card-profile-completion">
-                  <CardContent className="pt-4 pb-4">
-                    <div className="flex items-start gap-4">
-                      <div className="p-2 rounded-full bg-amber-100 dark:bg-amber-900/50">
-                        <User className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-2 mb-2">
-                          <h3 className="font-semibold text-sm">
-                            {language === 'en' ? 'Complete Your Profile' : 'Complétez votre profil'}
-                          </h3>
-                          <span className="text-sm font-medium text-amber-600 dark:text-amber-400">{percentage}%</span>
-                        </div>
-                        <div className="w-full bg-amber-200 dark:bg-amber-800 rounded-full h-2 mb-3">
-                          <div 
-                            className="bg-amber-500 h-2 rounded-full transition-all" 
-                            style={{ width: `${percentage}%` }}
-                          />
-                        </div>
-                        <p className="text-xs text-muted-foreground mb-2">
-                          {language === 'en' 
-                            ? 'Complete your profile to connect with employers instantly' 
-                            : 'Complétez votre profil pour vous connecter instantanément avec les employeurs'}
-                        </p>
-                        {incompleteFields.length > 0 && (
-                          <div className="flex flex-wrap gap-1.5">
-                            {incompleteFields.slice(0, 3).map((field, i) => (
-                              <Badge key={i} variant="outline" className="text-xs bg-background">
-                                {field.label}
-                              </Badge>
-                            ))}
-                            {incompleteFields.length > 3 && (
-                              <Badge variant="outline" className="text-xs bg-background">
-                                +{incompleteFields.length - 3} {language === 'en' ? 'more' : 'de plus'}
-                              </Badge>
-                            )}
-                          </div>
-                        )}
-                      </div>
+            {!profileCompletion.isComplete && (
+              <Card className="mb-4 border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20" data-testid="card-profile-completion">
+                <CardContent className="pt-4 pb-4">
+                  <div className="flex items-start gap-4">
+                    <div className="p-2 rounded-full bg-amber-100 dark:bg-amber-900/50">
+                      <User className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                     </div>
-                  </CardContent>
-                </Card>
-              );
-            })()}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <h3 className="font-semibold text-sm">
+                          {language === 'en' ? 'Complete Your Profile' : 'Complétez votre profil'}
+                        </h3>
+                        <span className="text-sm font-medium text-amber-600 dark:text-amber-400">{profileCompletion.percentage}%</span>
+                      </div>
+                      <div className="w-full bg-amber-200 dark:bg-amber-800 rounded-full h-2 mb-3">
+                        <div 
+                          className="bg-amber-500 h-2 rounded-full transition-all" 
+                          style={{ width: `${profileCompletion.percentage}%` }}
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground mb-2">
+                        {language === 'en' 
+                          ? 'Complete your profile to connect with employers instantly' 
+                          : 'Complétez votre profil pour vous connecter instantanément avec les employeurs'}
+                      </p>
+                      {profileCompletion.incompleteFields.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5">
+                          {profileCompletion.incompleteFields.slice(0, 3).map((field, i) => (
+                            <Badge key={i} variant="outline" className="text-xs bg-background">
+                              {field.label}
+                            </Badge>
+                          ))}
+                          {profileCompletion.incompleteFields.length > 3 && (
+                            <Badge variant="outline" className="text-xs bg-background">
+                              +{profileCompletion.incompleteFields.length - 3} {language === 'en' ? 'more' : 'de plus'}
+                            </Badge>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
             
             <Card>
               <CardHeader className="space-y-4">
@@ -3028,7 +3225,7 @@ export default function TechnicianPortal() {
                         <Button
                           variant="outline"
                           className="w-full"
-                          onClick={() => window.open('https://techconnect.irata.org/verify/tech', '_blank')}
+                          onClick={() => openExternalLink('https://techconnect.irata.org/verify/tech')}
                           data-testid="button-open-irata-portal"
                         >
                           <ExternalLink className="w-4 h-4 mr-2" />
@@ -3233,7 +3430,7 @@ export default function TechnicianPortal() {
                         <Button
                           variant="outline"
                           className="w-full"
-                          onClick={() => window.open('https://sprat.org/technician-verification-system/', '_blank')}
+                          onClick={() => openExternalLink('https://sprat.org/technician-verification-system/')}
                           data-testid="button-open-sprat-portal"
                         >
                           <ExternalLink className="w-4 h-4 mr-2" />

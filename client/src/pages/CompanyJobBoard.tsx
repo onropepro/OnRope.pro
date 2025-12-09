@@ -137,6 +137,7 @@ export default function CompanyJobBoard() {
   const [selectedJobIdForOffer, setSelectedJobIdForOffer] = useState<string>("");
   const [offerMessage, setOfferMessage] = useState("");
   const [deleteApplicationId, setDeleteApplicationId] = useState<string | null>(null);
+  const [showSentOffers, setShowSentOffers] = useState(false);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -177,6 +178,26 @@ export default function CompanyJobBoard() {
   const { data: countsData } = useQuery<{ counts: { jobPostingId: string; count: number }[] }>({
     queryKey: ["/api/job-applications/counts"],
   });
+
+  type SentOffer = {
+    id: string;
+    technicianId: string;
+    jobPostingId: string;
+    status: string;
+    statusUpdatedAt: string | null;
+    technician: { id: string; name: string; firstName: string | null; lastName: string | null; photoUrl: string | null; irataLevel: string | null; spratLevel: string | null } | null;
+    jobPosting: { id: string; title: string; location: string | null } | null;
+  };
+
+  const { data: sentOffersData } = useQuery<{ offers: SentOffer[] }>({
+    queryKey: ["/api/job-applications/sent-offers"],
+    enabled: showSentOffers,
+  });
+
+  const sentOffers = sentOffersData?.offers || [];
+  const pendingOffers = sentOffers.filter(o => o.status === "offered");
+  const refusedOffers = sentOffers.filter(o => o.status === "refused");
+  const acceptedOffers = sentOffers.filter(o => o.status === "hired");
 
   const jobPostings = data?.jobPostings || [];
   const currentApplications = applicationsData?.applications || [];
@@ -460,6 +481,18 @@ export default function CompanyJobBoard() {
           </div>
           <div className="flex items-center gap-2">
             <Button 
+              variant={showSentOffers ? "default" : "outline"}
+              onClick={() => setShowSentOffers(!showSentOffers)} 
+              className="gap-2" 
+              data-testid="button-sent-offers"
+            >
+              <Send className="w-4 h-4" />
+              <span className="hidden sm:inline">{t("jobBoard.sentOffers", "Sent Offers")}</span>
+              {refusedOffers.length > 0 && (
+                <Badge variant="destructive" className="ml-1">{refusedOffers.length}</Badge>
+              )}
+            </Button>
+            <Button 
               variant="outline" 
               onClick={() => setLocation("/talent-browser")} 
               className="gap-2" 
@@ -479,6 +512,115 @@ export default function CompanyJobBoard() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+        {/* Sent Offers Section */}
+        {showSentOffers && (
+          <Card className="border-primary/30">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Send className="w-5 h-5 text-primary" />
+                  <CardTitle>{t("jobBoard.sentOffers", "Sent Offers")}</CardTitle>
+                  <Badge variant="secondary">{sentOffers.length}</Badge>
+                </div>
+                <Button variant="ghost" size="icon" onClick={() => setShowSentOffers(false)} data-testid="button-close-sent-offers">
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+              <CardDescription>
+                {t("jobBoard.sentOffersDesc", "Track job offers you've sent to technicians")}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {sentOffers.length === 0 ? (
+                <div className="text-center py-6 text-muted-foreground">
+                  <Mail className="w-10 h-10 mx-auto mb-2 opacity-50" />
+                  <p>{t("jobBoard.noSentOffers", "No offers sent yet")}</p>
+                </div>
+              ) : (
+                <>
+                  {/* Pending Offers */}
+                  {pendingOffers.length > 0 && (
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-medium flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-amber-500" />
+                        {t("jobBoard.pendingOffers", "Pending Offers")}
+                        <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/30">{pendingOffers.length}</Badge>
+                      </h4>
+                      {pendingOffers.map((offer) => (
+                        <div key={offer.id} className="flex items-center justify-between p-3 rounded-lg bg-amber-500/5 border border-amber-500/20" data-testid={`offer-pending-${offer.id}`}>
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage src={offer.technician?.photoUrl || undefined} />
+                              <AvatarFallback>{offer.technician?.firstName?.[0] || offer.technician?.name?.[0] || "?"}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-medium text-sm">{offer.technician?.firstName && offer.technician?.lastName ? `${offer.technician.firstName} ${offer.technician.lastName}` : offer.technician?.name}</p>
+                              <p className="text-xs text-muted-foreground">{offer.jobPosting?.title}</p>
+                            </div>
+                          </div>
+                          <Badge className="bg-amber-500/20 text-amber-600 border-amber-500/30">{t("jobBoard.offerPending", "Pending")}</Badge>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {/* Refused Offers */}
+                  {refusedOffers.length > 0 && (
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-medium flex items-center gap-2">
+                        <X className="w-4 h-4 text-destructive" />
+                        {t("jobBoard.refusedOffers", "Declined Offers")}
+                        <Badge variant="destructive">{refusedOffers.length}</Badge>
+                      </h4>
+                      {refusedOffers.map((offer) => (
+                        <div key={offer.id} className="flex items-center justify-between p-3 rounded-lg bg-destructive/5 border border-destructive/20" data-testid={`offer-refused-${offer.id}`}>
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage src={offer.technician?.photoUrl || undefined} />
+                              <AvatarFallback>{offer.technician?.firstName?.[0] || offer.technician?.name?.[0] || "?"}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-medium text-sm">{offer.technician?.firstName && offer.technician?.lastName ? `${offer.technician.firstName} ${offer.technician.lastName}` : offer.technician?.name}</p>
+                              <p className="text-xs text-muted-foreground">{offer.jobPosting?.title}</p>
+                            </div>
+                          </div>
+                          <Badge variant="destructive">{t("jobBoard.offerDeclined", "Declined")}</Badge>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {/* Accepted/Hired Offers */}
+                  {acceptedOffers.length > 0 && (
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-medium flex items-center gap-2">
+                        <Award className="w-4 h-4 text-green-500" />
+                        {t("jobBoard.acceptedOffers", "Accepted Offers")}
+                        <Badge className="bg-green-500/20 text-green-600 border-green-500/30">{acceptedOffers.length}</Badge>
+                      </h4>
+                      {acceptedOffers.map((offer) => (
+                        <div key={offer.id} className="flex items-center justify-between p-3 rounded-lg bg-green-500/5 border border-green-500/20" data-testid={`offer-accepted-${offer.id}`}>
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage src={offer.technician?.photoUrl || undefined} />
+                              <AvatarFallback>{offer.technician?.firstName?.[0] || offer.technician?.name?.[0] || "?"}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-medium text-sm">{offer.technician?.firstName && offer.technician?.lastName ? `${offer.technician.firstName} ${offer.technician.lastName}` : offer.technician?.name}</p>
+                              <p className="text-xs text-muted-foreground">{offer.jobPosting?.title}</p>
+                            </div>
+                          </div>
+                          <Badge className="bg-green-500/20 text-green-600 border-green-500/30">{t("jobBoard.offerAccepted", "Hired")}</Badge>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <div className="animate-pulse text-muted-foreground">{t("common.loading", "Loading...")}</div>

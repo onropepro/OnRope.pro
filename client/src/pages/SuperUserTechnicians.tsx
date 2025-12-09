@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import SuperUserLayout from "@/components/SuperUserLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/queryClient";
 
 interface Technician {
   id: string;
@@ -34,6 +38,7 @@ interface Technician {
   employeeCountry: string | null;
   referralCode: string | null;
   referralCount: number;
+  hasPlusAccess: boolean;
 }
 
 interface TechnicianDetail {
@@ -81,6 +86,8 @@ interface TechnicianDetail {
   createdAt: string;
   lastActivityAt: string | null;
   irataBaselineHours: string | null;
+  hasPlusAccess: boolean;
+  referralCount: number;
 }
 
 interface CompanyInfo {
@@ -110,6 +117,7 @@ export default function SuperUserTechnicians() {
   const [linkedFilter, setLinkedFilter] = useState<string>("all");
   const [selectedTechnician, setSelectedTechnician] = useState<string | null>(null);
   const pageSize = 25;
+  const { toast } = useToast();
 
   // Build the URL with query parameters
   const buildTechniciansUrl = () => {
@@ -141,6 +149,33 @@ export default function SuperUserTechnicians() {
       return res.json();
     },
     enabled: !!selectedTechnician,
+  });
+
+  const togglePlusAccessMutation = useMutation({
+    mutationFn: async ({ technicianId, hasPlusAccess }: { technicianId: string; hasPlusAccess: boolean }) => {
+      const res = await fetch(`/api/superuser/technicians/${technicianId}/plus-access`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ hasPlusAccess }),
+      });
+      if (!res.ok) throw new Error(`${res.status}: ${await res.text()}`);
+      return res.json();
+    },
+    onSuccess: (_, variables) => {
+      toast({
+        title: variables.hasPlusAccess ? "PLUS Access Granted" : "PLUS Access Revoked",
+        description: `Successfully updated PLUS access for this technician.`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/superuser/technicians"] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
   });
 
   const technicians = techniciansData?.technicians || [];
@@ -284,8 +319,11 @@ export default function SuperUserTechnicians() {
                           <span className="material-icons text-muted-foreground">person</span>
                         </div>
                         <div>
-                          <div className="font-medium flex items-center gap-2">
+                          <div className="font-medium flex items-center gap-2 flex-wrap">
                             {tech.name}
+                            {tech.hasPlusAccess && (
+                              <Badge className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs">PRO</Badge>
+                            )}
                             {getStatusBadge(tech)}
                           </div>
                           <div className="text-sm text-muted-foreground">{tech.email}</div>
@@ -565,6 +603,54 @@ export default function SuperUserTechnicians() {
                       <DocumentCount label="First Aid" count={technicianDetailData.technician.firstAidDocuments?.length || 0} />
                       <DocumentCount label="IRATA Docs" count={technicianDetailData.technician.irataDocuments?.length || 0} />
                       <DocumentCount label="SPRAT Docs" count={technicianDetailData.technician.spratDocuments?.length || 0} />
+                    </div>
+                  </div>
+
+                  {/* PLUS Access Management */}
+                  <Separator />
+                  <div>
+                    <h3 className="font-semibold mb-3 flex items-center gap-2">
+                      <span className="material-icons text-sm text-amber-500">workspace_premium</span>
+                      PLUS Access
+                    </h3>
+                    <div className="bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/30 dark:to-yellow-950/30 p-4 rounded-lg border border-amber-200 dark:border-amber-800">
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <p className="font-medium">Technician PLUS</p>
+                            {technicianDetailData.technician.hasPlusAccess && (
+                              <Badge className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white">PRO</Badge>
+                            )}
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            {technicianDetailData.technician.hasPlusAccess 
+                              ? "This technician has PLUS access with premium features." 
+                              : "Grant PLUS access to unlock premium features."}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Referrals: {technicianDetailData.technician.referralCount || 0} technician(s) referred
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            id="plus-access"
+                            checked={technicianDetailData.technician.hasPlusAccess}
+                            onCheckedChange={(checked) => {
+                              if (selectedTechnician) {
+                                togglePlusAccessMutation.mutate({
+                                  technicianId: selectedTechnician,
+                                  hasPlusAccess: checked,
+                                });
+                              }
+                            }}
+                            disabled={togglePlusAccessMutation.isPending}
+                            data-testid="switch-plus-access"
+                          />
+                          <Label htmlFor="plus-access" className="sr-only">
+                            Toggle PLUS Access
+                          </Label>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>

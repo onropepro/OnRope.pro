@@ -3,8 +3,8 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections } from "@shared/schema";
-import { eq, sql, and, or, isNull, gt, desc } from "drizzle-orm";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages } from "@shared/schema";
+import { eq, sql, and, or, isNull, gt, desc, inArray } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import multer from "multer";
@@ -4329,6 +4329,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         employeeCountry: tech.employeeCountry,
         referralCode: tech.referralCode,
         referralCount: referralCounts.get(tech.id) || 0,
+        hasPlusAccess: tech.hasPlusAccess || false,
       }));
 
       res.json({ 
@@ -4422,6 +4423,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         createdAt: technician.createdAt,
         lastActivityAt: technician.lastActivityAt,
         irataBaselineHours: technician.irataBaselineHours,
+        
+        // PLUS Access
+        hasPlusAccess: technician.hasPlusAccess || false,
+        referralCount: await storage.getReferralCount(technicianId),
       };
 
       // Company info (if linked)
@@ -4440,6 +4445,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('[SuperUser] Get technician details error:', error);
       res.status(500).json({ message: "Failed to fetch technician details" });
+    }
+  });
+
+  // Toggle PLUS access for a technician (SuperUser only)
+  app.put("/api/superuser/technicians/:technicianId/plus-access", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const { technicianId } = req.params;
+      const { hasPlusAccess } = req.body;
+
+      if (typeof hasPlusAccess !== 'boolean') {
+        return res.status(400).json({ message: "hasPlusAccess must be a boolean" });
+      }
+
+      // Find the technician
+      const technician = await storage.getUserById(technicianId);
+      if (!technician) {
+        return res.status(404).json({ message: "Technician not found" });
+      }
+
+      // Only allow for technician or employee role users
+      if (technician.role !== 'technician' && technician.role !== 'employee') {
+        return res.status(400).json({ message: "PLUS access can only be granted to technicians or employees" });
+      }
+
+      // Update the hasPlusAccess field
+      await db.update(users).set({
+        hasPlusAccess: hasPlusAccess,
+      }).where(eq(users.id, technicianId));
+
+      console.log(`[SuperUser] ${hasPlusAccess ? 'Granted' : 'Revoked'} PLUS access for technician ${technicianId}`);
+
+      res.json({ 
+        success: true, 
+        message: `PLUS access ${hasPlusAccess ? 'granted' : 'revoked'} successfully` 
+      });
+    } catch (error) {
+      console.error('[SuperUser] Toggle PLUS access error:', error);
+      res.status(500).json({ message: "Failed to update PLUS access" });
     }
   });
 
@@ -5753,6 +5800,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get list of users referred by the logged-in user
+  app.get("/api/my-referrals", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Allow technicians and company owners to see their referrals
+      if (user.role !== 'rope_access_tech' && user.role !== 'company') {
+        return res.status(403).json({ message: "Only technicians and company owners can view referrals" });
+      }
+      
+      const referrals = await storage.getReferredUsers(user.id);
+      return res.json({ referrals });
+    } catch (error) {
+      console.error('[Referral] Error getting referrals:', error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Get pending invitations for the logged-in technician
   app.get("/api/my-invitations", requireAuth, async (req: Request, res: Response) => {
     try {
@@ -6488,10 +6556,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log(`[IRATA-Verify] Extracted level: Level ${result.irataLevel}`);
         }
         
-        // Save extracted license number if available
-        if (result.irataNumber) {
+        // Save extracted license number if available, but preserve the level/number format
+        // IMPORTANT: Don't overwrite if user already has a properly formatted license number
+        // The stored format is "level/number" (e.g., "3/123456") which is used for login
+        if (result.irataNumber && result.irataLevel) {
+          // Format as "level/number" to match registration format for login compatibility
+          const formattedLicense = `${result.irataLevel}/${result.irataNumber}`;
+          updateData.irataLicenseNumber = formattedLicense;
+          console.log(`[IRATA-Verify] Extracted and formatted license: ${formattedLicense}`);
+        } else if (result.irataNumber && !user.irataLicenseNumber) {
+          // Only set if user doesn't have one yet (shouldn't happen normally)
           updateData.irataLicenseNumber = result.irataNumber;
           console.log(`[IRATA-Verify] Extracted license number: ${result.irataNumber}`);
+        } else {
+          console.log(`[IRATA-Verify] Preserving existing license number: ${user.irataLicenseNumber}`);
         }
         
         await storage.updateUser(user.id, updateData);
@@ -15707,12 +15785,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get messages for each request
       const requestsWithMessages = await Promise.all(requests.map(async (req) => {
         const messages = await db.select().from(featureRequestMessages)
-          .where(eq(featureRequestMessages.featureRequestId, req.id))
+          .where(eq(featureRequestMessages.requestId, req.id))
           .orderBy(featureRequestMessages.createdAt);
         
         // Count unread messages from superuser
         const unreadCount = messages.filter(m => 
-          m.senderRole === 'superuser' && !m.readAt
+          m.senderRole === 'superuser' && !m.isRead
         ).length;
         
         return {
@@ -15744,11 +15822,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Mark all messages from superuser as read
       await db.update(featureRequestMessages)
-        .set({ readAt: new Date() })
+        .set({ isRead: true })
         .where(and(
-          eq(featureRequestMessages.featureRequestId, req.params.id),
+          eq(featureRequestMessages.requestId, req.params.id),
           eq(featureRequestMessages.senderRole, 'superuser'),
-          isNull(featureRequestMessages.readAt)
+          eq(featureRequestMessages.isRead, false)
         ));
 
       res.json({ success: true });
@@ -15777,9 +15855,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const messageData = insertFeatureRequestMessageSchema.parse({
-        featureRequestId: req.params.id,
+        requestId: req.params.id,
         senderId: currentUser.id,
         senderRole: currentUser.role,
+        senderName: currentUser.name || currentUser.email || 'User',
         message: message.trim(),
       });
 
@@ -16297,6 +16376,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all sent offers for a company (to track offered/refused/hired)
+  app.get("/api/job-applications/sent-offers", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Get all job postings for this company
+      const companyJobs = await db.select()
+        .from(jobPostings)
+        .where(eq(jobPostings.companyId, currentUser.id));
+
+      const jobIds = companyJobs.map(j => j.id);
+      if (jobIds.length === 0) {
+        return res.json({ offers: [] });
+      }
+
+      // Get all applications with status "offered", "refused", or "hired" for these jobs
+      const offers = await db.select()
+        .from(jobApplications)
+        .where(
+          and(
+            inArray(jobApplications.jobPostingId, jobIds),
+            inArray(jobApplications.status, ["offered", "refused", "hired"])
+          )
+        )
+        .orderBy(desc(jobApplications.statusUpdatedAt));
+
+      // Enrich with technician and job posting details
+      const offersWithDetails = await Promise.all(
+        offers.map(async (offer) => {
+          const technician = await storage.getUserById(offer.technicianId);
+          const job = companyJobs.find(j => j.id === offer.jobPostingId);
+          return {
+            ...offer,
+            technician: technician ? {
+              id: technician.id,
+              name: technician.name,
+              firstName: technician.firstName,
+              lastName: technician.lastName,
+              photoUrl: technician.photoUrl,
+              irataLevel: technician.irataLevel,
+              spratLevel: technician.spratLevel,
+            } : null,
+            jobPosting: job ? {
+              id: job.id,
+              title: job.title,
+              location: job.location,
+            } : null,
+          };
+        })
+      );
+
+      res.json({ offers: offersWithDetails });
+    } catch (error) {
+      console.error("Get sent offers error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Apply to a job (technician)
   app.post("/api/job-applications", requireAuth, async (req: Request, res: Response) => {
     try {
@@ -16445,6 +16585,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Application deleted successfully" });
     } catch (error) {
       console.error("Delete application error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Refuse a job offer (technician only)
+  app.post("/api/job-applications/:id/refuse", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const [application] = await db.select()
+        .from(jobApplications)
+        .where(eq(jobApplications.id, req.params.id));
+
+      if (!application) {
+        return res.status(404).json({ message: "Application not found" });
+      }
+
+      // Only the technician can refuse their own offer
+      if (application.technicianId !== currentUser.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      // Can only refuse if status is "offered"
+      if (application.status !== "offered") {
+        return res.status(400).json({ message: "Can only refuse offers with 'offered' status" });
+      }
+
+      const [updatedApplication] = await db.update(jobApplications)
+        .set({
+          status: "refused",
+          statusUpdatedAt: new Date(),
+        })
+        .where(eq(jobApplications.id, req.params.id))
+        .returning();
+
+      res.json({ application: updatedApplication });
+    } catch (error) {
+      console.error("Refuse offer error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
