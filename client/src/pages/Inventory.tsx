@@ -32,7 +32,8 @@ const getDateLocale = () => i18n.language?.startsWith('fr') ? fr : enUS;
 const gearTypes = [
   { name: "Harness", icon: Shield },
   { name: "Rope", icon: Cable },
-  { name: "Carabiner", icon: Link2 },
+  { name: "Carabiner - Steel", icon: Link2 },
+  { name: "Carabiner - Aluminum", icon: Link2 },
   { name: "Descender", icon: Gauge },
   { name: "Ascender", icon: TrendingUp },
   { name: "Helmet", icon: HardHat },
@@ -205,8 +206,12 @@ export default function Inventory() {
     queryKey: ["/api/equipment-damage-reports"],
   });
 
-  // Equipment types that have catalog support
-  const CATALOG_SUPPORTED_TYPES = ["Descender", "Harness", "Rope", "Carabiner"];
+  // Equipment types that have catalog support (all except Gas powered equipment, Soap, and Other)
+  const CATALOG_SUPPORTED_TYPES = [
+    "Descender", "Harness", "Rope", "Carabiner - Steel", "Carabiner - Aluminum",
+    "Ascender", "Helmet", "Gloves", "Work positioning device", "Squeegee rubbers",
+    "Applicators", "Suction cup", "Back up device", "Lanyard"
+  ];
 
   // Fetch equipment catalogs for smart gear picker
   const { data: descenderCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
@@ -221,9 +226,49 @@ export default function Inventory() {
     queryKey: ["/api/equipment-catalog", { type: "Rope" }],
     queryFn: async () => (await fetch("/api/equipment-catalog?type=Rope")).json(),
   });
-  const { data: carabinerCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
-    queryKey: ["/api/equipment-catalog", { type: "Carabiner" }],
-    queryFn: async () => (await fetch("/api/equipment-catalog?type=Carabiner")).json(),
+  const { data: steelCarabinerCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
+    queryKey: ["/api/equipment-catalog", { type: "Carabiner - Steel" }],
+    queryFn: async () => (await fetch("/api/equipment-catalog?type=Carabiner%20-%20Steel")).json(),
+  });
+  const { data: aluminumCarabinerCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
+    queryKey: ["/api/equipment-catalog", { type: "Carabiner - Aluminum" }],
+    queryFn: async () => (await fetch("/api/equipment-catalog?type=Carabiner%20-%20Aluminum")).json(),
+  });
+  const { data: ascenderCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
+    queryKey: ["/api/equipment-catalog", { type: "Ascender" }],
+    queryFn: async () => (await fetch("/api/equipment-catalog?type=Ascender")).json(),
+  });
+  const { data: helmetCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
+    queryKey: ["/api/equipment-catalog", { type: "Helmet" }],
+    queryFn: async () => (await fetch("/api/equipment-catalog?type=Helmet")).json(),
+  });
+  const { data: glovesCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
+    queryKey: ["/api/equipment-catalog", { type: "Gloves" }],
+    queryFn: async () => (await fetch("/api/equipment-catalog?type=Gloves")).json(),
+  });
+  const { data: workPositioningCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
+    queryKey: ["/api/equipment-catalog", { type: "Work positioning device" }],
+    queryFn: async () => (await fetch("/api/equipment-catalog?type=Work%20positioning%20device")).json(),
+  });
+  const { data: squeegeeCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
+    queryKey: ["/api/equipment-catalog", { type: "Squeegee rubbers" }],
+    queryFn: async () => (await fetch("/api/equipment-catalog?type=Squeegee%20rubbers")).json(),
+  });
+  const { data: applicatorsCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
+    queryKey: ["/api/equipment-catalog", { type: "Applicators" }],
+    queryFn: async () => (await fetch("/api/equipment-catalog?type=Applicators")).json(),
+  });
+  const { data: suctionCupCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
+    queryKey: ["/api/equipment-catalog", { type: "Suction cup" }],
+    queryFn: async () => (await fetch("/api/equipment-catalog?type=Suction%20cup")).json(),
+  });
+  const { data: backupDeviceCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
+    queryKey: ["/api/equipment-catalog", { type: "Back up device" }],
+    queryFn: async () => (await fetch("/api/equipment-catalog?type=Back%20up%20device")).json(),
+  });
+  const { data: lanyardCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
+    queryKey: ["/api/equipment-catalog", { type: "Lanyard" }],
+    queryFn: async () => (await fetch("/api/equipment-catalog?type=Lanyard")).json(),
   });
 
   // Create damage report mutation
@@ -556,7 +601,17 @@ export default function Inventory() {
       case "Descender": return descenderCatalog?.items || [];
       case "Harness": return harnessCatalog?.items || [];
       case "Rope": return ropeCatalog?.items || [];
-      case "Carabiner": return carabinerCatalog?.items || [];
+      case "Carabiner - Steel": return steelCarabinerCatalog?.items || [];
+      case "Carabiner - Aluminum": return aluminumCarabinerCatalog?.items || [];
+      case "Ascender": return ascenderCatalog?.items || [];
+      case "Helmet": return helmetCatalog?.items || [];
+      case "Gloves": return glovesCatalog?.items || [];
+      case "Work positioning device": return workPositioningCatalog?.items || [];
+      case "Squeegee rubbers": return squeegeeCatalog?.items || [];
+      case "Applicators": return applicatorsCatalog?.items || [];
+      case "Suction cup": return suctionCupCatalog?.items || [];
+      case "Back up device": return backupDeviceCatalog?.items || [];
+      case "Lanyard": return lanyardCatalog?.items || [];
       default: return [];
     }
   };
@@ -2417,10 +2472,7 @@ export default function Inventory() {
               {hasCatalogSupport && !showOtherDescender && (
                 <div className="space-y-3">
                   <FormLabel>
-                    {form.watch("equipmentType") === "Descender" && t('inventory.selectDescender', 'Select Descender')}
-                    {form.watch("equipmentType") === "Harness" && t('inventory.selectHarness', 'Select Harness')}
-                    {form.watch("equipmentType") === "Rope" && t('inventory.selectRope', 'Select Rope')}
-                    {form.watch("equipmentType") === "Carabiner" && t('inventory.selectCarabiner', 'Select Carabiner')}
+                    {t('inventory.selectEquipment', 'Select')} {form.watch("equipmentType")}
                   </FormLabel>
                   <div className="relative">
                     <Input
