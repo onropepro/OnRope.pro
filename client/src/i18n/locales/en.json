@@ -566,7 +566,7 @@
       "manageSubscription": "Manage Subscription"
     },
     "search": {
-      "placeholder": "Search by strata plan number..."
+      "placeholder": "Search by strata or job number..."
     },
     "newProject": "New Project",
     "limitReachedButton": "Project Limit Reached",
@@ -586,7 +586,7 @@
       "selectBuilding": "Select a client",
       "enterManually": "Enter Details Manually",
       "noClientsFound": "No clients found.",
-      "searchClientStrata": "Search by client, strata, or address...",
+      "searchClientStrata": "Search by client, strata/job number, or address...",
       "autoFillDesc": "Search and select from your client database to auto-fill details",
       "strataPlanNumber": "Strata plan number / Job number",
       "strataPlanPlaceholder": "LMS2345",
@@ -919,7 +919,7 @@
     "clientDatabase": {
       "title": "Client Database",
       "description": "Property managers and building contacts",
-      "searchPlaceholder": "Search by name, company, strata number, or address...",
+      "searchPlaceholder": "Search by name, company, strata/job number, or address...",
       "addNewClient": "Add New Client",
       "addClientDescription": "Enter property manager or building owner details",
       "loadingClients": "Loading clients...",
@@ -2077,7 +2077,7 @@
     "pageTitle": "Service Quotes",
     "pageSubtitle": "Create and manage service quotes for buildings",
     "newQuote": "New Quote",
-    "searchPlaceholder": "Search by strata plan number or building name...",
+    "searchPlaceholder": "Search by strata/job number or site name...",
     "floors": "floors",
     "services": "Services",
     "backToDashboard": "Back to Dashboard",
@@ -2588,7 +2588,7 @@
     "title": "Projects",
     "backToDashboard": "Back to Dashboard",
     "newProject": "New Project",
-    "searchPlaceholder": "Search by strata plan number...",
+    "searchPlaceholder": "Search by strata or job number...",
     "activeProjects": "Active Projects",
     "pastProjects": "Past Projects",
     "completed": "Completed",

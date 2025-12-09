@@ -566,7 +566,7 @@
       "manageSubscription": "Gérer l'abonnement"
     },
     "search": {
-      "placeholder": "Rechercher par numéro de plan strata..."
+      "placeholder": "Rechercher par numéro strata ou de travail..."
     },
     "newProject": "Nouveau projet",
     "limitReachedButton": "Limite de projets atteinte",
@@ -586,7 +586,7 @@
       "selectBuilding": "Sélectionner un client",
       "enterManually": "Entrer les détails manuellement",
       "noClientsFound": "Aucun client trouvé.",
-      "searchClientStrata": "Rechercher par client, strata ou adresse...",
+      "searchClientStrata": "Rechercher par client, numéro strata/travail, ou adresse...",
       "autoFillDesc": "Recherchez et sélectionnez depuis votre base de données clients pour remplir automatiquement les détails",
       "strataPlanNumber": "Numéro de plan strata / Numéro de travail",
       "strataPlanPlaceholder": "LMS2345",
@@ -919,7 +919,7 @@
     "clientDatabase": {
       "title": "Base de données clients",
       "description": "Gestionnaires immobiliers et contacts des bâtiments",
-      "searchPlaceholder": "Rechercher par nom, entreprise, numéro strata ou adresse...",
+      "searchPlaceholder": "Rechercher par nom, entreprise, numéro strata/travail, ou adresse...",
       "addNewClient": "Ajouter un nouveau client",
       "addClientDescription": "Entrer les détails du gestionnaire immobilier ou du propriétaire",
       "loadingClients": "Chargement des clients...",
@@ -2099,7 +2099,7 @@
     "pageTitle": "Devis de service",
     "pageSubtitle": "Créer et gérer les devis de service pour les bâtiments",
     "newQuote": "Nouveau devis",
-    "searchPlaceholder": "Rechercher par numéro de plan strata ou nom du bâtiment...",
+    "searchPlaceholder": "Rechercher par numéro strata/travail ou nom du site...",
     "floors": "étages",
     "services": "Services",
     "backToDashboard": "Retour au tableau de bord",
@@ -2610,7 +2610,7 @@
     "title": "Projets",
     "backToDashboard": "Retour au tableau de bord",
     "newProject": "Nouveau projet",
-    "searchPlaceholder": "Rechercher par numéro de plan de copropriété...",
+    "searchPlaceholder": "Rechercher par numéro strata ou de travail...",
     "activeProjects": "Projets actifs",
     "pastProjects": "Projets passés",
     "completed": "Terminés",
