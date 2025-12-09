@@ -105,10 +105,10 @@ const problemRows = [
   {
     direction: "right" as const,
     problems: [
-      "Indeed is useless for rope access",
+      "My Indeed account is mostly SPAM",
       "Endless search, zero results",
       "Where are the real postings?",
-      "Nobody hiring on job boards",
+      "Are jobs listed on job boards even real?",
       "Industry jobs are invisible",
     ]
   },
