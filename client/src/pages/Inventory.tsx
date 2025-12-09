@@ -226,21 +226,6 @@ export default function Inventory() {
     queryFn: async () => (await fetch("/api/equipment-catalog?type=Carabiner")).json(),
   });
 
-  // Get catalog for current equipment type
-  const getCurrentCatalog = () => {
-    const equipType = form.watch("equipmentType");
-    switch (equipType) {
-      case "Descender": return descenderCatalog?.items || [];
-      case "Harness": return harnessCatalog?.items || [];
-      case "Rope": return ropeCatalog?.items || [];
-      case "Carabiner": return carabinerCatalog?.items || [];
-      default: return [];
-    }
-  };
-
-  // Check if current equipment type has catalog support
-  const hasCatalogSupport = CATALOG_SUPPORTED_TYPES.includes(form.watch("equipmentType") || "");
-
   // Create damage report mutation
   const createDamageReportMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -563,6 +548,22 @@ export default function Inventory() {
       inService: true,
     },
   });
+
+  // Get catalog for current equipment type (must be after form is defined)
+  const getCurrentCatalog = () => {
+    const equipType = form.watch("equipmentType");
+    switch (equipType) {
+      case "Descender": return descenderCatalog?.items || [];
+      case "Harness": return harnessCatalog?.items || [];
+      case "Rope": return ropeCatalog?.items || [];
+      case "Carabiner": return carabinerCatalog?.items || [];
+      default: return [];
+    }
+  };
+
+  // Check if current equipment type has catalog support
+  const watchedEquipmentType = form.watch("equipmentType");
+  const hasCatalogSupport = CATALOG_SUPPORTED_TYPES.includes(watchedEquipmentType || "");
 
   const addItemMutation = useMutation({
     mutationFn: async (data: Partial<InsertGearItem>) => {
