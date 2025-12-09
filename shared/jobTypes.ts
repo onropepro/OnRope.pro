@@ -1,4 +1,4 @@
-export type JobCategory = 'building_maintenance' | 'ndt' | 'rock_scaling' | 'wind_turbine' | 'oil_field';
+export type JobCategory = 'building_maintenance';
 
 export type ElevationRequirement = 'always' | 'never' | 'configurable';
 
@@ -14,10 +14,6 @@ export interface JobTypeConfig {
 
 export const JOB_CATEGORIES: { value: JobCategory; labelKey: string; label: string; icon: string }[] = [
   { value: 'building_maintenance', labelKey: 'dashboard.jobCategories.building_maintenance', label: 'Building Maintenance', icon: 'apartment' },
-  { value: 'ndt', labelKey: 'dashboard.jobCategories.ndt', label: 'NDT - Non-Destructive Testing', icon: 'science' },
-  { value: 'rock_scaling', labelKey: 'dashboard.jobCategories.rock_scaling', label: 'Rock Scaling', icon: 'terrain' },
-  { value: 'wind_turbine', labelKey: 'dashboard.jobCategories.wind_turbine', label: 'Wind Turbine', icon: 'air' },
-  { value: 'oil_field', labelKey: 'dashboard.jobCategories.oil_field', label: 'Oil & Gas', icon: 'local_gas_station' },
 ];
 
 export const JOB_TYPES: JobTypeConfig[] = [
@@ -42,62 +38,6 @@ export const JOB_TYPES: JobTypeConfig[] = [
   
   // Building Maintenance - Other
   { value: 'other', category: 'building_maintenance', labelKey: 'dashboard.jobTypes.other', label: 'Other', icon: 'more_horiz', elevationRequirement: 'configurable', progressType: 'hours' },
-  
-  // NDT - Non-Destructive Testing (all hours-based, configurable elevation)
-  { value: 'ndt_visual_inspection', category: 'ndt', labelKey: 'dashboard.jobTypes.ndt_visual_inspection', label: 'Visual Inspection (VT)', icon: 'visibility', elevationRequirement: 'configurable', progressType: 'hours' },
-  { value: 'ndt_ultrasonic_testing', category: 'ndt', labelKey: 'dashboard.jobTypes.ndt_ultrasonic_testing', label: 'Ultrasonic Testing (UT)', icon: 'graphic_eq', elevationRequirement: 'configurable', progressType: 'hours' },
-  { value: 'ndt_magnetic_particle', category: 'ndt', labelKey: 'dashboard.jobTypes.ndt_magnetic_particle', label: 'Magnetic Particle Testing (MT)', icon: 'attractions', elevationRequirement: 'configurable', progressType: 'hours' },
-  { value: 'ndt_dye_penetrant', category: 'ndt', labelKey: 'dashboard.jobTypes.ndt_dye_penetrant', label: 'Dye Penetrant Testing (PT)', icon: 'colorize', elevationRequirement: 'configurable', progressType: 'hours' },
-  { value: 'ndt_radiographic', category: 'ndt', labelKey: 'dashboard.jobTypes.ndt_radiographic', label: 'Radiographic Testing (RT)', icon: 'radiology', elevationRequirement: 'configurable', progressType: 'hours' },
-  { value: 'ndt_eddy_current', category: 'ndt', labelKey: 'dashboard.jobTypes.ndt_eddy_current', label: 'Eddy Current Testing (ET)', icon: 'electric_bolt', elevationRequirement: 'configurable', progressType: 'hours' },
-  { value: 'ndt_thermographic', category: 'ndt', labelKey: 'dashboard.jobTypes.ndt_thermographic', label: 'Thermographic Inspection', icon: 'thermostat', elevationRequirement: 'configurable', progressType: 'hours' },
-  { value: 'ndt_acoustic_emission', category: 'ndt', labelKey: 'dashboard.jobTypes.ndt_acoustic_emission', label: 'Acoustic Emission Testing (AE)', icon: 'hearing', elevationRequirement: 'configurable', progressType: 'hours' },
-  { value: 'ndt_phased_array', category: 'ndt', labelKey: 'dashboard.jobTypes.ndt_phased_array', label: 'Phased Array Ultrasonic (PAUT)', icon: 'waves', elevationRequirement: 'configurable', progressType: 'hours' },
-  { value: 'ndt_time_of_flight', category: 'ndt', labelKey: 'dashboard.jobTypes.ndt_time_of_flight', label: 'Time of Flight Diffraction (TOFD)', icon: 'timeline', elevationRequirement: 'configurable', progressType: 'hours' },
-  { value: 'ndt_other', category: 'ndt', labelKey: 'dashboard.jobTypes.ndt_other', label: 'Other NDT', icon: 'more_horiz', elevationRequirement: 'configurable', progressType: 'hours' },
-  
-  // Rock Scaling (all hours-based, elevation always required for rope access work)
-  { value: 'rock_loose_removal', category: 'rock_scaling', labelKey: 'dashboard.jobTypes.rock_loose_removal', label: 'Loose Rock Removal', icon: 'texture', elevationRequirement: 'always', progressType: 'hours' },
-  { value: 'rock_bolting', category: 'rock_scaling', labelKey: 'dashboard.jobTypes.rock_bolting', label: 'Rock Bolting / Anchoring', icon: 'hardware', elevationRequirement: 'always', progressType: 'hours' },
-  { value: 'rock_mesh_installation', category: 'rock_scaling', labelKey: 'dashboard.jobTypes.rock_mesh_installation', label: 'Mesh / Net Installation', icon: 'grid_on', elevationRequirement: 'always', progressType: 'hours' },
-  { value: 'rock_shotcrete', category: 'rock_scaling', labelKey: 'dashboard.jobTypes.rock_shotcrete', label: 'Shotcrete Application', icon: 'format_paint', elevationRequirement: 'always', progressType: 'hours' },
-  { value: 'rock_face_inspection', category: 'rock_scaling', labelKey: 'dashboard.jobTypes.rock_face_inspection', label: 'Rock Face Inspection', icon: 'search', elevationRequirement: 'always', progressType: 'hours' },
-  { value: 'rock_crack_sealing', category: 'rock_scaling', labelKey: 'dashboard.jobTypes.rock_crack_sealing', label: 'Crack Sealing / Grouting', icon: 'plumbing', elevationRequirement: 'always', progressType: 'hours' },
-  { value: 'rock_slope_stabilization', category: 'rock_scaling', labelKey: 'dashboard.jobTypes.rock_slope_stabilization', label: 'Slope Stabilization', icon: 'landscape', elevationRequirement: 'always', progressType: 'hours' },
-  { value: 'rock_hazard_assessment', category: 'rock_scaling', labelKey: 'dashboard.jobTypes.rock_hazard_assessment', label: 'Rockfall Hazard Assessment', icon: 'warning', elevationRequirement: 'configurable', progressType: 'hours' },
-  { value: 'rock_catch_fence', category: 'rock_scaling', labelKey: 'dashboard.jobTypes.rock_catch_fence', label: 'Catch Fence Installation', icon: 'fence', elevationRequirement: 'always', progressType: 'hours' },
-  { value: 'rock_drilling', category: 'rock_scaling', labelKey: 'dashboard.jobTypes.rock_drilling', label: 'Rock Drilling', icon: 'precision_manufacturing', elevationRequirement: 'always', progressType: 'hours' },
-  { value: 'rock_other', category: 'rock_scaling', labelKey: 'dashboard.jobTypes.rock_other', label: 'Other Rock Scaling', icon: 'more_horiz', elevationRequirement: 'configurable', progressType: 'hours' },
-  
-  // Wind Turbine (all hours-based, no building-specific fields needed)
-  { value: 'turbine_blade_inspection', category: 'wind_turbine', labelKey: 'dashboard.jobTypes.turbine_blade_inspection', label: 'Blade Inspection', icon: 'visibility', elevationRequirement: 'never', progressType: 'hours' },
-  { value: 'turbine_blade_repair', category: 'wind_turbine', labelKey: 'dashboard.jobTypes.turbine_blade_repair', label: 'Blade Repair', icon: 'build', elevationRequirement: 'never', progressType: 'hours' },
-  { value: 'turbine_leading_edge', category: 'wind_turbine', labelKey: 'dashboard.jobTypes.turbine_leading_edge', label: 'Leading Edge Repair', icon: 'auto_fix_high', elevationRequirement: 'never', progressType: 'hours' },
-  { value: 'turbine_composite_patch', category: 'wind_turbine', labelKey: 'dashboard.jobTypes.turbine_composite_patch', label: 'Composite Patch Repair', icon: 'layers', elevationRequirement: 'never', progressType: 'hours' },
-  { value: 'turbine_lightning_protection', category: 'wind_turbine', labelKey: 'dashboard.jobTypes.turbine_lightning_protection', label: 'Lightning Protection System', icon: 'bolt', elevationRequirement: 'never', progressType: 'hours' },
-  { value: 'turbine_tower_inspection', category: 'wind_turbine', labelKey: 'dashboard.jobTypes.turbine_tower_inspection', label: 'Tower Inspection', icon: 'search', elevationRequirement: 'never', progressType: 'hours' },
-  { value: 'turbine_tower_coating', category: 'wind_turbine', labelKey: 'dashboard.jobTypes.turbine_tower_coating', label: 'Tower Coating / Painting', icon: 'format_paint', elevationRequirement: 'never', progressType: 'hours' },
-  { value: 'turbine_gearbox_service', category: 'wind_turbine', labelKey: 'dashboard.jobTypes.turbine_gearbox_service', label: 'Gearbox Service', icon: 'settings', elevationRequirement: 'never', progressType: 'hours' },
-  { value: 'turbine_nacelle_work', category: 'wind_turbine', labelKey: 'dashboard.jobTypes.turbine_nacelle_work', label: 'Nacelle Work', icon: 'engineering', elevationRequirement: 'never', progressType: 'hours' },
-  { value: 'turbine_standby_rescue', category: 'wind_turbine', labelKey: 'dashboard.jobTypes.turbine_standby_rescue', label: 'Standby / Rescue', icon: 'health_and_safety', elevationRequirement: 'never', progressType: 'hours' },
-  { value: 'turbine_other', category: 'wind_turbine', labelKey: 'dashboard.jobTypes.turbine_other', label: 'Other Wind Turbine', icon: 'more_horiz', elevationRequirement: 'never', progressType: 'hours' },
-  
-  // Oil & Gas (all hours-based, no building-specific fields needed)
-  { value: 'oil_tank_inspection', category: 'oil_field', labelKey: 'dashboard.jobTypes.oil_tank_inspection', label: 'Tank Inspection', icon: 'visibility', elevationRequirement: 'never', progressType: 'hours' },
-  { value: 'oil_tank_cleaning', category: 'oil_field', labelKey: 'dashboard.jobTypes.oil_tank_cleaning', label: 'Tank Cleaning', icon: 'cleaning_services', elevationRequirement: 'never', progressType: 'hours' },
-  { value: 'oil_tank_repair', category: 'oil_field', labelKey: 'dashboard.jobTypes.oil_tank_repair', label: 'Tank Repair', icon: 'build', elevationRequirement: 'never', progressType: 'hours' },
-  { value: 'oil_flare_stack', category: 'oil_field', labelKey: 'dashboard.jobTypes.oil_flare_stack', label: 'Flare Stack Work', icon: 'local_fire_department', elevationRequirement: 'never', progressType: 'hours' },
-  { value: 'oil_pipeline_inspection', category: 'oil_field', labelKey: 'dashboard.jobTypes.oil_pipeline_inspection', label: 'Pipeline Inspection', icon: 'search', elevationRequirement: 'never', progressType: 'hours' },
-  { value: 'oil_pipeline_repair', category: 'oil_field', labelKey: 'dashboard.jobTypes.oil_pipeline_repair', label: 'Pipeline Repair', icon: 'plumbing', elevationRequirement: 'never', progressType: 'hours' },
-  { value: 'oil_scaffolding_alternative', category: 'oil_field', labelKey: 'dashboard.jobTypes.oil_scaffolding_alternative', label: 'Scaffolding Alternative', icon: 'construction', elevationRequirement: 'never', progressType: 'hours' },
-  { value: 'oil_vessel_inspection', category: 'oil_field', labelKey: 'dashboard.jobTypes.oil_vessel_inspection', label: 'Pressure Vessel Inspection', icon: 'fact_check', elevationRequirement: 'never', progressType: 'hours' },
-  { value: 'oil_column_work', category: 'oil_field', labelKey: 'dashboard.jobTypes.oil_column_work', label: 'Column / Tower Work', icon: 'view_column', elevationRequirement: 'never', progressType: 'hours' },
-  { value: 'oil_refinery_maintenance', category: 'oil_field', labelKey: 'dashboard.jobTypes.oil_refinery_maintenance', label: 'Refinery Maintenance', icon: 'factory', elevationRequirement: 'never', progressType: 'hours' },
-  { value: 'oil_offshore_platform', category: 'oil_field', labelKey: 'dashboard.jobTypes.oil_offshore_platform', label: 'Offshore Platform Work', icon: 'directions_boat', elevationRequirement: 'never', progressType: 'hours' },
-  { value: 'oil_coating_painting', category: 'oil_field', labelKey: 'dashboard.jobTypes.oil_coating_painting', label: 'Industrial Coating / Painting', icon: 'format_paint', elevationRequirement: 'never', progressType: 'hours' },
-  { value: 'oil_confined_space', category: 'oil_field', labelKey: 'dashboard.jobTypes.oil_confined_space', label: 'Confined Space Entry', icon: 'meeting_room', elevationRequirement: 'never', progressType: 'hours' },
-  { value: 'oil_standby_rescue', category: 'oil_field', labelKey: 'dashboard.jobTypes.oil_standby_rescue', label: 'Standby / Rescue', icon: 'health_and_safety', elevationRequirement: 'never', progressType: 'hours' },
-  { value: 'oil_other', category: 'oil_field', labelKey: 'dashboard.jobTypes.oil_other', label: 'Other Oil & Gas', icon: 'more_horiz', elevationRequirement: 'never', progressType: 'hours' },
 ];
 
 export function getJobTypesByCategory(category: JobCategory): JobTypeConfig[] {
