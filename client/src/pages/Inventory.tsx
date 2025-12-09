@@ -130,6 +130,7 @@ export default function Inventory() {
   const [showOtherDescender, setShowOtherDescender] = useState(false);
   const [customBrand, setCustomBrand] = useState("");
   const [customModel, setCustomModel] = useState("");
+  const [catalogSearch, setCatalogSearch] = useState("");
 
   // Fetch current user
   const { data: userData } = useQuery<{ user: any }>({
@@ -587,6 +588,7 @@ export default function Inventory() {
       setShowOtherDescender(false);
       setCustomBrand("");
       setCustomModel("");
+      setCatalogSearch("");
     },
     onError: (error: any) => {
       toast({
@@ -2386,8 +2388,35 @@ export default function Inventory() {
               {form.watch("equipmentType") === "Descender" && !showOtherDescender && (
                 <div className="space-y-3">
                   <FormLabel>{t('inventory.selectDescender', 'Select Descender')}</FormLabel>
-                  <div className="grid grid-cols-1 gap-2 max-h-[40vh] overflow-y-auto pr-1">
-                    {catalogData?.items?.map((item) => (
+                  <div className="relative">
+                    <Input
+                      placeholder={t('inventory.searchDescenders', 'Search descenders...')}
+                      value={catalogSearch}
+                      onChange={(e) => setCatalogSearch(e.target.value)}
+                      className="pr-8"
+                      data-testid="input-catalog-search"
+                    />
+                    {catalogSearch && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6"
+                        onClick={() => setCatalogSearch("")}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-1 gap-2 max-h-[35vh] overflow-y-auto pr-1">
+                    {catalogData?.items
+                      ?.filter((item) => {
+                        if (!catalogSearch) return true;
+                        const search = catalogSearch.toLowerCase();
+                        return item.brand.toLowerCase().includes(search) || 
+                               item.model.toLowerCase().includes(search);
+                      })
+                      .map((item) => (
                       <Card
                         key={item.id}
                         className={`cursor-pointer hover-elevate active-elevate-2 transition-all ${
