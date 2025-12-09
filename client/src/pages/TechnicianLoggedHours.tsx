@@ -31,8 +31,7 @@ import {
   Camera,
   Scan,
   Check,
-  FileDown,
-  Star
+  FileDown
 } from "lucide-react";
 import { jsPDF } from "jspdf";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -1040,13 +1039,6 @@ export default function TechnicianLoggedHours() {
           >
             <FileDown className="w-4 h-4" />
             <span className="hidden sm:inline">{t.exportPdf}</span>
-            <Badge 
-              variant="secondary" 
-              className="bg-gradient-to-r from-amber-500 to-yellow-400 text-white border-0 text-[10px] px-1.5 py-0 hidden sm:flex"
-            >
-              <Star className="w-2.5 h-2.5 mr-0.5" />
-              PRO
-            </Badge>
           </Button>
         </div>
       </header>
@@ -1770,16 +1762,7 @@ export default function TechnicianLoggedHours() {
       <Dialog open={showExportDialog} onOpenChange={setShowExportDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <div className="flex items-center gap-2">
-              <DialogTitle>{t.exportWorkHistory}</DialogTitle>
-              <Badge 
-                variant="secondary" 
-                className="bg-gradient-to-r from-amber-500 to-yellow-400 text-white border-0 text-[10px] px-1.5 py-0"
-              >
-                <Star className="w-2.5 h-2.5 mr-0.5" />
-                PRO
-              </Badge>
-            </div>
+            <DialogTitle>{t.exportWorkHistory}</DialogTitle>
             <DialogDescription>
               {t.exportWorkHistoryDesc}
             </DialogDescription>
