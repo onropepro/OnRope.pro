@@ -3255,11 +3255,11 @@ export default function Dashboard() {
                                       const [clientId, strataIdx] = selectedStrataForProject.split("|");
                                       const client = clientsData?.find(c => c.id === clientId);
                                       const strata = client?.lmsNumbers?.[parseInt(strataIdx)];
-                                      return strata ? `${strata.number} - ${client.firstName} ${client.lastName}` : "Select a building...";
+                                      return strata ? `${strata.number} - ${client.firstName} ${client.lastName}` : t('dashboard.createProject.selectBuilding', 'Select a client');
                                     })()
                                   : selectedStrataForProject === "manual"
                                   ? t('dashboard.projects.enterManually', 'Enter Details Manually')
-                                  : t('dashboard.projects.selectBuilding', 'Select a building...')}
+                                  : t('dashboard.createProject.selectBuilding', 'Select a client')}
                                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                               </Button>
                             </PopoverTrigger>
@@ -3324,7 +3324,7 @@ export default function Dashboard() {
                             </PopoverContent>
                           </Popover>
                           <p className="text-xs text-muted-foreground mt-1">
-                            Search and select a building from your client database to auto-fill details
+                            {t('dashboard.createProject.autoFillDesc', 'Search and select from your client database to auto-fill details')}
                           </p>
                         </div>
 
@@ -3333,7 +3333,7 @@ export default function Dashboard() {
                           name="strataPlanNumber"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Strata Plan Number</FormLabel>
+                              <FormLabel>{t('dashboard.createProject.strataPlanNumber', 'Strata plan number / Job number')}</FormLabel>
                               <FormControl>
                                 <Input placeholder="LMS2345" {...field} data-testid="input-strata-plan-number" className="h-12" />
                               </FormControl>
