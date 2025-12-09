@@ -2459,10 +2459,10 @@ export default function Inventory() {
                           </SelectTrigger>
                           <SelectContent>
                             {activeEmployees
-                              .filter((emp: any) => emp.name && emp.name.trim() !== "")
+                              .filter((emp: any) => emp.name && emp.name.trim() !== "" && emp.role !== 'company')
                               .map((emp: any) => (
                                 <SelectItem key={emp.id} value={emp.id}>
-                                  {emp.name}
+                                  {emp.name} {emp.email ? `(${emp.email})` : ''}
                                 </SelectItem>
                               ))}
                           </SelectContent>
@@ -2527,10 +2527,10 @@ export default function Inventory() {
                           </SelectTrigger>
                           <SelectContent>
                             {activeEmployees
-                              .filter((emp: any) => emp.name && emp.name.trim() !== "")
+                              .filter((emp: any) => emp.name && emp.name.trim() !== "" && emp.role !== 'company')
                               .map((emp: any) => (
                                 <SelectItem key={emp.id} value={emp.id}>
-                                  {emp.name}
+                                  {emp.name} {emp.email ? `(${emp.email})` : ''}
                                 </SelectItem>
                               ))}
                           </SelectContent>
@@ -3150,10 +3150,10 @@ export default function Inventory() {
                       </SelectTrigger>
                       <SelectContent>
                         {activeEmployees
-                          .filter((emp: any) => emp.name && emp.name.trim() !== "")
+                          .filter((emp: any) => emp.name && emp.name.trim() !== "" && emp.role !== 'company')
                           .map((emp: any) => (
                             <SelectItem key={emp.id} value={emp.id}>
-                              {emp.name}
+                              {emp.name} {emp.email ? `(${emp.email})` : ''}
                             </SelectItem>
                           ))}
                       </SelectContent>
