@@ -88,6 +88,12 @@ type RecentChange = {
 const recentChangesData: RecentChange[] = [
   {
     date: "December 9, 2025",
+    title: "Changelog Accuracy Update",
+    description: "Comprehensive changelog update: Added 5 job categories (Building Maintenance, NDT, Rock Scaling, Wind Turbine, Oil Field) with 20 service types. Added Technician Portal, Building Manager Portal, and Landing Pages categories. Expanded SuperUser Administration to 11 pages. Added Technician Self-Registration section with referral system and PLUS access tier. Updated Employee Management with team invitation workflow and multi-employer connections",
+    type: "improvement"
+  },
+  {
+    date: "December 9, 2025",
     title: "Job Board System",
     description: "Complete job board ecosystem: Companies and SuperUsers can post employment opportunities with salary ranges, required certifications, and job types. Technicians can browse job listings, apply directly, and toggle profile visibility to employers. Visible profiles show resume, safety rating, name, experience, certification numbers, and photo. Includes application tracking and employer candidate browser",
     type: "feature"
@@ -310,85 +316,93 @@ const recentChangesData: RecentChange[] = [
   }
 ];
 
-const servicesData: ServiceItem[] = [
-  { 
-    name: "Window Cleaning", 
-    description: "Rope access high-rise window cleaning with directional drop tracking",
-    icon: "window",
-    trackingType: "Drop-based (N/E/S/W)"
+type ServiceCategory = {
+  category: string;
+  description: string;
+  services: ServiceItem[];
+};
+
+const servicesData: ServiceCategory[] = [
+  {
+    category: "Building Maintenance",
+    description: "High-rise building cleaning and maintenance services",
+    services: [
+      { name: "Window Cleaning", description: "Rope access high-rise window cleaning with directional drop tracking", icon: "window", trackingType: "Drop-based (N/E/S/W)" },
+      { name: "Exterior Dryer Vent Cleaning", description: "High-rise exterior dryer vent cleaning and maintenance", icon: "air", trackingType: "Drop-based (N/E/S/W)" },
+      { name: "Building Wash / Pressure Washing", description: "Building exterior cleaning and pressure washing services", icon: "water_drop", trackingType: "Drop-based (N/E/S/W)" },
+      { name: "General Pressure Washing", description: "Ground-level and general pressure washing services", icon: "cleaning_services", trackingType: "Hours-based" },
+      { name: "Gutter Cleaning", description: "Gutter cleaning, maintenance, and debris removal", icon: "home_repair_service", trackingType: "Hours-based" },
+      { name: "In-Suite Dryer Vent Cleaning", description: "Individual unit dryer vent cleaning with unit tracking", icon: "meeting_room", trackingType: "Unit-based" },
+      { name: "Parkade Pressure Cleaning", description: "Parking structure pressure washing with stall tracking", icon: "local_parking", trackingType: "Stall-based" },
+      { name: "Ground Window Cleaning", description: "Ground-level and low-rise window cleaning", icon: "storefront", trackingType: "Hours-based" },
+      { name: "Painting", description: "Rope access painting and coating services", icon: "format_paint", trackingType: "Hours-based" },
+      { name: "Inspection", description: "Building facade inspection and assessment", icon: "fact_check", trackingType: "Hours-based" },
+    ]
   },
-  { 
-    name: "Exterior Dryer Vent Cleaning", 
-    description: "High-rise exterior dryer vent cleaning and maintenance",
-    icon: "air",
-    trackingType: "Drop-based (N/E/S/W)"
+  {
+    category: "NDT (Non-Destructive Testing)",
+    description: "Specialized inspection and testing services requiring rope access",
+    services: [
+      { name: "Ultrasonic Testing", description: "Thickness measurement and flaw detection using ultrasound", icon: "sensors", trackingType: "Hours-based" },
+      { name: "Visual Inspection", description: "Detailed visual examination of structures and components", icon: "visibility", trackingType: "Hours-based" },
+      { name: "Magnetic Particle Testing", description: "Surface and near-surface flaw detection", icon: "grain", trackingType: "Hours-based" },
+    ]
   },
-  { 
-    name: "Building Wash / Pressure Washing", 
-    description: "Building exterior cleaning and pressure washing services",
-    icon: "water_drop",
-    trackingType: "Drop-based (N/E/S/W)"
+  {
+    category: "Rock Scaling",
+    description: "Rock face stabilization and hazard mitigation",
+    services: [
+      { name: "Manual Scaling", description: "Hand tool removal of loose rock material", icon: "landscape", trackingType: "Hours-based" },
+      { name: "Mechanical Scaling", description: "Power tool rock removal operations", icon: "construction", trackingType: "Hours-based" },
+      { name: "Rock Bolting", description: "Installation of rock reinforcement systems", icon: "build", trackingType: "Hours-based" },
+    ]
   },
-  { 
-    name: "General Pressure Washing", 
-    description: "Ground-level and general pressure washing services",
-    icon: "cleaning_services",
-    trackingType: "Hours-based"
+  {
+    category: "Wind Turbine",
+    description: "Wind turbine inspection, maintenance, and repair services",
+    services: [
+      { name: "Blade Inspection", description: "Visual and NDT inspection of turbine blades", icon: "air", trackingType: "Hours-based" },
+      { name: "Blade Repair", description: "Composite repair and leading edge protection", icon: "build", trackingType: "Hours-based" },
+      { name: "Tower Maintenance", description: "Tower cleaning, painting, and maintenance", icon: "domain", trackingType: "Hours-based" },
+    ]
   },
-  { 
-    name: "Gutter Cleaning", 
-    description: "Gutter cleaning, maintenance, and debris removal",
-    icon: "home_repair_service",
-    trackingType: "Hours-based"
+  {
+    category: "Oil Field",
+    description: "Petrochemical and industrial rope access services",
+    services: [
+      { name: "Tank Inspection", description: "Storage tank inspection and maintenance", icon: "propane_tank", trackingType: "Hours-based" },
+      { name: "Flare Stack Work", description: "Flare tip inspection and maintenance", icon: "local_fire_department", trackingType: "Hours-based" },
+      { name: "Pipeline Inspection", description: "Elevated pipeline inspection and coating", icon: "timeline", trackingType: "Hours-based" },
+    ]
   },
-  { 
-    name: "In-Suite Dryer Vent Cleaning", 
-    description: "Individual unit dryer vent cleaning with unit tracking",
-    icon: "meeting_room",
-    trackingType: "Unit-based"
-  },
-  { 
-    name: "Parkade Pressure Cleaning", 
-    description: "Parking structure pressure washing with stall tracking",
-    icon: "local_parking",
-    trackingType: "Stall-based"
-  },
-  { 
-    name: "Ground Window Cleaning", 
-    description: "Ground-level and low-rise window cleaning",
-    icon: "storefront",
-    trackingType: "Hours-based"
-  },
-  { 
-    name: "Painting", 
-    description: "Rope access painting and coating services",
-    icon: "format_paint",
-    trackingType: "Hours-based"
-  },
-  { 
-    name: "Inspection", 
-    description: "Building facade inspection and assessment",
-    icon: "fact_check",
-    trackingType: "Hours-based"
-  },
-  { 
-    name: "Custom Services", 
+  {
+    category: "Custom Services",
     description: "Create and save custom job types for your company",
-    icon: "more_horiz",
-    trackingType: "Configurable"
-  },
+    services: [
+      { name: "Custom Job Types", description: "Define your own specialized services with configurable tracking", icon: "more_horiz", trackingType: "Configurable" },
+    ]
+  }
 ];
 
 const pagesData: PageCategory[] = [
   {
-    category: "Public Pages",
+    category: "Landing Pages",
     icon: Globe,
-    iconColor: "text-success-600",
+    iconColor: "text-action-600 dark:text-action-400",
     pages: [
+      { name: "Technician Landing", path: "/technician-login", description: "Technician signup and PLUS upgrade page", roles: ["Public"] },
+      { name: "Employer Landing", path: "/employer", description: "Employer/company information page", roles: ["Public"] },
       { name: "Login", path: "/login", description: "User authentication", roles: ["Public"] },
       { name: "Register", path: "/register", description: "New company registration", roles: ["Public"] },
       { name: "Get License", path: "/get-license", description: "Subscription pricing", roles: ["Public"] },
       { name: "Resident/PM Linking", path: "/link", description: "Link account with company code", roles: ["Public"] },
+    ]
+  },
+  {
+    category: "Documentation & Guides",
+    icon: FileText,
+    iconColor: "text-success-600",
+    pages: [
       { name: "Changelog", path: "/changelog", description: "Platform feature overview", roles: ["Public"] },
       { name: "Pricing", path: "/changelog/pricing", description: "Subscription tiers and add-ons", roles: ["Public"] },
       { name: "Safety Guide", path: "/changelog/safety", description: "Safety & compliance documentation guide", roles: ["Public"] },
@@ -409,6 +423,32 @@ const pagesData: PageCategory[] = [
       { name: "Multi-Language Guide", path: "/changelog/language", description: "Internationalization and localization", roles: ["Public"] },
       { name: "GPS & Location Guide", path: "/changelog/gps", description: "Location tracking and verification", roles: ["Public"] },
       { name: "Property Manager Guide", path: "/changelog/property-manager", description: "Vendor management interface", roles: ["Public"] },
+    ]
+  },
+  {
+    category: "Technician Portal",
+    icon: HardHat,
+    iconColor: "text-warning-600",
+    pages: [
+      { name: "Technician Dashboard", path: "/technician", description: "Personal technician portal with profile and certifications", roles: ["Technician"] },
+      { name: "My Profile", path: "/technician/profile", description: "Personal information, certifications, and documents", roles: ["Technician"] },
+      { name: "My Logged Hours", path: "/technician/hours", description: "IRATA task logging history and statistics", roles: ["Technician"] },
+      { name: "My Gear", path: "/technician/gear", description: "Personal equipment assignments", roles: ["Technician"] },
+      { name: "My Employers", path: "/technician/employers", description: "Connected companies and PLUS multi-employer management", roles: ["Technician"] },
+      { name: "Pending Invitations", path: "/technician/invitations", description: "Team invitations from companies", roles: ["Technician"] },
+      { name: "Technician Registration", path: "/technician-register", description: "4-screen simplified self-registration", roles: ["Public"] },
+    ]
+  },
+  {
+    category: "Building Manager Portal",
+    icon: Building2,
+    iconColor: "text-violet-600 dark:text-violet-400",
+    pages: [
+      { name: "Building Dashboard", path: "/building-portal", description: "Single-building management dashboard", roles: ["Building Manager"] },
+      { name: "Service History", path: "/building-portal/history", description: "Maintenance and service records", roles: ["Building Manager"] },
+      { name: "Anchor Documents", path: "/building-portal/anchors", description: "Anchor inspection and certification docs", roles: ["Building Manager"] },
+      { name: "Vendor COI", path: "/building-portal/coi", description: "Vendor certificates of insurance", roles: ["Building Manager"] },
+      { name: "Safety Rating", path: "/building-portal/safety", description: "Vendor CSR scores and breakdowns", roles: ["Building Manager"] },
     ]
   },
   {
@@ -503,13 +543,21 @@ const pagesData: PageCategory[] = [
     ]
   },
   {
-    category: "Administration",
+    category: "SuperUser Administration",
     icon: Settings,
     iconColor: "text-neutral-400",
     pages: [
-      { name: "SuperUser Dashboard", path: "/superuser", description: "Platform administration", roles: ["SuperUser"] },
-      { name: "All Companies", path: "/superuser/companies", description: "Company oversight", roles: ["SuperUser"] },
+      { name: "SuperUser Dashboard", path: "/superuser", description: "Platform administration hub", roles: ["SuperUser"] },
+      { name: "All Companies", path: "/superuser/companies", description: "Company oversight and management", roles: ["SuperUser"] },
       { name: "Company Detail", path: "/superuser/companies/:id", description: "Individual company analytics", roles: ["SuperUser"] },
+      { name: "All Technicians", path: "/superuser/technicians", description: "Platform-wide technician management", roles: ["SuperUser"] },
+      { name: "Goals & KPIs", path: "/superuser/goals", description: "Year 1 operational metrics tracking", roles: ["SuperUser"] },
+      { name: "Platform Metrics", path: "/superuser/metrics", description: "MRR, churn, LTV, and revenue analytics", roles: ["SuperUser"] },
+      { name: "Task Management", path: "/superuser/tasks", description: "Internal project management with comments", roles: ["SuperUser"] },
+      { name: "Feature Requests", path: "/superuser/feature-requests", description: "Customer feature requests and messaging", roles: ["SuperUser"] },
+      { name: "Global Buildings", path: "/superuser/buildings", description: "Central database of all buildings", roles: ["SuperUser"] },
+      { name: "Founder Resources", path: "/superuser/resources", description: "Private development tools and roadmap", roles: ["SuperUser"] },
+      { name: "View as Company", path: "/superuser/view-as/:id", description: "Impersonation mode for support", roles: ["SuperUser"] },
     ]
   },
 ];
@@ -648,16 +696,44 @@ const changelogData: ChangelogSection[] = [
     title: "Employee Management",
     icon: Users,
     iconColor: "text-action-600 dark:text-action-400",
-    description: "Complete workforce administration with certification tracking",
+    description: "Complete workforce administration with team invitations and certification tracking",
     features: [
       "Employee profile management with contact details",
-      "IRATA certification level and expiration tracking",
-      "Driver's license management",
+      "IRATA and SPRAT certification level and expiration tracking",
+      "Team invitation system: Search technicians by license or email, send invitations",
+      "Technician accepts/declines invitations from their portal",
+      "Owner notification when technicians accept invitations",
+      "Multi-employer connections for PLUS technicians",
+      "AI license verification using Gemini screenshot analysis",
+      "Driver's license management with document uploads",
       "Emergency contact information",
       "Hourly rate configuration",
       "Role and permission assignment",
-      "Employee termination procedures",
+      "Employee termination (unlinks technician, preserves their account)",
       "Password reset by administrators"
+    ],
+    status: "complete"
+  },
+  {
+    title: "Technician Self-Registration",
+    icon: HardHat,
+    iconColor: "text-warning-600",
+    description: "Streamlined 4-screen registration with referral system and PLUS access tier",
+    features: [
+      "Simplified 4-screen registration flow (down from 20 screens)",
+      "Personal info: Name, email, password, phone",
+      "Certification info: IRATA/SPRAT level, license number, expiration",
+      "Contact info: Address with Geoapify autocomplete",
+      "Financial info: SIN (encrypted), banking details for payroll",
+      "Referral code system: 12-character unique codes for technicians",
+      "One-sided referral benefit: Code sharer gets PLUS upgrade",
+      "Technician PLUS access tier with premium features",
+      "PLUS badge (gold PRO) displayed next to technician names",
+      "Certification expiry alerts: 60-day yellow, 30-day red badges",
+      "Unlimited employer connections for PLUS members",
+      "Resume/CV document uploads with preview",
+      "Profile visibility toggle for Job Board",
+      "Bilingual support (English/French) throughout"
     ],
     status: "complete"
   },
@@ -985,7 +1061,7 @@ export default function Changelog() {
                   </div>
                   <div>
                     <div className="text-2xl font-bold">{servicesData.length}</div>
-                    <div className="text-sm text-muted-foreground">Service Types</div>
+                    <div className="text-sm text-muted-foreground">Job Categories</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -1055,29 +1131,40 @@ export default function Changelog() {
               <div>
                 <CardTitle className="text-xl">Services Managed</CardTitle>
                 <CardDescription>
-                  {servicesData.length} service types available for project management
+                  {servicesData.length} job categories with {servicesData.reduce((acc, cat) => acc + cat.services.length, 0)} service types
                 </CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="grid gap-3 sm:grid-cols-2">
-              {servicesData.map((service, index) => (
-                <div 
-                  key={index}
-                  className="flex items-start gap-3 p-3 rounded-lg bg-muted/30"
-                >
-                  <div className="p-2 rounded-lg bg-background ring-1 ring-border/50 flex-shrink-0">
-                    <span className="material-icons text-lg text-muted-foreground">{service.icon}</span>
+            <div className="space-y-6">
+              {servicesData.map((category, catIndex) => (
+                <div key={catIndex}>
+                  <div className="flex items-center gap-2 mb-3">
+                    <h3 className="font-semibold text-sm">{category.category}</h3>
+                    <Badge variant="secondary" className="text-xs">{category.services.length}</Badge>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-medium text-sm">{service.name}</span>
-                      <Badge variant="secondary" className="text-xs">{service.trackingType}</Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {service.description}
-                    </p>
+                  <p className="text-xs text-muted-foreground mb-3">{category.description}</p>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {category.services.map((service, index) => (
+                      <div 
+                        key={index}
+                        className="flex items-start gap-3 p-3 rounded-lg bg-muted/30"
+                      >
+                        <div className="p-2 rounded-lg bg-background ring-1 ring-border/50 flex-shrink-0">
+                          <span className="material-icons text-lg text-muted-foreground">{service.icon}</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-medium text-sm">{service.name}</span>
+                            <Badge variant="secondary" className="text-xs">{service.trackingType}</Badge>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            {service.description}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               ))}
