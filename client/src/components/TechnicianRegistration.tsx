@@ -342,18 +342,6 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
 
           {/* Right Panel - Form content */}
           <div className="flex-1 flex flex-col overflow-y-auto">
-            {/* Close button */}
-            <div className="absolute right-4 top-4 z-10">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleClose}
-                data-testid="button-close-registration"
-              >
-                <X className="w-5 h-5" />
-              </Button>
-            </div>
-
             <div className="flex-1 p-8 lg:p-10">
               {/* Welcome Screen */}
               {step === "welcome" && (
