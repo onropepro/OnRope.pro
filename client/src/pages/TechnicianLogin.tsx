@@ -256,7 +256,7 @@ export default function TechnicianLogin() {
     {
       icon: Users,
       title: "Instant Employer Connection",
-      description: "Plug into any company using OnRopePro. Your certs, banking, contacts—auto-shared. Employer only enters salary and permissions."
+      description: "Plug into any company using OnRopePro. Your certs, banking, contacts - auto-shared. Employer only enters salary and permissions."
     },
     {
       icon: Clock,
@@ -266,17 +266,17 @@ export default function TechnicianLogin() {
     {
       icon: FileText,
       title: "Logbook Reference",
-      description: "Every session recorded—building, tasks, height, hours. Fill out your IRATA logbook from real data, not guesswork two weeks later."
+      description: "Every session recorded. Building, tasks, height, hours. Fill out your IRATA logbook from real data, not guesswork two weeks later."
     },
     {
       icon: Award,
       title: "Professional Profile",
-      description: "IRATA/SPRAT ID, first aid, driver's abstract—verified and ready for any employer to see."
+      description: "IRATA/SPRAT ID, first aid, driver's abstract - verified and ready for any employer to see."
     },
     {
       icon: Lock,
       title: "Secure Document Vault",
-      description: "SIN, banking, void cheque—encrypted. Shared only when YOU connect. Never asked for a void cheque again."
+      description: "SIN, banking, void cheque - encrypted. Shared only when YOU connect. Never asked for a void cheque again."
     },
     {
       icon: Shield,
@@ -291,7 +291,7 @@ export default function TechnicianLogin() {
     {
       icon: Download,
       title: "Exportable History (Plus)",
-      description: "PDF proving 178 rope transfers, 3,500 deviations, 2,000 drops—not just \"I have 8 years experience.\""
+      description: "PDF proving 178 rope transfers, 3,500 deviations, 2,000 drops - not just \"I have 8 years experience.\""
     },
   ];
 
@@ -311,10 +311,10 @@ export default function TechnicianLogin() {
     "Unlimited employer connections (plug into multiple companies simultaneously)",
     "30-day certification expiry alerts (you AND your employer notified)",
     "Safety Rating score (0-100) with improvement recommendations",
-    "Exportable work history PDF (178 rope transfers, 3,500 deviations—actual proof)",
+    "Exportable work history PDF (178 rope transfers, 3,500 deviations - actual proof)",
     "Work history analytics (lifetime totals by task type)",
     "Resume storage",
-    "Job board access (rope access-specific postings—no more endless Indeed searches)"
+    "Job board access (rope access-specific postings, no more endless Indeed searches)"
   ];
 
   const steps = [
@@ -331,7 +331,7 @@ export default function TechnicianLogin() {
     {
       number: "3",
       title: "Plug into your employer",
-      description: "If they use OnRopePro, connect your account. They instantly see your verified credentials—zero paperwork on their end, zero on yours."
+      description: "If they use OnRopePro, connect your account. They instantly see your verified credentials, zero paperwork on their end, zero on yours."
     },
     {
       number: "4",
@@ -348,15 +348,15 @@ export default function TechnicianLogin() {
   const faqs = [
     {
       question: "Why is this free?",
-      answer: "Employers pay. You don't. When you plug your verified profile into a new company, they skip hours of onboarding paperwork and get automatic hour tracking. That's worth paying for. Your profile stays yours forever—we just make it portable."
+      answer: "Employers pay. You don't. When you plug your verified profile into a new company, they skip hours of onboarding paperwork and get automatic hour tracking. That's worth paying for. Your profile stays yours forever. We just make it portable."
     },
     {
       question: "What does \"plug in\" actually mean?",
-      answer: "If your employer uses OnRopePro, you connect your account to theirs with one tap. Instantly, they see your verified certs, banking info, and emergency contact—no forms to fill. From then on, your work hours submit automatically when you clock in/out. No timesheets. No texts. No \"did you log yesterday?\""
+      answer: "If your employer uses OnRopePro, you connect your account to theirs with one tap. Instantly, they see your verified certs, banking info, and emergency contact, no forms to fill. From then on, your work hours submit automatically when you clock in/out. No timesheets. No texts. No \"did you log yesterday?\""
     },
     {
       question: "What if my employer doesn't use OnRopePro?",
-      answer: "You still get all the personal benefits—document storage, logbook digitization, certification tracking, exportable work history. And when you eventually work for a company that does use it (or convince your current one), you're already set up for instant onboarding."
+      answer: "You still get all the personal benefits: document storage, logbook digitization, certification tracking, exportable work history. And when you eventually work for a company that does use it (or convince your current one), you're already set up for instant onboarding."
     },
     {
       question: "Who owns my data?",
@@ -368,7 +368,7 @@ export default function TechnicianLogin() {
     },
     {
       question: "What's the referral thing about?",
-      answer: "Share your unique code. When one tech signs up using it, you both get Plus—unlimited employer connections, exportable history, expiry alerts. Not MLM. Not commission. Just mutual benefit."
+      answer: "Share your unique code. When one tech signs up using it, you both get Plus: unlimited employer connections, exportable history, expiry alerts. Not MLM. Not commission. Just mutual benefit."
     }
   ];
 
@@ -567,7 +567,7 @@ export default function TechnicianLogin() {
                   </div>
                   <h3 className="font-bold text-lg mb-2">Day 1 at a new job?</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    You plug in. They instantly have your certs, banking, emergency contact—verified and ready. No forms. No "bring a void cheque."
+                    You plug in. They instantly have your certs, banking, emergency contact, verified and ready. No forms. No "bring a void cheque."
                   </p>
                 </div>
                 
@@ -577,7 +577,7 @@ export default function TechnicianLogin() {
                   </div>
                   <h3 className="font-bold text-lg mb-2">Every day after that?</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    Hours, buildings, tasks—logged automatically. Clock in, do your work, clock out. No timesheets. No disputes.
+                    Hours, buildings, tasks - logged automatically. Clock in, do your work, clock out. No timesheets. No disputes.
                   </p>
                 </div>
                 
@@ -587,7 +587,7 @@ export default function TechnicianLogin() {
                   </div>
                   <h3 className="font-bold text-lg mb-2">Fill out your logbook?</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    Every session recorded. Building, tasks, height, hours. Use actual records—not fuzzy memory two weeks later.
+                    Every session recorded. Building, tasks, height, hours. Use actual records, not fuzzy memory two weeks later.
                   </p>
                 </div>
                 
@@ -607,7 +607,7 @@ export default function TechnicianLogin() {
                   </div>
                   <h3 className="font-bold text-lg mb-2">Work multiple companies?</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    With Plus, connect to unlimited employers. Weekdays, weekends, your own clients—one profile handles it all.
+                    With Plus, connect to unlimited employers. Weekdays, weekends, your own clients. One profile handles it all.
                   </p>
                 </div>
                 
