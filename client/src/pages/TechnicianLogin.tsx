@@ -30,7 +30,11 @@ import {
   Share2,
   Award,
   X,
-  MessageSquareWarning
+  MessageSquareWarning,
+  Briefcase,
+  BookOpen,
+  Zap,
+  DollarSign
 } from "lucide-react";
 import { TechnicianRegistration } from "@/components/TechnicianRegistration";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
@@ -744,6 +748,244 @@ export default function TechnicianLogin() {
                 <Share2 className="w-4 h-4" />
                 Share with one tech. You get Plus. It's that simple.
               </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Plus Value Comparison Table - Flowbite Style */}
+        <section className="py-20 lg:py-28 bg-gradient-to-b from-muted/30 to-background">
+          <div className="container mx-auto px-6 lg:px-8">
+            <div className="text-center max-w-3xl mx-auto mb-12">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 mb-6">
+                <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Plus Value</span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-extrabold mb-4">Plus grows with your career</h2>
+              <p className="text-lg text-muted-foreground">
+                Great standalone value. Even better when your employer joins.
+              </p>
+            </div>
+
+            {/* Comparison Table */}
+            <div className="max-w-5xl mx-auto overflow-hidden rounded-2xl border border-border bg-card">
+              {/* Table Header */}
+              <div className="grid grid-cols-3 bg-muted/50 border-b border-border">
+                <div className="p-4 font-semibold text-sm">Feature</div>
+                <div className="p-4 font-semibold text-sm text-center border-l border-border">
+                  <span className="text-amber-600 dark:text-amber-400">Plus</span> - Standalone
+                </div>
+                <div className="p-4 font-semibold text-sm text-center border-l border-border bg-primary/5">
+                  <span className="text-primary">Plus</span> - Employer Connected
+                </div>
+              </div>
+
+              {/* Table Rows */}
+              <div className="divide-y divide-border">
+                {/* Job Board Access */}
+                <div className="grid grid-cols-3">
+                  <div className="p-4 font-medium text-sm flex items-start gap-2">
+                    <Briefcase className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    Job Board Access
+                  </div>
+                  <div className="p-4 text-sm border-l border-border">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-muted-foreground">Full access. Browse real rope access jobs from real companies.</span>
+                    </div>
+                  </div>
+                  <div className="p-4 text-sm border-l border-border bg-primary/5">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-muted-foreground">Same + employers can see your verified profile and reach out directly.</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Document Vault */}
+                <div className="grid grid-cols-3">
+                  <div className="p-4 font-medium text-sm flex items-start gap-2">
+                    <FileText className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    Document Vault
+                  </div>
+                  <div className="p-4 text-sm border-l border-border">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-muted-foreground">Store certs, banking info, void cheque, SIN. Encrypted, organized.</span>
+                    </div>
+                  </div>
+                  <div className="p-4 text-sm border-l border-border bg-primary/5">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-muted-foreground">One-click share to employer on connection. Zero re-entry.</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Logbook */}
+                <div className="grid grid-cols-3">
+                  <div className="p-4 font-medium text-sm flex items-start gap-2">
+                    <BookOpen className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    Logbook
+                  </div>
+                  <div className="p-4 text-sm border-l border-border">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-muted-foreground">Photo scan your physical logbook pages. Converted to text and saved.</span>
+                    </div>
+                  </div>
+                  <div className="p-4 text-sm border-l border-border bg-primary/5">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-muted-foreground">Scanning + automatic detailed logging. No more trying to remember.</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Exportable Work History */}
+                <div className="grid grid-cols-3">
+                  <div className="p-4 font-medium text-sm flex items-start gap-2">
+                    <Download className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    Exportable Work History
+                  </div>
+                  <div className="p-4 text-sm border-l border-border">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-muted-foreground">From scanned logbook data. Useful for job apps.</span>
+                    </div>
+                  </div>
+                  <div className="p-4 text-sm border-l border-border bg-primary/5">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-muted-foreground">Rich data: rope transfers, deviations, drops with dates and buildings.</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Cert Expiry Alerts */}
+                <div className="grid grid-cols-3">
+                  <div className="p-4 font-medium text-sm flex items-start gap-2">
+                    <Bell className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    30-Day Cert Expiry Alerts
+                  </div>
+                  <div className="p-4 text-sm border-l border-border">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-muted-foreground">You get notified before IRATA/SPRAT lapses.</span>
+                    </div>
+                  </div>
+                  <div className="p-4 text-sm border-l border-border bg-primary/5">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-muted-foreground">You AND employer get notified. No surprises.</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Safety Rating */}
+                <div className="grid grid-cols-3">
+                  <div className="p-4 font-medium text-sm flex items-start gap-2">
+                    <Shield className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    Safety Rating (0-100)
+                  </div>
+                  <div className="p-4 text-sm border-l border-border">
+                    <div className="flex items-start gap-2">
+                      <X className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                      <span className="text-muted-foreground">Not available. Requires daily harness inspections + signed docs.</span>
+                    </div>
+                  </div>
+                  <div className="p-4 text-sm border-l border-border bg-primary/5">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-muted-foreground">CSR score builds from compliance. Visible to future employers.</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Automatic Hour Logging */}
+                <div className="grid grid-cols-3">
+                  <div className="p-4 font-medium text-sm flex items-start gap-2">
+                    <Clock className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    Automatic Hour Logging
+                  </div>
+                  <div className="p-4 text-sm border-l border-border">
+                    <div className="flex items-start gap-2">
+                      <X className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                      <span className="text-muted-foreground">Not available.</span>
+                    </div>
+                  </div>
+                  <div className="p-4 text-sm border-l border-border bg-primary/5">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-muted-foreground">Clock in/out. Hours submit themselves. No timesheets.</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Instant Onboarding */}
+                <div className="grid grid-cols-3">
+                  <div className="p-4 font-medium text-sm flex items-start gap-2">
+                    <Zap className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    Instant Onboarding
+                  </div>
+                  <div className="p-4 text-sm border-l border-border">
+                    <div className="flex items-start gap-2">
+                      <X className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                      <span className="text-muted-foreground">Not available.</span>
+                    </div>
+                  </div>
+                  <div className="p-4 text-sm border-l border-border bg-primary/5">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-muted-foreground">Plug in. Employer enters salary + permissions. Day 1 ready.</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Payroll Accuracy */}
+                <div className="grid grid-cols-3">
+                  <div className="p-4 font-medium text-sm flex items-start gap-2">
+                    <DollarSign className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    Payroll Accuracy
+                  </div>
+                  <div className="p-4 text-sm border-l border-border">
+                    <div className="flex items-start gap-2">
+                      <X className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                      <span className="text-muted-foreground">Still at mercy of manual systems.</span>
+                    </div>
+                  </div>
+                  <div className="p-4 text-sm border-l border-border bg-primary/5">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-muted-foreground">Verified hours = no disputes. Transparent pay.</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Summary Cards */}
+            <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto mt-12">
+              <div className="p-6 rounded-2xl border border-border bg-card">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                    <Star className="w-4 h-4 text-amber-500" />
+                  </div>
+                  <h3 className="font-bold">Plus Standalone</h3>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Your professional home base. Certs organized. Logbook digitized. Job board access. Ready for when employers join.
+                </p>
+              </div>
+              <div className="p-6 rounded-2xl border border-primary bg-primary/5">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
+                    <Zap className="w-4 h-4 text-primary" />
+                  </div>
+                  <h3 className="font-bold">Plus + Employer</h3>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  You work. Everything else is automatic. Hours, certs, logbook, onboarding, safety rating. Handled.
+                </p>
+              </div>
             </div>
           </div>
         </section>
