@@ -86,6 +86,30 @@ type RecentChange = {
 
 const recentChangesData: RecentChange[] = [
   {
+    date: "December 9, 2025",
+    title: "Design System Compliance",
+    description: "Full design system compliance across all landing pages (TechnicianLogin, Login, Employer). Replaced hardcoded colors with semantic tokens (action-500, rust-500, neutral-100, navy-900), added dark mode support to all tinted sections, and implemented focus rings on action buttons for accessibility",
+    type: "improvement"
+  },
+  {
+    date: "December 9, 2025",
+    title: "Employer Landing Page",
+    description: "New dedicated /employer landing page with centered navigation header featuring 5 persona links (Employer, Technician, Property Manager, Resident, Building Manager). Full design system compliance with proper color tokens and dark mode support",
+    type: "feature"
+  },
+  {
+    date: "December 9, 2025",
+    title: "Technician Landing Page Updates",
+    description: "Added IRATA expiry problem to feature scroller, changed 'Most Popular' badge to 'This One Is Better' for Plus tier, reordered Plus features to prioritize certification expiry alerts. Updated referral messaging to correctly state one-sided benefit (referrer only gets Plus)",
+    type: "improvement"
+  },
+  {
+    date: "December 9, 2025",
+    title: "Navigation Header Redesign",
+    description: "Centered navigation header with absolute positioning for consistent persona-based navigation across landing pages. Fixed Resident nav routing from /resident-link to /link",
+    type: "improvement"
+  },
+  {
     date: "December 8, 2025",
     title: "Document Upload UX Improvements",
     description: "Moved upload buttons into their respective sections (Driver's License, Banking Documents, First Aid, Certifications) for better organization. Buttons now show contextual text - 'Upload' when no document exists, 'Add More' or 'Replace' when documents already uploaded. Fixed upload button getting stuck in 'Uploading...' state when file dialog is cancelled",
