@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections } from "@shared/schema";
 import { eq, sql, and, or, isNull, gt, desc } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -5814,26 +5814,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Check if technician is already linked to an ACTIVE company
       // Self-resigned technicians (with terminatedDate) can still accept new invitations
-      if (user.companyId && !user.terminatedDate) {
-        return res.status(400).json({ message: "You are already linked to a company" });
+      const hasActiveEmployer = user.companyId && !user.terminatedDate;
+      
+      // PLUS members can link to multiple employers
+      if (hasActiveEmployer && !user.hasPlusAccess) {
+        return res.status(400).json({ message: "You are already linked to a company. Upgrade to PLUS to connect with multiple employers." });
+      }
+      
+      // Check if already connected to this specific company
+      if (hasActiveEmployer) {
+        const existingConnection = await db.select().from(technicianEmployerConnections)
+          .where(and(
+            eq(technicianEmployerConnections.technicianId, user.id),
+            eq(technicianEmployerConnections.companyId, invitation.companyId),
+            eq(technicianEmployerConnections.status, "active")
+          )).limit(1);
+        
+        if (existingConnection.length > 0 || user.companyId === invitation.companyId) {
+          return res.status(400).json({ message: "You are already connected to this employer" });
+        }
       }
       
       // Accept the invitation and link the technician
       await storage.acceptTeamInvitation(invitationId);
       
-      // Link the technician to the company and clear any previous termination status
-      await storage.updateUser(user.id, {
-        companyId: invitation.companyId,
-        startDate: getTodayString(),
-        terminatedDate: null,
-        terminationReason: null,
-        terminationNotes: null,
-      });
-      
       const company = await storage.getUserById(invitation.companyId);
       const companyName = company?.companyName || company?.name || "the company";
       
-      console.log(`[Team-Invite] Technician ${user.id} (${user.name}) accepted invitation ${invitationId} from company ${invitation.companyId}`);
+      // For PLUS members with existing employer, create a connection record
+      if (hasActiveEmployer && user.hasPlusAccess) {
+        // Create a new employer connection
+        await db.insert(technicianEmployerConnections).values({
+          technicianId: user.id,
+          companyId: invitation.companyId,
+          isPrimary: false,
+          status: "active",
+          invitationId: invitationId,
+        });
+        
+        console.log(`[Team-Invite] PLUS member ${user.id} (${user.name}) added secondary employer ${invitation.companyId} via invitation ${invitationId}`);
+      } else {
+        // Link the technician to the company and clear any previous termination status
+        await storage.updateUser(user.id, {
+          companyId: invitation.companyId,
+          startDate: getTodayString(),
+          terminatedDate: null,
+          terminationReason: null,
+          terminationNotes: null,
+        });
+        
+        console.log(`[Team-Invite] Technician ${user.id} (${user.name}) accepted invitation ${invitationId} from company ${invitation.companyId}`);
+      }
       
       res.json({ 
         success: true, 
@@ -5881,6 +5912,137 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Decline invitation error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get technician's employer connections (for PLUS members with multiple employers)
+  app.get("/api/my-employer-connections", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (user.role !== 'rope_access_tech') {
+        return res.status(403).json({ message: "Only technicians can view employer connections" });
+      }
+      
+      // Get all active employer connections
+      const connections = await db.select({
+        id: technicianEmployerConnections.id,
+        companyId: technicianEmployerConnections.companyId,
+        isPrimary: technicianEmployerConnections.isPrimary,
+        status: technicianEmployerConnections.status,
+        connectedAt: technicianEmployerConnections.connectedAt,
+      }).from(technicianEmployerConnections)
+        .where(and(
+          eq(technicianEmployerConnections.technicianId, user.id),
+          eq(technicianEmployerConnections.status, "active")
+        ));
+      
+      // Get company details for each connection
+      const connectionsWithCompanies = await Promise.all(connections.map(async (conn) => {
+        const company = await storage.getUserById(conn.companyId);
+        return {
+          ...conn,
+          company: company ? {
+            id: company.id,
+            name: company.name,
+            companyName: company.companyName,
+            photoUrl: company.photoUrl,
+          } : null
+        };
+      }));
+      
+      // Also include the legacy companyId if not in connections table
+      let legacyEmployer = null;
+      if (user.companyId) {
+        const hasLegacyInConnections = connections.some(c => c.companyId === user.companyId);
+        if (!hasLegacyInConnections) {
+          const company = await storage.getUserById(user.companyId);
+          if (company) {
+            legacyEmployer = {
+              id: 'legacy',
+              companyId: user.companyId,
+              isPrimary: true,
+              status: 'active',
+              connectedAt: user.startDate || new Date(),
+              company: {
+                id: company.id,
+                name: company.name,
+                companyName: company.companyName,
+                photoUrl: company.photoUrl,
+              }
+            };
+          }
+        }
+      }
+      
+      const allConnections = legacyEmployer 
+        ? [legacyEmployer, ...connectionsWithCompanies]
+        : connectionsWithCompanies;
+      
+      res.json({ 
+        connections: allConnections,
+        hasPlusAccess: user.hasPlusAccess,
+        canAddMore: user.hasPlusAccess === true
+      });
+    } catch (error) {
+      console.error("Get employer connections error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Set primary employer connection
+  app.patch("/api/my-employer-connections/:connectionId/set-primary", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (user.role !== 'rope_access_tech') {
+        return res.status(403).json({ message: "Only technicians can manage employer connections" });
+      }
+      
+      const { connectionId } = req.params;
+      
+      // Handle legacy connection
+      if (connectionId === 'legacy') {
+        // For legacy, just update the main companyId - it's already primary
+        return res.json({ success: true, message: "Primary employer set" });
+      }
+      
+      // Verify connection belongs to this user
+      const connection = await db.select().from(technicianEmployerConnections)
+        .where(and(
+          eq(technicianEmployerConnections.id, connectionId),
+          eq(technicianEmployerConnections.technicianId, user.id)
+        )).limit(1);
+      
+      if (connection.length === 0) {
+        return res.status(404).json({ message: "Connection not found" });
+      }
+      
+      // Clear all primary flags for this user
+      await db.update(technicianEmployerConnections)
+        .set({ isPrimary: false })
+        .where(eq(technicianEmployerConnections.technicianId, user.id));
+      
+      // Set this connection as primary
+      await db.update(technicianEmployerConnections)
+        .set({ isPrimary: true })
+        .where(eq(technicianEmployerConnections.id, connectionId));
+      
+      // Also update the user's main companyId to this employer
+      await storage.updateUser(user.id, {
+        companyId: connection[0].companyId
+      });
+      
+      res.json({ success: true, message: "Primary employer set" });
+    } catch (error) {
+      console.error("Set primary employer error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
