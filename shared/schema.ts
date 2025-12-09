@@ -268,6 +268,43 @@ export const insertBuildingSchema = createInsertSchema(buildings).omit({
 export type Building = typeof buildings.$inferSelect;
 export type InsertBuilding = z.infer<typeof insertBuildingSchema>;
 
+// Building Instructions - Access info, keys/fob, roof access, contact info, special requests
+export const buildingInstructions = pgTable("building_instructions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  buildingId: varchar("building_id").notNull().references(() => buildings.id, { onDelete: "cascade" }),
+  
+  // Instruction categories
+  buildingAccess: text("building_access"), // How to access the building
+  keysAndFob: text("keys_and_fob"), // Where to get keys or fob
+  roofAccess: text("roof_access"), // How to access the roof
+  specialRequests: text("special_requests"), // Special requests or instructions
+  
+  // Contact information
+  buildingManagerName: varchar("building_manager_name"),
+  buildingManagerPhone: varchar("building_manager_phone"),
+  conciergeNames: text("concierge_names"), // Could be multiple, stored as text (comma-separated or JSON)
+  conciergePhone: varchar("concierge_phone"),
+  maintenanceName: varchar("maintenance_name"),
+  maintenancePhone: varchar("maintenance_phone"),
+  
+  // Tracking
+  createdByUserId: varchar("created_by_user_id").references(() => users.id),
+  createdByRole: varchar("created_by_role"), // building_manager | company | superuser
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_building_instructions_building").on(table.buildingId),
+]);
+
+export const insertBuildingInstructionsSchema = createInsertSchema(buildingInstructions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type BuildingInstructions = typeof buildingInstructions.$inferSelect;
+export type InsertBuildingInstructions = z.infer<typeof insertBuildingInstructionsSchema>;
+
 // Property Manager Company Links - junction table for property managers to access multiple companies via property manager codes
 export const propertyManagerCompanyLinks = pgTable("property_manager_company_links", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
