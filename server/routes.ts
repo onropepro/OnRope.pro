@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
 import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages } from "@shared/schema";
-import { eq, sql, and, or, isNull, gt, desc } from "drizzle-orm";
+import { eq, sql, and, or, isNull, gt, desc, inArray } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import multer from "multer";
@@ -16319,6 +16319,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all sent offers for a company (to track offered/refused/hired)
+  app.get("/api/job-applications/sent-offers", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Get all job postings for this company
+      const companyJobs = await db.select()
+        .from(jobPostings)
+        .where(eq(jobPostings.companyId, currentUser.id));
+
+      const jobIds = companyJobs.map(j => j.id);
+      if (jobIds.length === 0) {
+        return res.json({ offers: [] });
+      }
+
+      // Get all applications with status "offered", "refused", or "hired" for these jobs
+      const offers = await db.select()
+        .from(jobApplications)
+        .where(
+          and(
+            inArray(jobApplications.jobPostingId, jobIds),
+            inArray(jobApplications.status, ["offered", "refused", "hired"])
+          )
+        )
+        .orderBy(desc(jobApplications.statusUpdatedAt));
+
+      // Enrich with technician and job posting details
+      const offersWithDetails = await Promise.all(
+        offers.map(async (offer) => {
+          const technician = await storage.getUserById(offer.technicianId);
+          const job = companyJobs.find(j => j.id === offer.jobPostingId);
+          return {
+            ...offer,
+            technician: technician ? {
+              id: technician.id,
+              name: technician.name,
+              firstName: technician.firstName,
+              lastName: technician.lastName,
+              photoUrl: technician.photoUrl,
+              irataLevel: technician.irataLevel,
+              spratLevel: technician.spratLevel,
+            } : null,
+            jobPosting: job ? {
+              id: job.id,
+              title: job.title,
+              location: job.location,
+            } : null,
+          };
+        })
+      );
+
+      res.json({ offers: offersWithDetails });
+    } catch (error) {
+      console.error("Get sent offers error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Apply to a job (technician)
   app.post("/api/job-applications", requireAuth, async (req: Request, res: Response) => {
     try {
@@ -16467,6 +16528,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Application deleted successfully" });
     } catch (error) {
       console.error("Delete application error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Refuse a job offer (technician only)
+  app.post("/api/job-applications/:id/refuse", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const [application] = await db.select()
+        .from(jobApplications)
+        .where(eq(jobApplications.id, req.params.id));
+
+      if (!application) {
+        return res.status(404).json({ message: "Application not found" });
+      }
+
+      // Only the technician can refuse their own offer
+      if (application.technicianId !== currentUser.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      // Can only refuse if status is "offered"
+      if (application.status !== "offered") {
+        return res.status(400).json({ message: "Can only refuse offers with 'offered' status" });
+      }
+
+      const [updatedApplication] = await db.update(jobApplications)
+        .set({
+          status: "refused",
+          statusUpdatedAt: new Date(),
+        })
+        .where(eq(jobApplications.id, req.params.id))
+        .returning();
+
+      res.json({ application: updatedApplication });
+    } catch (error) {
+      console.error("Refuse offer error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

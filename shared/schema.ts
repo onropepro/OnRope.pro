@@ -2444,7 +2444,7 @@ export const jobApplications = pgTable("job_applications", {
   coverMessage: text("cover_message"), // Optional message from technician
   
   // Status tracking
-  status: varchar("status").notNull().default("applied"), // applied | reviewing | interviewed | offered | hired | rejected | withdrawn
+  status: varchar("status").notNull().default("applied"), // applied | reviewing | interviewed | offered | hired | rejected | withdrawn | refused
   
   // Employer notes (only visible to employer)
   employerNotes: text("employer_notes"),
