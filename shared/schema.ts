@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import { relations } from "drizzle-orm";
+import { isDropBasedJobType, isSuiteBasedJobType, isStallBasedJobType, getAllJobTypeValues, getCategoryForJobType } from './jobTypes';
 import {
   pgTable,
   varchar,
@@ -183,6 +184,9 @@ export const users = pgTable("users", {
   // Technician job board visibility (allows employers to see their profile)
   isVisibleToEmployers: boolean("is_visible_to_employers").default(false), // Whether technician's profile is visible on job board
   
+  // Technician rope access specialties (job types they specialize in)
+  ropeAccessSpecialties: text("rope_access_specialties").array().default(sql`ARRAY[]::text[]`), // Array of job type values from JOB_TYPES
+  
   // Technician expected salary (visible to employers)
   expectedSalaryMin: numeric("expected_salary_min", { precision: 12, scale: 2 }), // Minimum expected salary
   expectedSalaryMax: numeric("expected_salary_max", { precision: 12, scale: 2 }), // Maximum expected salary
@@ -299,8 +303,10 @@ export const projects = pgTable("projects", {
   buildingName: varchar("building_name"), // Building name for display
   strataPlanNumber: varchar("strata_plan_number"),
   buildingAddress: text("building_address"), // Building address visible to all employees
-  jobType: varchar("job_type").notNull(), // window_cleaning | dryer_vent_cleaning | building_wash | in_suite_dryer_vent_cleaning | parkade_pressure_cleaning | ground_window_cleaning | other
+  jobType: varchar("job_type").notNull(), // window_cleaning | dryer_vent_cleaning | building_wash | in_suite_dryer_vent_cleaning | parkade_pressure_cleaning | ground_window_cleaning | ndt_* | other
   customJobType: varchar("custom_job_type"), // Custom job type when jobType is "other"
+  jobCategory: varchar("job_category").notNull().default('building_maintenance'), // building_maintenance | ndt | rock_scaling | wind_turbine | welding
+  requiresElevation: boolean("requires_elevation").notNull().default(true), // Whether job involves rope access at height
   
   // Elevation-specific drop totals
   totalDropsNorth: integer("total_drops_north").default(0),
@@ -399,6 +405,10 @@ export const workSessions = pgTable("work_sessions", {
   
   // Peace work payment - when project has peaceWork enabled, pay = drops × pricePerDrop
   peaceWorkPay: numeric("peace_work_pay", { precision: 10, scale: 2 }), // Total pay for this session based on drops (null if not peace work)
+  
+  // Labor cost tracking for analytics (hours × employee hourly rate)
+  laborCost: numeric("labor_cost", { precision: 10, scale: 2 }), // Cost of labor for this session
+  employeeHourlyRate: numeric("employee_hourly_rate", { precision: 10, scale: 2 }), // Snapshot of employee rate at time of session
   
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -1491,6 +1501,9 @@ export const insertClientSchema = createInsertSchema(clients).omit({
 export type InsertClient = z.infer<typeof insertClientSchema>;
 export type Client = typeof clients.$inferSelect;
 
+// Valid job type values for schema validation
+const validJobTypeValues = getAllJobTypeValues() as [string, ...string[]];
+
 export const insertProjectSchema = createInsertSchema(projects)
   .omit({
     id: true,
@@ -1500,24 +1513,39 @@ export const insertProjectSchema = createInsertSchema(projects)
   })
   .extend({
     dailyDropTarget: z.number().optional(),
+    jobType: z.enum(validJobTypeValues, {
+      errorMap: () => ({ message: "Invalid job type selected" })
+    }),
+    jobCategory: z.enum(['building_maintenance', 'ndt', 'rock_scaling', 'wind_turbine', 'oil_field']).optional().default('building_maintenance'),
+    requiresElevation: z.boolean().optional().default(true),
   })
   .superRefine((data, ctx) => {
-    // Job types that use drop-based tracking
-    const dropBasedJobTypes = ['window_cleaning', 'dryer_vent_cleaning', 'building_wash'];
+    // Validate jobType belongs to the selected category (only if category is explicitly provided)
+    // Skip validation if jobCategory is undefined/null (will use default value)
+    if (data.jobCategory) {
+      const expectedCategory = getCategoryForJobType(data.jobType);
+      if (expectedCategory && data.jobCategory !== expectedCategory) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Job type "${data.jobType}" does not belong to category "${data.jobCategory}"`,
+          path: ["jobType"],
+        });
+      }
+    }
     
-    if (dropBasedJobTypes.includes(data.jobType)) {
-      // For drop-based jobs, dailyDropTarget is required
+    // Only require dailyDropTarget for drop-based jobs that require elevation
+    if (isDropBasedJobType(data.jobType) && data.requiresElevation !== false) {
       if (!data.dailyDropTarget || data.dailyDropTarget <= 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Daily drop target is required",
+          message: "Daily drop target is required for drop-based jobs",
           path: ["dailyDropTarget"],
         });
       }
     }
     
-    // Job-specific validations for non-drop jobs
-    if (data.jobType === 'in_suite_dryer_vent_cleaning') {
+    // Suite-based job validation
+    if (isSuiteBasedJobType(data.jobType)) {
       if (!data.suitesPerDay && !data.floorsPerDay) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -1527,7 +1555,8 @@ export const insertProjectSchema = createInsertSchema(projects)
       }
     }
     
-    if (data.jobType === 'parkade_pressure_cleaning') {
+    // Stall-based job validation
+    if (isStallBasedJobType(data.jobType)) {
       if (!data.stallsPerDay) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -1765,6 +1794,28 @@ export const insertEmployeeTimeOffSchema = createInsertSchema(employeeTimeOff).o
 
 export type EmployeeTimeOff = typeof employeeTimeOff.$inferSelect;
 export type InsertEmployeeTimeOff = z.infer<typeof insertEmployeeTimeOffSchema>;
+
+// Notifications table for in-app notifications
+export const notifications = pgTable("notifications", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  actorId: varchar("actor_id").references(() => users.id, { onDelete: "set null" }),
+  type: varchar("type").notNull(),
+  payload: jsonb("payload"),
+  isRead: boolean("is_read").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_notifications_company").on(table.companyId),
+  index("IDX_notifications_read").on(table.isRead),
+]);
+
+export const insertNotificationSchema = createInsertSchema(notifications).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = z.infer<typeof insertNotificationSchema>;
 
 // Type exports
 export type User = typeof users.$inferSelect;

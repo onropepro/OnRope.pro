@@ -608,6 +608,7 @@ export default function ProjectDetail() {
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
       queryClient.invalidateQueries({ queryKey: ["/api/projects", id] });
       toast({ title: t('projectDetail.toasts.projectCompleted', 'Project completed successfully') });
+      setLocation("/dashboard?tab=projects");
     },
     onError: (error: Error) => {
       toast({ title: t('projectDetail.toasts.error', 'Error'), description: error.message, variant: "destructive" });
@@ -1594,6 +1595,9 @@ export default function ProjectDetail() {
                                                       const sessionDrops = (session.dropsCompletedNorth ?? 0) + (session.dropsCompletedEast ?? 0) + 
                                                                            (session.dropsCompletedSouth ?? 0) + (session.dropsCompletedWest ?? 0);
                                                       const metTarget = sessionDrops >= project.dailyDropTarget;
+                                                      const isHoursBasedJob = project.jobType === "general_pressure_washing" || project.jobType === "ground_window_cleaning";
+                                                      const contributionPct = session.manualCompletionPercentage;
+                                                      const sessionLaborCost = session.laborCost ? parseFloat(session.laborCost) : null;
                                                       
                                                       const hasLocation = (session.startLatitude && session.startLongitude) || 
                                                                          (session.endLatitude && session.endLongitude);
@@ -1605,18 +1609,42 @@ export default function ProjectDetail() {
                                                           className="flex items-center justify-between p-3 rounded-lg border bg-card cursor-pointer hover-elevate active-elevate-2"
                                                           data-testid={`session-${session.id}`}
                                                         >
-                                                          <div className="flex items-center gap-2">
-                                                            <p className="text-sm font-medium">
-                                                              {session.techName || "Unknown"} {session.techRole && `(${session.techRole.replace(/_/g, ' ')})`}
-                                                            </p>
-                                                            {hasLocation && (
-                                                              <MapPin className="h-4 w-4 text-primary" />
+                                                          <div className="flex flex-col gap-1">
+                                                            <div className="flex items-center gap-2">
+                                                              <p className="text-sm font-medium">
+                                                                {session.techName || "Unknown"} {session.techRole && `(${session.techRole.replace(/_/g, ' ')})`}
+                                                              </p>
+                                                              {hasLocation && (
+                                                                <MapPin className="h-4 w-4 text-primary" />
+                                                              )}
+                                                            </div>
+                                                            {isCompleted && (isHoursBasedJob || sessionLaborCost) && (
+                                                              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                                                {isHoursBasedJob && contributionPct !== null && contributionPct !== undefined && (
+                                                                  <span className="flex items-center gap-1">
+                                                                    <span className="material-icons text-xs">trending_up</span>
+                                                                    +{contributionPct}% {t('projectDetail.progress.contribution', 'contribution')}
+                                                                  </span>
+                                                                )}
+                                                                {sessionLaborCost !== null && (
+                                                                  <span className="flex items-center gap-1">
+                                                                    <span className="material-icons text-xs">attach_money</span>
+                                                                    ${sessionLaborCost.toFixed(2)} {t('projectDetail.progress.laborCost', 'labor')}
+                                                                  </span>
+                                                                )}
+                                                              </div>
                                                             )}
                                                           </div>
                                                           {isCompleted ? (
-                                                            <Badge variant={metTarget ? "default" : "destructive"} className="text-xs" data-testid={`badge-${metTarget ? "met" : "below"}-target`}>
-                                                              {metTarget ? t('projectDetail.progress.targetMet', 'Target Met') : t('projectDetail.progress.belowTarget', 'Below Target')}
-                                                            </Badge>
+                                                            isHoursBasedJob && contributionPct !== null ? (
+                                                              <Badge variant="default" className="text-xs">
+                                                                +{contributionPct}%
+                                                              </Badge>
+                                                            ) : (
+                                                              <Badge variant={metTarget ? "default" : "destructive"} className="text-xs" data-testid={`badge-${metTarget ? "met" : "below"}-target`}>
+                                                                {metTarget ? t('projectDetail.progress.targetMet', 'Target Met') : t('projectDetail.progress.belowTarget', 'Below Target')}
+                                                              </Badge>
+                                                            )
                                                           ) : (
                                                             <Badge variant="outline" className="text-xs">{t('common.inProgress', 'In Progress')}</Badge>
                                                           )}
@@ -3156,7 +3184,7 @@ export default function ProjectDetail() {
             <DialogTitle>{t('projectDetail.dialogs.endDay.title', 'End Your Work Day')}</DialogTitle>
             <DialogDescription>
               {isHoursBased
-                ? t('projectDetail.dialogs.endDay.descriptionHours', 'Enter the completion percentage (0-100%) for your work on {{buildingName}}.', { buildingName: project.buildingName })
+                ? t('projectDetail.dialogs.endDay.descriptionHours', 'Enter how much of the job YOU completed today. This percentage will be added to the total project progress.', { buildingName: project.buildingName })
                 : project.jobType === "in_suite_dryer_vent_cleaning" 
                 ? t('projectDetail.dialogs.endDay.descriptionUnits', 'Enter the number of units you completed today for {{buildingName}}.', { buildingName: project.buildingName })
                 : project.jobType === "parkade_pressure_cleaning"
@@ -3173,7 +3201,7 @@ export default function ProjectDetail() {
                   name="manualCompletionPercentage"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('projectDetail.dialogs.endDay.completionPercentage', 'Completion Percentage (%)')}</FormLabel>
+                      <FormLabel>{t('projectDetail.dialogs.endDay.completionPercentage', 'Your Contribution Today (%)')}</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -3187,7 +3215,7 @@ export default function ProjectDetail() {
                         />
                       </FormControl>
                       <FormDescription>
-                        {t('projectDetail.dialogs.endDay.completionPercentageHelp', 'Enter how much of this job you completed (0-100%)')}
+                        {t('projectDetail.dialogs.endDay.completionPercentageHelp', 'How much of the job did YOU complete today? This adds to the total progress.')}
                       </FormDescription>
                       <FormMessage />
                     </FormItem>

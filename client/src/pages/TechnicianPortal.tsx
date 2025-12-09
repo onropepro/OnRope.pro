@@ -55,6 +55,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate, formatDateTime, parseLocalDate } from "@/lib/dateUtils";
+import { JOB_CATEGORIES, JOB_TYPES, getJobTypesByCategory, type JobCategory } from "@shared/jobTypes";
 import { 
   User, 
   LogOut, 
@@ -100,7 +101,8 @@ import {
   MoreHorizontal,
   ChevronDown,
   ChevronUp,
-  FileCheck
+  FileCheck,
+  Plus
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
@@ -213,6 +215,13 @@ const translations = {
     resume: "Resume / CV",
     uploadResume: "Upload Resume",
     addResume: "Add Another Resume",
+    specialties: "Rope Access Specialties",
+    specialtiesDesc: "Select the job types you specialize in",
+    noSpecialties: "No specialties selected",
+    addSpecialty: "Add Specialty",
+    removeSpecialty: "Remove",
+    selectCategory: "Select Category",
+    selectJobType: "Select Job Type",
     resumeUploaded: "Resume Uploaded",
     documentUploaded: "Document Uploaded",
     documentUploadedDesc: "Your document has been uploaded successfully.",
@@ -538,6 +547,13 @@ const translations = {
     resume: "Curriculum vitae",
     uploadResume: "Téléverser CV",
     addResume: "Ajouter un autre CV",
+    specialties: "Spécialités d'accès sur corde",
+    specialtiesDesc: "Sélectionnez les types de travaux dans lesquels vous vous spécialisez",
+    noSpecialties: "Aucune spécialité sélectionnée",
+    addSpecialty: "Ajouter",
+    removeSpecialty: "Retirer",
+    selectCategory: "Catégorie",
+    selectJobType: "Type de travail",
     resumeUploaded: "CV téléversé",
     documentUploaded: "Document téléversé",
     documentUploadedDesc: "Votre document a été téléversé avec succès.",
@@ -781,6 +797,7 @@ const createProfileSchema = (t: typeof translations['en']) => z.object({
   specialMedicalConditions: z.string().optional(),
   irataBaselineHours: z.string().optional(),
   ropeAccessStartDate: z.string().optional(),
+  ropeAccessSpecialties: z.array(z.string()).optional(),
 });
 
 type ProfileFormData = z.infer<ReturnType<typeof createProfileSchema>>;
@@ -790,6 +807,8 @@ export default function TechnicianPortal() {
   const [, setLocation] = useLocation();
   const [isEditing, setIsEditing] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
+  const [specialtyCategory, setSpecialtyCategory] = useState<JobCategory | "">("");
+  const [selectedSpecialtyJobType, setSelectedSpecialtyJobType] = useState<string>("");
   const [language, setLanguage] = useState<Language>(() => {
     const saved = localStorage.getItem('techPortalLanguage');
     return (saved === 'fr' ? 'fr' : 'en') as Language;
@@ -863,6 +882,7 @@ export default function TechnicianPortal() {
       specialMedicalConditions: "",
       irataBaselineHours: "",
       ropeAccessStartDate: "",
+      ropeAccessSpecialties: [],
     },
   });
 
@@ -1609,6 +1629,7 @@ export default function TechnicianPortal() {
         specialMedicalConditions: user.specialMedicalConditions || "",
         irataBaselineHours: user.irataBaselineHours || "",
         ropeAccessStartDate: user.ropeAccessStartDate || "",
+        ropeAccessSpecialties: user.ropeAccessSpecialties || [],
       });
     }
     setIsEditing(true);
@@ -4007,6 +4028,128 @@ export default function TechnicianPortal() {
                     </div>
                   </>
                 )}
+
+                {/* Rope Access Specialties Section */}
+                <Separator />
+                <div className="space-y-3">
+                  <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
+                    <HardHat className="w-4 h-4" />
+                    {t.specialties}
+                  </h3>
+                  <p className="text-xs text-muted-foreground">{t.specialtiesDesc}</p>
+                  
+                  {isEditing ? (
+                    <div className="space-y-3">
+                      {/* Current specialties with remove button */}
+                      <div className="flex flex-wrap gap-2">
+                        {(form.watch("ropeAccessSpecialties") || []).map((specialty: string, index: number) => {
+                          const jobType = JOB_TYPES.find(jt => jt.value === specialty);
+                          return (
+                            <Badge 
+                              key={specialty} 
+                              variant="secondary"
+                              className="gap-1 pr-1"
+                              data-testid={`badge-specialty-${index}`}
+                            >
+                              <HardHat className="w-3 h-3" />
+                              {jobType?.label || specialty}
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="h-5 w-5 ml-1 no-default-hover-elevate no-default-active-elevate"
+                                onClick={() => {
+                                  const current = form.getValues("ropeAccessSpecialties") || [];
+                                  form.setValue("ropeAccessSpecialties", current.filter((s: string) => s !== specialty));
+                                }}
+                                data-testid={`button-remove-specialty-${index}`}
+                              >
+                                <X className="w-3 h-3" />
+                              </Button>
+                            </Badge>
+                          );
+                        })}
+                        {(form.watch("ropeAccessSpecialties") || []).length === 0 && (
+                          <p className="text-sm text-muted-foreground italic">{t.noSpecialties}</p>
+                        )}
+                      </div>
+                      
+                      {/* Add specialty selector */}
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <select
+                          id="specialty-category"
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                          data-testid="select-specialty-category"
+                          value={specialtyCategory}
+                          onChange={(e) => {
+                            setSpecialtyCategory(e.target.value as JobCategory | "");
+                            setSelectedSpecialtyJobType("");
+                          }}
+                        >
+                          <option value="">{t.selectCategory}</option>
+                          {JOB_CATEGORIES.map(cat => (
+                            <option key={cat.value} value={cat.value}>{cat.label}</option>
+                          ))}
+                        </select>
+                        <select
+                          id="specialty-job-type"
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                          data-testid="select-specialty-job-type"
+                          value={selectedSpecialtyJobType}
+                          onChange={(e) => setSelectedSpecialtyJobType(e.target.value)}
+                          disabled={!specialtyCategory}
+                        >
+                          <option value="">{t.selectJobType}</option>
+                          {specialtyCategory && getJobTypesByCategory(specialtyCategory)
+                            .filter(jt => !jt.value.endsWith('_other') && !(form.watch("ropeAccessSpecialties") || []).includes(jt.value))
+                            .map(jt => (
+                              <option key={jt.value} value={jt.value}>{jt.label}</option>
+                            ))}
+                        </select>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="h-10 whitespace-nowrap"
+                          disabled={!selectedSpecialtyJobType}
+                          onClick={() => {
+                            if (selectedSpecialtyJobType) {
+                              const current = form.getValues("ropeAccessSpecialties") || [];
+                              if (!current.includes(selectedSpecialtyJobType)) {
+                                form.setValue("ropeAccessSpecialties", [...current, selectedSpecialtyJobType]);
+                              }
+                              setSelectedSpecialtyJobType("");
+                            }
+                          }}
+                          data-testid="button-add-specialty"
+                        >
+                          <Plus className="w-4 h-4 mr-1" />
+                          {t.addSpecialty}
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {(user.ropeAccessSpecialties || []).length > 0 ? (
+                        (user.ropeAccessSpecialties || []).map((specialty: string, index: number) => {
+                          const jobType = JOB_TYPES.find(jt => jt.value === specialty);
+                          return (
+                            <Badge 
+                              key={specialty} 
+                              variant="secondary"
+                              className="gap-1"
+                              data-testid={`badge-specialty-display-${index}`}
+                            >
+                              <HardHat className="w-3 h-3" />
+                              {jobType?.label || specialty}
+                            </Badge>
+                          );
+                        })
+                      ) : (
+                        <p className="text-sm text-muted-foreground italic">{t.noSpecialties}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
 
                 {/* Resume / CV Section */}
                 <Separator />

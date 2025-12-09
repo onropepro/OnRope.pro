@@ -2462,7 +2462,7 @@ export default function Inventory() {
                               .filter((emp: any) => emp.name && emp.name.trim() !== "")
                               .map((emp: any) => (
                                 <SelectItem key={emp.id} value={emp.id}>
-                                  {emp.name}
+                                  {emp.name} {emp.email ? `(${emp.email})` : ''}
                                 </SelectItem>
                               ))}
                           </SelectContent>
@@ -2530,7 +2530,7 @@ export default function Inventory() {
                               .filter((emp: any) => emp.name && emp.name.trim() !== "")
                               .map((emp: any) => (
                                 <SelectItem key={emp.id} value={emp.id}>
-                                  {emp.name}
+                                  {emp.name} {emp.email ? `(${emp.email})` : ''}
                                 </SelectItem>
                               ))}
                           </SelectContent>
@@ -3153,7 +3153,7 @@ export default function Inventory() {
                           .filter((emp: any) => emp.name && emp.name.trim() !== "")
                           .map((emp: any) => (
                             <SelectItem key={emp.id} value={emp.id}>
-                              {emp.name}
+                              {emp.name} {emp.email ? `(${emp.email})` : ''}
                             </SelectItem>
                           ))}
                       </SelectContent>

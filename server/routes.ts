@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications } from "@shared/schema";
 import { eq, sql, and, or, isNull, gt, desc, inArray } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -2600,6 +2600,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         irataBaselineHours,
         irataExpirationDate,
         spratExpirationDate,
+        ropeAccessSpecialties,
       } = req.body;
 
       // Validate required fields
@@ -2641,6 +2642,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (irataBaselineHours !== undefined) updateData.irataBaselineHours = irataBaselineHours || "0";
       if (irataExpirationDate !== undefined) updateData.irataExpirationDate = irataExpirationDate || null;
       if (spratExpirationDate !== undefined) updateData.spratExpirationDate = spratExpirationDate || null;
+      if (ropeAccessSpecialties !== undefined) updateData.ropeAccessSpecialties = Array.isArray(ropeAccessSpecialties) ? ropeAccessSpecialties : [];
 
       // Sensitive fields - these are encrypted by storage.updateUser via encryptSensitiveFields
       if (socialInsuranceNumber !== undefined) updateData.socialInsuranceNumber = socialInsuranceNumber || null;
@@ -7669,14 +7671,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Unable to determine company" });
       }
       
-      // Job types that don't use drop-based tracking
+      // Job types that don't use drop-based tracking (hours-based or non-elevation jobs)
       const nonDropJobTypes = ['in_suite_dryer_vent_cleaning', 'parkade_pressure_cleaning', 'ground_window_cleaning', 'general_pressure_washing'];
-      const isNonDropJob = nonDropJobTypes.includes(req.body.jobType);
+      const isNdtJob = req.body.jobType?.startsWith('ndt_');
+      const isNonDropJob = nonDropJobTypes.includes(req.body.jobType) || isNdtJob || req.body.requiresElevation === false;
       
       const projectData = insertProjectSchema.parse({
         ...req.body,
         strataPlanNumber: normalizeStrataPlan(req.body.strataPlanNumber),
         companyId,
+        jobCategory: req.body.jobCategory || 'building_maintenance',
+        requiresElevation: req.body.requiresElevation ?? true,
         targetCompletionDate: req.body.targetCompletionDate || null,
         // Default dailyDropTarget to 0 for non-drop job types
         dailyDropTarget: isNonDropJob ? 0 : req.body.dailyDropTarget,
@@ -7708,7 +7713,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // If this is a custom job type, save it to the company's custom job types list (if not already exists)
-      if (project.jobType === "other" && project.customJobType) {
+      if ((project.jobType === "other" || project.jobType === "ndt_other") && project.customJobType) {
         const existingCustomJobType = await storage.getCustomJobTypeByName(companyId, project.customJobType);
         if (!existingCustomJobType) {
           await storage.createCustomJobType({
@@ -7894,12 +7899,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
             return sum;
           }, 0);
           
-          // Get the latest manual completion percentage for hours-based projects
-          const latestCompletionPercentage = completedSessions.length > 0
-            ? completedSessions
-                .filter(s => s.manualCompletionPercentage !== null && s.manualCompletionPercentage !== undefined)
-                .sort((a, b) => new Date(b.endTime!).getTime() - new Date(a.endTime!).getTime())[0]
-                ?.manualCompletionPercentage || null
+          // Sum all manual completion percentages for hours-based projects (each session tracks contribution %)
+          const sessionsWithPercentage = completedSessions.filter(s => s.manualCompletionPercentage !== null && s.manualCompletionPercentage !== undefined);
+          const cumulativeCompletionPercentage = sessionsWithPercentage.length > 0
+            ? sessionsWithPercentage.reduce((sum: number, s) => sum + Number(s.manualCompletionPercentage ?? 0), 0)
+            : null;
+          // Cap at 100% and guard against NaN
+          const latestCompletionPercentage = cumulativeCompletionPercentage !== null && !isNaN(cumulativeCompletionPercentage)
+            ? Math.min(100, cumulativeCompletionPercentage) 
             : null;
           
           return {
@@ -8543,6 +8550,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`[PEACE WORK] Project ${project.id}: ${totalDropsCompleted} drops × $${project.pricePerDrop} = $${peaceWorkPay}`);
       }
       
+      // Calculate labor cost (total hours × employee hourly rate)
+      const employeeHourlyRate = currentUser.hourlyRate ? parseFloat(currentUser.hourlyRate) : null;
+      const totalHoursWorked = overtimeBreakdown.regularHours + overtimeBreakdown.overtimeHours + overtimeBreakdown.doubleTimeHours;
+      // Calculate labor cost: regular hours at base rate, OT at 1.5x, double time at 2x
+      let laborCost: number | null = null;
+      if (employeeHourlyRate !== null) {
+        laborCost = (overtimeBreakdown.regularHours * employeeHourlyRate) +
+                    (overtimeBreakdown.overtimeHours * employeeHourlyRate * 1.5) +
+                    (overtimeBreakdown.doubleTimeHours * employeeHourlyRate * 2);
+        console.log(`[LABOR COST] Session ${sessionId}: ${totalHoursWorked.toFixed(2)}hrs × $${employeeHourlyRate}/hr = $${laborCost.toFixed(2)}`);
+      }
+      
       // End the session with elevation-specific drops and overtime hours
       const session = await storage.endWorkSession(
         sessionId,
@@ -8557,7 +8576,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         overtimeBreakdown.overtimeHours,
         overtimeBreakdown.doubleTimeHours,
         completionPercentage,
-        peaceWorkPay
+        peaceWorkPay,
+        laborCost,
+        employeeHourlyRate
       );
       
       res.json({ session });
@@ -11824,15 +11845,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Calculate progress based on job type
         if (project.jobType === 'general_pressure_washing' || project.jobType === 'ground_window_cleaning') {
-          // Hours-based: use manualCompletionPercentage
+          // Hours-based: SUM all manualCompletionPercentage values (each session = contribution %)
           const sessionsWithPercentage = projectSessions.filter((s: any) => 
             s.manualCompletionPercentage !== null && s.manualCompletionPercentage !== undefined
           );
           if (sessionsWithPercentage.length > 0) {
-            const sortedSessions = [...sessionsWithPercentage].sort((a: any, b: any) => 
-              new Date(b.endTime).getTime() - new Date(a.endTime).getTime()
+            const summedPercentage = sessionsWithPercentage.reduce((sum: number, s: any) => 
+              sum + Number(s.manualCompletionPercentage ?? 0), 0
             );
-            totalProjectProgress += sortedSessions[0].manualCompletionPercentage || 0;
+            // Guard against NaN and cap at 100%
+            if (!isNaN(summedPercentage)) {
+              totalProjectProgress += Math.min(100, summedPercentage);
+            }
           }
         } else if (project.jobType === 'in_suite_dryer_vent_cleaning') {
           // Suite-based
@@ -16734,6 +16758,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .where(eq(jobApplications.id, req.params.id))
         .returning();
 
+      // Get job posting to find the company owner
+      const [job] = await db.select()
+        .from(jobPostings)
+        .where(eq(jobPostings.id, application.jobPostingId));
+
+      if (job) {
+        // Create notification for company owner
+        await db.insert(notifications).values({
+          companyId: job.companyId,
+          actorId: currentUser.id,
+          type: "job_offer_refused",
+          payload: {
+            applicationId: application.id,
+            jobPostingId: job.id,
+            jobTitle: job.title,
+            technicianId: currentUser.id,
+            technicianName: currentUser.name || "Unknown Technician",
+          },
+          isRead: false,
+        });
+      }
+
       res.json({ application: updatedApplication });
     } catch (error) {
       console.error("Refuse offer error:", error);
@@ -16952,6 +16998,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         expectedSalaryMin: users.expectedSalaryMin,
         expectedSalaryMax: users.expectedSalaryMax,
         expectedSalaryPeriod: users.expectedSalaryPeriod,
+        ropeAccessSpecialties: users.ropeAccessSpecialties,
       }).from(users)
         .where(and(
           eq(users.isVisibleToEmployers, true),
@@ -16962,6 +17009,117 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ technicians: visibleTechs });
     } catch (error) {
       console.error("Get visible technicians error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get notifications for company owner
+  app.get("/api/notifications", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const unreadOnly = req.query.unread === "true";
+
+      let query = db.select()
+        .from(notifications)
+        .where(eq(notifications.companyId, currentUser.id))
+        .orderBy(desc(notifications.createdAt));
+
+      if (unreadOnly) {
+        query = db.select()
+          .from(notifications)
+          .where(and(
+            eq(notifications.companyId, currentUser.id),
+            eq(notifications.isRead, false)
+          ))
+          .orderBy(desc(notifications.createdAt));
+      }
+
+      const results = await query;
+
+      res.json({ notifications: results });
+    } catch (error) {
+      console.error("Get notifications error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get unread notification count
+  app.get("/api/notifications/unread-count", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const result = await db.select({ count: sql<number>`count(*)` })
+        .from(notifications)
+        .where(and(
+          eq(notifications.companyId, currentUser.id),
+          eq(notifications.isRead, false)
+        ));
+
+      res.json({ count: Number(result[0]?.count || 0) });
+    } catch (error) {
+      console.error("Get unread count error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Mark notification as read
+  app.patch("/api/notifications/:id/read", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const [notification] = await db.select()
+        .from(notifications)
+        .where(eq(notifications.id, req.params.id));
+
+      if (!notification) {
+        return res.status(404).json({ message: "Notification not found" });
+      }
+
+      // Only the company owner can mark their own notifications as read
+      if (notification.companyId !== currentUser.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const [updated] = await db.update(notifications)
+        .set({ isRead: true })
+        .where(eq(notifications.id, req.params.id))
+        .returning();
+
+      res.json({ notification: updated });
+    } catch (error) {
+      console.error("Mark notification read error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Mark all notifications as read
+  app.patch("/api/notifications/read-all", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      await db.update(notifications)
+        .set({ isRead: true })
+        .where(and(
+          eq(notifications.companyId, currentUser.id),
+          eq(notifications.isRead, false)
+        ));
+
+      res.json({ message: "All notifications marked as read" });
+    } catch (error) {
+      console.error("Mark all read error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

@@ -1,5 +1,5 @@
 // GPS Location Tracking - v2.0 - CACHE BUST
-import { useState, useEffect, useMemo, useRef, useContext } from "react";
+import { useState, useEffect, useLayoutEffect, useMemo, useRef, useContext } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { BrandingContext } from "@/App";
@@ -12,7 +12,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
@@ -59,12 +59,21 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 
+import { JOB_CATEGORIES, JOB_TYPES, getJobTypesByCategory, getJobTypeConfig, getDefaultElevation, isElevationConfigurable, isDropBasedJobType, getAllJobTypeValues, getProgressType, getCategoryForJobType, type JobCategory } from "@shared/jobTypes";
+
+// Use helper function to get all job type values for validation
+const ALL_JOB_TYPE_VALUES = getAllJobTypeValues() as [string, ...string[]];
+
 const projectSchema = z.object({
   strataPlanNumber: z.string().optional(),
   buildingName: z.string().optional(),
   buildingAddress: z.string().optional(),
-  jobType: z.enum(["window_cleaning", "dryer_vent_cleaning", "building_wash", "general_pressure_washing", "gutter_cleaning", "in_suite_dryer_vent_cleaning", "parkade_pressure_cleaning", "ground_window_cleaning", "painting", "inspection", "other"]),
+  jobCategory: z.enum(['building_maintenance', 'ndt', 'rock_scaling', 'wind_turbine', 'oil_field']).default('building_maintenance'),
+  jobType: z.enum(ALL_JOB_TYPE_VALUES, {
+    errorMap: () => ({ message: "Please select a valid job type" })
+  }),
   customJobType: z.string().optional(),
+  requiresElevation: z.boolean().default(true),
   totalDropsNorth: z.string().optional(),
   totalDropsEast: z.string().optional(),
   totalDropsSouth: z.string().optional(),
@@ -87,7 +96,7 @@ const projectSchema = z.object({
   peaceWork: z.boolean().default(false),
   pricePerDrop: z.string().optional(),
 }).refine((data) => {
-  if (data.jobType === "other") {
+  if (data.jobType === "other" || data.jobType === "ndt_other" || data.jobType === "rock_other" || data.jobType === "turbine_other" || data.jobType === "oil_other") {
     return data.customJobType && data.customJobType.trim().length > 0;
   }
   return true;
@@ -564,6 +573,150 @@ function DeletedProjectsTab() {
   );
 }
 
+// Notification Bell Component for Company Owners
+function NotificationBell() {
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Fetch unread notification count
+  const { data: countData } = useQuery<{ count: number }>({
+    queryKey: ["/api/notifications/unread-count"],
+    refetchInterval: 30000,
+  });
+
+  // Fetch all notifications when dropdown opens
+  const { data: notificationsData, isLoading } = useQuery<{ notifications: any[] }>({
+    queryKey: ["/api/notifications"],
+    enabled: isOpen,
+  });
+
+  // Mark notification as read mutation
+  const markReadMutation = useMutation({
+    mutationFn: async (notificationId: string) => {
+      return apiRequest("PATCH", `/api/notifications/${notificationId}/read`, {});
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/notifications"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/notifications/unread-count"] });
+    },
+  });
+
+  // Mark all as read mutation
+  const markAllReadMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest("PATCH", "/api/notifications/read-all", {});
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/notifications"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/notifications/unread-count"] });
+    },
+  });
+
+  const unreadCount = countData?.count || 0;
+  const notifications = notificationsData?.notifications || [];
+
+  const getNotificationMessage = (notification: any) => {
+    if (notification.type === "job_offer_refused") {
+      const payload = notification.payload as any;
+      return t('notifications.jobOfferRefused', '{{name}} declined your offer for {{job}}', {
+        name: payload?.technicianName || 'A technician',
+        job: payload?.jobTitle || 'a position',
+      });
+    }
+    return t('notifications.genericNotification', 'New notification');
+  };
+
+  const getNotificationIcon = (type: string) => {
+    if (type === "job_offer_refused") return "person_off";
+    return "notifications";
+  };
+
+  return (
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger asChild>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="relative"
+          data-testid="button-notifications"
+        >
+          <span className="material-icons text-xl sm:text-2xl">notifications</span>
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-destructive text-destructive-foreground text-xs flex items-center justify-center font-medium">
+              {unreadCount > 9 ? '9+' : unreadCount}
+            </span>
+          )}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80 p-0" align="end">
+        <div className="flex items-center justify-between p-3 border-b">
+          <h4 className="font-semibold">{t('notifications.title', 'Notifications')}</h4>
+          {unreadCount > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => markAllReadMutation.mutate()}
+              disabled={markAllReadMutation.isPending}
+              data-testid="button-mark-all-read"
+            >
+              {t('notifications.markAllRead', 'Mark all read')}
+            </Button>
+          )}
+        </div>
+        <ScrollArea className="h-[300px]">
+          {isLoading ? (
+            <div className="p-4 text-center text-muted-foreground">
+              {t('common.loading', 'Loading...')}
+            </div>
+          ) : notifications.length === 0 ? (
+            <div className="p-8 text-center">
+              <span className="material-icons text-4xl text-muted-foreground mb-2">notifications_none</span>
+              <p className="text-muted-foreground text-sm">
+                {t('notifications.noNotifications', 'No notifications')}
+              </p>
+            </div>
+          ) : (
+            <div className="divide-y">
+              {notifications.map((notification: any) => (
+                <div
+                  key={notification.id}
+                  className={`p-3 hover-elevate cursor-pointer ${!notification.isRead ? 'bg-primary/5' : ''}`}
+                  onClick={() => {
+                    if (!notification.isRead) {
+                      markReadMutation.mutate(notification.id);
+                    }
+                  }}
+                  data-testid={`notification-${notification.id}`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`h-8 w-8 rounded-full flex items-center justify-center ${!notification.isRead ? 'bg-destructive/10 text-destructive' : 'bg-muted text-muted-foreground'}`}>
+                      <span className="material-icons text-sm">
+                        {getNotificationIcon(notification.type)}
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm ${!notification.isRead ? 'font-medium' : 'text-muted-foreground'}`}>
+                        {getNotificationMessage(notification)}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {notification.createdAt && formatTimestampDateShort(notification.createdAt)}
+                      </p>
+                    </div>
+                    {!notification.isRead && (
+                      <div className="h-2 w-2 rounded-full bg-primary mt-2" />
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </ScrollArea>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 export default function Dashboard() {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("");
@@ -1010,8 +1163,10 @@ export default function Dashboard() {
       strataPlanNumber: "",
       buildingName: "",
       buildingAddress: "",
+      jobCategory: "building_maintenance",
       jobType: "window_cleaning",
       customJobType: "",
+      requiresElevation: true,
       totalDropsNorth: "",
       totalDropsEast: "",
       totalDropsSouth: "",
@@ -1030,15 +1185,53 @@ export default function Dashboard() {
     },
   });
 
-  // Reset elevation fields flag when job type changes from "other" to something else
+  // Use useWatch for reactive updates to category and jobType
+  const watchedCategory = useWatch({ control: projectForm.control, name: "jobCategory" });
+  const watchedJobType = useWatch({ control: projectForm.control, name: "jobType" });
+  
+  // Track previous values to determine what changed and avoid double-firing
+  const prevCategoryRef = useRef<string | undefined>(watchedCategory);
+  const prevJobTypeRef = useRef<string | undefined>(watchedJobType);
+  
+  // Single unified effect handles both category and jobType changes
   useEffect(() => {
-    const subscription = projectForm.watch((value, { name }) => {
-      if (name === "jobType" && value.jobType !== "other") {
+    const categoryChanged = watchedCategory !== prevCategoryRef.current;
+    const jobTypeChanged = watchedJobType !== prevJobTypeRef.current;
+    
+    // Update refs immediately to track current values
+    prevCategoryRef.current = watchedCategory;
+    prevJobTypeRef.current = watchedJobType;
+    
+    if (categoryChanged && watchedCategory) {
+      // Category changed - set jobType to first type in category and update elevation
+      const types = getJobTypesByCategory(watchedCategory as JobCategory);
+      if (types.length > 0) {
+        const nextJobType = types[0].value;
+        const elevationDefault = getDefaultElevation(nextJobType);
+        
+        // Update jobType if it doesn't match the expected first type
+        if (nextJobType !== watchedJobType) {
+          prevJobTypeRef.current = nextJobType; // Pre-update ref to prevent jobType branch from firing
+          projectForm.setValue("jobType", nextJobType, { shouldDirty: true, shouldValidate: true });
+        }
+        
+        // Always update elevation when category changes
+        projectForm.setValue("requiresElevation", elevationDefault, { shouldDirty: true, shouldValidate: true });
+        
+        if (nextJobType !== "other" && nextJobType !== "ndt_other") {
+          setShowOtherElevationFields(false);
+        }
+      }
+    } else if (jobTypeChanged && watchedJobType && !categoryChanged) {
+      // JobType changed directly (not from category change) - update elevation
+      const elevationDefault = getDefaultElevation(watchedJobType);
+      projectForm.setValue("requiresElevation", elevationDefault, { shouldDirty: true, shouldValidate: true });
+      
+      if (watchedJobType !== "other" && watchedJobType !== "ndt_other") {
         setShowOtherElevationFields(false);
       }
-    });
-    return () => subscription.unsubscribe();
-  }, [projectForm]);
+    }
+  }, [watchedCategory, watchedJobType]);
 
   // Auto-set target completion date when end date is selected
   useEffect(() => {
@@ -1370,6 +1563,8 @@ export default function Dashboard() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...data,
+          jobCategory: data.jobCategory || 'building_maintenance',
+          requiresElevation: data.requiresElevation ?? true,
           totalDropsNorth: data.totalDropsNorth ? parseInt(data.totalDropsNorth) : 0,
           totalDropsEast: data.totalDropsEast ? parseInt(data.totalDropsEast) : 0,
           totalDropsSouth: data.totalDropsSouth ? parseInt(data.totalDropsSouth) : 0,
@@ -2234,13 +2429,20 @@ export default function Dashboard() {
     try {
       // Track logout event before clearing session
       trackLogout();
+      // Remember the user's role before logging out
+      const userRole = user?.role;
       await fetch("/api/logout", {
         method: "POST",
         credentials: "include",
       });
       // Clear ALL query cache to prevent stale data from causing redirect issues
       queryClient.clear();
-      setLocation("/login");
+      // Redirect technicians to technician login, others to regular login
+      if (userRole === 'rope_access_tech') {
+        setLocation("/technician-login");
+      } else {
+        setLocation("/login");
+      }
     } catch (error) {
       toast({ title: t('dashboard.toast.error', 'Error'), description: t('dashboard.toast.logoutFailed', 'Failed to logout'), variant: "destructive" });
     }
@@ -2756,6 +2958,10 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
+            {/* Notification Bell - Company owners only */}
+            {currentUser?.role === 'company' && (
+              <NotificationBell />
+            )}
             <CSRBadge user={currentUser} />
             <RefreshButton />
             <Button variant="ghost" size="icon" data-testid="button-logout" onClick={() => setShowLogoutDialog(true)}>
@@ -2986,7 +3192,7 @@ export default function Dashboard() {
                     search
                   </span>
                   <Input
-                    placeholder={t('dashboard.projects.searchPlaceholder', 'Search by strata plan number...')}
+                    placeholder={t('dashboard.projects.search.placeholder', 'Search by strata or job number...')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="h-14 pl-12 text-base shadow-sm border-2 focus-visible:ring-2"
@@ -3049,11 +3255,11 @@ export default function Dashboard() {
                                       const [clientId, strataIdx] = selectedStrataForProject.split("|");
                                       const client = clientsData?.find(c => c.id === clientId);
                                       const strata = client?.lmsNumbers?.[parseInt(strataIdx)];
-                                      return strata ? `${strata.number} - ${client.firstName} ${client.lastName}` : "Select a building...";
+                                      return strata ? `${strata.number} - ${client.firstName} ${client.lastName}` : t('dashboard.createProject.selectBuilding', 'Select a client');
                                     })()
                                   : selectedStrataForProject === "manual"
                                   ? t('dashboard.projects.enterManually', 'Enter Details Manually')
-                                  : t('dashboard.projects.selectBuilding', 'Select a building...')}
+                                  : t('dashboard.createProject.selectBuilding', 'Select a client')}
                                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                               </Button>
                             </PopoverTrigger>
@@ -3118,7 +3324,7 @@ export default function Dashboard() {
                             </PopoverContent>
                           </Popover>
                           <p className="text-xs text-muted-foreground mt-1">
-                            Search and select a building from your client database to auto-fill details
+                            {t('dashboard.createProject.autoFillDesc', 'Search and select from your client database to auto-fill details')}
                           </p>
                         </div>
 
@@ -3127,7 +3333,7 @@ export default function Dashboard() {
                           name="strataPlanNumber"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Strata Plan Number</FormLabel>
+                              <FormLabel>{t('dashboard.createProject.strataPlanNumber', 'Strata plan number / Job number')}</FormLabel>
                               <FormControl>
                                 <Input placeholder="LMS2345" {...field} data-testid="input-strata-plan-number" className="h-12" />
                               </FormControl>
@@ -3176,42 +3382,31 @@ export default function Dashboard() {
                           )}
                         />
 
+                        {/* Job Category Selection */}
                         <FormField
                           control={projectForm.control}
-                          name="jobType"
+                          name="jobCategory"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t('dashboard.createProject.jobType', 'Job Type')}</FormLabel>
+                              <FormLabel>{t('dashboard.createProject.jobCategory', 'Job Category')}</FormLabel>
                               <FormControl>
-                                <div className="grid grid-cols-4 sm:grid-cols-6 gap-3">
-                                  {[
-                                    { value: "window_cleaning", labelKey: "dashboard.jobTypes.window_cleaning", label: "Window Cleaning", icon: "window" },
-                                    { value: "dryer_vent_cleaning", labelKey: "dashboard.jobTypes.dryer_vent_cleaning_exterior", label: "Exterior Dryer Vent", icon: "air" },
-                                    { value: "building_wash", labelKey: "dashboard.jobTypes.building_wash_pressure", label: "Building Wash - Pressure washing", icon: "water_drop" },
-                                    { value: "general_pressure_washing", labelKey: "dashboard.jobTypes.general_pressure_washing", label: "General Pressure Washing", icon: "cleaning_services" },
-                                    { value: "gutter_cleaning", labelKey: "dashboard.jobTypes.gutter_cleaning", label: "Gutter Cleaning", icon: "home_repair_service" },
-                                    { value: "in_suite_dryer_vent_cleaning", labelKey: "dashboard.jobTypes.in_suite_dryer_vent_cleaning", label: "In-Suite Dryer Vent", icon: "meeting_room" },
-                                    { value: "parkade_pressure_cleaning", labelKey: "dashboard.jobTypes.parkade_pressure_cleaning", label: "Parkade Pressure", icon: "local_parking" },
-                                    { value: "ground_window_cleaning", labelKey: "dashboard.jobTypes.ground_window_cleaning", label: "Ground Window", icon: "storefront" },
-                                    { value: "painting", labelKey: "dashboard.jobTypes.painting", label: "Painting", icon: "format_paint" },
-                                    { value: "inspection", labelKey: "dashboard.jobTypes.inspection", label: "Inspection", icon: "fact_check" },
-                                    { value: "other", labelKey: "dashboard.jobTypes.other", label: "Other", icon: "more_horiz" },
-                                  ].map((jobType) => (
+                                <div className="flex gap-2 flex-wrap">
+                                  {JOB_CATEGORIES.map((category) => (
                                     <button
-                                      key={jobType.value}
+                                      key={category.value}
                                       type="button"
-                                      onClick={() => field.onChange(jobType.value)}
-                                      data-testid={`button-job-type-${jobType.value}`}
+                                      onClick={() => field.onChange(category.value)}
+                                      data-testid={`button-category-${category.value}`}
                                       className={`
-                                        flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all
-                                        ${field.value === jobType.value 
-                                          ? 'border-primary bg-primary/10 shadow-lg' 
+                                        flex items-center gap-2 px-4 py-2 rounded-lg border-2 transition-all
+                                        ${field.value === category.value 
+                                          ? 'border-primary bg-primary/10 shadow-md' 
                                           : 'border-border bg-card hover:border-primary/50 hover:bg-muted'
                                         }
                                       `}
                                     >
-                                      <span className="material-icons text-3xl">{jobType.icon}</span>
-                                      <span className="text-xs font-medium text-center leading-tight">{t(jobType.labelKey, jobType.label)}</span>
+                                      <span className="material-icons text-xl">{category.icon}</span>
+                                      <span className="text-sm font-medium">{t(category.labelKey, category.label)}</span>
                                     </button>
                                   ))}
                                 </div>
@@ -3221,7 +3416,117 @@ export default function Dashboard() {
                           )}
                         />
 
-                        {projectForm.watch("jobType") === "other" && (
+                        {/* Job Type Selection - filtered by category */}
+                        <FormField
+                          control={projectForm.control}
+                          name="jobType"
+                          render={({ field }) => {
+                            const selectedCategory = projectForm.watch("jobCategory") as JobCategory || 'building_maintenance';
+                            const categoryJobTypes = getJobTypesByCategory(selectedCategory);
+                            
+                            return (
+                              <FormItem>
+                                <FormLabel>{t('dashboard.createProject.jobType', 'Job Type')}</FormLabel>
+                                <FormControl>
+                                  <div className="grid grid-cols-4 sm:grid-cols-6 gap-3">
+                                    {categoryJobTypes.map((jobType) => (
+                                      <button
+                                        key={jobType.value}
+                                        type="button"
+                                        onClick={() => field.onChange(jobType.value)}
+                                        data-testid={`button-job-type-${jobType.value}`}
+                                        className={`
+                                          flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all
+                                          ${field.value === jobType.value 
+                                            ? 'border-primary bg-primary/10 shadow-lg' 
+                                            : 'border-border bg-card hover:border-primary/50 hover:bg-muted'
+                                          }
+                                        `}
+                                      >
+                                        <span className="material-icons text-3xl">{jobType.icon}</span>
+                                        <span className="text-xs font-medium text-center leading-tight">{t(jobType.labelKey, jobType.label)}</span>
+                                      </button>
+                                    ))}
+                                  </div>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            );
+                          }}
+                        />
+
+                        {/* Elevation Toggle - shown for configurable job types, hidden for rock_scaling */}
+                        {(() => {
+                          const currentJobType = projectForm.watch("jobType");
+                          const config = getJobTypeConfig(currentJobType);
+                          // Get category from the job type configuration if not available from form
+                          const formCategory = projectForm.watch("jobCategory");
+                          const category = formCategory || (currentJobType ? getCategoryForJobType(currentJobType) : 'building_maintenance');
+                          
+                          // Rock scaling, wind turbine, and oil field: don't show elevation indicator at all
+                          if (category === 'rock_scaling' || category === 'wind_turbine' || category === 'oil_field') {
+                            return null;
+                          }
+                          
+                          const isConfigurable = config?.elevationRequirement === 'configurable';
+                          const isAlways = config?.elevationRequirement === 'always';
+                          const isNever = config?.elevationRequirement === 'never';
+                          
+                          if (isConfigurable) {
+                            return (
+                              <FormField
+                                control={projectForm.control}
+                                name="requiresElevation"
+                                render={({ field }) => (
+                                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                                    <div className="space-y-0.5">
+                                      <FormLabel className="text-base flex items-center gap-2">
+                                        <span className="material-icons text-xl">height</span>
+                                        {t('dashboard.createProject.workAtHeight', 'Work at Height (Rope Access)')}
+                                      </FormLabel>
+                                      <FormDescription>
+                                        {t('dashboard.createProject.workAtHeightDesc', 'Enable for rope access work requiring elevation tracking')}
+                                      </FormDescription>
+                                    </div>
+                                    <FormControl>
+                                      <Switch
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                        data-testid="switch-requires-elevation"
+                                      />
+                                    </FormControl>
+                                  </FormItem>
+                                )}
+                              />
+                            );
+                          } else if (isAlways || isNever) {
+                            return (
+                              <div className="flex flex-row items-center justify-between rounded-lg border p-4 bg-muted/50">
+                                <div className="space-y-0.5">
+                                  <p className="text-base font-medium flex items-center gap-2">
+                                    <span className="material-icons text-xl">{isAlways ? 'height' : 'horizontal_rule'}</span>
+                                    {isAlways 
+                                      ? t('dashboard.createProject.elevationRequired', 'Elevation Work Required')
+                                      : t('dashboard.createProject.groundLevel', 'Ground Level Work')
+                                    }
+                                  </p>
+                                  <p className="text-sm text-muted-foreground">
+                                    {isAlways 
+                                      ? t('dashboard.createProject.elevationRequiredDesc', 'This job type always requires rope access at height')
+                                      : t('dashboard.createProject.groundLevelDesc', 'This job type is performed at ground level')
+                                    }
+                                  </p>
+                                </div>
+                                <span className={`material-icons text-2xl ${isAlways ? 'text-primary' : 'text-muted-foreground'}`}>
+                                  {isAlways ? 'check_circle' : 'cancel'}
+                                </span>
+                              </div>
+                            );
+                          }
+                          return null;
+                        })()}
+
+                        {(projectForm.watch("jobType") === "other" || projectForm.watch("jobType") === "ndt_other" || projectForm.watch("jobType") === "rock_other") && (
                           <>
                             <FormField
                               control={projectForm.control}
@@ -3342,9 +3647,10 @@ export default function Dashboard() {
                           />
                         )}
 
-                        {/* Hide Floor Count for General Pressure Washing and Ground Window (hours-based tracking) */}
+                        {/* Hide Floor Count for General Pressure Washing, Ground Window, and Rock Scaling (hours-based tracking) */}
                         {projectForm.watch("jobType") !== "general_pressure_washing" && 
-                         projectForm.watch("jobType") !== "ground_window_cleaning" && (
+                         projectForm.watch("jobType") !== "ground_window_cleaning" && 
+                         projectForm.watch("jobCategory") !== "rock_scaling" && (
                           <FormField
                             control={projectForm.control}
                             name="floorCount"
@@ -3366,35 +3672,27 @@ export default function Dashboard() {
                           />
                         )}
 
-                        {/* Building Height - for IRATA logbook */}
-                        <FormField
-                          control={projectForm.control}
-                          name="buildingHeight"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{t('dashboard.projectForm.buildingHeight', 'Building Height')}</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  placeholder={t('dashboard.projectForm.buildingHeightPlaceholder', 'e.g., 25 floors, 100m, 300ft')} 
-                                  {...field} 
-                                  data-testid="input-building-height" 
-                                  className="h-12" 
-                                />
-                              </FormControl>
-                              <p className="text-xs text-muted-foreground">
-                                {t('dashboard.projectForm.buildingHeightHint', 'Used for IRATA logbook hour tracking')}
-                              </p>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        {(projectForm.watch("jobType") === "window_cleaning" || 
-                          projectForm.watch("jobType") === "building_wash" || 
-                          projectForm.watch("jobType") === "dryer_vent_cleaning" ||
-                          projectForm.watch("jobType") === "painting" ||
-                          projectForm.watch("jobType") === "inspection" ||
-                          (projectForm.watch("jobType") === "other" && showOtherElevationFields)) && (
+                        {/* Show drop tracking fields (N/E/S/W drops) ONLY for building_maintenance with drops-based jobs */}
+                        {(() => {
+                          const currentJobType = projectForm.watch("jobType");
+                          const currentJobCategory = projectForm.watch("jobCategory");
+                          const requiresElevation = projectForm.watch("requiresElevation");
+                          const jobConfig = getJobTypeConfig(currentJobType);
+                          
+                          // Drop tracking is ONLY for building_maintenance category with drops-based progress
+                          // NDT and Rock Scaling use hours-based tracking, not drops
+                          if (currentJobCategory !== 'building_maintenance') return false;
+                          
+                          // Check if job uses drops-based progress
+                          if (jobConfig?.progressType !== 'drops') return false;
+                          
+                          // For configurable elevation, check the toggle
+                          if (jobConfig?.elevationRequirement === 'never') return false;
+                          if (jobConfig?.elevationRequirement === 'always') return true;
+                          if (requiresElevation) return true;
+                          if (currentJobType === "other" && showOtherElevationFields) return true;
+                          return false;
+                        })() && (
                           <>
                             <div className="space-y-2">
                               <label className="text-sm font-medium">{t('dashboard.projectForm.totalDropsPerElevation', 'Total Drops per Elevation')}</label>
@@ -3543,6 +3841,8 @@ export default function Dashboard() {
                           name="buildingHeight"
                           render={({ field }) => {
                             const floorCount = projectForm.watch("floorCount");
+                            const currentJobCategory = projectForm.watch("jobCategory");
+                            const isRockScaling = currentJobCategory === "rock_scaling";
                             const heightValue = field.value || "";
                             
                             const calculateFromFloors = () => {
@@ -3575,7 +3875,12 @@ export default function Dashboard() {
                             
                             return (
                               <FormItem>
-                                <FormLabel>{t('dashboard.projectForm.buildingHeight', 'Building Height')}</FormLabel>
+                                <FormLabel>
+                                  {isRockScaling 
+                                    ? t('dashboard.projectForm.siteMaxHeight', 'Site Max Height')
+                                    : t('dashboard.projectForm.buildingHeight', 'Building Height')
+                                  }
+                                </FormLabel>
                                 <div className="space-y-2">
                                   <div className="flex gap-2">
                                     <FormControl>
@@ -3587,7 +3892,7 @@ export default function Dashboard() {
                                         className="h-12" 
                                       />
                                     </FormControl>
-                                    {floorCount && parseInt(floorCount) > 0 && (
+                                    {!isRockScaling && floorCount && parseInt(floorCount) > 0 && (
                                       <Button
                                         type="button"
                                         variant="outline"
@@ -3606,9 +3911,12 @@ export default function Dashboard() {
                                 </div>
                                 <FormDescription className="text-xs mt-2">
                                   <span className="font-medium text-foreground">{t('dashboard.projectForm.buildingHeightImportant', 'Important for technicians:')}</span>{' '}
-                                  {t('dashboard.projectForm.buildingHeightExplain', 'Building height is required for IRATA logbook entries. Technicians need this to track work at height for certification progression.')}
+                                  {isRockScaling
+                                    ? t('dashboard.projectForm.siteHeightExplain', 'Site height is required for IRATA logbook entries. Technicians need this to track work at height for certification progression.')
+                                    : t('dashboard.projectForm.buildingHeightExplain', 'Building height is required for IRATA logbook entries. Technicians need this to track work at height for certification progression.')
+                                  }
                                 </FormDescription>
-                                {floorCount && parseInt(floorCount) > 0 && (
+                                {!isRockScaling && floorCount && parseInt(floorCount) > 0 && (
                                   <FormDescription className="text-xs">
                                     {t('dashboard.projectForm.buildingHeightCalcHint', 'Click Calculate to estimate height from floor count (floors × 9ft)')}
                                   </FormDescription>
@@ -3856,23 +4164,42 @@ export default function Dashboard() {
                     filteredProjects.filter((p: Project) => p.status === "active").map((project: Project) => {
                       const isInSuite = project.jobType === "in_suite_dryer_vent_cleaning";
                       const isParkade = project.jobType === "parkade_pressure_cleaning";
-                      const isHoursBased = project.jobType === "general_pressure_washing" || project.jobType === "ground_window_cleaning";
+                      // Use getProgressType to correctly identify hours-based jobs (NDT, Rock Scaling, etc.)
+                      const progressType = getProgressType(project.jobType);
+                      const isHoursBased = progressType === 'hours';
                       
                       let completed: number, total: number, progressPercent: number, unitLabel: string;
                       
+                      // Calculate total hours worked for hours-based projects
+                      const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id && s.endTime);
+                      const totalHoursWorked = projectSessions.reduce((sum: number, s: any) => {
+                        const regular = parseFloat(s.regularHours) || 0;
+                        const overtime = parseFloat(s.overtimeHours) || 0;
+                        const doubleTime = parseFloat(s.doubleTimeHours) || 0;
+                        return sum + regular + overtime + doubleTime;
+                      }, 0);
+                      
                       if (isHoursBased) {
-                        // Percentage-based tracking (General Pressure Washing, Ground Window)
-                        // Get the latest completion percentage from work sessions
-                        const projectSessions = allWorkSessions.filter((s: any) => 
-                          s.projectId === project.id && s.endTime && s.manualCompletionPercentage !== null
-                        );
-                        const latestSession = projectSessions.sort((a: any, b: any) => 
-                          new Date(b.endTime).getTime() - new Date(a.endTime).getTime()
-                        )[0];
-                        progressPercent = latestSession?.manualCompletionPercentage || 0;
-                        completed = progressPercent;
-                        total = 100;
-                        unitLabel = "%";
+                        // Hours-based tracking for NDT, Rock Scaling, General Pressure Washing, Ground Window
+                        // Show hours worked vs estimated hours if available, otherwise use completion percentage
+                        if (project.estimatedHours && project.estimatedHours > 0) {
+                          completed = Math.round(totalHoursWorked * 10) / 10;
+                          total = project.estimatedHours;
+                          progressPercent = Math.min((totalHoursWorked / project.estimatedHours) * 100, 100);
+                          unitLabel = t('dashboard.projects.hours', 'hrs');
+                        } else {
+                          // Fall back to completion percentage if no estimated hours
+                          const sessionsWithPercentage = allWorkSessions.filter((s: any) => 
+                            s.projectId === project.id && s.endTime && s.manualCompletionPercentage !== null
+                          );
+                          const latestSession = sessionsWithPercentage.sort((a: any, b: any) => 
+                            new Date(b.endTime).getTime() - new Date(a.endTime).getTime()
+                          )[0];
+                          progressPercent = latestSession?.manualCompletionPercentage || 0;
+                          completed = progressPercent;
+                          total = 100;
+                          unitLabel = "%";
+                        }
                       } else if (isInSuite) {
                         // Suite-based tracking (In-Suite Dryer Vent)
                         completed = project.completedDrops || 0;
@@ -3917,8 +4244,8 @@ export default function Dashboard() {
                                 )}
                               </div>
                               <div className="flex flex-col items-end gap-2">
-                                {/* Hide floor count badge for hours-based projects (General Pressure Washing, Ground Window) */}
-                                {!isHoursBased && (
+                                {/* Hide floor count badge for hours-based projects (NDT, Rock Scaling, General Pressure Washing, Ground Window) */}
+                                {!isHoursBased && !isInSuite && !isParkade && project.floorCount && (
                                   <Badge variant="secondary" className="text-sm px-3 py-1">
                                     <span className="material-icons text-xs mr-1">layers</span>
                                     {project.floorCount}
@@ -8069,9 +8396,10 @@ export default function Dashboard() {
             <DialogDescription>
               {(() => {
                 const activeProject = projects.find(p => p.id === activeSession?.projectId);
-                const isHoursBased = activeProject?.jobType === "general_pressure_washing" || activeProject?.jobType === "ground_window_cleaning";
+                const progressType = activeProject?.jobType ? getProgressType(activeProject.jobType) : 'drops';
+                const isHoursBased = progressType === 'hours';
                 if (isHoursBased) {
-                  return t('dashboard.endDay.completionPercentage', 'Enter the current completion percentage for this project (0-100%).');
+                  return t('dashboard.endDay.completionPercentage', 'Enter how much of the job YOU completed today. This will be added to the total project progress.');
                 } else if (activeProject?.jobType === "parkade_pressure_cleaning") {
                   return t('dashboard.endDay.parkingStalls', 'Enter the number of parking stalls you completed today.');
                 } else if (activeProject?.jobType === "in_suite_dryer_vent_cleaning") {
@@ -8087,7 +8415,8 @@ export default function Dashboard() {
             <form onSubmit={endDayForm.handleSubmit(onEndDaySubmit)} className="space-y-4">
               {(() => {
                 const activeProject = projects.find(p => p.id === activeSession?.projectId);
-                const isHoursBased = activeProject?.jobType === "general_pressure_washing" || activeProject?.jobType === "ground_window_cleaning";
+                const progressType = activeProject?.jobType ? getProgressType(activeProject.jobType) : 'drops';
+                const isHoursBased = progressType === 'hours';
                 const isParkade = activeProject?.jobType === "parkade_pressure_cleaning";
                 const isInSuite = activeProject?.jobType === "in_suite_dryer_vent_cleaning";
                 
@@ -8098,7 +8427,7 @@ export default function Dashboard() {
                       name="dropsNorth"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('dashboard.endDay.projectCompletionLabel', 'Project Completion Percentage')}</FormLabel>
+                          <FormLabel>{t('dashboard.endDay.projectCompletionLabel', 'Your Contribution Today (%)')}</FormLabel>
                           <FormControl>
                             <Input
                               type="number"
@@ -8112,7 +8441,7 @@ export default function Dashboard() {
                             />
                           </FormControl>
                           <FormDescription className="text-xs">
-                            {t('dashboard.endDay.completionHint', 'Enter a value between 0-100% representing the overall project completion')}
+                            {t('dashboard.endDay.completionHint', 'How much did YOU complete today? This adds to the total progress.')}
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
@@ -9029,9 +9358,9 @@ export default function Dashboard() {
       <AlertDialog open={showSaveAsClientDialog} onOpenChange={setShowSaveAsClientDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('dashboard.saveAsClient.title', 'Save Building as Client?')}</AlertDialogTitle>
+            <AlertDialogTitle>{t('dashboard.saveAsClient.title', 'Save as Client?')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t('dashboard.saveAsClient.description', 'Would you like to save this building information in your client database? This will make it easier to create future projects for this property.')}
+              {t('dashboard.saveAsClient.description', 'Would you like to save this information in your client database? This will make it easier to create future projects for this site.')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
