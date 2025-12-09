@@ -28,7 +28,9 @@ import {
   MapPin,
   Download,
   Share2,
-  Award
+  Award,
+  X,
+  MessageSquareWarning
 } from "lucide-react";
 import { TechnicianRegistration } from "@/components/TechnicianRegistration";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
@@ -162,6 +164,7 @@ export default function TechnicianLogin() {
   const [loginMethod, setLoginMethod] = useState<"license" | "email">("license");
   const [showRegistration, setShowRegistration] = useState(false);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
+  const [showProblemsColumn, setShowProblemsColumn] = useState(true);
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -392,8 +395,8 @@ export default function TechnicianLogin() {
         }
       `}</style>
 
-      {/* Left Column - 70% Marketing Content */}
-      <div className="flex-1 lg:w-[70%] overflow-y-auto bg-background">
+      {/* Left Column - 70% Marketing Content (or 100% when problems column is hidden) */}
+      <div className={`flex-1 ${showProblemsColumn ? 'lg:w-[70%]' : 'lg:w-full'} overflow-y-auto bg-background transition-all duration-300`}>
         {/* Header */}
         <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
           <div className="container mx-auto px-6 py-4 flex items-center justify-between gap-4">
@@ -862,14 +865,24 @@ export default function TechnicianLogin() {
       </div>
 
       {/* Right Column - 30% Scrolling Problems (Desktop only) */}
-      <div className="hidden lg:block lg:w-[30%] bg-muted/50 border-l h-screen sticky top-0 overflow-hidden">
-        <div className="h-full flex flex-col">
-          <div className="shrink-0 bg-muted/50 border-b p-4">
-            <div className="text-center">
-              <p className="text-base font-medium text-muted-foreground">Sound familiar?</p>
-              <p className="text-lg font-semibold text-primary">OnRopePro Solves This</p>
+      {showProblemsColumn ? (
+        <div className="hidden lg:block lg:w-[30%] bg-muted/50 border-l h-screen sticky top-0 overflow-hidden transition-all duration-300">
+          <div className="h-full flex flex-col">
+            <div className="shrink-0 bg-muted/50 border-b p-4 relative">
+              <Button
+                size="icon"
+                variant="ghost"
+                className="absolute right-2 top-2"
+                onClick={() => setShowProblemsColumn(false)}
+                data-testid="button-close-problems"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+              <div className="text-center">
+                <p className="text-base font-medium text-muted-foreground">Sound familiar?</p>
+                <p className="text-lg font-semibold text-primary">OnRopePro Solves This</p>
+              </div>
             </div>
-          </div>
           <div className="flex-1 flex flex-col justify-evenly py-6">
             {problemRows.map((row, index) => (
               <ScrollingProblems key={index} problems={row.problems} direction={row.direction} />
@@ -877,6 +890,19 @@ export default function TechnicianLogin() {
           </div>
         </div>
       </div>
+      ) : (
+        <div className="hidden lg:flex lg:items-start lg:pt-4 lg:pr-4 fixed right-0 top-0 z-50">
+          <Button
+            size="icon"
+            variant="outline"
+            className="shadow-lg"
+            onClick={() => setShowProblemsColumn(true)}
+            data-testid="button-open-problems"
+          >
+            <MessageSquareWarning className="w-4 h-4" />
+          </Button>
+        </div>
+      )}
 
       {/* Login Dialog */}
       <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
