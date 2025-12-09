@@ -664,7 +664,8 @@
     "jobCategories": {
       "building_maintenance": "Entretien de bâtiment",
       "ndt": "CND - Contrôle Non Destructif",
-      "rock_scaling": "Purge de paroi rocheuse"
+      "rock_scaling": "Purge de paroi rocheuse",
+      "wind_turbine": "Éolienne"
     },
     "jobTypes": {
       "window_cleaning": "Nettoyage de vitres",
@@ -702,7 +703,18 @@
       "rock_hazard_assessment": "Évaluation des risques d'éboulement",
       "rock_catch_fence": "Installation de clôtures pare-pierres",
       "rock_drilling": "Forage de roche",
-      "rock_other": "Autre purge rocheuse"
+      "rock_other": "Autre purge rocheuse",
+      "turbine_blade_inspection": "Inspection des pales",
+      "turbine_blade_repair": "Réparation des pales",
+      "turbine_leading_edge": "Réparation du bord d'attaque",
+      "turbine_composite_patch": "Réparation composite",
+      "turbine_lightning_protection": "Système de protection foudre",
+      "turbine_tower_inspection": "Inspection de la tour",
+      "turbine_tower_coating": "Revêtement / Peinture de tour",
+      "turbine_gearbox_service": "Entretien du réducteur",
+      "turbine_nacelle_work": "Travaux sur nacelle",
+      "turbine_standby_rescue": "Veille / Sauvetage",
+      "turbine_other": "Autre éolienne"
     },
     "toast": {
       "projectCreated": "Projet créé avec succès",

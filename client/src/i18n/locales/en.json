@@ -664,7 +664,8 @@
     "jobCategories": {
       "building_maintenance": "Building Maintenance",
       "ndt": "NDT - Non-Destructive Testing",
-      "rock_scaling": "Rock Scaling"
+      "rock_scaling": "Rock Scaling",
+      "wind_turbine": "Wind Turbine"
     },
     "jobTypes": {
       "window_cleaning": "Window Cleaning",
@@ -702,7 +703,18 @@
       "rock_hazard_assessment": "Rockfall Hazard Assessment",
       "rock_catch_fence": "Catch Fence Installation",
       "rock_drilling": "Rock Drilling",
-      "rock_other": "Other Rock Scaling"
+      "rock_other": "Other Rock Scaling",
+      "turbine_blade_inspection": "Blade Inspection",
+      "turbine_blade_repair": "Blade Repair",
+      "turbine_leading_edge": "Leading Edge Repair",
+      "turbine_composite_patch": "Composite Patch Repair",
+      "turbine_lightning_protection": "Lightning Protection System",
+      "turbine_tower_inspection": "Tower Inspection",
+      "turbine_tower_coating": "Tower Coating / Painting",
+      "turbine_gearbox_service": "Gearbox Service",
+      "turbine_nacelle_work": "Nacelle Work",
+      "turbine_standby_rescue": "Standby / Rescue",
+      "turbine_other": "Other Wind Turbine"
     },
     "toast": {
       "projectCreated": "Project created successfully",

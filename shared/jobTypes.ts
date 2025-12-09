@@ -1,4 +1,4 @@
-export type JobCategory = 'building_maintenance' | 'ndt' | 'rock_scaling';
+export type JobCategory = 'building_maintenance' | 'ndt' | 'rock_scaling' | 'wind_turbine';
 
 export type ElevationRequirement = 'always' | 'never' | 'configurable';
 
@@ -16,6 +16,7 @@ export const JOB_CATEGORIES: { value: JobCategory; labelKey: string; label: stri
   { value: 'building_maintenance', labelKey: 'dashboard.jobCategories.building_maintenance', label: 'Building Maintenance', icon: 'apartment' },
   { value: 'ndt', labelKey: 'dashboard.jobCategories.ndt', label: 'NDT - Non-Destructive Testing', icon: 'science' },
   { value: 'rock_scaling', labelKey: 'dashboard.jobCategories.rock_scaling', label: 'Rock Scaling', icon: 'terrain' },
+  { value: 'wind_turbine', labelKey: 'dashboard.jobCategories.wind_turbine', label: 'Wind Turbine', icon: 'air' },
 ];
 
 export const JOB_TYPES: JobTypeConfig[] = [
@@ -66,6 +67,19 @@ export const JOB_TYPES: JobTypeConfig[] = [
   { value: 'rock_catch_fence', category: 'rock_scaling', labelKey: 'dashboard.jobTypes.rock_catch_fence', label: 'Catch Fence Installation', icon: 'fence', elevationRequirement: 'always', progressType: 'hours' },
   { value: 'rock_drilling', category: 'rock_scaling', labelKey: 'dashboard.jobTypes.rock_drilling', label: 'Rock Drilling', icon: 'precision_manufacturing', elevationRequirement: 'always', progressType: 'hours' },
   { value: 'rock_other', category: 'rock_scaling', labelKey: 'dashboard.jobTypes.rock_other', label: 'Other Rock Scaling', icon: 'more_horiz', elevationRequirement: 'configurable', progressType: 'hours' },
+  
+  // Wind Turbine (all hours-based, no building-specific fields needed)
+  { value: 'turbine_blade_inspection', category: 'wind_turbine', labelKey: 'dashboard.jobTypes.turbine_blade_inspection', label: 'Blade Inspection', icon: 'visibility', elevationRequirement: 'never', progressType: 'hours' },
+  { value: 'turbine_blade_repair', category: 'wind_turbine', labelKey: 'dashboard.jobTypes.turbine_blade_repair', label: 'Blade Repair', icon: 'build', elevationRequirement: 'never', progressType: 'hours' },
+  { value: 'turbine_leading_edge', category: 'wind_turbine', labelKey: 'dashboard.jobTypes.turbine_leading_edge', label: 'Leading Edge Repair', icon: 'auto_fix_high', elevationRequirement: 'never', progressType: 'hours' },
+  { value: 'turbine_composite_patch', category: 'wind_turbine', labelKey: 'dashboard.jobTypes.turbine_composite_patch', label: 'Composite Patch Repair', icon: 'layers', elevationRequirement: 'never', progressType: 'hours' },
+  { value: 'turbine_lightning_protection', category: 'wind_turbine', labelKey: 'dashboard.jobTypes.turbine_lightning_protection', label: 'Lightning Protection System', icon: 'bolt', elevationRequirement: 'never', progressType: 'hours' },
+  { value: 'turbine_tower_inspection', category: 'wind_turbine', labelKey: 'dashboard.jobTypes.turbine_tower_inspection', label: 'Tower Inspection', icon: 'search', elevationRequirement: 'never', progressType: 'hours' },
+  { value: 'turbine_tower_coating', category: 'wind_turbine', labelKey: 'dashboard.jobTypes.turbine_tower_coating', label: 'Tower Coating / Painting', icon: 'format_paint', elevationRequirement: 'never', progressType: 'hours' },
+  { value: 'turbine_gearbox_service', category: 'wind_turbine', labelKey: 'dashboard.jobTypes.turbine_gearbox_service', label: 'Gearbox Service', icon: 'settings', elevationRequirement: 'never', progressType: 'hours' },
+  { value: 'turbine_nacelle_work', category: 'wind_turbine', labelKey: 'dashboard.jobTypes.turbine_nacelle_work', label: 'Nacelle Work', icon: 'engineering', elevationRequirement: 'never', progressType: 'hours' },
+  { value: 'turbine_standby_rescue', category: 'wind_turbine', labelKey: 'dashboard.jobTypes.turbine_standby_rescue', label: 'Standby / Rescue', icon: 'health_and_safety', elevationRequirement: 'never', progressType: 'hours' },
+  { value: 'turbine_other', category: 'wind_turbine', labelKey: 'dashboard.jobTypes.turbine_other', label: 'Other Wind Turbine', icon: 'more_horiz', elevationRequirement: 'never', progressType: 'hours' },
 ];
 
 export function getJobTypesByCategory(category: JobCategory): JobTypeConfig[] {
