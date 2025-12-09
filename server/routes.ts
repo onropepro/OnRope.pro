@@ -15909,22 +15909,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .where(eq(jobApplications.jobPostingId, req.params.jobId))
         .orderBy(desc(jobApplications.appliedAt));
 
-      // Mark all unviewed applications for this job as viewed
-      const unviewedAppIds = applications
-        .filter(app => !app.viewedByEmployerAt)
-        .map(app => app.id);
-      
-      if (unviewedAppIds.length > 0) {
-        await db.update(jobApplications)
-          .set({ viewedByEmployerAt: new Date() })
-          .where(
-            and(
-              eq(jobApplications.jobPostingId, req.params.jobId),
-              isNull(jobApplications.viewedByEmployerAt)
-            )
-          );
-      }
-
       // Fetch technician details for each application
       const applicationsWithTechnicians = await Promise.all(
         applications.map(async (app) => {
@@ -15949,7 +15933,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
       );
 
+      // Send response first with original viewedByEmployerAt values
       res.json({ applications: applicationsWithTechnicians });
+
+      // Then asynchronously mark unviewed applications as viewed (fire-and-forget)
+      const hasUnviewed = applications.some(app => !app.viewedByEmployerAt);
+      if (hasUnviewed) {
+        db.update(jobApplications)
+          .set({ viewedByEmployerAt: new Date() })
+          .where(
+            and(
+              eq(jobApplications.jobPostingId, req.params.jobId),
+              isNull(jobApplications.viewedByEmployerAt)
+            )
+          )
+          .catch(err => console.error("Failed to mark applications as viewed:", err));
+      }
     } catch (error) {
       console.error("Get job applications error:", error);
       res.status(500).json({ message: "Internal server error" });
