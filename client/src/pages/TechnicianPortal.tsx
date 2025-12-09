@@ -396,6 +396,7 @@ const translations = {
     tabProfile: "Profile",
     tabWork: "Work",
     tabMore: "More",
+    backToHome: "Back to Home",
     quickActions: "Quick Actions",
     documents: "Documents",
     certifications: "Certifications",
@@ -723,6 +724,7 @@ const translations = {
     tabProfile: "Profil",
     tabWork: "Travail",
     tabMore: "Plus",
+    backToHome: "Retour à l'accueil",
     quickActions: "Actions rapides",
     documents: "Documents",
     certifications: "Certifications",
@@ -1798,6 +1800,17 @@ export default function TechnicianPortal() {
         {/* WORK TAB - Job board, invitations, employer */}
         {activeTab === 'work' && (
           <>
+            {/* Back to Home button */}
+            <Button
+              variant="ghost"
+              onClick={() => setActiveTab('home')}
+              className="gap-2 -mt-2 mb-2"
+              data-testid="button-back-to-home-work"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              {t.backToHome}
+            </Button>
+            
             {/* Job Board Card */}
             {user && (
               <Card className="border-blue-500/50 bg-gradient-to-r from-blue-500/10 to-purple-500/10">
@@ -1830,6 +1843,17 @@ export default function TechnicianPortal() {
         {/* MORE TAB - Feedback, referral, settings */}
         {activeTab === 'more' && (
           <>
+            {/* Back to Home button */}
+            <Button
+              variant="ghost"
+              onClick={() => setActiveTab('home')}
+              className="gap-2 -mt-2 mb-2"
+              data-testid="button-back-to-home-more"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              {t.backToHome}
+            </Button>
+            
             {/* Feedback Card */}
             {user && (
               <Card className="border-purple-500/30 bg-gradient-to-r from-purple-500/5 to-pink-500/5">
@@ -2234,15 +2258,27 @@ export default function TechnicianPortal() {
 
         {/* PROFILE TAB - Personal information and certifications */}
         {activeTab === 'profile' && (
-          <Card>
-            <CardHeader className="space-y-4">
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3 sm:gap-4">
-                  <div className="p-2 sm:p-3 rounded-full bg-primary/10">
-                    <HardHat className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg sm:text-xl">{user.name}</CardTitle>
+          <>
+            {/* Back to Home button */}
+            <Button
+              variant="ghost"
+              onClick={() => setActiveTab('home')}
+              className="gap-2 -mt-2 mb-2"
+              data-testid="button-back-to-home"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              {t.backToHome}
+            </Button>
+            
+            <Card>
+              <CardHeader className="space-y-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="p-2 sm:p-3 rounded-full bg-primary/10">
+                      <HardHat className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg sm:text-xl">{user.name}</CardTitle>
                   <CardDescription className="flex flex-wrap items-center gap-2 mt-1">
                     {user.irataLevel && (
                       <Badge variant="secondary" className="gap-1">
@@ -3815,7 +3851,8 @@ export default function TechnicianPortal() {
               </div>
             )}
           </CardContent>
-          </Card>
+            </Card>
+          </>
         )}
       </main>
 
