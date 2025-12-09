@@ -4276,6 +4276,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ==================== BUILDING INSTRUCTIONS ====================
 
+  // Get building with instructions by strata plan number (for project detail page)
+  app.get("/api/buildings/by-strata/:strataPlanNumber", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { strataPlanNumber } = req.params;
+      const user = await storage.getUser(req.session.userId!);
+      
+      if (!user) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      const building = await storage.getBuildingByStrata(strataPlanNumber);
+      if (!building) {
+        return res.json({ building: null, instructions: null });
+      }
+
+      const instructions = await storage.getBuildingInstructions(building.id);
+      
+      // Remove sensitive data
+      const { passwordHash, ...buildingData } = building;
+      
+      res.json({ building: buildingData, instructions: instructions || null });
+    } catch (error) {
+      console.error('[Buildings] Get by strata error:', error);
+      res.status(500).json({ message: "Failed to get building data" });
+    }
+  });
+
   // Get building instructions by building ID (accessible to building managers, companies with projects, and superuser)
   app.get("/api/buildings/:buildingId/instructions", requireAuth, async (req: Request, res: Response) => {
     try {

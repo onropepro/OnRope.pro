@@ -7,10 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate, formatLocalDateLong } from "@/lib/dateUtils";
-import { Loader2, Building2, History, CheckCircle, Clock, AlertCircle, LogOut, Lock, Hash, ArrowLeft } from "lucide-react";
+import { Loader2, Building2, History, CheckCircle, Clock, AlertCircle, LogOut, Lock, Hash, ArrowLeft, KeyRound, DoorOpen, Phone, User, Wrench, FileText, Pencil, Save } from "lucide-react";
+import type { BuildingInstructions } from "@shared/schema";
 
 interface BuildingData {
   id: string;
@@ -52,6 +55,19 @@ export default function BuildingPortal() {
   const { toast } = useToast();
   const [strataPlanNumber, setStrataPlanNumber] = useState("");
   const [password, setPassword] = useState("");
+  const [showInstructionsDialog, setShowInstructionsDialog] = useState(false);
+  const [instructionsForm, setInstructionsForm] = useState({
+    buildingAccess: "",
+    keysAndFob: "",
+    roofAccess: "",
+    specialRequests: "",
+    buildingManagerName: "",
+    buildingManagerPhone: "",
+    conciergeNames: "",
+    conciergePhone: "",
+    maintenanceName: "",
+    maintenancePhone: "",
+  });
 
   const { 
     data: portalData, 
@@ -63,6 +79,59 @@ export default function BuildingPortal() {
     queryKey: ["/api/building/portal"],
     retry: false,
     refetchOnWindowFocus: false,
+  });
+
+  // Fetch building instructions when we have building data
+  const buildingId = portalData?.building?.id;
+  const { data: buildingInstructions, isLoading: isLoadingInstructions } = useQuery<BuildingInstructions | null>({
+    queryKey: ["/api/buildings", buildingId, "instructions"],
+    queryFn: async () => {
+      if (!buildingId) return null;
+      const response = await fetch(`/api/buildings/${buildingId}/instructions`, { credentials: "include" });
+      if (!response.ok) return null;
+      return response.json();
+    },
+    enabled: !!buildingId,
+  });
+
+  // Initialize form when instructions are loaded
+  useEffect(() => {
+    if (buildingInstructions) {
+      setInstructionsForm({
+        buildingAccess: buildingInstructions.buildingAccess || "",
+        keysAndFob: buildingInstructions.keysAndFob || "",
+        roofAccess: buildingInstructions.roofAccess || "",
+        specialRequests: buildingInstructions.specialRequests || "",
+        buildingManagerName: buildingInstructions.buildingManagerName || "",
+        buildingManagerPhone: buildingInstructions.buildingManagerPhone || "",
+        conciergeNames: buildingInstructions.conciergeNames || "",
+        conciergePhone: buildingInstructions.conciergePhone || "",
+        maintenanceName: buildingInstructions.maintenanceName || "",
+        maintenancePhone: buildingInstructions.maintenancePhone || "",
+      });
+    }
+  }, [buildingInstructions]);
+
+  const saveInstructionsMutation = useMutation({
+    mutationFn: async (data: typeof instructionsForm) => {
+      const response = await apiRequest("POST", `/api/buildings/${buildingId}/instructions`, data);
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Instructions Saved",
+        description: "Building instructions have been updated successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/buildings", buildingId, "instructions"] });
+      setShowInstructionsDialog(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Save Failed",
+        description: error.message || "Failed to save building instructions.",
+        variant: "destructive",
+      });
+    },
   });
 
   const loginMutation = useMutation({
@@ -352,6 +421,155 @@ export default function BuildingPortal() {
           </Card>
         </div>
 
+        {/* Building Instructions Section */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                <CardTitle>Building Instructions</CardTitle>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowInstructionsDialog(true)}
+                data-testid="button-edit-instructions"
+              >
+                <Pencil className="h-4 w-4 mr-2" />
+                Edit
+              </Button>
+            </div>
+            <CardDescription>
+              Access information, contacts, and special instructions for contractors
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isLoadingInstructions ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              </div>
+            ) : buildingInstructions && (
+              buildingInstructions.buildingAccess || 
+              buildingInstructions.keysAndFob || 
+              buildingInstructions.roofAccess ||
+              buildingInstructions.buildingManagerName ||
+              buildingInstructions.conciergeNames ||
+              buildingInstructions.maintenanceName ||
+              buildingInstructions.specialRequests
+            ) ? (
+              <div className="grid gap-4">
+                {/* Contact Information */}
+                {(buildingInstructions?.buildingManagerName || buildingInstructions?.conciergeNames || buildingInstructions?.maintenanceName) && (
+                  <div className="space-y-3">
+                    <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">Contacts</h4>
+                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                      {buildingInstructions?.buildingManagerName && (
+                        <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                          <User className="h-5 w-5 text-primary mt-0.5" />
+                          <div>
+                            <p className="font-medium text-sm">Building Manager</p>
+                            <p className="text-sm">{buildingInstructions.buildingManagerName}</p>
+                            {buildingInstructions.buildingManagerPhone && (
+                              <a href={`tel:${buildingInstructions.buildingManagerPhone}`} className="text-sm text-primary hover:underline">
+                                {buildingInstructions.buildingManagerPhone}
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                      {buildingInstructions?.conciergeNames && (
+                        <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                          <Phone className="h-5 w-5 text-primary mt-0.5" />
+                          <div>
+                            <p className="font-medium text-sm">Concierge</p>
+                            <p className="text-sm">{buildingInstructions.conciergeNames}</p>
+                            {buildingInstructions.conciergePhone && (
+                              <a href={`tel:${buildingInstructions.conciergePhone}`} className="text-sm text-primary hover:underline">
+                                {buildingInstructions.conciergePhone}
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                      {buildingInstructions?.maintenanceName && (
+                        <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                          <Wrench className="h-5 w-5 text-primary mt-0.5" />
+                          <div>
+                            <p className="font-medium text-sm">Maintenance</p>
+                            <p className="text-sm">{buildingInstructions.maintenanceName}</p>
+                            {buildingInstructions.maintenancePhone && (
+                              <a href={`tel:${buildingInstructions.maintenancePhone}`} className="text-sm text-primary hover:underline">
+                                {buildingInstructions.maintenancePhone}
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Access Information */}
+                {(buildingInstructions?.buildingAccess || buildingInstructions?.keysAndFob || buildingInstructions?.roofAccess) && (
+                  <div className="space-y-3">
+                    <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">Access Information</h4>
+                    <div className="grid gap-3">
+                      {buildingInstructions?.buildingAccess && (
+                        <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                          <DoorOpen className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                          <div>
+                            <p className="font-medium text-sm">Building Access</p>
+                            <p className="text-sm whitespace-pre-wrap">{buildingInstructions.buildingAccess}</p>
+                          </div>
+                        </div>
+                      )}
+                      {buildingInstructions?.keysAndFob && (
+                        <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                          <KeyRound className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                          <div>
+                            <p className="font-medium text-sm">Keys / Fob</p>
+                            <p className="text-sm whitespace-pre-wrap">{buildingInstructions.keysAndFob}</p>
+                          </div>
+                        </div>
+                      )}
+                      {buildingInstructions?.roofAccess && (
+                        <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                          <Building2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                          <div>
+                            <p className="font-medium text-sm">Roof Access</p>
+                            <p className="text-sm whitespace-pre-wrap">{buildingInstructions.roofAccess}</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Special Requests */}
+                {buildingInstructions?.specialRequests && (
+                  <div className="space-y-3">
+                    <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">Special Requests</h4>
+                    <div className="p-3 rounded-lg bg-muted/50">
+                      <p className="text-sm whitespace-pre-wrap">{buildingInstructions.specialRequests}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <div className="mx-auto h-12 w-12 rounded-full bg-muted flex items-center justify-center mb-3">
+                  <FileText className="h-6 w-6 text-muted-foreground" />
+                </div>
+                <p className="text-muted-foreground mb-3">No building instructions added yet.</p>
+                <Button variant="outline" onClick={() => setShowInstructionsDialog(true)} data-testid="button-add-instructions">
+                  <Pencil className="h-4 w-4 mr-2" />
+                  Add Instructions
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -412,6 +630,189 @@ export default function BuildingPortal() {
           <p>Building Portal - Viewing maintenance history for {building?.strataPlanNumber}</p>
         </div>
       </div>
+
+      {/* Edit Instructions Dialog */}
+      <Dialog open={showInstructionsDialog} onOpenChange={setShowInstructionsDialog}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Building Instructions</DialogTitle>
+            <DialogDescription>
+              Add access information and contact details for contractors working at this building.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6 py-4">
+            {/* Contact Information Section */}
+            <div className="space-y-4">
+              <h4 className="font-medium flex items-center gap-2">
+                <Phone className="h-4 w-4" />
+                Contact Information
+              </h4>
+              
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="buildingManagerName">Building Manager Name</Label>
+                  <Input
+                    id="buildingManagerName"
+                    placeholder="e.g., John Smith"
+                    value={instructionsForm.buildingManagerName}
+                    onChange={(e) => setInstructionsForm(prev => ({ ...prev, buildingManagerName: e.target.value }))}
+                    data-testid="input-manager-name"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="buildingManagerPhone">Building Manager Phone</Label>
+                  <Input
+                    id="buildingManagerPhone"
+                    placeholder="e.g., (604) 555-1234"
+                    value={instructionsForm.buildingManagerPhone}
+                    onChange={(e) => setInstructionsForm(prev => ({ ...prev, buildingManagerPhone: e.target.value }))}
+                    data-testid="input-manager-phone"
+                  />
+                </div>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="conciergeNames">Concierge Name(s)</Label>
+                  <Input
+                    id="conciergeNames"
+                    placeholder="e.g., Jane Doe, Mike Wilson"
+                    value={instructionsForm.conciergeNames}
+                    onChange={(e) => setInstructionsForm(prev => ({ ...prev, conciergeNames: e.target.value }))}
+                    data-testid="input-concierge-names"
+                  />
+                  <p className="text-xs text-muted-foreground">Separate multiple names with commas</p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="conciergePhone">Concierge Phone</Label>
+                  <Input
+                    id="conciergePhone"
+                    placeholder="e.g., (604) 555-5678"
+                    value={instructionsForm.conciergePhone}
+                    onChange={(e) => setInstructionsForm(prev => ({ ...prev, conciergePhone: e.target.value }))}
+                    data-testid="input-concierge-phone"
+                  />
+                </div>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="maintenanceName">Maintenance Contact Name</Label>
+                  <Input
+                    id="maintenanceName"
+                    placeholder="e.g., Building Maintenance"
+                    value={instructionsForm.maintenanceName}
+                    onChange={(e) => setInstructionsForm(prev => ({ ...prev, maintenanceName: e.target.value }))}
+                    data-testid="input-maintenance-name"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="maintenancePhone">Maintenance Phone</Label>
+                  <Input
+                    id="maintenancePhone"
+                    placeholder="e.g., (604) 555-9012"
+                    value={instructionsForm.maintenancePhone}
+                    onChange={(e) => setInstructionsForm(prev => ({ ...prev, maintenancePhone: e.target.value }))}
+                    data-testid="input-maintenance-phone"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Access Information Section */}
+            <div className="space-y-4">
+              <h4 className="font-medium flex items-center gap-2">
+                <DoorOpen className="h-4 w-4" />
+                Access Information
+              </h4>
+              
+              <div className="space-y-2">
+                <Label htmlFor="buildingAccess">Building Access Instructions</Label>
+                <Textarea
+                  id="buildingAccess"
+                  placeholder="e.g., Enter through main lobby, check in with concierge..."
+                  value={instructionsForm.buildingAccess}
+                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, buildingAccess: e.target.value }))}
+                  rows={3}
+                  data-testid="textarea-building-access"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="keysAndFob">Keys / Fob Pickup</Label>
+                <Textarea
+                  id="keysAndFob"
+                  placeholder="e.g., Pick up keys from concierge desk, return by 5pm..."
+                  value={instructionsForm.keysAndFob}
+                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, keysAndFob: e.target.value }))}
+                  rows={3}
+                  data-testid="textarea-keys-fob"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="roofAccess">Roof Access Instructions</Label>
+                <Textarea
+                  id="roofAccess"
+                  placeholder="e.g., Roof access via penthouse level, key required..."
+                  value={instructionsForm.roofAccess}
+                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, roofAccess: e.target.value }))}
+                  rows={3}
+                  data-testid="textarea-roof-access"
+                />
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Special Requests Section */}
+            <div className="space-y-4">
+              <h4 className="font-medium flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                Special Requests
+              </h4>
+              
+              <div className="space-y-2">
+                <Label htmlFor="specialRequests">Additional Instructions or Requests</Label>
+                <Textarea
+                  id="specialRequests"
+                  placeholder="e.g., Quiet hours before 8am, no work on weekends, parking instructions..."
+                  value={instructionsForm.specialRequests}
+                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, specialRequests: e.target.value }))}
+                  rows={4}
+                  data-testid="textarea-special-requests"
+                />
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowInstructionsDialog(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={() => saveInstructionsMutation.mutate(instructionsForm)}
+              disabled={saveInstructionsMutation.isPending}
+              data-testid="button-save-instructions"
+            >
+              {saveInstructionsMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4 mr-2" />
+                  Save Instructions
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
