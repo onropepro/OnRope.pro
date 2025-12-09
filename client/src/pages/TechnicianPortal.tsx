@@ -51,6 +51,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -102,7 +103,9 @@ import {
   ChevronDown,
   ChevronUp,
   FileCheck,
-  Plus
+  Plus,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
@@ -426,8 +429,21 @@ const translations = {
     myFeedbackTitle: "My Feedback",
     tabHome: "Home",
     tabProfile: "Profile",
+    tabEmployer: "Employer View",
     tabWork: "Work",
     tabMore: "More",
+    employerProfileTitle: "What Employers See",
+    employerProfileDesc: "This is how your profile appears to potential employers browsing the talent pool.",
+    editEmployerProfile: "Edit",
+    saveEmployerProfile: "Save",
+    cancelEdit: "Cancel",
+    visibilityStatus: "Visibility Status",
+    visibleToEmployers: "Visible to Employers",
+    hiddenFromEmployers: "Hidden from Employers",
+    makeVisible: "Make Visible",
+    makeHidden: "Hide Profile",
+    yourSpecialties: "Your Specialties",
+    addYourFirstSpecialty: "Add your first specialty to appear in employer searches",
     backToHome: "Back to Home",
     quickActions: "Quick Actions",
     myFeedbackDesc: "View your submitted feedback and responses from OnRopePro",
@@ -758,8 +774,21 @@ const translations = {
     myFeedbackTitle: "Mes commentaires",
     tabHome: "Accueil",
     tabProfile: "Profil",
+    tabEmployer: "Vue Employeur",
     tabWork: "Travail",
     tabMore: "Plus",
+    employerProfileTitle: "Ce que voient les employeurs",
+    employerProfileDesc: "Voici comment votre profil apparaît aux employeurs potentiels.",
+    editEmployerProfile: "Modifier",
+    saveEmployerProfile: "Sauvegarder",
+    cancelEdit: "Annuler",
+    visibilityStatus: "Statut de visibilité",
+    visibleToEmployers: "Visible aux employeurs",
+    hiddenFromEmployers: "Caché des employeurs",
+    makeVisible: "Rendre visible",
+    makeHidden: "Cacher le profil",
+    yourSpecialties: "Vos spécialités",
+    addYourFirstSpecialty: "Ajoutez votre première spécialité pour apparaître dans les recherches",
     backToHome: "Retour à l'accueil",
     quickActions: "Actions rapides",
     myFeedbackDesc: "Consultez vos commentaires soumis et les réponses de OnRopePro",
@@ -1048,8 +1077,11 @@ export default function TechnicianPortal() {
   const [showPlusBenefits, setShowPlusBenefits] = useState(false);
   
   // Mobile-friendly tab navigation
-  type TabType = 'home' | 'profile' | 'work' | 'more';
+  type TabType = 'home' | 'profile' | 'employer' | 'work' | 'more';
   const [activeTab, setActiveTab] = useState<TabType>('home');
+  
+  // State for editing employer profile specialties
+  const [isEditingEmployerProfile, setIsEditingEmployerProfile] = useState(false);
   
   // Feedback state
   const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
@@ -1188,6 +1220,8 @@ export default function TechnicianPortal() {
       { label: language === 'en' ? 'First Aid' : 'Premiers soins', complete: !!user.hasFirstAid },
       { label: language === 'en' ? 'Driver\'s License' : 'Permis de conduire', complete: !!user.driversLicenseNumber },
       { label: language === 'en' ? 'Address' : 'Adresse', complete: !!user.streetAddress },
+      // Employer-visible profile fields
+      { label: language === 'en' ? 'Specialties' : 'Spécialités', complete: !!(user.ropeAccessSpecialties && user.ropeAccessSpecialties.length > 0) },
     ];
     
     const completedCount = profileFields.filter(f => f.complete).length;
@@ -1978,6 +2012,362 @@ export default function TechnicianPortal() {
                 <p className="text-xs text-muted-foreground mt-1">{t.shareReferralCode.split(' ').slice(0, 3).join(' ')}...</p>
               </div>
             </div>
+          </>
+        )}
+
+        {/* EMPLOYER VIEW TAB - What employers see */}
+        {activeTab === 'employer' && user && user.role === 'rope_access_tech' && (
+          <>
+            {/* Back to Home button */}
+            <Button
+              variant="ghost"
+              onClick={() => setActiveTab('home')}
+              className="gap-2 -mt-2 mb-2"
+              data-testid="button-back-to-home-employer"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              {t.backToHome}
+            </Button>
+
+            {/* Header with edit button */}
+            <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-full bg-primary/20">
+                      <Eye className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">{t.employerProfileTitle}</CardTitle>
+                      <p className="text-sm text-muted-foreground">{t.employerProfileDesc}</p>
+                    </div>
+                  </div>
+                  {!isEditingEmployerProfile ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsEditingEmployerProfile(true)}
+                      data-testid="button-edit-employer-profile"
+                    >
+                      <Pencil className="w-4 h-4 mr-1" />
+                      {t.editEmployerProfile}
+                    </Button>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsEditingEmployerProfile(false)}
+                        data-testid="button-cancel-employer-edit"
+                      >
+                        {t.cancelEdit}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </CardHeader>
+            </Card>
+
+            {/* Visibility Status Card */}
+            <Card className={user.isVisibleToEmployers ? "border-green-500/50 bg-green-500/5" : "border-amber-500/50 bg-amber-500/5"}>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-full ${user.isVisibleToEmployers ? "bg-green-500/20" : "bg-amber-500/20"}`}>
+                      {user.isVisibleToEmployers ? (
+                        <Eye className="w-5 h-5 text-green-500" />
+                      ) : (
+                        <EyeOff className="w-5 h-5 text-amber-500" />
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-medium">{t.visibilityStatus}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {user.isVisibleToEmployers ? t.visibleToEmployers : t.hiddenFromEmployers}
+                      </p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={user.isVisibleToEmployers || false}
+                    onCheckedChange={async (checked) => {
+                      try {
+                        const response = await fetch("/api/technician/visibility", {
+                          method: "PATCH",
+                          headers: { "Content-Type": "application/json" },
+                          credentials: "include",
+                          body: JSON.stringify({ isVisible: checked }),
+                        });
+                        if (!response.ok) throw new Error("Failed to update visibility");
+                        queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+                        toast({
+                          title: checked ? t.visibleToEmployers : t.hiddenFromEmployers,
+                          description: checked 
+                            ? (language === 'en' ? "Employers can now find you in the talent pool" : "Les employeurs peuvent maintenant vous trouver")
+                            : (language === 'en' ? "Your profile is now hidden from employers" : "Votre profil est maintenant caché"),
+                        });
+                      } catch (error) {
+                        toast({ title: "Error", description: "Failed to update visibility", variant: "destructive" });
+                      }
+                    }}
+                    data-testid="switch-employer-visibility"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Profile Preview Card */}
+            <Card>
+              <CardContent className="pt-6 space-y-6">
+                {/* Basic Info */}
+                <div className="flex items-start gap-4">
+                  <Avatar className="w-20 h-20 border-2 border-primary/20">
+                    {user.profilePhotoUrl ? (
+                      <AvatarImage src={user.profilePhotoUrl} alt={user.name || ""} />
+                    ) : (
+                      <AvatarFallback className="text-2xl bg-primary/10 text-primary">
+                        {user.name?.split(" ").map(n => n[0]).join("").toUpperCase() || "?"}
+                      </AvatarFallback>
+                    )}
+                  </Avatar>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="text-xl font-semibold">{user.name}</h3>
+                      {user.hasPlusAccess && (
+                        <Badge className="bg-gradient-to-r from-amber-500 to-yellow-400 text-black font-bold text-xs">
+                          PRO
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-muted-foreground">{user.city}{user.province ? `, ${user.province}` : ""}</p>
+                    
+                    {/* Experience */}
+                    {user.ropeAccessStartDate && (
+                      <div className="flex items-center gap-2 mt-2 text-sm">
+                        <Clock className="w-4 h-4 text-muted-foreground" />
+                        <span>
+                          {(() => {
+                            const start = new Date(user.ropeAccessStartDate);
+                            const now = new Date();
+                            const months = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
+                            const years = Math.floor(months / 12);
+                            const remainingMonths = months % 12;
+                            if (years > 0) {
+                              return `${years} ${language === 'en' ? 'year(s)' : 'an(s)'}, ${remainingMonths} ${language === 'en' ? 'month(s)' : 'mois'}`;
+                            }
+                            return `${months} ${language === 'en' ? 'month(s)' : 'mois'}`;
+                          })()}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Certifications */}
+                <div>
+                  <h4 className="font-medium mb-3 flex items-center gap-2">
+                    <Award className="w-4 h-4 text-primary" />
+                    {t.certifications}
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {user.irataLicenseNumber && (
+                      <Badge variant="secondary" className="gap-1">
+                        IRATA Level {user.irataLevel || "?"} - {user.irataLicenseNumber}
+                      </Badge>
+                    )}
+                    {user.spratLicenseNumber && (
+                      <Badge variant="secondary" className="gap-1">
+                        SPRAT Level {user.spratLevel || "?"} - {user.spratLicenseNumber}
+                      </Badge>
+                    )}
+                    {user.hasFirstAid && (
+                      <Badge variant="outline" className="gap-1">
+                        <Heart className="w-3 h-3" /> {t.firstAid}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Specialties Section - Editable */}
+                <div>
+                  <h4 className="font-medium mb-3 flex items-center gap-2">
+                    <HardHat className="w-4 h-4 text-primary" />
+                    {t.yourSpecialties}
+                  </h4>
+                  
+                  {isEditingEmployerProfile ? (
+                    <div className="space-y-4">
+                      {/* Current specialties with remove button */}
+                      <div className="flex flex-wrap gap-2">
+                        {(user.ropeAccessSpecialties || []).map((specialty: string, index: number) => {
+                          const jobType = JOB_TYPES.find(jt => jt.value === specialty);
+                          return (
+                            <Badge 
+                              key={specialty} 
+                              variant="secondary"
+                              className="gap-1 pr-1"
+                              data-testid={`badge-specialty-${index}`}
+                            >
+                              <HardHat className="w-3 h-3" />
+                              {jobType?.label || specialty}
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-5 w-5 ml-1 no-default-hover-elevate no-default-active-elevate"
+                                onClick={async () => {
+                                  const updated = (user.ropeAccessSpecialties || []).filter((s: string) => s !== specialty);
+                                  try {
+                                    const response = await fetch("/api/technician/specialties", {
+                                      method: "POST",
+                                      headers: { "Content-Type": "application/json" },
+                                      credentials: "include",
+                                      body: JSON.stringify({ specialties: updated }),
+                                    });
+                                    if (!response.ok) throw new Error("Failed to update");
+                                    queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+                                  } catch (error) {
+                                    toast({ title: "Error", description: "Failed to remove specialty", variant: "destructive" });
+                                  }
+                                }}
+                                data-testid={`button-remove-specialty-${index}`}
+                              >
+                                <X className="w-3 h-3" />
+                              </Button>
+                            </Badge>
+                          );
+                        })}
+                        {(user.ropeAccessSpecialties || []).length === 0 && (
+                          <p className="text-sm text-muted-foreground italic">{t.addYourFirstSpecialty}</p>
+                        )}
+                      </div>
+
+                      {/* Add new specialty */}
+                      <div className="flex flex-wrap gap-2 items-end">
+                        <div className="flex-1 min-w-[120px]">
+                          <Label className="text-xs">{t.selectCategory}</Label>
+                          <select
+                            className="w-full mt-1 px-3 py-2 border rounded-md bg-background text-sm"
+                            value={specialtyCategory}
+                            onChange={(e) => {
+                              setSpecialtyCategory(e.target.value);
+                              setSelectedSpecialtyJobType("");
+                            }}
+                            data-testid="select-specialty-category"
+                          >
+                            <option value="">{t.selectCategory}</option>
+                            {JOB_CATEGORIES.map(cat => (
+                              <option key={cat.value} value={cat.value}>{cat.label}</option>
+                            ))}
+                          </select>
+                        </div>
+                        {specialtyCategory && (
+                          <div className="flex-1 min-w-[150px]">
+                            <Label className="text-xs">{t.selectJobType}</Label>
+                            <select
+                              className="w-full mt-1 px-3 py-2 border rounded-md bg-background text-sm"
+                              value={selectedSpecialtyJobType}
+                              onChange={(e) => setSelectedSpecialtyJobType(e.target.value)}
+                              data-testid="select-specialty-job-type"
+                            >
+                              <option value="">{t.selectJobType}</option>
+                              {getJobTypesByCategory(specialtyCategory)
+                                .filter(jt => !jt.value.endsWith('_other') && !(user.ropeAccessSpecialties || []).includes(jt.value))
+                                .map(jt => (
+                                  <option key={jt.value} value={jt.value}>{jt.label}</option>
+                                ))}
+                            </select>
+                          </div>
+                        )}
+                        <Button
+                          size="sm"
+                          disabled={!selectedSpecialtyJobType}
+                          onClick={async () => {
+                            if (selectedSpecialtyJobType) {
+                              const current = user.ropeAccessSpecialties || [];
+                              if (!current.includes(selectedSpecialtyJobType)) {
+                                try {
+                                  const response = await fetch("/api/technician/specialties", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    credentials: "include",
+                                    body: JSON.stringify({ specialties: [...current, selectedSpecialtyJobType] }),
+                                  });
+                                  if (!response.ok) throw new Error("Failed to update");
+                                  queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+                                } catch (error) {
+                                  toast({ title: "Error", description: "Failed to add specialty", variant: "destructive" });
+                                }
+                              }
+                              setSelectedSpecialtyJobType("");
+                            }
+                          }}
+                          data-testid="button-add-specialty"
+                        >
+                          <Plus className="w-4 h-4 mr-1" />
+                          {t.addSpecialty}
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {(user.ropeAccessSpecialties || []).length > 0 ? (
+                        (user.ropeAccessSpecialties || []).map((specialty: string, index: number) => {
+                          const jobType = JOB_TYPES.find(jt => jt.value === specialty);
+                          return (
+                            <Badge 
+                              key={specialty} 
+                              variant="secondary"
+                              className="gap-1"
+                              data-testid={`badge-specialty-view-${index}`}
+                            >
+                              <HardHat className="w-3 h-3" />
+                              {jobType?.label || specialty}
+                            </Badge>
+                          );
+                        })
+                      ) : (
+                        <div className="text-center w-full py-4">
+                          <p className="text-sm text-muted-foreground italic mb-2">{t.addYourFirstSpecialty}</p>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setIsEditingEmployerProfile(true)}
+                            data-testid="button-add-first-specialty"
+                          >
+                            <Plus className="w-4 h-4 mr-1" />
+                            {t.addSpecialty}
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Resumes */}
+                {user.resumeDocuments && user.resumeDocuments.filter((u: string) => u && u.trim()).length > 0 && (
+                  <>
+                    <Separator />
+                    <div>
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-primary" />
+                        {t.resume}
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {user.resumeDocuments.filter((u: string) => u && u.trim()).map((doc: string, index: number) => (
+                          <Badge key={index} variant="outline" className="gap-1">
+                            <FileText className="w-3 h-3" />
+                            Resume {index + 1}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
           </>
         )}
         
@@ -4252,7 +4642,7 @@ export default function TechnicianPortal() {
         <div className="max-w-4xl mx-auto flex items-center justify-around py-2">
           <button
             onClick={() => setActiveTab('home')}
-            className={`flex flex-col items-center gap-1 px-4 py-2 min-w-[64px] rounded-lg transition-colors ${
+            className={`flex flex-col items-center gap-1 px-3 py-2 min-w-[56px] rounded-lg transition-colors ${
               activeTab === 'home' 
                 ? 'text-primary bg-primary/10' 
                 : 'text-muted-foreground'
@@ -4260,11 +4650,11 @@ export default function TechnicianPortal() {
             data-testid="tab-home"
           >
             <Home className="w-5 h-5" />
-            <span className="text-xs font-medium">{t.tabHome}</span>
+            <span className="text-[10px] font-medium">{t.tabHome}</span>
           </button>
           <button
             onClick={() => setActiveTab('profile')}
-            className={`flex flex-col items-center gap-1 px-4 py-2 min-w-[64px] rounded-lg transition-colors ${
+            className={`flex flex-col items-center gap-1 px-3 py-2 min-w-[56px] rounded-lg transition-colors ${
               activeTab === 'profile' 
                 ? 'text-primary bg-primary/10' 
                 : 'text-muted-foreground'
@@ -4272,11 +4662,28 @@ export default function TechnicianPortal() {
             data-testid="tab-profile"
           >
             <User className="w-5 h-5" />
-            <span className="text-xs font-medium">{t.tabProfile}</span>
+            <span className="text-[10px] font-medium">{t.tabProfile}</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('employer')}
+            className={`flex flex-col items-center gap-1 px-3 py-2 min-w-[56px] rounded-lg transition-colors relative ${
+              activeTab === 'employer' 
+                ? 'text-primary bg-primary/10' 
+                : 'text-muted-foreground'
+            }`}
+            data-testid="tab-employer"
+          >
+            <Eye className="w-5 h-5" />
+            <span className="text-[10px] font-medium leading-tight text-center">{language === 'en' ? 'Employer' : 'Employeur'}</span>
+            {!(user?.ropeAccessSpecialties && user.ropeAccessSpecialties.length > 0) && (
+              <span className="absolute -top-1 -right-1 bg-amber-500 text-white text-[8px] rounded-full w-3 h-3 flex items-center justify-center">
+                !
+              </span>
+            )}
           </button>
           <button
             onClick={() => setActiveTab('work')}
-            className={`flex flex-col items-center gap-1 px-4 py-2 min-w-[64px] rounded-lg transition-colors relative ${
+            className={`flex flex-col items-center gap-1 px-3 py-2 min-w-[56px] rounded-lg transition-colors relative ${
               activeTab === 'work' 
                 ? 'text-primary bg-primary/10' 
                 : 'text-muted-foreground'
@@ -4284,7 +4691,7 @@ export default function TechnicianPortal() {
             data-testid="tab-work"
           >
             <Briefcase className="w-5 h-5" />
-            <span className="text-xs font-medium">{t.tabWork}</span>
+            <span className="text-[10px] font-medium">{t.tabWork}</span>
             {pendingInvitations.length > 0 && (
               <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
                 {pendingInvitations.length}
@@ -4293,7 +4700,7 @@ export default function TechnicianPortal() {
           </button>
           <button
             onClick={() => setActiveTab('more')}
-            className={`flex flex-col items-center gap-1 px-4 py-2 min-w-[64px] rounded-lg transition-colors relative ${
+            className={`flex flex-col items-center gap-1 px-3 py-2 min-w-[56px] rounded-lg transition-colors relative ${
               activeTab === 'more' 
                 ? 'text-primary bg-primary/10' 
                 : 'text-muted-foreground'
@@ -4301,7 +4708,7 @@ export default function TechnicianPortal() {
             data-testid="tab-more"
           >
             <MoreHorizontal className="w-5 h-5" />
-            <span className="text-xs font-medium">{t.tabMore}</span>
+            <span className="text-[10px] font-medium">{t.tabMore}</span>
             {totalUnreadFeedback > 0 && (
               <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
                 {totalUnreadFeedback}
