@@ -46,7 +46,8 @@ import {
   Mail, 
   Award, 
   Heart, 
-  Building, 
+  Building,
+  Building2,
   CreditCard,
   Calendar,
   AlertCircle,
@@ -252,6 +253,13 @@ const translations = {
     accessProjects: "Access projects, clock in/out, and safety forms",
     dashboardDisabledNoCompany: "You need to be linked with a company to access the Work Dashboard. Accept an invitation below to get started.",
     dashboardDisabledTerminated: "Your employment has been terminated. Accept a new invitation to access the Work Dashboard.",
+    selectEmployer: "Select Employer",
+    selectEmployerDesc: "Choose which employer's dashboard to access",
+    connectedEmployers: "Connected Employers",
+    primaryEmployer: "Primary",
+    setPrimary: "Set as Primary",
+    continueToEmployer: "Continue",
+    noEmployersConnected: "No employers connected",
     myLoggedHours: "My Logged Hours",
     viewLoggedHoursDesc: "Track your rope access career progress",
     viewLoggedHours: "View Logged Hours",
@@ -549,6 +557,13 @@ const translations = {
     accessProjects: "Accéder aux projets, pointage et formulaires de sécurité",
     dashboardDisabledNoCompany: "Vous devez être lié à une entreprise pour accéder au tableau de bord. Acceptez une invitation ci-dessous pour commencer.",
     dashboardDisabledTerminated: "Votre emploi a été résilié. Acceptez une nouvelle invitation pour accéder au tableau de bord.",
+    selectEmployer: "Sélectionner l'employeur",
+    selectEmployerDesc: "Choisissez le tableau de bord de l'employeur à accéder",
+    connectedEmployers: "Employeurs connectés",
+    primaryEmployer: "Principal",
+    setPrimary: "Définir comme principal",
+    continueToEmployer: "Continuer",
+    noEmployersConnected: "Aucun employeur connecté",
     myLoggedHours: "Mes heures enregistrées",
     viewLoggedHoursDesc: "Suivez votre progression de carrière en accès sur corde",
     viewLoggedHours: "Voir les heures enregistrées",
@@ -938,6 +953,36 @@ export default function TechnicianPortal() {
   const [feedbackPriority, setFeedbackPriority] = useState("normal");
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
   const [showFeedbackSuccess, setShowFeedbackSuccess] = useState(false);
+  
+  // Employer selection state (for PLUS members with multiple employers)
+  const [showEmployerSelectDialog, setShowEmployerSelectDialog] = useState(false);
+  const [selectedEmployerId, setSelectedEmployerId] = useState<string | null>(null);
+  
+  // Query for employer connections (for PLUS members)
+  type EmployerConnection = {
+    id: string;
+    companyId: string;
+    isPrimary: boolean;
+    status: string;
+    connectedAt: Date | string;
+    company: {
+      id: string;
+      name: string;
+      companyName: string | null;
+      photoUrl: string | null;
+    } | null;
+  };
+  
+  const { data: employerConnectionsData } = useQuery<{
+    connections: EmployerConnection[];
+    hasPlusAccess: boolean;
+    canAddMore: boolean;
+  }>({
+    queryKey: ["/api/my-employer-connections"],
+    enabled: !!user && user.role === 'rope_access_tech',
+  });
+  
+  const hasMultipleEmployers = (employerConnectionsData?.connections?.length ?? 0) > 1;
   
   // Handle copy referral code
   const handleCopyReferralCode = () => {
@@ -1587,7 +1632,13 @@ export default function TechnicianPortal() {
                   </div>
                 </div>
                 <Button
-                  onClick={() => setLocation("/dashboard")}
+                  onClick={() => {
+                    if (hasMultipleEmployers) {
+                      setShowEmployerSelectDialog(true);
+                    } else {
+                      setLocation("/dashboard");
+                    }
+                  }}
                   className="gap-2"
                   disabled={!user.companyId || !!user.terminatedDate}
                   data-testid="button-go-to-dashboard"
@@ -3774,6 +3825,86 @@ export default function TechnicianPortal() {
           <DialogFooter>
             <Button onClick={() => setShowPlusBenefits(false)} data-testid="button-close-plus-benefits">
               {t.cancel}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Employer Selection Dialog (for PLUS members with multiple employers) */}
+      <Dialog open={showEmployerSelectDialog} onOpenChange={setShowEmployerSelectDialog}>
+        <DialogContent className="sm:max-w-md" data-testid="dialog-select-employer">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Building2 className="w-5 h-5 text-primary" />
+              {t.selectEmployer}
+            </DialogTitle>
+            <DialogDescription>{t.selectEmployerDesc}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-4">
+            {employerConnectionsData?.connections && employerConnectionsData.connections.length > 0 ? (
+              employerConnectionsData.connections.map((conn) => (
+                <div
+                  key={conn.id}
+                  className={`p-3 rounded-md border cursor-pointer hover-elevate ${
+                    selectedEmployerId === conn.companyId 
+                      ? "border-primary bg-primary/10" 
+                      : "border-muted"
+                  }`}
+                  onClick={() => setSelectedEmployerId(conn.companyId)}
+                  data-testid={`employer-option-${conn.companyId}`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      {conn.company?.photoUrl ? (
+                        <img 
+                          src={conn.company.photoUrl} 
+                          alt={conn.company.companyName || conn.company.name} 
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                      ) : (
+                        <Building2 className="w-5 h-5 text-primary" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium">
+                        {conn.company?.companyName || conn.company?.name || "Unknown Company"}
+                      </p>
+                      {conn.isPrimary && (
+                        <Badge variant="secondary" className="text-xs">
+                          {t.primaryEmployer}
+                        </Badge>
+                      )}
+                    </div>
+                    {selectedEmployerId === conn.companyId && (
+                      <CheckCircle2 className="w-5 h-5 text-primary" />
+                    )}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                {t.noEmployersConnected}
+              </p>
+            )}
+          </div>
+          <DialogFooter className="gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowEmployerSelectDialog(false)}
+              data-testid="button-cancel-employer-select"
+            >
+              {t.cancel}
+            </Button>
+            <Button 
+              onClick={() => {
+                setShowEmployerSelectDialog(false);
+                setLocation("/dashboard");
+              }}
+              disabled={!selectedEmployerId}
+              data-testid="button-continue-employer"
+            >
+              {t.continueToEmployer}
+              <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </DialogFooter>
         </DialogContent>
