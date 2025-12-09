@@ -62,11 +62,18 @@ export class Storage {
 
   async getUserByRopeAccessLicense(licenseNumber: string): Promise<User | undefined> {
     // Search for users by IRATA or SPRAT license number
-    // For IRATA, the stored format is "level/number" (e.g., "1/123456"), so we search with LIKE %/number
+    // For IRATA, the stored format is "level/number" (e.g., "3/123456")
+    // Accept: exact match "3/123456", just the number "123456", or partial match
     // For SPRAT, the stored format is just the number
     const result = await db.select().from(users).where(
       or(
+        // Exact match for full IRATA format (e.g., "3/123456")
+        eq(users.irataLicenseNumber, licenseNumber),
+        // Match just the number part after the slash (e.g., "123456" matches "3/123456")
         sql`${users.irataLicenseNumber} LIKE '%/' || ${licenseNumber}`,
+        // Extract number part and compare (handles "3/123456" stored, "123456" entered)
+        sql`split_part(${users.irataLicenseNumber}, '/', 2) = ${licenseNumber}`,
+        // SPRAT exact match
         eq(users.spratLicenseNumber, licenseNumber)
       )
     ).limit(1);
