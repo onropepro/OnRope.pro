@@ -43,7 +43,8 @@ import {
   Languages,
   TrendingUp,
   Activity,
-  Code
+  Code,
+  Briefcase
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -85,6 +86,12 @@ type RecentChange = {
 };
 
 const recentChangesData: RecentChange[] = [
+  {
+    date: "December 9, 2025",
+    title: "Job Board System",
+    description: "Complete job board ecosystem: Companies and SuperUsers can post employment opportunities with salary ranges, required certifications, and job types. Technicians can browse job listings, apply directly, and toggle profile visibility to employers. Visible profiles show resume, safety rating, name, experience, certification numbers, and photo. Includes application tracking and employer candidate browser",
+    type: "feature"
+  },
   {
     date: "December 9, 2025",
     title: "Design System Compliance",
@@ -473,6 +480,17 @@ const pagesData: PageCategory[] = [
     pages: [
       { name: "My Vendors", path: "/property-manager", description: "Vendor management dashboard", roles: ["Property Manager"] },
       { name: "PM Settings", path: "/property-manager/settings", description: "Property manager account settings", roles: ["Property Manager"] },
+    ]
+  },
+  {
+    category: "Job Board",
+    icon: Briefcase,
+    iconColor: "text-teal-600 dark:text-teal-400",
+    pages: [
+      { name: "Technician Job Board", path: "/technician-job-board", description: "Browse jobs and manage visibility", roles: ["Technician"] },
+      { name: "Company Job Board", path: "/company-job-board", description: "Post jobs and browse candidates", roles: ["Company", "Ops Manager"] },
+      { name: "Visible Technicians", path: "/visible-technicians", description: "Browse technicians visible to employers", roles: ["Company", "Ops Manager"] },
+      { name: "SuperUser Job Board", path: "/superuser/job-board", description: "Platform-wide job management", roles: ["SuperUser"] },
     ]
   },
   {
@@ -956,7 +974,7 @@ export default function Changelog() {
                     <Code className="h-5 w-5 text-pink-600 dark:text-pink-400" />
                   </div>
                   <div>
-                    <div className="text-2xl font-bold">78,450</div>
+                    <div className="text-2xl font-bold">136,800</div>
                     <div className="text-sm text-muted-foreground">Lines of Code</div>
                   </div>
                 </div>
@@ -974,7 +992,7 @@ export default function Changelog() {
               <div>
                 <CardTitle className="text-xl">Recent Changes</CardTitle>
                 <CardDescription>
-                  Latest platform updates and improvements (November 2025)
+                  Latest platform updates and improvements (December 2025)
                 </CardDescription>
               </div>
             </div>
