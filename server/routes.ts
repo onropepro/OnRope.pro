@@ -4473,15 +4473,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "hasPlusAccess must be a boolean" });
       }
 
-      // Find the technician
-      const technician = await storage.getUserById(technicianId);
-      if (!technician) {
-        return res.status(404).json({ message: "Technician not found" });
-      }
-
-      // Only allow for rope_access_tech role users (technicians)
-      if (technician.role !== 'rope_access_tech') {
-        return res.status(400).json({ message: "PLUS access can only be granted to technicians" });
+      // Find the user
+      const user = await storage.getUserById(technicianId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
       }
 
       // Update the hasPlusAccess field
