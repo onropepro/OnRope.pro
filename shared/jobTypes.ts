@@ -1,4 +1,4 @@
-export type JobCategory = 'building_maintenance' | 'ndt';
+export type JobCategory = 'building_maintenance' | 'ndt' | 'rock_scaling';
 
 export type ElevationRequirement = 'always' | 'never' | 'configurable';
 
@@ -15,6 +15,7 @@ export interface JobTypeConfig {
 export const JOB_CATEGORIES: { value: JobCategory; labelKey: string; label: string; icon: string }[] = [
   { value: 'building_maintenance', labelKey: 'dashboard.jobCategories.building_maintenance', label: 'Building Maintenance', icon: 'apartment' },
   { value: 'ndt', labelKey: 'dashboard.jobCategories.ndt', label: 'NDT - Non-Destructive Testing', icon: 'science' },
+  { value: 'rock_scaling', labelKey: 'dashboard.jobCategories.rock_scaling', label: 'Rock Scaling', icon: 'terrain' },
 ];
 
 export const JOB_TYPES: JobTypeConfig[] = [
@@ -52,6 +53,19 @@ export const JOB_TYPES: JobTypeConfig[] = [
   { value: 'ndt_phased_array', category: 'ndt', labelKey: 'dashboard.jobTypes.ndt_phased_array', label: 'Phased Array Ultrasonic (PAUT)', icon: 'waves', elevationRequirement: 'configurable', progressType: 'hours' },
   { value: 'ndt_time_of_flight', category: 'ndt', labelKey: 'dashboard.jobTypes.ndt_time_of_flight', label: 'Time of Flight Diffraction (TOFD)', icon: 'timeline', elevationRequirement: 'configurable', progressType: 'hours' },
   { value: 'ndt_other', category: 'ndt', labelKey: 'dashboard.jobTypes.ndt_other', label: 'Other NDT', icon: 'more_horiz', elevationRequirement: 'configurable', progressType: 'hours' },
+  
+  // Rock Scaling (all hours-based, elevation always required for rope access work)
+  { value: 'rock_loose_removal', category: 'rock_scaling', labelKey: 'dashboard.jobTypes.rock_loose_removal', label: 'Loose Rock Removal', icon: 'landslide', elevationRequirement: 'always', progressType: 'hours' },
+  { value: 'rock_bolting', category: 'rock_scaling', labelKey: 'dashboard.jobTypes.rock_bolting', label: 'Rock Bolting / Anchoring', icon: 'hardware', elevationRequirement: 'always', progressType: 'hours' },
+  { value: 'rock_mesh_installation', category: 'rock_scaling', labelKey: 'dashboard.jobTypes.rock_mesh_installation', label: 'Mesh / Net Installation', icon: 'grid_on', elevationRequirement: 'always', progressType: 'hours' },
+  { value: 'rock_shotcrete', category: 'rock_scaling', labelKey: 'dashboard.jobTypes.rock_shotcrete', label: 'Shotcrete Application', icon: 'format_paint', elevationRequirement: 'always', progressType: 'hours' },
+  { value: 'rock_face_inspection', category: 'rock_scaling', labelKey: 'dashboard.jobTypes.rock_face_inspection', label: 'Rock Face Inspection', icon: 'search', elevationRequirement: 'always', progressType: 'hours' },
+  { value: 'rock_crack_sealing', category: 'rock_scaling', labelKey: 'dashboard.jobTypes.rock_crack_sealing', label: 'Crack Sealing / Grouting', icon: 'plumbing', elevationRequirement: 'always', progressType: 'hours' },
+  { value: 'rock_slope_stabilization', category: 'rock_scaling', labelKey: 'dashboard.jobTypes.rock_slope_stabilization', label: 'Slope Stabilization', icon: 'landscape', elevationRequirement: 'always', progressType: 'hours' },
+  { value: 'rock_hazard_assessment', category: 'rock_scaling', labelKey: 'dashboard.jobTypes.rock_hazard_assessment', label: 'Rockfall Hazard Assessment', icon: 'warning', elevationRequirement: 'configurable', progressType: 'hours' },
+  { value: 'rock_catch_fence', category: 'rock_scaling', labelKey: 'dashboard.jobTypes.rock_catch_fence', label: 'Catch Fence Installation', icon: 'fence', elevationRequirement: 'always', progressType: 'hours' },
+  { value: 'rock_drilling', category: 'rock_scaling', labelKey: 'dashboard.jobTypes.rock_drilling', label: 'Rock Drilling', icon: 'precision_manufacturing', elevationRequirement: 'always', progressType: 'hours' },
+  { value: 'rock_other', category: 'rock_scaling', labelKey: 'dashboard.jobTypes.rock_other', label: 'Other Rock Scaling', icon: 'more_horiz', elevationRequirement: 'configurable', progressType: 'hours' },
 ];
 
 export function getJobTypesByCategory(category: JobCategory): JobTypeConfig[] {

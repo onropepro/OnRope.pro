@@ -663,7 +663,8 @@
     },
     "jobCategories": {
       "building_maintenance": "Building Maintenance",
-      "ndt": "NDT - Non-Destructive Testing"
+      "ndt": "NDT - Non-Destructive Testing",
+      "rock_scaling": "Rock Scaling"
     },
     "jobTypes": {
       "window_cleaning": "Window Cleaning",
@@ -690,7 +691,18 @@
       "ndt_acoustic_emission": "Acoustic Emission Testing (AE)",
       "ndt_phased_array": "Phased Array Ultrasonic (PAUT)",
       "ndt_time_of_flight": "Time of Flight Diffraction (TOFD)",
-      "ndt_other": "Other NDT"
+      "ndt_other": "Other NDT",
+      "rock_loose_removal": "Loose Rock Removal",
+      "rock_bolting": "Rock Bolting / Anchoring",
+      "rock_mesh_installation": "Mesh / Net Installation",
+      "rock_shotcrete": "Shotcrete Application",
+      "rock_face_inspection": "Rock Face Inspection",
+      "rock_crack_sealing": "Crack Sealing / Grouting",
+      "rock_slope_stabilization": "Slope Stabilization",
+      "rock_hazard_assessment": "Rockfall Hazard Assessment",
+      "rock_catch_fence": "Catch Fence Installation",
+      "rock_drilling": "Rock Drilling",
+      "rock_other": "Other Rock Scaling"
     },
     "toast": {
       "projectCreated": "Project created successfully",

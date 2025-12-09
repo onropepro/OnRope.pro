@@ -663,7 +663,8 @@
     },
     "jobCategories": {
       "building_maintenance": "Entretien de bâtiment",
-      "ndt": "CND - Contrôle Non Destructif"
+      "ndt": "CND - Contrôle Non Destructif",
+      "rock_scaling": "Purge de paroi rocheuse"
     },
     "jobTypes": {
       "window_cleaning": "Nettoyage de vitres",
@@ -690,7 +691,18 @@
       "ndt_acoustic_emission": "Émission acoustique (AE)",
       "ndt_phased_array": "Ultrasons multiéléments (PAUT)",
       "ndt_time_of_flight": "Diffraction en temps de vol (TOFD)",
-      "ndt_other": "Autre CND"
+      "ndt_other": "Autre CND",
+      "rock_loose_removal": "Purge de roches instables",
+      "rock_bolting": "Boulonnage / Ancrage",
+      "rock_mesh_installation": "Installation de filets / grillages",
+      "rock_shotcrete": "Application de béton projeté",
+      "rock_face_inspection": "Inspection de paroi rocheuse",
+      "rock_crack_sealing": "Colmatage de fissures / Injection",
+      "rock_slope_stabilization": "Stabilisation de talus",
+      "rock_hazard_assessment": "Évaluation des risques d'éboulement",
+      "rock_catch_fence": "Installation de clôtures pare-pierres",
+      "rock_drilling": "Forage de roche",
+      "rock_other": "Autre purge rocheuse"
     },
     "toast": {
       "projectCreated": "Projet créé avec succès",
