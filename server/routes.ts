@@ -1191,6 +1191,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Your employment has been terminated. Please contact your administrator for more information." });
       }
       
+      // Check if account has been disabled by SuperUser
+      if (user.isDisabled) {
+        return res.status(403).json({ message: "Your account has been suspended. Please contact support for more information." });
+      }
+      
       // GENERATE CODES ON FIRST LOGIN (company role only)
       if (user.role === 'company') {
         const updates: any = {};
@@ -4330,6 +4335,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         referralCode: tech.referralCode,
         referralCount: referralCounts.get(tech.id) || 0,
         hasPlusAccess: tech.hasPlusAccess || false,
+        isDisabled: tech.isDisabled || false,
       }));
 
       res.json({ 
@@ -4427,6 +4433,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // PLUS Access
         hasPlusAccess: technician.hasPlusAccess || false,
         referralCount: await storage.getReferralCount(technicianId),
+        
+        // Account Status
+        isDisabled: technician.isDisabled || false,
+        disabledAt: technician.disabledAt,
+        disabledReason: technician.disabledReason,
       };
 
       // Company info (if linked)
@@ -4487,6 +4498,111 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('[SuperUser] Toggle PLUS access error:', error);
       res.status(500).json({ message: "Failed to update PLUS access" });
+    }
+  });
+
+  // Disable/Enable account (SuperUser only) - for fraud or misuse
+  app.put("/api/superuser/accounts/:userId/status", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const { userId } = req.params;
+      const { isDisabled, reason, confirmationCode } = req.body;
+
+      // Validate confirmation code for double confirmation
+      if (confirmationCode !== 'CONFIRM-DISABLE' && confirmationCode !== 'CONFIRM-ENABLE') {
+        return res.status(400).json({ message: "Invalid confirmation code. Use 'CONFIRM-DISABLE' or 'CONFIRM-ENABLE'" });
+      }
+
+      // Validate the action matches the confirmation code
+      if (isDisabled && confirmationCode !== 'CONFIRM-DISABLE') {
+        return res.status(400).json({ message: "Confirmation code must be 'CONFIRM-DISABLE' to disable an account" });
+      }
+      if (!isDisabled && confirmationCode !== 'CONFIRM-ENABLE') {
+        return res.status(400).json({ message: "Confirmation code must be 'CONFIRM-ENABLE' to re-enable an account" });
+      }
+
+      if (typeof isDisabled !== 'boolean') {
+        return res.status(400).json({ message: "isDisabled must be a boolean" });
+      }
+
+      // Find the user
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Cannot disable superuser
+      if (user.role === 'superuser') {
+        return res.status(400).json({ message: "Cannot disable superuser account" });
+      }
+
+      // Only allow disabling company or rope_access_tech accounts
+      if (user.role !== 'company' && user.role !== 'rope_access_tech') {
+        return res.status(400).json({ message: "Can only disable company or technician accounts" });
+      }
+
+      // Require reason for disabling
+      if (isDisabled && (!reason || reason.trim().length < 10)) {
+        return res.status(400).json({ message: "A reason of at least 10 characters is required to disable an account" });
+      }
+
+      // Update the account status
+      await db.update(users).set({
+        isDisabled: isDisabled,
+        disabledAt: isDisabled ? new Date() : null,
+        disabledReason: isDisabled ? reason : null,
+        disabledBy: isDisabled ? 'superuser' : null,
+      }).where(eq(users.id, userId));
+
+      console.log(`[SuperUser] ${isDisabled ? 'Disabled' : 'Re-enabled'} account for user ${userId} (${user.email || user.companyName}). Reason: ${reason || 'N/A'}`);
+
+      res.json({ 
+        success: true, 
+        message: `Account ${isDisabled ? 'disabled' : 're-enabled'} successfully`,
+        user: {
+          id: user.id,
+          name: user.name || user.companyName,
+          email: user.email,
+          role: user.role,
+          isDisabled: isDisabled,
+        }
+      });
+    } catch (error) {
+      console.error('[SuperUser] Toggle account status error:', error);
+      res.status(500).json({ message: "Failed to update account status" });
+    }
+  });
+
+  // Get account suspension status (SuperUser only)
+  app.get("/api/superuser/accounts/:userId/status", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const { userId } = req.params;
+      const user = await storage.getUserById(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      res.json({
+        id: user.id,
+        name: user.name || user.companyName,
+        email: user.email,
+        role: user.role,
+        isDisabled: user.isDisabled || false,
+        disabledAt: user.disabledAt,
+        disabledReason: user.disabledReason,
+        disabledBy: user.disabledBy,
+      });
+    } catch (error) {
+      console.error('[SuperUser] Get account status error:', error);
+      res.status(500).json({ message: "Failed to get account status" });
     }
   });
 
