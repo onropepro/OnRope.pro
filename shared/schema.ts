@@ -400,6 +400,10 @@ export const workSessions = pgTable("work_sessions", {
   // Peace work payment - when project has peaceWork enabled, pay = drops × pricePerDrop
   peaceWorkPay: numeric("peace_work_pay", { precision: 10, scale: 2 }), // Total pay for this session based on drops (null if not peace work)
   
+  // Labor cost tracking for analytics (hours × employee hourly rate)
+  laborCost: numeric("labor_cost", { precision: 10, scale: 2 }), // Cost of labor for this session
+  employeeHourlyRate: numeric("employee_hourly_rate", { precision: 10, scale: 2 }), // Snapshot of employee rate at time of session
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [

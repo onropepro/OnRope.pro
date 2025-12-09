@@ -7894,12 +7894,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
             return sum;
           }, 0);
           
-          // Get the latest manual completion percentage for hours-based projects
-          const latestCompletionPercentage = completedSessions.length > 0
-            ? completedSessions
-                .filter(s => s.manualCompletionPercentage !== null && s.manualCompletionPercentage !== undefined)
-                .sort((a, b) => new Date(b.endTime!).getTime() - new Date(a.endTime!).getTime())[0]
-                ?.manualCompletionPercentage || null
+          // Sum all manual completion percentages for hours-based projects (each session tracks contribution %)
+          const sessionsWithPercentage = completedSessions.filter(s => s.manualCompletionPercentage !== null && s.manualCompletionPercentage !== undefined);
+          const cumulativeCompletionPercentage = sessionsWithPercentage.length > 0
+            ? sessionsWithPercentage.reduce((sum: number, s) => sum + Number(s.manualCompletionPercentage ?? 0), 0)
+            : null;
+          // Cap at 100% and guard against NaN
+          const latestCompletionPercentage = cumulativeCompletionPercentage !== null && !isNaN(cumulativeCompletionPercentage)
+            ? Math.min(100, cumulativeCompletionPercentage) 
             : null;
           
           return {
@@ -8543,6 +8545,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`[PEACE WORK] Project ${project.id}: ${totalDropsCompleted} drops × $${project.pricePerDrop} = $${peaceWorkPay}`);
       }
       
+      // Calculate labor cost (total hours × employee hourly rate)
+      const employeeHourlyRate = currentUser.hourlyRate ? parseFloat(currentUser.hourlyRate) : null;
+      const totalHoursWorked = overtimeBreakdown.regularHours + overtimeBreakdown.overtimeHours + overtimeBreakdown.doubleTimeHours;
+      // Calculate labor cost: regular hours at base rate, OT at 1.5x, double time at 2x
+      let laborCost: number | null = null;
+      if (employeeHourlyRate !== null) {
+        laborCost = (overtimeBreakdown.regularHours * employeeHourlyRate) +
+                    (overtimeBreakdown.overtimeHours * employeeHourlyRate * 1.5) +
+                    (overtimeBreakdown.doubleTimeHours * employeeHourlyRate * 2);
+        console.log(`[LABOR COST] Session ${sessionId}: ${totalHoursWorked.toFixed(2)}hrs × $${employeeHourlyRate}/hr = $${laborCost.toFixed(2)}`);
+      }
+      
       // End the session with elevation-specific drops and overtime hours
       const session = await storage.endWorkSession(
         sessionId,
@@ -8557,7 +8571,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         overtimeBreakdown.overtimeHours,
         overtimeBreakdown.doubleTimeHours,
         completionPercentage,
-        peaceWorkPay
+        peaceWorkPay,
+        laborCost,
+        employeeHourlyRate
       );
       
       res.json({ session });
@@ -11824,15 +11840,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Calculate progress based on job type
         if (project.jobType === 'general_pressure_washing' || project.jobType === 'ground_window_cleaning') {
-          // Hours-based: use manualCompletionPercentage
+          // Hours-based: SUM all manualCompletionPercentage values (each session = contribution %)
           const sessionsWithPercentage = projectSessions.filter((s: any) => 
             s.manualCompletionPercentage !== null && s.manualCompletionPercentage !== undefined
           );
           if (sessionsWithPercentage.length > 0) {
-            const sortedSessions = [...sessionsWithPercentage].sort((a: any, b: any) => 
-              new Date(b.endTime).getTime() - new Date(a.endTime).getTime()
+            const summedPercentage = sessionsWithPercentage.reduce((sum: number, s: any) => 
+              sum + Number(s.manualCompletionPercentage ?? 0), 0
             );
-            totalProjectProgress += sortedSessions[0].manualCompletionPercentage || 0;
+            // Guard against NaN and cap at 100%
+            if (!isNaN(summedPercentage)) {
+              totalProjectProgress += Math.min(100, summedPercentage);
+            }
           }
         } else if (project.jobType === 'in_suite_dryer_vent_cleaning') {
           // Suite-based

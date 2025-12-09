@@ -8226,7 +8226,7 @@ export default function Dashboard() {
                 const activeProject = projects.find(p => p.id === activeSession?.projectId);
                 const isHoursBased = activeProject?.jobType === "general_pressure_washing" || activeProject?.jobType === "ground_window_cleaning";
                 if (isHoursBased) {
-                  return t('dashboard.endDay.completionPercentage', 'Enter the current completion percentage for this project (0-100%).');
+                  return t('dashboard.endDay.completionPercentage', 'Enter how much of the job YOU completed today. This will be added to the total project progress.');
                 } else if (activeProject?.jobType === "parkade_pressure_cleaning") {
                   return t('dashboard.endDay.parkingStalls', 'Enter the number of parking stalls you completed today.');
                 } else if (activeProject?.jobType === "in_suite_dryer_vent_cleaning") {
@@ -8253,7 +8253,7 @@ export default function Dashboard() {
                       name="dropsNorth"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('dashboard.endDay.projectCompletionLabel', 'Project Completion Percentage')}</FormLabel>
+                          <FormLabel>{t('dashboard.endDay.projectCompletionLabel', 'Your Contribution Today (%)')}</FormLabel>
                           <FormControl>
                             <Input
                               type="number"
@@ -8267,7 +8267,7 @@ export default function Dashboard() {
                             />
                           </FormControl>
                           <FormDescription className="text-xs">
-                            {t('dashboard.endDay.completionHint', 'Enter a value between 0-100% representing the overall project completion')}
+                            {t('dashboard.endDay.completionHint', 'How much did YOU complete today? This adds to the total progress.')}
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
