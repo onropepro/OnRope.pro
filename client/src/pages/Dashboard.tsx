@@ -59,7 +59,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 
-import { JOB_CATEGORIES, JOB_TYPES, getJobTypesByCategory, getJobTypeConfig, getDefaultElevation, isElevationConfigurable, getAllJobTypeValues, type JobCategory } from "@shared/jobTypes";
+import { JOB_CATEGORIES, JOB_TYPES, getJobTypesByCategory, getJobTypeConfig, getDefaultElevation, isElevationConfigurable, isDropBasedJobType, getAllJobTypeValues, type JobCategory } from "@shared/jobTypes";
 
 // Use helper function to get all job type values for validation
 const ALL_JOB_TYPE_VALUES = getAllJobTypeValues() as [string, ...string[]];
@@ -3685,12 +3685,22 @@ export default function Dashboard() {
                           )}
                         />
 
-                        {(projectForm.watch("jobType") === "window_cleaning" || 
-                          projectForm.watch("jobType") === "building_wash" || 
-                          projectForm.watch("jobType") === "dryer_vent_cleaning" ||
-                          projectForm.watch("jobType") === "painting" ||
-                          projectForm.watch("jobType") === "inspection" ||
-                          (projectForm.watch("jobType") === "other" && showOtherElevationFields)) && (
+                        {/* Show drops fields for drop-based jobs when elevation is required */}
+                        {(() => {
+                          const currentJobType = projectForm.watch("jobType");
+                          const requiresElevation = projectForm.watch("requiresElevation");
+                          const jobConfig = getJobTypeConfig(currentJobType);
+                          
+                          // Show drops fields if:
+                          // 1. Job type is drop-based AND
+                          // 2. Either elevation is always required OR (configurable AND toggle is ON)
+                          if (!isDropBasedJobType(currentJobType)) return false;
+                          if (jobConfig?.elevationRequirement === 'always') return true;
+                          if (jobConfig?.elevationRequirement === 'configurable' && requiresElevation) return true;
+                          // For 'other' job type with showOtherElevationFields
+                          if ((currentJobType === "other" || currentJobType === "ndt_other") && showOtherElevationFields) return true;
+                          return false;
+                        })() && (
                           <>
                             <div className="space-y-2">
                               <label className="text-sm font-medium">{t('dashboard.projectForm.totalDropsPerElevation', 'Total Drops per Elevation')}</label>
