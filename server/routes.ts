@@ -924,9 +924,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!password) {
         return res.status(400).json({ message: "Password is required" });
       }
-      if (!emergencyContactName || !emergencyContactPhone) {
-        return res.status(400).json({ message: "Emergency contact is required" });
-      }
       if (!streetAddress || !city || !provinceState || !country || !postalCode) {
         return res.status(400).json({ message: "Full address is required" });
       }
@@ -1113,10 +1110,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log('[Technician-Register] User created:', user.id);
 
-      // Return success (don't log them in - they need to be approved first)
+      // Return success with referral code (don't log them in - they can sign in immediately)
       res.json({ 
         success: true,
-        message: "Registration submitted successfully. You will receive an email once your account is approved."
+        message: "Registration completed successfully. You can now sign in to your account.",
+        referralCode: newReferralCode,
       });
     } catch (error: any) {
       console.error('[Technician-Register] Error:', error);

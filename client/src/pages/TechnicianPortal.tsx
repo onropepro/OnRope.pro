@@ -2259,6 +2259,68 @@ export default function TechnicianPortal() {
               {t.backToHome}
             </Button>
             
+            {/* Profile Completion Widget */}
+            {(() => {
+              const profileFields = [
+                { label: language === 'en' ? 'Emergency Contact' : 'Contact d\'urgence', complete: !!user.emergencyContactName && !!user.emergencyContactPhone },
+                { label: language === 'en' ? 'Banking Info' : 'Info bancaire', complete: !!user.bankAccountNumber },
+                { label: language === 'en' ? 'Birthday' : 'Anniversaire', complete: !!user.birthday },
+                { label: language === 'en' ? 'First Aid' : 'Premiers soins', complete: !!user.hasFirstAid },
+                { label: language === 'en' ? 'Driver\'s License' : 'Permis de conduire', complete: !!user.driversLicenseNumber },
+              ];
+              const completedCount = profileFields.filter(f => f.complete).length;
+              const totalFields = profileFields.length;
+              const percentage = Math.round((completedCount / totalFields) * 100);
+              const incompleteFields = profileFields.filter(f => !f.complete);
+              
+              if (percentage === 100) return null;
+              
+              return (
+                <Card className="mb-4 border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20" data-testid="card-profile-completion">
+                  <CardContent className="pt-4 pb-4">
+                    <div className="flex items-start gap-4">
+                      <div className="p-2 rounded-full bg-amber-100 dark:bg-amber-900/50">
+                        <User className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2 mb-2">
+                          <h3 className="font-semibold text-sm">
+                            {language === 'en' ? 'Complete Your Profile' : 'Complétez votre profil'}
+                          </h3>
+                          <span className="text-sm font-medium text-amber-600 dark:text-amber-400">{percentage}%</span>
+                        </div>
+                        <div className="w-full bg-amber-200 dark:bg-amber-800 rounded-full h-2 mb-3">
+                          <div 
+                            className="bg-amber-500 h-2 rounded-full transition-all" 
+                            style={{ width: `${percentage}%` }}
+                          />
+                        </div>
+                        <p className="text-xs text-muted-foreground mb-2">
+                          {language === 'en' 
+                            ? 'Complete your profile to connect with employers instantly' 
+                            : 'Complétez votre profil pour vous connecter instantanément avec les employeurs'}
+                        </p>
+                        {incompleteFields.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5">
+                            {incompleteFields.slice(0, 3).map((field, i) => (
+                              <Badge key={i} variant="outline" className="text-xs bg-background">
+                                {field.label}
+                              </Badge>
+                            ))}
+                            {incompleteFields.length > 3 && (
+                              <Badge variant="outline" className="text-xs bg-background">
+                                +{incompleteFields.length - 3} {language === 'en' ? 'more' : 'de plus'}
+                              </Badge>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })()}
+            
             <Card>
               <CardHeader className="space-y-4">
                 <div className="flex items-center justify-between gap-4">
