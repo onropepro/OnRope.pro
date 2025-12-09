@@ -17,7 +17,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertGearItemSchema, type InsertGearItem, type GearItem, type GearAssignment, type GearSerialNumber } from "@shared/schema";
-import { ArrowLeft, Plus, Pencil, X, Trash2, Shield, Cable, Link2, Gauge, TrendingUp, HardHat, Hand, Fuel, Scissors, PaintBucket, Droplets, CircleDot, Lock, Anchor, Zap, MoreHorizontal, Users, ShieldAlert, AlertTriangle, FileWarning, FileDown, Wrench } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, X, Trash2, Shield, Cable, Link2, Gauge, TrendingUp, HardHat, Hand, Fuel, Scissors, PaintBucket, Droplets, CircleDot, Lock, Anchor, Zap, MoreHorizontal, Users, ShieldAlert, AlertTriangle, FileWarning, FileDown, Wrench, Search, ChevronDown, ChevronRight } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Label } from "@/components/ui/label";
 import { hasFinancialAccess, canViewCSR, canAccessInventory, canManageInventory, canAssignGear, canViewGearAssignments } from "@/lib/permissions";
 import HarnessInspectionForm from "./HarnessInspectionForm";
@@ -71,6 +72,8 @@ export default function Inventory() {
   const [customType, setCustomType] = useState("");
   const [addItemStep, setAddItemStep] = useState(1);
   const [activeTab, setActiveTab] = useState("");
+  const [inventorySearch, setInventorySearch] = useState("");
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
   const [inspectionFilter, setInspectionFilter] = useState<"week" | "month" | "all" | "combined">("week");
   
   // Assignment dialog state
@@ -1967,6 +1970,28 @@ export default function Inventory() {
               </CardHeader>
             </Card>
 
+            {/* Search Bar */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder={t('inventory.searchInventory', 'Search by brand, model, or type...')}
+                value={inventorySearch}
+                onChange={(e) => setInventorySearch(e.target.value)}
+                className="pl-10"
+                data-testid="input-inventory-search"
+              />
+              {inventorySearch && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                  onClick={() => setInventorySearch("")}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+
             {/* View Inventory Section - Grouped by Equipment Type */}
             {isLoading ? (
               <Card>
@@ -1982,48 +2007,86 @@ export default function Inventory() {
                   </div>
                 </CardContent>
               </Card>
-            ) : (
-              <div className="space-y-3">
-                {/* Group items by equipment type */}
-                {Object.entries(
-                  gearData.items.reduce((groups: Record<string, typeof gearData.items>, item) => {
-                    const type = item.equipmentType || "Other";
-                    if (!groups[type]) groups[type] = [];
-                    groups[type].push(item);
-                    return groups;
-                  }, {})
-                )
-                  .sort(([a], [b]) => a.localeCompare(b))
-                  .map(([equipmentType, items]) => {
-                    const typeIcon = EQUIPMENT_ICONS[equipmentType] || "build";
-                    const totalQty = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
-                    const typeValue = items.reduce((sum, item) => sum + calculateItemValue(item), 0);
-                    
-                    return (
-                      <Card key={equipmentType}>
-                        <CardHeader className="pb-3">
-                          <div className="flex items-center justify-between gap-2">
-                            <div className="flex items-center gap-3">
-                              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                                <span className="material-icons text-primary">{typeIcon}</span>
-                              </div>
-                              <div>
-                                <CardTitle className="text-lg">{equipmentType}</CardTitle>
-                                <CardDescription>
-                                  {totalQty} {totalQty === 1 ? t('inventory.item', 'item') : t('inventory.items', 'items')}
-                                  {canViewFinancials && typeValue > 0 && (
-                                    <span className="ml-2 text-primary font-medium">
-                                      • ${typeValue.toFixed(2)}
-                                    </span>
+            ) : (() => {
+              // Filter items based on search
+              const searchLower = inventorySearch.toLowerCase();
+              const filteredItems = inventorySearch 
+                ? gearData.items.filter(item => 
+                    (item.brand?.toLowerCase().includes(searchLower)) ||
+                    (item.model?.toLowerCase().includes(searchLower)) ||
+                    (item.equipmentType?.toLowerCase().includes(searchLower)) ||
+                    (item.notes?.toLowerCase().includes(searchLower))
+                  )
+                : gearData.items;
+
+              if (filteredItems.length === 0) {
+                return (
+                  <Card>
+                    <CardContent className="py-8">
+                      <div className="text-center text-muted-foreground">
+                        {t('inventory.noSearchResults', 'No items match your search.')}
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              }
+
+              // Group filtered items by equipment type
+              const grouped = filteredItems.reduce((groups: Record<string, typeof gearData.items>, item) => {
+                const type = item.equipmentType || "Other";
+                if (!groups[type]) groups[type] = [];
+                groups[type].push(item);
+                return groups;
+              }, {});
+
+              return (
+                <div className="space-y-2">
+                  {Object.entries(grouped)
+                    .sort(([a], [b]) => a.localeCompare(b))
+                    .map(([equipmentType, items]) => {
+                      const typeIcon = EQUIPMENT_ICONS[equipmentType] || "build";
+                      const totalQty = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+                      const typeValue = items.reduce((sum, item) => sum + calculateItemValue(item), 0);
+                      const isExpanded = expandedSections[equipmentType] ?? true;
+                      
+                      return (
+                        <Collapsible 
+                          key={equipmentType} 
+                          open={isExpanded}
+                          onOpenChange={(open) => setExpandedSections(prev => ({ ...prev, [equipmentType]: open }))}
+                        >
+                          <Card>
+                            <CollapsibleTrigger asChild>
+                              <CardHeader className="pb-3 cursor-pointer hover-elevate">
+                                <div className="flex items-center justify-between gap-2">
+                                  <div className="flex items-center gap-3">
+                                    <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                                      <span className="material-icons text-primary">{typeIcon}</span>
+                                    </div>
+                                    <div>
+                                      <CardTitle className="text-lg">{equipmentType}</CardTitle>
+                                      <CardDescription>
+                                        {totalQty} {totalQty === 1 ? t('inventory.item', 'item') : t('inventory.items', 'items')}
+                                        {canViewFinancials && typeValue > 0 && (
+                                          <span className="ml-2 text-primary font-medium">
+                                            • ${typeValue.toFixed(2)}
+                                          </span>
+                                        )}
+                                      </CardDescription>
+                                    </div>
+                                  </div>
+                                  {isExpanded ? (
+                                    <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                                  ) : (
+                                    <ChevronRight className="h-5 w-5 text-muted-foreground" />
                                   )}
-                                </CardDescription>
-                              </div>
-                            </div>
-                          </div>
-                        </CardHeader>
-                        <CardContent className="pt-0">
-                          <div className="space-y-2">
-                            {items.map((item) => (
+                                </div>
+                              </CardHeader>
+                            </CollapsibleTrigger>
+                            <CollapsibleContent>
+                              <CardContent className="pt-0">
+                                <div className="space-y-2">
+                                  {items.map((item) => (
                   <Card key={item.id} className="bg-muted/30" data-testid={`item-${item.id}`}>
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between gap-4">
@@ -2138,14 +2201,17 @@ export default function Inventory() {
                       </div>
                     </CardContent>
                   </Card>
-                            ))}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
-              </div>
-            )}
+                                  ))}
+                                </div>
+                              </CardContent>
+                            </CollapsibleContent>
+                          </Card>
+                        </Collapsible>
+                      );
+                    })}
+                </div>
+              );
+            })()}
           </TabsContent>
           )}
 
