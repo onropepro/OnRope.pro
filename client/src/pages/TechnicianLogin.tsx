@@ -882,10 +882,6 @@ export default function TechnicianLogin() {
 
         {/* Mobile: Show scrolling problems at bottom */}
         <div className="lg:hidden bg-muted/50 py-8 overflow-hidden">
-          <div className="text-center mb-4 px-6">
-            <p className="text-xs text-muted-foreground">Sound familiar?</p>
-            <p className="text-sm font-semibold text-primary">OnRopePro Solves This</p>
-          </div>
           {problemRows.map((row, index) => (
             <ScrollingProblems key={index} problems={row.problems} direction={row.direction} />
           ))}
@@ -906,10 +902,6 @@ export default function TechnicianLogin() {
               >
                 <X className="w-4 h-4" />
               </Button>
-              <div className="text-center">
-                <p className="text-base font-medium text-muted-foreground">Sound familiar?</p>
-                <p className="text-lg font-semibold text-primary">OnRopePro Solves This</p>
-              </div>
             </div>
           <div className="flex-1 flex flex-col justify-evenly py-6">
             {problemRows.map((row, index) => (
