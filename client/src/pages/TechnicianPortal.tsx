@@ -72,7 +72,8 @@ import {
   Star,
   Gift,
   Lock,
-  Crown
+  Crown,
+  MessageSquare
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
@@ -350,6 +351,31 @@ const translations = {
     improvementNeeded: "Areas to improve:",
     improveHarness: "Complete harness inspection before clocking in",
     improveDocs: "Sign all assigned safety documents",
+    // Feedback
+    feedback: "Feedback",
+    feedbackDesc: "Share suggestions or report issues with the OnRopePro team",
+    sendFeedback: "Send Feedback",
+    feedbackTitle: "Title",
+    feedbackTitlePlaceholder: "Brief summary of your feedback",
+    feedbackCategory: "Category",
+    feedbackCategoryFeature: "New Feature",
+    feedbackCategoryImprovement: "Improvement",
+    feedbackCategoryBug: "Bug Report",
+    feedbackCategoryOther: "Other",
+    feedbackDescription: "Description",
+    feedbackDescriptionPlaceholder: "Please describe your feedback in detail...",
+    feedbackPriority: "Priority",
+    feedbackPriorityLow: "Low",
+    feedbackPriorityNormal: "Normal",
+    feedbackPriorityHigh: "High",
+    feedbackPriorityUrgent: "Urgent",
+    feedbackScreenshot: "Screenshot (Optional)",
+    feedbackScreenshotAdd: "Add Screenshot",
+    feedbackSubmit: "Submit Feedback",
+    feedbackSubmitting: "Submitting...",
+    feedbackSuccess: "Thank You!",
+    feedbackSuccessDesc: "Your feedback has been submitted. We appreciate your input and will review it carefully.",
+    feedbackError: "Failed to submit feedback",
   },
   fr: {
     technicianPortal: "Portail du technicien",
@@ -622,6 +648,31 @@ const translations = {
     improvementNeeded: "Points à améliorer:",
     improveHarness: "Effectuer l'inspection du harnais avant de pointer",
     improveDocs: "Signer tous les documents de sécurité assignés",
+    // Feedback
+    feedback: "Commentaires",
+    feedbackDesc: "Partagez vos suggestions ou signalez des problèmes à l'équipe OnRopePro",
+    sendFeedback: "Envoyer des commentaires",
+    feedbackTitle: "Titre",
+    feedbackTitlePlaceholder: "Résumé bref de vos commentaires",
+    feedbackCategory: "Catégorie",
+    feedbackCategoryFeature: "Nouvelle fonctionnalité",
+    feedbackCategoryImprovement: "Amélioration",
+    feedbackCategoryBug: "Rapport de bogue",
+    feedbackCategoryOther: "Autre",
+    feedbackDescription: "Description",
+    feedbackDescriptionPlaceholder: "Veuillez décrire vos commentaires en détail...",
+    feedbackPriority: "Priorité",
+    feedbackPriorityLow: "Faible",
+    feedbackPriorityNormal: "Normale",
+    feedbackPriorityHigh: "Haute",
+    feedbackPriorityUrgent: "Urgente",
+    feedbackScreenshot: "Capture d'écran (Optionnel)",
+    feedbackScreenshotAdd: "Ajouter une capture d'écran",
+    feedbackSubmit: "Soumettre les commentaires",
+    feedbackSubmitting: "Soumission...",
+    feedbackSuccess: "Merci!",
+    feedbackSuccessDesc: "Vos commentaires ont été soumis. Nous apprécions votre contribution et les examinerons attentivement.",
+    feedbackError: "Échec de la soumission des commentaires",
   }
 };
 
@@ -879,6 +930,15 @@ export default function TechnicianPortal() {
   // State for PLUS benefits dialog
   const [showPlusBenefits, setShowPlusBenefits] = useState(false);
   
+  // Feedback state
+  const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
+  const [feedbackTitle, setFeedbackTitle] = useState("");
+  const [feedbackCategory, setFeedbackCategory] = useState("improvement");
+  const [feedbackDescription, setFeedbackDescription] = useState("");
+  const [feedbackPriority, setFeedbackPriority] = useState("normal");
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
+  const [showFeedbackSuccess, setShowFeedbackSuccess] = useState(false);
+  
   // Handle copy referral code
   const handleCopyReferralCode = () => {
     if (user?.referralCode) {
@@ -1016,6 +1076,51 @@ export default function TechnicianPortal() {
       setLocation("/technician-login");
     } catch (error) {
       console.error("Logout error:", error);
+    }
+  };
+
+  // Handle feedback submission
+  const handleSubmitFeedback = async () => {
+    if (!feedbackTitle.trim() || !feedbackDescription.trim()) {
+      toast({
+        title: language === 'en' ? "Missing Information" : "Information manquante",
+        description: language === 'en' ? "Please fill in all required fields" : "Veuillez remplir tous les champs requis",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsSubmittingFeedback(true);
+    try {
+      const response = await fetch('/api/feature-requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          title: feedbackTitle,
+          category: feedbackCategory,
+          description: feedbackDescription,
+          priority: feedbackPriority,
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to submit feedback');
+      }
+      
+      setShowFeedbackDialog(false);
+      setFeedbackTitle("");
+      setFeedbackCategory("improvement");
+      setFeedbackDescription("");
+      setFeedbackPriority("normal");
+      setShowFeedbackSuccess(true);
+    } catch (error) {
+      toast({
+        title: t.feedbackError,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmittingFeedback(false);
     }
   };
 
@@ -1333,8 +1438,8 @@ export default function TechnicianPortal() {
               <h1 className="font-semibold text-sm">{t.technicianPortal}</h1>
               <div className="flex items-center gap-1.5">
                 <p className="text-xs text-muted-foreground">{user.name}</p>
-                {/* PLUS Badge - Only shown for users with PLUS access */}
-                {user.hasPlusAccess && (
+                {/* PLUS Badge - Only shown for technicians with PLUS access */}
+                {user.role === 'rope_access_tech' && user.hasPlusAccess && (
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Badge 
@@ -1522,6 +1627,34 @@ export default function TechnicianPortal() {
                 >
                   {t.browseJobs}
                   <ArrowRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Feedback Card */}
+        {user && (
+          <Card className="border-purple-500/30 bg-gradient-to-r from-purple-500/5 to-pink-500/5">
+            <CardContent className="p-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-purple-500/20">
+                    <MessageSquare className="w-5 h-5 text-purple-500" />
+                  </div>
+                  <div>
+                    <p className="font-medium">{t.feedback}</p>
+                    <p className="text-sm text-muted-foreground">{t.feedbackDesc}</p>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowFeedbackDialog(true)}
+                  className="gap-2"
+                  data-testid="button-send-feedback"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  {t.sendFeedback}
                 </Button>
               </div>
             </CardContent>
@@ -3640,6 +3773,120 @@ export default function TechnicianPortal() {
           </div>
           <DialogFooter>
             <Button onClick={() => setShowPlusBenefits(false)} data-testid="button-close-plus-benefits">
+              {t.cancel}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Feedback Dialog */}
+      <Dialog open={showFeedbackDialog} onOpenChange={setShowFeedbackDialog}>
+        <DialogContent className="sm:max-w-lg" data-testid="dialog-feedback">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <MessageSquare className="w-5 h-5 text-purple-500" />
+              {t.feedback}
+            </DialogTitle>
+            <DialogDescription>
+              {t.feedbackDesc}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="feedback-title">{t.feedbackTitle}</Label>
+              <Input
+                id="feedback-title"
+                placeholder={t.feedbackTitlePlaceholder}
+                value={feedbackTitle}
+                onChange={(e) => setFeedbackTitle(e.target.value)}
+                data-testid="input-feedback-title"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="feedback-category">{t.feedbackCategory}</Label>
+              <select
+                id="feedback-category"
+                value={feedbackCategory}
+                onChange={(e) => setFeedbackCategory(e.target.value)}
+                className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                data-testid="select-feedback-category"
+              >
+                <option value="feature">{t.feedbackCategoryFeature}</option>
+                <option value="improvement">{t.feedbackCategoryImprovement}</option>
+                <option value="bug">{t.feedbackCategoryBug}</option>
+                <option value="other">{t.feedbackCategoryOther}</option>
+              </select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="feedback-priority">{t.feedbackPriority}</Label>
+              <select
+                id="feedback-priority"
+                value={feedbackPriority}
+                onChange={(e) => setFeedbackPriority(e.target.value)}
+                className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                data-testid="select-feedback-priority"
+              >
+                <option value="low">{t.feedbackPriorityLow}</option>
+                <option value="normal">{t.feedbackPriorityNormal}</option>
+                <option value="high">{t.feedbackPriorityHigh}</option>
+                <option value="urgent">{t.feedbackPriorityUrgent}</option>
+              </select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="feedback-description">{t.feedbackDescription}</Label>
+              <Textarea
+                id="feedback-description"
+                placeholder={t.feedbackDescriptionPlaceholder}
+                value={feedbackDescription}
+                onChange={(e) => setFeedbackDescription(e.target.value)}
+                rows={4}
+                data-testid="input-feedback-description"
+              />
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowFeedbackDialog(false)}
+              data-testid="button-cancel-feedback"
+            >
+              {t.cancel}
+            </Button>
+            <Button
+              onClick={handleSubmitFeedback}
+              disabled={isSubmittingFeedback || !feedbackTitle.trim() || !feedbackDescription.trim()}
+              data-testid="button-submit-feedback"
+            >
+              {isSubmittingFeedback ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {t.feedbackSubmitting}
+                </>
+              ) : (
+                t.feedbackSubmit
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Feedback Success Dialog */}
+      <Dialog open={showFeedbackSuccess} onOpenChange={setShowFeedbackSuccess}>
+        <DialogContent className="sm:max-w-md" data-testid="dialog-feedback-success">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-green-600">
+              <CheckCircle2 className="w-5 h-5" />
+              {t.feedbackSuccess}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-muted-foreground">{t.feedbackSuccessDesc}</p>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setShowFeedbackSuccess(false)} data-testid="button-close-feedback-success">
               {t.cancel}
             </Button>
           </DialogFooter>
