@@ -1,9 +1,28 @@
-import { useState, useRef, useMemo, useEffect } from "react";
+import { useState, useRef, useMemo, useEffect, useCallback } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+
+// Helper to detect iOS PWA standalone mode
+const isIOSPWA = (): boolean => {
+  return (
+    'standalone' in window.navigator && 
+    (window.navigator as any).standalone === true
+  );
+};
+
+// Helper to open external links reliably on iOS PWA
+const openExternalLink = (url: string): void => {
+  if (isIOSPWA()) {
+    // In iOS PWA mode, use location.href to force Safari to open
+    window.location.href = url;
+  } else {
+    // Normal browser behavior
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+};
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -3138,17 +3157,11 @@ export default function TechnicianPortal() {
                         <Button
                           variant="outline"
                           className="w-full"
-                          asChild
+                          onClick={() => openExternalLink('https://techconnect.irata.org/verify/tech')}
                           data-testid="button-open-irata-portal"
                         >
-                          <a 
-                            href="https://techconnect.irata.org/verify/tech" 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                          >
-                            <ExternalLink className="w-4 h-4 mr-2" />
-                            {t.openIrataPortal}
-                          </a>
+                          <ExternalLink className="w-4 h-4 mr-2" />
+                          {t.openIrataPortal}
                         </Button>
                         
                         <input
@@ -3349,17 +3362,11 @@ export default function TechnicianPortal() {
                         <Button
                           variant="outline"
                           className="w-full"
-                          asChild
+                          onClick={() => openExternalLink('https://sprat.org/technician-verification-system/')}
                           data-testid="button-open-sprat-portal"
                         >
-                          <a 
-                            href="https://sprat.org/technician-verification-system/" 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                          >
-                            <ExternalLink className="w-4 h-4 mr-2" />
-                            {t.openSpratPortal}
-                          </a>
+                          <ExternalLink className="w-4 h-4 mr-2" />
+                          {t.openSpratPortal}
                         </Button>
                         
                         <input
