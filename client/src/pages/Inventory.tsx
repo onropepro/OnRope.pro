@@ -1209,20 +1209,28 @@ export default function Inventory() {
     return assignments.some(a => a.employeeId === currentUser?.id);
   });
 
+  // Helper function to calculate item value - handles ropes (length × pricePerFeet) and other items (itemPrice × quantity)
+  const calculateItemValue = (item: any): number => {
+    if (item.equipmentType === "Rope" && item.ropeLength && item.pricePerFeet) {
+      // For ropes: value = length × price per foot × quantity
+      const length = parseFloat(item.ropeLength || "0");
+      const pricePerFoot = parseFloat(item.pricePerFeet || "0");
+      const qty = item.quantity || 1;
+      return length * pricePerFoot * qty;
+    } else {
+      // For other items: value = itemPrice × quantity
+      const price = parseFloat(item.itemPrice || "0");
+      const qty = item.quantity || 1;
+      return price * qty;
+    }
+  };
+
   const totalMyItems = myGear.reduce((sum: number, item: any) => sum + (item.quantity || 0), 0);
-  const totalMyValue = myGear.reduce((sum: number, item: any) => {
-    const price = parseFloat(item.itemPrice || "0");
-    const qty = item.quantity || 0;
-    return sum + (price * qty);
-  }, 0);
+  const totalMyValue = myGear.reduce((sum: number, item: any) => sum + calculateItemValue(item), 0);
 
   // Calculate total value of ALL inventory items
   const totalAllItems = allGearItems.reduce((sum: number, item: any) => sum + (item.quantity || 0), 0);
-  const totalAllValue = allGearItems.reduce((sum: number, item: any) => {
-    const price = parseFloat(item.itemPrice || "0");
-    const qty = item.quantity || 0;
-    return sum + (price * qty);
-  }, 0);
+  const totalAllValue = allGearItems.reduce((sum: number, item: any) => sum + calculateItemValue(item), 0);
 
   const EQUIPMENT_ICONS: Record<string, string> = {
     Harness: "security",
@@ -2016,16 +2024,29 @@ export default function Inventory() {
                             </div>
                           </div>
                           <div>
-                            {canViewFinancials && item.itemPrice && (
+                            {canViewFinancials && (item.itemPrice || (item.equipmentType === "Rope" && item.ropeLength && item.pricePerFeet)) && (
                               <div className="space-y-0.5 mb-1">
-                                <div className="text-sm font-semibold text-primary">
-                                  ${parseFloat(item.itemPrice).toFixed(2)} each
-                                </div>
-                                {item.quantity && item.quantity > 1 && (
-                                  <div className="text-sm font-medium text-primary/80">
-                                    Total: ${(parseFloat(item.itemPrice) * item.quantity).toFixed(2)}
-                                  </div>
-                                )}
+                                {item.equipmentType === "Rope" && item.ropeLength && item.pricePerFeet ? (
+                                  <>
+                                    <div className="text-xs text-muted-foreground">
+                                      {item.ropeLength}ft @ ${parseFloat(item.pricePerFeet).toFixed(2)}/ft
+                                    </div>
+                                    <div className="text-sm font-semibold text-primary">
+                                      Value: ${(parseFloat(item.ropeLength) * parseFloat(item.pricePerFeet) * (item.quantity || 1)).toFixed(2)}
+                                    </div>
+                                  </>
+                                ) : item.itemPrice ? (
+                                  <>
+                                    <div className="text-sm font-semibold text-primary">
+                                      ${parseFloat(item.itemPrice).toFixed(2)} each
+                                    </div>
+                                    {item.quantity && item.quantity > 1 && (
+                                      <div className="text-sm font-medium text-primary/80">
+                                        Total: ${(parseFloat(item.itemPrice) * item.quantity).toFixed(2)}
+                                      </div>
+                                    )}
+                                  </>
+                                ) : null}
                               </div>
                             )}
                             {item.notes && (
