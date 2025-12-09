@@ -205,14 +205,41 @@ export default function Inventory() {
     queryKey: ["/api/equipment-damage-reports"],
   });
 
-  // Fetch equipment catalog for smart gear picker (currently only for Descenders)
-  const { data: catalogData } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
+  // Equipment types that have catalog support
+  const CATALOG_SUPPORTED_TYPES = ["Descender", "Harness", "Rope", "Carabiner"];
+
+  // Fetch equipment catalogs for smart gear picker
+  const { data: descenderCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
     queryKey: ["/api/equipment-catalog", { type: "Descender" }],
-    queryFn: async () => {
-      const res = await fetch("/api/equipment-catalog?type=Descender");
-      return res.json();
-    },
+    queryFn: async () => (await fetch("/api/equipment-catalog?type=Descender")).json(),
   });
+  const { data: harnessCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
+    queryKey: ["/api/equipment-catalog", { type: "Harness" }],
+    queryFn: async () => (await fetch("/api/equipment-catalog?type=Harness")).json(),
+  });
+  const { data: ropeCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
+    queryKey: ["/api/equipment-catalog", { type: "Rope" }],
+    queryFn: async () => (await fetch("/api/equipment-catalog?type=Rope")).json(),
+  });
+  const { data: carabinerCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
+    queryKey: ["/api/equipment-catalog", { type: "Carabiner" }],
+    queryFn: async () => (await fetch("/api/equipment-catalog?type=Carabiner")).json(),
+  });
+
+  // Get catalog for current equipment type
+  const getCurrentCatalog = () => {
+    const equipType = form.watch("equipmentType");
+    switch (equipType) {
+      case "Descender": return descenderCatalog?.items || [];
+      case "Harness": return harnessCatalog?.items || [];
+      case "Rope": return ropeCatalog?.items || [];
+      case "Carabiner": return carabinerCatalog?.items || [];
+      default: return [];
+    }
+  };
+
+  // Check if current equipment type has catalog support
+  const hasCatalogSupport = CATALOG_SUPPORTED_TYPES.includes(form.watch("equipmentType") || "");
 
   // Create damage report mutation
   const createDamageReportMutation = useMutation({
@@ -649,18 +676,19 @@ export default function Inventory() {
   });
 
   const handleAddItem = async (data: Partial<InsertGearItem>) => {
-    // If adding a custom descender, save it to the shared catalog first
-    if (data.equipmentType === "Descender" && showOtherDescender && data.brand && data.model) {
+    // If adding custom gear for a catalog-supported type, save it to the shared catalog first
+    const equipType = data.equipmentType || "";
+    if (CATALOG_SUPPORTED_TYPES.includes(equipType) && showOtherDescender && data.brand && data.model) {
       try {
         await apiRequest("POST", "/api/equipment-catalog", {
-          equipmentType: "Descender",
+          equipmentType: equipType,
           brand: data.brand,
           model: data.model,
         });
         // Invalidate catalog cache so new item appears next time
         queryClient.invalidateQueries({ queryKey: ["/api/equipment-catalog"] });
       } catch (err) {
-        console.log("Descender added to catalog or already exists");
+        console.log("Item added to catalog or already exists");
       }
     }
     
@@ -2384,13 +2412,18 @@ export default function Inventory() {
                 <>
                   <div className="flex-1 min-h-0 overflow-y-auto px-1 space-y-4">
 
-              {/* Smart Descender Picker - shows list of common descenders */}
-              {form.watch("equipmentType") === "Descender" && !showOtherDescender && (
+              {/* Smart Gear Picker - shows list of common gear for supported types */}
+              {hasCatalogSupport && !showOtherDescender && (
                 <div className="space-y-3">
-                  <FormLabel>{t('inventory.selectDescender', 'Select Descender')}</FormLabel>
+                  <FormLabel>
+                    {form.watch("equipmentType") === "Descender" && t('inventory.selectDescender', 'Select Descender')}
+                    {form.watch("equipmentType") === "Harness" && t('inventory.selectHarness', 'Select Harness')}
+                    {form.watch("equipmentType") === "Rope" && t('inventory.selectRope', 'Select Rope')}
+                    {form.watch("equipmentType") === "Carabiner" && t('inventory.selectCarabiner', 'Select Carabiner')}
+                  </FormLabel>
                   <div className="relative">
                     <Input
-                      placeholder={t('inventory.searchDescenders', 'Search descenders...')}
+                      placeholder={t('inventory.searchGear', 'Search by brand or model...')}
                       value={catalogSearch}
                       onChange={(e) => setCatalogSearch(e.target.value)}
                       className="pr-8"
@@ -2409,66 +2442,69 @@ export default function Inventory() {
                     )}
                   </div>
                   <div className="grid grid-cols-1 gap-2 max-h-[35vh] overflow-y-auto pr-1">
-                    {catalogData?.items
-                      ?.filter((item) => {
+                    {getCurrentCatalog()
+                      .filter((item) => {
                         if (!catalogSearch) return true;
                         const search = catalogSearch.toLowerCase();
                         return item.brand.toLowerCase().includes(search) || 
                                item.model.toLowerCase().includes(search);
                       })
-                      .map((item) => (
-                      <Card
-                        key={item.id}
-                        className={`cursor-pointer hover-elevate active-elevate-2 transition-all ${
-                          selectedCatalogItem?.id === item.id ? "bg-primary/10 border-primary border-2" : ""
-                        }`}
-                        onClick={() => {
-                          setSelectedCatalogItem(item);
-                          form.setValue("brand", item.brand);
-                          form.setValue("model", item.model);
-                          // Track usage
-                          apiRequest("PATCH", `/api/equipment-catalog/${item.id}/use`);
-                        }}
-                        data-testid={`card-descender-${item.brand.toLowerCase()}-${item.model.toLowerCase().replace(/\s+/g, "-")}`}
-                      >
-                        <CardContent className="p-3 flex items-center gap-3">
-                          <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${
-                            selectedCatalogItem?.id === item.id ? "bg-primary text-primary-foreground" : "bg-muted"
-                          }`}>
-                            <Gauge className="h-5 w-5" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="font-medium text-sm">{item.brand}</div>
-                            <div className="text-xs text-muted-foreground truncate">{item.model}</div>
-                          </div>
-                          {selectedCatalogItem?.id === item.id && (
-                            <div className="text-primary">
-                              <span className="material-icons text-lg">check_circle</span>
-                            </div>
-                          )}
-                        </CardContent>
-                      </Card>
-                    ))}
+                      .map((item) => {
+                        const equipType = form.watch("equipmentType");
+                        const IconComponent = equipType === "Harness" ? Shield : 
+                                             equipType === "Rope" ? Cable : 
+                                             equipType === "Carabiner" ? Link2 : Gauge;
+                        return (
+                          <Card
+                            key={item.id}
+                            className={`cursor-pointer hover-elevate active-elevate-2 transition-all ${
+                              selectedCatalogItem?.id === item.id ? "bg-primary/10 border-primary border-2" : ""
+                            }`}
+                            onClick={() => {
+                              setSelectedCatalogItem(item);
+                              form.setValue("brand", item.brand);
+                              form.setValue("model", item.model);
+                              apiRequest("PATCH", `/api/equipment-catalog/${item.id}/use`);
+                            }}
+                            data-testid={`card-gear-${item.brand.toLowerCase()}-${item.model.toLowerCase().replace(/\s+/g, "-")}`}
+                          >
+                            <CardContent className="p-3 flex items-center gap-3">
+                              <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${
+                                selectedCatalogItem?.id === item.id ? "bg-primary text-primary-foreground" : "bg-muted"
+                              }`}>
+                                <IconComponent className="h-5 w-5" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="font-medium text-sm">{item.brand}</div>
+                                <div className="text-xs text-muted-foreground truncate">{item.model}</div>
+                              </div>
+                              {selectedCatalogItem?.id === item.id && (
+                                <div className="text-primary">
+                                  <span className="material-icons text-lg">check_circle</span>
+                                </div>
+                              )}
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
                     {/* Other option */}
                     <Card
-                      className={`cursor-pointer hover-elevate active-elevate-2 transition-all border-dashed ${
-                        showOtherDescender ? "bg-primary/10 border-primary border-2" : ""
-                      }`}
+                      className="cursor-pointer hover-elevate active-elevate-2 transition-all border-dashed"
                       onClick={() => {
                         setShowOtherDescender(true);
                         setSelectedCatalogItem(null);
                         form.setValue("brand", "");
                         form.setValue("model", "");
                       }}
-                      data-testid="card-descender-other"
+                      data-testid="card-gear-other"
                     >
                       <CardContent className="p-3 flex items-center gap-3">
                         <div className="h-10 w-10 rounded-lg flex items-center justify-center bg-muted">
                           <Plus className="h-5 w-5" />
                         </div>
                         <div className="flex-1">
-                          <div className="font-medium text-sm">{t('inventory.otherDescender', 'Other / Not Listed')}</div>
-                          <div className="text-xs text-muted-foreground">{t('inventory.addNewDescender', 'Add a new descender to the database')}</div>
+                          <div className="font-medium text-sm">{t('inventory.otherGear', 'Other / Not Listed')}</div>
+                          <div className="text-xs text-muted-foreground">{t('inventory.addNewGear', 'Add new gear to the shared database')}</div>
                         </div>
                       </CardContent>
                     </Card>
@@ -2476,8 +2512,8 @@ export default function Inventory() {
                 </div>
               )}
 
-              {/* Custom Descender Entry - when "Other" is selected */}
-              {form.watch("equipmentType") === "Descender" && showOtherDescender && (
+              {/* Custom Gear Entry - when "Other" is selected for catalog-supported types */}
+              {hasCatalogSupport && showOtherDescender && (
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <Button
@@ -2489,12 +2525,14 @@ export default function Inventory() {
                         setCustomBrand("");
                         setCustomModel("");
                       }}
-                      data-testid="button-back-to-descender-list"
+                      data-testid="button-back-to-gear-list"
                     >
                       <ArrowLeft className="h-4 w-4 mr-1" />
                       {t('common.back', 'Back')}
                     </Button>
-                    <span className="text-sm text-muted-foreground">{t('inventory.addCustomDescender', 'Add Custom Descender')}</span>
+                    <span className="text-sm text-muted-foreground">
+                      {t('inventory.addCustomGear', 'Add Custom')} {form.watch("equipmentType")}
+                    </span>
                   </div>
                   <FormField
                     control={form.control}
@@ -2541,13 +2579,13 @@ export default function Inventory() {
                     )}
                   />
                   <p className="text-xs text-muted-foreground">
-                    {t('inventory.catalogNote', 'This descender will be saved to the shared database for all companies to use.')}
+                    {t('inventory.catalogNoteGeneric', 'This item will be saved to the shared database for all companies to use.')}
                   </p>
                 </div>
               )}
 
-              {/* Standard Brand/Model fields for non-Descender items */}
-              {form.watch("equipmentType") !== "Descender" && (
+              {/* Standard Brand/Model fields for non-catalog items */}
+              {!hasCatalogSupport && (
                 <>
                   <FormField
                     control={form.control}
