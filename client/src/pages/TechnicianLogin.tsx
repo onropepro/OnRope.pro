@@ -442,7 +442,7 @@ export default function TechnicianLogin() {
               
               <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
                 One profile. Any employer using OnRopePro. Hours submit themselves. Certs already verified. 
-                Logbook entries you didn't have to make up. Onboarding done before you arrive.
+                Logbook entries you didn't have to make up. Paperwork done before you arrive.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
