@@ -1011,7 +1011,8 @@ export default function TechnicianPortal() {
     }>;
   }>({
     queryKey: ["/api/my-invitations"],
-    enabled: !!user && user.role === 'rope_access_tech' && (!user.companyId || !!user.terminatedDate),
+    // Fetch invitations for: unlinked technicians, terminated technicians, or PLUS technicians (can connect to multiple employers)
+    enabled: !!user && user.role === 'rope_access_tech' && (!user.companyId || !!user.terminatedDate || !!user.hasPlusAccess),
   });
 
   const pendingInvitations = invitationsData?.invitations || [];
@@ -2479,8 +2480,8 @@ export default function TechnicianPortal() {
           </>
         )}
 
-        {/* Team Invitations Section - Show for unlinked technicians OR self-resigned technicians (WORK TAB) */}
-        {activeTab === 'work' && user && user.role === 'rope_access_tech' && (!user.companyId || user.terminatedDate) && (
+        {/* Team Invitations Section - Show for unlinked technicians, self-resigned technicians, OR PLUS technicians (WORK TAB) */}
+        {activeTab === 'work' && user && user.role === 'rope_access_tech' && (!user.companyId || user.terminatedDate || user.hasPlusAccess) && (
           <Card className="border-primary/30 bg-primary/5">
             <CardHeader>
               <div className="flex items-center gap-3">
