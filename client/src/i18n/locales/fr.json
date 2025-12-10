@@ -523,7 +523,7 @@
         "description": "Heures des employés"
       },
       "quotes": {
-        "label": "Soumissions",
+        "label": "Devis et CRM",
         "description": "Devis de service"
       },
       "schedule": {
@@ -2142,7 +2142,7 @@
     "gearItem": "Article de matériel"
   },
   "quotes": {
-    "title": "Devis",
+    "title": "Devis et CRM",
     "pageTitle": "Devis de service",
     "pageSubtitle": "Créer et gérer les devis de service pour les bâtiments",
     "newQuote": "Nouveau devis",
