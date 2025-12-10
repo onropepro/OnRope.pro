@@ -293,7 +293,7 @@ export default function BuildingPortal() {
     switch (status) {
       case "completed":
         return (
-          <Badge variant="outline" className="bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/30">
+          <Badge variant="outline" className="bg-success-600/10 text-success-600 dark:text-success-500 border-success-600/30">
             <CheckCircle className="w-3 h-3 mr-1" />
             Completed
           </Badge>
@@ -301,14 +301,14 @@ export default function BuildingPortal() {
       case "active":
       case "in_progress":
         return (
-          <Badge variant="outline" className="bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30">
+          <Badge variant="outline" className="bg-action-600/10 text-action-600 dark:text-action-400 border-action-600/30">
             <Clock className="w-3 h-3 mr-1" />
             In Progress
           </Badge>
         );
       case "pending":
         return (
-          <Badge variant="outline" className="bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/30">
+          <Badge variant="outline" className="bg-warning-600/10 text-warning-600 dark:text-warning-500 border-warning-600/30">
             <AlertCircle className="w-3 h-3 mr-1" />
             Pending
           </Badge>
@@ -487,7 +487,7 @@ export default function BuildingPortal() {
               <Building2 className="h-7 w-7 text-primary" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold">
+              <h1 className="text-3xl md:text-4xl font-extrabold text-foreground">
                 {building?.buildingName || `Building ${building?.strataPlanNumber}`}
               </h1>
               <p className="text-muted-foreground">
@@ -542,11 +542,11 @@ export default function BuildingPortal() {
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
-                <div className="h-10 w-10 rounded-full bg-blue-500/10 flex items-center justify-center">
-                  <History className="h-5 w-5 text-blue-500" />
+                <div className="h-10 w-10 rounded-full bg-action-600/10 flex items-center justify-center">
+                  <History className="h-5 w-5 text-action-600 dark:text-action-400" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">{stats?.totalProjects || 0}</p>
+                  <p className="text-2xl font-bold text-foreground">{stats?.totalProjects || 0}</p>
                   <p className="text-sm text-muted-foreground">Total Projects</p>
                 </div>
               </div>
@@ -555,11 +555,11 @@ export default function BuildingPortal() {
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
-                <div className="h-10 w-10 rounded-full bg-green-500/10 flex items-center justify-center">
-                  <CheckCircle className="h-5 w-5 text-green-500" />
+                <div className="h-10 w-10 rounded-full bg-success-600/10 flex items-center justify-center">
+                  <CheckCircle className="h-5 w-5 text-success-600 dark:text-success-500" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">{stats?.completedProjects || 0}</p>
+                  <p className="text-2xl font-bold text-foreground">{stats?.completedProjects || 0}</p>
                   <p className="text-sm text-muted-foreground">Completed</p>
                 </div>
               </div>
@@ -568,11 +568,11 @@ export default function BuildingPortal() {
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
-                <div className="h-10 w-10 rounded-full bg-yellow-500/10 flex items-center justify-center">
-                  <Clock className="h-5 w-5 text-yellow-500" />
+                <div className="h-10 w-10 rounded-full bg-warning-600/10 flex items-center justify-center">
+                  <Clock className="h-5 w-5 text-warning-600 dark:text-warning-500" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">{stats?.activeProjects || 0}</p>
+                  <p className="text-2xl font-bold text-foreground">{stats?.activeProjects || 0}</p>
                   <p className="text-sm text-muted-foreground">Active</p>
                 </div>
               </div>
@@ -624,12 +624,12 @@ export default function BuildingPortal() {
                     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                       {buildingInstructions?.buildingManagerName && (
                         <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                          <User className="h-5 w-5 text-primary mt-0.5" />
+                          <User className="h-5 w-5 text-muted-foreground mt-0.5" />
                           <div>
-                            <p className="font-medium text-sm">Building Manager</p>
-                            <p className="text-sm">{buildingInstructions.buildingManagerName}</p>
+                            <p className="font-medium text-sm text-foreground">Building Manager</p>
+                            <p className="text-sm text-foreground">{buildingInstructions.buildingManagerName}</p>
                             {buildingInstructions.buildingManagerPhone && (
-                              <a href={`tel:${buildingInstructions.buildingManagerPhone}`} className="text-sm text-primary hover:underline">
+                              <a href={`tel:${buildingInstructions.buildingManagerPhone}`} className="text-sm text-action-600 dark:text-action-400 hover:underline">
                                 {buildingInstructions.buildingManagerPhone}
                               </a>
                             )}
@@ -638,12 +638,12 @@ export default function BuildingPortal() {
                       )}
                       {buildingInstructions?.conciergeNames && (
                         <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                          <Phone className="h-5 w-5 text-primary mt-0.5" />
+                          <Phone className="h-5 w-5 text-muted-foreground mt-0.5" />
                           <div>
-                            <p className="font-medium text-sm">Concierge</p>
-                            <p className="text-sm">{buildingInstructions.conciergeNames}</p>
+                            <p className="font-medium text-sm text-foreground">Concierge</p>
+                            <p className="text-sm text-foreground">{buildingInstructions.conciergeNames}</p>
                             {buildingInstructions.conciergePhone && (
-                              <a href={`tel:${buildingInstructions.conciergePhone}`} className="text-sm text-primary hover:underline">
+                              <a href={`tel:${buildingInstructions.conciergePhone}`} className="text-sm text-action-600 dark:text-action-400 hover:underline">
                                 {buildingInstructions.conciergePhone}
                               </a>
                             )}
@@ -655,12 +655,12 @@ export default function BuildingPortal() {
                       )}
                       {buildingInstructions?.maintenanceName && (
                         <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                          <Wrench className="h-5 w-5 text-primary mt-0.5" />
+                          <Wrench className="h-5 w-5 text-muted-foreground mt-0.5" />
                           <div>
-                            <p className="font-medium text-sm">Maintenance</p>
-                            <p className="text-sm">{buildingInstructions.maintenanceName}</p>
+                            <p className="font-medium text-sm text-foreground">Maintenance</p>
+                            <p className="text-sm text-foreground">{buildingInstructions.maintenanceName}</p>
                             {buildingInstructions.maintenancePhone && (
-                              <a href={`tel:${buildingInstructions.maintenancePhone}`} className="text-sm text-primary hover:underline">
+                              <a href={`tel:${buildingInstructions.maintenancePhone}`} className="text-sm text-action-600 dark:text-action-400 hover:underline">
                                 {buildingInstructions.maintenancePhone}
                               </a>
                             )}
@@ -669,10 +669,10 @@ export default function BuildingPortal() {
                       )}
                       {(buildingInstructions as any)?.councilMemberUnits && (
                         <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                          <span className="material-icons text-primary mt-0.5" style={{ fontSize: '20px' }}>groups</span>
+                          <span className="material-icons text-muted-foreground mt-0.5" style={{ fontSize: '20px' }}>groups</span>
                           <div>
-                            <p className="font-medium text-sm">Council Member Units</p>
-                            <p className="text-sm">{(buildingInstructions as any).councilMemberUnits}</p>
+                            <p className="font-medium text-sm text-foreground">Council Member Units</p>
+                            <p className="text-sm text-foreground">{(buildingInstructions as any).councilMemberUnits}</p>
                           </div>
                         </div>
                       )}
@@ -687,19 +687,19 @@ export default function BuildingPortal() {
                     <div className="grid gap-3">
                       {buildingInstructions?.buildingAccess && (
                         <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                          <DoorOpen className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                          <DoorOpen className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />
                           <div>
-                            <p className="font-medium text-sm">Building Access</p>
-                            <p className="text-sm whitespace-pre-wrap">{buildingInstructions.buildingAccess}</p>
+                            <p className="font-medium text-sm text-foreground">Building Access</p>
+                            <p className="text-sm text-foreground whitespace-pre-wrap">{buildingInstructions.buildingAccess}</p>
                           </div>
                         </div>
                       )}
                       {buildingInstructions?.keysAndFob && (
                         <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                          <KeyRound className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                          <KeyRound className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />
                           <div>
-                            <p className="font-medium text-sm">Keys / Fob</p>
-                            <p className="text-sm whitespace-pre-wrap">{buildingInstructions.keysAndFob}</p>
+                            <p className="font-medium text-sm text-foreground">Keys / Fob</p>
+                            <p className="text-sm text-foreground whitespace-pre-wrap">{buildingInstructions.keysAndFob}</p>
                             {(buildingInstructions as any).keysReturnPolicy && (
                               <p className="text-xs text-muted-foreground mt-1">
                                 Return: {
@@ -715,10 +715,10 @@ export default function BuildingPortal() {
                       )}
                       {buildingInstructions?.roofAccess && (
                         <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                          <Building2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                          <Building2 className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />
                           <div>
-                            <p className="font-medium text-sm">Roof Access</p>
-                            <p className="text-sm whitespace-pre-wrap">{buildingInstructions.roofAccess}</p>
+                            <p className="font-medium text-sm text-foreground">Roof Access</p>
+                            <p className="text-sm text-foreground whitespace-pre-wrap">{buildingInstructions.roofAccess}</p>
                           </div>
                         </div>
                       )}
@@ -731,13 +731,13 @@ export default function BuildingPortal() {
                   <div className="space-y-3">
                     <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">Trade Parking</h4>
                     <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                      <span className="material-icons text-primary mt-0.5 shrink-0" style={{ fontSize: '20px' }}>local_parking</span>
+                      <span className="material-icons text-muted-foreground mt-0.5 shrink-0" style={{ fontSize: '20px' }}>local_parking</span>
                       <div>
                         {(buildingInstructions as any).tradeParkingSpots && (
-                          <p className="text-sm font-medium">{(buildingInstructions as any).tradeParkingSpots} spot(s) available</p>
+                          <p className="text-sm font-medium text-foreground">{(buildingInstructions as any).tradeParkingSpots} spot(s) available</p>
                         )}
                         {(buildingInstructions as any).tradeParkingInstructions && (
-                          <p className="text-sm whitespace-pre-wrap">{(buildingInstructions as any).tradeParkingInstructions}</p>
+                          <p className="text-sm text-foreground whitespace-pre-wrap">{(buildingInstructions as any).tradeParkingInstructions}</p>
                         )}
                       </div>
                     </div>
@@ -749,8 +749,8 @@ export default function BuildingPortal() {
                   <div className="space-y-3">
                     <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">Trade Washroom</h4>
                     <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                      <span className="material-icons text-primary mt-0.5 shrink-0" style={{ fontSize: '20px' }}>wc</span>
-                      <p className="text-sm whitespace-pre-wrap">{(buildingInstructions as any).tradeWashroomLocation}</p>
+                      <span className="material-icons text-muted-foreground mt-0.5 shrink-0" style={{ fontSize: '20px' }}>wc</span>
+                      <p className="text-sm text-foreground whitespace-pre-wrap">{(buildingInstructions as any).tradeWashroomLocation}</p>
                     </div>
                   </div>
                 )}
@@ -760,7 +760,7 @@ export default function BuildingPortal() {
                   <div className="space-y-3">
                     <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">Special Requests</h4>
                     <div className="p-3 rounded-lg bg-muted/50">
-                      <p className="text-sm whitespace-pre-wrap">{buildingInstructions.specialRequests}</p>
+                      <p className="text-sm text-foreground whitespace-pre-wrap">{buildingInstructions.specialRequests}</p>
                     </div>
                   </div>
                 )}
@@ -810,11 +810,11 @@ export default function BuildingPortal() {
                   return (
                     <div key={project.id}>
                       {index > 0 && <Separator className="my-4" />}
-                      <div className={`${isActive ? 'p-4 rounded-lg border-2 border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/30' : ''}`}>
+                      <div className={`${isActive ? 'p-4 rounded-lg border-2 border-action-600/30 dark:border-action-600/40 bg-action-600/5 dark:bg-action-600/10' : ''}`}>
                         <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                           <div className="space-y-2 flex-1">
                             <div className="flex items-center gap-2 flex-wrap">
-                              <span className="font-medium">{getJobTypeName(project)}</span>
+                              <span className="font-medium text-foreground">{getJobTypeName(project)}</span>
                               {getStatusBadge(project.status)}
                             </div>
                             <p className="text-sm text-muted-foreground">
@@ -871,7 +871,7 @@ export default function BuildingPortal() {
                                 {(project.companyPhone || project.companyEmail) && (
                                   <div className="flex flex-wrap gap-3 text-sm">
                                     {project.companyPhone && (
-                                      <a href={`tel:${project.companyPhone}`} className="flex items-center gap-1 text-primary hover:underline">
+                                      <a href={`tel:${project.companyPhone}`} className="flex items-center gap-1 text-action-600 dark:text-action-400 hover:underline">
                                         <Phone className="h-3 w-3" />
                                         {project.companyPhone}
                                       </a>
