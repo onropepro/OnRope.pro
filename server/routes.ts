@@ -2032,15 +2032,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Validate all employees belong to this company and are active (not suspended or terminated)
+      // Uses checkEmployeeBelongsToCompany to handle both primary and secondary (PLUS) connections
       const employeesToSuspend: { id: string; name: string }[] = [];
       for (const empId of uniqueEmployeeIds) {
         const emp = await storage.getUserById(empId);
         if (!emp) {
           return res.status(400).json({ message: `Employee ${empId} not found` });
         }
-        if (emp.companyId !== user.id) {
+        
+        // Check if employee belongs to this company (either primary or secondary connection)
+        const membership = await storage.checkEmployeeBelongsToCompany(empId, user.id);
+        if (!membership.belongs) {
           return res.status(400).json({ message: "Cannot suspend employees from another company" });
         }
+        
         if (emp.suspendedAt) {
           return res.status(400).json({ message: `Employee ${emp.name} is already suspended` });
         }
@@ -2114,15 +2119,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let finalSeatCount = previousSeatCount; // Will be updated after Stripe succeeds
 
       // Step 1: Suspend all employees in DB (do this first, it's reversible)
+      // Uses suspendEmployeeConnection to handle both primary and secondary (PLUS) connections
       console.log(`[Stripe] Step 1: Suspending ${employeesToSuspend.length} employees in DB`);
       for (const emp of employeesToSuspend) {
-        await db.update(users)
-          .set({
-            suspendedAt: suspendedAt,
-            suspendedBy: user.id,
-          })
-          .where(eq(users.id, emp.id));
-        console.log(`[Stripe] Suspended employee ${emp.id} (${emp.name})`);
+        await storage.suspendEmployeeConnection(emp.id, user.id);
+        // Also set suspendedBy for audit trail on primary connections
+        const membership = await storage.checkEmployeeBelongsToCompany(emp.id, user.id);
+        if (membership.connectionType === 'primary') {
+          await db.update(users)
+            .set({ suspendedBy: user.id })
+            .where(eq(users.id, emp.id));
+        }
+        console.log(`[Stripe] Suspended employee ${emp.id} (${emp.name}) - ${membership.connectionType} connection`);
       }
 
       // Step 2: Update Stripe subscription
@@ -6127,11 +6135,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get the employee to verify they belong to this company
       const employee = await storage.getUserById(req.params.id);
       
-      // Allow if: employee belongs to company OR user is editing themselves
+      // Allow if: employee belongs to company (primary or secondary) OR user is editing themselves
       const isOwnProfile = req.params.id === currentUser.id;
-      const belongsToCompany = employee?.companyId === companyId;
+      const membership = employee ? await storage.checkEmployeeBelongsToCompany(employee.id, companyId) : { belongs: false };
       
-      if (!employee || (!belongsToCompany && !isOwnProfile)) {
+      if (!employee || (!membership.belongs && !isOwnProfile)) {
         return res.status(403).json({ message: "Access denied" });
       }
       
@@ -6148,7 +6156,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const roleChanged = role !== undefined && role !== employee.role;
       const isBeingTerminated = terminatedDate !== undefined && terminatedDate !== null && !employee.terminatedDate;
       
-      // Update employee
+      // For secondary connections (PLUS technicians), handle termination separately
+      if (isBeingTerminated && membership.connectionType === 'secondary') {
+        // Use the termination helper which handles secondary connections
+        await storage.terminateEmployeeConnection(req.params.id, companyId, terminationReason, terminationNotes);
+        
+        // Notify the technician
+        await wsHub.terminateUser(req.params.id);
+        
+        // Return the employee data (they still exist, just disconnected from this company)
+        const { passwordHash: _, ...employeeWithoutPassword } = employee;
+        return res.json({ employee: { ...employeeWithoutPassword, connectionTerminated: true } });
+      }
+      
+      // Update employee (for primary connections or non-termination updates)
       const updatedEmployee = await storage.updateUser(req.params.id, {
         name,
         email,
@@ -6215,19 +6236,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Unable to determine company" });
       }
       
-      // Get the employee to verify they belong to this company
+      // Get the employee to verify they belong to this company (primary or secondary)
       const employee = await storage.getUserById(req.params.id);
+      const membership = employee ? await storage.checkEmployeeBelongsToCompany(employee.id, companyId) : { belongs: false };
       
-      if (!employee || employee.companyId !== companyId) {
+      if (!employee || !membership.belongs) {
         return res.status(403).json({ message: "Access denied" });
       }
       
-      // Reactivate employee by clearing termination fields
-      const updatedEmployee = await storage.updateUser(req.params.id, {
-        terminatedDate: null,
-        terminationReason: null,
-        terminationNotes: null,
-      });
+      // Reactivate employee - handle both primary and secondary connections
+      let updatedEmployee = employee;
+      if (membership.connectionType === 'secondary' && membership.connectionId) {
+        // Reactivate secondary connection
+        await db.update(technicianEmployerConnections)
+          .set({ status: "active", terminatedAt: null })
+          .where(eq(technicianEmployerConnections.id, membership.connectionId));
+      } else {
+        // Reactivate primary connection
+        updatedEmployee = await storage.updateUser(req.params.id, {
+          terminatedDate: null,
+          terminationReason: null,
+          terminationNotes: null,
+        });
+      }
       
       const { passwordHash: _, ...employeeWithoutPassword } = updatedEmployee;
       res.json({ employee: employeeWithoutPassword });

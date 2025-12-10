@@ -159,6 +159,101 @@ export class Storage {
     return results.map(user => decryptSensitiveFields(user));
   }
 
+  /**
+   * Check if an employee belongs to a company (either via companyId or via employer_connections)
+   * Returns { belongs: boolean, connectionType: 'primary' | 'secondary' | null, connectionId?: string }
+   */
+  async checkEmployeeBelongsToCompany(employeeId: string, companyId: string): Promise<{
+    belongs: boolean;
+    connectionType: 'primary' | 'secondary' | null;
+    connectionId?: string;
+  }> {
+    const employee = await this.getUserById(employeeId);
+    if (!employee) {
+      return { belongs: false, connectionType: null };
+    }
+
+    // Check primary connection (companyId field)
+    if (employee.companyId === companyId) {
+      return { belongs: true, connectionType: 'primary' };
+    }
+
+    // Check secondary connection (employer_connections table)
+    const secondaryConnection = await db.select().from(technicianEmployerConnections)
+      .where(and(
+        eq(technicianEmployerConnections.technicianId, employeeId),
+        eq(technicianEmployerConnections.companyId, companyId),
+        eq(technicianEmployerConnections.status, "active")
+      )).limit(1);
+
+    if (secondaryConnection.length > 0) {
+      return { belongs: true, connectionType: 'secondary', connectionId: secondaryConnection[0].id };
+    }
+
+    return { belongs: false, connectionType: null };
+  }
+
+  /**
+   * Terminate an employee's connection to a company
+   * Handles both primary (companyId) and secondary (employer_connections) relationships
+   */
+  async terminateEmployeeConnection(employeeId: string, companyId: string, reason?: string, notes?: string): Promise<boolean> {
+    const membership = await this.checkEmployeeBelongsToCompany(employeeId, companyId);
+    
+    if (!membership.belongs) {
+      return false;
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+
+    if (membership.connectionType === 'primary') {
+      // Primary connection - set terminatedDate on user record
+      await this.updateUser(employeeId, {
+        terminatedDate: today,
+        terminationReason: reason || null,
+        terminationNotes: notes || null,
+      });
+    } else if (membership.connectionType === 'secondary' && membership.connectionId) {
+      // Secondary connection - update the connection record
+      await db.update(technicianEmployerConnections)
+        .set({
+          status: "terminated",
+          terminatedAt: new Date(),
+        })
+        .where(eq(technicianEmployerConnections.id, membership.connectionId));
+    }
+
+    return true;
+  }
+
+  /**
+   * Suspend an employee's access to a company (for seat removal)
+   * Handles both primary and secondary connections
+   */
+  async suspendEmployeeConnection(employeeId: string, companyId: string): Promise<boolean> {
+    const membership = await this.checkEmployeeBelongsToCompany(employeeId, companyId);
+    
+    if (!membership.belongs) {
+      return false;
+    }
+
+    if (membership.connectionType === 'primary') {
+      // Primary connection - set suspendedAt on user record
+      await this.updateUser(employeeId, {
+        suspendedAt: new Date().toISOString(),
+      });
+    } else if (membership.connectionType === 'secondary' && membership.connectionId) {
+      // Secondary connection - update the connection record status
+      await db.update(technicianEmployerConnections)
+        .set({
+          status: "suspended",
+        })
+        .where(eq(technicianEmployerConnections.id, membership.connectionId));
+    }
+
+    return true;
+  }
+
   // SuperUser: Get all technicians with pagination and search
   async getAllTechnicians(options: { 
     page?: number; 
