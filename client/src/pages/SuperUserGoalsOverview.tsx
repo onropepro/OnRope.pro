@@ -408,10 +408,10 @@ export default function SuperUserGoalsOverview() {
           <div className="space-y-2">
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div>
-                <h1 className="text-2xl font-bold text-gray-800 dark:text-white/90" data-testid="text-page-title">
+                <h1 className="text-4xl md:text-5xl font-extrabold text-foreground" data-testid="text-page-title">
                   Metrics Dashboard
                 </h1>
-                <p className="text-gray-500 dark:text-gray-400">
+                <p className="text-muted-foreground">
                   Real-time visibility into the metrics that matter
                 </p>
               </div>

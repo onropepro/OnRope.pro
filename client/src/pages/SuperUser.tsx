@@ -124,10 +124,10 @@ export default function SuperUser() {
   return (
     <SuperUserLayout title="Dashboard">
       <div className="p-6 space-y-6">
-        {/* Welcome Section - TailAdmin Style */}
+        {/* Welcome Section */}
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-white/90">Welcome back</h2>
-          <p className="text-gray-500 dark:text-gray-400">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground">Welcome back</h2>
+          <p className="text-muted-foreground">
             Here's an overview of your platform activity
           </p>
         </div>

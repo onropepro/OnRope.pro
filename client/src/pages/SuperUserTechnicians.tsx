@@ -295,8 +295,8 @@ export default function SuperUserTechnicians() {
     <SuperUserLayout title="Technician Database">
       <div className="p-6 space-y-6">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-white/90">Technician Database</h2>
-          <p className="text-gray-500 dark:text-gray-400">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground">Technician Database</h2>
+          <p className="text-muted-foreground">
             View all technicians registered on the platform
           </p>
         </div>

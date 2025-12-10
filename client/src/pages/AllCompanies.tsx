@@ -33,7 +33,7 @@ export default function AllCompanies() {
         <div className="max-w-7xl mx-auto space-y-6">
           {/* Header */}
           <div>
-            <h1 className="text-3xl font-bold">All Registered Companies</h1>
+            <h1 className="text-4xl md:text-5xl font-extrabold text-foreground">All Registered Companies</h1>
             <p className="text-muted-foreground mt-2">
               View and manage all companies registered on the platform
             </p>
