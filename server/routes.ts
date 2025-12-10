@@ -5229,11 +5229,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get all projects for this building across all companies
       const allProjects = await storage.getProjectsForBuilding(building.strataPlanNumber);
       
-      // Get work sessions for these projects
+      // Get work sessions for these projects with additional details for active projects
       const projectHistory = await Promise.all(
         allProjects.map(async (project) => {
           const company = await storage.getUserById(project.companyId);
-          return {
+          
+          // Base project info
+          const projectInfo: any = {
             id: project.id,
             jobType: project.jobType,
             customJobType: project.customJobType,
@@ -5243,6 +5245,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
             companyName: company?.companyName || 'Unknown Company',
             createdAt: project.createdAt,
           };
+          
+          // For active projects, include more details and resident code
+          if (project.status === 'active') {
+            projectInfo.residentCode = company?.residentCode || null;
+            projectInfo.companyPhone = company?.phone || null;
+            projectInfo.companyEmail = company?.email || null;
+            projectInfo.notes = project.notes || null;
+            projectInfo.scheduledDates = project.scheduledDates || [];
+            
+            // Get progress info based on job type
+            if (project.progressType === 'drops') {
+              projectInfo.progressType = 'drops';
+              projectInfo.totalDropsNorth = project.totalDropsNorth;
+              projectInfo.totalDropsEast = project.totalDropsEast;
+              projectInfo.totalDropsSouth = project.totalDropsSouth;
+              projectInfo.totalDropsWest = project.totalDropsWest;
+              projectInfo.completedDropsNorth = project.completedDropsNorth;
+              projectInfo.completedDropsEast = project.completedDropsEast;
+              projectInfo.completedDropsSouth = project.completedDropsSouth;
+              projectInfo.completedDropsWest = project.completedDropsWest;
+            } else if (project.progressType === 'suites') {
+              projectInfo.progressType = 'suites';
+              projectInfo.totalSuites = project.totalSuites;
+              projectInfo.completedSuites = project.completedSuites;
+            } else if (project.progressType === 'stalls') {
+              projectInfo.progressType = 'stalls';
+              projectInfo.totalStalls = project.totalStalls;
+              projectInfo.completedStalls = project.completedStalls;
+            } else if (project.progressType === 'hours') {
+              projectInfo.progressType = 'hours';
+              projectInfo.estimatedHours = project.estimatedHours;
+              projectInfo.loggedHours = project.loggedHours;
+            }
+          }
+          
+          return projectInfo;
         })
       );
 

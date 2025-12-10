@@ -13,7 +13,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate, formatLocalDateLong } from "@/lib/dateUtils";
-import { Loader2, Building2, History, CheckCircle, Clock, AlertCircle, LogOut, Lock, Hash, ArrowLeft, KeyRound, DoorOpen, Phone, User, Wrench, FileText, Pencil, Save } from "lucide-react";
+import { Loader2, Building2, History, CheckCircle, Clock, AlertCircle, LogOut, Lock, Hash, ArrowLeft, KeyRound, DoorOpen, Phone, User, Wrench, FileText, Pencil, Save, Copy, Users } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import type { BuildingInstructions } from "@shared/schema";
 
 interface BuildingData {
@@ -40,6 +41,31 @@ interface ProjectHistoryItem {
   endDate: string | null;
   companyName: string;
   createdAt: string;
+  // Additional fields for active projects
+  residentCode?: string | null;
+  companyPhone?: string | null;
+  companyEmail?: string | null;
+  notes?: string | null;
+  scheduledDates?: string[];
+  progressType?: 'drops' | 'suites' | 'stalls' | 'hours';
+  // Drop progress
+  totalDropsNorth?: number;
+  totalDropsEast?: number;
+  totalDropsSouth?: number;
+  totalDropsWest?: number;
+  completedDropsNorth?: number;
+  completedDropsEast?: number;
+  completedDropsSouth?: number;
+  completedDropsWest?: number;
+  // Suite progress
+  totalSuites?: number;
+  completedSuites?: number;
+  // Stall progress
+  totalStalls?: number;
+  completedStalls?: number;
+  // Hours progress
+  estimatedHours?: number;
+  loggedHours?: number;
 }
 
 interface PortalData {
@@ -311,6 +337,34 @@ export default function BuildingPortal() {
       other: "Other",
     };
     return jobTypeNames[project.jobType] || project.jobType;
+  };
+
+  const getProjectProgress = (project: ProjectHistoryItem): { completed: number; total: number; label: string; hasProgress: boolean } | null => {
+    if (!project.progressType) return null;
+    
+    switch (project.progressType) {
+      case 'drops': {
+        const total = (project.totalDropsNorth || 0) + (project.totalDropsEast || 0) + 
+                     (project.totalDropsSouth || 0) + (project.totalDropsWest || 0);
+        const completed = (project.completedDropsNorth || 0) + (project.completedDropsEast || 0) + 
+                         (project.completedDropsSouth || 0) + (project.completedDropsWest || 0);
+        return { completed, total, label: 'drops', hasProgress: total > 0 };
+      }
+      case 'suites': {
+        const total = project.totalSuites || 0;
+        return { completed: project.completedSuites || 0, total, label: 'suites', hasProgress: total > 0 };
+      }
+      case 'stalls': {
+        const total = project.totalStalls || 0;
+        return { completed: project.completedStalls || 0, total, label: 'stalls', hasProgress: total > 0 };
+      }
+      case 'hours': {
+        const total = project.estimatedHours || 0;
+        return { completed: project.loggedHours || 0, total, label: 'hours', hasProgress: total > 0 };
+      }
+      default:
+        return null;
+    }
   };
 
   const isAuthenticated = !hasPortalError && portalData;
@@ -749,34 +803,108 @@ export default function BuildingPortal() {
               </div>
             ) : (
               <div className="space-y-4">
-                {projectHistory.map((project, index) => (
-                  <div key={project.id}>
-                    {index > 0 && <Separator className="my-4" />}
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-medium">{getJobTypeName(project)}</span>
-                          {getStatusBadge(project.status)}
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          by {project.companyName}
-                        </p>
-                      </div>
-                      <div className="text-sm text-muted-foreground md:text-right">
-                        {project.startDate ? (
-                          <>
-                            <span>{formatLocalDate(project.startDate)}</span>
-                            {project.endDate && project.startDate !== project.endDate && (
-                              <span> - {formatLocalDate(project.endDate)}</span>
+                {projectHistory.map((project, index) => {
+                  const progress = project.status === 'active' ? getProjectProgress(project) : null;
+                  const isActive = project.status === 'active';
+                  
+                  return (
+                    <div key={project.id}>
+                      {index > 0 && <Separator className="my-4" />}
+                      <div className={`${isActive ? 'p-4 rounded-lg border-2 border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/30' : ''}`}>
+                        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                          <div className="space-y-2 flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-medium">{getJobTypeName(project)}</span>
+                              {getStatusBadge(project.status)}
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                              by {project.companyName}
+                            </p>
+                            
+                            {/* Enhanced details for active projects */}
+                            {isActive && (
+                              <div className="mt-3 space-y-3">
+                                {/* Progress bar */}
+                                {progress && (
+                                  <div className="space-y-1">
+                                    <div className="flex justify-between text-xs text-muted-foreground">
+                                      <span>Progress</span>
+                                      {progress.hasProgress ? (
+                                        <span>{progress.completed} / {progress.total} {progress.label}</span>
+                                      ) : (
+                                        <span className="italic">Not yet configured</span>
+                                      )}
+                                    </div>
+                                    <Progress 
+                                      value={progress.hasProgress ? (progress.completed / progress.total) * 100 : 0} 
+                                      className="h-2" 
+                                    />
+                                  </div>
+                                )}
+                                
+                                {/* Resident Code - important for building manager */}
+                                {project.residentCode && (
+                                  <div className="flex items-center gap-2 p-2 rounded-md bg-background border">
+                                    <Users className="h-4 w-4 text-muted-foreground shrink-0" />
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-xs text-muted-foreground">Resident Feedback Code</p>
+                                      <p className="font-mono font-medium">{project.residentCode}</p>
+                                    </div>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={() => {
+                                        navigator.clipboard.writeText(project.residentCode!);
+                                        toast({
+                                          title: "Copied",
+                                          description: "Resident code copied to clipboard",
+                                        });
+                                      }}
+                                      data-testid={`button-copy-resident-code-${project.id}`}
+                                    >
+                                      <Copy className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                )}
+                                
+                                {/* Company contact info */}
+                                {(project.companyPhone || project.companyEmail) && (
+                                  <div className="flex flex-wrap gap-3 text-sm">
+                                    {project.companyPhone && (
+                                      <a href={`tel:${project.companyPhone}`} className="flex items-center gap-1 text-primary hover:underline">
+                                        <Phone className="h-3 w-3" />
+                                        {project.companyPhone}
+                                      </a>
+                                    )}
+                                  </div>
+                                )}
+                                
+                                {/* Notes */}
+                                {project.notes && (
+                                  <p className="text-sm text-muted-foreground italic">
+                                    Note: {project.notes}
+                                  </p>
+                                )}
+                              </div>
                             )}
-                          </>
-                        ) : (
-                          <span>Created {formatLocalDate(project.createdAt)}</span>
-                        )}
+                          </div>
+                          <div className="text-sm text-muted-foreground md:text-right shrink-0">
+                            {project.startDate ? (
+                              <>
+                                <span>{formatLocalDate(project.startDate)}</span>
+                                {project.endDate && project.startDate !== project.endDate && (
+                                  <span> - {formatLocalDate(project.endDate)}</span>
+                                )}
+                              </>
+                            ) : (
+                              <span>Created {formatLocalDate(project.createdAt)}</span>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </CardContent>
