@@ -603,36 +603,60 @@ export default function Payroll() {
 
               {selectedPeriodId && !hoursLoading && hoursData && hoursData.hoursSummary.length > 0 && (
                 <div className="space-y-4">
-                  <div className="grid gap-4 md:grid-cols-3">
-                    <Card>
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium">{t('payroll.employee', 'Total Employees')}</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-bold">{hoursData.hoursSummary.length}</div>
-                      </CardContent>
-                    </Card>
-                    <Card>
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium">{t('payroll.totalHours', 'Total Hours')}</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-bold">
-                          {hoursData.hoursSummary.reduce((sum, emp) => sum + emp.totalHours, 0).toFixed(2)}
-                        </div>
-                      </CardContent>
-                    </Card>
-                    <Card>
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium">{t('payroll.grossPay', 'Total Labor Cost')}</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-bold">
-                          ${hoursData.hoursSummary.reduce((sum, emp) => sum + emp.totalPay, 0).toFixed(2)}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
+                  {(() => {
+                    // Calculate piece work total from all sessions
+                    const pieceWorkTotal = hoursData.hoursSummary.reduce((total, emp) => {
+                      return total + emp.sessions.reduce((empTotal, session) => {
+                        if (session.isPeaceWork && session.peaceWorkPay) {
+                          return empTotal + parseFloat(session.peaceWorkPay);
+                        }
+                        return empTotal;
+                      }, 0);
+                    }, 0);
+                    
+                    return (
+                      <div className="grid gap-4 md:grid-cols-4">
+                        <Card>
+                          <CardHeader className="pb-2">
+                            <CardTitle className="text-sm font-medium">{t('payroll.employee', 'Total Employees')}</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="text-2xl font-bold">{hoursData.hoursSummary.length}</div>
+                          </CardContent>
+                        </Card>
+                        <Card>
+                          <CardHeader className="pb-2">
+                            <CardTitle className="text-sm font-medium">{t('payroll.totalHours', 'Total Hours')}</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="text-2xl font-bold">
+                              {hoursData.hoursSummary.reduce((sum, emp) => sum + emp.totalHours, 0).toFixed(2)}
+                            </div>
+                          </CardContent>
+                        </Card>
+                        <Card>
+                          <CardHeader className="pb-2">
+                            <CardTitle className="text-sm font-medium">{t('payroll.pieceWorkTotal', 'Piece Work')}</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                              ${pieceWorkTotal.toFixed(2)}
+                            </div>
+                          </CardContent>
+                        </Card>
+                        <Card>
+                          <CardHeader className="pb-2">
+                            <CardTitle className="text-sm font-medium">{t('payroll.grossPay', 'Total Labor Cost')}</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="text-2xl font-bold">
+                              ${hoursData.hoursSummary.reduce((sum, emp) => sum + emp.totalPay, 0).toFixed(2)}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    );
+                  })()}
 
                   <div className="space-y-2">
                     <Accordion type="single" collapsible className="space-y-2">
