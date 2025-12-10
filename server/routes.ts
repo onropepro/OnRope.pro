@@ -3618,8 +3618,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const updates: any = {};
       
       if (parsedSeats > 0) {
-        // Each add-on is 1 seat
-        updates.additionalSeatsCount = (company.additionalSeatsCount || 0) + parsedSeats;
+        // Gifted seats are stored separately and are free forever
+        updates.giftedSeatsCount = (company.giftedSeatsCount || 0) + parsedSeats;
       }
       
       if (parsedProjects > 0) {
@@ -3658,6 +3658,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           id: updatedCompany?.id,
           companyName: updatedCompany?.companyName,
           additionalSeatsCount: updatedCompany?.additionalSeatsCount,
+          giftedSeatsCount: updatedCompany?.giftedSeatsCount,
           additionalProjectsCount: updatedCompany?.additionalProjectsCount,
           whitelabelBrandingActive: updatedCompany?.whitelabelBrandingActive,
         },
