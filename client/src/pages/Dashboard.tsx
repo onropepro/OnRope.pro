@@ -4773,13 +4773,6 @@ export default function Dashboard() {
                           </div>
                         </div>
                       </div>
-                      {employeesData.seatInfo.tier && employeesData.seatInfo.tier !== 'none' && (
-                        <div className="text-right">
-                          <Badge variant={employeesData.seatInfo.atSeatLimit ? "destructive" : "secondary"} data-testid="badge-tier-status">
-                            {employeesData.seatInfo.tier.charAt(0).toUpperCase() + employeesData.seatInfo.tier.slice(1)}
-                          </Badge>
-                        </div>
-                      )}
                     </div>
                     
                     {employeesData.seatInfo.atSeatLimit && (
