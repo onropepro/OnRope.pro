@@ -1568,16 +1568,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Get extra seats price ID
+      // Get extra seats price ID (current price)
       const addonConfig = ADDON_CONFIG.extra_seats;
       const addonPriceId = currency === 'usd' ? addonConfig.priceIdUSD : addonConfig.priceIdCAD;
+      
+      // Legacy price IDs (for counting existing seats from old pricing)
+      const legacySeatPriceIds = [
+        'price_1SWDH4BzDsOltscrMxt5u3ij',  // Old USD seat price
+        'price_1SZG7KBzDsOltscrAcGW9Vuw',  // Old CAD seat price
+      ];
 
       console.log(`[Stripe] Adding ${seatsToAdd} extra seat(s) to subscription ${user.stripeSubscriptionId}`);
 
-      // Check if extra seats already exists on subscription
+      // Count ALL existing seats across current and legacy prices
+      let totalExistingSeats = 0;
+      for (const item of subscription.items.data) {
+        if (item.price.id === addonPriceId || legacySeatPriceIds.includes(item.price.id)) {
+          totalExistingSeats += item.quantity || 0;
+        }
+      }
+
+      // Check if current price already exists on subscription
       const existingItem = subscription.items.data.find(item => item.price.id === addonPriceId);
 
-      let newQuantity: number;
+      let newQuantityOnCurrentPrice: number;
       if (existingItem) {
         // Update quantity of existing subscription item
         const currentQuantity = existingItem.quantity || 0;
@@ -1587,7 +1601,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           quantity: targetQuantity,
           proration_behavior: 'create_prorations',
         });
-        newQuantity = updatedItem.quantity || targetQuantity;
+        newQuantityOnCurrentPrice = updatedItem.quantity || targetQuantity;
       } else {
         // Create new subscription item with requested quantity
         console.log(`[Stripe] Adding ${seatsToAdd} extra seat(s) as new subscription item`);
@@ -1597,21 +1611,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
           quantity: seatsToAdd,
           proration_behavior: 'create_prorations',
         });
-        newQuantity = newItem.quantity || seatsToAdd;
+        newQuantityOnCurrentPrice = newItem.quantity || seatsToAdd;
       }
 
-      // Update user's additional seats count in database with authoritative Stripe quantity
+      // Total seats = existing seats on legacy prices + seats on current price
+      const totalSeats = totalExistingSeats - (existingItem?.quantity || 0) + newQuantityOnCurrentPrice;
+
+      // Update user's additional seats count in database with total from all seat items
       await storage.updateUser(user.id, {
-        additionalSeatsCount: newQuantity,
+        additionalSeatsCount: totalSeats,
       });
 
-      console.log(`[Stripe] ${seatsToAdd} extra seat(s) added successfully. Total additional seats: ${newQuantity}`);
+      console.log(`[Stripe] ${seatsToAdd} extra seat(s) added successfully. Total additional seats: ${totalSeats}`);
       res.json({
         success: true,
         message: `${seatsToAdd} seat(s) added successfully`,
         seatsAdded: seatsToAdd,
-        additionalSeats: newQuantity,
-        totalExtraSeats: newQuantity,
+        additionalSeats: totalSeats,
+        totalExtraSeats: totalSeats,
       });
     } catch (error: any) {
       console.error('[Stripe] Add seats error:', error);
