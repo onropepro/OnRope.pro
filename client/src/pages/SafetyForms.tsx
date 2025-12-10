@@ -76,7 +76,7 @@ export default function SafetyForms() {
     <div className="min-h-screen bg-background p-4 pb-24">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center gap-3 mb-4">
-          <BackButton size="icon" />
+          <BackButton size="icon" to="/dashboard" />
           <MainMenuButton size="icon" />
           <div className="flex items-center gap-2 min-w-0 flex-1">
             <Shield className="h-5 w-5 sm:h-6 sm:w-6 text-primary flex-shrink-0" />

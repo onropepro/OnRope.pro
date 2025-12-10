@@ -328,7 +328,7 @@ export default function ToolboxMeetingForm() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate("/dashboard")}
+            onClick={() => navigate("/safety-forms")}
             data-testid="button-back"
           >
             <ArrowLeft className="h-5 w-5" />
