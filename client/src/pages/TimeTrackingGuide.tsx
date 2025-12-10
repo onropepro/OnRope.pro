@@ -383,7 +383,7 @@ export default function TimeTrackingGuide() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base">Peace Work Projects</CardTitle>
+                <CardTitle className="text-base">Piece Work Projects</CardTitle>
               </CardHeader>
               <CardContent className="text-base space-y-3">
                 <div className="bg-muted p-3 rounded space-y-2">
@@ -451,7 +451,6 @@ export default function TimeTrackingGuide() {
                   <p className="font-semibold text-xs">Features:</p>
                   <ul className="list-disc list-inside space-y-1 text-base">
                     <li>Real-time status updates</li>
-                    <li>Click to see GPS location</li>
                     <li>View session start time</li>
                     <li>Filter by project</li>
                   </ul>
@@ -550,7 +549,7 @@ export default function TimeTrackingGuide() {
                   <ul className="list-disc list-inside space-y-1 text-base">
                     <li>Total hours worked</li>
                     <li>Overtime breakdown</li>
-                    <li>Peace work pay (if applicable)</li>
+                    <li>Piece work pay (if applicable)</li>
                     <li>Payroll amounts</li>
                   </ul>
                 </div>
