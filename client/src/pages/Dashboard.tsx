@@ -2119,6 +2119,32 @@ export default function Dashboard() {
       toast({ title: t('dashboard.toast.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
+  
+  const reactivateSuspendedMutation = useMutation({
+    mutationFn: async (employeeId: string) => {
+      const response = await apiRequest("POST", `/api/employees/${employeeId}/reactivate-suspended`, {});
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to reactivate employee");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/employees/all"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/employees"] });
+      toast({
+        title: t('dashboard.toast.employeeReactivated', 'Employee reactivated successfully'),
+        description: t('dashboard.toast.employeeReactivatedDesc', 'The employee now has access to their account.'),
+      });
+    },
+    onError: (error: Error) => {
+      toast({ 
+        title: t('dashboard.toast.error', 'Error'), 
+        description: error.message, 
+        variant: "destructive" 
+      });
+    },
+  });
 
   const onEditEmployeeSubmit = async (data: EditEmployeeFormData) => {
     if (!employeeToEdit) return;
@@ -4784,9 +4810,20 @@ export default function Dashboard() {
                                   const seatsRemaining = employeesData.seatInfo.seatLimit === -1 
                                     ? '∞' 
                                     : Math.max(0, employeesData.seatInfo.seatLimit - employeesData.seatInfo.seatsUsed);
-                                  const additionalInfo = employeesData.seatInfo.additionalSeats > 0 
-                                    ? ` (${employeesData.seatInfo.baseSeatLimit} base + ${employeesData.seatInfo.additionalSeats} additional)` 
-                                    : '';
+                                  const paidSeats = employeesData.seatInfo.paidSeats || 0;
+                                  const giftedSeats = employeesData.seatInfo.giftedSeats || 0;
+                                  const totalAdditional = employeesData.seatInfo.additionalSeats || 0;
+                                  
+                                  let additionalInfo = '';
+                                  if (totalAdditional > 0) {
+                                    if (paidSeats > 0 && giftedSeats > 0) {
+                                      additionalInfo = ` (${employeesData.seatInfo.baseSeatLimit} base + ${paidSeats} paid + ${giftedSeats} gifted)`;
+                                    } else if (giftedSeats > 0) {
+                                      additionalInfo = ` (${employeesData.seatInfo.baseSeatLimit} base + ${giftedSeats} gifted)`;
+                                    } else if (paidSeats > 0) {
+                                      additionalInfo = ` (${employeesData.seatInfo.baseSeatLimit} base + ${paidSeats} paid)`;
+                                    }
+                                  }
                                   
                                   return employeesData.seatInfo.seatLimit === -1
                                     ? `${employeesData.seatInfo.seatsUsed} ${t('dashboard.employeeSeats.seatsUsed', 'seats used')} • ${t('dashboard.employeeSeats.unlimited', 'Unlimited available')}`
@@ -5745,7 +5782,7 @@ export default function Dashboard() {
                 <div className="space-y-2">
                   <h3 className="text-lg font-medium">{t('dashboard.employees.activeEmployees', 'Active Employees')}</h3>
                   {(() => {
-                    const activeEmployees = employees.filter((emp: any) => !emp.terminatedDate);
+                    const activeEmployees = employees.filter((emp: any) => !emp.terminatedDate && !emp.suspendedAt);
                     
                     if (activeEmployees.length === 0) {
                       return (
@@ -5994,6 +6031,73 @@ export default function Dashboard() {
                     });
                   })()}
                 </div>
+
+                {/* Suspended Employees - Seat removed but can be reactivated */}
+                {(() => {
+                  const suspendedEmployees = employees.filter((emp: any) => emp.suspendedAt && !emp.terminatedDate);
+                  
+                  if (suspendedEmployees.length > 0) {
+                    return (
+                      <div className="space-y-2 mt-6">
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-lg font-medium text-amber-600 dark:text-amber-400">
+                            {t('dashboard.employees.suspendedEmployees', 'Suspended Employees')}
+                          </h3>
+                          <Badge variant="outline" className="bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800">
+                            {suspendedEmployees.length}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          {t('dashboard.employees.suspendedDesc', 'These employees had their seats removed. Purchase a new seat to reactivate them.')}
+                        </p>
+                        {suspendedEmployees.map((employee: any) => (
+                          <Card key={employee.id} data-testid={`suspended-employee-card-${employee.id}`} className="border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20">
+                            <CardContent className="p-4">
+                              <div className="flex items-center justify-between gap-3 flex-wrap">
+                                <div className="flex items-center gap-3">
+                                  <div className="p-2 bg-amber-100 dark:bg-amber-900 rounded-full">
+                                    <span className="material-icons text-amber-600 dark:text-amber-400">pause_circle</span>
+                                  </div>
+                                  <div>
+                                    <div className="font-medium">{employee.name || employee.email}</div>
+                                    <div className="flex items-center gap-2 mt-1">
+                                      <Badge variant="outline" className="text-xs capitalize">
+                                        {employee.role?.replace(/_/g, ' ') || 'Employee'}
+                                      </Badge>
+                                      <span className="text-xs text-muted-foreground">
+                                        {t('dashboard.employees.suspendedOn', 'Suspended:')} {formatTimestampDate(employee.suspendedAt)}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <Button
+                                  variant="default"
+                                  size="sm"
+                                  onClick={() => reactivateSuspendedMutation.mutate(employee.id)}
+                                  disabled={reactivateSuspendedMutation.isPending}
+                                  data-testid={`button-reactivate-suspended-${employee.id}`}
+                                >
+                                  {reactivateSuspendedMutation.isPending ? (
+                                    <>
+                                      <span className="material-icons text-sm mr-1 animate-spin">sync</span>
+                                      {t('dashboard.employees.reactivating', 'Reactivating...')}
+                                    </>
+                                  ) : (
+                                    <>
+                                      <span className="material-icons text-sm mr-1">person_add</span>
+                                      {t('dashboard.employees.reactivate', 'Reactivate')}
+                                    </>
+                                  )}
+                                </Button>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
 
                 {/* Terminated Employees */}
                 {(() => {

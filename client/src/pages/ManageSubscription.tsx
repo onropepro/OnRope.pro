@@ -25,6 +25,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { formatTimestampDate } from "@/lib/dateUtils";
+import { RemoveSeatsDialog } from "@/components/RemoveSeatsDialog";
 
 type TierName = 'basic' | 'starter' | 'premium' | 'enterprise';
 
@@ -35,6 +36,7 @@ interface SubscriptionDetails {
   cancelAtPeriodEnd: boolean;
   whitelabelBrandingActive?: boolean;
   additionalSeatsCount: number;
+  giftedSeatsCount: number;
   additionalProjectsCount: number;
   currency: 'usd' | 'cad';
 }
@@ -67,6 +69,7 @@ export default function ManageSubscription() {
   const [cancelSeatPackNumber, setCancelSeatPackNumber] = useState<number>(0);
   const [cancelProjectNumber, setCancelProjectNumber] = useState<number>(0);
   const [showAddSeatsDialog, setShowAddSeatsDialog] = useState(false);
+  const [showRemoveSeatsDialog, setShowRemoveSeatsDialog] = useState(false);
   const [showAddProjectDialog, setShowAddProjectDialog] = useState(false);
   const [showAddBrandingDialog, setShowAddBrandingDialog] = useState(false);
 
@@ -335,6 +338,7 @@ export default function ManageSubscription() {
             {/* Active Add-ons in Current Plan */}
             {(subscriptionData.whitelabelBrandingActive || 
               subscriptionData.additionalSeatsCount > 0 || 
+              (subscriptionData.giftedSeatsCount || 0) > 0 ||
               subscriptionData.additionalProjectsCount > 0) && (
               <>
                 <div className="text-sm font-medium text-muted-foreground">Active Add-ons:</div>
@@ -359,9 +363,9 @@ export default function ManageSubscription() {
                   </div>
                 )}
 
-                {/* Extra Seats Summary */}
-                {subscriptionData.additionalSeatsCount > 0 && (
-                  <div className="flex items-center justify-between p-4 bg-muted/50 rounded-md">
+                {/* Extra Seats Summary - Show paid and gifted separately */}
+                {(subscriptionData.additionalSeatsCount > 0 || (subscriptionData.giftedSeatsCount || 0) > 0) && (
+                  <div className="flex items-center justify-between p-4 bg-muted/50 rounded-md gap-4 flex-wrap">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-primary/10 rounded-md">
                         <CreditCard className="w-5 h-5 text-primary" />
@@ -369,12 +373,39 @@ export default function ManageSubscription() {
                       <div>
                         <h3 className="font-medium">Extra Team Seats</h3>
                         <p className="text-sm text-muted-foreground">
-                          {subscriptionData.additionalSeatsCount} additional seat{subscriptionData.additionalSeatsCount > 1 ? 's' : ''}
+                          {subscriptionData.additionalSeatsCount + (subscriptionData.giftedSeatsCount || 0)} total seat{(subscriptionData.additionalSeatsCount + (subscriptionData.giftedSeatsCount || 0)) !== 1 ? 's' : ''}
+                          {subscriptionData.additionalSeatsCount > 0 && (subscriptionData.giftedSeatsCount || 0) > 0 && (
+                            <span className="block text-xs">
+                              ({subscriptionData.additionalSeatsCount} paid + {subscriptionData.giftedSeatsCount} gifted)
+                            </span>
+                          )}
+                          {subscriptionData.additionalSeatsCount === 0 && (subscriptionData.giftedSeatsCount || 0) > 0 && (
+                            <span className="block text-xs text-green-600 dark:text-green-400">
+                              ({subscriptionData.giftedSeatsCount} gifted - free forever)
+                            </span>
+                          )}
                         </p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-medium">{currencySymbol}{(subscriptionData.additionalSeatsCount * 34.95).toFixed(2)}/month</p>
+                    <div className="flex items-center gap-4">
+                      {subscriptionData.additionalSeatsCount > 0 && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setShowRemoveSeatsDialog(true)}
+                          data-testid="button-remove-seats"
+                        >
+                          <span className="material-icons text-sm mr-1">person_remove</span>
+                          Remove Seats
+                        </Button>
+                      )}
+                      <div className="text-right">
+                        {subscriptionData.additionalSeatsCount > 0 ? (
+                          <p className="font-medium">{currencySymbol}{(subscriptionData.additionalSeatsCount * 34.95).toFixed(2)}/month</p>
+                        ) : (
+                          <p className="font-medium text-green-600 dark:text-green-400">Free</p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 )}
@@ -547,6 +578,7 @@ export default function ManageSubscription() {
 
             {!subscriptionData.whitelabelBrandingActive && 
              subscriptionData.additionalSeatsCount === 0 &&
+             (subscriptionData.giftedSeatsCount || 0) === 0 &&
              subscriptionData.additionalProjectsCount === 0 && (
               <div className="text-center py-8">
                 <p className="text-muted-foreground">No active add-ons</p>
@@ -819,6 +851,20 @@ export default function ManageSubscription() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Remove Seats Dialog */}
+      {subscriptionData && (
+        <RemoveSeatsDialog
+          open={showRemoveSeatsDialog}
+          onOpenChange={setShowRemoveSeatsDialog}
+          paidSeats={subscriptionData.additionalSeatsCount}
+          giftedSeats={subscriptionData.giftedSeatsCount || 0}
+          onRemoveSuccess={() => {
+            queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+            queryClient.invalidateQueries({ queryKey: ["/api/subscription/details"] });
+          }}
+        />
+      )}
     </div>
   );
 }

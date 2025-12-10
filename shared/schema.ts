@@ -154,6 +154,10 @@ export const users = pgTable("users", {
   terminationReason: text("termination_reason"), // Reason for termination (optional)
   terminationNotes: text("termination_notes"), // Additional notes about termination (optional)
   
+  // Seat suspension (for removing paid seats during slow season)
+  suspendedAt: timestamp("suspended_at"), // When the employee was suspended (seat removed)
+  suspendedBy: varchar("suspended_by").references(() => users.id, { onDelete: "set null" }), // Company owner who suspended them
+  
   // Stripe subscription management (company role only)
   stripeCustomerId: varchar("stripe_customer_id"), // Stripe customer ID for billing
   subscriptionTier: varchar("subscription_tier").default('none'), // none | basic | starter | premium | enterprise

@@ -55,9 +55,11 @@ export async function checkSubscriptionLimits(userId: string): Promise<{
         seats: tierConfig.maxSeats,
       };
       
-      // Add purchased add-ons to base limits
+      // Add purchased add-ons and gifted seats to base limits
       const additionalProjects = user.additionalProjectsCount || 0;
-      const additionalSeats = user.additionalSeatsCount || 0;
+      const paidSeats = user.additionalSeatsCount || 0;
+      const giftedSeats = user.giftedSeatsCount || 0;
+      const totalAdditionalSeats = paidSeats + giftedSeats;
       
       // Calculate total limits (handle unlimited tier)
       maxProjects = baseLimits.projects === -1 
@@ -66,9 +68,9 @@ export async function checkSubscriptionLimits(userId: string): Promise<{
       
       maxSeats = baseLimits.seats === -1 
         ? -1 
-        : baseLimits.seats + additionalSeats;
+        : baseLimits.seats + totalAdditionalSeats;
       
-      console.log(`[Subscription] Company ${user.id} limits - Base: ${baseLimits.projects}p/${baseLimits.seats}s, Add-ons: +${additionalProjects}p/+${additionalSeats}s, Total: ${maxProjects}p/${maxSeats}s`);
+      console.log(`[Subscription] Company ${user.id} limits - Base: ${baseLimits.projects}p/${baseLimits.seats}s, Add-ons: +${additionalProjects}p/+${paidSeats}paid+${giftedSeats}gifted seats, Total: ${maxProjects}p/${maxSeats}s`);
     } else if (user.subscriptionStatus === 'canceled' && user.subscriptionEndDate) {
       // Grace period check - 48 hours after subscription end
       const endDate = new Date(user.subscriptionEndDate);

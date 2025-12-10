@@ -1771,6 +1771,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         cancelAtPeriodEnd: subscription.cancel_at_period_end,
         whitelabelBrandingActive: user.whitelabelBrandingActive || false,
         additionalSeatsCount: user.additionalSeatsCount || 0,
+        giftedSeatsCount: user.giftedSeatsCount || 0,
         additionalProjectsCount: user.additionalProjectsCount || 0,
         currency,
       });
@@ -1950,6 +1951,198 @@ export async function registerRoutes(app: Express): Promise<Server> {
     return res.status(400).json({ 
       message: "Project add-ons are no longer available. Your subscription includes unlimited projects." 
     });
+  });
+
+  /**
+   * Remove multiple seats with employee suspension
+   * POST /api/stripe/remove-seats
+   */
+  app.post("/api/stripe/remove-seats", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.role !== 'company') {
+        return res.status(403).json({ message: "Only company accounts can remove seats" });
+      }
+
+      if (!user.stripeSubscriptionId) {
+        return res.status(400).json({ message: "No active subscription found" });
+      }
+
+      const { quantity, employeeIds } = req.body;
+      
+      if (!quantity || quantity < 1) {
+        return res.status(400).json({ message: "Invalid quantity" });
+      }
+
+      if (!employeeIds || !Array.isArray(employeeIds) || employeeIds.length !== quantity) {
+        return res.status(400).json({ message: "Must select employees equal to the number of seats to remove" });
+      }
+
+      const paidSeats = user.additionalSeatsCount || 0;
+      if (quantity > paidSeats) {
+        return res.status(400).json({ message: `Cannot remove more seats than you have paid for (${paidSeats})` });
+      }
+
+      // Validate all employees belong to this company and are active (not suspended or terminated)
+      for (const empId of employeeIds) {
+        const emp = await storage.getUserById(empId);
+        if (!emp) {
+          return res.status(400).json({ message: `Employee ${empId} not found` });
+        }
+        if (emp.companyId !== user.id) {
+          return res.status(400).json({ message: "Cannot suspend employees from another company" });
+        }
+        if (emp.suspendedAt) {
+          return res.status(400).json({ message: `Employee ${emp.name} is already suspended` });
+        }
+        if (emp.terminatedDate) {
+          return res.status(400).json({ message: `Employee ${emp.name} is terminated and cannot be suspended` });
+        }
+      }
+
+      // Get current subscription to determine currency
+      const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
+      const currency = subscription.currency.toLowerCase() as 'usd' | 'cad';
+
+      // Get extra seats price ID
+      const addonConfig = ADDON_CONFIG.extra_seats;
+      const addonPriceId = currency === 'usd' ? addonConfig.priceIdUSD : addonConfig.priceIdCAD;
+
+      console.log(`[Stripe] Removing ${quantity} extra seats from subscription ${user.stripeSubscriptionId}`);
+
+      // Find the subscription item for extra seats
+      const existingItem = subscription.items.data.find(item => item.price.id === addonPriceId);
+
+      if (!existingItem) {
+        return res.status(404).json({ message: "Extra seats subscription item not found" });
+      }
+
+      const currentQuantity = existingItem.quantity || 0;
+      const newQuantity = Math.max(0, currentQuantity - quantity);
+
+      let creditAmount = 0;
+
+      if (newQuantity > 0) {
+        // Reduce quantity
+        console.log(`[Stripe] Reducing seats from ${currentQuantity} to ${newQuantity}`);
+        await stripe.subscriptionItems.update(existingItem.id, {
+          quantity: newQuantity,
+          proration_behavior: 'create_prorations',
+        });
+      } else {
+        // Remove the subscription item entirely
+        console.log(`[Stripe] Removing all seats`);
+        await stripe.subscriptionItems.del(existingItem.id, {
+          proration_behavior: 'create_prorations',
+        });
+      }
+
+      // Calculate estimated credit (prorated)
+      const now = new Date();
+      const periodEnd = new Date(subscription.current_period_end * 1000);
+      const daysRemaining = Math.max(0, Math.ceil((periodEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+      const dailyRate = 34.95 / 30; // Approximate daily rate
+      creditAmount = Math.round(quantity * dailyRate * daysRemaining * 100) / 100;
+
+      // Suspend the selected employees
+      const suspendedAt = new Date();
+      for (const empId of employeeIds) {
+        await db.update(users)
+          .set({
+            suspendedAt: suspendedAt,
+            suspendedBy: user.id,
+          })
+          .where(eq(users.id, empId));
+        console.log(`[Stripe] Suspended employee ${empId}`);
+      }
+
+      // Update database with new seat count
+      await storage.updateUser(user.id, {
+        additionalSeatsCount: newQuantity,
+      });
+
+      console.log(`[Stripe] ${quantity} seats removed successfully. Remaining paid seats: ${newQuantity}. Credit: $${creditAmount}`);
+      res.json({
+        success: true,
+        message: `${quantity} seat(s) removed successfully`,
+        seatsRemoved: quantity,
+        remainingPaidSeats: newQuantity,
+        suspendedEmployees: employeeIds.length,
+        creditAmount: creditAmount.toFixed(2),
+      });
+    } catch (error: any) {
+      console.error('[Stripe] Remove seats error:', error);
+      res.status(500).json({ message: error.message || "Failed to remove seats" });
+    }
+  });
+
+  /**
+   * Reactivate a suspended employee (requires available seat)
+   * POST /api/employees/:id/reactivate-suspended
+   */
+  app.post("/api/employees/:id/reactivate-suspended", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.role !== 'company') {
+        return res.status(403).json({ message: "Only company accounts can reactivate employees" });
+      }
+
+      const { id } = req.params;
+      const employee = await storage.getUserById(id);
+
+      if (!employee) {
+        return res.status(404).json({ message: "Employee not found" });
+      }
+
+      if (employee.companyId !== user.id) {
+        return res.status(403).json({ message: "Cannot reactivate employees from another company" });
+      }
+
+      if (!employee.suspendedAt) {
+        return res.status(400).json({ message: "Employee is not suspended" });
+      }
+
+      // Check if there's an available seat
+      const employees = await storage.getAllEmployees(user.id);
+      const activeCount = employees.filter(e => !e.terminatedDate && !e.suspendedAt).length;
+      const paidSeats = user.additionalSeatsCount || 0;
+      const giftedSeats = user.giftedSeatsCount || 0;
+      const totalSeats = paidSeats + giftedSeats;
+
+      if (activeCount >= totalSeats) {
+        return res.status(400).json({ 
+          message: "No available seats. Please purchase additional seats first.",
+          activeCount,
+          totalSeats 
+        });
+      }
+
+      // Reactivate the employee
+      await db.update(users)
+        .set({
+          suspendedAt: null,
+          suspendedBy: null,
+        })
+        .where(eq(users.id, id));
+
+      console.log(`[Employees] Reactivated suspended employee ${id}`);
+      res.json({
+        success: true,
+        message: "Employee reactivated successfully",
+        employeeId: id,
+      });
+    } catch (error: any) {
+      console.error('[Employees] Reactivate suspended error:', error);
+      res.status(500).json({ message: error.message || "Failed to reactivate employee" });
+    }
   });
 
   /**
@@ -3430,8 +3623,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const limitsCheck = await checkSubscriptionLimits(companyId);
       const activeEmployeeCount = employees.filter(emp => !emp.terminatedDate).length;
       const tier = company.subscriptionTier || 'none';
-      const additionalSeats = company.additionalSeatsCountCount || 0;
-      const baseSeatLimit = limitsCheck.limits.maxSeats - additionalSeats;
+      const paidSeats = company.additionalSeatsCount || 0;
+      const giftedSeats = company.giftedSeatsCount || 0;
+      const totalAdditionalSeats = paidSeats + giftedSeats;
+      const baseSeatLimit = limitsCheck.limits.maxSeats - totalAdditionalSeats;
       const seatLimit = limitsCheck.limits.maxSeats;
       
       res.json({ 
@@ -3439,7 +3634,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           tier,
           seatLimit,
           baseSeatLimit,
-          additionalSeats,
+          paidSeats,
+          giftedSeats,
+          additionalSeats: totalAdditionalSeats,
           seatsUsed: activeEmployeeCount,
           seatsAvailable: seatLimit === -1 ? -1 : Math.max(0, seatLimit - activeEmployeeCount),
           atSeatLimit: seatLimit === 0 || (seatLimit > 0 && activeEmployeeCount >= seatLimit)
@@ -5942,9 +6139,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const activeEmployeeCount = employees.filter(emp => !emp.terminatedDate).length;
       const limitsCheck = await checkSubscriptionLimits(currentUser.id);
       const tier = companyOwner.subscriptionTier || 'none';
-      const additionalSeats = companyOwner.additionalSeatsCount || 0;
+      const paidSeats = companyOwner.additionalSeatsCount || 0;
+      const giftedSeats = companyOwner.giftedSeatsCount || 0;
+      const totalAdditionalSeats = paidSeats + giftedSeats;
       const seatLimit = limitsCheck.limits.maxSeats;
-      const baseSeatLimit = seatLimit - additionalSeats;
+      const baseSeatLimit = seatLimit - totalAdditionalSeats;
       
       res.json({ 
         employees: employeesWithoutPasswords,
@@ -5952,7 +6151,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           tier,
           seatLimit,
           baseSeatLimit,
-          additionalSeats,
+          paidSeats,
+          giftedSeats,
+          additionalSeats: totalAdditionalSeats,
           seatsUsed: activeEmployeeCount,
           seatsAvailable: seatLimit === -1 ? -1 : Math.max(0, seatLimit - activeEmployeeCount),
           atSeatLimit: seatLimit === 0 || (seatLimit > 0 && activeEmployeeCount >= seatLimit)
@@ -6001,9 +6202,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const employeeCount = employees.filter(emp => !emp.terminatedDate).length;
       const limitsCheck = await checkSubscriptionLimits(companyId);
       const tier = companyOwner?.subscriptionTier || 'none';
-      const additionalSeats = companyOwner?.additionalSeatsCount || 0;
+      const paidSeats = companyOwner?.additionalSeatsCount || 0;
+      const giftedSeats = companyOwner?.giftedSeatsCount || 0;
+      const totalAdditionalSeats = paidSeats + giftedSeats;
       const seatLimit = limitsCheck.limits.maxSeats;
-      const baseSeatLimit = seatLimit - additionalSeats;
+      const baseSeatLimit = seatLimit - totalAdditionalSeats;
       
       res.json({ 
         employees: activeEmployees,
@@ -6011,7 +6214,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           tier,
           seatLimit,
           baseSeatLimit,
-          additionalSeats,
+          paidSeats,
+          giftedSeats,
+          additionalSeats: totalAdditionalSeats,
           seatsUsed: employeeCount,
           seatsAvailable: seatLimit === -1 ? -1 : Math.max(0, seatLimit - employeeCount),
           atSeatLimit: seatLimit === 0 || (seatLimit > 0 && employeeCount >= seatLimit)

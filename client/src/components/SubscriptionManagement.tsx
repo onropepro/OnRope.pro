@@ -86,6 +86,7 @@ export function SubscriptionManagement() {
     cancelAtPeriodEnd: boolean;
     whitelabelBrandingActive: boolean;
     additionalSeatsCount: number;
+    giftedSeatsCount: number;
     additionalProjectsCount: number;
     currency: string;
   }>({
@@ -284,12 +285,14 @@ export function SubscriptionManagement() {
               const tierInfo = TIER_INFO[subStatus.currentTier];
               const TierIcon = tierInfo.icon;
               
-              // Calculate total limits including add-ons
+              // Calculate total limits including add-ons (paid + gifted)
               const additionalProjects = subDetails?.additionalProjectsCount || 0;
-              const additionalSeats = subDetails?.additionalSeatsCount || 0;
+              const paidSeats = subDetails?.additionalSeatsCount || 0;
+              const giftedSeats = subDetails?.giftedSeatsCount || 0;
+              const totalAdditionalSeats = paidSeats + giftedSeats;
               
               const totalProjects = tierInfo.projects === -1 ? -1 : tierInfo.projects + additionalProjects;
-              const totalSeats = tierInfo.seats === -1 ? -1 : tierInfo.seats + additionalSeats;
+              const totalSeats = tierInfo.seats === -1 ? -1 : tierInfo.seats + totalAdditionalSeats;
               
               return (
                 <div className="flex items-center gap-3">
