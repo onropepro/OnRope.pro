@@ -1191,6 +1191,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Your employment has been terminated. Please contact your administrator for more information." });
       }
       
+      // Check if user's seat has been suspended (company removed their seat)
+      if (user.suspendedAt) {
+        return res.status(403).json({ message: "Your account access has been suspended. Please contact your employer for more information." });
+      }
+      
       // Check if account has been disabled by SuperUser
       if (user.isDisabled) {
         return res.status(403).json({ message: "Your account has been suspended. Please contact support for more information." });
@@ -2213,6 +2218,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       console.log(`[Stripe] ${quantity} seats removed successfully. Remaining paid seats: ${finalSeatCount}. Credit: $${creditAmount}. Legacy price: ${isLegacyPrice}`);
+      
+      // Send real-time notifications to kick out suspended employees
+      for (const emp of employeesToSuspend) {
+        await wsHub.terminateUser(emp.id);
+        console.log(`[WebSocket] Sent termination signal to suspended employee ${emp.id}`);
+      }
+      
       res.json({
         success: true,
         message: `${quantity} seat(s) removed successfully`,
