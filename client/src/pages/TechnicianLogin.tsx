@@ -464,13 +464,10 @@ export default function TechnicianLogin() {
             <div className="max-w-4xl mx-auto text-center">
               {/* Pill Badge */}
               <div 
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8 border"
                 style={{
-                  backgroundColor: "#79AEA3",
-                  opacity: 0.1,
-                  borderWidth: "1px",
-                  borderStyle: "solid",
-                  borderColor: "#79AEA3"
+                  backgroundColor: "rgba(121, 174, 163, 0.1)",
+                  borderColor: "rgba(121, 174, 163, 0.2)"
                 }}
               >
                 <HardHat className="w-4 h-4" style={{ color: "#79AEA3" }} />
