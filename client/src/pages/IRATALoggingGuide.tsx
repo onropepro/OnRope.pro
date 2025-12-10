@@ -28,14 +28,14 @@ import { Button } from "@/components/ui/button";
 export default function IRATALoggingGuide() {
   return (
     <ChangelogGuideLayout 
-      title="IRATA Task Logging Guide"
+      title="IRATA / SPRAT Task Logging Guide"
       version="2.0"
       lastUpdated="December 5, 2025"
     >
       <div className="space-y-8">
         <section className="space-y-4">
           <p className="text-muted-foreground leading-relaxed text-base">
-            The IRATA Task Logging System allows rope access technicians to track their work hours against specific task types for certification progression. Hours are automatically captured from work sessions and can be categorized by the type of rope access work performed.
+            The IRATA / SPRAT Task Logging System allows rope access technicians to track their work hours against specific task types for certification progression. Hours are automatically captured from work sessions and can be categorized by the type of rope access work performed.
           </p>
         </section>
 
@@ -44,7 +44,7 @@ export default function IRATALoggingGuide() {
             <CardHeader className="pb-2">
               <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2 text-amber-900 dark:text-amber-100">
                 <Award className="w-5 h-5" />
-                The Golden Rule: Hours Build Your IRATA Portfolio
+                The Golden Rule: Hours Build Your IRATA / SPRAT Portfolio
               </CardTitle>
             </CardHeader>
             <CardContent className="text-amber-900 dark:text-amber-100 space-y-4">
@@ -55,7 +55,7 @@ export default function IRATALoggingGuide() {
               </div>
               
               <div className="space-y-2 text-base">
-                <p><strong>Your IRATA hours accumulate automatically.</strong> The system tracks:</p>
+                <p><strong>Your IRATA / SPRAT hours accumulate automatically.</strong> The system tracks:</p>
                 <ul className="list-disc list-inside space-y-1 ml-2">
                   <li><strong>Baseline Hours</strong>: Pre-existing logbook hours you enter manually</li>
                   <li><strong>Session Hours</strong>: Hours automatically logged from completed work sessions</li>
@@ -65,9 +65,9 @@ export default function IRATALoggingGuide() {
               <div className="bg-amber-100 dark:bg-amber-800 rounded-lg p-3 text-sm">
                 <p className="font-semibold flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4" />
-                  IRATA Technicians Only
+                  IRATA / SPRAT Technicians Only
                 </p>
-                <p className="mt-1">The task logging prompt only appears for employees with IRATA certification tracking enabled. After ending a work session, you'll be prompted to categorize your hours.</p>
+                <p className="mt-1">The task logging prompt only appears for employees with IRATA / SPRAT certification tracking enabled. After ending a work session, you'll be prompted to categorize your hours.</p>
               </div>
 
               <div className="grid md:grid-cols-3 gap-3 text-sm">
@@ -106,11 +106,11 @@ export default function IRATALoggingGuide() {
               <ul className="space-y-2 text-sm">
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span><strong>Paper logbook management:</strong> Digital IRATA hours tracking replaces error-prone physical logbooks</span>
+                  <span><strong>Paper logbook management:</strong> Digital IRATA / SPRAT hours tracking replaces error-prone physical logbooks</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span><strong>Certification progression tracking:</strong> Automatic hour accumulation shows progress toward next IRATA level</span>
+                  <span><strong>Certification progression tracking:</strong> Automatic hour accumulation shows progress toward next IRATA / SPRAT level</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
@@ -122,7 +122,7 @@ export default function IRATALoggingGuide() {
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span><strong>Assessment preparation:</strong> Complete hour history available instantly for IRATA level assessments</span>
+                  <span><strong>Assessment preparation:</strong> Complete hour history available instantly for IRATA / SPRAT level assessments</span>
                 </li>
               </ul>
             </CardContent>
@@ -305,7 +305,7 @@ export default function IRATALoggingGuide() {
                   <div>
                     <h3 className="text-xl md:text-2xl font-semibold">Task Selection Dialog Appears</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      After ending your session, a dialog prompts you to select which rope access tasks you performed. This only appears for IRATA-certified technicians.
+                      After ending your session, a dialog prompts you to select which rope access tasks you performed. This only appears for IRATA / SPRAT certified technicians.
                     </p>
                   </div>
                 </div>
@@ -345,7 +345,7 @@ export default function IRATALoggingGuide() {
                   <div>
                     <h3 className="text-xl md:text-2xl font-semibold">Hours Added to Your Portfolio</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Your logged hours are automatically added to your IRATA portfolio. View your complete history on the "My Logged Hours" page.
+                      Your logged hours are automatically added to your IRATA / SPRAT portfolio. View your complete history on the "My Logged Hours" page.
                     </p>
                   </div>
                 </div>
@@ -362,7 +362,7 @@ export default function IRATALoggingGuide() {
             My Logged Hours Page
           </h2>
           <p className="text-muted-foreground text-sm">
-            Access your complete IRATA hours history from your Profile page.
+            Access your complete IRATA / SPRAT hours history from your Profile page.
           </p>
 
           <div className="grid md:grid-cols-2 gap-4">
@@ -422,10 +422,10 @@ export default function IRATALoggingGuide() {
                 <Info className="w-5 h-5 text-action-600 dark:text-action-400 mt-0.5 shrink-0" />
                 <div className="space-y-2 text-sm">
                   <p className="font-semibold text-action-900 dark:text-action-100">
-                    Already Have IRATA Experience?
+                    Already Have IRATA / SPRAT Experience?
                   </p>
                   <p className="text-action-800 dark:text-action-200">
-                    If you have pre-existing hours in your IRATA logbook from previous employment, you can enter these as baseline hours. This ensures your total portfolio reflects your complete career experience.
+                    If you have pre-existing hours in your IRATA / SPRAT logbook from previous employment, you can enter these as baseline hours. This ensures your total portfolio reflects your complete career experience.
                   </p>
                   <p className="text-action-800 dark:text-action-200">
                     Access baseline hour entry from the "My Logged Hours" page. Once entered, these hours combine with your new logged sessions for accurate certification tracking.
@@ -459,7 +459,7 @@ export default function IRATALoggingGuide() {
                     <tr>
                       <td className="py-2">Task Selection</td>
                       <td className="py-2 text-muted-foreground">Choose task types after ending session</td>
-                      <td className="py-2"><Badge variant="outline">IRATA Techs</Badge></td>
+                      <td className="py-2"><Badge variant="outline">IRATA / SPRAT Techs</Badge></td>
                     </tr>
                     <tr>
                       <td className="py-2">My Logged Hours</td>
