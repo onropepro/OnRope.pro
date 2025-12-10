@@ -53,8 +53,10 @@ import {
   AppWindow
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLocation } from "wouter";
 
 export default function ProjectsGuide() {
+  const [, navigate] = useLocation();
   return (
     <ChangelogGuideLayout 
       title="Project Management Guide"
@@ -1002,8 +1004,7 @@ export default function ProjectsGuide() {
           </Button>
         </div>
 
-      </main>
       </div>
-    </ChangelogLayout>
+    </ChangelogGuideLayout>
   );
 }
