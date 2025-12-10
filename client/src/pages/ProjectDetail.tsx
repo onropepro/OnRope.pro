@@ -145,8 +145,10 @@ export default function ProjectDetail() {
     buildingManagerPhone: "",
     conciergeNames: "",
     conciergePhone: "",
+    conciergeHours: "",
     maintenanceName: "",
     maintenancePhone: "",
+    staffParkingInstructions: "",
   });
 
   const endDayForm = useForm<EndDayFormData>({
@@ -274,8 +276,10 @@ export default function ProjectDetail() {
         buildingManagerPhone: buildingData.instructions.buildingManagerPhone || "",
         conciergeNames: buildingData.instructions.conciergeNames || "",
         conciergePhone: buildingData.instructions.conciergePhone || "",
+        conciergeHours: (buildingData.instructions as any).conciergeHours || "",
         maintenanceName: buildingData.instructions.maintenanceName || "",
         maintenancePhone: buildingData.instructions.maintenancePhone || "",
+        staffParkingInstructions: (buildingData.instructions as any).staffParkingInstructions || "",
       });
     }
   }, [buildingData?.instructions]);
@@ -1499,6 +1503,11 @@ export default function ProjectDetail() {
                                       {buildingData.instructions.conciergePhone}
                                     </a>
                                   )}
+                                  {(buildingData.instructions as any).conciergeHours && (
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                      {t('projectDetail.buildingInstructions.hours', 'Hours')}: {(buildingData.instructions as any).conciergeHours}
+                                    </p>
+                                  )}
                                 </div>
                               </div>
                             )}
@@ -1517,6 +1526,20 @@ export default function ProjectDetail() {
                                 </div>
                               </div>
                             )}
+                          </div>
+                        </>
+                      )}
+
+                      {/* Staff Parking */}
+                      {(buildingData.instructions as any).staffParkingInstructions && (
+                        <>
+                          <Separator />
+                          <div className="flex gap-3">
+                            <span className="material-icons text-sm text-muted-foreground shrink-0 mt-0.5">local_parking</span>
+                            <div>
+                              <p className="text-xs font-medium text-muted-foreground">{t('projectDetail.buildingInstructions.staffParking', 'Staff Parking Instructions')}</p>
+                              <p className="text-sm whitespace-pre-wrap">{(buildingData.instructions as any).staffParkingInstructions}</p>
+                            </div>
                           </div>
                         </>
                       )}
@@ -3952,6 +3975,17 @@ export default function ProjectDetail() {
                 </div>
               </div>
 
+              <div className="space-y-2">
+                <Label htmlFor="conciergeHours">{t('projectDetail.buildingInstructions.conciergeHours', 'Concierge Hours of Operation')}</Label>
+                <Input
+                  id="conciergeHours"
+                  placeholder={t('projectDetail.buildingInstructions.conciergeHoursPlaceholder', 'e.g., Mon-Fri 8am-8pm, Sat-Sun 9am-5pm')}
+                  value={instructionsForm.conciergeHours}
+                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, conciergeHours: e.target.value }))}
+                  data-testid="input-concierge-hours"
+                />
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
                   <Label htmlFor="maintenanceName">{t('projectDetail.buildingInstructions.maintenanceName', 'Maintenance Name')}</Label>
@@ -3975,6 +4009,23 @@ export default function ProjectDetail() {
                   />
                 </div>
               </div>
+            </div>
+
+            <Separator />
+
+            {/* Staff Parking */}
+            <div className="space-y-2">
+              <Label htmlFor="staffParkingInstructions" className="flex items-center gap-2">
+                <span className="material-icons text-sm">local_parking</span>
+                {t('projectDetail.buildingInstructions.staffParking', 'Staff Parking Instructions')}
+              </Label>
+              <Textarea
+                id="staffParkingInstructions"
+                placeholder={t('projectDetail.buildingInstructions.staffParkingPlaceholder', 'Where staff can park (e.g., visitor parking, loading zone, street parking with permit)...')}
+                value={instructionsForm.staffParkingInstructions}
+                onChange={(e) => setInstructionsForm(prev => ({ ...prev, staffParkingInstructions: e.target.value }))}
+                data-testid="input-staff-parking"
+              />
             </div>
 
             <Separator />

@@ -65,8 +65,10 @@ export default function BuildingPortal() {
     buildingManagerPhone: "",
     conciergeNames: "",
     conciergePhone: "",
+    conciergeHours: "",
     maintenanceName: "",
     maintenancePhone: "",
+    staffParkingInstructions: "",
   });
 
   const { 
@@ -106,8 +108,10 @@ export default function BuildingPortal() {
         buildingManagerPhone: buildingInstructions.buildingManagerPhone || "",
         conciergeNames: buildingInstructions.conciergeNames || "",
         conciergePhone: buildingInstructions.conciergePhone || "",
+        conciergeHours: (buildingInstructions as any).conciergeHours || "",
         maintenanceName: buildingInstructions.maintenanceName || "",
         maintenancePhone: buildingInstructions.maintenancePhone || "",
+        staffParkingInstructions: (buildingInstructions as any).staffParkingInstructions || "",
       });
     }
   }, [buildingInstructions]);
@@ -488,6 +492,9 @@ export default function BuildingPortal() {
                                 {buildingInstructions.conciergePhone}
                               </a>
                             )}
+                            {(buildingInstructions as any).conciergeHours && (
+                              <p className="text-xs text-muted-foreground mt-1">Hours: {(buildingInstructions as any).conciergeHours}</p>
+                            )}
                           </div>
                         </div>
                       )}
@@ -541,6 +548,17 @@ export default function BuildingPortal() {
                           </div>
                         </div>
                       )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Staff Parking */}
+                {(buildingInstructions as any)?.staffParkingInstructions && (
+                  <div className="space-y-3">
+                    <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">Staff Parking</h4>
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                      <span className="material-icons text-primary mt-0.5 shrink-0" style={{ fontSize: '20px' }}>local_parking</span>
+                      <p className="text-sm whitespace-pre-wrap">{(buildingInstructions as any).staffParkingInstructions}</p>
                     </div>
                   </div>
                 )}
@@ -696,6 +714,17 @@ export default function BuildingPortal() {
                 </div>
               </div>
 
+              <div className="space-y-2">
+                <Label htmlFor="conciergeHours">Concierge Hours of Operation</Label>
+                <Input
+                  id="conciergeHours"
+                  placeholder="e.g., Mon-Fri 8am-8pm, Sat-Sun 9am-5pm"
+                  value={instructionsForm.conciergeHours}
+                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, conciergeHours: e.target.value }))}
+                  data-testid="input-concierge-hours"
+                />
+              </div>
+
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="maintenanceName">Maintenance Contact Name</Label>
@@ -768,6 +797,28 @@ export default function BuildingPortal() {
 
             <Separator />
 
+            {/* Staff Parking Section */}
+            <div className="space-y-4">
+              <h4 className="font-medium flex items-center gap-2">
+                <span className="material-icons text-base">local_parking</span>
+                Staff Parking
+              </h4>
+              
+              <div className="space-y-2">
+                <Label htmlFor="staffParkingInstructions">Staff Parking Instructions</Label>
+                <Textarea
+                  id="staffParkingInstructions"
+                  placeholder="e.g., Visitor parking on P1, loading zone available, street parking with permit..."
+                  value={instructionsForm.staffParkingInstructions}
+                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, staffParkingInstructions: e.target.value }))}
+                  rows={3}
+                  data-testid="textarea-staff-parking"
+                />
+              </div>
+            </div>
+
+            <Separator />
+
             {/* Special Requests Section */}
             <div className="space-y-4">
               <h4 className="font-medium flex items-center gap-2">
@@ -779,7 +830,7 @@ export default function BuildingPortal() {
                 <Label htmlFor="specialRequests">Additional Instructions or Requests</Label>
                 <Textarea
                   id="specialRequests"
-                  placeholder="e.g., Quiet hours before 8am, no work on weekends, parking instructions..."
+                  placeholder="e.g., Quiet hours before 8am, no work on weekends..."
                   value={instructionsForm.specialRequests}
                   onChange={(e) => setInstructionsForm(prev => ({ ...prev, specialRequests: e.target.value }))}
                   rows={4}

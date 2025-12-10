@@ -284,8 +284,12 @@ export const buildingInstructions = pgTable("building_instructions", {
   buildingManagerPhone: varchar("building_manager_phone"),
   conciergeNames: text("concierge_names"), // Could be multiple, stored as text (comma-separated or JSON)
   conciergePhone: varchar("concierge_phone"),
+  conciergeHours: text("concierge_hours"), // Hours of operation for concierge
   maintenanceName: varchar("maintenance_name"),
   maintenancePhone: varchar("maintenance_phone"),
+  
+  // Parking
+  staffParkingInstructions: text("staff_parking_instructions"), // Where staff can park
   
   // Tracking
   createdByUserId: varchar("created_by_user_id").references(() => users.id),
