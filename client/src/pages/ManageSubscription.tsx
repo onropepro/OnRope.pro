@@ -39,25 +39,25 @@ interface SubscriptionDetails {
   currency: 'usd' | 'cad';
 }
 
-const TIER_NAMES = {
-  basic: 'Basic',
-  starter: 'Starter',
-  premium: 'Premium',
-  enterprise: 'Enterprise',
+const TIER_NAMES: Record<string, string> = {
+  basic: 'OnRopePro',
+  starter: 'OnRopePro',
+  premium: 'OnRopePro',
+  enterprise: 'OnRopePro',
 };
 
-const TIER_PRICES = {
-  basic: { usd: 79, cad: 99 },
-  starter: { usd: 299, cad: 399 },
-  premium: { usd: 499, cad: 649 },
-  enterprise: { usd: 899, cad: 1199 },
+const TIER_PRICES: Record<string, { usd: number; cad: number }> = {
+  basic: { usd: 99, cad: 99 },
+  starter: { usd: 99, cad: 99 },
+  premium: { usd: 99, cad: 99 },
+  enterprise: { usd: 99, cad: 99 },
 };
 
-const TIER_LIMITS = {
-  basic: { projects: 2, seats: 4 },
-  starter: { projects: 5, seats: 10 },
-  premium: { projects: 9, seats: 18 },
-  enterprise: { projects: Infinity, seats: Infinity },
+const TIER_LIMITS: Record<string, { projects: number; seats: number }> = {
+  basic: { projects: Infinity, seats: 0 },
+  starter: { projects: Infinity, seats: 0 },
+  premium: { projects: Infinity, seats: 0 },
+  enterprise: { projects: Infinity, seats: 0 },
 };
 
 export default function ManageSubscription() {
@@ -323,11 +323,7 @@ export default function ManageSubscription() {
                 <div>
                   <h3 className="font-medium">{tierName}</h3>
                   <p className="text-sm text-muted-foreground">
-                    {TIER_LIMITS[subscriptionData.tier].projects === Infinity 
-                      ? 'Unlimited projects' 
-                      : `${TIER_LIMITS[subscriptionData.tier].projects} projects`}, {TIER_LIMITS[subscriptionData.tier].seats === Infinity 
-                      ? 'unlimited seats' 
-                      : `${TIER_LIMITS[subscriptionData.tier].seats} seats`}
+                    Unlimited projects, add seats at $34.95/month each
                   </p>
                 </div>
               </div>
@@ -373,12 +369,12 @@ export default function ManageSubscription() {
                       <div>
                         <h3 className="font-medium">Extra Team Seats</h3>
                         <p className="text-sm text-muted-foreground">
-                          {subscriptionData.additionalSeatsCount} pack{subscriptionData.additionalSeatsCount > 1 ? 's' : ''} ({subscriptionData.additionalSeatsCount * 2} seats)
+                          {subscriptionData.additionalSeatsCount} additional seat{subscriptionData.additionalSeatsCount > 1 ? 's' : ''}
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-medium">{currencySymbol}{subscriptionData.additionalSeatsCount * 19}/month</p>
+                      <p className="font-medium">{currencySymbol}{(subscriptionData.additionalSeatsCount * 34.95).toFixed(2)}/month</p>
                     </div>
                   </div>
                 )}
@@ -475,20 +471,20 @@ export default function ManageSubscription() {
               </>
             )}
 
-            {/* Extra Seats - Display each pack individually */}
+            {/* Extra Seats - Display each seat individually */}
             {subscriptionData.additionalSeatsCount > 0 && (
               <>
                 {Array.from({ length: subscriptionData.additionalSeatsCount }).map((_, index) => (
-                  <div key={`seat-pack-${index}`}>
+                  <div key={`seat-${index}`}>
                     <div className="flex items-center justify-between p-4 border rounded-md">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-primary/10 rounded-md">
                           <CreditCard className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                          <h3 className="font-medium">Extra Team Seats - Pack {index + 1}</h3>
+                          <h3 className="font-medium">Extra Team Seat {index + 1}</h3>
                           <p className="text-sm text-muted-foreground">
-                            2 seats • {currencySymbol}19/month
+                            {currencySymbol}34.95/month
                           </p>
                         </div>
                       </div>
@@ -582,34 +578,13 @@ export default function ManageSubscription() {
                   <CreditCard className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h4 className="font-medium">Extra Team Seats</h4>
-                  <p className="text-sm text-muted-foreground">Add 2 additional seats to your plan</p>
+                  <h4 className="font-medium">Extra Team Seat</h4>
+                  <p className="text-sm text-muted-foreground">Add 1 additional seat to your plan</p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="font-semibold">{currencySymbol}19/month</p>
-                <p className="text-xs text-muted-foreground">per pack</p>
-              </div>
-            </button>
-
-            {/* Extra Project */}
-            <button
-              onClick={() => setShowAddProjectDialog(true)}
-              className="w-full flex items-center justify-between p-4 border rounded-md hover-elevate active-elevate-2 text-left"
-              data-testid="button-add-project"
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-primary/10 rounded-md">
-                  <CreditCard className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <h4 className="font-medium">Extra Project</h4>
-                  <p className="text-sm text-muted-foreground">Add 1 additional active project</p>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="font-semibold">{currencySymbol}49/month</p>
-                <p className="text-xs text-muted-foreground">per project</p>
+                <p className="font-semibold">{currencySymbol}34.95/month</p>
+                <p className="text-xs text-muted-foreground">per seat</p>
               </div>
             </button>
 
@@ -704,9 +679,9 @@ export default function ManageSubscription() {
       <Dialog open={cancelTarget === 'seats'} onOpenChange={(open) => !open && setCancelTarget(null)}>
         <DialogContent data-testid="dialog-cancel-seats">
           <DialogHeader>
-            <DialogTitle>Cancel Extra Team Seats - Pack {cancelSeatPackNumber}</DialogTitle>
+            <DialogTitle>Cancel Extra Team Seat {cancelSeatPackNumber}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to cancel this seat pack? The 2 seats from Pack {cancelSeatPackNumber} will remain active until {renewalDate}.
+              Are you sure you want to cancel this seat? Seat {cancelSeatPackNumber} will remain active until {renewalDate}.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2">
@@ -715,7 +690,7 @@ export default function ManageSubscription() {
               onClick={() => setCancelTarget(null)}
               data-testid="button-cancel-seats-no"
             >
-              Keep Add-on
+              Keep Seat
             </Button>
             <Button
               variant="destructive"
@@ -762,9 +737,9 @@ export default function ManageSubscription() {
       <Dialog open={showAddSeatsDialog} onOpenChange={setShowAddSeatsDialog}>
         <DialogContent data-testid="dialog-add-seats">
           <DialogHeader>
-            <DialogTitle>Add Extra Team Seats</DialogTitle>
+            <DialogTitle>Add Team Seat</DialogTitle>
             <DialogDescription>
-              Add 2 additional team seats to your subscription for {currencySymbol}19/month.
+              Add 1 additional team seat to your subscription for {currencySymbol}34.95/month.
               This will be prorated for your current billing period.
             </DialogDescription>
           </DialogHeader>
