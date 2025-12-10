@@ -1439,24 +1439,41 @@ export default function PropertyManager() {
                             
                             {/* Contacts */}
                             {(projectDetailsData.buildingInstructions.buildingManagerName || 
+                              projectDetailsData.buildingInstructions.buildingManagerPhone ||
+                              projectDetailsData.buildingInstructions.buildingManagerEmail ||
                               projectDetailsData.buildingInstructions.conciergeName ||
-                              projectDetailsData.buildingInstructions.maintenanceContactName) && (
+                              projectDetailsData.buildingInstructions.conciergePhone ||
+                              projectDetailsData.buildingInstructions.conciergeHours ||
+                              projectDetailsData.buildingInstructions.maintenanceContactName ||
+                              projectDetailsData.buildingInstructions.maintenanceContactPhone ||
+                              projectDetailsData.buildingInstructions.councilMemberUnits) && (
                               <div className="space-y-2">
                                 <h4 className="text-sm font-medium">{t('propertyManager.projectDetails.buildingInstructions.contacts', 'Contacts')}</h4>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                                  {projectDetailsData.buildingInstructions.buildingManagerName && (
+                                  {(projectDetailsData.buildingInstructions.buildingManagerName || 
+                                    projectDetailsData.buildingInstructions.buildingManagerPhone ||
+                                    projectDetailsData.buildingInstructions.buildingManagerEmail) && (
                                     <div>
                                       <Label className="text-xs text-muted-foreground">{t('propertyManager.projectDetails.buildingInstructions.buildingManager', 'Building Manager')}</Label>
-                                      <p className="font-medium">{projectDetailsData.buildingInstructions.buildingManagerName}</p>
+                                      {projectDetailsData.buildingInstructions.buildingManagerName && (
+                                        <p className="font-medium">{projectDetailsData.buildingInstructions.buildingManagerName}</p>
+                                      )}
                                       {projectDetailsData.buildingInstructions.buildingManagerPhone && (
                                         <p className="text-muted-foreground">{projectDetailsData.buildingInstructions.buildingManagerPhone}</p>
                                       )}
+                                      {projectDetailsData.buildingInstructions.buildingManagerEmail && (
+                                        <p className="text-muted-foreground">{projectDetailsData.buildingInstructions.buildingManagerEmail}</p>
+                                      )}
                                     </div>
                                   )}
-                                  {projectDetailsData.buildingInstructions.conciergeName && (
+                                  {(projectDetailsData.buildingInstructions.conciergeName || 
+                                    projectDetailsData.buildingInstructions.conciergePhone ||
+                                    projectDetailsData.buildingInstructions.conciergeHours) && (
                                     <div>
                                       <Label className="text-xs text-muted-foreground">{t('propertyManager.projectDetails.buildingInstructions.concierge', 'Concierge')}</Label>
-                                      <p className="font-medium">{projectDetailsData.buildingInstructions.conciergeName}</p>
+                                      {projectDetailsData.buildingInstructions.conciergeName && (
+                                        <p className="font-medium">{projectDetailsData.buildingInstructions.conciergeName}</p>
+                                      )}
                                       {projectDetailsData.buildingInstructions.conciergePhone && (
                                         <p className="text-muted-foreground">{projectDetailsData.buildingInstructions.conciergePhone}</p>
                                       )}
@@ -1465,13 +1482,22 @@ export default function PropertyManager() {
                                       )}
                                     </div>
                                   )}
-                                  {projectDetailsData.buildingInstructions.maintenanceContactName && (
+                                  {(projectDetailsData.buildingInstructions.maintenanceContactName ||
+                                    projectDetailsData.buildingInstructions.maintenanceContactPhone) && (
                                     <div>
                                       <Label className="text-xs text-muted-foreground">{t('propertyManager.projectDetails.buildingInstructions.maintenance', 'Maintenance')}</Label>
-                                      <p className="font-medium">{projectDetailsData.buildingInstructions.maintenanceContactName}</p>
+                                      {projectDetailsData.buildingInstructions.maintenanceContactName && (
+                                        <p className="font-medium">{projectDetailsData.buildingInstructions.maintenanceContactName}</p>
+                                      )}
                                       {projectDetailsData.buildingInstructions.maintenanceContactPhone && (
                                         <p className="text-muted-foreground">{projectDetailsData.buildingInstructions.maintenanceContactPhone}</p>
                                       )}
+                                    </div>
+                                  )}
+                                  {projectDetailsData.buildingInstructions.councilMemberUnits && (
+                                    <div>
+                                      <Label className="text-xs text-muted-foreground">{t('propertyManager.projectDetails.buildingInstructions.councilUnits', 'Council Member Units')}</Label>
+                                      <p className="text-sm">{projectDetailsData.buildingInstructions.councilMemberUnits}</p>
                                     </div>
                                   )}
                                 </div>
