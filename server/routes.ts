@@ -7077,7 +7077,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Only technicians can view employer connections" });
       }
       
-      // Get all active employer connections
+      // Get all employer connections (including suspended, but not terminated)
+      // This allows the UI to show suspended employers with appropriate status badges
       const connections = await db.select({
         id: technicianEmployerConnections.id,
         companyId: technicianEmployerConnections.companyId,
@@ -7087,7 +7088,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }).from(technicianEmployerConnections)
         .where(and(
           eq(technicianEmployerConnections.technicianId, user.id),
-          eq(technicianEmployerConnections.status, "active")
+          or(
+            eq(technicianEmployerConnections.status, "active"),
+            eq(technicianEmployerConnections.status, "suspended")
+          )
         ));
       
       // Get company details for each connection
@@ -7105,8 +7109,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }));
       
       // Also include the legacy companyId if not in connections table
+      // Check suspendedAt to determine if primary employer connection is suspended
       let legacyEmployer = null;
-      if (user.companyId) {
+      if (user.companyId && !user.terminatedDate) {
         const hasLegacyInConnections = connections.some(c => c.companyId === user.companyId);
         if (!hasLegacyInConnections) {
           const company = await storage.getUserById(user.companyId);
@@ -7115,8 +7120,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
               id: 'legacy',
               companyId: user.companyId,
               isPrimary: true,
-              status: 'active',
+              status: user.suspendedAt ? 'suspended' : 'active',
               connectedAt: user.startDate || new Date(),
+              suspendedAt: user.suspendedAt || null,
               company: {
                 id: company.id,
                 name: company.name,

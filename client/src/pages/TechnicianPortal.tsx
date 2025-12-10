@@ -296,6 +296,8 @@ const translations = {
     selectEmployerDesc: "Choose which employer's dashboard to access",
     connectedEmployers: "Connected Employers",
     primaryEmployer: "Primary",
+    suspended: "Suspended",
+    active: "Active",
     setPrimary: "Set as Primary",
     continueToEmployer: "Continue",
     noEmployersConnected: "No employers connected",
@@ -641,6 +643,8 @@ const translations = {
     selectEmployerDesc: "Choisissez le tableau de bord de l'employeur à accéder",
     connectedEmployers: "Employeurs connectés",
     primaryEmployer: "Principal",
+    suspended: "Suspendu",
+    active: "Actif",
     setPrimary: "Définir comme principal",
     continueToEmployer: "Continuer",
     noEmployersConnected: "Aucun employeur connecté",
@@ -4914,45 +4918,64 @@ export default function TechnicianPortal() {
           </DialogHeader>
           <div className="space-y-3 py-4">
             {employerConnectionsData?.connections && employerConnectionsData.connections.length > 0 ? (
-              employerConnectionsData.connections.map((conn) => (
-                <div
-                  key={conn.id}
-                  className={`p-3 rounded-md border cursor-pointer hover-elevate ${
-                    selectedEmployerId === conn.companyId 
-                      ? "border-primary bg-primary/10" 
-                      : "border-muted"
-                  }`}
-                  onClick={() => setSelectedEmployerId(conn.companyId)}
-                  data-testid={`employer-option-${conn.companyId}`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      {conn.company?.photoUrl ? (
-                        <img 
-                          src={conn.company.photoUrl} 
-                          alt={conn.company.companyName || conn.company.name} 
-                          className="w-10 h-10 rounded-full object-cover"
-                        />
-                      ) : (
-                        <Building2 className="w-5 h-5 text-primary" />
+              employerConnectionsData.connections.map((conn) => {
+                const isSuspended = conn.status === 'suspended';
+                return (
+                  <div
+                    key={conn.id}
+                    className={`p-3 rounded-md border ${
+                      isSuspended 
+                        ? "opacity-60 cursor-not-allowed border-muted" 
+                        : "cursor-pointer hover-elevate"
+                    } ${
+                      selectedEmployerId === conn.companyId && !isSuspended
+                        ? "border-primary bg-primary/10" 
+                        : "border-muted"
+                    }`}
+                    onClick={() => !isSuspended && setSelectedEmployerId(conn.companyId)}
+                    data-testid={`employer-option-${conn.companyId}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                        isSuspended ? "bg-muted" : "bg-primary/10"
+                      }`}>
+                        {conn.company?.photoUrl ? (
+                          <img 
+                            src={conn.company.photoUrl} 
+                            alt={conn.company.companyName || conn.company.name} 
+                            className={`w-10 h-10 rounded-full object-cover ${isSuspended ? "grayscale" : ""}`}
+                          />
+                        ) : (
+                          <Building2 className={`w-5 h-5 ${isSuspended ? "text-muted-foreground" : "text-primary"}`} />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <p className={`font-medium ${isSuspended ? "text-muted-foreground" : ""}`}>
+                          {conn.company?.companyName || conn.company?.name || "Unknown Company"}
+                        </p>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {conn.isPrimary && (
+                            <Badge variant="secondary" className="text-xs">
+                              {t.primaryEmployer}
+                            </Badge>
+                          )}
+                          {isSuspended && (
+                            <Badge variant="destructive" className="text-xs">
+                              {t.suspended || "Suspended"}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                      {selectedEmployerId === conn.companyId && !isSuspended && (
+                        <CheckCircle2 className="w-5 h-5 text-primary" />
+                      )}
+                      {isSuspended && (
+                        <span className="material-icons text-muted-foreground">block</span>
                       )}
                     </div>
-                    <div className="flex-1">
-                      <p className="font-medium">
-                        {conn.company?.companyName || conn.company?.name || "Unknown Company"}
-                      </p>
-                      {conn.isPrimary && (
-                        <Badge variant="secondary" className="text-xs">
-                          {t.primaryEmployer}
-                        </Badge>
-                      )}
-                    </div>
-                    {selectedEmployerId === conn.companyId && (
-                      <CheckCircle2 className="w-5 h-5 text-primary" />
-                    )}
                   </div>
-                </div>
-              ))
+                );
+              })
             ) : (
               <p className="text-sm text-muted-foreground text-center py-4">
                 {t.noEmployersConnected}

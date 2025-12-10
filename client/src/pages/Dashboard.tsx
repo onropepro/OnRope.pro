@@ -898,6 +898,41 @@ export default function Dashboard() {
     ? userData.user.id 
     : (urlEmployerId || userData?.user?.companyId);
 
+  // For technicians, fetch employer connections to check access status
+  const { data: employerConnectionsData } = useQuery<{
+    connections: Array<{
+      id: string;
+      companyId: string;
+      isPrimary: boolean;
+      status: string;
+      company: { id: string; name: string; companyName: string; } | null;
+    }>;
+  }>({
+    queryKey: ["/api/my-employer-connections"],
+    enabled: userData?.user?.role === 'employee' || userData?.user?.role === 'rope_access_tech',
+  });
+
+  // Check if technician is suspended from the employer they're trying to access
+  useEffect(() => {
+    if (!employerConnectionsData?.connections || !companyIdForData) return;
+    
+    const currentConnection = employerConnectionsData.connections.find(
+      c => c.companyId === companyIdForData
+    );
+    
+    // If we found the connection and it's suspended, redirect to portal
+    if (currentConnection && currentConnection.status === 'suspended') {
+      toast({
+        title: t('dashboard.accessSuspended', 'Access Suspended'),
+        description: t('dashboard.accessSuspendedDesc', `Your access to ${currentConnection.company?.companyName || 'this company'} has been suspended. Redirecting to your portal.`),
+        variant: "destructive",
+      });
+      setTimeout(() => {
+        setLocation('/technician-portal');
+      }, 2000);
+    }
+  }, [employerConnectionsData, companyIdForData, toast, setLocation, t]);
+
   // Fetch company information
   const { data: companyData } = useQuery({
     queryKey: ["/api/companies", companyIdForData],
