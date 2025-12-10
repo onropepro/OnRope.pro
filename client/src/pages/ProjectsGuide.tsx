@@ -113,169 +113,210 @@ export default function ProjectsGuide() {
 
         <Separator />
 
-        {/* Job Types Visual Grid */}
-        <section className="space-y-4">
-          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
-            <Grid3X3 className="w-5 h-5 text-action-600 dark:text-action-400" />
-            Supported Job Types
-          </h2>
-          
-          <div className="grid md:grid-cols-2 gap-3">
-            <Card>
-              <CardContent className="pt-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                    <span className="material-icons text-action-600 dark:text-action-400">window</span>
-                  </div>
-                  <div>
-                    <p className="font-medium">Window Cleaning</p>
-                    <p className="text-xs text-muted-foreground">Drop-based (N/E/S/W)</p>
-                  </div>
+        {/* Services Managed - Exact match with Changelog.tsx */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-warning-100 dark:bg-warning-600/20 ring-1 ring-warning-600/20">
+                <Wrench className="h-5 w-5 text-warning-600" />
+              </div>
+              <div>
+                <CardTitle className="text-xl">Services Managed</CardTitle>
+                <CardDescription>
+                  Building maintenance focus with 11 specialized service types
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="space-y-6">
+              {/* Building Maintenance Category */}
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <h3 className="font-semibold text-base">Building Maintenance</h3>
+                  <Badge variant="secondary" className="text-xs">10</Badge>
                 </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                    <span className="material-icons text-action-600 dark:text-action-400">air</span>
+                <p className="text-sm text-muted-foreground mb-3">High-rise building cleaning and maintenance services</p>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                    <div className="p-2 rounded-lg bg-background ring-1 ring-border/50 flex-shrink-0">
+                      <span className="material-icons text-lg text-muted-foreground">window</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium text-base">Window Cleaning</span>
+                        <Badge variant="secondary" className="text-xs">Drop-based (N/E/S/W)</Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-0.5">
+                        Rope access high-rise window cleaning with directional drop tracking
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium">Exterior Dryer Vent Cleaning</p>
-                    <p className="text-xs text-muted-foreground">Drop-based (N/E/S/W)</p>
+                  
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                    <div className="p-2 rounded-lg bg-background ring-1 ring-border/50 flex-shrink-0">
+                      <span className="material-icons text-lg text-muted-foreground">air</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium text-base">Exterior Dryer Vent Cleaning</span>
+                        <Badge variant="secondary" className="text-xs">Drop-based (N/E/S/W)</Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-0.5">
+                        High-rise exterior dryer vent cleaning and maintenance
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                    <span className="material-icons text-action-600 dark:text-action-400">water_drop</span>
+                  
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                    <div className="p-2 rounded-lg bg-background ring-1 ring-border/50 flex-shrink-0">
+                      <span className="material-icons text-lg text-muted-foreground">water_drop</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium text-base">Building Wash / Pressure Washing</span>
+                        <Badge variant="secondary" className="text-xs">Drop-based (N/E/S/W)</Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-0.5">
+                        Building exterior cleaning and pressure washing services
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium">Building Wash / Pressure Washing</p>
-                    <p className="text-xs text-muted-foreground">Drop-based (N/E/S/W)</p>
+                  
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                    <div className="p-2 rounded-lg bg-background ring-1 ring-border/50 flex-shrink-0">
+                      <span className="material-icons text-lg text-muted-foreground">cleaning_services</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium text-base">General Pressure Washing</span>
+                        <Badge variant="secondary" className="text-xs">Hours-based</Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-0.5">
+                        Ground-level and general pressure washing services
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                    <span className="material-icons text-gray-600 dark:text-gray-400">cleaning_services</span>
+                  
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                    <div className="p-2 rounded-lg bg-background ring-1 ring-border/50 flex-shrink-0">
+                      <span className="material-icons text-lg text-muted-foreground">home_repair_service</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium text-base">Gutter Cleaning</span>
+                        <Badge variant="secondary" className="text-xs">Hours-based</Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-0.5">
+                        Gutter cleaning, maintenance, and debris removal
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium">General Pressure Washing</p>
-                    <p className="text-xs text-muted-foreground">Hours-based</p>
+                  
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                    <div className="p-2 rounded-lg bg-background ring-1 ring-border/50 flex-shrink-0">
+                      <span className="material-icons text-lg text-muted-foreground">meeting_room</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium text-base">In-Suite Dryer Vent Cleaning</span>
+                        <Badge variant="secondary" className="text-xs">Unit-based</Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-0.5">
+                        Individual unit dryer vent cleaning with unit tracking
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                    <span className="material-icons text-gray-600 dark:text-gray-400">home_repair_service</span>
+                  
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                    <div className="p-2 rounded-lg bg-background ring-1 ring-border/50 flex-shrink-0">
+                      <span className="material-icons text-lg text-muted-foreground">local_parking</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium text-base">Parkade Pressure Cleaning</span>
+                        <Badge variant="secondary" className="text-xs">Stall-based</Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-0.5">
+                        Parking structure pressure washing with stall tracking
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium">Gutter Cleaning</p>
-                    <p className="text-xs text-muted-foreground">Hours-based</p>
+                  
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                    <div className="p-2 rounded-lg bg-background ring-1 ring-border/50 flex-shrink-0">
+                      <span className="material-icons text-lg text-muted-foreground">storefront</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium text-base">Ground Window Cleaning</span>
+                        <Badge variant="secondary" className="text-xs">Hours-based</Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-0.5">
+                        Ground-level and low-rise window cleaning
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center">
-                    <span className="material-icons text-amber-600 dark:text-amber-400">meeting_room</span>
+                  
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                    <div className="p-2 rounded-lg bg-background ring-1 ring-border/50 flex-shrink-0">
+                      <span className="material-icons text-lg text-muted-foreground">format_paint</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium text-base">Painting</span>
+                        <Badge variant="secondary" className="text-xs">Hours-based</Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-0.5">
+                        Rope access painting and coating services
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium">In-Suite Dryer Vent Cleaning</p>
-                    <p className="text-xs text-muted-foreground">Unit-based</p>
+                  
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                    <div className="p-2 rounded-lg bg-background ring-1 ring-border/50 flex-shrink-0">
+                      <span className="material-icons text-lg text-muted-foreground">fact_check</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium text-base">Inspection</span>
+                        <Badge variant="secondary" className="text-xs">Hours-based</Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-0.5">
+                        Building facade inspection and assessment
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
-                    <span className="material-icons text-purple-600 dark:text-purple-400">local_parking</span>
-                  </div>
-                  <div>
-                    <p className="font-medium">Parkade Pressure Cleaning</p>
-                    <p className="text-xs text-muted-foreground">Stall-based</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                    <span className="material-icons text-gray-600 dark:text-gray-400">storefront</span>
-                  </div>
-                  <div>
-                    <p className="font-medium">Ground Window Cleaning</p>
-                    <p className="text-xs text-muted-foreground">Hours-based</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                    <span className="material-icons text-gray-600 dark:text-gray-400">format_paint</span>
-                  </div>
-                  <div>
-                    <p className="font-medium">Painting</p>
-                    <p className="text-xs text-muted-foreground">Hours-based</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                    <span className="material-icons text-gray-600 dark:text-gray-400">fact_check</span>
-                  </div>
-                  <div>
-                    <p className="font-medium">Inspection</p>
-                    <p className="text-xs text-muted-foreground">Hours-based</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <Card className="border-dashed">
-            <CardContent className="pt-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg border-2 border-dashed flex items-center justify-center">
-                  <Sparkles className="w-5 h-5 text-muted-foreground" />
-                </div>
-                <div>
-                  <p className="font-medium">Custom Job Types</p>
-                  <p className="text-xs text-muted-foreground">Create and save custom job types with icons for reuse across projects</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </section>
+              
+              {/* Custom Services Category */}
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <h3 className="font-semibold text-base">Custom Services</h3>
+                  <Badge variant="secondary" className="text-xs">1</Badge>
+                </div>
+                <p className="text-sm text-muted-foreground mb-3">Create and save custom job types for your company</p>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                    <div className="p-2 rounded-lg bg-background ring-1 ring-border/50 flex-shrink-0">
+                      <span className="material-icons text-lg text-muted-foreground">more_horiz</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium text-base">Custom Job Types</span>
+                        <Badge variant="secondary" className="text-xs">Configurable</Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-0.5">
+                        Define your own specialized services with configurable tracking
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         <Separator />
 
