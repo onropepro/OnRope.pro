@@ -4789,20 +4789,10 @@ export default function Dashboard() {
                           <div className="flex-1">
                             <div className="text-sm font-medium text-destructive">{t('dashboard.employeeSeats.seatLimitReached', 'Seat Limit Reached')}</div>
                             <div className="text-xs text-muted-foreground mt-1">
-                              {t('dashboard.employeeSeats.seatLimitReachedDesc', "You've reached your {{limit}}-employee limit. Visit Profile → Subscription to upgrade your tier or add more seats.", { limit: employeesData.seatInfo.seatLimit })}
+                              {t('dashboard.employeeSeats.seatLimitReachedDesc', "You've reached your {{limit}}-employee limit. Click 'Add New Employee' below to purchase additional seats.", { limit: employeesData.seatInfo.seatLimit })}
                             </div>
                           </div>
                         </div>
-                        <Button 
-                          size="sm" 
-                          variant="default" 
-                          className="mt-2 w-full"
-                          data-testid="button-manage-subscription-seats"
-                          onClick={() => window.location.href = "/profile"}
-                        >
-                          <span className="material-icons text-sm mr-1">settings</span>
-                          {t('dashboard.employeeSeats.manageSubscription', 'Manage Subscription')}
-                        </Button>
                       </div>
                     )}
                   </CardContent>
