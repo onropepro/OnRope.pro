@@ -5,12 +5,6 @@ import { Separator } from "@/components/ui/separator";
 
 import ChangelogGuideLayout from "@/components/ChangelogGuideLayout";
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import {
   Building2,
   FolderOpen,
   Calendar,
@@ -39,7 +33,6 @@ import {
   Paintbrush,
   Search,
   MoreHorizontal,
-  Crown,
   Key,
   Brain,
   DollarSign,
@@ -356,173 +349,220 @@ export default function ProjectsGuide() {
         <Separator />
 
         {/* Problems Solved */}
-        <section className="space-y-8">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-2">Problems Solved</h2>
-            <p className="text-muted-foreground leading-relaxed text-base">
-              Real challenges addressed by OnRopePro's Project Management module.
-            </p>
-          </div>
+        <section className="space-y-4">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 text-green-900 dark:text-green-100">
+            <CheckCircle2 className="w-6 h-6" />
+            Problems Solved
+          </h2>
 
-          {/* Company Owners Section */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3 pb-2 border-b">
-              <Crown className="w-5 h-5 text-amber-500" />
-              <h3 className="text-xl md:text-2xl font-semibold">For Rope Access Company Owners</h3>
-            </div>
-            
-            <Accordion type="single" collapsible className="space-y-3">
-              <AccordionItem value="owner-1" className="border rounded-lg px-4">
-                <AccordionTrigger className="hover:no-underline py-4">
-                  <span className="text-left font-medium text-base">I have no idea where my 6 active projects actually stand</span>
-                </AccordionTrigger>
-                <AccordionContent className="pb-4">
-                  <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
-                    <p>You're juggling window washing at Tower A, caulking at Building B, and anchor inspections at Complex C. When a client calls asking for a status update, you're guessing based on what you remember from yesterday's phone call with your supervisor. You drive site-to-site taking notes, wasting 10-15 hours per week just figuring out what's happening.</p>
-                    <p><span className="font-medium text-foreground">Example:</span> You bid a new project for next week, but you're not sure if your current jobs will finish on time. You don't know if Tommy is overloaded or if Sarah has capacity. You commit anyway and hope it works out—then discover you've double-booked your best crew.</p>
-                    <p><span className="font-medium text-foreground">Solution:</span> Real-time dashboard showing every project's progress percentage, days remaining, assigned crew, and completion forecast. Filter by status, building, or technician. Updates automatically as work sessions are logged.</p>
-                    <p><span className="font-medium text-foreground">Benefit:</span> Instant oversight without site visits. Confidently quote new work based on real crew availability. Make data-driven prioritization decisions in seconds, not hours.</p>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
+          <div className="space-y-6">
+            {/* Problem 1 - Project Visibility */}
+            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+                  "I have no idea where my 6 active projects actually stand"
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
+                <div>
+                  <p className="font-semibold">The Pain:</p>
+                  <p>You're juggling window washing at Tower A, caulking at Building B, and anchor inspections at Complex C. When a client calls asking for a status update, you're guessing based on what you remember from yesterday's phone call with your supervisor.</p>
+                </div>
+                <div className="bg-green-100 dark:bg-green-900 p-3 rounded italic">
+                  "You bid a new project for next week, but you're not sure if your current jobs will finish on time. You don't know if Tommy is overloaded or if Sarah has capacity. You commit anyway and hope it works out—then discover you've double-booked your best crew."
+                </div>
+                <div>
+                  <p className="font-semibold">The Solution:</p>
+                  <p>Real-time dashboard showing every project's progress percentage, days remaining, assigned crew, and completion forecast. Filter by status, building, or technician. Updates automatically as work sessions are logged.</p>
+                </div>
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="font-medium">Instant oversight without site visits. Confidently quote new work based on real crew availability.</span>
+                </div>
+              </CardContent>
+            </Card>
 
-              <AccordionItem value="owner-2" className="border rounded-lg px-4">
-                <AccordionTrigger className="hover:no-underline py-4">
-                  <span className="text-left font-medium text-base">One tech is crushing it while another coasts—and I can't prove it</span>
-                </AccordionTrigger>
-                <AccordionContent className="pb-4">
-                  <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
-                    <p>Your gut says Tommy completes 5 drops per day while another employee barely does 1, but they work the same hours. Without hard data, you can't have the coaching conversation. You suspect someone's on their phone half the day, but proving it means physical surveillance—awkward and time-consuming.</p>
-                    <p><span className="font-medium text-foreground">Example:</span> Two techs worked the same 8-hour shift at the same building. Your client complains progress is slow. You pay both techs full wages, but you're only getting one tech's worth of productivity. The high performer feels demoralized; the underperformer coasts undetected.</p>
-                    <p><span className="font-medium text-foreground">Solution:</span> Per-employee performance tracking showing drops/units completed per shift, target achievement rates (e.g., "Meeting target 87% of time"), and historical trends. Outlier detection automatically flags significant deviations from team averages.</p>
-                    <p><span className="font-medium text-foreground">Benefit:</span> Objective performance data for coaching conversations. High performers feel recognized (lower turnover). Underperformers either improve or self-select out. Clients see 20-30% faster project completion.</p>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
+            {/* Problem 2 - Performance Tracking */}
+            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+                  "One tech is crushing it while another coasts—and I can't prove it"
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
+                <div>
+                  <p className="font-semibold">The Pain:</p>
+                  <p>Your gut says Tommy completes 5 drops per day while another employee barely does 1, but they work the same hours. Without hard data, you can't have the coaching conversation.</p>
+                </div>
+                <div className="bg-green-100 dark:bg-green-900 p-3 rounded italic">
+                  "Two techs worked the same 8-hour shift at the same building. Your client complains progress is slow. You pay both techs full wages, but you're only getting one tech's worth of productivity. The high performer feels demoralized; the underperformer coasts undetected."
+                </div>
+                <div>
+                  <p className="font-semibold">The Solution:</p>
+                  <p>Per-employee performance tracking showing drops/units completed per shift, target achievement rates, and historical trends. Outlier detection automatically flags significant deviations from team averages.</p>
+                </div>
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="font-medium">Objective performance data for coaching conversations. High performers feel recognized.</span>
+                </div>
+              </CardContent>
+            </Card>
 
-              <AccordionItem value="owner-3" className="border rounded-lg px-4">
-                <AccordionTrigger className="hover:no-underline py-4">
-                  <span className="text-left font-medium text-base">Residents bombard the property manager with status questions</span>
-                </AccordionTrigger>
-                <AccordionContent className="pb-4">
-                  <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
-                    <p>The property manager receives 15-30 status calls per week during your project. Residents assume the worst because they have no visibility. The property manager becomes frustrated playing telephone between you and 40 units. Your professional reputation suffers even though your crew is working efficiently.</p>
-                    <p><span className="font-medium text-foreground">Example:</span> Unit 402 has a birthday party on Sunday and demands you not work near their windows that day. The property manager calls you at 8 PM on Friday with this restriction. You scramble to reschedule your crew, move equipment, and adjust the timeline—2 hours of chaos that could have been avoided.</p>
-                    <p><span className="font-medium text-foreground">Solution:</span> Resident-facing portal showing real-time progress (4-elevation visual system), upcoming work schedules ("We'll be near your unit Wednesday 9am-3pm"), photo galleries of completed work, and expected completion dates. Residents submit feedback directly without property manager middleman.</p>
-                    <p><span className="font-medium text-foreground">Benefit:</span> Property manager time saved (20+ hours/month per active project). Resident complaints drop 60-70%. Your company looks professional and transparent. Contract renewals increase 15-25%. Building managers refer you to other properties.</p>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
+            {/* Problem 3 - Resident Communication */}
+            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+                  "Residents bombard the property manager with status questions"
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
+                <div>
+                  <p className="font-semibold">The Pain:</p>
+                  <p>The property manager receives 15-30 status calls per week during your project. Residents assume the worst because they have no visibility. Your professional reputation suffers even though your crew is working efficiently.</p>
+                </div>
+                <div className="bg-green-100 dark:bg-green-900 p-3 rounded italic">
+                  "Unit 402 has a birthday party on Sunday and demands you not work near their windows that day. The property manager calls you at 8 PM on Friday with this restriction. You scramble to reschedule your crew—2 hours of chaos that could have been avoided."
+                </div>
+                <div>
+                  <p className="font-semibold">The Solution:</p>
+                  <p>Resident-facing portal showing real-time progress (4-elevation visual system), upcoming work schedules, photo galleries of completed work, and expected completion dates. Residents submit feedback directly without property manager middleman.</p>
+                </div>
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="font-medium">Property manager time saved 20+ hours/month. Resident feedback drop 60-70%.</span>
+                </div>
+              </CardContent>
+            </Card>
 
-              <AccordionItem value="owner-4" className="border rounded-lg px-4">
-                <AccordionTrigger className="hover:no-underline py-4">
-                  <span className="text-left font-medium text-base">I create a project, then manually re-enter everything into my calendar</span>
-                </AccordionTrigger>
-                <AccordionContent className="pb-4">
-                  <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
-                    <p>You win a new contract. You create the project in your system (or Excel). Then you open Google Calendar and manually block off dates. Then you text your supervisor the crew assignments. Then you update your whiteboard. Same information, four different places, wasting 30-45 minutes per project.</p>
-                    <p><span className="font-medium text-foreground">Example:</span> You forget to add Project #3 to the calendar. Your supervisor doesn't see it on the schedule. The client calls on the scheduled start date asking where your crew is. Embarrassing scramble ensues—you send whoever's available, not the optimal crew. Client perceives you as disorganized.</p>
-                    <p><span className="font-medium text-foreground">Solution:</span> Creating a project with date range + assigned employees automatically populates calendar entries. Color-coded project bars show scheduling conflicts instantly. Drag-and-drop editing syncs back to project assignments in real-time.</p>
-                    <p><span className="font-medium text-foreground">Benefit:</span> Zero redundant data entry. Impossible to forget calendar entries. Schedule automatically reflects project reality. <strong>5-10 hours/week saved.</strong> No more "Oh no, I forgot to schedule that" emergencies.</p>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
+            {/* Problem 4 - Calendar Integration */}
+            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+                  "I create a project, then manually re-enter everything into my calendar"
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
+                <div>
+                  <p className="font-semibold">The Pain:</p>
+                  <p>You win a new contract. You create the project in your system (or Excel). Then you open Google Calendar and manually block off dates. Then you text your supervisor the crew assignments. Same information, four different places.</p>
+                </div>
+                <div className="bg-green-100 dark:bg-green-900 p-3 rounded italic">
+                  "You forget to add Project #3 to the calendar. Your supervisor doesn't see it on the schedule. The client calls on the scheduled start date asking where your crew is. Embarrassing scramble ensues."
+                </div>
+                <div>
+                  <p className="font-semibold">The Solution:</p>
+                  <p>Creating a project with date range + assigned employees automatically populates calendar entries. Color-coded project bars show scheduling conflicts instantly. Drag-and-drop editing syncs back to project assignments in real-time.</p>
+                </div>
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="font-medium">Zero redundant data entry. 5-10 hours/week saved. No more forgotten schedules.</span>
+                </div>
+              </CardContent>
+            </Card>
 
-              <AccordionItem value="owner-5" className="border rounded-lg px-4">
-                <AccordionTrigger className="hover:no-underline py-4">
-                  <span className="text-left font-medium text-base">I'm guessing which techs are available next week</span>
-                </AccordionTrigger>
-                <AccordionContent className="pb-4">
-                  <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
-                    <p>You need to quote a new project starting Monday. You think Tommy is finishing Tower A on Friday, but you're not certain. Sarah might be on vacation? You're not sure if you have enough crew capacity, so you either: (A) Decline the work (lost revenue) or (B) Commit and hope (risk overcommitting and disappointing clients).</p>
-                    <p><span className="font-medium text-foreground">Example:</span> You confidently quote a project for next week, then realize you double-booked Tommy on two simultaneous jobs 40 km apart. You either pull him off one project (angry client A) or scramble to find last-minute coverage at premium rates (angry client B + unexpected labor costs).</p>
-                    <p><span className="font-medium text-foreground">Solution:</span> Calendar view with employee availability filters, color-coded project bars spanning multiple days, and automatic conflict detection. System flags when techs are double-booked or when projects lack assigned crew. "Tommy: Available Dec 10-15, Assigned Dec 16-20, Vacation Dec 21-23."</p>
-                    <p><span className="font-medium text-foreground">Benefit:</span> Confidently commit to new work based on real availability. Optimize crew utilization (eliminate idle time). <strong>Prevent double-booking disasters that cost $2,000-$5,000 in emergency coverage.</strong></p>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
+            {/* Problem 5 - Crew Availability */}
+            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+                  "I'm guessing which techs are available next week"
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
+                <div>
+                  <p className="font-semibold">The Pain:</p>
+                  <p>You need to quote a new project starting Monday. You think Tommy is finishing Tower A on Friday, but you're not certain. Sarah might be on vacation? You're not sure if you have enough crew capacity.</p>
+                </div>
+                <div className="bg-green-100 dark:bg-green-900 p-3 rounded italic">
+                  "You confidently quote a project for next week, then realize you double-booked Tommy on two simultaneous jobs 40 km apart. You either pull him off one project (angry client A) or scramble to find last-minute coverage at premium rates."
+                </div>
+                <div>
+                  <p className="font-semibold">The Solution:</p>
+                  <p>Calendar view with employee availability filters, color-coded project bars spanning multiple days, and automatic conflict detection. System flags when techs are double-booked or when projects lack assigned crew.</p>
+                </div>
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="font-medium">Prevent double-booking disasters that cost $2,000-$5,000 in emergency coverage.</span>
+                </div>
+              </CardContent>
+            </Card>
 
-              <AccordionItem value="owner-6" className="border rounded-lg px-4">
-                <AccordionTrigger className="hover:no-underline py-4">
-                  <span className="text-left font-medium text-base">I have no idea how long this type of job should take</span>
-                </AccordionTrigger>
-                <AccordionContent className="pb-4">
-                  <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
-                    <p>A client asks you to quote a 15-story window wash. How many days? How many techs? You completed a similar job six months ago, but you can't remember if it took 9 days or 14 days. You can't find your notes. You guess conservatively (overbid, lose contract) or aggressively (underbid, lose money).</p>
-                    <p><span className="font-medium text-foreground">Example:</span> You quote 12 days for a building wash based on gut feel. Historical data would have shown you averaged 8 days for similar buildings (4.2 drops/day average). You overbid by 50%—client goes with competitor. You leave $18,000 on the table.</p>
-                    <p><span className="font-medium text-foreground">Solution:</span> Searchable project archive with filters (date range, building type, job type, completion status). Analytics dashboard showing average drops/day by job type, labor hours per elevation, and project duration trends. "Similar Projects: 15-20 story window washes averaged 9.3 days, 2.4 techs, 4.1 drops/day."</p>
-                    <p><span className="font-medium text-foreground">Benefit:</span> Data-driven quoting (<strong>15-20% more accurate pricing</strong>). Faster quote preparation (75% time saved—from 45 minutes to 10 minutes). Win more contracts with competitive pricing while protecting margins. <strong>Prevent 3-5 underbids/year = $6,000-$10,000 saved.</strong></p>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
+            {/* Problem 6 - Historical Data */}
+            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+                  "I have no idea how long this type of job should take"
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
+                <div>
+                  <p className="font-semibold">The Pain:</p>
+                  <p>A client asks you to quote a 15-story window wash. How many days? How many techs? You completed a similar job six months ago, but you can't remember if it took 9 days or 14 days.</p>
+                </div>
+                <div className="bg-green-100 dark:bg-green-900 p-3 rounded italic">
+                  "You quote 12 days for a building wash based on gut feel. Historical data would have shown you averaged 8 days for similar buildings. You overbid by 50%—client goes with competitor. You leave $18,000 on the table."
+                </div>
+                <div>
+                  <p className="font-semibold">The Solution:</p>
+                  <p>Searchable project archive with filters (date range, building type, job type, completion status). Analytics dashboard showing average drops/day by job type, labor hours per elevation, and project duration trends.</p>
+                </div>
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="font-medium">Data-driven quoting—15-20% more accurate pricing. Prevent 3-5 underbids/year.</span>
+                </div>
+              </CardContent>
+            </Card>
 
-              <AccordionItem value="owner-7" className="border rounded-lg px-4">
-                <AccordionTrigger className="hover:no-underline py-4">
-                  <span className="text-left font-medium text-base">My brain is my business—and it's exhausted</span>
-                </AccordionTrigger>
-                <AccordionContent className="pb-4">
-                  <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
-                    <p>You're mentally tracking: which projects are behind schedule, who's assigned to which building tomorrow, which clients owe invoices, which technicians are approaching overtime, which buildings need safety documentation, when equipment inspections are due, and resident complaints that need responses.</p>
-                    <p>This cognitive overload leads to: forgetting important details, making errors under pressure, burnout and decision fatigue, and inability to take vacation (business collapses without your mental database).</p>
-                    <p><span className="font-medium text-foreground">Example:</span> You wake up at 3 AM wondering if you remembered to schedule Tommy for the Tower B project starting tomorrow. You check your phone. You didn't. You can't fall back asleep. This happens 3x per week. Your partner is frustrated. Your health suffers.</p>
-                    <p><span className="font-medium text-foreground">Solution:</span> Unified system externalizes your mental database. Projects, schedules, payroll, safety docs, and client communications live in one place with automated reminders for critical tasks. "Tommy scheduled Tower B Dec 5-8" + "COI expires Dec 12—renew now" + "Unit 507 feedback awaiting response (2 days)."</p>
-                    <p><span className="font-medium text-foreground">Benefit:</span> <strong>Psychological load reduced by 60-70%.</strong> Mental bandwidth freed for strategic thinking (business growth, marketing, relationship building—not firefighting). Confidence to delegate operations to supervisors. Ability to take actual vacations without midnight panic attacks. Better sleep. Happier family.</p>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
+            {/* Problem 7 - Mental Load */}
+            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+                  "My brain is my business—and it's exhausted"
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
+                <div>
+                  <p className="font-semibold">The Pain:</p>
+                  <p>You're mentally tracking: which projects are behind schedule, who's assigned to which building tomorrow, which clients owe invoices, which technicians are approaching overtime, when equipment inspections are due.</p>
+                </div>
+                <div className="bg-green-100 dark:bg-green-900 p-3 rounded italic">
+                  "You wake up at 3 AM wondering if you remembered to schedule Tommy for the Tower B project starting tomorrow. You check your phone. You didn't. You can't fall back asleep. This happens 3x per week. Your partner is frustrated. Your health suffers."
+                </div>
+                <div>
+                  <p className="font-semibold">The Solution:</p>
+                  <p>Unified system externalizes your mental database. Projects, schedules, payroll, safety docs, and client communications live in one place with automated reminders for critical tasks.</p>
+                </div>
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="font-medium">Psychological load reduced by 60-70%. Ability to take actual vacations.</span>
+                </div>
+              </CardContent>
+            </Card>
 
-              <AccordionItem value="owner-8" className="border rounded-lg px-4">
-                <AccordionTrigger className="hover:no-underline py-4">
-                  <span className="text-left font-medium text-base">Building managers call me constantly asking "How's it going?"</span>
-                </AccordionTrigger>
-                <AccordionContent className="pb-4">
-                  <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
-                    <p>Your building manager client has no visibility into project progress. They're fielding resident questions ("When will you finish my elevation?") and have no answers. They call/text you 5-10 times per week asking for updates. You spend <strong>3-4 hours per week</strong> on status calls instead of productive work—and you still sound vague because you don't have instant access to current progress either.</p>
-                    <p><span className="font-medium text-foreground">Example:</span> Building manager calls Tuesday morning: "Mrs. Johnson in Unit 802 wants to know when you'll finish her elevation. She's having family visit this weekend." You don't have the answer immediately—you're at another job site. You have to check with your crew, call back later. Building manager perceives you as disorganized. Mrs. Johnson complains to strata council. Relationship strained.</p>
-                    <p><span className="font-medium text-foreground">Solution:</span> Building manager portal with identical visibility to your internal dashboard. They log in anytime, see real-time progress by elevation, review before/after photo galleries, check upcoming schedules, and download safety documentation—without calling you. "South Elevation: 73% complete. Expected completion: Dec 8. View 47 progress photos."</p>
-                    <p><span className="font-medium text-foreground">Benefit:</span> Status call volume drops 80% (from 8 calls/week to 1-2). Building managers perceive you as tech-savvy and professional—"most organized contractor we work with." <strong>Stronger client relationships. 15-25% higher contract renewal rates.</strong> Referrals to other buildings they manage.</p>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          </div>
-
-          {/* Additional Problems Solved - Consolidated */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3 pb-2 border-b">
-              <CheckCircle2 className="w-5 h-5 text-green-500" />
-              <h3 className="text-xl md:text-2xl font-semibold">Additional Problems Solved</h3>
-            </div>
-            
-            <div className="grid gap-4 md:grid-cols-2">
-              <Card>
-                <CardContent className="pt-4 space-y-2">
-                  <p className="font-medium">Inconsistent Project Tracking</p>
-                  <p className="text-sm text-muted-foreground leading-relaxed">Manual progress tracking leads to guesswork and outdated information. OnRopePro provides automatic, real-time progress measurement based on work session entries. Everyone sees the same accurate data.</p>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="pt-4 space-y-2">
-                  <p className="font-medium">Missing Project Schedules</p>
-                  <p className="text-sm text-muted-foreground leading-relaxed">Without calendar integration, project timelines exist only in your head or scattered across multiple tools. OnRopePro automatically generates visual schedules showing project duration, crew assignments, and conflicts.</p>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="pt-4 space-y-2">
-                  <p className="font-medium">Disconnected Safety Documentation</p>
-                  <p className="text-sm text-muted-foreground leading-relaxed">Safety docs, schedules, and worker assignments scattered across emails, Google Drive, and paper files. OnRopePro links all safety documentation (Rope Access Plans, Toolbox Meetings, Anchor Inspections) directly to the relevant project.</p>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="pt-4 space-y-2">
-                  <p className="font-medium">Manual Payroll Data Entry</p>
-                  <p className="text-sm text-muted-foreground leading-relaxed">Technicians log work sessions with project-specific tracking (drops, hours, units). This data automatically feeds payroll calculations—no manual timesheet transcription. <strong>Eliminates 87-93% of payroll errors.</strong></p>
-                </CardContent>
-              </Card>
-            </div>
+            {/* Problem 8 - Building Manager Calls */}
+            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+                  "Building managers call me constantly asking 'How's it going?'"
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
+                <div>
+                  <p className="font-semibold">The Pain:</p>
+                  <p>Your building manager client has no visibility into project progress. They're fielding resident questions and have no answers. They call/text you 5-10 times per week asking for updates.</p>
+                </div>
+                <div className="bg-green-100 dark:bg-green-900 p-3 rounded italic">
+                  "Building manager calls Tuesday morning: 'Mrs. Johnson in Unit 802 wants to know when you'll finish her elevation.' You don't have the answer immediately—you're at another job site. Building manager perceives you as disorganized."
+                </div>
+                <div>
+                  <p className="font-semibold">The Solution:</p>
+                  <p>Building manager portal with identical visibility to your internal dashboard. They log in anytime, see real-time progress by elevation, review photo galleries, check upcoming schedules—without calling you.</p>
+                </div>
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="font-medium">Status call volume drops 80%. 15-25% higher contract renewal rates.</span>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </section>
 
