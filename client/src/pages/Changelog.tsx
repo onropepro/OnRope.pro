@@ -1101,8 +1101,8 @@ export default function Changelog() {
         <Card className="mb-8">
           <CardHeader>
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-warning-100 dark:bg-warning-600/20 ring-1 ring-warning-600/20">
-                <Wrench className="h-5 w-5 text-warning-600" />
+              <div className="p-2.5 rounded-xl bg-[#989C94]/10 ring-1 ring-[#989C94]/20">
+                <Wrench className="h-5 w-5" style={{ color: '#989C94' }} />
               </div>
               <div>
                 <CardTitle className="text-xl">Services Managed</CardTitle>
