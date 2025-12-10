@@ -121,7 +121,7 @@ function KpiCard({
           <p className="su-metric-label">{title}</p>
           <p className="su-metric-value">{value}</p>
           {subtitle && (
-            <p className="text-xs text-gray-500 dark:text-gray-400">{subtitle}</p>
+            <p className="text-xs text-muted-foreground">{subtitle}</p>
           )}
         </div>
         <div className={`su-metric-icon ${iconStyles[variant]}`}>
@@ -132,11 +132,11 @@ function KpiCard({
         <div className="mt-4 flex items-center gap-1 text-xs">
           {trend === 'up' && <ArrowUp className="h-3 w-3 text-emerald-500" />}
           {trend === 'down' && <ArrowDown className="h-3 w-3 text-red-500" />}
-          {trend === 'neutral' && <Minus className="h-3 w-3 text-gray-400" />}
+          {trend === 'neutral' && <Minus className="h-3 w-3 text-muted-foreground" />}
           <span className={
             trend === 'up' ? 'text-emerald-500' : 
             trend === 'down' ? 'text-red-500' : 
-            'text-gray-400'
+            'text-muted-foreground'
           }>
             {trendValue}
           </span>
