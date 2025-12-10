@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { trackCheckoutStart, trackAddOnPurchase } from "@/lib/analytics";
+import { PurchaseSeatsDialog } from "@/components/PurchaseSeatsDialog";
 import { 
   CreditCard, 
   Check, 
@@ -193,32 +194,6 @@ export function SubscriptionManagement() {
       toast({
         title: "Upgrade Failed",
         description: error.message || "Failed to upgrade subscription",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Add extra seats mutation
-  const addSeatsMutation = useMutation({
-    mutationFn: async () => {
-      const response = await apiRequest('POST', '/api/stripe/add-seats', {});
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/stripe/subscription-status'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/user'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/subscription/details'] });
-      setShowAddSeatsDialog(false);
-      toast({
-        title: "Seat Added!",
-        description: "1 additional seat has been added to your subscription. Changes are effective immediately.",
-      });
-    },
-    onError: (error: any) => {
-      setShowAddSeatsDialog(false);
-      toast({
-        title: "Failed to Add Seats",
-        description: error.message || "Failed to add extra seats",
         variant: "destructive",
       });
     },
@@ -625,47 +600,17 @@ export function SubscriptionManagement() {
         </DialogContent>
       </Dialog>
 
-      {/* Add Extra Seats Dialog */}
-      <Dialog open={showAddSeatsDialog} onOpenChange={setShowAddSeatsDialog}>
-        <DialogContent data-testid="dialog-add-seats">
-          <DialogHeader>
-            <DialogTitle>Add Team Seat</DialogTitle>
-            <DialogDescription>
-              <div className="space-y-4 pt-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">Price:</span>
-                  <span className="font-semibold text-base">$34.95/month</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-primary" />
-                  <span className="text-sm">Add 1 additional team seat</span>
-                </div>
-                <div className="text-xs text-muted-foreground pt-2 border-t space-y-1">
-                  <p><strong>Prorated Billing:</strong> You'll only be charged for the time remaining in your current billing period.</p>
-                  <p>Changes take effect immediately. Your team can use the extra seat right away.</p>
-                </div>
-              </div>
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setShowAddSeatsDialog(false)}
-              data-testid="button-add-seats-cancel"
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="default"
-              onClick={() => addSeatsMutation.mutate()}
-              disabled={addSeatsMutation.isPending}
-              data-testid="button-confirm-add-seats"
-            >
-              {addSeatsMutation.isPending ? 'Processing...' : 'Confirm Purchase'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Add Extra Seats Dialog - using shared PurchaseSeatsDialog component */}
+      <PurchaseSeatsDialog
+        open={showAddSeatsDialog}
+        onOpenChange={setShowAddSeatsDialog}
+        currentSeats={subDetails?.additionalSeatsCount || 0}
+        onPurchaseSuccess={() => {
+          queryClient.invalidateQueries({ queryKey: ['/api/stripe/subscription-status'] });
+          queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+          queryClient.invalidateQueries({ queryKey: ['/api/subscription/details'] });
+        }}
+      />
 
       {/* Add White Label Branding Dialog */}
       <Dialog open={showAddBrandingDialog} onOpenChange={setShowAddBrandingDialog}>
