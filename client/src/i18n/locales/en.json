@@ -799,8 +799,7 @@
       "unlimited": "Unlimited available",
       "manageCapacity": "Manage your employee capacity",
       "seatLimitReached": "Seat Limit Reached",
-      "seatLimitReachedDesc": "You've reached your {{limit}}-employee limit. Visit Profile → Subscription to upgrade your tier or add more seats.",
-      "manageSubscription": "Manage Subscription",
+      "seatLimitReachedDesc": "You've reached your {{limit}}-employee limit. Click 'Add New Employee' below to purchase additional seats.",
       "addNewEmployee": "Add New Employee"
     },
     "employees": {
