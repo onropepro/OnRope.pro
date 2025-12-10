@@ -2250,42 +2250,117 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Employee not found" });
       }
 
-      if (employee.companyId !== user.id) {
+      // Check if employee belongs to this company (primary or secondary)
+      const membership = await storage.checkEmployeeBelongsToCompany(id, user.id);
+      if (!membership.belongs) {
         return res.status(403).json({ message: "Cannot reactivate employees from another company" });
       }
 
-      if (!employee.suspendedAt) {
-        return res.status(400).json({ message: "Employee is not suspended" });
+      // Validate that the employee is actually suspended
+      if (membership.connectionType === 'primary') {
+        if (!employee.suspendedAt) {
+          return res.status(400).json({ message: "Employee is not suspended" });
+        }
+      } else if (membership.connectionType === 'secondary' && membership.connectionId) {
+        // For secondary connections, check the connection status
+        const connection = await db.select().from(technicianEmployerConnections)
+          .where(eq(technicianEmployerConnections.id, membership.connectionId)).limit(1);
+        if (!connection.length || connection[0].status !== 'suspended') {
+          return res.status(400).json({ message: "Employee connection is not suspended" });
+        }
       }
 
-      // Check if there's an available seat
+      // Check if there's an available seat OR if we need to add one via Stripe
       const employees = await storage.getAllEmployees(user.id);
-      const activeCount = employees.filter(e => !e.terminatedDate && !e.suspendedAt).length;
+      const activeCount = employees.filter((e: any) => !e.terminatedDate && !e.suspendedAt).length;
       const paidSeats = user.additionalSeatsCount || 0;
       const giftedSeats = user.giftedSeatsCount || 0;
       const totalSeats = paidSeats + giftedSeats;
 
+      // Track if we need to add a seat
+      let seatWasAdded = false;
+
+      // If no available seats, add one via Stripe
       if (activeCount >= totalSeats) {
-        return res.status(400).json({ 
-          message: "No available seats. Please purchase additional seats first.",
-          activeCount,
-          totalSeats 
-        });
+        if (!user.stripeSubscriptionId) {
+          return res.status(400).json({ 
+            message: "No available seats and no active subscription to add seats.",
+            activeCount,
+            totalSeats 
+          });
+        }
+
+        // Add a seat via Stripe (with dedicated error handling)
+        try {
+          console.log(`[Employees] No available seats (${activeCount}/${totalSeats}), adding seat via Stripe`);
+          
+          const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
+          const currency = subscription.currency.toLowerCase() as 'usd' | 'cad';
+          
+          const addonConfig = ADDON_CONFIG.extra_seats;
+          const addonPriceId = currency === 'usd' ? addonConfig.priceIdUSD : addonConfig.priceIdCAD;
+          const legacySeatPriceIds = [
+            'price_1SWDH4BzDsOltscrMxt5u3ij',
+            'price_1SZG7KBzDsOltscrAcGW9Vuw',
+          ];
+
+          // Check if there's an existing seat item to update
+          let existingItem = subscription.items.data.find(item => item.price.id === addonPriceId);
+          if (!existingItem) {
+            existingItem = subscription.items.data.find(item => legacySeatPriceIds.includes(item.price.id));
+          }
+
+          if (existingItem) {
+            // Update existing item
+            await stripe.subscriptionItems.update(existingItem.id, {
+              quantity: (existingItem.quantity || 0) + 1,
+              proration_behavior: 'create_prorations',
+            });
+          } else {
+            // Add new item
+            await stripe.subscriptionItems.create({
+              subscription: user.stripeSubscriptionId,
+              price: addonPriceId,
+              quantity: 1,
+              proration_behavior: 'create_prorations',
+            });
+          }
+
+          // Only update local seat count after Stripe succeeds
+          await storage.updateUser(user.id, {
+            additionalSeatsCount: (user.additionalSeatsCount || 0) + 1,
+          });
+
+          seatWasAdded = true;
+          console.log(`[Employees] Added 1 seat via Stripe for reactivation`);
+        } catch (stripeError: any) {
+          console.error('[Employees] Failed to add seat via Stripe:', stripeError);
+          return res.status(500).json({ 
+            message: `Failed to add seat to subscription: ${stripeError.message || 'Stripe error'}` 
+          });
+        }
       }
 
-      // Reactivate the employee
-      await db.update(users)
-        .set({
-          suspendedAt: null,
-          suspendedBy: null,
-        })
-        .where(eq(users.id, id));
+      // Reactivate the employee based on connection type
+      if (membership.connectionType === 'secondary' && membership.connectionId) {
+        await db.update(technicianEmployerConnections)
+          .set({ status: "active" })
+          .where(eq(technicianEmployerConnections.id, membership.connectionId));
+      } else {
+        await db.update(users)
+          .set({
+            suspendedAt: null,
+            suspendedBy: null,
+          })
+          .where(eq(users.id, id));
+      }
 
       console.log(`[Employees] Reactivated suspended employee ${id}`);
       res.json({
         success: true,
         message: "Employee reactivated successfully",
         employeeId: id,
+        seatAdded: seatWasAdded,
       });
     } catch (error: any) {
       console.error('[Employees] Reactivate suspended error:', error);

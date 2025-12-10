@@ -786,6 +786,7 @@ export default function Dashboard() {
   const [clientDropdownOpen, setClientDropdownOpen] = useState(false);
   const [clientSearchQuery, setClientSearchQuery] = useState("");
   const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
+  const [employeeToSuspendSeat, setEmployeeToSuspendSeat] = useState<any | null>(null); // For seat removal/suspend
   const [showDropDialog, setShowDropDialog] = useState(false);
   const [dropProject, setDropProject] = useState<any>(null);
   const [showInspectionCheckDialog, setShowInspectionCheckDialog] = useState(false);
@@ -2122,19 +2123,26 @@ export default function Dashboard() {
   
   const reactivateSuspendedMutation = useMutation({
     mutationFn: async (employeeId: string) => {
-      const response = await apiRequest("POST", `/api/employees/${employeeId}/reactivate-suspended`, {});
+      const response = await fetch(`/api/employees/${employeeId}/reactivate-suspended`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      });
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.message || "Failed to reactivate employee");
       }
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ["/api/employees/all"] });
       queryClient.invalidateQueries({ queryKey: ["/api/employees"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       toast({
         title: t('dashboard.toast.employeeReactivated', 'Employee reactivated successfully'),
-        description: t('dashboard.toast.employeeReactivatedDesc', 'The employee now has access to their account.'),
+        description: data?.seatAdded 
+          ? t('dashboard.toast.seatAddedForReactivation', 'A new seat was added to your subscription.')
+          : t('dashboard.toast.employeeReactivatedDesc', 'The employee now has access to their account.'),
       });
     },
     onError: (error: Error) => {
@@ -2169,6 +2177,32 @@ export default function Dashboard() {
       queryClient.invalidateQueries({ queryKey: ["/api/employees/all"] });
       setEmployeeToDelete(null);
       toast({ title: t('dashboard.toast.employeeDeleted', 'Employee deleted successfully') });
+    },
+    onError: (error: Error) => {
+      toast({ title: t('dashboard.toast.error', 'Error'), description: error.message, variant: "destructive" });
+    },
+  });
+
+  // Suspend employee and remove seat mutation
+  const suspendSeatMutation = useMutation({
+    mutationFn: async (employeeId: string) => {
+      const response = await apiRequest("POST", "/api/subscription/remove-seats", {
+        quantity: 1,
+        employeeIds: [employeeId],
+      });
+      return response;
+    },
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/employees/all"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      setEmployeeToSuspendSeat(null);
+      const creditAmount = data.creditAmount || 0;
+      toast({ 
+        title: t('dashboard.toast.employeeSuspended', 'Employee suspended'),
+        description: creditAmount > 0 
+          ? t('dashboard.toast.seatRemovedWithCredit', `Seat removed. $${creditAmount.toFixed(2)} credit applied to your account.`)
+          : t('dashboard.toast.seatRemoved', 'Seat removed from your subscription.')
+      });
     },
     onError: (error: Error) => {
       toast({ title: t('dashboard.toast.error', 'Error'), description: error.message, variant: "destructive" });
@@ -5890,6 +5924,23 @@ export default function Dashboard() {
                                     <span className="material-icons text-sm">lock_reset</span>
                                   </Button>
                                 )}
+                                {/* Remove Seat button - only for employees, not company owner */}
+                                {user?.role === "company" && employee.id !== user?.id && (
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setEmployeeToSuspendSeat(employee);
+                                    }}
+                                    data-testid={`button-remove-seat-${employee.id}`}
+                                    className="h-9 w-9 text-amber-600 hover:text-amber-700"
+                                    disabled={userIsReadOnly}
+                                    title={t('dashboard.employees.removeSeat', 'Remove Seat')}
+                                  >
+                                    <span className="material-icons text-sm">person_remove</span>
+                                  </Button>
+                                )}
                                 <Button
                                   variant="ghost"
                                   size="icon"
@@ -8434,6 +8485,41 @@ export default function Dashboard() {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {t('common.delete', 'Delete')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Suspend Employee / Remove Seat Confirmation Dialog */}
+      <AlertDialog open={employeeToSuspendSeat !== null} onOpenChange={(open) => !open && setEmployeeToSuspendSeat(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('dashboard.suspendEmployee.title', 'Suspend Employee')}</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-2">
+              <span className="block">
+                {t('dashboard.suspendEmployee.description', 'Are you sure you want to suspend')} <strong>{employeeToSuspendSeat?.name || employeeToSuspendSeat?.email}</strong>?
+              </span>
+              <span className="block text-amber-600 dark:text-amber-400">
+                {t('dashboard.suspendEmployee.warning', 'This will remove one seat from your subscription. The employee will lose access but can be reactivated later.')}
+              </span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-suspend">{t('common.cancel', 'Cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => employeeToSuspendSeat && suspendSeatMutation.mutate(employeeToSuspendSeat.id)}
+              data-testid="button-confirm-suspend"
+              className="bg-amber-600 text-white hover:bg-amber-700"
+              disabled={suspendSeatMutation.isPending}
+            >
+              {suspendSeatMutation.isPending ? (
+                <span className="material-icons animate-spin text-sm">refresh</span>
+              ) : (
+                <>
+                  <span className="material-icons text-sm mr-1">person_remove</span>
+                  {t('dashboard.suspendEmployee.confirm', 'Suspend Employee')}
+                </>
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
