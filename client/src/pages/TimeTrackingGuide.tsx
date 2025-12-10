@@ -38,8 +38,8 @@ export default function TimeTrackingGuide() {
   return (
     <ChangelogGuideLayout 
       title="Work Session & Time Tracking Guide"
-      version="2.0"
-      lastUpdated="December 5, 2025"
+      version="2.1"
+      lastUpdated="December 10, 2025"
     >
       <div className="space-y-8">
         
@@ -93,9 +93,9 @@ export default function TimeTrackingGuide() {
               <div className="bg-amber-100 dark:bg-amber-800 rounded-lg p-3 text-sm">
                 <p className="font-semibold flex items-center gap-2">
                   <Info className="w-4 h-4" />
-                  Honor System with Auditing
+                  Honor System with Passive Auditing
                 </p>
-                <p className="mt-1">Employees can select "Yes" even without completing an inspection, but the system knows. The inspection database is checked independently, and any discrepancy (claiming "Yes" without a matching inspection record) is reflected in the Company Safety Rating (CSR). Honest employees build trust. Dishonest answers create an audit trail that affects company compliance scores visible to property managers.</p>
+                <p className="mt-1">Employees can select "Yes" and proceed to work even without a matching inspection record in the database. The system does NOT actively block work sessions. However, the inspection database is checked independently during CSR (Company Safety Rating) calculations. Any discrepancy (claiming "Yes" without a matching inspection record) creates a penalty that affects the company's compliance score visible to property managers. Honest employees build trust. Dishonest answers are passively tracked and penalize the company's safety rating.</p>
               </div>
             </CardContent>
           </Card>
@@ -345,8 +345,18 @@ export default function TimeTrackingGuide() {
                 <p className="text-xs">14-hour shift = 8 regular + 4 overtime + 2 double time</p>
               </div>
 
-              <div className="bg-muted p-2 rounded text-sm">
-                <strong>Note:</strong> These thresholds are configurable per company in settings.
+              <div className="bg-muted p-2 rounded text-sm space-y-2">
+                <p><strong>Configurable Settings:</strong></p>
+                <ul className="list-disc list-inside space-y-1 text-xs">
+                  <li><strong>Daily triggers:</strong> Overtime/double-time calculated per day (default)</li>
+                  <li><strong>Weekly triggers:</strong> Hours accumulated across the week before OT kicks in</li>
+                  <li><strong>Custom thresholds:</strong> Adjust when OT/DT begin (8h/12h defaults)</li>
+                  <li><strong>Disable overtime:</strong> Set trigger to "none" for flat-rate pay</li>
+                </ul>
+              </div>
+
+              <div className="bg-purple-100 dark:bg-purple-900 p-2 rounded text-xs">
+                <strong>Labor Cost Tracking:</strong> Each session also captures the employee's hourly rate at time of work, calculating and storing total labor cost for project analytics.
               </div>
             </CardContent>
           </Card>
@@ -487,12 +497,20 @@ export default function TimeTrackingGuide() {
               <p className="text-muted-foreground">After ending a work session, technicians are prompted to log their IRATA task hours for certification progression:</p>
               
               <div className="bg-teal-50 dark:bg-teal-950 p-3 rounded space-y-2">
-                <p className="font-semibold text-xs">Task Categories:</p>
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  <div className="p-2 bg-background rounded">Rigging & anchor work</div>
-                  <div className="p-2 bg-background rounded">Rope access work</div>
-                  <div className="p-2 bg-background rounded">Rescue practice</div>
-                  <div className="p-2 bg-background rounded">Equipment inspection</div>
+                <p className="font-semibold text-xs">Task Categories (20 types available):</p>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+                  <div className="p-2 bg-background rounded">Rope Transfer</div>
+                  <div className="p-2 bg-background rounded">Re-Anchor</div>
+                  <div className="p-2 bg-background rounded">Ascending</div>
+                  <div className="p-2 bg-background rounded">Descending</div>
+                  <div className="p-2 bg-background rounded">Rigging</div>
+                  <div className="p-2 bg-background rounded">Deviation</div>
+                  <div className="p-2 bg-background rounded">Aid Climbing</div>
+                  <div className="p-2 bg-background rounded">Edge Transition</div>
+                  <div className="p-2 bg-background rounded">Knot Passing</div>
+                  <div className="p-2 bg-background rounded">Rescue Technique</div>
+                  <div className="p-2 bg-background rounded">Hauling / Lowering</div>
+                  <div className="p-2 bg-background rounded text-muted-foreground">+ 9 more...</div>
                 </div>
               </div>
 
@@ -549,9 +567,9 @@ export default function TimeTrackingGuide() {
               <div className="bg-red-50 dark:bg-red-950 p-3 rounded">
                 <p className="flex items-center gap-2 font-semibold text-xs text-red-900 dark:text-red-100">
                   <Shield className="w-4 h-4" />
-                  Required Permission: view_financial_data
+                  Required Permission: canAccessFinancials
                 </p>
-                <p className="text-xs mt-1 text-red-800 dark:text-red-200">Session editing is restricted to prevent unauthorized payroll modifications.</p>
+                <p className="text-xs mt-1 text-red-800 dark:text-red-200">Session editing is restricted to prevent unauthorized payroll modifications. This permission is typically granted to company owners, operations managers, and accounting roles.</p>
               </div>
             </CardContent>
           </Card>
