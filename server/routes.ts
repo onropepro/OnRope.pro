@@ -1552,6 +1552,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "No active subscription found" });
       }
 
+      // Get quantity from request body (default to 1 for backwards compatibility)
+      const seatsToAdd = Math.max(1, Math.min(100, parseInt(req.body.quantity) || 1));
+
       // Get current subscription to determine currency
       const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
       
@@ -1569,7 +1572,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const addonConfig = ADDON_CONFIG.extra_seats;
       const addonPriceId = currency === 'usd' ? addonConfig.priceIdUSD : addonConfig.priceIdCAD;
 
-      console.log(`[Stripe] Adding extra seats to subscription ${user.stripeSubscriptionId}`);
+      console.log(`[Stripe] Adding ${seatsToAdd} extra seat(s) to subscription ${user.stripeSubscriptionId}`);
 
       // Check if extra seats already exists on subscription
       const existingItem = subscription.items.data.find(item => item.price.id === addonPriceId);
@@ -1577,22 +1580,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let newQuantity: number;
       if (existingItem) {
         // Update quantity of existing subscription item
-        console.log(`[Stripe] Extra seats already on subscription. Updating quantity from ${existingItem.quantity} to ${(existingItem.quantity || 1) + 1}`);
+        const currentQuantity = existingItem.quantity || 0;
+        const targetQuantity = currentQuantity + seatsToAdd;
+        console.log(`[Stripe] Extra seats already on subscription. Updating quantity from ${currentQuantity} to ${targetQuantity}`);
         const updatedItem = await stripe.subscriptionItems.update(existingItem.id, {
-          quantity: (existingItem.quantity || 1) + 1,
+          quantity: targetQuantity,
           proration_behavior: 'create_prorations',
         });
-        newQuantity = updatedItem.quantity || 1;
+        newQuantity = updatedItem.quantity || targetQuantity;
       } else {
-        // Create new subscription item with quantity 1
-        console.log(`[Stripe] Adding extra seats as new subscription item`);
+        // Create new subscription item with requested quantity
+        console.log(`[Stripe] Adding ${seatsToAdd} extra seat(s) as new subscription item`);
         const newItem = await stripe.subscriptionItems.create({
           subscription: user.stripeSubscriptionId,
           price: addonPriceId,
-          quantity: 1,
+          quantity: seatsToAdd,
           proration_behavior: 'create_prorations',
         });
-        newQuantity = newItem.quantity || 1;
+        newQuantity = newItem.quantity || seatsToAdd;
       }
 
       // Update user's additional seats count in database with authoritative Stripe quantity
@@ -1600,10 +1605,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         additionalSeatsCount: newQuantity,
       });
 
-      console.log(`[Stripe] Extra seat added successfully. Total additional seats: ${newQuantity}`);
+      console.log(`[Stripe] ${seatsToAdd} extra seat(s) added successfully. Total additional seats: ${newQuantity}`);
       res.json({
         success: true,
-        message: "Extra seat added successfully",
+        message: `${seatsToAdd} seat(s) added successfully`,
+        seatsAdded: seatsToAdd,
         additionalSeats: newQuantity,
         totalExtraSeats: newQuantity,
       });
