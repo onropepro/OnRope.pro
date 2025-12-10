@@ -3922,6 +3922,14 @@ export default function ProjectDetail() {
             </DialogDescription>
           </DialogHeader>
 
+          {/* Notice about Building Portal visibility */}
+          <div className="flex items-start gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800">
+            <span className="material-icons text-blue-600 dark:text-blue-400 shrink-0 mt-0.5">info</span>
+            <p className="text-sm text-blue-800 dark:text-blue-200">
+              {t('projectDetail.buildingInstructions.portalNotice', 'All changes you make here will be visible to the Building Manager from their OnRopePro Building Portal.')}
+            </p>
+          </div>
+
           <div className="space-y-4 py-4">
             {/* Access Information */}
             <div className="space-y-3">
