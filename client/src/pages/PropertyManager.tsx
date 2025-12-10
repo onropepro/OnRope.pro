@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Building2, Plus, Mail, Phone, LogOut, Settings, FileText, Download, AlertCircle, CheckCircle2, Clock, Upload, FileCheck, Trash2, User, Shield } from "lucide-react";
+import { Building2, Plus, Mail, Phone, LogOut, Settings, FileText, Download, AlertCircle, CheckCircle2, Clock, Upload, FileCheck, Trash2, User, Shield, Users } from "lucide-react";
 import { formatLocalDate, formatTimestampDate, formatTime, formatDurationMs } from "@/lib/dateUtils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
@@ -761,6 +761,15 @@ export default function PropertyManager() {
                                 <div className="flex items-center gap-2">
                                   <Phone className="w-3 h-3 flex-shrink-0" />
                                   <span data-testid={`text-vendor-phone-${vendor.id}`}>{vendor.phone}</span>
+                                </div>
+                              )}
+                              {vendor.residentCode && (
+                                <div className="flex items-center gap-2 mt-2 pt-2 border-t">
+                                  <Users className="w-3 h-3 flex-shrink-0" />
+                                  <span className="text-xs text-muted-foreground">Resident Code:</span>
+                                  <span className="font-mono font-medium text-foreground" data-testid={`text-vendor-resident-code-${vendor.id}`}>
+                                    {vendor.residentCode}
+                                  </span>
                                 </div>
                               )}
                             </div>
