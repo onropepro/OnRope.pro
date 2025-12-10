@@ -108,7 +108,7 @@ export default function TimeTrackingGuide() {
               <ul className="space-y-2 text-sm">
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span><strong>Inaccurate time records:</strong> GPS-verified clock-in/out with precise timestamps eliminates timesheet fraud</span>
+                  <span><strong>Inaccurate time records:</strong> GPS-verified clock-in/out with precise timestamps eliminates timesheet fraud. Location pins confirm employees are at the actual job site, not clocking in from home or a coffee shop.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
@@ -272,8 +272,8 @@ export default function TimeTrackingGuide() {
             <CardHeader className="pb-2">
               <CardTitle className="text-base">Data Captured at Clock Out</CardTitle>
             </CardHeader>
-            <CardContent className="text-base">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <CardContent className="text-base space-y-3">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                 <div className="p-2 bg-muted rounded text-center">
                   <Clock className="w-4 h-4 mx-auto mb-1" />
                   <p className="text-xs font-semibold">End Time</p>
@@ -289,6 +289,45 @@ export default function TimeTrackingGuide() {
                 <div className="p-2 bg-muted rounded text-center">
                   <Calculator className="w-4 h-4 mx-auto mb-1" />
                   <p className="text-xs font-semibold">Hours Calc</p>
+                </div>
+                <div className="p-2 bg-muted rounded text-center">
+                  <TrendingUp className="w-4 h-4 mx-auto mb-1" />
+                  <p className="text-xs font-semibold">Performance</p>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">Each completed work session contributes to the employee's performance analytics, tracking target achievement rates and productivity trends over time.</p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-2 border-orange-200 dark:border-orange-900 bg-orange-50/50 dark:bg-orange-950/50">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Shield className="w-4 h-4 text-orange-600" />
+                Performance-Protected Shortfall Reasons
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-base space-y-3">
+              <p className="text-muted-foreground">When technicians don't meet their daily target, they must provide a reason. Certain reasons are designated as "performance-protected" and do NOT negatively impact the employee's productivity metrics:</p>
+              
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <p className="font-semibold text-xs text-green-700 dark:text-green-300">Protected Reasons (No Impact):</p>
+                  <ul className="list-disc list-inside space-y-1 text-sm">
+                    <li>Weather delays (wind, rain, lightning)</li>
+                    <li>Equipment issues</li>
+                    <li>Building access problems</li>
+                    <li>Emergency evacuation</li>
+                    <li>Client-requested pause</li>
+                    <li>Safety concern</li>
+                  </ul>
+                </div>
+                <div className="space-y-2">
+                  <p className="font-semibold text-xs text-amber-700 dark:text-amber-300">Unprotected (Custom) Reasons:</p>
+                  <ul className="list-disc list-inside space-y-1 text-sm">
+                    <li>Free-text explanations are logged</li>
+                    <li>DO count toward performance metrics</li>
+                    <li>Supervisors can review during performance reviews</li>
+                  </ul>
                 </div>
               </div>
             </CardContent>
@@ -456,13 +495,15 @@ export default function TimeTrackingGuide() {
                   </ul>
                 </div>
                 <div className="space-y-2">
-                  <p className="font-semibold text-xs">Access:</p>
+                  <p className="font-semibold text-xs">Default Access:</p>
                   <ul className="list-disc list-inside space-y-1 text-base">
                     <li>Company owners: All workers</li>
                     <li>Ops managers: All workers</li>
                     <li>Supervisors: Their team</li>
-                    <li>Technicians: Not accessible</li>
                   </ul>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Note: Company owners can grant Active Workers visibility to any role via permission settings.
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -476,6 +517,19 @@ export default function TimeTrackingGuide() {
             <ClipboardCheck className="w-5 h-5 text-teal-600 dark:text-teal-400" />
             IRATA Hours Logging
           </h2>
+
+          <div className="bg-amber-100 dark:bg-amber-900 border-2 border-amber-500 p-4 rounded-lg mb-4">
+            <p className="flex items-center gap-2 font-bold text-amber-900 dark:text-amber-100">
+              <AlertTriangle className="w-5 h-5" />
+              Important Disclaimer
+            </p>
+            <p className="mt-2 text-sm text-amber-800 dark:text-amber-200">
+              IRATA/SPRAT hours logged in OnRopePro are <strong>NOT certification-approved</strong>. 
+              This tool helps technicians track their hours to accurately fill their official logbooks. 
+              It does not replace the official IRATA or SPRAT logging requirements. 
+              Future integration with certification bodies is planned.
+            </p>
+          </div>
 
           <Card className="border-2 border-teal-200 dark:border-teal-900">
             <CardHeader className="pb-2">
