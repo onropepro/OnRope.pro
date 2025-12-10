@@ -1186,17 +1186,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid credentials" });
       }
       
-      // Check if user has been terminated
-      if (user.terminatedDate) {
+      // Check if user has been terminated (only applies to non-technicians)
+      // Technicians can still access their portal even if terminated from a company
+      const isTechnician = !!(user.ropeAccessLicenseNumber || user.irataCertNumber || user.spratCertNumber);
+      
+      if (user.terminatedDate && !isTechnician) {
         return res.status(403).json({ message: "Your employment has been terminated. Please contact your administrator for more information." });
       }
       
       // Check if user's seat has been suspended (company removed their seat)
-      if (user.suspendedAt) {
+      // Technicians can still access their portal even when suspended from a company
+      // They just lose access to that specific company's dashboard
+      if (user.suspendedAt && !isTechnician) {
         return res.status(403).json({ message: "Your account access has been suspended. Please contact your employer for more information." });
       }
       
-      // Check if account has been disabled by SuperUser
+      // Check if account has been disabled by SuperUser (this blocks everyone)
       if (user.isDisabled) {
         return res.status(403).json({ message: "Your account has been suspended. Please contact support for more information." });
       }
@@ -2219,10 +2224,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log(`[Stripe] ${quantity} seats removed successfully. Remaining paid seats: ${finalSeatCount}. Credit: $${creditAmount}. Legacy price: ${isLegacyPrice}`);
       
-      // Send real-time notifications to kick out suspended employees
+      // Send real-time notifications to suspended employees
+      // Technicians get a suspension notification (can still access portal)
+      // Non-technicians get terminated (no portal access)
       for (const emp of employeesToSuspend) {
-        await wsHub.terminateUser(emp.id);
-        console.log(`[WebSocket] Sent termination signal to suspended employee ${emp.id}`);
+        const empData = await storage.getUserById(emp.id);
+        const empIsTechnician = !!(empData?.ropeAccessLicenseNumber || empData?.irataCertNumber || empData?.spratCertNumber);
+        
+        if (empIsTechnician) {
+          // Technician: notify of suspension but don't logout (they can still access their portal)
+          wsHub.notifyEmployerSuspension(emp.id, user.id, user.companyName || 'Unknown Company');
+          console.log(`[WebSocket] Sent employer suspension notification to technician ${emp.id}`);
+        } else {
+          // Non-technician: terminate session completely
+          await wsHub.terminateUser(emp.id);
+          console.log(`[WebSocket] Sent termination signal to non-technician employee ${emp.id}`);
+        }
       }
       
       res.json({

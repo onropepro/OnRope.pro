@@ -35,6 +35,21 @@ export function usePermissionSync(isAuthenticated: boolean) {
             });
             queryClient.invalidateQueries({ queryKey: ['/api/user'] });
             queryClient.invalidateQueries({ queryKey: ['/api/employees'] });
+          } else if (data.type === 'employer:suspended') {
+            // Technician was suspended from a specific company
+            // They can still access their portal and other employers
+            toast({
+              title: "Access Suspended",
+              description: data.message || `Your access to ${data.companyName || 'an employer'} has been suspended.`,
+              variant: "destructive",
+            });
+            // Refresh user data to update employer connections
+            queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+            queryClient.invalidateQueries({ queryKey: ['/api/technician/employer-connections'] });
+            // Redirect to technician portal (their safe space)
+            setTimeout(() => {
+              setLocation('/technician-portal');
+            }, 2000);
           } else if (data.type === 'user:terminated') {
             toast({
               title: "Session Ended",

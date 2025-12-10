@@ -155,6 +155,25 @@ class WebSocketHub {
     this.notifyPermissionsUpdated(userId);
     await this.invalidateUserSessions(userId);
   }
+
+  // Notify technician that their access to a specific company has been suspended
+  // This does NOT logout the technician - they can still access their portal
+  notifyEmployerSuspension(userId: string, companyId: string, companyName: string) {
+    const userConnections = this.connections.get(userId);
+    if (userConnections) {
+      const message = JSON.stringify({ 
+        type: 'employer:suspended',
+        companyId,
+        companyName,
+        message: `Your access to ${companyName} has been suspended.`
+      });
+      userConnections.forEach(ws => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(message);
+        }
+      });
+    }
+  }
 }
 
 export const wsHub = new WebSocketHub();
