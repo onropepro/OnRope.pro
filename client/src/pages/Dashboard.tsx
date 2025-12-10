@@ -6600,14 +6600,20 @@ export default function Dashboard() {
                           <FormItem>
                             <FormLabel>{t('dashboard.clientForm.addressOptional', 'Address (Optional)')}</FormLabel>
                             <FormControl>
-                              <Textarea 
-                                placeholder="123 Main St, Vancouver, BC" 
-                                {...field} 
+                              <AddressAutocomplete
+                                placeholder="123 Main St, Vancouver, BC"
+                                value={field.value || ""}
                                 data-testid="input-client-address"
-                                onChange={(e) => {
-                                  field.onChange(e);
+                                onChange={(value) => {
+                                  field.onChange(value);
                                   if (sameAsAddress) {
-                                    clientForm.setValue("billingAddress", e.target.value);
+                                    clientForm.setValue("billingAddress", value);
+                                  }
+                                }}
+                                onSelect={(address) => {
+                                  field.onChange(address.formatted);
+                                  if (sameAsAddress) {
+                                    clientForm.setValue("billingAddress", address.formatted);
                                   }
                                 }}
                               />
@@ -6669,16 +6675,20 @@ export default function Dashboard() {
                               </div>
                               <div>
                                 <label className="text-xs text-muted-foreground mb-1 block">{t('dashboard.clientForm.buildingAddress', 'Building Address')}</label>
-                                <Textarea
+                                <AddressAutocomplete
                                   placeholder="123 Main St, Vancouver, BC"
                                   value={lms.address}
-                                  onChange={(e) => {
+                                  data-testid={`input-client-lms-address-${index}`}
+                                  onChange={(value) => {
                                     const newLmsNumbers = [...lmsNumbers];
-                                    newLmsNumbers[index] = { ...lms, address: e.target.value };
+                                    newLmsNumbers[index] = { ...lms, address: value };
                                     setLmsNumbers(newLmsNumbers);
                                   }}
-                                  rows={2}
-                                  data-testid={`input-client-lms-address-${index}`}
+                                  onSelect={(address) => {
+                                    const newLmsNumbers = [...lmsNumbers];
+                                    newLmsNumbers[index] = { ...lms, address: address.formatted };
+                                    setLmsNumbers(newLmsNumbers);
+                                  }}
                                 />
                               </div>
                               <div className="grid grid-cols-2 gap-2">
@@ -7069,14 +7079,20 @@ export default function Dashboard() {
                   <FormItem>
                     <FormLabel>{t('dashboard.clientForm.addressOptional', 'Address (Optional)')}</FormLabel>
                     <FormControl>
-                      <Textarea 
-                        placeholder="123 Main St, Vancouver, BC" 
-                        {...field} 
+                      <AddressAutocomplete
+                        placeholder="123 Main St, Vancouver, BC"
+                        value={field.value || ""}
                         data-testid="input-edit-client-address"
-                        onChange={(e) => {
-                          field.onChange(e);
+                        onChange={(value) => {
+                          field.onChange(value);
                           if (editSameAsAddress) {
-                            editClientForm.setValue("billingAddress", e.target.value);
+                            editClientForm.setValue("billingAddress", value);
+                          }
+                        }}
+                        onSelect={(address) => {
+                          field.onChange(address.formatted);
+                          if (editSameAsAddress) {
+                            editClientForm.setValue("billingAddress", address.formatted);
                           }
                         }}
                       />
@@ -7138,16 +7154,20 @@ export default function Dashboard() {
                       </div>
                       <div>
                         <label className="text-xs text-muted-foreground mb-1 block">{t('dashboard.clientForm.buildingAddress', 'Building Address')}</label>
-                        <Textarea
+                        <AddressAutocomplete
                           placeholder="123 Main St, Vancouver, BC"
                           value={lms.address}
-                          onChange={(e) => {
+                          data-testid={`input-edit-client-lms-address-${index}`}
+                          onChange={(value) => {
                             const newLmsNumbers = [...editLmsNumbers];
-                            newLmsNumbers[index] = { ...lms, address: e.target.value };
+                            newLmsNumbers[index] = { ...lms, address: value };
                             setEditLmsNumbers(newLmsNumbers);
                           }}
-                          rows={2}
-                          data-testid={`input-edit-client-lms-address-${index}`}
+                          onSelect={(address) => {
+                            const newLmsNumbers = [...editLmsNumbers];
+                            newLmsNumbers[index] = { ...lms, address: address.formatted };
+                            setEditLmsNumbers(newLmsNumbers);
+                          }}
                         />
                       </div>
                       <div className="grid grid-cols-3 gap-2">
