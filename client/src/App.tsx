@@ -69,6 +69,11 @@ import AnalyticsGuide from "@/pages/AnalyticsGuide";
 import LanguageGuide from "@/pages/LanguageGuide";
 import GPSGuide from "@/pages/GPSGuide";
 import PropertyManagerGuide from "@/pages/PropertyManagerGuide";
+import CSRGuide from "@/pages/CSRGuide";
+import TechnicianRegistrationGuide from "@/pages/TechnicianRegistrationGuide";
+import PayrollGuide from "@/pages/PayrollGuide";
+import MobileDesignGuide from "@/pages/MobileDesignGuide";
+import JobBoardGuide from "@/pages/JobBoardGuide";
 import Pricing from "@/pages/Pricing";
 import ROICalculator from "@/pages/ROICalculator";
 import TechnicianLogin from "@/pages/TechnicianLogin";
@@ -334,6 +339,11 @@ function Router() {
       <Route path="/changelog/language" component={LanguageGuide} />
       <Route path="/changelog/gps" component={GPSGuide} />
       <Route path="/changelog/property-manager" component={PropertyManagerGuide} />
+      <Route path="/changelog/csr" component={CSRGuide} />
+      <Route path="/changelog/technician-registration" component={TechnicianRegistrationGuide} />
+      <Route path="/changelog/payroll" component={PayrollGuide} />
+      <Route path="/changelog/mobile-design" component={MobileDesignGuide} />
+      <Route path="/changelog/job-board" component={JobBoardGuide} />
       <Route path="/changelog/pricing" component={Pricing} />
       <Route path="/roi-calculator" component={ROICalculator} />
       <Route component={NotFound} />

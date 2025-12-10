@@ -21,7 +21,10 @@ import {
   ClipboardCheck,
   HardHat,
   CreditCard,
-  ChevronLeft
+  ChevronLeft,
+  Star,
+  Smartphone,
+  Briefcase
 } from "lucide-react";
 
 interface GuideLink {
@@ -35,21 +38,26 @@ const guideLinks: GuideLink[] = [
   { name: "Projects", path: "/changelog/projects", icon: FolderOpen },
   { name: "Time Tracking", path: "/changelog/time-tracking", icon: Clock },
   { name: "IRATA Logging", path: "/changelog/irata-logging", icon: ClipboardCheck },
+  { name: "Safety", path: "/changelog/safety", icon: Shield },
+  { name: "CSR Rating", path: "/changelog/csr", icon: Star },
   { name: "Documents", path: "/changelog/documents", icon: FileText },
   { name: "Employees", path: "/changelog/employees", icon: Users },
+  { name: "Technician Registration", path: "/changelog/technician-registration", icon: HardHat },
   { name: "Scheduling", path: "/changelog/scheduling", icon: Calendar },
+  { name: "Inventory", path: "/changelog/inventory", icon: Package },
+  { name: "Payroll & Financial", path: "/changelog/payroll", icon: CreditCard },
   { name: "Quoting", path: "/changelog/quoting", icon: Receipt },
   { name: "CRM", path: "/changelog/crm", icon: Building2 },
   { name: "Resident Portal", path: "/changelog/resident-portal", icon: MessageSquare },
+  { name: "Property Manager", path: "/changelog/property-manager", icon: Home },
+  { name: "Pricing", path: "/changelog/pricing", icon: CreditCard },
   { name: "Branding", path: "/changelog/branding", icon: Palette },
   { name: "Platform Admin", path: "/changelog/platform-admin", icon: HardHat },
   { name: "Analytics", path: "/changelog/analytics", icon: BarChart3 },
   { name: "Language", path: "/changelog/language", icon: Globe },
+  { name: "Mobile Design", path: "/changelog/mobile-design", icon: Smartphone },
   { name: "GPS & Location", path: "/changelog/gps", icon: MapPin },
-  { name: "Property Manager", path: "/changelog/property-manager", icon: Home },
-  { name: "Safety", path: "/changelog/safety", icon: Shield },
-  { name: "Inventory", path: "/changelog/inventory", icon: Package },
-  { name: "Pricing", path: "/changelog/pricing", icon: CreditCard },
+  { name: "Job Board", path: "/changelog/job-board", icon: Briefcase },
 ];
 
 interface ChangelogGuideLayoutProps {
