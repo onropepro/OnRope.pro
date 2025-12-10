@@ -121,7 +121,10 @@ export default function Schedule() {
   const { data: employeesData } = useQuery<{ employees: User[] }>({
     queryKey: ["/api/employees"],
   });
-  const employees = employeesData?.employees || [];
+  // Filter out suspended and terminated employees from schedule
+  const employees = (employeesData?.employees || []).filter(e => 
+    !e.suspendedAt && !e.terminatedDate
+  );
 
   // Fetch employee time off entries
   const { data: timeOffData } = useQuery<{ timeOff: EmployeeTimeOff[] }>({
