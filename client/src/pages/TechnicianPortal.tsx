@@ -4970,7 +4970,8 @@ export default function TechnicianPortal() {
             <Button 
               onClick={() => {
                 setShowEmployerSelectDialog(false);
-                setLocation("/dashboard");
+                // Navigate to dashboard with the selected employer ID
+                setLocation(`/dashboard?employerId=${selectedEmployerId}`);
               }}
               disabled={!selectedEmployerId}
               data-testid="button-continue-employer"

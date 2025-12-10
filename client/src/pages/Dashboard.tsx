@@ -887,12 +887,16 @@ export default function Dashboard() {
   // Extract user from userData for use throughout component
   const user = userData?.user;
 
+  // Get employer ID from URL for PLUS technicians switching between employers
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlEmployerId = urlParams.get('employerId');
+
   // Determine company ID for fetching data
   // For company users: use their own ID
-  // For employees: use their companyId
+  // For employees: use their companyId, OR the URL employerId if switching employers (PLUS)
   const companyIdForData = userData?.user?.role === 'company' 
     ? userData.user.id 
-    : userData?.user?.companyId;
+    : (urlEmployerId || userData?.user?.companyId);
 
   // Fetch company information
   const { data: companyData } = useQuery({
