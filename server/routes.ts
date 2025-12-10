@@ -7341,7 +7341,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Check if technician is linked to a DIFFERENT company (protect against cross-company hijacking)
       // If linked to THIS company (via accepting invitation), that's expected and allowed
-      if (technician.companyId && technician.companyId !== companyId) {
+      // PLUS technicians can be linked to multiple companies, so we skip this check for them
+      if (technician.companyId && technician.companyId !== companyId && !technician.hasPlusAccess) {
         return res.status(400).json({ message: "This technician is already linked to a different company" });
       }
       
@@ -7379,39 +7380,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const today = new Date();
       const startDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
       
-      // Update the technician record to link to company and set employee details
-      const updateData: any = {
-        companyId: companyId,
-        role: role || 'rope_access_tech',
-        permissions: permissions || [],
-        startDate: startDate,
-        isSalary: isSalary || false,
-      };
+      // For PLUS technicians who already have a primary employer, create an employer_connection
+      // instead of changing their companyId
+      const isPlusWithExistingEmployer = technician.hasPlusAccess && technician.companyId && technician.companyId !== companyId;
       
-      // Set compensation
-      if (isSalary && salary) {
-        updateData.salary = salary;
-        updateData.hourlyRate = null;
-      } else if (hourlyRate) {
-        updateData.hourlyRate = hourlyRate;
-        updateData.salary = null;
+      if (isPlusWithExistingEmployer) {
+        // Check if connection already exists
+        const existingConnection = await db.select().from(technicianEmployerConnections)
+          .where(and(
+            eq(technicianEmployerConnections.technicianId, technician.id),
+            eq(technicianEmployerConnections.companyId, companyId)
+          )).limit(1);
+        
+        if (existingConnection.length === 0) {
+          // Create a new employer connection for PLUS technician
+          await db.insert(technicianEmployerConnections).values({
+            technicianId: technician.id,
+            companyId: companyId,
+            isPrimary: false,
+            status: "active",
+            invitationId: invitationId,
+            hourlyRate: hourlyRate || null,
+            isSalary: isSalary || false,
+            salary: isSalary && salary ? salary : null,
+          });
+          
+          console.log(`[Team-Invite] PLUS technician ${technician.id} added as secondary employee to company ${companyId}`);
+        } else {
+          // Update existing connection
+          await db.update(technicianEmployerConnections)
+            .set({
+              status: "active",
+              hourlyRate: hourlyRate || null,
+              isSalary: isSalary || false,
+              salary: isSalary && salary ? salary : null,
+            })
+            .where(eq(technicianEmployerConnections.id, existingConnection[0].id));
+        }
+      } else {
+        // Regular flow: Update the technician record to link to company and set employee details
+        const updateData: any = {
+          companyId: companyId,
+          role: role || 'rope_access_tech',
+          permissions: permissions || [],
+          startDate: startDate,
+          isSalary: isSalary || false,
+        };
+        
+        // Set compensation
+        if (isSalary && salary) {
+          updateData.salary = salary;
+          updateData.hourlyRate = null;
+        } else if (hourlyRate) {
+          updateData.hourlyRate = hourlyRate;
+          updateData.salary = null;
+        }
+        
+        // Update first aid info if provided
+        if (hasFirstAid !== undefined) {
+          updateData.hasFirstAid = hasFirstAid;
+        }
+        if (firstAidType !== undefined) {
+          updateData.firstAidType = firstAidType;
+        }
+        if (firstAidExpiry !== undefined) {
+          updateData.firstAidExpiry = firstAidExpiry;
+        }
+        if (firstAidDocuments !== undefined) {
+          updateData.firstAidDocuments = firstAidDocuments;
+        }
+        
+        await storage.updateUser(invitation.technicianId, updateData);
       }
-      
-      // Update first aid info if provided
-      if (hasFirstAid !== undefined) {
-        updateData.hasFirstAid = hasFirstAid;
-      }
-      if (firstAidType !== undefined) {
-        updateData.firstAidType = firstAidType;
-      }
-      if (firstAidExpiry !== undefined) {
-        updateData.firstAidExpiry = firstAidExpiry;
-      }
-      if (firstAidDocuments !== undefined) {
-        updateData.firstAidDocuments = firstAidDocuments;
-      }
-      
-      await storage.updateUser(invitation.technicianId, updateData);
       
       // Mark invitation as acknowledged
       await storage.acknowledgeTeamInvitation(invitationId, companyId);
