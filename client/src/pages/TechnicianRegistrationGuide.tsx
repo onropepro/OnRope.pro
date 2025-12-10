@@ -184,7 +184,7 @@ export default function TechnicianRegistrationGuide() {
           <Card className="bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-950 dark:to-amber-900/50 border-amber-200 dark:border-amber-800">
             <CardHeader className="pb-2">
               <div className="flex items-center gap-2">
-                <Badge className="bg-amber-500 text-white">PRO</Badge>
+                <Badge className="bg-amber-500 text-white">PLUS</Badge>
                 <CardTitle className="text-lg">Premium Features</CardTitle>
               </div>
             </CardHeader>
@@ -222,7 +222,7 @@ export default function TechnicianRegistrationGuide() {
               
               <div className="bg-white/50 dark:bg-black/20 p-3 rounded mt-3">
                 <p className="text-sm text-muted-foreground">
-                  PLUS members display a gold "PRO" badge next to their name in both the Technician Portal and Dashboard employee cards.
+                  PLUS members display a gold "PLUS" badge next to their name in both the Technician Portal and Dashboard employee cards.
                 </p>
               </div>
             </CardContent>

@@ -702,7 +702,7 @@ const changelogData: ChangelogSection[] = [
       "Referral code system: 12-character unique codes for technicians",
       "One-sided referral benefit: Code sharer gets PLUS upgrade",
       "Technician PLUS access tier with premium features",
-      "PLUS badge (gold PRO) displayed next to technician names",
+      "PLUS badge displayed next to technician names",
       "Certification expiry alerts: 60-day yellow, 30-day red badges",
       "Unlimited employer connections for PLUS members",
       "Resume/CV document uploads with preview",

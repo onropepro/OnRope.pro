@@ -2137,7 +2137,7 @@ export default function TechnicianPortal() {
                       <h3 className="text-xl font-semibold">{user.name}</h3>
                       {user.hasPlusAccess && (
                         <Badge className="bg-gradient-to-r from-amber-500 to-yellow-400 text-black font-bold text-xs">
-                          PRO
+                          PLUS
                         </Badge>
                       )}
                     </div>
