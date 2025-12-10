@@ -1537,6 +1537,30 @@ export default function Dashboard() {
             setShowOtherElevationFields(true);
           }
           
+          // Set the client selection from the quote if available
+          if (quoteData.clientId && clientsData) {
+            const client = clientsData.find(c => c.id === quoteData.clientId);
+            if (client && client.lmsNumbers && client.lmsNumbers.length > 0) {
+              // Find the matching strata by strata plan number from quote
+              const strataIndex = client.lmsNumbers.findIndex(
+                (s: any) => s.number === quoteData.strataPlanNumber
+              );
+              if (strataIndex >= 0) {
+                // Set both client and strata for proper dropdown display
+                setSelectedClientForProject(quoteData.clientId);
+                setSelectedStrataForProject(`${quoteData.clientId}|${strataIndex}`);
+              } else {
+                // Client found but no matching strata - just set client
+                setSelectedClientForProject(quoteData.clientId);
+                // Use first strata as fallback
+                setSelectedStrataForProject(`${quoteData.clientId}|0`);
+              }
+            } else {
+              // Client found but no strata - just set client ID
+              setSelectedClientForProject(quoteData.clientId);
+            }
+          }
+          
           // Open the project creation dialog
           setShowProjectDialog(true);
           
@@ -1554,7 +1578,7 @@ export default function Dashboard() {
         }
       }
     }
-  }, [projectForm, defaultCalendarColor, toast, t]);
+  }, [projectForm, defaultCalendarColor, toast, t, clientsData]);
 
   const createProjectMutation = useMutation({
     mutationFn: async (data: ProjectFormData & { ropeAccessPlanUrl?: string | null; anchorInspectionCertificateUrl?: string | null }) => {
@@ -2595,6 +2619,17 @@ export default function Dashboard() {
       isVisible: (user: any) => user?.role === 'company', // Company owners who work on buildings
       borderColor: "#8b5cf6",
       category: "team",
+    },
+    {
+      id: "my-account",
+      label: t('dashboard.cards.myAccount.label', 'My Account'),
+      description: t('dashboard.cards.myAccount.description', 'Subscription & billing'),
+      icon: "settings",
+      onClick: () => setLocation("/profile"),
+      testId: "button-nav-my-account",
+      isVisible: (user: any) => user?.role === 'company', // Company owners only
+      borderColor: "#6366f1",
+      category: "financial",
     },
     {
       id: "projects",

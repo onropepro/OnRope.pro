@@ -2866,7 +2866,7 @@ export class Storage {
     });
   }
 
-  async getPropertyManagerProjectDetails(projectId: string, companyId: string, normalizedStrata: string): Promise<{ project: any; complaints: any[] }> {
+  async getPropertyManagerProjectDetails(projectId: string, companyId: string, normalizedStrata: string): Promise<{ project: any; complaints: any[]; buildingInstructions: any | null }> {
     // Strata number is required for security
     if (!normalizedStrata || normalizedStrata.trim() === '') {
       throw new Error('Strata number is required');
@@ -2911,12 +2911,33 @@ export class Storage {
         isNotNull(workSessions.endTime)
       ));
     
+    // Get building instructions by matching strata plan number to building
+    let projectBuildingInstructions = null;
+    if (project.strataPlanNumber) {
+      // First find the building by strata plan number
+      const [building] = await db.select()
+        .from(buildings)
+        .where(eq(buildings.strataPlanNumber, project.strataPlanNumber))
+        .limit(1);
+      
+      if (building) {
+        // Then get the building instructions
+        const [instructions] = await db.select()
+          .from(buildingInstructions)
+          .where(eq(buildingInstructions.buildingId, building.id))
+          .limit(1);
+        
+        projectBuildingInstructions = instructions || null;
+      }
+    }
+    
     return {
       project: {
         ...project,
         workSessions: projectWorkSessions,
       },
       complaints: projectComplaints,
+      buildingInstructions: projectBuildingInstructions,
     };
   }
 
@@ -3531,6 +3552,19 @@ export class Storage {
   async getBuildingById(id: string): Promise<Building | undefined> {
     const result = await db.select().from(buildings).where(eq(buildings.id, id)).limit(1);
     return result[0];
+  }
+
+  /**
+   * Update building password and set passwordChangedAt timestamp
+   */
+  async updateBuildingPassword(buildingId: string, newPasswordHash: string): Promise<void> {
+    await db.update(buildings)
+      .set({ 
+        passwordHash: newPasswordHash, 
+        passwordChangedAt: new Date(),
+        updatedAt: new Date()
+      })
+      .where(eq(buildings.id, buildingId));
   }
 
   /**

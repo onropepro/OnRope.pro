@@ -134,7 +134,7 @@ export default function ProjectDetail() {
   } | null>(null);
   
   // Building instructions state
-  const [buildingInstructionsOpen, setBuildingInstructionsOpen] = useState(false);
+  const [buildingInstructionsOpen, setBuildingInstructionsOpen] = useState(true);
   const [showEditInstructionsDialog, setShowEditInstructionsDialog] = useState(false);
   const [instructionsForm, setInstructionsForm] = useState({
     buildingAccess: "",
@@ -152,6 +152,7 @@ export default function ProjectDetail() {
     councilMemberUnits: "",
     tradeParkingInstructions: "",
     tradeParkingSpots: "",
+    tradeWashroomLocation: "",
   });
 
   const endDayForm = useForm<EndDayFormData>({
@@ -286,6 +287,7 @@ export default function ProjectDetail() {
         councilMemberUnits: (buildingData.instructions as any).councilMemberUnits || "",
         tradeParkingInstructions: (buildingData.instructions as any).tradeParkingInstructions || "",
         tradeParkingSpots: (buildingData.instructions as any).tradeParkingSpots?.toString() || "",
+        tradeWashroomLocation: (buildingData.instructions as any).tradeWashroomLocation || "",
       });
     }
   }, [buildingData?.instructions]);
@@ -1364,64 +1366,14 @@ export default function ProjectDetail() {
           </CardContent>
         </Card>
 
-        {/* Quick Actions - Safety Forms accessible to all employees */}
-        <Card className="glass-card border-0 shadow-premium">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <span className="material-icons text-primary">bolt</span>
-              {t('projectDetail.quickActions.title', 'Quick Actions')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-3">
-              <Button
-                variant="outline"
-                className="h-auto py-4 flex flex-col items-center gap-2"
-                onClick={() => setLocation(`/harness-inspection?projectId=${id}`)}
-                data-testid="button-harness-inspection"
-              >
-                <span className="material-icons text-2xl text-amber-600">security</span>
-                <span className="text-xs font-medium text-center">{t('projectDetail.quickActions.harnessInspection', 'Harness Inspection')}</span>
-              </Button>
-              <Button
-                variant="outline"
-                className="h-auto py-4 flex flex-col items-center gap-2"
-                onClick={() => setLocation(`/toolbox-meeting?projectId=${id}`)}
-                data-testid="button-toolbox-meeting"
-              >
-                <span className="material-icons text-2xl text-blue-600">groups</span>
-                <span className="text-xs font-medium text-center">{t('projectDetail.quickActions.toolboxMeeting', 'Toolbox Meeting')}</span>
-              </Button>
-              <Button
-                variant="outline"
-                className="h-auto py-4 flex flex-col items-center gap-2"
-                onClick={() => setLocation(`/flha?projectId=${id}`)}
-                data-testid="button-flha"
-              >
-                <span className="material-icons text-2xl text-green-600">assignment</span>
-                <span className="text-xs font-medium text-center">{t('projectDetail.quickActions.flha', 'FLHA Form')}</span>
-              </Button>
-              <Button
-                variant="outline"
-                className="h-auto py-4 flex flex-col items-center gap-2"
-                onClick={() => setLocation(`/incident-report?projectId=${id}`)}
-                data-testid="button-incident-report"
-              >
-                <span className="material-icons text-2xl text-red-600">report_problem</span>
-                <span className="text-xs font-medium text-center">{t('projectDetail.quickActions.incidentReport', 'Incident Report')}</span>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Building Instructions Section */}
+        {/* Building Instructions Section - Prominent styling */}
         {buildingData?.building && (
-          <Card className="glass-card border-0 shadow-premium">
+          <Card className="glass-card border-2 border-primary/30 shadow-premium bg-primary/5">
             <Collapsible open={buildingInstructionsOpen} onOpenChange={setBuildingInstructionsOpen}>
               <CardHeader className="pb-3">
                 <CollapsibleTrigger className="flex items-center justify-between w-full" data-testid="trigger-building-instructions">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-primary" />
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <span className="material-icons text-primary">apartment</span>
                     {t('projectDetail.buildingInstructions.title', 'Building Instructions')}
                   </CardTitle>
                   <div className="flex items-center gap-2">
@@ -1574,6 +1526,20 @@ export default function ProjectDetail() {
                         </>
                       )}
 
+                      {/* Trade Washroom */}
+                      {(buildingData.instructions as any).tradeWashroomLocation && (
+                        <>
+                          <Separator />
+                          <div className="flex gap-3">
+                            <span className="material-icons text-sm text-muted-foreground shrink-0 mt-0.5">wc</span>
+                            <div>
+                              <p className="text-xs font-medium text-muted-foreground">{t('projectDetail.buildingInstructions.tradeWashroom', 'Trade Washroom')}</p>
+                              <p className="text-sm whitespace-pre-wrap">{(buildingData.instructions as any).tradeWashroomLocation}</p>
+                            </div>
+                          </div>
+                        </>
+                      )}
+
                       {/* Special Requests */}
                       {buildingData.instructions.specialRequests && (
                         <>
@@ -1610,6 +1576,56 @@ export default function ProjectDetail() {
             </Collapsible>
           </Card>
         )}
+
+        {/* Quick Actions - Safety Forms accessible to all employees */}
+        <Card className="glass-card border-0 shadow-premium">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <span className="material-icons text-primary">bolt</span>
+              {t('projectDetail.quickActions.title', 'Quick Actions')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-3">
+              <Button
+                variant="outline"
+                className="h-auto py-4 flex flex-col items-center gap-2"
+                onClick={() => setLocation(`/harness-inspection?projectId=${id}`)}
+                data-testid="button-harness-inspection"
+              >
+                <span className="material-icons text-2xl text-amber-600">security</span>
+                <span className="text-xs font-medium text-center">{t('projectDetail.quickActions.harnessInspection', 'Harness Inspection')}</span>
+              </Button>
+              <Button
+                variant="outline"
+                className="h-auto py-4 flex flex-col items-center gap-2"
+                onClick={() => setLocation(`/toolbox-meeting?projectId=${id}`)}
+                data-testid="button-toolbox-meeting"
+              >
+                <span className="material-icons text-2xl text-blue-600">groups</span>
+                <span className="text-xs font-medium text-center">{t('projectDetail.quickActions.toolboxMeeting', 'Toolbox Meeting')}</span>
+              </Button>
+              <Button
+                variant="outline"
+                className="h-auto py-4 flex flex-col items-center gap-2"
+                onClick={() => setLocation(`/flha?projectId=${id}`)}
+                data-testid="button-flha"
+              >
+                <span className="material-icons text-2xl text-green-600">assignment</span>
+                <span className="text-xs font-medium text-center">{t('projectDetail.quickActions.flha', 'FLHA Form')}</span>
+              </Button>
+              <Button
+                variant="outline"
+                className="h-auto py-4 flex flex-col items-center gap-2"
+                onClick={() => setLocation(`/incident-report?projectId=${id}`)}
+                data-testid="button-incident-report"
+              >
+                <span className="material-icons text-2xl text-red-600">report_problem</span>
+                <span className="text-xs font-medium text-center">{t('projectDetail.quickActions.incidentReport', 'Incident Report')}</span>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Analytics - Target Performance & Work Session History */}
         {(isManagement || canViewWorkHistory) && (
@@ -3906,6 +3922,14 @@ export default function ProjectDetail() {
             </DialogDescription>
           </DialogHeader>
 
+          {/* Notice about Building Portal visibility */}
+          <div className="flex items-start gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800">
+            <span className="material-icons text-blue-600 dark:text-blue-400 shrink-0 mt-0.5">info</span>
+            <p className="text-sm text-blue-800 dark:text-blue-200">
+              {t('projectDetail.buildingInstructions.portalNotice', 'All changes you make here will be visible to the Building Manager from their OnRopePro Building Portal.')}
+            </p>
+          </div>
+
           <div className="space-y-4 py-4">
             {/* Access Information */}
             <div className="space-y-3">
@@ -4099,6 +4123,26 @@ export default function ProjectDetail() {
                   value={instructionsForm.tradeParkingInstructions}
                   onChange={(e) => setInstructionsForm(prev => ({ ...prev, tradeParkingInstructions: e.target.value }))}
                   data-testid="input-trade-parking"
+                />
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Trade Washroom */}
+            <div className="space-y-3">
+              <Label className="flex items-center gap-2">
+                <span className="material-icons text-sm">wc</span>
+                {t('projectDetail.buildingInstructions.tradeWashroom', 'Trade Washroom')}
+              </Label>
+              <div className="space-y-2">
+                <Label htmlFor="tradeWashroomLocation">{t('projectDetail.buildingInstructions.tradeWashroomLocation', 'Washroom Location')}</Label>
+                <Textarea
+                  id="tradeWashroomLocation"
+                  placeholder={t('projectDetail.buildingInstructions.tradeWashroomPlaceholder', 'e.g., Main floor lobby, P1 parkade near elevator, amenity room...')}
+                  value={instructionsForm.tradeWashroomLocation}
+                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, tradeWashroomLocation: e.target.value }))}
+                  data-testid="input-trade-washroom"
                 />
               </div>
             </div>

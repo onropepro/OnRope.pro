@@ -221,6 +221,7 @@ export const buildings = pgTable("buildings", {
   // Login credentials - strata number is the username
   strataPlanNumber: varchar("strata_plan_number").notNull().unique(), // Unique identifier and login username
   passwordHash: text("password_hash").notNull(), // Hashed password (defaults to strata number initially)
+  passwordChangedAt: timestamp("password_changed_at"), // When password was changed from default (null = still using default)
   
   // Building details
   buildingName: varchar("building_name"),
@@ -293,6 +294,9 @@ export const buildingInstructions = pgTable("building_instructions", {
   // Parking
   tradeParkingInstructions: text("trade_parking_instructions"), // Where trades can park
   tradeParkingSpots: integer("trade_parking_spots"), // Number of trade parking spots available
+  
+  // Washroom
+  tradeWashroomLocation: text("trade_washroom_location"), // Where trades can use washroom
   
   // Tracking
   createdByUserId: varchar("created_by_user_id").references(() => users.id),
@@ -1273,6 +1277,9 @@ export const quotes = pgTable("quotes", {
   // Strata Property Manager information (optional)
   strataManagerName: varchar("strata_manager_name"),
   strataManagerAddress: text("strata_manager_address"),
+  
+  // Client reference (optional) - links to clients table for project conversion
+  clientId: varchar("client_id").references(() => clients.id, { onDelete: "set null" }),
   
   // Photo attachments - support multiple photos
   photoUrls: text("photo_urls").array().default(sql`ARRAY[]::text[]`), // Array of photo URLs in object storage

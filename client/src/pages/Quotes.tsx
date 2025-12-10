@@ -435,6 +435,7 @@ export default function Quotes() {
         floorCount: buildingInfo.floorCount,
         strataManagerName: buildingInfo.strataManagerName,
         strataManagerAddress: buildingInfo.strataManagerAddress,
+        clientId: selectedClientId, // Save client reference for project conversion
         status: "open",
         services, // Include services array
       });
@@ -841,6 +842,7 @@ export default function Quotes() {
       dailyDropTarget: dropsPerDay,
       quoteId: quote.id,
       quoteNumber: quote.quoteNumber || "",
+      clientId: quote.clientId || "", // Pass client reference for project creation
     };
     
     sessionStorage.setItem('quoteToProject', JSON.stringify(projectData));

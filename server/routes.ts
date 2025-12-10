@@ -1534,12 +1534,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         additionalSeatsCount: newQuantity,
       });
 
-      console.log(`[Stripe] Extra seats added successfully. Additional packs: ${newQuantity}, Total extra seats: ${newQuantity * addonConfig.seats}`);
+      console.log(`[Stripe] Extra seat added successfully. Total additional seats: ${newQuantity}`);
       res.json({
         success: true,
-        message: "Extra seats added successfully",
-        additionalPacks: newQuantity,
-        totalExtraSeats: newQuantity * addonConfig.seats,
+        message: "Extra seat added successfully",
+        additionalSeats: newQuantity,
+        totalExtraSeats: newQuantity,
       });
     } catch (error: any) {
       console.error('[Stripe] Add seats error:', error);
@@ -1550,80 +1550,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   /**
    * Add extra project to subscription
    * POST /api/stripe/add-project
+   * DEPRECATED: New pricing model includes unlimited projects
    */
   app.post("/api/stripe/add-project", requireAuth, async (req: Request, res: Response) => {
-    try {
-      const user = await storage.getUserById(req.session.userId!);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      if (user.role !== 'company') {
-        return res.status(403).json({ message: "Only company accounts can purchase add-ons" });
-      }
-
-      if (!user.stripeSubscriptionId) {
-        return res.status(400).json({ message: "No active subscription found" });
-      }
-
-      // Get current subscription to determine currency
-      const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
-      
-      // Use Stripe's subscription currency (authoritative source)
-      const currency = subscription.currency.toLowerCase() as 'usd' | 'cad';
-      
-      // Validate currency is supported
-      if (currency !== 'usd' && currency !== 'cad') {
-        return res.status(400).json({ 
-          message: `Unsupported currency: ${currency}. Only USD and CAD are supported.` 
-        });
-      }
-
-      // Get extra project price ID
-      const addonConfig = ADDON_CONFIG.extra_project;
-      const addonPriceId = currency === 'usd' ? addonConfig.priceIdUSD : addonConfig.priceIdCAD;
-
-      console.log(`[Stripe] Adding extra project to subscription ${user.stripeSubscriptionId}`);
-
-      // Check if extra project already exists on subscription
-      const existingItem = subscription.items.data.find(item => item.price.id === addonPriceId);
-
-      let newQuantity: number;
-      if (existingItem) {
-        // Update quantity of existing subscription item
-        console.log(`[Stripe] Extra project already on subscription. Updating quantity from ${existingItem.quantity} to ${(existingItem.quantity || 1) + 1}`);
-        const updatedItem = await stripe.subscriptionItems.update(existingItem.id, {
-          quantity: (existingItem.quantity || 1) + 1,
-          proration_behavior: 'create_prorations',
-        });
-        newQuantity = updatedItem.quantity || 1;
-      } else {
-        // Create new subscription item with quantity 1
-        console.log(`[Stripe] Adding extra project as new subscription item`);
-        const newItem = await stripe.subscriptionItems.create({
-          subscription: user.stripeSubscriptionId,
-          price: addonPriceId,
-          quantity: 1,
-          proration_behavior: 'create_prorations',
-        });
-        newQuantity = newItem.quantity || 1;
-      }
-
-      // Update user's additional projects count in database with authoritative Stripe quantity
-      await storage.updateUser(user.id, {
-        additionalProjectsCount: newQuantity,
-      });
-
-      console.log(`[Stripe] Extra project added successfully. Additional projects: ${newQuantity}`);
-      res.json({
-        success: true,
-        message: "Extra project added successfully",
-        additionalProjects: newQuantity,
-      });
-    } catch (error: any) {
-      console.error('[Stripe] Add project error:', error);
-      res.status(500).json({ message: error.message || "Failed to add extra project" });
-    }
+    // DEPRECATED: This endpoint is no longer needed as the new pricing model includes unlimited projects
+    return res.status(400).json({ 
+      message: "Project add-ons are no longer available. Your subscription includes unlimited projects." 
+    });
   });
 
   /**
@@ -1848,7 +1781,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   /**
-   * Remove one extra seat pack from subscription
+   * Remove one extra seat from subscription
    * POST /api/stripe/remove-addon-seats
    */
   app.post("/api/stripe/remove-addon-seats", requireAuth, async (req: Request, res: Response) => {
@@ -1863,7 +1796,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       if ((user.additionalSeatsCount || 0) === 0) {
-        return res.status(400).json({ message: "No extra seat packs to remove" });
+        return res.status(400).json({ message: "No extra seats to remove" });
       }
 
       // Get current subscription to determine currency
@@ -1874,7 +1807,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const addonConfig = ADDON_CONFIG.extra_seats;
       const addonPriceId = currency === 'usd' ? addonConfig.priceIdUSD : addonConfig.priceIdCAD;
 
-      console.log(`[Stripe] Removing one extra seat pack from subscription ${user.stripeSubscriptionId}`);
+      console.log(`[Stripe] Removing one extra seat from subscription ${user.stripeSubscriptionId}`);
 
       // Find the subscription item for extra seats
       const existingItem = subscription.items.data.find(item => item.price.id === addonPriceId);
@@ -1888,7 +1821,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (currentQuantity > 1) {
         // Decrement quantity by 1
-        console.log(`[Stripe] Reducing seat packs from ${currentQuantity} to ${currentQuantity - 1}`);
+        console.log(`[Stripe] Reducing seats from ${currentQuantity} to ${currentQuantity - 1}`);
         const updatedItem = await stripe.subscriptionItems.update(existingItem.id, {
           quantity: currentQuantity - 1,
           proration_behavior: 'create_prorations',
@@ -1896,7 +1829,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         newQuantity = updatedItem.quantity || 0;
       } else {
         // Remove the subscription item entirely
-        console.log(`[Stripe] Removing last seat pack`);
+        console.log(`[Stripe] Removing last seat`);
         await stripe.subscriptionItems.del(existingItem.id, {
           proration_behavior: 'create_prorations',
         });
@@ -1908,90 +1841,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         additionalSeatsCount: newQuantity,
       });
 
-      console.log(`[Stripe] Extra seat pack removed successfully. Remaining packs: ${newQuantity}`);
+      console.log(`[Stripe] Extra seat removed successfully. Remaining seats: ${newQuantity}`);
       res.json({
         success: true,
-        message: "Extra seat pack removed successfully",
-        remainingPacks: newQuantity,
-        totalExtraSeats: newQuantity * addonConfig.seats,
+        message: "Extra seat removed successfully",
+        remainingSeats: newQuantity,
+        totalExtraSeats: newQuantity,
       });
     } catch (error: any) {
-      console.error('[Stripe] Remove seat pack error:', error);
-      res.status(500).json({ message: error.message || "Failed to remove extra seat pack" });
+      console.error('[Stripe] Remove seat error:', error);
+      res.status(500).json({ message: error.message || "Failed to remove extra seat" });
     }
   });
 
   /**
    * Remove one extra project from subscription
    * POST /api/stripe/remove-addon-projects
+   * DEPRECATED: New pricing model includes unlimited projects
    */
   app.post("/api/stripe/remove-addon-projects", requireAuth, async (req: Request, res: Response) => {
-    try {
-      const user = await storage.getUserById(req.session.userId!);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      if (!user.stripeSubscriptionId) {
-        return res.status(400).json({ message: "No active subscription found" });
-      }
-
-      if ((user.additionalProjectsCount || 0) === 0) {
-        return res.status(400).json({ message: "No extra projects to remove" });
-      }
-
-      // Get current subscription to determine currency
-      const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
-      const currency = subscription.currency.toLowerCase() as 'usd' | 'cad';
-
-      // Get extra project price ID
-      const addonConfig = ADDON_CONFIG.extra_project;
-      const addonPriceId = currency === 'usd' ? addonConfig.priceIdUSD : addonConfig.priceIdCAD;
-
-      console.log(`[Stripe] Removing one extra project from subscription ${user.stripeSubscriptionId}`);
-
-      // Find the subscription item for extra projects
-      const existingItem = subscription.items.data.find(item => item.price.id === addonPriceId);
-
-      if (!existingItem) {
-        return res.status(404).json({ message: "Extra projects subscription item not found" });
-      }
-
-      let newQuantity = 0;
-      const currentQuantity = existingItem.quantity || 1;
-
-      if (currentQuantity > 1) {
-        // Decrement quantity by 1
-        console.log(`[Stripe] Reducing extra projects from ${currentQuantity} to ${currentQuantity - 1}`);
-        const updatedItem = await stripe.subscriptionItems.update(existingItem.id, {
-          quantity: currentQuantity - 1,
-          proration_behavior: 'create_prorations',
-        });
-        newQuantity = updatedItem.quantity || 0;
-      } else {
-        // Remove the subscription item entirely
-        console.log(`[Stripe] Removing last extra project`);
-        await stripe.subscriptionItems.del(existingItem.id, {
-          proration_behavior: 'create_prorations',
-        });
-        newQuantity = 0;
-      }
-
-      // Update database with new quantity
-      await storage.updateUser(user.id, {
-        additionalProjectsCount: newQuantity,
-      });
-
-      console.log(`[Stripe] Extra project removed successfully. Remaining projects: ${newQuantity}`);
-      res.json({
-        success: true,
-        message: "Extra project removed successfully",
-        remainingProjects: newQuantity,
-      });
-    } catch (error: any) {
-      console.error('[Stripe] Remove extra project error:', error);
-      res.status(500).json({ message: error.message || "Failed to remove extra project" });
-    }
+    // DEPRECATED: This endpoint is no longer needed as the new pricing model includes unlimited projects
+    return res.status(400).json({ 
+      message: "Project add-ons are no longer available. Your subscription includes unlimited projects." 
+    });
   });
 
   /**
@@ -4070,12 +3942,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
       );
 
+      // Get building instructions
+      const instructions = await storage.getBuildingInstructions(building.id);
+
       const { passwordHash, ...buildingData } = building;
       
       res.json({ 
         building: buildingData,
         projects: buildingProjects,
         companies: companies.filter(Boolean),
+        instructions: instructions || null,
       });
     } catch (error) {
       console.error('[SuperUser] Get building error:', error);
@@ -5229,11 +5105,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get all projects for this building across all companies
       const allProjects = await storage.getProjectsForBuilding(building.strataPlanNumber);
       
-      // Get work sessions for these projects
+      // Get work sessions for these projects with additional details for active projects
       const projectHistory = await Promise.all(
         allProjects.map(async (project) => {
           const company = await storage.getUserById(project.companyId);
-          return {
+          
+          // Base project info
+          const projectInfo: any = {
             id: project.id,
             jobType: project.jobType,
             customJobType: project.customJobType,
@@ -5243,6 +5121,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
             companyName: company?.companyName || 'Unknown Company',
             createdAt: project.createdAt,
           };
+          
+          // For active projects, include more details and resident code
+          if (project.status === 'active') {
+            projectInfo.residentCode = company?.residentCode || null;
+            projectInfo.companyPhone = company?.phone || null;
+            projectInfo.companyEmail = company?.email || null;
+            projectInfo.notes = project.notes || null;
+            projectInfo.scheduledDates = project.scheduledDates || [];
+            
+            // Get progress info based on job type
+            if (project.progressType === 'drops') {
+              projectInfo.progressType = 'drops';
+              projectInfo.totalDropsNorth = project.totalDropsNorth;
+              projectInfo.totalDropsEast = project.totalDropsEast;
+              projectInfo.totalDropsSouth = project.totalDropsSouth;
+              projectInfo.totalDropsWest = project.totalDropsWest;
+              projectInfo.completedDropsNorth = project.completedDropsNorth;
+              projectInfo.completedDropsEast = project.completedDropsEast;
+              projectInfo.completedDropsSouth = project.completedDropsSouth;
+              projectInfo.completedDropsWest = project.completedDropsWest;
+            } else if (project.progressType === 'suites') {
+              projectInfo.progressType = 'suites';
+              projectInfo.totalSuites = project.totalSuites;
+              projectInfo.completedSuites = project.completedSuites;
+            } else if (project.progressType === 'stalls') {
+              projectInfo.progressType = 'stalls';
+              projectInfo.totalStalls = project.totalStalls;
+              projectInfo.completedStalls = project.completedStalls;
+            } else if (project.progressType === 'hours') {
+              projectInfo.progressType = 'hours';
+              projectInfo.estimatedHours = project.estimatedHours;
+              projectInfo.loggedHours = project.loggedHours;
+            }
+          }
+          
+          return projectInfo;
         })
       );
 
@@ -5260,6 +5174,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('[Building] Portal error:', error);
       res.status(500).json({ message: "Failed to fetch building data" });
+    }
+  });
+
+  // Building portal: Change password
+  app.post("/api/building/change-password", requireAuth, async (req: Request, res: Response) => {
+    try {
+      // Check if this is a building session
+      if (req.session.role !== 'building' || !req.session.buildingId) {
+        return res.status(403).json({ message: "Access denied. Building login required." });
+      }
+
+      const { currentPassword, newPassword, confirmPassword } = req.body;
+
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        return res.status(400).json({ message: "All password fields are required" });
+      }
+
+      if (newPassword !== confirmPassword) {
+        return res.status(400).json({ message: "New passwords do not match" });
+      }
+
+      if (newPassword.length < 6) {
+        return res.status(400).json({ message: "Password must be at least 6 characters long" });
+      }
+
+      const building = await storage.getBuildingById(req.session.buildingId);
+      
+      if (!building) {
+        return res.status(404).json({ message: "Building not found" });
+      }
+
+      // Verify current password
+      const bcrypt = await import('bcrypt');
+      const isCurrentPasswordValid = await bcrypt.compare(currentPassword, building.passwordHash);
+      
+      if (!isCurrentPasswordValid) {
+        return res.status(401).json({ message: "Current password is incorrect" });
+      }
+
+      // Don't allow new password to be the same as strata number
+      if (newPassword === building.strataPlanNumber) {
+        return res.status(400).json({ message: "New password cannot be the same as your strata number" });
+      }
+
+      // Hash and save new password
+      const newPasswordHash = await bcrypt.hash(newPassword, 10);
+      await storage.updateBuildingPassword(building.id, newPasswordHash);
+
+      res.json({ 
+        success: true, 
+        message: "Password changed successfully",
+        passwordChangedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('[Building] Change password error:', error);
+      res.status(500).json({ message: "Failed to change password" });
     }
   });
 
@@ -6998,6 +6968,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else {
         cb(new Error('Only image or PDF files are allowed'));
       }
+    }
+  });
+
+  // Property Manager: Save building instructions for a project's building
+  app.put("/api/property-managers/vendors/:linkId/projects/:projectId/building-instructions", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
+    try {
+      const { linkId, projectId } = req.params;
+      const propertyManagerId = req.session.userId!;
+      
+      // Verify the link belongs to this property manager
+      const links = await storage.getPropertyManagerCompanyLinks(propertyManagerId);
+      const ownedLink = links.find(link => link.id === linkId);
+      
+      if (!ownedLink) {
+        return res.status(403).json({ message: "Unauthorized: This vendor link does not belong to you" });
+      }
+      
+      // SECURITY: Require strata number to prevent cross-building data leaks
+      if (!ownedLink.strataNumber) {
+        return res.status(400).json({ message: "Strata number required. Please set your strata/building number first." });
+      }
+      
+      // Get project to verify access
+      const projectDetails = await storage.getPropertyManagerProjectDetails(
+        projectId, 
+        ownedLink.companyId,
+        ownedLink.strataNumber
+      );
+      
+      if (!projectDetails.project.strataPlanNumber) {
+        return res.status(400).json({ message: "Project does not have a strata/building number" });
+      }
+      
+      // Find the building by strata plan number
+      const building = await storage.getBuildingByStrata(projectDetails.project.strataPlanNumber);
+      
+      if (!building) {
+        return res.status(404).json({ message: "Building not found in the global database" });
+      }
+      
+      // Save or update building instructions
+      // Property managers save with createdByUserId = null since they're not in users table for this company
+      const instructionsData = {
+        buildingId: building.id,
+        buildingAccess: req.body.buildingAccess || null,
+        keysAndFob: req.body.keysAndFob || null,
+        keysReturnPolicy: req.body.keysReturnPolicy || null,
+        roofAccess: req.body.roofAccess || null,
+        buildingManagerName: req.body.buildingManagerName || null,
+        buildingManagerPhone: req.body.buildingManagerPhone || null,
+        conciergeNames: req.body.conciergeNames || null,
+        conciergePhone: req.body.conciergePhone || null,
+        conciergeHours: req.body.conciergeHours || null,
+        maintenanceName: req.body.maintenanceName || null,
+        maintenancePhone: req.body.maintenancePhone || null,
+        councilMemberUnits: req.body.councilMemberUnits || null,
+        tradeParkingInstructions: req.body.tradeParkingInstructions || null,
+        tradeParkingSpots: req.body.tradeParkingSpots || null,
+        tradeWashroomLocation: req.body.tradeWashroomLocation || null,
+        specialRequests: req.body.specialRequests || null,
+        createdByUserId: null, // Property manager - not in company users table
+      };
+      
+      const result = await storage.upsertBuildingInstructions(instructionsData);
+      res.json({ success: true, instructions: result });
+    } catch (error: any) {
+      console.error("Property manager save building instructions error:", error);
+      if (error.message?.includes('not found') || error.message?.includes('access denied')) {
+        return res.status(404).json({ message: error.message });
+      }
+      res.status(500).json({ message: "Internal server error" });
     }
   });
 

@@ -13,7 +13,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate, formatLocalDateLong } from "@/lib/dateUtils";
-import { Loader2, Building2, History, CheckCircle, Clock, AlertCircle, LogOut, Lock, Hash, ArrowLeft, KeyRound, DoorOpen, Phone, User, Wrench, FileText, Pencil, Save } from "lucide-react";
+import { Loader2, Building2, History, CheckCircle, Clock, AlertCircle, LogOut, Lock, Hash, ArrowLeft, KeyRound, DoorOpen, Phone, User, Wrench, FileText, Pencil, Save, Copy, Users } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import type { BuildingInstructions } from "@shared/schema";
 
 interface BuildingData {
@@ -28,6 +29,7 @@ interface BuildingData {
   totalProjects: number;
   projectsCompleted: number;
   createdAt: string;
+  passwordChangedAt: string | null;
 }
 
 interface ProjectHistoryItem {
@@ -39,6 +41,31 @@ interface ProjectHistoryItem {
   endDate: string | null;
   companyName: string;
   createdAt: string;
+  // Additional fields for active projects
+  residentCode?: string | null;
+  companyPhone?: string | null;
+  companyEmail?: string | null;
+  notes?: string | null;
+  scheduledDates?: string[];
+  progressType?: 'drops' | 'suites' | 'stalls' | 'hours';
+  // Drop progress
+  totalDropsNorth?: number;
+  totalDropsEast?: number;
+  totalDropsSouth?: number;
+  totalDropsWest?: number;
+  completedDropsNorth?: number;
+  completedDropsEast?: number;
+  completedDropsSouth?: number;
+  completedDropsWest?: number;
+  // Suite progress
+  totalSuites?: number;
+  completedSuites?: number;
+  // Stall progress
+  totalStalls?: number;
+  completedStalls?: number;
+  // Hours progress
+  estimatedHours?: number;
+  loggedHours?: number;
 }
 
 interface PortalData {
@@ -57,6 +84,12 @@ export default function BuildingPortal() {
   const [strataPlanNumber, setStrataPlanNumber] = useState("");
   const [password, setPassword] = useState("");
   const [showInstructionsDialog, setShowInstructionsDialog] = useState(false);
+  const [showChangePasswordDialog, setShowChangePasswordDialog] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
   const [instructionsForm, setInstructionsForm] = useState({
     buildingAccess: "",
     keysAndFob: "",
@@ -73,6 +106,7 @@ export default function BuildingPortal() {
     councilMemberUnits: "",
     tradeParkingInstructions: "",
     tradeParkingSpots: "",
+    tradeWashroomLocation: "",
   });
 
   const { 
@@ -119,6 +153,7 @@ export default function BuildingPortal() {
         councilMemberUnits: (buildingInstructions as any).councilMemberUnits || "",
         tradeParkingInstructions: (buildingInstructions as any).tradeParkingInstructions || "",
         tradeParkingSpots: (buildingInstructions as any).tradeParkingSpots?.toString() || "",
+        tradeWashroomLocation: (buildingInstructions as any).tradeWashroomLocation || "",
       });
     }
   }, [buildingInstructions]);
@@ -165,6 +200,58 @@ export default function BuildingPortal() {
       });
     },
   });
+
+  const changePasswordMutation = useMutation({
+    mutationFn: async (data: typeof passwordForm) => {
+      const response = await apiRequest("POST", "/api/building/change-password", data);
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Password Changed",
+        description: "Your password has been updated successfully.",
+      });
+      setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+      setShowChangePasswordDialog(false);
+      queryClient.invalidateQueries({ queryKey: ["/api/building/portal"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Password Change Failed",
+        description: error.message || "Failed to change password. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleChangePassword = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all password fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      toast({
+        title: "Passwords Don't Match",
+        description: "New password and confirmation must match.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (passwordForm.newPassword.length < 6) {
+      toast({
+        title: "Password Too Short",
+        description: "Password must be at least 6 characters long.",
+        variant: "destructive",
+      });
+      return;
+    }
+    changePasswordMutation.mutate(passwordForm);
+  };
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -250,6 +337,34 @@ export default function BuildingPortal() {
       other: "Other",
     };
     return jobTypeNames[project.jobType] || project.jobType;
+  };
+
+  const getProjectProgress = (project: ProjectHistoryItem): { completed: number; total: number; label: string; hasProgress: boolean } | null => {
+    if (!project.progressType) return null;
+    
+    switch (project.progressType) {
+      case 'drops': {
+        const total = (project.totalDropsNorth || 0) + (project.totalDropsEast || 0) + 
+                     (project.totalDropsSouth || 0) + (project.totalDropsWest || 0);
+        const completed = (project.completedDropsNorth || 0) + (project.completedDropsEast || 0) + 
+                         (project.completedDropsSouth || 0) + (project.completedDropsWest || 0);
+        return { completed, total, label: 'drops', hasProgress: total > 0 };
+      }
+      case 'suites': {
+        const total = project.totalSuites || 0;
+        return { completed: project.completedSuites || 0, total, label: 'suites', hasProgress: total > 0 };
+      }
+      case 'stalls': {
+        const total = project.totalStalls || 0;
+        return { completed: project.completedStalls || 0, total, label: 'stalls', hasProgress: total > 0 };
+      }
+      case 'hours': {
+        const total = project.estimatedHours || 0;
+        return { completed: project.loggedHours || 0, total, label: 'hours', hasProgress: total > 0 };
+      }
+      default:
+        return null;
+    }
   };
 
   const isAuthenticated = !hasPortalError && portalData;
@@ -380,15 +495,48 @@ export default function BuildingPortal() {
               </p>
             </div>
           </div>
-          <Button 
-            variant="outline" 
-            onClick={handleLogout}
-            data-testid="button-logout"
-          >
-            <LogOut className="mr-2 h-4 w-4" />
-            Logout
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowChangePasswordDialog(true)}
+              data-testid="button-change-password"
+            >
+              <Lock className="mr-2 h-4 w-4" />
+              Change Password
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={handleLogout}
+              data-testid="button-logout"
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              Logout
+            </Button>
+          </div>
         </div>
+
+        {/* Password Change Warning Banner - shown until password is changed */}
+        {building && !building.passwordChangedAt && (
+          <div className="flex items-start gap-3 p-4 rounded-lg bg-amber-50 dark:bg-amber-950/50 border border-amber-300 dark:border-amber-700">
+            <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <h4 className="font-medium text-amber-800 dark:text-amber-200">Security Notice: Please Change Your Password</h4>
+              <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+                Your account is using the default password (your strata number). For security reasons, please change your password to something unique and secure.
+              </p>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="mt-3 border-amber-400 text-amber-700 hover:bg-amber-100 dark:border-amber-600 dark:text-amber-300 dark:hover:bg-amber-900/50"
+                onClick={() => setShowChangePasswordDialog(true)}
+                data-testid="button-change-password-banner"
+              >
+                <Lock className="mr-2 h-4 w-4" />
+                Change Password Now
+              </Button>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card>
@@ -596,6 +744,17 @@ export default function BuildingPortal() {
                   </div>
                 )}
 
+                {/* Trade Washroom */}
+                {(buildingInstructions as any)?.tradeWashroomLocation && (
+                  <div className="space-y-3">
+                    <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">Trade Washroom</h4>
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                      <span className="material-icons text-primary mt-0.5 shrink-0" style={{ fontSize: '20px' }}>wc</span>
+                      <p className="text-sm whitespace-pre-wrap">{(buildingInstructions as any).tradeWashroomLocation}</p>
+                    </div>
+                  </div>
+                )}
+
                 {/* Special Requests */}
                 {buildingInstructions?.specialRequests && (
                   <div className="space-y-3">
@@ -644,34 +803,108 @@ export default function BuildingPortal() {
               </div>
             ) : (
               <div className="space-y-4">
-                {projectHistory.map((project, index) => (
-                  <div key={project.id}>
-                    {index > 0 && <Separator className="my-4" />}
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-medium">{getJobTypeName(project)}</span>
-                          {getStatusBadge(project.status)}
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          by {project.companyName}
-                        </p>
-                      </div>
-                      <div className="text-sm text-muted-foreground md:text-right">
-                        {project.startDate ? (
-                          <>
-                            <span>{formatLocalDate(project.startDate)}</span>
-                            {project.endDate && project.startDate !== project.endDate && (
-                              <span> - {formatLocalDate(project.endDate)}</span>
+                {projectHistory.map((project, index) => {
+                  const progress = project.status === 'active' ? getProjectProgress(project) : null;
+                  const isActive = project.status === 'active';
+                  
+                  return (
+                    <div key={project.id}>
+                      {index > 0 && <Separator className="my-4" />}
+                      <div className={`${isActive ? 'p-4 rounded-lg border-2 border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/30' : ''}`}>
+                        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                          <div className="space-y-2 flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-medium">{getJobTypeName(project)}</span>
+                              {getStatusBadge(project.status)}
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                              by {project.companyName}
+                            </p>
+                            
+                            {/* Enhanced details for active projects */}
+                            {isActive && (
+                              <div className="mt-3 space-y-3">
+                                {/* Progress bar */}
+                                {progress && (
+                                  <div className="space-y-1">
+                                    <div className="flex justify-between text-xs text-muted-foreground">
+                                      <span>Progress</span>
+                                      {progress.hasProgress ? (
+                                        <span>{progress.completed} / {progress.total} {progress.label}</span>
+                                      ) : (
+                                        <span className="italic">Not yet configured</span>
+                                      )}
+                                    </div>
+                                    <Progress 
+                                      value={progress.hasProgress ? (progress.completed / progress.total) * 100 : 0} 
+                                      className="h-2" 
+                                    />
+                                  </div>
+                                )}
+                                
+                                {/* Resident Code - important for building manager */}
+                                {project.residentCode && (
+                                  <div className="flex items-center gap-2 p-2 rounded-md bg-background border">
+                                    <Users className="h-4 w-4 text-muted-foreground shrink-0" />
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-xs text-muted-foreground">Resident Feedback Code</p>
+                                      <p className="font-mono font-medium">{project.residentCode}</p>
+                                    </div>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={() => {
+                                        navigator.clipboard.writeText(project.residentCode!);
+                                        toast({
+                                          title: "Copied",
+                                          description: "Resident code copied to clipboard",
+                                        });
+                                      }}
+                                      data-testid={`button-copy-resident-code-${project.id}`}
+                                    >
+                                      <Copy className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                )}
+                                
+                                {/* Company contact info */}
+                                {(project.companyPhone || project.companyEmail) && (
+                                  <div className="flex flex-wrap gap-3 text-sm">
+                                    {project.companyPhone && (
+                                      <a href={`tel:${project.companyPhone}`} className="flex items-center gap-1 text-primary hover:underline">
+                                        <Phone className="h-3 w-3" />
+                                        {project.companyPhone}
+                                      </a>
+                                    )}
+                                  </div>
+                                )}
+                                
+                                {/* Notes */}
+                                {project.notes && (
+                                  <p className="text-sm text-muted-foreground italic">
+                                    Note: {project.notes}
+                                  </p>
+                                )}
+                              </div>
                             )}
-                          </>
-                        ) : (
-                          <span>Created {formatLocalDate(project.createdAt)}</span>
-                        )}
+                          </div>
+                          <div className="text-sm text-muted-foreground md:text-right shrink-0">
+                            {project.startDate ? (
+                              <>
+                                <span>{formatLocalDate(project.startDate)}</span>
+                                {project.endDate && project.startDate !== project.endDate && (
+                                  <span> - {formatLocalDate(project.endDate)}</span>
+                                )}
+                              </>
+                            ) : (
+                              <span>Created {formatLocalDate(project.createdAt)}</span>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </CardContent>
@@ -895,6 +1128,28 @@ export default function BuildingPortal() {
 
             <Separator />
 
+            {/* Trade Washroom Section */}
+            <div className="space-y-4">
+              <h4 className="font-medium flex items-center gap-2">
+                <span className="material-icons text-base">wc</span>
+                Trade Washroom
+              </h4>
+              
+              <div className="space-y-2">
+                <Label htmlFor="tradeWashroomLocation">Washroom Location</Label>
+                <Textarea
+                  id="tradeWashroomLocation"
+                  placeholder="e.g., Main floor lobby, P1 parkade near elevator, amenity room on 2nd floor..."
+                  value={instructionsForm.tradeWashroomLocation}
+                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, tradeWashroomLocation: e.target.value }))}
+                  rows={2}
+                  data-testid="textarea-trade-washroom"
+                />
+              </div>
+            </div>
+
+            <Separator />
+
             {/* Special Requests Section */}
             <div className="space-y-4">
               <h4 className="font-medium flex items-center gap-2">
@@ -938,6 +1193,88 @@ export default function BuildingPortal() {
               )}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Change Password Dialog */}
+      <Dialog open={showChangePasswordDialog} onOpenChange={setShowChangePasswordDialog}>
+        <DialogContent className="max-w-md" data-testid="dialog-change-password">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Lock className="h-5 w-5" />
+              Change Password
+            </DialogTitle>
+            <DialogDescription>
+              Enter your current password and choose a new secure password.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleChangePassword} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="currentPassword">Current Password</Label>
+              <Input
+                id="currentPassword"
+                type="password"
+                value={passwordForm.currentPassword}
+                onChange={(e) => setPasswordForm(prev => ({ ...prev, currentPassword: e.target.value }))}
+                placeholder="Enter your current password"
+                data-testid="input-current-password"
+              />
+              <p className="text-xs text-muted-foreground">
+                Your current password is your strata number if you haven't changed it before.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="newPassword">New Password</Label>
+              <Input
+                id="newPassword"
+                type="password"
+                value={passwordForm.newPassword}
+                onChange={(e) => setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }))}
+                placeholder="Enter new password (min 6 characters)"
+                data-testid="input-new-password"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm New Password</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                value={passwordForm.confirmPassword}
+                onChange={(e) => setPasswordForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                placeholder="Confirm new password"
+                data-testid="input-confirm-password"
+              />
+            </div>
+            <DialogFooter className="gap-2 pt-4">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => {
+                  setShowChangePasswordDialog(false);
+                  setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+                }}
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit"
+                disabled={changePasswordMutation.isPending}
+                data-testid="button-submit-password-change"
+              >
+                {changePasswordMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Changing...
+                  </>
+                ) : (
+                  <>
+                    <Lock className="h-4 w-4 mr-2" />
+                    Change Password
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
     </div>

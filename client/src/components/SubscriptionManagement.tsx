@@ -41,58 +41,58 @@ interface SubscriptionStatus {
 
 const TIER_INFO = {
   basic: {
-    name: 'Basic',
-    price: 79,
-    projects: 2,
-    seats: 4,
-    color: 'bg-primary/50',
+    name: 'OnRopePro',
+    price: 99,
+    projects: -1,
+    seats: 0,
+    color: 'bg-primary',
     icon: Briefcase,
     features: [
-      '2 active projects',
-      '4 team seats',
+      'Unlimited projects',
+      'Add seats at $34.95/month each',
       'GPS tracking',
-      'Basic reporting',
+      'Advanced reporting',
       'Safety compliance',
     ]
   },
   starter: {
-    name: 'Starter',
-    price: 299,
-    projects: 5,
-    seats: 10,
-    color: 'bg-purple-500',
+    name: 'OnRopePro',
+    price: 99,
+    projects: -1,
+    seats: 0,
+    color: 'bg-primary',
     icon: Users,
     features: [
-      '5 active projects',
-      '10 team seats',
+      'Unlimited projects',
+      'Add seats at $34.95/month each',
       'Advanced analytics',
       'Priority support',
     ]
   },
   premium: {
-    name: 'Premium',
-    price: 499,
-    projects: 9,
-    seats: 18,
-    color: 'bg-orange-500',
+    name: 'OnRopePro',
+    price: 99,
+    projects: -1,
+    seats: 0,
+    color: 'bg-primary',
     icon: Crown,
     features: [
-      '9 active projects',
-      '18 team seats',
+      'Unlimited projects',
+      'Add seats at $34.95/month each',
       'Premium analytics',
       'API access',
     ]
   },
   enterprise: {
-    name: 'Enterprise',
-    price: 899,
+    name: 'OnRopePro',
+    price: 99,
     projects: -1,
-    seats: -1,
-    color: 'bg-gradient-to-r from-yellow-400 to-orange-500',
+    seats: 0,
+    color: 'bg-primary',
     icon: Crown,
     features: [
       'Unlimited projects',
-      'Unlimited team seats',
+      'Add seats at $34.95/month each',
       'Enterprise analytics',
       'Dedicated support',
       'Custom integrations',
@@ -107,7 +107,6 @@ export function SubscriptionManagement() {
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
   const [pendingUpgradeTier, setPendingUpgradeTier] = useState<TierName | null>(null);
   const [showAddSeatsDialog, setShowAddSeatsDialog] = useState(false);
-  const [showAddProjectDialog, setShowAddProjectDialog] = useState(false);
   const [showAddBrandingDialog, setShowAddBrandingDialog] = useState(false);
 
   // Fetch current subscription status
@@ -248,8 +247,8 @@ export function SubscriptionManagement() {
       queryClient.invalidateQueries({ queryKey: ['/api/subscription/details'] });
       setShowAddSeatsDialog(false);
       toast({
-        title: "Seats Added!",
-        description: "2 additional seats have been added to your subscription. Changes are effective immediately.",
+        title: "Seat Added!",
+        description: "1 additional seat has been added to your subscription. Changes are effective immediately.",
       });
     },
     onError: (error: any) => {
@@ -257,32 +256,6 @@ export function SubscriptionManagement() {
       toast({
         title: "Failed to Add Seats",
         description: error.message || "Failed to add extra seats",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Add extra project mutation
-  const addProjectMutation = useMutation({
-    mutationFn: async () => {
-      const response = await apiRequest('POST', '/api/stripe/add-project', {});
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/stripe/subscription-status'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/user'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/subscription/details'] });
-      setShowAddProjectDialog(false);
-      toast({
-        title: "Project Added!",
-        description: "1 additional project slot has been added to your subscription. Changes are effective immediately.",
-      });
-    },
-    onError: (error: any) => {
-      setShowAddProjectDialog(false);
-      toast({
-        title: "Failed to Add Project",
-        description: error.message || "Failed to add extra project",
         variant: "destructive",
       });
     },
@@ -523,28 +496,12 @@ export function SubscriptionManagement() {
             data-testid="button-add-seats"
           >
             <div>
-              <h4 className="font-medium">Extra Team Seats</h4>
-              <p className="text-sm text-muted-foreground">Add 2 additional seats to your plan</p>
+              <h4 className="font-medium">Additional Seat</h4>
+              <p className="text-sm text-muted-foreground">Add 1 team member to your plan</p>
             </div>
             <div className="text-right">
-              <p className="font-semibold">$19/month</p>
-              <p className="text-xs text-muted-foreground">per pack</p>
-            </div>
-          </button>
-
-          <button
-            onClick={() => setShowAddProjectDialog(true)}
-            disabled={!subStatus?.hasActiveSubscription}
-            className="w-full flex items-center justify-between p-4 border rounded-lg hover-elevate active-elevate-2 text-left disabled:opacity-50 disabled:cursor-not-allowed"
-            data-testid="button-add-project"
-          >
-            <div>
-              <h4 className="font-medium">Extra Project</h4>
-              <p className="text-sm text-muted-foreground">Add 1 additional active project</p>
-            </div>
-            <div className="text-right">
-              <p className="font-semibold">$49/month</p>
-              <p className="text-xs text-muted-foreground">per project</p>
+              <p className="font-semibold">$34.95/month</p>
+              <p className="text-xs text-muted-foreground">per seat</p>
             </div>
           </button>
 
@@ -710,20 +667,20 @@ export function SubscriptionManagement() {
       <Dialog open={showAddSeatsDialog} onOpenChange={setShowAddSeatsDialog}>
         <DialogContent data-testid="dialog-add-seats">
           <DialogHeader>
-            <DialogTitle>Add Extra Team Seats</DialogTitle>
+            <DialogTitle>Add Team Seat</DialogTitle>
             <DialogDescription>
               <div className="space-y-4 pt-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Price:</span>
-                  <span className="font-semibold text-base">$19/month</span>
+                  <span className="font-semibold text-base">$34.95/month</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-primary" />
-                  <span className="text-sm">Add 2 additional team seats</span>
+                  <span className="text-sm">Add 1 additional team seat</span>
                 </div>
                 <div className="text-xs text-muted-foreground pt-2 border-t space-y-1">
                   <p><strong>Prorated Billing:</strong> You'll only be charged for the time remaining in your current billing period.</p>
-                  <p>Changes take effect immediately. Your team can use the extra seats right away.</p>
+                  <p>Changes take effect immediately. Your team can use the extra seat right away.</p>
                 </div>
               </div>
             </DialogDescription>
@@ -743,48 +700,6 @@ export function SubscriptionManagement() {
               data-testid="button-confirm-add-seats"
             >
               {addSeatsMutation.isPending ? 'Processing...' : 'Confirm Purchase'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Add Extra Project Dialog */}
-      <Dialog open={showAddProjectDialog} onOpenChange={setShowAddProjectDialog}>
-        <DialogContent data-testid="dialog-add-project">
-          <DialogHeader>
-            <DialogTitle>Add Extra Project</DialogTitle>
-            <DialogDescription>
-              <div className="space-y-4 pt-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">Price:</span>
-                  <span className="font-semibold text-base">$49/month</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-primary" />
-                  <span className="text-sm">Add 1 additional active project slot</span>
-                </div>
-                <div className="text-xs text-muted-foreground pt-2 border-t space-y-1">
-                  <p><strong>Prorated Billing:</strong> You'll only be charged for the time remaining in your current billing period.</p>
-                  <p>Changes take effect immediately. You can create a new project right away.</p>
-                </div>
-              </div>
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setShowAddProjectDialog(false)}
-              data-testid="button-add-project-cancel"
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="default"
-              onClick={() => addProjectMutation.mutate()}
-              disabled={addProjectMutation.isPending}
-              data-testid="button-confirm-add-project"
-            >
-              {addProjectMutation.isPending ? 'Processing...' : 'Confirm Purchase'}
             </Button>
           </DialogFooter>
         </DialogContent>
