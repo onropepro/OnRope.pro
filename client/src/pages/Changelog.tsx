@@ -87,6 +87,12 @@ type RecentChange = {
 
 const recentChangesData: RecentChange[] = [
   {
+    date: "December 10, 2025",
+    title: "Feature Guide Navigation Sidebar",
+    description: "All 18 changelog feature guides now include a persistent left navigation sidebar for easy browsing between guides. Removed redundant Back and Main Menu buttons. Improved text readability with proper 16px body text sizing across all guide pages",
+    type: "improvement"
+  },
+  {
     date: "December 9, 2025",
     title: "Platform Focus: Building Maintenance",
     description: "Refocused platform exclusively on building maintenance services to maintain product clarity and target market precision. Removed experimental NDT, Rock Scaling, Wind Turbine, and Oil Field categories. Platform now features 10 specialized building maintenance job types plus custom services",
