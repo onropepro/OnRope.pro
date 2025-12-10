@@ -1,10 +1,9 @@
-import { Link, useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { BackButton } from "@/components/BackButton";
-import { MainMenuButton } from "@/components/MainMenuButton";
-import ChangelogLayout from "@/components/ChangelogLayout";
+
+
+import ChangelogGuideLayout from "@/components/ChangelogGuideLayout";
 import {
   Building2,
   Users,

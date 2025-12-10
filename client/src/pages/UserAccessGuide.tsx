@@ -1,10 +1,7 @@
-import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { BackButton } from "@/components/BackButton";
-import { MainMenuButton } from "@/components/MainMenuButton";
-import ChangelogLayout from "@/components/ChangelogLayout";
+import ChangelogGuideLayout from "@/components/ChangelogGuideLayout";
 import {
   Accordion,
   AccordionContent,
@@ -48,25 +45,13 @@ import {
 import { Button } from "@/components/ui/button";
 
 export default function UserAccessGuide() {
-  const [, navigate] = useLocation();
-
   return (
-    <ChangelogLayout title="User Access Guide">
-      <div className="min-h-screen bg-background pb-20">
-        <header className="sticky top-0 z-50 bg-card border-b shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <BackButton to="/changelog" />
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold">User Access & Authentication Guide</h1>
-              <p className="text-base text-muted-foreground">Version 2.1 - Updated December 5, 2025</p>
-            </div>
-          </div>
-          <MainMenuButton />
-        </div>
-      </header>
-
-      <main className="max-w-4xl mx-auto px-4 py-8 space-y-8">
+    <ChangelogGuideLayout 
+      title="User Access & Authentication Guide"
+      version="2.1"
+      lastUpdated="December 5, 2025"
+    >
+      <div className="space-y-8">
         
         <section className="space-y-4">
           <div>
@@ -1560,19 +1545,7 @@ export default function UserAccessGuide() {
           </Card>
         </section>
 
-        <div className="pt-8">
-          <Button 
-            onClick={() => navigate("/changelog")}
-            variant="outline"
-            className="w-full"
-            data-testid="button-back-to-changelog"
-          >
-            <ChevronRight className="w-4 h-4 mr-2 rotate-180" />
-            Back to Knowledge Base
-          </Button>
-        </div>
-      </main>
       </div>
-    </ChangelogLayout>
+    </ChangelogGuideLayout>
   );
 }

@@ -1,10 +1,9 @@
-import { Link, useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { BackButton } from "@/components/BackButton";
-import { MainMenuButton } from "@/components/MainMenuButton";
-import ChangelogLayout from "@/components/ChangelogLayout";
+
+
+import ChangelogGuideLayout from "@/components/ChangelogGuideLayout";
 import {
   Clock,
   Play,
@@ -695,19 +694,7 @@ export default function TimeTrackingGuide() {
           </div>
         </section>
 
-        <div className="pt-8">
-          <Button 
-            onClick={() => navigate("/changelog")}
-            variant="outline"
-            className="w-full"
-            data-testid="button-back-to-changelog"
-          >
-            <ChevronRight className="w-4 h-4 mr-2 rotate-180" />
-            Back to Knowledge Base
-          </Button>
-        </div>
-      </main>
-      </div>
-    </ChangelogLayout>
+              </div>
+    </ChangelogGuideLayout>
   );
 }
