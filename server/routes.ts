@@ -7001,6 +7001,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Property Manager: Save building instructions for a project's building
+  app.put("/api/property-managers/vendors/:linkId/projects/:projectId/building-instructions", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
+    try {
+      const { linkId, projectId } = req.params;
+      const propertyManagerId = req.session.userId!;
+      
+      // Verify the link belongs to this property manager
+      const links = await storage.getPropertyManagerCompanyLinks(propertyManagerId);
+      const ownedLink = links.find(link => link.id === linkId);
+      
+      if (!ownedLink) {
+        return res.status(403).json({ message: "Unauthorized: This vendor link does not belong to you" });
+      }
+      
+      // SECURITY: Require strata number to prevent cross-building data leaks
+      if (!ownedLink.strataNumber) {
+        return res.status(400).json({ message: "Strata number required. Please set your strata/building number first." });
+      }
+      
+      // Get project to verify access
+      const projectDetails = await storage.getPropertyManagerProjectDetails(
+        projectId, 
+        ownedLink.companyId,
+        ownedLink.strataNumber
+      );
+      
+      if (!projectDetails.project.strataPlanNumber) {
+        return res.status(400).json({ message: "Project does not have a strata/building number" });
+      }
+      
+      // Find the building by strata plan number
+      const building = await storage.getBuildingByStrata(projectDetails.project.strataPlanNumber);
+      
+      if (!building) {
+        return res.status(404).json({ message: "Building not found in the global database" });
+      }
+      
+      // Save or update building instructions
+      // Property managers save with createdByUserId = null since they're not in users table for this company
+      const instructionsData = {
+        buildingId: building.id,
+        buildingAccessInstructions: req.body.buildingAccessInstructions || null,
+        keysAndFobInfo: req.body.keysAndFobInfo || null,
+        keysReturnPolicy: req.body.keysReturnPolicy || null,
+        roofAccessInstructions: req.body.roofAccessInstructions || null,
+        buildingManagerName: req.body.buildingManagerName || null,
+        buildingManagerPhone: req.body.buildingManagerPhone || null,
+        buildingManagerEmail: req.body.buildingManagerEmail || null,
+        conciergeName: req.body.conciergeName || null,
+        conciergePhone: req.body.conciergePhone || null,
+        conciergeHours: req.body.conciergeHours || null,
+        maintenanceContactName: req.body.maintenanceContactName || null,
+        maintenanceContactPhone: req.body.maintenanceContactPhone || null,
+        councilMemberUnits: req.body.councilMemberUnits || null,
+        tradeParkingInstructions: req.body.tradeParkingInstructions || null,
+        tradeParkingSpots: req.body.tradeParkingSpots || null,
+        tradeWashroomLocation: req.body.tradeWashroomLocation || null,
+        specialRequests: req.body.specialRequests || null,
+        createdByUserId: null, // Property manager - not in company users table
+      };
+      
+      const result = await storage.upsertBuildingInstructions(instructionsData);
+      res.json({ success: true, instructions: result });
+    } catch (error: any) {
+      console.error("Property manager save building instructions error:", error);
+      if (error.message?.includes('not found') || error.message?.includes('access denied')) {
+        return res.status(404).json({ message: error.message });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Property Manager: Upload anchor inspection document
   app.post("/api/property-managers/vendors/:linkId/projects/:projectId/anchor-inspection", requireAuth, requireRole("property_manager"), documentUpload.single('document'), async (req: Request, res: Response) => {
     try {
