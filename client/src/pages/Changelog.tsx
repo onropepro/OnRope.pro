@@ -1054,86 +1054,6 @@ export default function Changelog() {
           </Card>
         </div>
 
-        <Card className="mb-8">
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-action-600/10 dark:bg-action-600/20 ring-1 ring-action-600/20">
-                <FolderOpen className="h-5 w-5 text-action-600 dark:text-action-400" />
-              </div>
-              <div>
-                <CardTitle className="text-xl">All Pages & Views</CardTitle>
-                <CardDescription>
-                  {pagesData.reduce((acc, cat) => acc + cat.pages.length, 0)} pages organized by category
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="space-y-6">
-              {pagesData.map((category, catIndex) => {
-                const CatIcon = category.icon;
-                return (
-                  <div key={catIndex}>
-                    <div className="flex items-center gap-2 mb-3">
-                      <CatIcon className={`h-4 w-4 ${category.iconColor}`} />
-                      <h3 className="font-semibold text-base">{category.category}</h3>
-                      <Badge variant="secondary" className="text-xs">{category.pages.length}</Badge>
-                    </div>
-                    <div className="grid gap-2">
-                      {category.pages.map((page, pageIndex) => {
-                        const isLinkable = !page.path.includes(':');
-                        return (
-                          <div 
-                            key={pageIndex}
-                            className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover-elevate"
-                          >
-                            <div className="flex items-center gap-3 flex-1 min-w-0">
-                              <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <span className="font-medium text-base">{page.name}</span>
-                                  <code className="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
-                                    {page.path}
-                                  </code>
-                                </div>
-                                <p className="text-sm text-muted-foreground mt-0.5 truncate">
-                                  {page.description}
-                                </p>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2 ml-2 flex-shrink-0">
-                              <div className="hidden sm:flex flex-wrap gap-1 justify-end max-w-[200px]">
-                                {page.roles.slice(0, 2).map((role, roleIndex) => (
-                                  <Badge key={roleIndex} variant="outline" className="text-xs">
-                                    {role}
-                                  </Badge>
-                                ))}
-                                {page.roles.length > 2 && (
-                                  <Badge variant="outline" className="text-xs">
-                                    +{page.roles.length - 2}
-                                  </Badge>
-                                )}
-                              </div>
-                              {isLinkable && (
-                                <Link href={page.path}>
-                                  <Button variant="ghost" size="icon" className="h-8 w-8" data-testid={`link-page-${page.path.replace(/\//g, '-')}`}>
-                                    <ExternalLink className="h-4 w-4" />
-                                  </Button>
-                                </Link>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                    {catIndex < pagesData.length - 1 && <Separator className="mt-4" />}
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-
         <h2 className="text-2xl md:text-3xl font-bold mb-6">Module / Feature Changelog</h2>
 
         <div className="space-y-4">
@@ -1333,6 +1253,86 @@ export default function Changelog() {
             );
           })}
         </div>
+
+        <Card className="mb-8">
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-action-600/10 dark:bg-action-600/20 ring-1 ring-action-600/20">
+                <FolderOpen className="h-5 w-5 text-action-600 dark:text-action-400" />
+              </div>
+              <div>
+                <CardTitle className="text-xl">All Pages & Views</CardTitle>
+                <CardDescription>
+                  {pagesData.reduce((acc, cat) => acc + cat.pages.length, 0)} pages organized by category
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="space-y-6">
+              {pagesData.map((category, catIndex) => {
+                const CatIcon = category.icon;
+                return (
+                  <div key={catIndex}>
+                    <div className="flex items-center gap-2 mb-3">
+                      <CatIcon className={`h-4 w-4 ${category.iconColor}`} />
+                      <h3 className="font-semibold text-base">{category.category}</h3>
+                      <Badge variant="secondary" className="text-xs">{category.pages.length}</Badge>
+                    </div>
+                    <div className="grid gap-2">
+                      {category.pages.map((page, pageIndex) => {
+                        const isLinkable = !page.path.includes(':');
+                        return (
+                          <div 
+                            key={pageIndex}
+                            className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover-elevate"
+                          >
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                              <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="font-medium text-base">{page.name}</span>
+                                  <code className="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+                                    {page.path}
+                                  </code>
+                                </div>
+                                <p className="text-sm text-muted-foreground mt-0.5 truncate">
+                                  {page.description}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 ml-2 flex-shrink-0">
+                              <div className="hidden sm:flex flex-wrap gap-1 justify-end max-w-[200px]">
+                                {page.roles.slice(0, 2).map((role, roleIndex) => (
+                                  <Badge key={roleIndex} variant="outline" className="text-xs">
+                                    {role}
+                                  </Badge>
+                                ))}
+                                {page.roles.length > 2 && (
+                                  <Badge variant="outline" className="text-xs">
+                                    +{page.roles.length - 2}
+                                  </Badge>
+                                )}
+                              </div>
+                              {isLinkable && (
+                                <Link href={page.path}>
+                                  <Button variant="ghost" size="icon" className="h-8 w-8" data-testid={`link-page-${page.path.replace(/\//g, '-')}`}>
+                                    <ExternalLink className="h-4 w-4" />
+                                  </Button>
+                                </Link>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {catIndex < pagesData.length - 1 && <Separator className="mt-4" />}
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
 
         <Card className="mb-8">
           <CardHeader>
