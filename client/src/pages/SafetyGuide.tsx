@@ -34,30 +34,16 @@ import {
   Calculator
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
 
 export default function SafetyGuide() {
-  const [, navigate] = useLocation();
-
   return (
-    <ChangelogLayout title="Safety Guide">
-      <div className="min-h-screen bg-background pb-20">
-        {/* Header */}
-        <header className="sticky top-0 z-50 bg-card border-b shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <BackButton to="/changelog" />
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold">Safety & Compliance Guide</h1>
-              <p className="text-xs text-muted-foreground">Complete documentation for safety systems</p>
-            </div>
-          </div>
-          <MainMenuButton />
-        </div>
-      </header>
-
-      {/* Content */}
-      <main className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-        
+    <ChangelogGuideLayout 
+      title="Safety & Compliance Guide"
+      version="2.0"
+      lastUpdated="December 5, 2025"
+    >
+      <div className="space-y-8">
         {/* Overview */}
         <section className="space-y-4">
           <div>
@@ -1078,69 +1064,48 @@ export default function SafetyGuide() {
           <h2 className="text-3xl md:text-4xl font-bold">Quick Links</h2>
           
           <div className="grid md:grid-cols-2 gap-4">
-            <Button 
-              variant="outline" 
-              className="justify-between h-auto p-4"
-              onClick={() => navigate("/harness-inspection")}
-              data-testid="link-harness-inspection"
-            >
-              <div className="text-left">
-                <div className="font-semibold">Harness Inspection</div>
-                <div className="text-xs text-muted-foreground">Complete your daily equipment check</div>
-              </div>
-              <ChevronRight className="w-4 h-4" />
-            </Button>
+            <Link href="/harness-inspection">
+              <Button variant="outline" className="w-full justify-between h-auto p-4" data-testid="link-harness-inspection">
+                <div className="text-left">
+                  <div className="font-semibold">Harness Inspection</div>
+                  <div className="text-xs text-muted-foreground">Complete your daily equipment check</div>
+                </div>
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </Link>
 
-            <Button 
-              variant="outline" 
-              className="justify-between h-auto p-4"
-              onClick={() => navigate("/toolbox-meeting")}
-              data-testid="link-toolbox-meeting"
-            >
-              <div className="text-left">
-                <div className="font-semibold">Toolbox Meeting</div>
-                <div className="text-xs text-muted-foreground">Create a team safety briefing</div>
-              </div>
-              <ChevronRight className="w-4 h-4" />
-            </Button>
+            <Link href="/toolbox-meeting">
+              <Button variant="outline" className="w-full justify-between h-auto p-4" data-testid="link-toolbox-meeting">
+                <div className="text-left">
+                  <div className="font-semibold">Toolbox Meeting</div>
+                  <div className="text-xs text-muted-foreground">Create a team safety briefing</div>
+                </div>
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </Link>
 
-            <Button 
-              variant="outline" 
-              className="justify-between h-auto p-4"
-              onClick={() => navigate("/flha")}
-              data-testid="link-flha"
-            >
-              <div className="text-left">
-                <div className="font-semibold">FLHA Form</div>
-                <div className="text-xs text-muted-foreground">Field level hazard assessment</div>
-              </div>
-              <ChevronRight className="w-4 h-4" />
-            </Button>
+            <Link href="/flha">
+              <Button variant="outline" className="w-full justify-between h-auto p-4" data-testid="link-flha">
+                <div className="text-left">
+                  <div className="font-semibold">FLHA Form</div>
+                  <div className="text-xs text-muted-foreground">Field level hazard assessment</div>
+                </div>
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </Link>
 
-            <Button 
-              variant="outline" 
-              className="justify-between h-auto p-4"
-              onClick={() => navigate("/documents")}
-              data-testid="link-documents"
-            >
-              <div className="text-left">
-                <div className="font-semibold">Documents</div>
-                <div className="text-xs text-muted-foreground">View and export safety records</div>
-              </div>
-              <ChevronRight className="w-4 h-4" />
-            </Button>
+            <Link href="/documents">
+              <Button variant="outline" className="w-full justify-between h-auto p-4" data-testid="link-documents">
+                <div className="text-left">
+                  <div className="font-semibold">Documents</div>
+                  <div className="text-xs text-muted-foreground">View and export safety records</div>
+                </div>
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </Link>
           </div>
         </section>
-
-        {/* Footer */}
-        <Card className="border-muted bg-muted/50">
-          <CardContent className="pt-6 text-base text-muted-foreground">
-            <p><strong>Last updated:</strong> December 2, 2024 | <strong>Version:</strong> 1.0</p>
-            <p className="mt-1">This document serves as the authoritative reference for the Safety & Compliance System. For technical implementation details, see <code>safety-documentation-instructions-v1.0.md</code> in the instructions folder.</p>
-          </CardContent>
-        </Card>
-      </main>
       </div>
-    </ChangelogLayout>
+    </ChangelogGuideLayout>
   );
 }

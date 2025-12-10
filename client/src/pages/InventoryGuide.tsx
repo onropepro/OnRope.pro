@@ -33,30 +33,16 @@ import {
   Layers
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
 
 export default function InventoryGuide() {
-  const [, navigate] = useLocation();
-
   return (
-    <ChangelogLayout title="Inventory Guide">
-      <div className="min-h-screen bg-background pb-20">
-        {/* Header */}
-        <header className="sticky top-0 z-50 bg-card border-b shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <BackButton to="/changelog" />
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold">Inventory System Guide</h1>
-              <p className="text-xs text-muted-foreground">Complete documentation for equipment tracking</p>
-            </div>
-          </div>
-          <MainMenuButton />
-        </div>
-      </header>
-
-      {/* Content */}
-      <main className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-        
+    <ChangelogGuideLayout 
+      title="Gear Inventory Management Guide"
+      version="2.0"
+      lastUpdated="December 5, 2025"
+    >
+      <div className="space-y-8">
         {/* Overview */}
         <section className="space-y-4">
           <div>
@@ -909,31 +895,31 @@ export default function InventoryGuide() {
           <h2 className="text-3xl md:text-4xl font-bold">Quick Links</h2>
           
           <div className="grid md:grid-cols-2 gap-4">
-            <Button 
-              variant="outline" 
+            <Link href="/inventory">
+              <Button variant="outline" 
               className="justify-between h-auto p-4"
-              onClick={() => navigate("/inventory")}
-              data-testid="link-inventory"
-            >
+              data-testid="link-inventory" className="w-full justify-between h-auto p-4">
+
               <div className="text-left">
                 <div className="font-semibold">Go to Inventory</div>
                 <div className="text-xs text-muted-foreground">Manage your equipment catalog</div>
               </div>
               <ChevronRight className="w-4 h-4" />
             </Button>
+            </Link>
 
-            <Button 
-              variant="outline" 
+            <Link href="/my-gear">
+              <Button variant="outline" 
               className="justify-between h-auto p-4"
-              onClick={() => navigate("/my-gear")}
-              data-testid="link-my-gear"
-            >
+              data-testid="link-my-gear" className="w-full justify-between h-auto p-4">
+
               <div className="text-left">
                 <div className="font-semibold">My Gear</div>
                 <div className="text-xs text-muted-foreground">View your assigned equipment</div>
               </div>
               <ChevronRight className="w-4 h-4" />
             </Button>
+            </Link>
           </div>
         </section>
 
@@ -944,8 +930,7 @@ export default function InventoryGuide() {
             <p className="mt-1">This document serves as the authoritative reference for the Inventory System. For technical implementation details, see <code>gear-inventory-instructions-v1.0.md</code> in the instructions folder.</p>
           </CardContent>
         </Card>
-      </main>
       </div>
-    </ChangelogLayout>
+    </ChangelogGuideLayout>
   );
 }

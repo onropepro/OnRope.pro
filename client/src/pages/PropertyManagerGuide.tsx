@@ -1,8 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-
-
 import ChangelogGuideLayout from "@/components/ChangelogGuideLayout";
 import {
   Building2,
@@ -27,28 +25,16 @@ import {
   Home
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
 
 export default function PropertyManagerGuide() {
-  const [, navigate] = useLocation();
-
   return (
-    <ChangelogLayout title="Property Manager Guide">
-      <div className="min-h-screen bg-background pb-20">
-        <header className="sticky top-0 z-50 bg-card border-b shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <BackButton to="/changelog" />
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold">Property Manager Interface Guide</h1>
-              <p className="text-xs text-muted-foreground">Vendor management and safety compliance viewing</p>
-            </div>
-          </div>
-          <MainMenuButton />
-        </div>
-      </header>
-
-      <main className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-        
+    <ChangelogGuideLayout 
+      title="Property Manager Interface Guide"
+      version="2.0"
+      lastUpdated="December 5, 2025"
+    >
+      <div className="space-y-8">
         <section className="space-y-4">
           <div>
             <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
@@ -531,42 +517,37 @@ export default function PropertyManagerGuide() {
           <h2 className="text-3xl md:text-4xl font-bold">Quick Links</h2>
           
           <div className="grid md:grid-cols-2 gap-4">
-            <Button 
-              variant="outline" 
-              className="justify-between h-auto p-4"
-              onClick={() => navigate("/my-vendors")}
-              data-testid="link-my-vendors"
-            >
-              <div className="text-left">
-                <div className="font-semibold">My Vendors</div>
-                <div className="text-xs text-muted-foreground">View contracted companies</div>
-              </div>
-              <ArrowRight className="w-4 h-4" />
-            </Button>
+            <Link href="/my-vendors">
+              <Button 
+                variant="outline" 
+                className="justify-between h-auto p-4 w-full"
+                data-testid="link-my-vendors"
+              >
+                <div className="text-left">
+                  <div className="font-semibold">My Vendors</div>
+                  <div className="text-xs text-muted-foreground">View contracted companies</div>
+                </div>
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </Link>
 
-            <Button 
-              variant="outline" 
-              className="justify-between h-auto p-4"
-              onClick={() => navigate("/changelog/safety")}
-              data-testid="link-safety-guide"
-            >
-              <div className="text-left">
-                <div className="font-semibold">Safety Guide</div>
-                <div className="text-xs text-muted-foreground">Compliance documentation</div>
-              </div>
-              <ArrowRight className="w-4 h-4" />
-            </Button>
+            <Link href="/changelog/safety">
+              <Button 
+                variant="outline" 
+                className="justify-between h-auto p-4 w-full"
+                data-testid="link-safety-guide"
+              >
+                <div className="text-left">
+                  <div className="font-semibold">Safety Guide</div>
+                  <div className="text-xs text-muted-foreground">Compliance documentation</div>
+                </div>
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </Link>
           </div>
         </section>
 
-        <Card className="border-muted bg-muted/50">
-          <CardContent className="pt-6 text-base text-muted-foreground">
-            <p><strong>Last updated:</strong> December 3, 2024 | <strong>Version:</strong> 1.0</p>
-            <p className="mt-1">This document serves as the authoritative reference for the Property Manager Interface.</p>
-          </CardContent>
-        </Card>
-      </main>
       </div>
-    </ChangelogLayout>
+    </ChangelogGuideLayout>
   );
 }

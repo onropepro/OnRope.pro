@@ -53,6 +53,7 @@ import {
   AppWindow
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
 import { useLocation } from "wouter";
 
 export default function ProjectsGuide() {
@@ -998,10 +999,13 @@ export default function ProjectsGuide() {
 
         <div className="pt-8 text-center">
           <p className="text-sm text-muted-foreground mb-4">Need help with project management?</p>
-          <Button onClick={() => navigate("/changelog")}>
+          <Link href="/changelog">
+              <Button  className="w-full ">
+
             View All Documentation
             <ChevronRight className="w-4 h-4 ml-2" />
           </Button>
+            </Link>
         </div>
 
       </div>

@@ -28,30 +28,16 @@ import {
   Send
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
 
 export default function QuotingGuide() {
-  const [, navigate] = useLocation();
-
   return (
-    <ChangelogLayout title="Quoting Guide">
-      <div className="min-h-screen bg-background pb-20">
-        {/* Header */}
-        <header className="sticky top-0 z-50 bg-card border-b shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <BackButton to="/changelog" />
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold">Quoting & Sales Pipeline Guide</h1>
-              <p className="text-xs text-muted-foreground">Professional quote creation and pipeline management</p>
-            </div>
-          </div>
-          <MainMenuButton />
-        </div>
-      </header>
-
-      {/* Content */}
-      <main className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-        
+    <ChangelogGuideLayout 
+      title="Quoting & Sales Pipeline Guide"
+      version="2.0"
+      lastUpdated="December 5, 2025"
+    >
+      <div className="space-y-8">
         {/* Overview */}
         <section className="space-y-4">
           <div>
@@ -694,31 +680,31 @@ export default function QuotingGuide() {
           <h2 className="text-xl font-bold">Quick Links</h2>
           
           <div className="grid md:grid-cols-2 gap-4">
-            <Button 
-              variant="outline" 
+            <Link href="/quotes">
+              <Button variant="outline" 
               className="justify-between h-auto p-4"
-              onClick={() => navigate("/quotes")}
-              data-testid="link-quotes"
-            >
+              data-testid="link-quotes" className="w-full justify-between h-auto p-4">
+
               <div className="text-left">
                 <div className="font-semibold">Go to Quotes</div>
                 <div className="text-xs text-muted-foreground">Create and manage quotes</div>
               </div>
               <ArrowRight className="w-4 h-4" />
             </Button>
+            </Link>
 
-            <Button 
-              variant="outline" 
+            <Link href="/changelog/crm">
+              <Button variant="outline" 
               className="justify-between h-auto p-4"
-              onClick={() => navigate("/changelog/crm")}
-              data-testid="link-crm-guide"
-            >
+              data-testid="link-crm-guide" className="w-full justify-between h-auto p-4">
+
               <div className="text-left">
                 <div className="font-semibold">CRM Guide</div>
                 <div className="text-xs text-muted-foreground">Client management documentation</div>
               </div>
               <ArrowRight className="w-4 h-4" />
             </Button>
+            </Link>
           </div>
         </section>
 
@@ -729,8 +715,7 @@ export default function QuotingGuide() {
             <p className="mt-1">This document serves as the authoritative reference for the Quoting & Sales Pipeline System.</p>
           </CardContent>
         </Card>
-      </main>
       </div>
-    </ChangelogLayout>
+    </ChangelogGuideLayout>
   );
 }

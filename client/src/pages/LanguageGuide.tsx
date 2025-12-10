@@ -25,28 +25,16 @@ import {
   Smartphone
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
 
 export default function LanguageGuide() {
-  const [, navigate] = useLocation();
-
   return (
-    <ChangelogLayout title="Language Guide">
-      <div className="min-h-screen bg-background pb-20">
-        <header className="sticky top-0 z-50 bg-card border-b shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <BackButton to="/changelog" />
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold">Multi-Language Support Guide</h1>
-              <p className="text-xs text-muted-foreground">Internationalization and localization features</p>
-            </div>
-          </div>
-          <MainMenuButton />
-        </div>
-      </header>
-
-      <main className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-        
+    <ChangelogGuideLayout 
+      title="Language & Localization Guide"
+      version="2.0"
+      lastUpdated="December 5, 2025"
+    >
+      <div className="space-y-8">
         <section className="space-y-4">
           <div>
             <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
@@ -456,31 +444,31 @@ export default function LanguageGuide() {
           <h2 className="text-3xl md:text-4xl font-bold">Quick Links</h2>
           
           <div className="grid md:grid-cols-2 gap-4">
-            <Button 
-              variant="outline" 
+            <Link href="/profile">
+              <Button variant="outline" 
               className="justify-between h-auto p-4"
-              onClick={() => navigate("/profile")}
-              data-testid="link-profile"
-            >
+              data-testid="link-profile" className="w-full justify-between h-auto p-4">
+
               <div className="text-left">
                 <div className="font-semibold">Go to Profile</div>
                 <div className="text-xs text-muted-foreground">Set language preference</div>
               </div>
               <ArrowRight className="w-4 h-4" />
             </Button>
+            </Link>
 
-            <Button 
-              variant="outline" 
+            <Link href="/changelog/gps">
+              <Button variant="outline" 
               className="justify-between h-auto p-4"
-              onClick={() => navigate("/changelog/gps")}
-              data-testid="link-gps-guide"
-            >
+              data-testid="link-gps-guide" className="w-full justify-between h-auto p-4">
+
               <div className="text-left">
                 <div className="font-semibold">GPS & Location Guide</div>
                 <div className="text-xs text-muted-foreground">Location services documentation</div>
               </div>
               <ArrowRight className="w-4 h-4" />
             </Button>
+            </Link>
           </div>
         </section>
 
@@ -490,8 +478,7 @@ export default function LanguageGuide() {
             <p className="mt-1">This document serves as the authoritative reference for Multi-Language Support.</p>
           </CardContent>
         </Card>
-      </main>
       </div>
-    </ChangelogLayout>
+    </ChangelogGuideLayout>
   );
 }

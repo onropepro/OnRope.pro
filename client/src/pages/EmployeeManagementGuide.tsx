@@ -32,26 +32,13 @@ import {
 import { Button } from "@/components/ui/button";
 
 export default function EmployeeManagementGuide() {
-  const [, navigate] = useLocation();
-
   return (
-    <ChangelogLayout title="Employee Management Guide">
-      <div className="min-h-screen bg-background pb-20">
-        <header className="sticky top-0 z-50 bg-card border-b shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <BackButton to="/changelog" />
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold">Employee Management Guide</h1>
-              <p className="text-xs text-muted-foreground">Workforce administration and certification tracking</p>
-            </div>
-          </div>
-          <MainMenuButton />
-        </div>
-      </header>
-
-      <main className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-        
+    <ChangelogGuideLayout 
+      title="Employee Management Guide"
+      version="2.0"
+      lastUpdated="December 5, 2025"
+    >
+      <div className="space-y-8">
         <section className="space-y-4">
           <div>
             <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
@@ -540,17 +527,7 @@ export default function EmployeeManagementGuide() {
           </Card>
         </section>
 
-        <div className="mt-8 flex justify-center">
-          <Link href="/changelog">
-            <Button variant="outline" className="gap-2" data-testid="button-back-to-changelog">
-              <ChevronRight className="w-4 h-4 rotate-180" />
-              Back to Knowledge Base
-            </Button>
-          </Link>
-        </div>
-
-      </main>
-      </div>
-    </ChangelogLayout>
+              </div>
+    </ChangelogGuideLayout>
   );
 }

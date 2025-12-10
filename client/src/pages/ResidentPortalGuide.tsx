@@ -26,30 +26,16 @@ import {
   FileText
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
 
 export default function ResidentPortalGuide() {
-  const [, navigate] = useLocation();
-
   return (
-    <ChangelogLayout title="Resident Portal Guide">
-      <div className="min-h-screen bg-background pb-20">
-        {/* Header */}
-        <header className="sticky top-0 z-50 bg-card border-b shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <BackButton to="/changelog" />
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold">Resident Portal Guide</h1>
-              <p className="text-xs text-muted-foreground">Resident access, feedback, and communication</p>
-            </div>
-          </div>
-          <MainMenuButton />
-        </div>
-      </header>
-
-      {/* Content */}
-      <main className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-        
+    <ChangelogGuideLayout 
+      title="Resident Portal Guide"
+      version="2.0"
+      lastUpdated="December 5, 2025"
+    >
+      <div className="space-y-8">
         {/* Overview */}
         <section className="space-y-4">
           <div>
@@ -902,31 +888,31 @@ export default function ResidentPortalGuide() {
           <h2 className="text-xl font-bold">Quick Links</h2>
           
           <div className="grid md:grid-cols-2 gap-4">
-            <Button 
-              variant="outline" 
+            <Link href="/residents">
+              <Button variant="outline" 
               className="justify-between h-auto p-4"
-              onClick={() => navigate("/residents")}
-              data-testid="link-residents"
-            >
+              data-testid="link-residents" className="w-full justify-between h-auto p-4">
+
               <div className="text-left">
                 <div className="font-semibold">Resident Management</div>
                 <div className="text-xs text-muted-foreground">View and manage feedback</div>
               </div>
               <ArrowRight className="w-4 h-4" />
             </Button>
+            </Link>
 
-            <Button 
-              variant="outline" 
+            <Link href="/changelog/branding">
+              <Button variant="outline" 
               className="justify-between h-auto p-4"
-              onClick={() => navigate("/changelog/branding")}
-              data-testid="link-branding-guide"
-            >
+              data-testid="link-branding-guide" className="w-full justify-between h-auto p-4">
+
               <div className="text-left">
                 <div className="font-semibold">Branding Guide</div>
                 <div className="text-xs text-muted-foreground">White-label customization</div>
               </div>
               <ArrowRight className="w-4 h-4" />
             </Button>
+            </Link>
           </div>
         </section>
 
@@ -937,8 +923,7 @@ export default function ResidentPortalGuide() {
             <p className="mt-1">This document serves as the authoritative reference for the Resident Portal System.</p>
           </CardContent>
         </Card>
-      </main>
       </div>
-    </ChangelogLayout>
+    </ChangelogGuideLayout>
   );
 }
