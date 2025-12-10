@@ -102,7 +102,12 @@ export class Storage {
 
   async getAllEmployees(companyId: string): Promise<User[]> {
     // Get all employees created by this company (exclude residents and company owner)
-    const results = await db.select().from(users)
+    // Include BOTH:
+    // 1. Users with companyId set to this company (primary employees)
+    // 2. PLUS technicians connected via employer_connections table (secondary employees)
+    
+    // Get primary employees (companyId matches)
+    const primaryEmployees = await db.select().from(users)
       .where(
         and(
           eq(users.companyId, companyId),
@@ -111,7 +116,39 @@ export class Storage {
         )
       )
       .orderBy(desc(users.createdAt));
-    return results.map(user => decryptSensitiveFields(user));
+    
+    // Get secondary employees (connected via employer_connections)
+    const secondaryConnections = await db.select({
+      user: users,
+    }).from(technicianEmployerConnections)
+      .innerJoin(users, eq(technicianEmployerConnections.technicianId, users.id))
+      .where(
+        and(
+          eq(technicianEmployerConnections.companyId, companyId),
+          eq(technicianEmployerConnections.status, "active")
+        )
+      );
+    
+    const secondaryEmployees = secondaryConnections.map(c => c.user);
+    
+    // Combine and deduplicate (in case someone appears in both)
+    const allEmployees = [...primaryEmployees];
+    const primaryIds = new Set(primaryEmployees.map(e => e.id));
+    
+    for (const employee of secondaryEmployees) {
+      if (!primaryIds.has(employee.id)) {
+        allEmployees.push(employee);
+      }
+    }
+    
+    // Sort by createdAt descending
+    allEmployees.sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateB - dateA;
+    });
+    
+    return allEmployees.map(user => decryptSensitiveFields(user));
   }
 
   async getAllCompanies(): Promise<User[]> {
