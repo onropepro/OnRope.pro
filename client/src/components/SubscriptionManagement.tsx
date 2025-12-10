@@ -28,7 +28,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-type TierName = 'basic' | 'starter' | 'premium' | 'enterprise';
+type TierName = 'basic';
 
 interface SubscriptionStatus {
   hasActiveSubscription: boolean;
@@ -50,54 +50,17 @@ const TIER_INFO = {
     features: [
       'Unlimited projects',
       'Add seats at $34.95/month each',
-      'GPS tracking',
-      'Advanced reporting',
-      'Safety compliance',
-    ]
-  },
-  starter: {
-    name: 'OnRopePro',
-    price: 99,
-    projects: -1,
-    seats: 0,
-    color: 'bg-primary',
-    icon: Users,
-    features: [
-      'Unlimited projects',
-      'Add seats at $34.95/month each',
-      'Advanced analytics',
+      'Employee management',
+      'Advanced scheduling',
+      'GPS time tracking',
+      'Safety forms & compliance',
+      'CRM & quotes suite',
+      'Advanced analytics & reports',
+      'Resident portal',
+      'Inventory tracking',
       'Priority support',
     ]
   },
-  premium: {
-    name: 'OnRopePro',
-    price: 99,
-    projects: -1,
-    seats: 0,
-    color: 'bg-primary',
-    icon: Crown,
-    features: [
-      'Unlimited projects',
-      'Add seats at $34.95/month each',
-      'Premium analytics',
-      'API access',
-    ]
-  },
-  enterprise: {
-    name: 'OnRopePro',
-    price: 99,
-    projects: -1,
-    seats: 0,
-    color: 'bg-primary',
-    icon: Crown,
-    features: [
-      'Unlimited projects',
-      'Add seats at $34.95/month each',
-      'Enterprise analytics',
-      'Dedicated support',
-      'Custom integrations',
-    ]
-  }
 };
 
 export function SubscriptionManagement() {
@@ -412,15 +375,16 @@ export function SubscriptionManagement() {
         </Card>
       )}
 
-      {/* Subscription Plans */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {Object.entries(TIER_INFO).map(([tier, info]) => {
-          const isCurrent = subStatus?.currentTier === tier;
+      {/* Subscription Plan */}
+      <div className="max-w-md mx-auto">
+        {(() => {
+          const tier = 'basic';
+          const info = TIER_INFO.basic;
+          const isCurrent = subStatus?.currentTier === tier || subStatus?.hasActiveSubscription;
           const TierIcon = info.icon;
 
           return (
             <Card
-              key={tier}
               className={`relative ${isCurrent ? 'ring-2 ring-primary' : ''}`}
               data-testid={`card-tier-${tier}`}
             >
@@ -441,7 +405,7 @@ export function SubscriptionManagement() {
                   <span className="text-2xl font-bold text-foreground">
                     ${info.price}
                   </span>
-                  <span className="text-muted-foreground">/month</span>
+                  <span className="text-muted-foreground">/month (USD or CAD)</span>
                 </CardDescription>
               </CardHeader>
 
@@ -470,13 +434,13 @@ export function SubscriptionManagement() {
                   ) : isCurrent ? (
                     'Current Plan'
                   ) : (
-                    `Subscribe to ${info.name}`
+                    'Subscribe to OnRopePro'
                   )}
                 </Button>
               </CardFooter>
             </Card>
           );
-        })}
+        })()}
       </div>
 
       {/* Add-ons Section */}
