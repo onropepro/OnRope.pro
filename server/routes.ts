@@ -4011,6 +4011,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  /**
+   * SuperUser: Remove legacy $19 seat items from a company's Stripe subscription
+   * POST /api/superuser/companies/:id/remove-legacy-seats
+   */
+  app.post("/api/superuser/companies/:id/remove-legacy-seats", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const { id } = req.params;
+      const company = await storage.getUserById(id);
+
+      if (!company || company.role !== 'company') {
+        return res.status(404).json({ message: "Company not found" });
+      }
+
+      if (!company.stripeSubscriptionId) {
+        return res.status(400).json({ message: "Company has no Stripe subscription" });
+      }
+
+      // Legacy seat price IDs
+      const legacySeatPriceIds = [
+        'price_1SWDH4BzDsOltscrMxt5u3ij',  // Old USD seat price ($19/month)
+        'price_1SZG7KBzDsOltscrAcGW9Vuw',  // Old CAD seat price ($19/month)
+      ];
+
+      // Current seat price IDs
+      const addonConfig = ADDON_CONFIG.extra_seats;
+      const currentSeatPriceIds = [addonConfig.priceIdUSD, addonConfig.priceIdCAD];
+
+      console.log(`[SuperUser] Removing legacy seats for company ${company.companyName} (${id})`);
+
+      // Get current subscription
+      const subscription = await stripe.subscriptions.retrieve(company.stripeSubscriptionId);
+
+      // Find legacy seat items
+      const legacyItems = subscription.items.data.filter(item => 
+        legacySeatPriceIds.includes(item.price.id)
+      );
+
+      if (legacyItems.length === 0) {
+        return res.status(400).json({ message: "No legacy seats found on this subscription" });
+      }
+
+      // Count legacy seats being removed
+      let legacySeatsRemoved = 0;
+      for (const item of legacyItems) {
+        legacySeatsRemoved += item.quantity || 0;
+        console.log(`[SuperUser] Removing legacy seat item: ${item.id}, price: ${item.price.id}, quantity: ${item.quantity}`);
+        await stripe.subscriptionItems.del(item.id, {
+          proration_behavior: 'create_prorations',  // Give credit for unused time
+        });
+      }
+
+      // Re-fetch subscription to get accurate count of remaining seats
+      const verifySubscription = await stripe.subscriptions.retrieve(company.stripeSubscriptionId);
+      let remainingSeats = 0;
+      for (const item of verifySubscription.items.data) {
+        if (currentSeatPriceIds.includes(item.price.id)) {
+          remainingSeats += item.quantity || 0;
+        }
+      }
+
+      // Update database to match Stripe
+      await storage.updateUser(company.id, {
+        additionalSeatsCount: remainingSeats,
+      });
+
+      console.log(`[SuperUser] Legacy seats removed. Removed: ${legacySeatsRemoved}, Remaining: ${remainingSeats}`);
+      res.json({
+        success: true,
+        message: `Removed ${legacySeatsRemoved} legacy seat(s) from ${company.companyName}`,
+        legacySeatsRemoved,
+        remainingSeats,
+        companyId: company.id,
+        companyName: company.companyName,
+      });
+    } catch (error: any) {
+      console.error('[SuperUser] Remove legacy seats error:', error);
+      res.status(500).json({ message: error.message || "Failed to remove legacy seats" });
+    }
+  });
+
   // ==================== SuperUser Platform Metrics Endpoints ====================
 
   // SuperUser: Get MRR metrics summary
