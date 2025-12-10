@@ -139,6 +139,7 @@ export default function ProjectDetail() {
   const [instructionsForm, setInstructionsForm] = useState({
     buildingAccess: "",
     keysAndFob: "",
+    keysReturnPolicy: "",
     roofAccess: "",
     specialRequests: "",
     buildingManagerName: "",
@@ -270,6 +271,7 @@ export default function ProjectDetail() {
       setInstructionsForm({
         buildingAccess: buildingData.instructions.buildingAccess || "",
         keysAndFob: buildingData.instructions.keysAndFob || "",
+        keysReturnPolicy: (buildingData.instructions as any).keysReturnPolicy || "",
         roofAccess: buildingData.instructions.roofAccess || "",
         specialRequests: buildingData.instructions.specialRequests || "",
         buildingManagerName: buildingData.instructions.buildingManagerName || "",
@@ -1457,6 +1459,16 @@ export default function ProjectDetail() {
                             <div>
                               <p className="text-xs font-medium text-muted-foreground">{t('projectDetail.buildingInstructions.keysAndFob', 'Keys/Fob Location')}</p>
                               <p className="text-sm">{buildingData.instructions.keysAndFob}</p>
+                              {(buildingData.instructions as any).keysReturnPolicy && (
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {t('projectDetail.buildingInstructions.returnBy', 'Return')}: {
+                                    (buildingData.instructions as any).keysReturnPolicy === 'end_of_day' ? t('projectDetail.buildingInstructions.endOfDay', 'End of Every Day') :
+                                    (buildingData.instructions as any).keysReturnPolicy === 'end_of_week' ? t('projectDetail.buildingInstructions.endOfWeek', 'End of Week') :
+                                    (buildingData.instructions as any).keysReturnPolicy === 'end_of_project' ? t('projectDetail.buildingInstructions.endOfProject', 'End of Project') :
+                                    t('projectDetail.buildingInstructions.keepUntilComplete', 'Keep Until Work Complete')
+                                  }
+                                </p>
+                              )}
                             </div>
                           </div>
                         )}
@@ -3904,6 +3916,24 @@ export default function ProjectDetail() {
                   onChange={(e) => setInstructionsForm(prev => ({ ...prev, keysAndFob: e.target.value }))}
                   data-testid="input-keys-fob"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="keysReturnPolicy">{t('projectDetail.buildingInstructions.keysReturnPolicy', 'Keys/Fob Return Policy')}</Label>
+                <Select
+                  value={instructionsForm.keysReturnPolicy}
+                  onValueChange={(value) => setInstructionsForm(prev => ({ ...prev, keysReturnPolicy: value }))}
+                >
+                  <SelectTrigger data-testid="select-keys-return">
+                    <SelectValue placeholder={t('projectDetail.buildingInstructions.selectReturnPolicy', 'Select when to return keys...')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="end_of_day">{t('projectDetail.buildingInstructions.endOfDay', 'End of Every Day')}</SelectItem>
+                    <SelectItem value="end_of_week">{t('projectDetail.buildingInstructions.endOfWeek', 'End of Week')}</SelectItem>
+                    <SelectItem value="end_of_project">{t('projectDetail.buildingInstructions.endOfProject', 'End of Project')}</SelectItem>
+                    <SelectItem value="keep_until_complete">{t('projectDetail.buildingInstructions.keepUntilComplete', 'Keep Until Work Complete')}</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">

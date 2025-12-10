@@ -276,6 +276,7 @@ export const buildingInstructions = pgTable("building_instructions", {
   // Instruction categories
   buildingAccess: text("building_access"), // How to access the building
   keysAndFob: text("keys_and_fob"), // Where to get keys or fob
+  keysReturnPolicy: varchar("keys_return_policy"), // When to return keys: end_of_day, end_of_week, end_of_project
   roofAccess: text("roof_access"), // How to access the roof
   specialRequests: text("special_requests"), // Special requests or instructions
   

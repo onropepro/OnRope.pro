@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -59,6 +60,7 @@ export default function BuildingPortal() {
   const [instructionsForm, setInstructionsForm] = useState({
     buildingAccess: "",
     keysAndFob: "",
+    keysReturnPolicy: "",
     roofAccess: "",
     specialRequests: "",
     buildingManagerName: "",
@@ -102,6 +104,7 @@ export default function BuildingPortal() {
       setInstructionsForm({
         buildingAccess: buildingInstructions.buildingAccess || "",
         keysAndFob: buildingInstructions.keysAndFob || "",
+        keysReturnPolicy: (buildingInstructions as any).keysReturnPolicy || "",
         roofAccess: buildingInstructions.roofAccess || "",
         specialRequests: buildingInstructions.specialRequests || "",
         buildingManagerName: buildingInstructions.buildingManagerName || "",
@@ -536,6 +539,16 @@ export default function BuildingPortal() {
                           <div>
                             <p className="font-medium text-sm">Keys / Fob</p>
                             <p className="text-sm whitespace-pre-wrap">{buildingInstructions.keysAndFob}</p>
+                            {(buildingInstructions as any).keysReturnPolicy && (
+                              <p className="text-xs text-muted-foreground mt-1">
+                                Return: {
+                                  (buildingInstructions as any).keysReturnPolicy === 'end_of_day' ? 'End of Every Day' :
+                                  (buildingInstructions as any).keysReturnPolicy === 'end_of_week' ? 'End of Week' :
+                                  (buildingInstructions as any).keysReturnPolicy === 'end_of_project' ? 'End of Project' :
+                                  'Keep Until Work Complete'
+                                }
+                              </p>
+                            )}
                           </div>
                         </div>
                       )}
@@ -780,6 +793,24 @@ export default function BuildingPortal() {
                   rows={3}
                   data-testid="textarea-keys-fob"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="keysReturnPolicy">Keys / Fob Return Policy</Label>
+                <Select
+                  value={instructionsForm.keysReturnPolicy}
+                  onValueChange={(value) => setInstructionsForm(prev => ({ ...prev, keysReturnPolicy: value }))}
+                >
+                  <SelectTrigger data-testid="select-keys-return">
+                    <SelectValue placeholder="Select when to return keys..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="end_of_day">End of Every Day</SelectItem>
+                    <SelectItem value="end_of_week">End of Week</SelectItem>
+                    <SelectItem value="end_of_project">End of Project</SelectItem>
+                    <SelectItem value="keep_until_complete">Keep Until Work Complete</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">
