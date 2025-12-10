@@ -1057,56 +1057,6 @@ export default function Changelog() {
         <Card className="mb-8">
           <CardHeader>
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-neutral-400/10 dark:bg-neutral-500/20 ring-1 ring-neutral-400/20 dark:ring-neutral-500/20">
-                <Wrench className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />
-              </div>
-              <div>
-                <CardTitle className="text-xl">Services Managed</CardTitle>
-                <CardDescription>
-                  Building maintenance focus with {servicesData.reduce((acc, cat) => acc + cat.services.length, 0)} specialized service types
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="space-y-6">
-              {servicesData.map((category, catIndex) => (
-                <div key={catIndex}>
-                  <div className="flex items-center gap-2 mb-3">
-                    <h3 className="font-semibold text-base">{category.category}</h3>
-                    <Badge variant="secondary" className="text-xs">{category.services.length}</Badge>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-3">{category.description}</p>
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    {category.services.map((service, index) => (
-                      <div 
-                        key={index}
-                        className="flex items-start gap-3 p-3 rounded-lg bg-muted/30"
-                      >
-                        <div className="p-2 rounded-lg bg-background ring-1 ring-border/50 flex-shrink-0">
-                          <span className="material-icons text-lg text-muted-foreground">{service.icon}</span>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-medium text-base">{service.name}</span>
-                            <Badge variant="secondary" className="text-xs">{service.trackingType}</Badge>
-                          </div>
-                          <p className="text-sm text-muted-foreground mt-0.5">
-                            {service.description}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="mb-8">
-          <CardHeader>
-            <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-xl bg-action-600/10 dark:bg-action-600/20 ring-1 ring-action-600/20">
                 <FolderOpen className="h-5 w-5 text-action-600 dark:text-action-400" />
               </div>
