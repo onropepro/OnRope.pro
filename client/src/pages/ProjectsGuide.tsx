@@ -570,6 +570,129 @@ export default function ProjectsGuide() {
               </CardContent>
             </Card>
           </div>
+
+          {/* Additional Problems Solved Section */}
+          <div className="mt-8 space-y-4">
+            <div className="flex items-center gap-3 pb-2 border-b border-green-200 dark:border-green-800">
+              <Zap className="w-5 h-5 text-amber-500" />
+              <h3 className="text-xl md:text-2xl font-semibold text-green-900 dark:text-green-100">Additional Problems Solved</h3>
+            </div>
+
+            {/* Inconsistent Project Tracking */}
+            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+                  Inconsistent Project Tracking
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
+                <div>
+                  <p className="font-semibold">The Problem:</p>
+                  <p>Manual progress tracking leads to guesswork and outdated information. Different people have different versions of project status.</p>
+                </div>
+                <div>
+                  <p className="font-semibold">The Solution:</p>
+                  <p>OnRopePro provides automatic, real-time progress measurement based on work session entries. Everyone (company, employees, clients, residents) sees the same accurate data.</p>
+                </div>
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="font-medium">Single source of truth for all stakeholders.</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Missing Project Schedules */}
+            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+                  Missing Project Schedules
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
+                <div>
+                  <p className="font-semibold">The Problem:</p>
+                  <p>Without calendar integration, project timelines exist only in your head or scattered across multiple tools.</p>
+                </div>
+                <div>
+                  <p className="font-semibold">The Solution:</p>
+                  <p>OnRopePro automatically generates visual schedules showing project duration, crew assignments, and conflicts—all synchronized with actual project data.</p>
+                </div>
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="font-medium">Automatic calendar sync eliminates manual scheduling.</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Disconnected Safety Documentation */}
+            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+                  Disconnected Safety Documentation
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
+                <div>
+                  <p className="font-semibold">The Problem:</p>
+                  <p>Safety docs, schedules, and worker assignments scattered across emails, Google Drive, and paper files.</p>
+                </div>
+                <div>
+                  <p className="font-semibold">The Solution:</p>
+                  <p>OnRopePro links all safety documentation (Rope Access Plans, Toolbox Meetings, Anchor Inspections) directly to the relevant project. Property managers access compliance documents instantly through their portal.</p>
+                </div>
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="font-medium">Project-linked safety docs accessible to all stakeholders.</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Manual Payroll Data Entry */}
+            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+                  Manual Payroll Data Entry
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
+                <div>
+                  <p className="font-semibold">The Problem:</p>
+                  <p>Transcribing timesheets and drop counts from paper or texts into payroll software wastes hours and introduces errors.</p>
+                </div>
+                <div>
+                  <p className="font-semibold">The Solution:</p>
+                  <p>Technicians log work sessions with project-specific tracking (drops, hours, units). This data automatically feeds payroll calculations—no manual timesheet transcription.</p>
+                </div>
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="font-medium">Eliminates 87-93% of payroll errors. Saves 15-25 hours/week for 10-15 person crews.</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Unclear Project Status */}
+            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+                  Unclear Project Status
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
+                <div>
+                  <p className="font-semibold">The Problem:</p>
+                  <p>"How's the project going?" shouldn't require a phone call, site visit, or guesswork.</p>
+                </div>
+                <div>
+                  <p className="font-semibold">The Solution:</p>
+                  <p>OnRopePro's visual progress system (4-elevation tracking for multi-sided buildings) shows completion percentage, photos, and remaining work at a glance. Accessible to company owners, supervisors, building managers, and residents—each with appropriate permission levels.</p>
+                </div>
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="font-medium">Role-based visibility for all stakeholders.</span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </section>
 
         <Separator />
