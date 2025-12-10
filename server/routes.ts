@@ -3532,8 +3532,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const updates: any = {};
       
       if (parsedSeats > 0) {
-        // Each seat pack is 2 seats
-        updates.additionalSeatsCount = (company.additionalSeatsCount || 0) + (parsedSeats * 2);
+        // Each add-on is 1 seat
+        updates.additionalSeatsCount = (company.additionalSeatsCount || 0) + parsedSeats;
       }
       
       if (parsedProjects > 0) {
@@ -3561,7 +3561,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Build descriptive message
       const giftedItems: string[] = [];
-      if (parsedSeats > 0) giftedItems.push(`${parsedSeats * 2} seats`);
+      if (parsedSeats > 0) giftedItems.push(`${parsedSeats} seat${parsedSeats > 1 ? 's' : ''}`);
       if (parsedProjects > 0) giftedItems.push(`${parsedProjects} projects`);
       if (parsedWhiteLabel && !company.whitelabelBrandingActive) giftedItems.push('white-label branding');
 
@@ -3576,7 +3576,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           whitelabelBrandingActive: updatedCompany?.whitelabelBrandingActive,
         },
         gifted: {
-          seats: parsedSeats * 2,
+          seats: parsedSeats,
           projects: parsedProjects,
           whiteLabel: parsedWhiteLabel && !company.whitelabelBrandingActive,
         },

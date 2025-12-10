@@ -312,10 +312,9 @@ export function SubscriptionManagement() {
               // Calculate total limits including add-ons
               const additionalProjects = subDetails?.additionalProjectsCount || 0;
               const additionalSeats = subDetails?.additionalSeatsCount || 0;
-              const seatsPerPack = 2;
               
               const totalProjects = tierInfo.projects === -1 ? -1 : tierInfo.projects + additionalProjects;
-              const totalSeats = tierInfo.seats === -1 ? -1 : tierInfo.seats + (additionalSeats * seatsPerPack);
+              const totalSeats = tierInfo.seats === -1 ? -1 : tierInfo.seats + additionalSeats;
               
               return (
                 <div className="flex items-center gap-3">

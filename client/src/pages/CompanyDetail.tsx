@@ -517,7 +517,7 @@ export default function CompanyDetail() {
 
             {/* Extra Seats */}
             <div className="space-y-2">
-              <Label htmlFor="extraSeats">Extra Seat Packs (2 seats each)</Label>
+              <Label htmlFor="extraSeats">Extra Seats</Label>
               <Input
                 id="extraSeats"
                 type="number"
@@ -528,7 +528,7 @@ export default function CompanyDetail() {
                 data-testid="input-extra-seats"
               />
               <p className="text-xs text-muted-foreground">
-                {addonsForm.extraSeats > 0 ? `Will add ${addonsForm.extraSeats * 2} seats` : 'Enter number of seat packs to gift'}
+                {addonsForm.extraSeats > 0 ? `Will add ${addonsForm.extraSeats} seat${addonsForm.extraSeats > 1 ? 's' : ''}` : 'Enter number of seats to gift'}
               </p>
             </div>
 
