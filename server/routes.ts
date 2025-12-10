@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema } from "@shared/schema";
 import { eq, sql, and, or, isNull, gt, desc, asc, inArray } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -3852,6 +3852,92 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('[SuperUser] Send message error:', error);
       res.status(500).json({ message: "Failed to send message" });
+    }
+  });
+
+  // ==================== FUTURE IDEAS (SUPERUSER) ====================
+
+  // SuperUser: Get all future ideas
+  app.get("/api/superuser/future-ideas", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const ideas = await db.select().from(futureIdeas).orderBy(desc(futureIdeas.createdAt));
+      res.json(ideas);
+    } catch (error) {
+      console.error('[SuperUser] Get future ideas error:', error);
+      res.status(500).json({ message: "Failed to fetch future ideas" });
+    }
+  });
+
+  // SuperUser: Create a future idea
+  app.post("/api/superuser/future-ideas", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const parsed = insertFutureIdeaSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ message: "Invalid data", errors: parsed.error.errors });
+      }
+
+      const [newIdea] = await db.insert(futureIdeas).values(parsed.data).returning();
+      res.json(newIdea);
+    } catch (error) {
+      console.error('[SuperUser] Create future idea error:', error);
+      res.status(500).json({ message: "Failed to create idea" });
+    }
+  });
+
+  // SuperUser: Update a future idea
+  app.patch("/api/superuser/future-ideas/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const ideaId = req.params.id;
+      const { title, description, category, priority, status } = req.body;
+
+      const [updated] = await db.update(futureIdeas)
+        .set({
+          ...(title !== undefined && { title }),
+          ...(description !== undefined && { description }),
+          ...(category !== undefined && { category }),
+          ...(priority !== undefined && { priority }),
+          ...(status !== undefined && { status }),
+          updatedAt: new Date(),
+        })
+        .where(eq(futureIdeas.id, ideaId))
+        .returning();
+
+      if (!updated) {
+        return res.status(404).json({ message: "Idea not found" });
+      }
+
+      res.json(updated);
+    } catch (error) {
+      console.error('[SuperUser] Update future idea error:', error);
+      res.status(500).json({ message: "Failed to update idea" });
+    }
+  });
+
+  // SuperUser: Delete a future idea
+  app.delete("/api/superuser/future-ideas/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const ideaId = req.params.id;
+      await db.delete(futureIdeas).where(eq(futureIdeas.id, ideaId));
+      res.json({ message: "Idea deleted" });
+    } catch (error) {
+      console.error('[SuperUser] Delete future idea error:', error);
+      res.status(500).json({ message: "Failed to delete idea" });
     }
   });
 

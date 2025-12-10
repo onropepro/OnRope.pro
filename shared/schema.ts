@@ -2603,3 +2603,19 @@ export const insertJobApplicationSchema = createInsertSchema(jobApplications).om
 
 export type JobApplication = typeof jobApplications.$inferSelect;
 export type InsertJobApplication = z.infer<typeof insertJobApplicationSchema>;
+
+// Future Ideas - Internal ideas tracker for platform development
+export const futureIdeas = pgTable("future_ideas", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: varchar("title").notNull(),
+  description: text("description"),
+  category: varchar("category"), // e.g., "feature", "improvement", "integration", "design"
+  priority: varchar("priority").default("medium"), // low, medium, high
+  status: varchar("status").default("idea"), // idea, planned, in_progress, completed, archived
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertFutureIdeaSchema = createInsertSchema(futureIdeas).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertFutureIdea = z.infer<typeof insertFutureIdeaSchema>;
+export type FutureIdea = typeof futureIdeas.$inferSelect;

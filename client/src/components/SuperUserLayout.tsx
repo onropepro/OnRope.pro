@@ -125,6 +125,11 @@ const menuGroups: MenuGroup[] = [
         icon: "lightbulb",
         path: "/superuser/feature-requests",
       },
+      {
+        title: "Future Ideas",
+        icon: "auto_awesome",
+        path: "/superuser/future-ideas",
+      },
     ],
   },
   {

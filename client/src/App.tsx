@@ -44,6 +44,7 @@ import SuperUserBuildings from "@/pages/SuperUserBuildings";
 import SuperUserTechnicians from "@/pages/SuperUserTechnicians";
 import SuperUserTasks from "@/pages/SuperUserTasks";
 import SuperUserJobBoard from "@/pages/SuperUserJobBoard";
+import SuperUserFutureIdeas from "@/pages/SuperUserFutureIdeas";
 import ResidentsManagement from "@/pages/ResidentsManagement";
 import Documents from "@/pages/Documents";
 import ResidentLink from "@/pages/ResidentLink";
@@ -164,6 +165,11 @@ function Router() {
       <Route path="/superuser/job-board">
         <ProtectedRoute allowedRoles={["superuser"]}>
           <SuperUserJobBoard />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/superuser/future-ideas">
+        <ProtectedRoute allowedRoles={["superuser"]}>
+          <SuperUserFutureIdeas />
         </ProtectedRoute>
       </Route>
       <Route path="/building-portal" component={BuildingPortal} />
