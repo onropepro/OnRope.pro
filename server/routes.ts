@@ -450,8 +450,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(500).json({ message: "Address service not configured" });
       }
       
+      // Filter to include both Canada (ca) and USA (us) for North American addresses
       const response = await fetch(
-        `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(query)}&format=json&apiKey=${apiKey}`
+        `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(query)}&filter=countrycode:ca,us&format=json&apiKey=${apiKey}`
       );
       
       if (!response.ok) {
