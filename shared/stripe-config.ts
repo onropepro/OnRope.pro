@@ -8,19 +8,20 @@
  */
 
 export const STRIPE_PRICE_IDS = {
-  // Subscription Tiers (Recurring Monthly) - Same price, different currency
+  // Subscription Tiers (Recurring Monthly) - Single OnRopePro plan at $99/month
+  // Updated: 2025-12-10 - New pricing model with single tier
   tiers: {
     usd: {
-      basic: 'price_1SW7VXBzDsOltscr9WZ6NPBV',       // $79/mo - 2 projects, 4 seats
-      starter: 'price_1SW7VXBzDsOltscrEUVBsWxP',     // $299/mo - 5 projects, 10 seats
-      premium: 'price_1SW7VYBzDsOltscrtnes8hXS',     // $499/mo - 9 projects, 18 seats
-      enterprise: 'price_1SW7VYBzDsOltscrIAUE5EyJ',  // $899/mo - Unlimited
+      basic: 'price_1SchE1BzDsOltscr7YZLP8q6',       // $99/mo - OnRopePro, unlimited projects
+      starter: 'price_1SchE1BzDsOltscr7YZLP8q6',     // $99/mo - same as basic (legacy compatibility)
+      premium: 'price_1SchE1BzDsOltscr7YZLP8q6',     // $99/mo - same as basic (legacy compatibility)
+      enterprise: 'price_1SchE1BzDsOltscr7YZLP8q6',  // $99/mo - same as basic (legacy compatibility)
     },
     cad: {
-      basic: 'price_1SZG6qBzDsOltscrieJwV0Uf',       // $79 CAD/mo - 2 projects, 4 seats (FIXED - same as USD)
-      starter: 'price_1SZG6qBzDsOltscrXwhfXjys',     // $299 CAD/mo - 5 projects, 10 seats (FIXED - same as USD)
-      premium: 'price_1SZG6qBzDsOltscrSkZXaalG',     // $499 CAD/mo - 9 projects, 18 seats (FIXED - same as USD)
-      enterprise: 'price_1SZG6qBzDsOltscrD9aT6Fqz',  // $899 CAD/mo - Unlimited (FIXED - same as USD)
+      basic: 'price_1SchE1BzDsOltscr8GLwkiaW',       // $99 CAD/mo - OnRopePro, unlimited projects
+      starter: 'price_1SchE1BzDsOltscr8GLwkiaW',     // $99 CAD/mo - same as basic (legacy compatibility)
+      premium: 'price_1SchE1BzDsOltscr8GLwkiaW',     // $99 CAD/mo - same as basic (legacy compatibility)
+      enterprise: 'price_1SchE1BzDsOltscr8GLwkiaW',  // $99 CAD/mo - same as basic (legacy compatibility)
     },
   },
   

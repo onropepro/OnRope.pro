@@ -1368,6 +1368,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // =====================================================================
   
   /**
+   * SUPERUSER ONLY: Create new Stripe prices at $99/month
+   * This endpoint creates new prices in Stripe and returns the price IDs
+   * POST /api/stripe/create-new-prices
+   */
+  app.post("/api/stripe/create-new-prices", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user || user.role !== 'superuser') {
+        return res.status(403).json({ message: "SuperUser access required" });
+      }
+
+      console.log('[Stripe] Creating new $99/month prices for OnRopePro plan...');
+
+      // First, find or create the product
+      let product: any;
+      const existingProducts = await stripe.products.list({ limit: 100 });
+      product = existingProducts.data.find(p => p.name === 'OnRopePro');
+      
+      if (!product) {
+        product = await stripe.products.create({
+          name: 'OnRopePro',
+          description: 'OnRopePro - Building Maintenance Management Platform. Unlimited projects included.',
+        });
+        console.log('[Stripe] Created new product:', product.id);
+      } else {
+        console.log('[Stripe] Using existing product:', product.id);
+      }
+
+      // Create USD price at $99/month
+      const usdPrice = await stripe.prices.create({
+        product: product.id,
+        unit_amount: 9900, // $99.00 in cents
+        currency: 'usd',
+        recurring: { interval: 'month' },
+        nickname: 'OnRopePro Monthly - USD',
+      });
+      console.log('[Stripe] Created USD price:', usdPrice.id);
+
+      // Create CAD price at $99/month
+      const cadPrice = await stripe.prices.create({
+        product: product.id,
+        unit_amount: 9900, // $99.00 in cents
+        currency: 'cad',
+        recurring: { interval: 'month' },
+        nickname: 'OnRopePro Monthly - CAD',
+      });
+      console.log('[Stripe] Created CAD price:', cadPrice.id);
+
+      // Return the new price IDs
+      res.json({
+        success: true,
+        message: 'New prices created successfully at $99/month',
+        productId: product.id,
+        prices: {
+          usd: usdPrice.id,
+          cad: cadPrice.id,
+        },
+        instructions: 'Update STRIPE_PRICE_IDS in shared/stripe-config.ts with these new price IDs'
+      });
+    } catch (error: any) {
+      console.error('[Stripe] Failed to create new prices:', error);
+      res.status(500).json({ message: error.message || 'Failed to create new prices' });
+    }
+  });
+
+  /**
    * Upgrade/downgrade existing subscription with proration
    * POST /api/stripe/upgrade-subscription
    */
