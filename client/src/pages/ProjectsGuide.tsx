@@ -355,7 +355,13 @@ export default function ProjectsGuide() {
             Problems Solved
           </h2>
 
-          <div className="space-y-6">
+          {/* For Rope Access Company Owners Section */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 pb-2 border-b border-green-200 dark:border-green-800">
+              <Building2 className="w-5 h-5 text-blue-500" />
+              <h3 className="text-xl md:text-2xl font-semibold text-green-900 dark:text-green-100">For Rope Access Company Owners</h3>
+            </div>
+
             {/* Problem 1 - Project Visibility */}
             <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
               <CardHeader className="pb-2">
