@@ -28,7 +28,8 @@ import {
   Calculator,
   ClipboardCheck,
   Smartphone,
-  Key
+  Key,
+  HardHat
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -255,6 +256,152 @@ export default function TimeTrackingGuide() {
                 <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
                   <CheckCircle2 className="w-4 h-4" />
                   <span className="font-medium">Zero manual calculation. Piece work and hourly employees can work the same project. Payroll exports are accurate automatically.</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Problem 7 - Payroll Processing */}
+            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+                  "Payroll takes forever because I'm deciphering texts and timesheets"
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
+                <div>
+                  <p className="font-semibold">The Pain:</p>
+                  <p>Every pay period, you're collecting timesheets from paper forms, text messages, emails, and memory. Then you're entering it all into payroll manually. Overtime calculations happen in your head. Mistakes happen. The whole process takes 6-10 hours for a 15-person crew.</p>
+                </div>
+                <div className="bg-green-100 dark:bg-green-900 p-3 rounded italic">
+                  "Tommy texts 'worked 9.5 hours Tuesday, building was rough.' Sarah's paper timesheet says '8 hours Monday, 10 hours Wednesday.' You have three texts you can't find, one timesheet that's illegible, and Friday's hours aren't submitted yet. Payroll is due in 2 hours."
+                </div>
+                <div>
+                  <p className="font-semibold">The Solution:</p>
+                  <p>Work sessions are logged in real-time with automatic overtime calculation. The system tracks regular hours (0-8), overtime hours (8-12), and double-time hours (12+) based on your company's rules. Payroll page shows a complete breakdown for each employee—exportable in one click.</p>
+                </div>
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="font-medium">Payroll processing time reduced by 87-93%. Overtime calculated automatically. Export to your payroll provider in seconds.</span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* For Technicians Section */}
+          <div className="mt-8 space-y-4">
+            <div className="flex items-center gap-3 pb-2 border-b border-green-200 dark:border-green-800">
+              <HardHat className="w-5 h-5 text-orange-500" />
+              <h3 className="text-xl md:text-2xl font-semibold text-green-900 dark:text-green-100">For Technicians</h3>
+            </div>
+
+            {/* Problem 8 - IRATA Logbook */}
+            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+                  "I forgot to fill out my logbook and now I can't remember what tasks I did"
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
+                <div>
+                  <p className="font-semibold">The Pain:</p>
+                  <p>IRATA and SPRAT certifications require detailed task logging—hours spent on rope transfers, rescues, ascending, rigging, etc. You're supposed to log these daily, but life gets busy. Two months later, you're filling out your logbook from memory, guessing what days you did rope transfers versus re-anchors.</p>
+                </div>
+                <div className="bg-green-100 dark:bg-green-900 p-3 rounded italic">
+                  "Your IRATA recertification is in 3 weeks. You open your logbook—last entry was 6 months ago. You've done hundreds of hours of rope work since then. You guess at task breakdowns and hope the assessor doesn't ask detailed questions."
+                </div>
+                <div>
+                  <p className="font-semibold">The Solution:</p>
+                  <p>After ending each work session, you're prompted to log your IRATA/SPRAT task hours by category (20+ task types available). This data accumulates in your profile. When it's time to update your official logbook, you have a detailed record of exactly what tasks you performed and when.</p>
+                </div>
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="font-medium">Accurate certification tracking without daily logbook discipline. Recertification prep takes 30 minutes instead of 3 hours of guessing.</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Problem 9 - Fair Performance Evaluation */}
+            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+                  "My boss thinks I'm slacking when I legitimately couldn't hit target"
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
+                <div>
+                  <p className="font-semibold">The Pain:</p>
+                  <p>You're evaluated on drops per day, but some days are impossible. Wind picks up at noon, you lose half the afternoon. Building access gets blocked for 2 hours. You hit 2 drops instead of your 4-drop target. Without documentation, it looks like you underperformed.</p>
+                </div>
+                <div className="bg-green-100 dark:bg-green-900 p-3 rounded italic">
+                  "I could fix that easily just by adding a bunch of automatic reasons that you can select like weather delays... if one of those are selected, it will not affect their performance."
+                </div>
+                <div>
+                  <p className="font-semibold">The Solution:</p>
+                  <p>When you don't meet your daily target, the system requires a shortfall reason before you can close your session. Weather delays, equipment issues, building access problems—all documented. Certain reasons are "performance-protected" and don't negatively impact your productivity metrics.</p>
+                </div>
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="font-medium">Your legitimate challenges are documented, not forgotten. Weather delays don't hurt your performance score.</span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* For Operations Managers Section */}
+          <div className="mt-8 space-y-4">
+            <div className="flex items-center gap-3 pb-2 border-b border-green-200 dark:border-green-800">
+              <Users className="w-5 h-5 text-blue-500" />
+              <h3 className="text-xl md:text-2xl font-semibold text-green-900 dark:text-green-100">For Operations Managers</h3>
+            </div>
+
+            {/* Problem 10 - Worker Visibility */}
+            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+                  "I have 15 workers across 6 sites and no idea who's where"
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
+                <div>
+                  <p className="font-semibold">The Pain:</p>
+                  <p>You're managing multiple crews across multiple buildings. Someone calls in sick, someone finishes early, someone hasn't clocked in and you don't know if they're late or just forgot. You're texting and calling trying to build a mental picture of who's where.</p>
+                </div>
+                <div className="bg-green-100 dark:bg-green-900 p-3 rounded italic">
+                  "It's 9:15 AM. You see 12 of 15 workers have clocked in. Are the other 3 late? Did they forget to clock in? Are they sick? You start making calls. Tommy forgot his phone. Sarah's stuck in traffic. Mike forgot to clock in. You just spent 30 minutes on basic attendance."
+                </div>
+                <div>
+                  <p className="font-semibold">The Solution:</p>
+                  <p>Real-time Active Workers dashboard shows everyone currently clocked in, which project they're working on, and when they started. Missing workers are immediately visible—you know who to follow up with.</p>
+                </div>
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="font-medium">Attendance tracking in seconds, not 30 minutes. Know exactly who's where without phone calls.</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Problem 11 - Clock-Out Corrections */}
+            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+                  "A tech forgot to clock out and now their hours are wrong"
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
+                <div>
+                  <p className="font-semibold">The Pain:</p>
+                  <p>Employees forget to clock out. They close the app and go home. Next morning, you see a 16-hour work session that's obviously wrong. Now you're playing detective—calling the employee, checking when they actually left, manually adjusting the record.</p>
+                </div>
+                <div className="bg-green-100 dark:bg-green-900 p-3 rounded italic">
+                  "Tommy's session shows 15.5 hours yesterday. He definitely didn't work that long—he left around 5 PM. But the system has him clocked out at 9:30 PM. You call Tommy, he doesn't remember exactly when he left. You guess at 5:15 PM and manually adjust."
+                </div>
+                <div>
+                  <p className="font-semibold">The Solution:</p>
+                  <p>Users with financial permissions (owners, ops managers, accounting) can edit completed sessions. Adjust start time, end time, drops completed, and billable status. The system automatically recalculates hours breakdown (regular, overtime, double-time) and payroll amounts.</p>
+                </div>
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="font-medium">Fix clock-out errors in 30 seconds without complicated workarounds. Payroll stays accurate.</span>
                 </div>
               </CardContent>
             </Card>
