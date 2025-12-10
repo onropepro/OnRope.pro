@@ -6671,7 +6671,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Seat limit reached. Please upgrade your subscription or add more seats." });
       }
       
-      // Find the technician and verify they're unlinked
+      // Find the technician
       const technician = await storage.getUserById(technicianId);
       if (!technician) {
         return res.status(404).json({ message: "Technician not found" });
@@ -6681,8 +6681,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "This user is not a technician" });
       }
       
-      if (technician.companyId) {
-        return res.status(400).json({ message: "This technician is already linked to a company" });
+      // Check if already linked to THIS company
+      if (technician.companyId === companyId) {
+        return res.status(400).json({ message: "This technician is already linked to your company" });
+      }
+      
+      // Check existing employer connections
+      const existingConnections = (technician.employerConnections || []) as any[];
+      const alreadyConnected = existingConnections.some((conn: any) => conn.companyId === companyId);
+      if (alreadyConnected) {
+        return res.status(400).json({ message: "This technician is already connected to your company" });
+      }
+      
+      // If linked to another company, require PLUS access
+      if (technician.companyId && !technician.hasPlusAccess) {
+        return res.status(400).json({ 
+          message: "This technician is already linked to another company. They need Technician PLUS to connect with multiple employers." 
+        });
       }
       
       // Check if there's already a pending invitation
