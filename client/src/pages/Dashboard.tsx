@@ -914,22 +914,39 @@ export default function Dashboard() {
 
   // Check if technician is suspended from the employer they're trying to access
   useEffect(() => {
-    if (!employerConnectionsData?.connections || !companyIdForData) return;
+    if (!employerConnectionsData?.connections) return;
     
-    const currentConnection = employerConnectionsData.connections.find(
-      c => c.companyId === companyIdForData
-    );
+    const connections = employerConnectionsData.connections;
+    const activeConnections = connections.filter(c => c.status === 'active' || c.status === 'accepted');
     
-    // If we found the connection and it's suspended, redirect to portal
-    if (currentConnection && currentConnection.status === 'suspended') {
+    // If technician has no active connections at all, redirect to portal
+    if (connections.length > 0 && activeConnections.length === 0) {
       toast({
-        title: t('dashboard.accessSuspended', 'Access Suspended'),
-        description: t('dashboard.accessSuspendedDesc', `Your access to ${currentConnection.company?.companyName || 'this company'} has been suspended. Redirecting to your portal.`),
+        title: t('dashboard.allAccessSuspended', 'Access Suspended'),
+        description: t('dashboard.allAccessSuspendedDesc', 'All your employer connections have been suspended. Redirecting to your portal.'),
         variant: "destructive",
       });
       setTimeout(() => {
         setLocation('/technician-portal');
       }, 2000);
+      return;
+    }
+    
+    // Check if the specific company they're accessing is suspended
+    if (companyIdForData) {
+      const currentConnection = connections.find(c => c.companyId === companyIdForData);
+      
+      // If we found the connection and it's suspended, redirect to portal
+      if (currentConnection && currentConnection.status === 'suspended') {
+        toast({
+          title: t('dashboard.accessSuspended', 'Access Suspended'),
+          description: t('dashboard.accessSuspendedDesc', `Your access to ${currentConnection.company?.companyName || 'this company'} has been suspended. Redirecting to your portal.`),
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          setLocation('/technician-portal');
+        }, 2000);
+      }
     }
   }, [employerConnectionsData, companyIdForData, toast, setLocation, t]);
 
