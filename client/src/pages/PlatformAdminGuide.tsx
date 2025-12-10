@@ -38,18 +38,10 @@ export default function PlatformAdminGuide() {
     >
       <div className="space-y-8">
         <section className="space-y-4">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
-              <Crown className="w-6 h-6 text-amber-600 dark:text-amber-400" />
-              Platform Administration Overview
-            </h2>
-            <p className="text-muted-foreground">
-              Platform Administration provides <strong>SuperUser-level access</strong> to manage all registered companies, monitor platform health, and provision accounts. SuperUsers operate outside the normal company structure with full visibility across the entire platform.
-            </p>
-          </div>
+          <p className="text-muted-foreground leading-relaxed text-base">
+            Platform Administration provides <strong>SuperUser-level access</strong> to manage all registered companies, monitor platform health, and provision accounts. SuperUsers operate outside the normal company structure with full visibility across the entire platform.
+          </p>
         </section>
-
-        <Separator />
 
         <section className="space-y-4">
           <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950">

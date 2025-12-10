@@ -36,20 +36,11 @@ export default function ResidentPortalGuide() {
       lastUpdated="December 5, 2025"
     >
       <div className="space-y-8">
-        {/* Overview */}
         <section className="space-y-4">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
-              <Home className="w-6 h-6 text-cyan-600 dark:text-cyan-400" />
-              Resident Portal Overview
-            </h2>
-            <p className="text-muted-foreground">
-              The Resident Portal provides building residents with direct access to view project progress, submit feedback, and communicate with management. Residents link their accounts using a <strong>unique building code</strong> provided by the property manager or company.
-            </p>
-          </div>
+          <p className="text-muted-foreground leading-relaxed text-base">
+            The Resident Portal provides building residents with direct access to view project progress, submit feedback, and communicate with management. Residents link their accounts using a <strong>unique building code</strong> provided by the property manager or company.
+          </p>
         </section>
-
-        <Separator />
 
         {/* THE GOLDEN RULE */}
         <section className="space-y-4">

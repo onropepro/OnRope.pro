@@ -27,12 +27,8 @@ export default function TechnicianRegistrationGuide() {
       lastUpdated="December 10, 2025"
     >
       <div className="space-y-8">
-        <section>
-          <div className="flex items-center gap-3 mb-4">
-            <HardHat className="w-8 h-8 text-warning-500" />
-            <h2 className="text-2xl md:text-3xl font-bold">Registration Overview</h2>
-          </div>
-          <p className="text-muted-foreground text-base mb-4">
+        <section className="space-y-4">
+          <p className="text-muted-foreground leading-relaxed text-base">
             The Technician Self-Registration system allows IRATA and SPRAT technicians to create their own accounts on the platform. The streamlined 4-screen registration process collects essential information while minimizing friction.
           </p>
           

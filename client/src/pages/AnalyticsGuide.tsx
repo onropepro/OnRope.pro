@@ -39,18 +39,10 @@ export default function AnalyticsGuide() {
     >
       <div className="space-y-8">
         <section className="space-y-4">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
-              <BarChart3 className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
-              Analytics & Reporting Overview
-            </h2>
-            <p className="text-muted-foreground">
-              The Analytics system provides <strong>comprehensive business intelligence</strong> across time tracking, project performance, workforce productivity, and financial metrics. Reports are permission-controlled to ensure appropriate data access.
-            </p>
-          </div>
+          <p className="text-muted-foreground leading-relaxed text-base">
+            The Analytics system provides <strong>comprehensive business intelligence</strong> across time tracking, project performance, workforce productivity, and financial metrics. Reports are permission-controlled to ensure appropriate data access.
+          </p>
         </section>
-
-        <Separator />
 
         <section className="space-y-4">
           <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950">

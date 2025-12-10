@@ -36,18 +36,10 @@ export default function LanguageGuide() {
     >
       <div className="space-y-8">
         <section className="space-y-4">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
-              <Globe className="w-6 h-6 text-action-600 dark:text-action-400" />
-              Multi-Language Support Overview
-            </h2>
-            <p className="text-muted-foreground">
-              The platform supports <strong>full internationalization (i18n)</strong> with language switching, localized date/time formatting, and user language preferences. Currently supporting English and French with infrastructure for additional languages.
-            </p>
-          </div>
+          <p className="text-muted-foreground leading-relaxed text-base">
+            The platform supports <strong>full internationalization (i18n)</strong> with language switching, localized date/time formatting, and user language preferences. Currently supporting English and French with infrastructure for additional languages.
+          </p>
         </section>
-
-        <Separator />
 
         <section className="space-y-4">
           <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950">

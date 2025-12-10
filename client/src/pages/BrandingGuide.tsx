@@ -35,20 +35,11 @@ export default function BrandingGuide() {
       lastUpdated="December 5, 2025"
     >
       <div className="space-y-8">
-        {/* Overview */}
         <section className="space-y-4">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
-              <Palette className="w-6 h-6 text-sky-600 dark:text-sky-400" />
-              White-Label Branding Overview
-            </h2>
-            <p className="text-muted-foreground">
-              The White-Label Branding system allows companies to customize the platform with their own logo and brand colors. This subscription-gated feature applies branding <strong>globally across all authenticated pages</strong> and to safety document PDFs. Access branding settings from the Profile page under the "Branding" tab.
-            </p>
-          </div>
+          <p className="text-muted-foreground leading-relaxed text-base">
+            The White-Label Branding system allows companies to customize the platform with their own logo and brand colors. This subscription-gated feature applies branding <strong>globally across all authenticated pages</strong> and to safety document PDFs. Access branding settings from the Profile page under the "Branding" tab.
+          </p>
         </section>
-
-        <Separator />
 
         {/* THE GOLDEN RULE */}
         <section className="space-y-4">

@@ -54,21 +54,13 @@ export default function UserAccessGuide() {
       <div className="space-y-8">
         
         <section className="space-y-4">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
-              <Users className="w-6 h-6 text-action-600 dark:text-action-400" />
-              User Access Overview
-            </h2>
-            <p className="text-muted-foreground leading-relaxed text-base">
-              OnRopePro implements a sophisticated role-based access control system with <strong>company-scoped multi-tenant architecture</strong>. Each company's data remains completely isolated, and users can only access information relevant to their assigned company and role permissions.
-            </p>
-            <p className="text-muted-foreground mt-2 leading-relaxed text-base">
-              The platform supports three distinct user categories with <strong>granular, customizable permissions</strong> to accommodate diverse organizational structures across the rope access industry.
-            </p>
-          </div>
+          <p className="text-muted-foreground leading-relaxed text-base">
+            OnRopePro implements a sophisticated role-based access control system with <strong>company-scoped multi-tenant architecture</strong>. Each company's data remains completely isolated, and users can only access information relevant to their assigned company and role permissions.
+          </p>
+          <p className="text-muted-foreground leading-relaxed text-base">
+            The platform supports three distinct user categories with <strong>granular, customizable permissions</strong> to accommodate diverse organizational structures across the rope access industry.
+          </p>
         </section>
-
-        <Separator />
 
         <section className="space-y-6">
           <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950">

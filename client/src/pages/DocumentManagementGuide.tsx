@@ -39,18 +39,10 @@ export default function DocumentManagementGuide() {
     >
       <div className="space-y-8">
         <section className="space-y-4">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
-              <FileText className="w-6 h-6 text-action-600 dark:text-action-400" />
-              Document Management Overview
-            </h2>
-            <p className="text-muted-foreground">
-              The Document Management system provides centralized storage for all company documents with compliance tracking, employee acknowledgment workflows, and role-based access controls. Access it from the Documents section in your dashboard.
-            </p>
-          </div>
+          <p className="text-muted-foreground leading-relaxed text-base">
+            The Document Management system provides centralized storage for all company documents with compliance tracking, employee acknowledgment workflows, and role-based access controls. Access it from the Documents section in your dashboard.
+          </p>
         </section>
-
-        <Separator />
 
         <section className="space-y-4">
           <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950">

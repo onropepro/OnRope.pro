@@ -44,20 +44,11 @@ export default function SafetyGuide() {
       lastUpdated="December 5, 2025"
     >
       <div className="space-y-8">
-        {/* Overview */}
         <section className="space-y-4">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
-              <Shield className="w-6 h-6 text-red-600 dark:text-red-400" />
-              Safety & Compliance Overview
-            </h2>
-            <p className="text-muted-foreground">
-              The Safety & Compliance system ensures all rope access work is documented, inspected, and compliant with IRATA, OSHA, and industry regulations. It provides <strong>digital capture of safety documentation</strong>, legally-binding digital signatures, professional PDF generation, and feeds into the <strong>Company Safety Rating (CSR)</strong> visible to property managers.
-            </p>
-          </div>
+          <p className="text-muted-foreground leading-relaxed text-base">
+            The Safety & Compliance system ensures all rope access work is documented, inspected, and compliant with IRATA, OSHA, and industry regulations. It provides <strong>digital capture of safety documentation</strong>, legally-binding digital signatures, professional PDF generation, and feeds into the <strong>Company Safety Rating (CSR)</strong> visible to property managers.
+          </p>
         </section>
-
-        <Separator />
 
         {/* THE GOLDEN RULE */}
         <section className="space-y-4">

@@ -36,18 +36,10 @@ export default function PropertyManagerGuide() {
     >
       <div className="space-y-8">
         <section className="space-y-4">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
-              <Building2 className="w-6 h-6 text-teal-600 dark:text-teal-400" />
-              Property Manager Interface Overview
-            </h2>
-            <p className="text-muted-foreground">
-              The Property Manager Interface provides a <strong>dedicated "My Vendors" dashboard</strong> where property managers can view their contracted rope access companies, access read-only company information, and monitor safety compliance through the Company Safety Rating (CSR) system.
-            </p>
-          </div>
+          <p className="text-muted-foreground leading-relaxed text-base">
+            The Property Manager Interface provides a <strong>dedicated "My Vendors" dashboard</strong> where property managers can view their contracted rope access companies, access read-only company information, and monitor safety compliance through the Company Safety Rating (CSR) system.
+          </p>
         </section>
-
-        <Separator />
 
         <section className="space-y-4">
           <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950">

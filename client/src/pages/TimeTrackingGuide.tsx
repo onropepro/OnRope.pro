@@ -44,18 +44,10 @@ export default function TimeTrackingGuide() {
       <div className="space-y-8">
         
         <section className="space-y-4">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
-              <Clock className="w-6 h-6 text-orange-600 dark:text-orange-400" />
-              Work Session Overview
-            </h2>
-            <p className="text-muted-foreground">
-              Work sessions are the core time tracking mechanism. When an employee "starts their day" on a project, the system records their start time, location, and links the session to both the project and their payroll. At the end of the day, they log their work output and the session closes.
-            </p>
-          </div>
+          <p className="text-muted-foreground leading-relaxed text-base">
+            Work sessions are the core time tracking mechanism. When an employee "starts their day" on a project, the system records their start time, location, and links the session to both the project and their payroll. At the end of the day, they log their work output and the session closes.
+          </p>
         </section>
-
-        <Separator />
 
         <section className="space-y-4">
           <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950">

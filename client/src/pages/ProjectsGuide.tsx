@@ -67,18 +67,10 @@ export default function ProjectsGuide() {
       <div className="space-y-8">
         
         <section className="space-y-4">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
-              <FolderOpen className="w-6 h-6 text-action-600 dark:text-action-400" />
-              Project Management Overview
-            </h2>
-            <p className="text-muted-foreground leading-relaxed text-base">
-              Projects represent individual building maintenance jobs. Each project tracks a specific type of work at a specific location, with progress measured differently depending on the job type. Projects are the central hub connecting <strong>employees, scheduling, safety documentation, and financial tracking</strong>.
-            </p>
-          </div>
+          <p className="text-muted-foreground leading-relaxed text-base">
+            Projects represent individual building maintenance jobs. Each project tracks a specific type of work at a specific location, with progress measured differently depending on the job type. Projects are the central hub connecting <strong>employees, scheduling, safety documentation, and financial tracking</strong>.
+          </p>
         </section>
-
-        <Separator />
 
         <section className="space-y-6">
           <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950">

@@ -25,17 +25,11 @@ export default function PayrollGuide() {
       lastUpdated="December 10, 2025"
     >
       <div className="space-y-8">
-        <section>
-          <div className="flex items-center gap-3 mb-4">
-            <CreditCard className="w-8 h-8 text-success-500" />
-            <h2 className="text-2xl md:text-3xl font-bold">Payroll Overview</h2>
-          </div>
-          <p className="text-muted-foreground text-base mb-4">
+        <section className="space-y-4">
+          <p className="text-muted-foreground leading-relaxed text-base">
             The Payroll & Financial module provides comprehensive timesheet generation and payroll processing capabilities. Work sessions are automatically aggregated into payroll-ready reports with configurable pay periods and overtime calculations.
           </p>
         </section>
-
-        <Separator />
 
         <section>
           <div className="flex items-center gap-3 mb-4">

@@ -37,20 +37,11 @@ export default function CRMGuide() {
       lastUpdated="December 5, 2025"
     >
       <div className="space-y-8">
-        {/* Overview */}
         <section className="space-y-4">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
-              <Users className="w-6 h-6 text-action-600 dark:text-action-400" />
-              Client Management Overview
-            </h2>
-            <p className="text-muted-foreground">
-              The CRM system provides centralized management of property managers, strata companies, and building owners. Each client can have multiple <strong>LMS (Land Management System) numbers</strong> representing different buildings they manage. Access it from the Clients section in your dashboard.
-            </p>
-          </div>
+          <p className="text-muted-foreground leading-relaxed text-base">
+            The CRM system provides centralized management of property managers, strata companies, and building owners. Each client can have multiple <strong>LMS (Land Management System) numbers</strong> representing different buildings they manage. Access it from the Clients section in your dashboard.
+          </p>
         </section>
-
-        <Separator />
 
         {/* THE GOLDEN RULE */}
         <section className="space-y-4">

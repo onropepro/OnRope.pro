@@ -39,18 +39,10 @@ export default function SchedulingGuide() {
     >
       <div className="space-y-8">
         <section className="space-y-4">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
-              <Calendar className="w-6 h-6 text-orange-600 dark:text-orange-400" />
-              Scheduling System Overview
-            </h2>
-            <p className="text-muted-foreground">
-              The Scheduling system provides a dual-calendar view for project assignments and employee availability, with integrated time-off management. Access it from the Schedule section in your dashboard.
-            </p>
-          </div>
+          <p className="text-muted-foreground leading-relaxed text-base">
+            The Scheduling system provides a dual-calendar view for project assignments and employee availability, with integrated time-off management. Access it from the Schedule section in your dashboard.
+          </p>
         </section>
-
-        <Separator />
 
         <section className="space-y-4">
           <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950">

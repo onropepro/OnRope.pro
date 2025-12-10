@@ -43,20 +43,11 @@ export default function InventoryGuide() {
       lastUpdated="December 5, 2025"
     >
       <div className="space-y-8">
-        {/* Overview */}
         <section className="space-y-4">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
-              <Package className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-              Inventory System Overview
-            </h2>
-            <p className="text-muted-foreground">
-              The inventory system provides centralized equipment tracking and management for rope access companies. It uses a <strong>slot-based availability model</strong> where equipment availability is calculated as Total Quantity minus Assigned Quantity. Serial numbers are optional metadata for tracking individual units.
-            </p>
-          </div>
+          <p className="text-muted-foreground leading-relaxed text-base">
+            The inventory system provides centralized equipment tracking and management for rope access companies. It uses a <strong>slot-based availability model</strong> where equipment availability is calculated as Total Quantity minus Assigned Quantity. Serial numbers are optional metadata for tracking individual units.
+          </p>
         </section>
-
-        <Separator />
 
         {/* THE GOLDEN RULE */}
         <section className="space-y-4">

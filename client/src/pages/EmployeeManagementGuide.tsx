@@ -40,18 +40,10 @@ export default function EmployeeManagementGuide() {
     >
       <div className="space-y-8">
         <section className="space-y-4">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
-              <Users className="w-6 h-6 text-cyan-600 dark:text-cyan-400" />
-              Employee Management Overview
-            </h2>
-            <p className="text-muted-foreground">
-              The Employee Management system provides complete workforce administration including profile management, certification tracking, compensation configuration, and role-based access control. Access it from the Employees section in your dashboard.
-            </p>
-          </div>
+          <p className="text-muted-foreground leading-relaxed text-base">
+            The Employee Management system provides complete workforce administration including profile management, certification tracking, compensation configuration, and role-based access control. Access it from the Employees section in your dashboard.
+          </p>
         </section>
-
-        <Separator />
 
         <section className="space-y-4">
           <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950">

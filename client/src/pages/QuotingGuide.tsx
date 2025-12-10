@@ -38,20 +38,11 @@ export default function QuotingGuide() {
       lastUpdated="December 5, 2025"
     >
       <div className="space-y-8">
-        {/* Overview */}
         <section className="space-y-4">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-2">
-              <FileText className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
-              Quoting System Overview
-            </h2>
-            <p className="text-muted-foreground">
-              The quoting system enables rope access companies to create detailed service quotes with automatic labor cost calculations. Quotes progress through a visual <strong>Kanban-style sales pipeline</strong> from Draft to Won/Lost, with drag-and-drop stage management. Access it from the Quotes section in your dashboard.
-            </p>
-          </div>
+          <p className="text-muted-foreground leading-relaxed text-base">
+            The quoting system enables rope access companies to create detailed service quotes with automatic labor cost calculations. Quotes progress through a visual <strong>Kanban-style sales pipeline</strong> from Draft to Won/Lost, with drag-and-drop stage management. Access it from the Quotes section in your dashboard.
+          </p>
         </section>
-
-        <Separator />
 
         {/* THE GOLDEN RULE */}
         <section className="space-y-4">
