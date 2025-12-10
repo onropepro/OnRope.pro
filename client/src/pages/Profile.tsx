@@ -1717,7 +1717,7 @@ export default function Profile() {
                         <div>
                           <h3 className="font-semibold text-lg mb-2">White Label Branding Subscription</h3>
                           <p className="text-sm text-muted-foreground mb-4">
-                            Customize the resident portal with your company's logo and brand colors for just <strong className="text-foreground">$0.49/month</strong>
+                            Customize the resident portal with your company's logo and brand colors for just <strong className="text-foreground">$49/month</strong>
                           </p>
                           <ul className="text-sm text-muted-foreground space-y-2 mb-6 text-left max-w-md mx-auto">
                             <li className="flex items-start gap-2">
