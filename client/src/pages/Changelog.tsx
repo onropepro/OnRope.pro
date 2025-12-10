@@ -1057,50 +1057,6 @@ export default function Changelog() {
         <Card className="mb-8">
           <CardHeader>
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-warning-100 dark:bg-warning-600/20 ring-1 ring-warning-600/20">
-                <History className="h-5 w-5 text-warning-600" />
-              </div>
-              <div>
-                <CardTitle className="text-xl">Recent Changes</CardTitle>
-                <CardDescription>
-                  Latest platform updates and improvements (December 2025)
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="space-y-4">
-              {recentChangesData.map((change, index) => (
-                <div 
-                  key={index}
-                  className="p-4 rounded-lg bg-muted/30"
-                >
-                  <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <span className="font-semibold text-base text-foreground">{change.title}</span>
-                    <Badge 
-                      variant="secondary" 
-                      className={`text-xs ${
-                        change.type === 'feature' 
-                          ? 'bg-success-100 text-success-600 dark:bg-success-600/20' 
-                          : change.type === 'improvement'
-                          ? 'bg-action-600/10 text-action-600 dark:bg-action-600/20 dark:text-action-400'
-                          : 'bg-warning-100 text-warning-600 dark:bg-warning-600/20'
-                      }`}
-                    >
-                      {change.type === 'feature' ? 'New Feature' : change.type === 'improvement' ? 'Improvement' : 'Fix'}
-                    </Badge>
-                  </div>
-                  <p className="text-base text-muted-foreground mt-2.5 mb-2.5">{change.description}</p>
-                  <p className="text-xs text-muted-foreground/70">{change.date}</p>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="mb-8">
-          <CardHeader>
-            <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-xl bg-neutral-400/10 dark:bg-neutral-500/20 ring-1 ring-neutral-400/20 dark:ring-neutral-500/20">
                 <Wrench className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />
               </div>
@@ -1228,7 +1184,7 @@ export default function Changelog() {
           </CardContent>
         </Card>
 
-        <h2 className="text-2xl md:text-3xl font-bold mb-6">Feature Changelog</h2>
+        <h2 className="text-2xl md:text-3xl font-bold mb-6">Module / Feature Changelog</h2>
 
         <div className="space-y-4">
           {changelogData.map((section, index) => {
@@ -1427,6 +1383,50 @@ export default function Changelog() {
             );
           })}
         </div>
+
+        <Card className="mb-8">
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-warning-100 dark:bg-warning-600/20 ring-1 ring-warning-600/20">
+                <History className="h-5 w-5 text-warning-600" />
+              </div>
+              <div>
+                <CardTitle className="text-xl">Recent Changes</CardTitle>
+                <CardDescription>
+                  Latest platform updates and improvements (December 2025)
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="space-y-4">
+              {recentChangesData.map((change, index) => (
+                <div 
+                  key={index}
+                  className="p-4 rounded-lg bg-muted/30"
+                >
+                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                    <span className="font-semibold text-base text-foreground">{change.title}</span>
+                    <Badge 
+                      variant="secondary" 
+                      className={`text-xs ${
+                        change.type === 'feature' 
+                          ? 'bg-success-100 text-success-600 dark:bg-success-600/20' 
+                          : change.type === 'improvement'
+                          ? 'bg-action-600/10 text-action-600 dark:bg-action-600/20 dark:text-action-400'
+                          : 'bg-warning-100 text-warning-600 dark:bg-warning-600/20'
+                      }`}
+                    >
+                      {change.type === 'feature' ? 'New Feature' : change.type === 'improvement' ? 'Improvement' : 'Fix'}
+                    </Badge>
+                  </div>
+                  <p className="text-base text-muted-foreground mt-2.5 mb-2.5">{change.description}</p>
+                  <p className="text-xs text-muted-foreground/70">{change.date}</p>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
         <Card className="mt-8 bg-gradient-to-br from-neutral-100 to-transparent dark:from-navy-900 dark:to-transparent">
           <CardContent className="pt-6">
