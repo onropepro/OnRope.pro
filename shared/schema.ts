@@ -294,6 +294,9 @@ export const buildingInstructions = pgTable("building_instructions", {
   tradeParkingInstructions: text("trade_parking_instructions"), // Where trades can park
   tradeParkingSpots: integer("trade_parking_spots"), // Number of trade parking spots available
   
+  // Washroom
+  tradeWashroomLocation: text("trade_washroom_location"), // Where trades can use washroom
+  
   // Tracking
   createdByUserId: varchar("created_by_user_id").references(() => users.id),
   createdByRole: varchar("created_by_role"), // building_manager | company | superuser

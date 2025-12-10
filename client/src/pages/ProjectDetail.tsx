@@ -152,6 +152,7 @@ export default function ProjectDetail() {
     councilMemberUnits: "",
     tradeParkingInstructions: "",
     tradeParkingSpots: "",
+    tradeWashroomLocation: "",
   });
 
   const endDayForm = useForm<EndDayFormData>({
@@ -286,6 +287,7 @@ export default function ProjectDetail() {
         councilMemberUnits: (buildingData.instructions as any).councilMemberUnits || "",
         tradeParkingInstructions: (buildingData.instructions as any).tradeParkingInstructions || "",
         tradeParkingSpots: (buildingData.instructions as any).tradeParkingSpots?.toString() || "",
+        tradeWashroomLocation: (buildingData.instructions as any).tradeWashroomLocation || "",
       });
     }
   }, [buildingData?.instructions]);
@@ -1569,6 +1571,20 @@ export default function ProjectDetail() {
                               {(buildingData.instructions as any).tradeParkingInstructions && (
                                 <p className="text-sm whitespace-pre-wrap">{(buildingData.instructions as any).tradeParkingInstructions}</p>
                               )}
+                            </div>
+                          </div>
+                        </>
+                      )}
+
+                      {/* Trade Washroom */}
+                      {(buildingData.instructions as any).tradeWashroomLocation && (
+                        <>
+                          <Separator />
+                          <div className="flex gap-3">
+                            <span className="material-icons text-sm text-muted-foreground shrink-0 mt-0.5">wc</span>
+                            <div>
+                              <p className="text-xs font-medium text-muted-foreground">{t('projectDetail.buildingInstructions.tradeWashroom', 'Trade Washroom')}</p>
+                              <p className="text-sm whitespace-pre-wrap">{(buildingData.instructions as any).tradeWashroomLocation}</p>
                             </div>
                           </div>
                         </>
@@ -4099,6 +4115,26 @@ export default function ProjectDetail() {
                   value={instructionsForm.tradeParkingInstructions}
                   onChange={(e) => setInstructionsForm(prev => ({ ...prev, tradeParkingInstructions: e.target.value }))}
                   data-testid="input-trade-parking"
+                />
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Trade Washroom */}
+            <div className="space-y-3">
+              <Label className="flex items-center gap-2">
+                <span className="material-icons text-sm">wc</span>
+                {t('projectDetail.buildingInstructions.tradeWashroom', 'Trade Washroom')}
+              </Label>
+              <div className="space-y-2">
+                <Label htmlFor="tradeWashroomLocation">{t('projectDetail.buildingInstructions.tradeWashroomLocation', 'Washroom Location')}</Label>
+                <Textarea
+                  id="tradeWashroomLocation"
+                  placeholder={t('projectDetail.buildingInstructions.tradeWashroomPlaceholder', 'e.g., Main floor lobby, P1 parkade near elevator, amenity room...')}
+                  value={instructionsForm.tradeWashroomLocation}
+                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, tradeWashroomLocation: e.target.value }))}
+                  data-testid="input-trade-washroom"
                 />
               </div>
             </div>

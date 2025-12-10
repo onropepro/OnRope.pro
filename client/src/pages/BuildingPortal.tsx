@@ -73,6 +73,7 @@ export default function BuildingPortal() {
     councilMemberUnits: "",
     tradeParkingInstructions: "",
     tradeParkingSpots: "",
+    tradeWashroomLocation: "",
   });
 
   const { 
@@ -119,6 +120,7 @@ export default function BuildingPortal() {
         councilMemberUnits: (buildingInstructions as any).councilMemberUnits || "",
         tradeParkingInstructions: (buildingInstructions as any).tradeParkingInstructions || "",
         tradeParkingSpots: (buildingInstructions as any).tradeParkingSpots?.toString() || "",
+        tradeWashroomLocation: (buildingInstructions as any).tradeWashroomLocation || "",
       });
     }
   }, [buildingInstructions]);
@@ -596,6 +598,17 @@ export default function BuildingPortal() {
                   </div>
                 )}
 
+                {/* Trade Washroom */}
+                {(buildingInstructions as any)?.tradeWashroomLocation && (
+                  <div className="space-y-3">
+                    <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">Trade Washroom</h4>
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                      <span className="material-icons text-primary mt-0.5 shrink-0" style={{ fontSize: '20px' }}>wc</span>
+                      <p className="text-sm whitespace-pre-wrap">{(buildingInstructions as any).tradeWashroomLocation}</p>
+                    </div>
+                  </div>
+                )}
+
                 {/* Special Requests */}
                 {buildingInstructions?.specialRequests && (
                   <div className="space-y-3">
@@ -889,6 +902,28 @@ export default function BuildingPortal() {
                   onChange={(e) => setInstructionsForm(prev => ({ ...prev, tradeParkingInstructions: e.target.value }))}
                   rows={3}
                   data-testid="textarea-trade-parking"
+                />
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Trade Washroom Section */}
+            <div className="space-y-4">
+              <h4 className="font-medium flex items-center gap-2">
+                <span className="material-icons text-base">wc</span>
+                Trade Washroom
+              </h4>
+              
+              <div className="space-y-2">
+                <Label htmlFor="tradeWashroomLocation">Washroom Location</Label>
+                <Textarea
+                  id="tradeWashroomLocation"
+                  placeholder="e.g., Main floor lobby, P1 parkade near elevator, amenity room on 2nd floor..."
+                  value={instructionsForm.tradeWashroomLocation}
+                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, tradeWashroomLocation: e.target.value }))}
+                  rows={2}
+                  data-testid="textarea-trade-washroom"
                 />
               </div>
             </div>
