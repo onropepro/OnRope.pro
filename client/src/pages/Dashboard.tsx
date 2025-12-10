@@ -338,6 +338,29 @@ function createTintFromHex(hex: string, lightness: number = 90): string {
   return `hsl(${Math.round(h * 360)}, ${Math.round(s * 100)}%, ${lightness}%)`;
 }
 
+// Helper function to get a visible icon color - darkens light colors for visibility
+function getVisibleIconColor(hex: string): string {
+  hex = hex.replace(/^#/, '');
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+  
+  // Calculate relative luminance (perceived brightness)
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  
+  // If the color is too light (luminance > 0.6), darken it significantly
+  if (luminance > 0.6) {
+    // Return a darkened version of the color
+    const darkenFactor = 0.4;
+    const newR = Math.round(r * darkenFactor);
+    const newG = Math.round(g * darkenFactor);
+    const newB = Math.round(b * darkenFactor);
+    return `rgb(${newR}, ${newG}, ${newB})`;
+  }
+  
+  return hex.startsWith('#') ? hex : `#${hex}`;
+}
+
 // Static Card Component - for filtered views without drag-and-drop
 function StaticCard({ card, colorIndex, brandColors }: { card: any; colorIndex: number; brandColors: string[] }) {
   const brandingActive = brandColors.length > 0;
@@ -350,7 +373,7 @@ function StaticCard({ card, colorIndex, brandColors }: { card: any; colorIndex: 
     const brandColor = brandColors[colorIndex % brandColors.length];
     activeColor = brandColor;
     cardBackground = createTintFromHex(brandColor, 90);
-    iconColor = brandColor;
+    iconColor = getVisibleIconColor(brandColor);
   }
 
   const style: React.CSSProperties = {
@@ -417,7 +440,7 @@ function SortableCard({ card, isRearranging, colorIndex, brandColors }: { card: 
     const brandColor = brandColors[colorIndex % brandColors.length];
     activeColor = brandColor;
     cardBackground = createTintFromHex(brandColor, 90);
-    iconColor = brandColor;
+    iconColor = getVisibleIconColor(brandColor);
   }
 
   const style: React.CSSProperties = {
