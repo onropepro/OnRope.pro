@@ -28,13 +28,14 @@ export const STRIPE_PRICE_IDS = {
   // Add-ons - Same price, different currency
   // All add-ons are RECURRING to work with subscription system
   // NOTE: extra_project removed - new pricing model has unlimited projects
+  // Updated: 2025-12-10 - New seat prices at $34.95/month
   addons: {
     usd: {
-      extra_seats: 'price_1SWDH4BzDsOltscrMxt5u3ij',     // $34.95/mo recurring - 1 seat (price to be updated in Stripe)
+      extra_seats: 'price_1SchmLBzDsOltscrBFnvcvjF',     // $34.95/mo recurring - 1 seat ✓
       white_label: 'price_1SWCTnBzDsOltscrD2qcZ47m',     // $49/mo recurring ✓
     },
     cad: {
-      extra_seats: 'price_1SZG7KBzDsOltscrAcGW9Vuw',     // $34.95 CAD/mo recurring - 1 seat (price to be updated in Stripe)
+      extra_seats: 'price_1SchmLBzDsOltscr8RBwsJwM',     // $34.95 CAD/mo recurring - 1 seat ✓
       white_label: 'price_1SZG7KBzDsOltscrs9vnr0v2',     // $49 CAD/mo recurring ✓
     },
   },
