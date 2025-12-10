@@ -49,7 +49,7 @@ const changelogSubItems: SubMenuItem[] = [
   { title: "User Access Guide", path: "/changelog/user-access" },
   { title: "Projects Guide", path: "/changelog/projects" },
   { title: "Time Tracking Guide", path: "/changelog/time-tracking" },
-  { title: "IRATA / SPRAT Logging Guide", path: "/changelog/irata-logging" },
+  { title: "IRATA / SPRAT Task Logging Guide", path: "/changelog/irata-logging" },
   { title: "Documents Guide", path: "/changelog/documents" },
   { title: "Employees Guide", path: "/changelog/employees" },
   { title: "Scheduling Guide", path: "/changelog/scheduling" },

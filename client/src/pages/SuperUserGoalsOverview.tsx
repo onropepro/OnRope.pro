@@ -437,7 +437,7 @@ export default function SuperUserGoalsOverview() {
             <TabsContent value="summary" className="space-y-6">
               <div className="su-card" data-testid="card-summary-dashboard">
                 <div className="su-card-header">
-                  <h3 className="text-xl md:text-2xl font-semibold text-foreground">At-a-Glance View</h3>
+                  <h3 className="font-semibold text-foreground">At-a-Glance View</h3>
                   <p className="text-sm text-muted-foreground">All key metrics in one place</p>
                 </div>
                 <div className="su-card-body">
@@ -497,7 +497,7 @@ export default function SuperUserGoalsOverview() {
                   <div className="su-card-header">
                     <div className="flex items-center gap-2">
                       <Bell className="h-5 w-5 text-amber-500" />
-                      <h3 className="text-xl md:text-2xl font-semibold text-foreground">Trigger Escalations</h3>
+                      <h3 className="font-semibold text-foreground">Trigger Escalations</h3>
                     </div>
                   </div>
                   <div className="su-card-body">
@@ -519,7 +519,7 @@ export default function SuperUserGoalsOverview() {
                   <div className="su-card-header">
                     <div className="flex items-center gap-2">
                       <Calendar className="h-5 w-5 text-blue-500" />
-                      <h3 className="text-xl md:text-2xl font-semibold text-foreground">Review Cadence</h3>
+                      <h3 className="font-semibold text-foreground">Review Cadence</h3>
                     </div>
                   </div>
                   <div className="su-card-body">
@@ -553,7 +553,7 @@ export default function SuperUserGoalsOverview() {
                             <div className={`p-2 rounded-lg ${statusConfig.bg}`}>
                               <Icon className={`h-5 w-5 ${statusConfig.color}`} />
                             </div>
-                            <h3 className="text-xl md:text-2xl font-semibold text-foreground">{metric.name}</h3>
+                            <h3 className="font-semibold text-foreground">{metric.name}</h3>
                           </div>
                           <Badge className={statusConfig.badge}>
                             <StatusIcon className="h-3 w-3 mr-1" />
@@ -620,7 +620,7 @@ export default function SuperUserGoalsOverview() {
                             <div className={`p-2 rounded-lg ${statusConfig.bg}`}>
                               <Icon className={`h-5 w-5 ${statusConfig.color}`} />
                             </div>
-                            <h3 className="text-xl md:text-2xl font-semibold text-foreground text-sm">{metric.name}</h3>
+                            <h3 className="font-semibold text-foreground text-sm">{metric.name}</h3>
                           </div>
                           <StatusIcon className={`h-5 w-5 ${statusConfig.color}`} />
                         </div>
@@ -648,7 +648,7 @@ export default function SuperUserGoalsOverview() {
 
               <div className="su-card" data-testid="card-pricing-model">
                 <div className="su-card-header">
-                  <h3 className="text-xl md:text-2xl font-semibold text-foreground">Pricing Model</h3>
+                  <h3 className="font-semibold text-foreground">Pricing Model</h3>
                   <p className="text-sm text-muted-foreground">Current subscription structure</p>
                 </div>
                 <div className="su-card-body">
@@ -674,7 +674,7 @@ export default function SuperUserGoalsOverview() {
                   <div className="su-card-header">
                     <div className="flex items-center gap-2">
                       <Building2 className="h-5 w-5 text-amber-500" />
-                      <h3 className="text-xl md:text-2xl font-semibold text-foreground">Buildings by Location</h3>
+                      <h3 className="font-semibold text-foreground">Buildings by Location</h3>
                     </div>
                   </div>
                   <div className="su-card-body">
@@ -712,7 +712,7 @@ export default function SuperUserGoalsOverview() {
                   <div className="su-card-header">
                     <div className="flex items-center gap-2">
                       <Users className="h-5 w-5 text-blue-500" />
-                      <h3 className="text-xl md:text-2xl font-semibold text-foreground">Tech Accounts by Location</h3>
+                      <h3 className="font-semibold text-foreground">Tech Accounts by Location</h3>
                     </div>
                   </div>
                   <div className="su-card-body">
@@ -747,7 +747,7 @@ export default function SuperUserGoalsOverview() {
                   <div className="su-card-header">
                     <div className="flex items-center gap-2">
                       <Target className="h-5 w-5 text-purple-500" />
-                      <h3 className="text-xl md:text-2xl font-semibold text-foreground">Employer Accounts by Location</h3>
+                      <h3 className="font-semibold text-foreground">Employer Accounts by Location</h3>
                     </div>
                   </div>
                   <div className="su-card-body">
@@ -782,7 +782,7 @@ export default function SuperUserGoalsOverview() {
                   <div className="su-card-header">
                     <div className="flex items-center gap-2">
                       <Building2 className="h-5 w-5 text-teal-500" />
-                      <h3 className="text-xl md:text-2xl font-semibold text-foreground">Property Manager Accounts</h3>
+                      <h3 className="font-semibold text-foreground">Property Manager Accounts</h3>
                     </div>
                   </div>
                   <div className="su-card-body">
@@ -813,7 +813,7 @@ export default function SuperUserGoalsOverview() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="su-card" data-testid="card-cac">
                   <div className="su-card-header">
-                    <h3 className="text-xl md:text-2xl font-semibold text-foreground">Customer Acquisition Cost</h3>
+                    <h3 className="font-semibold text-foreground">Customer Acquisition Cost</h3>
                   </div>
                   <div className="su-card-body space-y-3">
                     <div className="text-3xl font-bold text-foreground">
@@ -830,7 +830,7 @@ export default function SuperUserGoalsOverview() {
 
                 <div className="su-card" data-testid="card-ltv">
                   <div className="su-card-header">
-                    <h3 className="text-xl md:text-2xl font-semibold text-foreground">Lifetime Value (LTV)</h3>
+                    <h3 className="font-semibold text-foreground">Lifetime Value (LTV)</h3>
                   </div>
                   <div className="su-card-body space-y-3">
                     <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
@@ -846,7 +846,7 @@ export default function SuperUserGoalsOverview() {
 
                 <div className="su-card" data-testid="card-ltv-cac">
                   <div className="su-card-header">
-                    <h3 className="text-xl md:text-2xl font-semibold text-foreground">LTV:CAC Ratio</h3>
+                    <h3 className="font-semibold text-foreground">LTV:CAC Ratio</h3>
                   </div>
                   <div className="su-card-body space-y-3">
                     <div className="text-3xl font-bold text-foreground">
@@ -860,7 +860,7 @@ export default function SuperUserGoalsOverview() {
 
                 <div className="su-card" data-testid="card-payback">
                   <div className="su-card-header">
-                    <h3 className="text-xl md:text-2xl font-semibold text-foreground">CAC Payback</h3>
+                    <h3 className="font-semibold text-foreground">CAC Payback</h3>
                   </div>
                   <div className="su-card-body space-y-3">
                     <div className="text-3xl font-bold text-foreground">
@@ -883,7 +883,7 @@ export default function SuperUserGoalsOverview() {
                   <div className="su-card-header">
                     <div className="flex items-center gap-2">
                       <Target className="h-5 w-5 text-blue-500" />
-                      <h3 className="text-xl md:text-2xl font-semibold text-foreground">Employer Engagement</h3>
+                      <h3 className="font-semibold text-foreground">Employer Engagement</h3>
                     </div>
                     <p className="text-sm text-muted-foreground">Last 30 days</p>
                   </div>
@@ -912,7 +912,7 @@ export default function SuperUserGoalsOverview() {
                   <div className="su-card-header">
                     <div className="flex items-center gap-2">
                       <Users className="h-5 w-5 text-purple-500" />
-                      <h3 className="text-xl md:text-2xl font-semibold text-foreground">Tech Engagement</h3>
+                      <h3 className="font-semibold text-foreground">Tech Engagement</h3>
                     </div>
                     <p className="text-sm text-muted-foreground">Last 30 days</p>
                   </div>
@@ -940,7 +940,7 @@ export default function SuperUserGoalsOverview() {
                   <div className="su-card-header">
                     <div className="flex items-center gap-2">
                       <Building2 className="h-5 w-5 text-teal-500" />
-                      <h3 className="text-xl md:text-2xl font-semibold text-foreground">PM Engagement</h3>
+                      <h3 className="font-semibold text-foreground">PM Engagement</h3>
                     </div>
                     <p className="text-sm text-muted-foreground">Last 30 days</p>
                   </div>
@@ -968,7 +968,7 @@ export default function SuperUserGoalsOverview() {
                 <div className="su-card-header">
                   <div className="flex items-center gap-2">
                     <Gauge className="h-5 w-5 text-amber-500" />
-                    <h3 className="text-xl md:text-2xl font-semibold text-foreground">Engagement Health Score</h3>
+                    <h3 className="font-semibold text-foreground">Engagement Health Score</h3>
                   </div>
                 </div>
                 <div className="su-card-body">
@@ -1001,7 +1001,7 @@ export default function SuperUserGoalsOverview() {
             <TabsContent value="goals" className="space-y-6">
               <div className="su-card" data-testid="card-smart-goals">
                 <div className="su-card-header">
-                  <h3 className="text-xl md:text-2xl font-semibold text-foreground">Year 1 SMART Goals</h3>
+                  <h3 className="font-semibold text-foreground">Year 1 SMART Goals</h3>
                   <p className="text-sm text-muted-foreground">Launch → Dec 31, 2026</p>
                 </div>
                 <div className="su-card-body">
