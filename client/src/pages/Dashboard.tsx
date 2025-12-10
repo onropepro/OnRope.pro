@@ -1538,8 +1538,27 @@ export default function Dashboard() {
           }
           
           // Set the client selection from the quote if available
-          if (quoteData.clientId) {
-            setSelectedClientForProject(quoteData.clientId);
+          if (quoteData.clientId && clientsData) {
+            const client = clientsData.find(c => c.id === quoteData.clientId);
+            if (client && client.lmsNumbers && client.lmsNumbers.length > 0) {
+              // Find the matching strata by strata plan number from quote
+              const strataIndex = client.lmsNumbers.findIndex(
+                (s: any) => s.number === quoteData.strataPlanNumber
+              );
+              if (strataIndex >= 0) {
+                // Set both client and strata for proper dropdown display
+                setSelectedClientForProject(quoteData.clientId);
+                setSelectedStrataForProject(`${quoteData.clientId}|${strataIndex}`);
+              } else {
+                // Client found but no matching strata - just set client
+                setSelectedClientForProject(quoteData.clientId);
+                // Use first strata as fallback
+                setSelectedStrataForProject(`${quoteData.clientId}|0`);
+              }
+            } else {
+              // Client found but no strata - just set client ID
+              setSelectedClientForProject(quoteData.clientId);
+            }
           }
           
           // Open the project creation dialog
@@ -1559,7 +1578,7 @@ export default function Dashboard() {
         }
       }
     }
-  }, [projectForm, defaultCalendarColor, toast, t]);
+  }, [projectForm, defaultCalendarColor, toast, t, clientsData]);
 
   const createProjectMutation = useMutation({
     mutationFn: async (data: ProjectFormData & { ropeAccessPlanUrl?: string | null; anchorInspectionCertificateUrl?: string | null }) => {
