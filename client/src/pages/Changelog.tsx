@@ -1,10 +1,8 @@
-import { useLocation, Link } from "wouter";
+import { Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { BackButton } from "@/components/BackButton";
-import { MainMenuButton } from "@/components/MainMenuButton";
-import ChangelogLayout from "@/components/ChangelogLayout";
+import ChangelogGuideLayout from "@/components/ChangelogGuideLayout";
 import { 
   Shield, 
   Users, 
@@ -980,26 +978,19 @@ function getStatusBadge(status: "complete" | "in-progress" | "planned") {
 }
 
 export default function Changelog() {
-  const [, navigate] = useLocation();
-  
   const completedCount = changelogData.filter(s => s.status === "complete").length;
   const totalFeatures = changelogData.reduce((acc, section) => acc + section.features.length, 0);
 
   return (
-    <ChangelogLayout title="Changelog">
-      <div className="min-h-screen bg-background p-4 pb-24">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-8">
-            <div className="flex items-center gap-3 mb-4">
-              <BackButton size="icon" />
-              <MainMenuButton size="icon" />
-            <div className="flex-1">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold">Platform Changelog</h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                Development progress and feature overview
-              </p>
-            </div>
-          </div>
+    <ChangelogGuideLayout 
+      title="Platform Changelog"
+      version="1.0"
+      lastUpdated="December 10, 2025"
+    >
+      <div className="space-y-8">
+        <div className="text-lg text-muted-foreground">
+          <p>Development progress and feature overview</p>
+        </div>
           
           <Card className="bg-gradient-to-br from-neutral-100 via-neutral-50 to-transparent dark:from-navy-900 dark:via-navy-950 dark:to-transparent">
             <CardContent className="pt-6">
@@ -1398,8 +1389,6 @@ export default function Changelog() {
             </div>
           </CardContent>
         </Card>
-        </div>
-      </div>
-    </ChangelogLayout>
+    </ChangelogGuideLayout>
   );
 }
