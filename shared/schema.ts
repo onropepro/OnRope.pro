@@ -291,7 +291,8 @@ export const buildingInstructions = pgTable("building_instructions", {
   councilMemberUnits: text("council_member_units"), // Floor/unit numbers of council members
   
   // Parking
-  staffParkingInstructions: text("staff_parking_instructions"), // Where staff can park
+  tradeParkingInstructions: text("trade_parking_instructions"), // Where trades can park
+  tradeParkingSpots: integer("trade_parking_spots"), // Number of trade parking spots available
   
   // Tracking
   createdByUserId: varchar("created_by_user_id").references(() => users.id),

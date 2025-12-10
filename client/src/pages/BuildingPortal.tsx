@@ -71,7 +71,8 @@ export default function BuildingPortal() {
     maintenanceName: "",
     maintenancePhone: "",
     councilMemberUnits: "",
-    staffParkingInstructions: "",
+    tradeParkingInstructions: "",
+    tradeParkingSpots: "",
   });
 
   const { 
@@ -116,7 +117,8 @@ export default function BuildingPortal() {
         maintenanceName: buildingInstructions.maintenanceName || "",
         maintenancePhone: buildingInstructions.maintenancePhone || "",
         councilMemberUnits: (buildingInstructions as any).councilMemberUnits || "",
-        staffParkingInstructions: (buildingInstructions as any).staffParkingInstructions || "",
+        tradeParkingInstructions: (buildingInstructions as any).tradeParkingInstructions || "",
+        tradeParkingSpots: (buildingInstructions as any).tradeParkingSpots?.toString() || "",
       });
     }
   }, [buildingInstructions]);
@@ -576,13 +578,20 @@ export default function BuildingPortal() {
                   </div>
                 )}
 
-                {/* Staff Parking */}
-                {(buildingInstructions as any)?.staffParkingInstructions && (
+                {/* Trade Parking */}
+                {((buildingInstructions as any)?.tradeParkingInstructions || (buildingInstructions as any)?.tradeParkingSpots) && (
                   <div className="space-y-3">
-                    <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">Staff Parking</h4>
+                    <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">Trade Parking</h4>
                     <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
                       <span className="material-icons text-primary mt-0.5 shrink-0" style={{ fontSize: '20px' }}>local_parking</span>
-                      <p className="text-sm whitespace-pre-wrap">{(buildingInstructions as any).staffParkingInstructions}</p>
+                      <div>
+                        {(buildingInstructions as any).tradeParkingSpots && (
+                          <p className="text-sm font-medium">{(buildingInstructions as any).tradeParkingSpots} spot(s) available</p>
+                        )}
+                        {(buildingInstructions as any).tradeParkingInstructions && (
+                          <p className="text-sm whitespace-pre-wrap">{(buildingInstructions as any).tradeParkingInstructions}</p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 )}
@@ -851,22 +860,35 @@ export default function BuildingPortal() {
 
             <Separator />
 
-            {/* Staff Parking Section */}
+            {/* Trade Parking Section */}
             <div className="space-y-4">
               <h4 className="font-medium flex items-center gap-2">
                 <span className="material-icons text-base">local_parking</span>
-                Staff Parking
+                Trade Parking
               </h4>
               
               <div className="space-y-2">
-                <Label htmlFor="staffParkingInstructions">Staff Parking Instructions</Label>
+                <Label htmlFor="tradeParkingSpots">Number of Trade Parking Spots</Label>
+                <Input
+                  id="tradeParkingSpots"
+                  type="number"
+                  min="0"
+                  placeholder="e.g., 2"
+                  value={instructionsForm.tradeParkingSpots}
+                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, tradeParkingSpots: e.target.value }))}
+                  data-testid="input-trade-parking-spots"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="tradeParkingInstructions">Trade Parking Instructions</Label>
                 <Textarea
-                  id="staffParkingInstructions"
+                  id="tradeParkingInstructions"
                   placeholder="e.g., Visitor parking on P1, loading zone available, street parking with permit..."
-                  value={instructionsForm.staffParkingInstructions}
-                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, staffParkingInstructions: e.target.value }))}
+                  value={instructionsForm.tradeParkingInstructions}
+                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, tradeParkingInstructions: e.target.value }))}
                   rows={3}
-                  data-testid="textarea-staff-parking"
+                  data-testid="textarea-trade-parking"
                 />
               </div>
             </div>

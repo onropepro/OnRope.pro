@@ -150,7 +150,8 @@ export default function ProjectDetail() {
     maintenanceName: "",
     maintenancePhone: "",
     councilMemberUnits: "",
-    staffParkingInstructions: "",
+    tradeParkingInstructions: "",
+    tradeParkingSpots: "",
   });
 
   const endDayForm = useForm<EndDayFormData>({
@@ -283,7 +284,8 @@ export default function ProjectDetail() {
         maintenanceName: buildingData.instructions.maintenanceName || "",
         maintenancePhone: buildingData.instructions.maintenancePhone || "",
         councilMemberUnits: (buildingData.instructions as any).councilMemberUnits || "",
-        staffParkingInstructions: (buildingData.instructions as any).staffParkingInstructions || "",
+        tradeParkingInstructions: (buildingData.instructions as any).tradeParkingInstructions || "",
+        tradeParkingSpots: (buildingData.instructions as any).tradeParkingSpots?.toString() || "",
       });
     }
   }, [buildingData?.instructions]);
@@ -1553,15 +1555,20 @@ export default function ProjectDetail() {
                         </>
                       )}
 
-                      {/* Staff Parking */}
-                      {(buildingData.instructions as any).staffParkingInstructions && (
+                      {/* Trade Parking */}
+                      {((buildingData.instructions as any).tradeParkingInstructions || (buildingData.instructions as any).tradeParkingSpots) && (
                         <>
                           <Separator />
                           <div className="flex gap-3">
                             <span className="material-icons text-sm text-muted-foreground shrink-0 mt-0.5">local_parking</span>
                             <div>
-                              <p className="text-xs font-medium text-muted-foreground">{t('projectDetail.buildingInstructions.staffParking', 'Staff Parking Instructions')}</p>
-                              <p className="text-sm whitespace-pre-wrap">{(buildingData.instructions as any).staffParkingInstructions}</p>
+                              <p className="text-xs font-medium text-muted-foreground">{t('projectDetail.buildingInstructions.tradeParking', 'Trade Parking')}</p>
+                              {(buildingData.instructions as any).tradeParkingSpots && (
+                                <p className="text-sm font-medium">{(buildingData.instructions as any).tradeParkingSpots} {t('projectDetail.buildingInstructions.spotsAvailable', 'spot(s) available')}</p>
+                              )}
+                              {(buildingData.instructions as any).tradeParkingInstructions && (
+                                <p className="text-sm whitespace-pre-wrap">{(buildingData.instructions as any).tradeParkingInstructions}</p>
+                              )}
                             </div>
                           </div>
                         </>
@@ -4066,19 +4073,34 @@ export default function ProjectDetail() {
 
             <Separator />
 
-            {/* Staff Parking */}
-            <div className="space-y-2">
-              <Label htmlFor="staffParkingInstructions" className="flex items-center gap-2">
+            {/* Trade Parking */}
+            <div className="space-y-3">
+              <Label className="flex items-center gap-2">
                 <span className="material-icons text-sm">local_parking</span>
-                {t('projectDetail.buildingInstructions.staffParking', 'Staff Parking Instructions')}
+                {t('projectDetail.buildingInstructions.tradeParking', 'Trade Parking')}
               </Label>
-              <Textarea
-                id="staffParkingInstructions"
-                placeholder={t('projectDetail.buildingInstructions.staffParkingPlaceholder', 'Where staff can park (e.g., visitor parking, loading zone, street parking with permit)...')}
-                value={instructionsForm.staffParkingInstructions}
-                onChange={(e) => setInstructionsForm(prev => ({ ...prev, staffParkingInstructions: e.target.value }))}
-                data-testid="input-staff-parking"
-              />
+              <div className="space-y-2">
+                <Label htmlFor="tradeParkingSpots">{t('projectDetail.buildingInstructions.tradeParkingSpots', 'Number of Trade Parking Spots')}</Label>
+                <Input
+                  id="tradeParkingSpots"
+                  type="number"
+                  min="0"
+                  placeholder={t('projectDetail.buildingInstructions.tradeParkingSpotsPlaceholder', 'e.g., 2')}
+                  value={instructionsForm.tradeParkingSpots}
+                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, tradeParkingSpots: e.target.value }))}
+                  data-testid="input-trade-parking-spots"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="tradeParkingInstructions">{t('projectDetail.buildingInstructions.tradeParkingInstructions', 'Trade Parking Instructions')}</Label>
+                <Textarea
+                  id="tradeParkingInstructions"
+                  placeholder={t('projectDetail.buildingInstructions.tradeParkingPlaceholder', 'Where trades can park (e.g., visitor parking, loading zone, street parking with permit)...')}
+                  value={instructionsForm.tradeParkingInstructions}
+                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, tradeParkingInstructions: e.target.value }))}
+                  data-testid="input-trade-parking"
+                />
+              </div>
             </div>
 
             <Separator />
