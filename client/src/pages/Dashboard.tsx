@@ -338,7 +338,7 @@ function createTintFromHex(hex: string, lightness: number = 90): string {
   return `hsl(${Math.round(h * 360)}, ${Math.round(s * 100)}%, ${lightness}%)`;
 }
 
-// Helper function to get a visible icon color - darkens light colors for visibility
+// Helper function to get a visible icon color - increases saturation for light colors
 function getVisibleIconColor(hex: string): string {
   hex = hex.replace(/^#/, '');
   const r = parseInt(hex.substring(0, 2), 16);
@@ -348,10 +348,11 @@ function getVisibleIconColor(hex: string): string {
   // Calculate relative luminance (perceived brightness)
   const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
   
-  // If the color is too light (luminance > 0.6), darken it significantly
-  if (luminance > 0.6) {
-    // Return a darkened version of the color
-    const darkenFactor = 0.4;
+  // If the color is too light (luminance > 0.65), shift to a more saturated/darker version
+  if (luminance > 0.65) {
+    // Use a gentler darkening - target 60% of original brightness, not 40%
+    // This keeps the color recognizable while making it visible
+    const darkenFactor = 0.6;
     const newR = Math.round(r * darkenFactor);
     const newG = Math.round(g * darkenFactor);
     const newB = Math.round(b * darkenFactor);
