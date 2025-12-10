@@ -738,6 +738,7 @@
       "employeeUpdated": "Employé mis à jour avec succès",
       "employeeDeleted": "Employé supprimé avec succès",
       "employeeReactivated": "Employé réactivé avec succès",
+      "employeeReactivatedDesc": "L'employé a maintenant accès à son compte.",
       "passwordChanged": "Mot de passe changé avec succès",
       "clientCreated": "Client créé avec succès",
       "clientUpdated": "Client mis à jour avec succès",
@@ -805,6 +806,9 @@
     "employees": {
       "activeEmployees": "Employés actifs",
       "terminatedEmployees": "Employés licenciés",
+      "suspendedEmployees": "Employés suspendus",
+      "suspendedDesc": "Ces employés ont eu leur siège retiré. Achetez un nouveau siège pour les réactiver.",
+      "suspendedOn": "Suspendu :",
       "noActiveEmployees": "Aucun employé actif pour le moment",
       "pendingOnboarding": "Intégration en attente",
       "pendingOnboardingDesc": "Ces techniciens ont accepté votre invitation mais ont besoin que leur salaire et autorisations soient configurés.",
@@ -822,6 +826,7 @@
       "terminated": "Licencié :",
       "terminationReason": "Motif de licenciement :",
       "reactivate": "Réactiver",
+      "reactivating": "Réactivation en cours...",
       "createEmployee": "Créer l'employé",
       "creating": "Création en cours...",
       "driversLicense": "Permis de conduire"

@@ -738,6 +738,7 @@
       "employeeUpdated": "Employee updated successfully",
       "employeeDeleted": "Employee deleted successfully",
       "employeeReactivated": "Employee reactivated successfully",
+      "employeeReactivatedDesc": "The employee now has access to their account.",
       "passwordChanged": "Password changed successfully",
       "clientCreated": "Client created successfully",
       "clientUpdated": "Client updated successfully",
@@ -805,6 +806,9 @@
     "employees": {
       "activeEmployees": "Active Employees",
       "terminatedEmployees": "Terminated Employees",
+      "suspendedEmployees": "Suspended Employees",
+      "suspendedDesc": "These employees had their seats removed. Purchase a new seat to reactivate them.",
+      "suspendedOn": "Suspended:",
       "noActiveEmployees": "No active employees yet",
       "pendingOnboarding": "Pending Onboarding",
       "pendingOnboardingDesc": "These technicians have accepted your invitation but need salary and permissions set up.",
@@ -822,6 +826,7 @@
       "terminated": "Terminated:",
       "terminationReason": "Termination Reason:",
       "reactivate": "Reactivate",
+      "reactivating": "Reactivating...",
       "createEmployee": "Create Employee",
       "creating": "Creating...",
       "driversLicense": "Driver's License"
