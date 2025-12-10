@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema } from "@shared/schema";
 import { eq, sql, and, or, isNull, gt, desc, asc, inArray } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -8976,8 +8976,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                             (project.totalDropsWest ?? 0);
           
           // Calculate total hours worked from work sessions (for hours-based tracking)
-          const workSessions = await storage.getWorkSessionsByProject(project.id);
-          const completedSessions = workSessions.filter(s => s.endTime);
+          const projectWorkSessions = await storage.getWorkSessionsByProject(project.id);
+          const completedSessions = projectWorkSessions.filter(s => s.endTime);
           const totalHoursWorked = completedSessions.reduce((sum, session) => {
             if (session.startTime && session.endTime) {
               const hours = (new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / (1000 * 60 * 60);
@@ -8996,12 +8996,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
             ? Math.min(100, cumulativeCompletionPercentage) 
             : null;
           
+          // Get assigned technicians from scheduled jobs and active workers
+          const technicianMap = new Map<string, { id: string; name: string; photoUrl?: string | null; isActive: boolean }>();
+          
+          // 1. Get active workers (currently clocked in - endTime is null)
+          const activeSessions = projectWorkSessions.filter(s => !s.endTime);
+          for (const session of activeSessions) {
+            if (!technicianMap.has(session.employeeId)) {
+              const emp = await storage.getUserById(session.employeeId);
+              if (emp) {
+                technicianMap.set(session.employeeId, {
+                  id: emp.id,
+                  name: emp.fullName || emp.email,
+                  photoUrl: emp.photoUrl,
+                  isActive: true,
+                });
+              }
+            }
+          }
+          
+          // 2. Get scheduled technicians from jobAssignments linked to this project
+          const projectScheduledJobs = await db.select().from(scheduledJobs)
+            .where(eq(scheduledJobs.projectId, project.id));
+          
+          for (const job of projectScheduledJobs) {
+            const assignments = await db.select().from(jobAssignments)
+              .where(eq(jobAssignments.jobId, job.id));
+            
+            for (const assignment of assignments) {
+              if (!technicianMap.has(assignment.employeeId)) {
+                const emp = await storage.getUserById(assignment.employeeId);
+                if (emp) {
+                  technicianMap.set(assignment.employeeId, {
+                    id: emp.id,
+                    name: emp.fullName || emp.email,
+                    photoUrl: emp.photoUrl,
+                    isActive: false,
+                  });
+                }
+              }
+            }
+          }
+          
+          // Convert map to array - active workers first
+          const techArray = Array.from(technicianMap.values());
+          techArray.sort((a, b) => {
+            if (a.isActive && !b.isActive) return -1;
+            if (!a.isActive && b.isActive) return 1;
+            return a.name.localeCompare(b.name);
+          });
+          
           return {
             ...project,
             completedDrops: total,
             totalDrops,
             totalHoursWorked,
             latestCompletionPercentage,
+            assignedTechnicians: techArray,
           };
         })
       );

@@ -11,6 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useForm, useWatch } from "react-hook-form";
@@ -35,7 +37,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import type { Project, Client, InsertClient } from "@shared/schema";
 import { normalizeStrataPlan } from "@shared/schema";
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip as RechartsTooltip } from "recharts";
 import { isManagement, hasFinancialAccess, canManageEmployees, canViewPerformance, hasPermission, isReadOnly, canViewSchedule } from "@/lib/permissions";
 import { DocumentUploader } from "@/components/DocumentUploader";
 import { RefreshButton } from "@/components/RefreshButton";
@@ -4475,6 +4477,58 @@ export default function Dashboard() {
                                 <span className="text-muted-foreground">{completed} / {total} {unitLabel}</span>
                                 <span className="material-icons text-primary group-hover:translate-x-1 transition-transform">arrow_forward</span>
                               </div>
+                              
+                              {/* Assigned Technicians */}
+                              {project.assignedTechnicians && project.assignedTechnicians.length > 0 && (
+                                <div className="flex items-center gap-2 pt-2 border-t">
+                                  <span className="material-icons text-sm text-muted-foreground">people</span>
+                                  <div className="flex items-center -space-x-2">
+                                    {project.assignedTechnicians.slice(0, 5).map((tech: any, idx: number) => (
+                                      <Tooltip key={tech.id}>
+                                        <TooltipTrigger asChild>
+                                          <Avatar 
+                                            className={`w-7 h-7 border-2 border-background ${tech.isActive ? 'ring-2 ring-green-500 ring-offset-1' : ''}`}
+                                            data-testid={`avatar-technician-${tech.id}`}
+                                          >
+                                            {tech.photoUrl ? (
+                                              <AvatarImage src={tech.photoUrl} alt={tech.name} />
+                                            ) : null}
+                                            <AvatarFallback className="text-xs bg-muted">
+                                              {tech.name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() || '?'}
+                                            </AvatarFallback>
+                                          </Avatar>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          <div className="flex items-center gap-1">
+                                            {tech.name}
+                                            {tech.isActive && (
+                                              <span className="text-green-500 text-xs">(Active)</span>
+                                            )}
+                                          </div>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    ))}
+                                    {project.assignedTechnicians.length > 5 && (
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-xs font-medium border-2 border-background">
+                                            +{project.assignedTechnicians.length - 5}
+                                          </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          {project.assignedTechnicians.slice(5).map((tech: any) => tech.name).join(', ')}
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    )}
+                                  </div>
+                                  {project.assignedTechnicians.some((t: any) => t.isActive) && (
+                                    <Badge variant="outline" className="ml-auto text-xs bg-green-500/10 text-green-600 border-green-500/30">
+                                      <span className="w-1.5 h-1.5 rounded-full bg-green-500 mr-1 animate-pulse"></span>
+                                      {t('dashboard.projects.activeNow', 'Active')}
+                                    </Badge>
+                                  )}
+                                </div>
+                              )}
                             </div>
                           </CardContent>
                         </Card>
@@ -4605,7 +4659,7 @@ export default function Dashboard() {
                                 <Cell key={`cell-${index}`} fill={entry.color} />
                               ))}
                             </Pie>
-                            <Tooltip />
+                            <RechartsTooltip />
                             <Legend />
                           </PieChart>
                         </ResponsiveContainer>
@@ -4673,7 +4727,7 @@ export default function Dashboard() {
                                           <Cell key={`cell-${index}`} fill={entry.color} />
                                         ))}
                                       </Pie>
-                                      <Tooltip />
+                                      <RechartsTooltip />
                                     </PieChart>
                                   </ResponsiveContainer>
                                   <div className="grid grid-cols-2 gap-2 mt-2 w-full text-center">
