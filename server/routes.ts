@@ -4070,12 +4070,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
       );
 
+      // Get building instructions
+      const instructions = await storage.getBuildingInstructions(building.id);
+
       const { passwordHash, ...buildingData } = building;
       
       res.json({ 
         building: buildingData,
         projects: buildingProjects,
         companies: companies.filter(Boolean),
+        instructions: instructions || null,
       });
     } catch (error) {
       console.error('[SuperUser] Get building error:', error);

@@ -11,7 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate } from "@/lib/dateUtils";
-import { Loader2, Building2, ArrowLeft, Search, History, CheckCircle, RefreshCw, Key, Layers, MapPin, Compass, Map, List, Globe } from "lucide-react";
+import { Loader2, Building2, ArrowLeft, Search, History, CheckCircle, RefreshCw, Key, Layers, MapPin, Compass, Map, List, Globe, DoorOpen, KeyRound, Phone, User, Wrench, Car, FileText } from "lucide-react";
 import SuperUserLayout from "@/components/SuperUserLayout";
 import { BackButton } from "@/components/BackButton";
 import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from "react-leaflet";
@@ -186,10 +186,32 @@ interface CompanyData {
   name: string;
 }
 
+interface BuildingInstructionsData {
+  id: string;
+  buildingId: string;
+  buildingAccess: string | null;
+  keysAndFob: string | null;
+  roofAccess: string | null;
+  buildingManagerName: string | null;
+  buildingManagerPhone: string | null;
+  conciergeNames: string | null;
+  conciergePhone: string | null;
+  conciergeHours: string | null;
+  maintenanceName: string | null;
+  maintenancePhone: string | null;
+  tradeParkingSpots: number | null;
+  tradeParkingInstructions: string | null;
+  keysReturnPolicy: string | null;
+  signageRequirements: string | null;
+  specialRequests: string | null;
+  updatedAt: string;
+}
+
 interface BuildingDetailsData {
   building: BuildingData;
   projects: ProjectData[];
   companies: CompanyData[];
+  instructions: BuildingInstructionsData | null;
 }
 
 export default function SuperUserBuildings() {
@@ -547,6 +569,189 @@ export default function SuperUserBuildings() {
                   </CardContent>
                 </Card>
               )}
+
+              {/* Building Instructions */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Building Instructions
+                  </CardTitle>
+                  <CardDescription>
+                    Access information and special requirements for contractors
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {!buildingDetailsData?.instructions ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <p>No building instructions have been added yet.</p>
+                      <p className="text-sm mt-2">Building managers can add instructions via the Building Portal.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-6">
+                      {/* Access Information */}
+                      {(buildingDetailsData.instructions.buildingAccess || 
+                        buildingDetailsData.instructions.keysAndFob || 
+                        buildingDetailsData.instructions.roofAccess ||
+                        buildingDetailsData.instructions.keysReturnPolicy) && (
+                        <div className="space-y-4">
+                          <h4 className="font-medium flex items-center gap-2">
+                            <DoorOpen className="h-4 w-4" />
+                            Access Information
+                          </h4>
+                          <div className="grid gap-3 pl-6">
+                            {buildingDetailsData.instructions.buildingAccess && (
+                              <div>
+                                <p className="text-sm text-muted-foreground">Building Access</p>
+                                <p className="text-sm">{buildingDetailsData.instructions.buildingAccess}</p>
+                              </div>
+                            )}
+                            {buildingDetailsData.instructions.keysAndFob && (
+                              <div>
+                                <p className="text-sm text-muted-foreground">Keys & Fob Information</p>
+                                <p className="text-sm">{buildingDetailsData.instructions.keysAndFob}</p>
+                              </div>
+                            )}
+                            {buildingDetailsData.instructions.roofAccess && (
+                              <div>
+                                <p className="text-sm text-muted-foreground">Roof Access</p>
+                                <p className="text-sm">{buildingDetailsData.instructions.roofAccess}</p>
+                              </div>
+                            )}
+                            {buildingDetailsData.instructions.keysReturnPolicy && (
+                              <div>
+                                <p className="text-sm text-muted-foreground">Keys Return Policy</p>
+                                <Badge variant="outline">{buildingDetailsData.instructions.keysReturnPolicy}</Badge>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Contact Information */}
+                      {(buildingDetailsData.instructions.buildingManagerName || 
+                        buildingDetailsData.instructions.buildingManagerPhone ||
+                        buildingDetailsData.instructions.conciergeNames || 
+                        buildingDetailsData.instructions.conciergePhone ||
+                        buildingDetailsData.instructions.maintenanceName || 
+                        buildingDetailsData.instructions.maintenancePhone) && (
+                        <>
+                          <Separator />
+                          <div className="space-y-4">
+                            <h4 className="font-medium flex items-center gap-2">
+                              <Phone className="h-4 w-4" />
+                              Contact Information
+                            </h4>
+                            <div className="grid gap-4 sm:grid-cols-2 pl-6">
+                              {(buildingDetailsData.instructions.buildingManagerName || buildingDetailsData.instructions.buildingManagerPhone) && (
+                                <div className="flex items-start gap-2">
+                                  <User className="h-4 w-4 mt-0.5 text-muted-foreground" />
+                                  <div>
+                                    <p className="text-sm text-muted-foreground">Building Manager</p>
+                                    {buildingDetailsData.instructions.buildingManagerName && (
+                                      <p className="text-sm font-medium">{buildingDetailsData.instructions.buildingManagerName}</p>
+                                    )}
+                                    {buildingDetailsData.instructions.buildingManagerPhone && (
+                                      <p className="text-sm">{buildingDetailsData.instructions.buildingManagerPhone}</p>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                              {(buildingDetailsData.instructions.conciergeNames || buildingDetailsData.instructions.conciergePhone) && (
+                                <div className="flex items-start gap-2">
+                                  <User className="h-4 w-4 mt-0.5 text-muted-foreground" />
+                                  <div>
+                                    <p className="text-sm text-muted-foreground">Concierge</p>
+                                    {buildingDetailsData.instructions.conciergeNames && (
+                                      <p className="text-sm font-medium">{buildingDetailsData.instructions.conciergeNames}</p>
+                                    )}
+                                    {buildingDetailsData.instructions.conciergePhone && (
+                                      <p className="text-sm">{buildingDetailsData.instructions.conciergePhone}</p>
+                                    )}
+                                    {buildingDetailsData.instructions.conciergeHours && (
+                                      <p className="text-xs text-muted-foreground">Hours: {buildingDetailsData.instructions.conciergeHours}</p>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                              {(buildingDetailsData.instructions.maintenanceName || buildingDetailsData.instructions.maintenancePhone) && (
+                                <div className="flex items-start gap-2">
+                                  <Wrench className="h-4 w-4 mt-0.5 text-muted-foreground" />
+                                  <div>
+                                    <p className="text-sm text-muted-foreground">Maintenance</p>
+                                    {buildingDetailsData.instructions.maintenanceName && (
+                                      <p className="text-sm font-medium">{buildingDetailsData.instructions.maintenanceName}</p>
+                                    )}
+                                    {buildingDetailsData.instructions.maintenancePhone && (
+                                      <p className="text-sm">{buildingDetailsData.instructions.maintenancePhone}</p>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </>
+                      )}
+
+                      {/* Parking */}
+                      {(buildingDetailsData.instructions.tradeParkingSpots || buildingDetailsData.instructions.tradeParkingInstructions) && (
+                        <>
+                          <Separator />
+                          <div className="space-y-2">
+                            <h4 className="font-medium flex items-center gap-2">
+                              <Car className="h-4 w-4" />
+                              Trade Parking
+                            </h4>
+                            <div className="pl-6 space-y-2">
+                              {buildingDetailsData.instructions.tradeParkingSpots !== null && (
+                                <p className="text-sm">
+                                  <span className="text-muted-foreground">Available spots: </span>
+                                  <span className="font-medium">{buildingDetailsData.instructions.tradeParkingSpots}</span>
+                                </p>
+                              )}
+                              {buildingDetailsData.instructions.tradeParkingInstructions && (
+                                <p className="text-sm">{buildingDetailsData.instructions.tradeParkingInstructions}</p>
+                              )}
+                            </div>
+                          </div>
+                        </>
+                      )}
+
+                      {/* Special Requests */}
+                      {(buildingDetailsData.instructions.signageRequirements || buildingDetailsData.instructions.specialRequests) && (
+                        <>
+                          <Separator />
+                          <div className="space-y-2">
+                            <h4 className="font-medium flex items-center gap-2">
+                              <FileText className="h-4 w-4" />
+                              Special Requirements
+                            </h4>
+                            <div className="pl-6 space-y-3">
+                              {buildingDetailsData.instructions.signageRequirements && (
+                                <div>
+                                  <p className="text-sm text-muted-foreground">Signage Requirements</p>
+                                  <p className="text-sm">{buildingDetailsData.instructions.signageRequirements}</p>
+                                </div>
+                              )}
+                              {buildingDetailsData.instructions.specialRequests && (
+                                <div>
+                                  <p className="text-sm text-muted-foreground">Special Requests</p>
+                                  <p className="text-sm whitespace-pre-wrap">{buildingDetailsData.instructions.specialRequests}</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </>
+                      )}
+
+                      {/* Last Updated */}
+                      <div className="text-xs text-muted-foreground text-right">
+                        Last updated: {formatLocalDate(buildingDetailsData.instructions.updatedAt)}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
 
               <Card>
                 <CardHeader>
