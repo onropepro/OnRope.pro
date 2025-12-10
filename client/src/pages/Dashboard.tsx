@@ -4809,17 +4809,72 @@ export default function Dashboard() {
               )}
               
               {/* Create Employee Button */}
+              <Button 
+                className="w-full h-12 gap-2" 
+                data-testid="button-create-employee"
+                disabled={userIsReadOnly}
+                onClick={() => {
+                  if (employeesData?.seatInfo?.atSeatLimit) {
+                    setShowPurchaseSeatsDialog(true);
+                  } else {
+                    setShowEmployeeDialog(true);
+                  }
+                }}
+              >
+                <span className="material-icons">person_add</span>
+                {t('dashboard.employeeSeats.addNewEmployee', 'Add New Employee')}
+              </Button>
+              
+              {/* Purchase Seats Dialog - shown when no seats available */}
+              <Dialog open={showPurchaseSeatsDialog} onOpenChange={setShowPurchaseSeatsDialog}>
+                <DialogContent className="max-w-md" data-testid="dialog-purchase-seats">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      <span className="material-icons text-primary">group_add</span>
+                      Purchase Employee Seats
+                    </DialogTitle>
+                    <DialogDescription>
+                      {employeesData?.seatInfo?.seatLimit === 0 
+                        ? "You haven't purchased any employee seats yet. Each seat allows you to add one team member to your company."
+                        : `You've used all ${employeesData?.seatInfo?.seatLimit} of your employee seats. Purchase additional seats to add more team members.`}
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="py-4 space-y-4">
+                    <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                      <div>
+                        <p className="font-medium">Additional Seat</p>
+                        <p className="text-sm text-muted-foreground">Add 1 team member</p>
+                      </div>
+                      <p className="font-semibold text-lg">$34.95/month</p>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Seats are billed monthly and prorated based on your billing cycle.
+                    </p>
+                  </div>
+                  <DialogFooter className="gap-2">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setShowPurchaseSeatsDialog(false)}
+                      data-testid="button-cancel-purchase-seats"
+                    >
+                      Cancel
+                    </Button>
+                    <Button 
+                      onClick={() => {
+                        setShowPurchaseSeatsDialog(false);
+                        window.location.href = "/profile";
+                      }}
+                      data-testid="button-go-to-subscription"
+                    >
+                      <span className="material-icons text-sm mr-1">shopping_cart</span>
+                      Go to Subscription
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+              
+              {/* Employee Dialog */}
               <Dialog open={showEmployeeDialog} onOpenChange={(open) => { setShowEmployeeDialog(open); if (!open) resetOnRopeProSearch(); }}>
-                <DialogTrigger asChild>
-                  <Button 
-                    className="w-full h-12 gap-2" 
-                    data-testid="button-create-employee"
-                    disabled={userIsReadOnly || (employeesData?.seatInfo?.atSeatLimit ?? false)}
-                  >
-                    <span className="material-icons">person_add</span>
-                    {employeesData?.seatInfo?.atSeatLimit ? t('dashboard.employeeSeats.seatLimitReached', 'Seat Limit Reached') : t('dashboard.employeeSeats.addNewEmployee', 'Add New Employee')}
-                  </Button>
-                </DialogTrigger>
                 <DialogContent className="max-w-2xl p-0 max-h-[95vh] flex flex-col">
                   <div className="p-6 border-b">
                     <DialogHeader>

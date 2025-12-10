@@ -1644,10 +1644,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "No active subscription found" });
       }
 
-      // Check if user is on Starter tier or above (Basic cannot have white label)
-      if (user.subscriptionTier === 'basic') {
-        return res.status(400).json({ message: "White label branding is only available for Starter tier and above" });
-      }
+      // White label branding is available to all OnRopePro subscribers
 
       // Get current subscription to determine currency
       const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);

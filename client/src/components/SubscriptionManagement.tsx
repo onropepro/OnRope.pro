@@ -483,7 +483,6 @@ export function SubscriptionManagement() {
             </div>
             <div className="text-right">
               <p className="font-semibold">$49/month</p>
-              <p className="text-xs text-muted-foreground">Available for Starter+</p>
             </div>
           </button>
 
@@ -697,7 +696,6 @@ export function SubscriptionManagement() {
                   </div>
                 </div>
                 <div className="text-xs text-muted-foreground pt-2 border-t space-y-1">
-                  <p><strong>Available for Starter tier and above.</strong></p>
                   <p><strong>Prorated Billing:</strong> You'll only be charged for the time remaining in your current billing period.</p>
                   <p>Changes take effect immediately. Configure your branding in Settings.</p>
                 </div>
