@@ -5928,17 +5928,17 @@ export default function Dashboard() {
                                 {user?.role === "company" && employee.id !== user?.id && (
                                   <Button
                                     variant="ghost"
-                                    size="icon"
+                                    size="sm"
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       setEmployeeToSuspendSeat(employee);
                                     }}
                                     data-testid={`button-remove-seat-${employee.id}`}
-                                    className="h-9 w-9 text-amber-600 hover:text-amber-700"
+                                    className="text-amber-600 hover:text-amber-700"
                                     disabled={userIsReadOnly}
-                                    title={t('dashboard.employees.removeSeat', 'Remove Seat')}
                                   >
-                                    <span className="material-icons text-sm">person_remove</span>
+                                    <span className="material-icons text-sm mr-1">person_remove</span>
+                                    {t('dashboard.employees.removeSeat', 'Remove Seat')}
                                   </Button>
                                 )}
                                 <Button
