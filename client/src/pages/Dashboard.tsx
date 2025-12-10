@@ -2242,7 +2242,7 @@ export default function Dashboard() {
   // Suspend employee and remove seat mutation
   const suspendSeatMutation = useMutation({
     mutationFn: async (employeeId: string) => {
-      const response = await apiRequest("POST", "/api/subscription/remove-seats", {
+      const response = await apiRequest("POST", "/api/stripe/remove-seats", {
         quantity: 1,
         employeeIds: [employeeId],
       });
