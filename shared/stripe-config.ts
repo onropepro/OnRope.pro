@@ -26,55 +26,55 @@ export const STRIPE_PRICE_IDS = {
   
   // Add-ons - Same price, different currency
   // All add-ons are RECURRING to work with subscription system
+  // NOTE: extra_project removed - new pricing model has unlimited projects
   addons: {
     usd: {
-      extra_seats: 'price_1SWDH4BzDsOltscrMxt5u3ij',     // $19/mo recurring - 2 seats ✓
-      extra_project: 'price_1SWDH5BzDsOltscrmWT8Bfuw',   // $49/mo recurring - 1 project ✓
+      extra_seats: 'price_1SWDH4BzDsOltscrMxt5u3ij',     // $34.95/mo recurring - 1 seat (price to be updated in Stripe)
       white_label: 'price_1SWCTnBzDsOltscrD2qcZ47m',     // $49/mo recurring ✓
     },
     cad: {
-      extra_seats: 'price_1SZG7KBzDsOltscrAcGW9Vuw',     // $19 CAD/mo recurring - 2 seats (FIXED - same as USD)
-      extra_project: 'price_1SZG7KBzDsOltscru51yMkzP',   // $49 CAD/mo recurring - 1 project (FIXED - same as USD)
-      white_label: 'price_1SZG7KBzDsOltscrs9vnr0v2',     // $49 CAD/mo recurring (FIXED - same as USD)
+      extra_seats: 'price_1SZG7KBzDsOltscrAcGW9Vuw',     // $34.95 CAD/mo recurring - 1 seat (price to be updated in Stripe)
+      white_label: 'price_1SZG7KBzDsOltscrs9vnr0v2',     // $49 CAD/mo recurring ✓
     },
   },
 } as const;
 
 // Tier configuration with limits and pricing (same price for both currencies)
+// NEW PRICING MODEL: $99/month base + $34.95/seat, unlimited projects
 export const TIER_CONFIG = {
   basic: {
-    name: 'Basic',
-    priceUSD: 79,
-    priceCAD: 79,  // Same price, Stripe handles currency
-    maxProjects: 2,
-    maxSeats: 4,
+    name: 'OnRopePro',
+    priceUSD: 99,
+    priceCAD: 99,  // Same price, Stripe handles currency
+    maxProjects: -1, // unlimited
+    maxSeats: 0,     // no included seats, add at $34.95/seat
     priceIdUSD: STRIPE_PRICE_IDS.tiers.usd.basic,
     priceIdCAD: STRIPE_PRICE_IDS.tiers.cad.basic,
   },
   starter: {
-    name: 'Starter',
-    priceUSD: 299,
-    priceCAD: 299,  // Same price, Stripe handles currency
-    maxProjects: 5,
-    maxSeats: 10,
+    name: 'OnRopePro',
+    priceUSD: 99,
+    priceCAD: 99,  // Same price, Stripe handles currency
+    maxProjects: -1, // unlimited
+    maxSeats: 0,     // no included seats
     priceIdUSD: STRIPE_PRICE_IDS.tiers.usd.starter,
     priceIdCAD: STRIPE_PRICE_IDS.tiers.cad.starter,
   },
   premium: {
-    name: 'Premium',
-    priceUSD: 499,
-    priceCAD: 499,  // Same price, Stripe handles currency
-    maxProjects: 9,
-    maxSeats: 18,
+    name: 'OnRopePro',
+    priceUSD: 99,
+    priceCAD: 99,  // Same price, Stripe handles currency
+    maxProjects: -1, // unlimited
+    maxSeats: 0,     // no included seats
     priceIdUSD: STRIPE_PRICE_IDS.tiers.usd.premium,
     priceIdCAD: STRIPE_PRICE_IDS.tiers.cad.premium,
   },
   enterprise: {
-    name: 'Enterprise',
-    priceUSD: 899,
-    priceCAD: 899,  // Same price, Stripe handles currency
+    name: 'OnRopePro',
+    priceUSD: 99,
+    priceCAD: 99,  // Same price, Stripe handles currency
     maxProjects: -1, // unlimited
-    maxSeats: -1,    // unlimited
+    maxSeats: 0,     // no included seats
     priceIdUSD: STRIPE_PRICE_IDS.tiers.usd.enterprise,
     priceIdCAD: STRIPE_PRICE_IDS.tiers.cad.enterprise,
   },
@@ -82,24 +82,16 @@ export const TIER_CONFIG = {
 
 // Add-on configuration with pricing (same price for both currencies)
 // NOTE: All add-ons are RECURRING to work with subscription system
+// NEW PRICING: $34.95/seat (1 seat per add-on), no project add-ons
 export const ADDON_CONFIG = {
   extra_seats: {
-    name: 'Extra Seats (2)',
-    priceUSD: 19,
-    priceCAD: 19,  // Same price, Stripe handles currency
-    seats: 2,
+    name: 'Additional Seat',
+    priceUSD: 34.95,
+    priceCAD: 34.95,  // Same price, Stripe handles currency
+    seats: 1,
     priceIdUSD: STRIPE_PRICE_IDS.addons.usd.extra_seats,
     priceIdCAD: STRIPE_PRICE_IDS.addons.cad.extra_seats,
-    type: 'recurring' as const,  // Changed from one_time - requires new Stripe price
-  },
-  extra_project: {
-    name: 'Extra Project',
-    priceUSD: 49,
-    priceCAD: 49,  // Same price, Stripe handles currency
-    projects: 1,
-    priceIdUSD: STRIPE_PRICE_IDS.addons.usd.extra_project,
-    priceIdCAD: STRIPE_PRICE_IDS.addons.cad.extra_project,
-    type: 'recurring' as const,  // Changed from one_time - requires new Stripe price
+    type: 'recurring' as const,
   },
   white_label: {
     name: 'White Label Branding',

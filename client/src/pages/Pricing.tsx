@@ -14,104 +14,38 @@ export default function Pricing() {
   useEffect(() => {
     trackPricingPageView({ source: 'pricing_page' });
   }, []);
-  const subscriptionTiers = [
-    {
-      name: "Basic",
-      price: "$79",
-      period: "/month (USD/CAD)",
-      description: "Perfect for small teams getting started",
-      features: [
-        { text: "2 Projects", included: true },
-        { text: "4 Seats", included: true },
-        { text: "Employee Management", included: true },
-        { text: "Basic Scheduling", included: true },
-        { text: "Standard Support", included: true },
-        { text: "Inventory Tracking", included: true },
-        { text: "Safety Forms", included: true },
-        { text: "White Label Branding", included: false },
-        { text: "CRM & Quotes", included: false },
-        { text: "Advanced Analytics", included: false }
-      ],
-      highlighted: false
-    },
-    {
-      name: "Starter",
-      price: "$299",
-      period: "/month (USD/CAD)",
-      description: "Great for growing rope access companies",
-      features: [
-        { text: "5 Projects", included: true },
-        { text: "10 Seats", included: true },
-        { text: "Employee Management", included: true },
-        { text: "Advanced Scheduling", included: true },
-        { text: "Priority Support", included: true },
-        { text: "Inventory Tracking", included: true },
-        { text: "Safety Forms & Compliance", included: true },
-        { text: "White Label Branding", included: false },
-        { text: "CRM & Quotes", included: true },
-        { text: "Basic Analytics", included: true }
-      ],
-      highlighted: false
-    },
-    {
-      name: "Premium",
-      price: "$499",
-      period: "/month (USD/CAD)",
-      description: "For established operations with multiple sites",
-      features: [
-        { text: "9 Projects", included: true },
-        { text: "18 Seats", included: true },
-        { text: "Employee Management", included: true },
-        { text: "Advanced Scheduling", included: true },
-        { text: "24/7 Priority Support", included: true },
-        { text: "Inventory Tracking", included: true },
-        { text: "Safety Forms & Compliance", included: true },
-        { text: "White Label Branding", included: true },
-        { text: "Full CRM & Quotes Suite", included: true },
-        { text: "Advanced Analytics & Reports", included: true }
-      ],
-      highlighted: true
-    },
-    {
-      name: "Enterprise",
-      price: "$899",
-      period: "/month (USD/CAD)",
-      description: "Unlimited scale for large enterprises",
-      features: [
-        { text: "Unlimited Projects", included: true },
-        { text: "Unlimited Seats", included: true },
-        { text: "Employee Management", included: true },
-        { text: "Enterprise Scheduling", included: true },
-        { text: "Dedicated Support", included: true },
-        { text: "Inventory Tracking", included: true },
-        { text: "Safety Forms & Compliance", included: true },
-        { text: "White Label Branding", included: true },
-        { text: "Enterprise CRM Suite", included: true },
-        { text: "Custom Analytics & Reporting", included: true }
-      ],
-      highlighted: false
-    }
-  ];
+  const subscriptionPlan = {
+    name: "OnRopePro",
+    price: "$99",
+    period: "/month (USD/CAD)",
+    description: "Complete rope access management platform for your entire operation",
+    features: [
+      { text: "Unlimited Projects", included: true },
+      { text: "Employee Management", included: true },
+      { text: "Advanced Scheduling", included: true },
+      { text: "Priority Support", included: true },
+      { text: "Inventory Tracking", included: true },
+      { text: "Safety Forms & Compliance", included: true },
+      { text: "CRM & Quotes Suite", included: true },
+      { text: "Advanced Analytics & Reports", included: true },
+      { text: "GPS Time Tracking", included: true },
+      { text: "Resident Portal", included: true },
+    ],
+    highlighted: true
+  };
 
   const addOns = [
     {
       name: "Additional Seats",
-      price: "$19",
-      description: "Add 2 more team member seats to your account",
-      icon: "👥"
-    },
-    {
-      name: "Extra Projects",
-      price: "$49",
-      description: "Add one additional project slot to your plan",
-      icon: "📋"
+      price: "$34.95",
+      period: "/month per seat",
+      description: "Add team members to your account. First seat included free during trial.",
     },
     {
       name: "White Label Branding",
       price: "$49",
       period: "/month add-on",
       description: "Customize the platform with your company branding and colors",
-      icon: "🎨"
     }
   ];
 
@@ -140,58 +74,45 @@ export default function Pricing() {
           </p>
         </div>
 
-        {/* Subscription Tiers */}
+        {/* Main Subscription Plan */}
         <div className="mb-12">
-          <h3 className="text-2xl font-bold mb-6">Subscription Plans</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {subscriptionTiers.map((tier, index) => (
-              <Card 
-                key={index} 
-                className={`flex flex-col ${tier.highlighted ? 'ring-2 ring-primary shadow-lg' : ''}`}
-              >
-                {tier.highlighted && (
-                  <div className="bg-primary text-primary-foreground py-2 px-4 text-center text-sm font-semibold">
-                    Most Popular
+          <h3 className="text-2xl font-bold mb-6">Subscription Plan</h3>
+          <div className="max-w-lg mx-auto">
+            <Card className="flex flex-col ring-2 ring-primary shadow-lg">
+              <div className="bg-primary text-primary-foreground py-2 px-4 text-center text-sm font-semibold">
+                All-Inclusive Platform
+              </div>
+              <CardHeader className="pb-4">
+                <CardTitle className="text-2xl">{subscriptionPlan.name}</CardTitle>
+                <CardDescription className="text-sm">{subscriptionPlan.description}</CardDescription>
+              </CardHeader>
+              <CardContent className="flex flex-col flex-1">
+                <div className="mb-6">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-4xl font-bold">{subscriptionPlan.price}</span>
+                    <span className="text-sm text-muted-foreground">{subscriptionPlan.period}</span>
                   </div>
-                )}
-                <CardHeader className="pb-4">
-                  <CardTitle>{tier.name}</CardTitle>
-                  <CardDescription className="text-xs">{tier.description}</CardDescription>
-                </CardHeader>
-                <CardContent className="flex flex-col flex-1">
-                  <div className="mb-6">
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-3xl font-bold">{tier.price}</span>
-                      <span className="text-sm text-muted-foreground">{tier.period}</span>
-                    </div>
-                  </div>
+                  <p className="text-sm text-muted-foreground mt-2">+ $34.95/month per additional seat</p>
+                </div>
 
-                  <ul className="space-y-3 flex-1 mb-6">
-                    {tier.features.map((feature, fIndex) => (
-                      <li key={fIndex} className="flex items-start gap-2 text-sm">
-                        <Check className={`h-4 w-4 mt-0.5 flex-shrink-0 ${
-                          feature.included 
-                            ? 'text-emerald-500' 
-                            : 'text-muted-foreground/30'
-                        }`} />
-                        <span className={feature.included ? '' : 'text-muted-foreground/50'}>
-                          {feature.text}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
+                <ul className="space-y-3 flex-1 mb-6">
+                  {subscriptionPlan.features.map((feature, fIndex) => (
+                    <li key={fIndex} className="flex items-start gap-2 text-sm">
+                      <Check className="h-4 w-4 mt-0.5 flex-shrink-0 text-emerald-500" />
+                      <span>{feature.text}</span>
+                    </li>
+                  ))}
+                </ul>
 
-                  <Button 
-                    className="w-full" 
-                    variant={tier.highlighted ? "default" : "outline"}
-                    data-testid={`button-select-${tier.name.toLowerCase()}`}
-                  >
-                    Get Started
-                    <ArrowRight className="h-4 w-4 ml-2" />
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
+                <Button 
+                  className="w-full" 
+                  data-testid="button-select-onropepro"
+                >
+                  Get Started
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </div>
 
@@ -204,11 +125,10 @@ export default function Pricing() {
             Enhance your subscription with additional capacity and features
           </p>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
             {addOns.map((addon, index) => (
               <Card key={index} className="flex flex-col">
                 <CardHeader className="pb-3">
-                  <div className="text-2xl mb-2">{addon.icon}</div>
                   <CardTitle className="text-lg">{addon.name}</CardTitle>
                   <CardDescription className="text-xs">{addon.description}</CardDescription>
                 </CardHeader>
