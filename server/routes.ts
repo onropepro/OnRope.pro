@@ -6454,7 +6454,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // ==================== ONROPEPRO TECHNICIAN LINKING ====================
   
-  // Search for unlinked technicians (self-registered but not linked to any company)
+  // Search for technicians (including PLUS members who can link to multiple companies)
   app.get("/api/technicians/search", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
     try {
       const { searchType, searchValue } = req.query;
@@ -6472,24 +6472,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Search value cannot be empty" });
       }
       
-      // Search for unlinked technicians (companyId is null)
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      // Search for ANY technician (including already linked ones for PLUS access)
       let technician = null;
       
       if (searchType === 'email') {
-        const user = await storage.getUserByEmail(searchVal);
-        if (user && user.role === 'rope_access_tech' && !user.companyId) {
-          technician = user;
-        }
+        technician = await storage.getTechnicianByEmail(searchVal);
       } else if (searchType === 'irata') {
-        // Search by IRATA license number using dedicated storage function
-        technician = await storage.getUnlinkedTechnicianByIrataLicense(searchVal);
+        technician = await storage.getTechnicianByIrataLicense(searchVal);
       } else if (searchType === 'sprat') {
-        // Search by SPRAT license number using dedicated storage function
-        technician = await storage.getUnlinkedTechnicianBySpratLicense(searchVal);
+        technician = await storage.getTechnicianBySpratLicense(searchVal);
       }
       
       if (!technician) {
-        return res.json({ found: false, message: "No unlinked technician found with that information" });
+        return res.json({ found: false, message: "No technician found with that information" });
+      }
+      
+      // Check if technician is already linked to THIS company
+      if (technician.companyId === companyId) {
+        return res.json({ found: false, message: "This technician is already linked to your company" });
+      }
+      
+      // Check existing employer connections for THIS company
+      const existingConnections = technician.employerConnections || [];
+      const alreadyConnected = existingConnections.some((conn: any) => conn.companyId === companyId);
+      if (alreadyConnected) {
+        return res.json({ found: false, message: "This technician is already connected to your company" });
+      }
+      
+      // If technician is linked to another company and doesn't have PLUS access
+      if (technician.companyId && !technician.hasPlusAccess) {
+        return res.json({ 
+          found: false, 
+          message: "This technician is already linked to another company. They need Technician PLUS to connect with multiple employers." 
+        });
       }
       
       // Return limited info for privacy (don't expose sensitive fields)
@@ -6510,6 +6531,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           employeeProvinceState: safeInfo.employeeProvinceState,
           hasFirstAid: safeInfo.hasFirstAid,
           firstAidType: safeInfo.firstAidType,
+          hasPlusAccess: safeInfo.hasPlusAccess,
+          isAlreadyLinked: !!technician.companyId, // Tell frontend if this is a PLUS multi-employer link
         }
       });
     } catch (error) {
@@ -6543,7 +6566,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Seat limit reached. Please upgrade your subscription or add more seats." });
       }
       
-      // Find the technician and verify they're unlinked
+      // Find the technician
       const technician = await storage.getUserById(technicianId);
       if (!technician) {
         return res.status(404).json({ message: "Technician not found" });
@@ -6553,25 +6576,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "This user is not a technician" });
       }
       
-      if (technician.companyId) {
-        return res.status(400).json({ message: "This technician is already linked to a company" });
+      // Check if already linked to THIS company
+      if (technician.companyId === companyId) {
+        return res.status(400).json({ message: "This technician is already linked to your company" });
       }
       
-      // Link the technician to this company
-      await storage.updateUser(technicianId, {
-        companyId,
-        hourlyRate: hourlyRate || null,
-        isSalary: isSalary || false,
-        salary: salary || null,
-        startDate: getTodayString(),
-      });
+      // Check existing employer connections
+      const existingConnections = (technician.employerConnections || []) as any[];
+      const alreadyConnected = existingConnections.some((conn: any) => conn.companyId === companyId);
+      if (alreadyConnected) {
+        return res.status(400).json({ message: "This technician is already connected to your company" });
+      }
       
-      console.log(`[Technician-Link] Linked technician ${technicianId} (${technician.name}) to company ${companyId}`);
+      // Get company name for the connection
+      const companyOwner = await storage.getUserById(companyId);
+      const companyName = companyOwner?.companyName || 'Unknown Company';
       
-      res.json({ 
-        success: true, 
-        message: `${technician.name} has been added to your team!` 
-      });
+      if (technician.companyId) {
+        // Technician is already linked to another company
+        if (!technician.hasPlusAccess) {
+          return res.status(400).json({ 
+            message: "This technician is already linked to another company. They need Technician PLUS to connect with multiple employers." 
+          });
+        }
+        
+        // PLUS technician - add via employer_connections
+        const newConnection = {
+          companyId,
+          companyName,
+          hourlyRate: hourlyRate || null,
+          isSalary: isSalary || false,
+          salary: salary || null,
+          connectedAt: new Date().toISOString(),
+        };
+        
+        const updatedConnections = [...existingConnections, newConnection];
+        await storage.updateUser(technicianId, {
+          employerConnections: updatedConnections,
+        });
+        
+        console.log(`[Technician-Link] PLUS technician ${technicianId} (${technician.name}) connected to additional employer ${companyId} (${companyName})`);
+        
+        res.json({ 
+          success: true, 
+          message: `${technician.name} has been connected to your company as an additional employer!` 
+        });
+      } else {
+        // Unlinked technician - set as primary company
+        await storage.updateUser(technicianId, {
+          companyId,
+          hourlyRate: hourlyRate || null,
+          isSalary: isSalary || false,
+          salary: salary || null,
+          startDate: getTodayString(),
+        });
+        
+        console.log(`[Technician-Link] Linked technician ${technicianId} (${technician.name}) to company ${companyId}`);
+        
+        res.json({ 
+          success: true, 
+          message: `${technician.name} has been added to your team!` 
+        });
+      }
     } catch (error) {
       console.error("Link technician error:", error);
       res.status(500).json({ message: "Internal server error" });

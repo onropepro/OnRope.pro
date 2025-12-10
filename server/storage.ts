@@ -283,6 +283,46 @@ export class Storage {
     return results[0] ? decryptSensitiveFields(results[0]) : undefined;
   }
 
+  async getTechnicianByIrataLicense(licenseNumber: string): Promise<User | undefined> {
+    // Search for ANY technician by IRATA license (including already linked ones for PLUS access)
+    const results = await db.select().from(users).where(
+      and(
+        eq(users.role, "rope_access_tech"),
+        or(
+          eq(users.irataLicenseNumber, licenseNumber),
+          sql`${users.irataLicenseNumber} LIKE '%/' || ${licenseNumber}`,
+          sql`split_part(${users.irataLicenseNumber}, '/', 2) = ${licenseNumber}`
+        )
+      )
+    ).limit(1);
+    return results[0] ? decryptSensitiveFields(results[0]) : undefined;
+  }
+
+  async getTechnicianBySpratLicense(licenseNumber: string): Promise<User | undefined> {
+    // Search for ANY technician by SPRAT license (including already linked ones for PLUS access)
+    const results = await db.select().from(users).where(
+      and(
+        eq(users.role, "rope_access_tech"),
+        or(
+          eq(users.spratLicenseNumber, licenseNumber),
+          sql`split_part(${users.spratLicenseNumber}, '/', 2) = ${licenseNumber}`
+        )
+      )
+    ).limit(1);
+    return results[0] ? decryptSensitiveFields(results[0]) : undefined;
+  }
+
+  async getTechnicianByEmail(email: string): Promise<User | undefined> {
+    // Search for ANY technician by email (including already linked ones for PLUS access)
+    const results = await db.select().from(users).where(
+      and(
+        eq(users.role, "rope_access_tech"),
+        eq(users.email, email.toLowerCase())
+      )
+    ).limit(1);
+    return results[0] ? decryptSensitiveFields(results[0]) : undefined;
+  }
+
   async getResidentsByStrataPlan(strataPlanNumber: string): Promise<User[]> {
     const results = await db.select().from(users)
       .where(
