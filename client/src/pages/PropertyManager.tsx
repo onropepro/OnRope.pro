@@ -58,18 +58,18 @@ export default function PropertyManager() {
   const [selectedComplaint, setSelectedComplaint] = useState<any | null>(null);
   const [editBuildingInstructionsOpen, setEditBuildingInstructionsOpen] = useState(false);
   const [buildingInstructionsForm, setBuildingInstructionsForm] = useState({
-    buildingAccessInstructions: "",
-    keysAndFobInfo: "",
+    buildingAccess: "",
+    keysAndFob: "",
     keysReturnPolicy: "",
-    roofAccessInstructions: "",
+    roofAccess: "",
     buildingManagerName: "",
     buildingManagerPhone: "",
     buildingManagerEmail: "",
-    conciergeName: "",
+    conciergeNames: "",
     conciergePhone: "",
     conciergeHours: "",
-    maintenanceContactName: "",
-    maintenanceContactPhone: "",
+    maintenanceName: "",
+    maintenancePhone: "",
     councilMemberUnits: "",
     tradeParkingInstructions: "",
     tradeParkingSpots: "",
@@ -378,18 +378,18 @@ export default function PropertyManager() {
     if (projectDetailsData?.buildingInstructions) {
       const bi = projectDetailsData.buildingInstructions;
       setBuildingInstructionsForm({
-        buildingAccessInstructions: bi.buildingAccessInstructions || "",
-        keysAndFobInfo: bi.keysAndFobInfo || "",
+        buildingAccess: bi.buildingAccess || "",
+        keysAndFob: bi.keysAndFob || "",
         keysReturnPolicy: bi.keysReturnPolicy || "",
-        roofAccessInstructions: bi.roofAccessInstructions || "",
+        roofAccess: bi.roofAccess || "",
         buildingManagerName: bi.buildingManagerName || "",
         buildingManagerPhone: bi.buildingManagerPhone || "",
         buildingManagerEmail: bi.buildingManagerEmail || "",
-        conciergeName: bi.conciergeName || "",
+        conciergeNames: bi.conciergeNames || "",
         conciergePhone: bi.conciergePhone || "",
         conciergeHours: bi.conciergeHours || "",
-        maintenanceContactName: bi.maintenanceContactName || "",
-        maintenanceContactPhone: bi.maintenanceContactPhone || "",
+        maintenanceName: bi.maintenanceName || "",
+        maintenancePhone: bi.maintenancePhone || "",
         councilMemberUnits: bi.councilMemberUnits || "",
         tradeParkingInstructions: bi.tradeParkingInstructions || "",
         tradeParkingSpots: bi.tradeParkingSpots?.toString() || "",
@@ -399,18 +399,18 @@ export default function PropertyManager() {
     } else if (projectDetailsData && !projectDetailsData.buildingInstructions) {
       // Reset form if no instructions exist
       setBuildingInstructionsForm({
-        buildingAccessInstructions: "",
-        keysAndFobInfo: "",
+        buildingAccess: "",
+        keysAndFob: "",
         keysReturnPolicy: "",
-        roofAccessInstructions: "",
+        roofAccess: "",
         buildingManagerName: "",
         buildingManagerPhone: "",
         buildingManagerEmail: "",
-        conciergeName: "",
+        conciergeNames: "",
         conciergePhone: "",
         conciergeHours: "",
-        maintenanceContactName: "",
-        maintenanceContactPhone: "",
+        maintenanceName: "",
+        maintenancePhone: "",
         councilMemberUnits: "",
         tradeParkingInstructions: "",
         tradeParkingSpots: "",
@@ -1406,31 +1406,31 @@ export default function PropertyManager() {
                         {projectDetailsData.buildingInstructions ? (
                           <div className="space-y-4">
                             {/* Access Information */}
-                            {(projectDetailsData.buildingInstructions.buildingAccessInstructions || 
-                              projectDetailsData.buildingInstructions.keysAndFobInfo ||
-                              projectDetailsData.buildingInstructions.roofAccessInstructions) && (
+                            {(projectDetailsData.buildingInstructions.buildingAccess || 
+                              projectDetailsData.buildingInstructions.keysAndFob ||
+                              projectDetailsData.buildingInstructions.roofAccess) && (
                               <div className="space-y-2">
                                 <h4 className="text-sm font-medium">{t('propertyManager.projectDetails.buildingInstructions.accessInfo', 'Access Information')}</h4>
                                 <div className="grid grid-cols-1 gap-2 text-sm">
-                                  {projectDetailsData.buildingInstructions.buildingAccessInstructions && (
+                                  {projectDetailsData.buildingInstructions.buildingAccess && (
                                     <div>
                                       <Label className="text-xs text-muted-foreground">{t('propertyManager.projectDetails.buildingInstructions.buildingAccess', 'Building Access')}</Label>
-                                      <p className="text-sm">{projectDetailsData.buildingInstructions.buildingAccessInstructions}</p>
+                                      <p className="text-sm">{projectDetailsData.buildingInstructions.buildingAccess}</p>
                                     </div>
                                   )}
-                                  {projectDetailsData.buildingInstructions.keysAndFobInfo && (
+                                  {projectDetailsData.buildingInstructions.keysAndFob && (
                                     <div>
                                       <Label className="text-xs text-muted-foreground">{t('propertyManager.projectDetails.buildingInstructions.keysAndFob', 'Keys/Fob')}</Label>
-                                      <p className="text-sm">{projectDetailsData.buildingInstructions.keysAndFobInfo}</p>
+                                      <p className="text-sm">{projectDetailsData.buildingInstructions.keysAndFob}</p>
                                       {projectDetailsData.buildingInstructions.keysReturnPolicy && (
                                         <Badge variant="secondary" className="mt-1">{projectDetailsData.buildingInstructions.keysReturnPolicy}</Badge>
                                       )}
                                     </div>
                                   )}
-                                  {projectDetailsData.buildingInstructions.roofAccessInstructions && (
+                                  {projectDetailsData.buildingInstructions.roofAccess && (
                                     <div>
                                       <Label className="text-xs text-muted-foreground">{t('propertyManager.projectDetails.buildingInstructions.roofAccess', 'Roof Access')}</Label>
-                                      <p className="text-sm">{projectDetailsData.buildingInstructions.roofAccessInstructions}</p>
+                                      <p className="text-sm">{projectDetailsData.buildingInstructions.roofAccess}</p>
                                     </div>
                                   )}
                                 </div>
@@ -1440,19 +1440,17 @@ export default function PropertyManager() {
                             {/* Contacts */}
                             {(projectDetailsData.buildingInstructions.buildingManagerName || 
                               projectDetailsData.buildingInstructions.buildingManagerPhone ||
-                              projectDetailsData.buildingInstructions.buildingManagerEmail ||
-                              projectDetailsData.buildingInstructions.conciergeName ||
+                              projectDetailsData.buildingInstructions.conciergeNames ||
                               projectDetailsData.buildingInstructions.conciergePhone ||
                               projectDetailsData.buildingInstructions.conciergeHours ||
-                              projectDetailsData.buildingInstructions.maintenanceContactName ||
-                              projectDetailsData.buildingInstructions.maintenanceContactPhone ||
+                              projectDetailsData.buildingInstructions.maintenanceName ||
+                              projectDetailsData.buildingInstructions.maintenancePhone ||
                               projectDetailsData.buildingInstructions.councilMemberUnits) && (
                               <div className="space-y-2">
                                 <h4 className="text-sm font-medium">{t('propertyManager.projectDetails.buildingInstructions.contacts', 'Contacts')}</h4>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                                   {(projectDetailsData.buildingInstructions.buildingManagerName || 
-                                    projectDetailsData.buildingInstructions.buildingManagerPhone ||
-                                    projectDetailsData.buildingInstructions.buildingManagerEmail) && (
+                                    projectDetailsData.buildingInstructions.buildingManagerPhone) && (
                                     <div>
                                       <Label className="text-xs text-muted-foreground">{t('propertyManager.projectDetails.buildingInstructions.buildingManager', 'Building Manager')}</Label>
                                       {projectDetailsData.buildingInstructions.buildingManagerName && (
@@ -1461,18 +1459,15 @@ export default function PropertyManager() {
                                       {projectDetailsData.buildingInstructions.buildingManagerPhone && (
                                         <p className="text-muted-foreground">{projectDetailsData.buildingInstructions.buildingManagerPhone}</p>
                                       )}
-                                      {projectDetailsData.buildingInstructions.buildingManagerEmail && (
-                                        <p className="text-muted-foreground">{projectDetailsData.buildingInstructions.buildingManagerEmail}</p>
-                                      )}
                                     </div>
                                   )}
-                                  {(projectDetailsData.buildingInstructions.conciergeName || 
+                                  {(projectDetailsData.buildingInstructions.conciergeNames || 
                                     projectDetailsData.buildingInstructions.conciergePhone ||
                                     projectDetailsData.buildingInstructions.conciergeHours) && (
                                     <div>
                                       <Label className="text-xs text-muted-foreground">{t('propertyManager.projectDetails.buildingInstructions.concierge', 'Concierge')}</Label>
-                                      {projectDetailsData.buildingInstructions.conciergeName && (
-                                        <p className="font-medium">{projectDetailsData.buildingInstructions.conciergeName}</p>
+                                      {projectDetailsData.buildingInstructions.conciergeNames && (
+                                        <p className="font-medium">{projectDetailsData.buildingInstructions.conciergeNames}</p>
                                       )}
                                       {projectDetailsData.buildingInstructions.conciergePhone && (
                                         <p className="text-muted-foreground">{projectDetailsData.buildingInstructions.conciergePhone}</p>
@@ -1482,15 +1477,15 @@ export default function PropertyManager() {
                                       )}
                                     </div>
                                   )}
-                                  {(projectDetailsData.buildingInstructions.maintenanceContactName ||
-                                    projectDetailsData.buildingInstructions.maintenanceContactPhone) && (
+                                  {(projectDetailsData.buildingInstructions.maintenanceName ||
+                                    projectDetailsData.buildingInstructions.maintenancePhone) && (
                                     <div>
                                       <Label className="text-xs text-muted-foreground">{t('propertyManager.projectDetails.buildingInstructions.maintenance', 'Maintenance')}</Label>
-                                      {projectDetailsData.buildingInstructions.maintenanceContactName && (
-                                        <p className="font-medium">{projectDetailsData.buildingInstructions.maintenanceContactName}</p>
+                                      {projectDetailsData.buildingInstructions.maintenanceName && (
+                                        <p className="font-medium">{projectDetailsData.buildingInstructions.maintenanceName}</p>
                                       )}
-                                      {projectDetailsData.buildingInstructions.maintenanceContactPhone && (
-                                        <p className="text-muted-foreground">{projectDetailsData.buildingInstructions.maintenanceContactPhone}</p>
+                                      {projectDetailsData.buildingInstructions.maintenancePhone && (
+                                        <p className="text-muted-foreground">{projectDetailsData.buildingInstructions.maintenancePhone}</p>
                                       )}
                                     </div>
                                   )}
@@ -2031,8 +2026,8 @@ export default function PropertyManager() {
                     <Label htmlFor="pm-buildingAccess">{t('propertyManager.buildingInstructions.buildingAccess', 'Building Access Instructions')}</Label>
                     <Input
                       id="pm-buildingAccess"
-                      value={buildingInstructionsForm.buildingAccessInstructions}
-                      onChange={(e) => setBuildingInstructionsForm(prev => ({ ...prev, buildingAccessInstructions: e.target.value }))}
+                      value={buildingInstructionsForm.buildingAccess}
+                      onChange={(e) => setBuildingInstructionsForm(prev => ({ ...prev, buildingAccess: e.target.value }))}
                       placeholder={t('propertyManager.buildingInstructions.buildingAccessPlaceholder', 'e.g., Enter through loading dock on south side')}
                       data-testid="input-building-access"
                     />
@@ -2042,8 +2037,8 @@ export default function PropertyManager() {
                       <Label htmlFor="pm-keysAndFob">{t('propertyManager.buildingInstructions.keysAndFob', 'Keys/Fob Information')}</Label>
                       <Input
                         id="pm-keysAndFob"
-                        value={buildingInstructionsForm.keysAndFobInfo}
-                        onChange={(e) => setBuildingInstructionsForm(prev => ({ ...prev, keysAndFobInfo: e.target.value }))}
+                        value={buildingInstructionsForm.keysAndFob}
+                        onChange={(e) => setBuildingInstructionsForm(prev => ({ ...prev, keysAndFob: e.target.value }))}
                         placeholder={t('propertyManager.buildingInstructions.keysPlaceholder', 'e.g., Pick up from concierge')}
                         data-testid="input-keys-and-fob"
                       />
@@ -2069,8 +2064,8 @@ export default function PropertyManager() {
                     <Label htmlFor="pm-roofAccess">{t('propertyManager.buildingInstructions.roofAccess', 'Roof Access Instructions')}</Label>
                     <Input
                       id="pm-roofAccess"
-                      value={buildingInstructionsForm.roofAccessInstructions}
-                      onChange={(e) => setBuildingInstructionsForm(prev => ({ ...prev, roofAccessInstructions: e.target.value }))}
+                      value={buildingInstructionsForm.roofAccess}
+                      onChange={(e) => setBuildingInstructionsForm(prev => ({ ...prev, roofAccess: e.target.value }))}
                       placeholder={t('propertyManager.buildingInstructions.roofAccessPlaceholder', 'e.g., Access via penthouse stairwell')}
                       data-testid="input-roof-access"
                     />
@@ -2116,8 +2111,8 @@ export default function PropertyManager() {
                     <Label htmlFor="pm-conciergeName">{t('propertyManager.buildingInstructions.conciergeName', 'Concierge Name')}</Label>
                     <Input
                       id="pm-conciergeName"
-                      value={buildingInstructionsForm.conciergeName}
-                      onChange={(e) => setBuildingInstructionsForm(prev => ({ ...prev, conciergeName: e.target.value }))}
+                      value={buildingInstructionsForm.conciergeNames}
+                      onChange={(e) => setBuildingInstructionsForm(prev => ({ ...prev, conciergeNames: e.target.value }))}
                       data-testid="input-concierge-name"
                     />
                   </div>
@@ -2146,8 +2141,8 @@ export default function PropertyManager() {
                     <Label htmlFor="pm-maintName">{t('propertyManager.buildingInstructions.maintenanceName', 'Maintenance Contact Name')}</Label>
                     <Input
                       id="pm-maintName"
-                      value={buildingInstructionsForm.maintenanceContactName}
-                      onChange={(e) => setBuildingInstructionsForm(prev => ({ ...prev, maintenanceContactName: e.target.value }))}
+                      value={buildingInstructionsForm.maintenanceName}
+                      onChange={(e) => setBuildingInstructionsForm(prev => ({ ...prev, maintenanceName: e.target.value }))}
                       data-testid="input-maintenance-name"
                     />
                   </div>
@@ -2155,8 +2150,8 @@ export default function PropertyManager() {
                     <Label htmlFor="pm-maintPhone">{t('propertyManager.buildingInstructions.maintenancePhone', 'Phone')}</Label>
                     <Input
                       id="pm-maintPhone"
-                      value={buildingInstructionsForm.maintenanceContactPhone}
-                      onChange={(e) => setBuildingInstructionsForm(prev => ({ ...prev, maintenanceContactPhone: e.target.value }))}
+                      value={buildingInstructionsForm.maintenancePhone}
+                      onChange={(e) => setBuildingInstructionsForm(prev => ({ ...prev, maintenancePhone: e.target.value }))}
                       data-testid="input-maintenance-phone"
                     />
                   </div>
