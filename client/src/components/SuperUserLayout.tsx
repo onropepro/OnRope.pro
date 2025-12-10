@@ -49,7 +49,7 @@ const changelogSubItems: SubMenuItem[] = [
   { title: "User Access Guide", path: "/changelog/user-access" },
   { title: "Projects Guide", path: "/changelog/projects" },
   { title: "Time Tracking Guide", path: "/changelog/time-tracking" },
-  { title: "IRATA Logging Guide", path: "/changelog/irata-logging" },
+  { title: "IRATA / SPRAT Logging Guide", path: "/changelog/irata-logging" },
   { title: "Documents Guide", path: "/changelog/documents" },
   { title: "Employees Guide", path: "/changelog/employees" },
   { title: "Scheduling Guide", path: "/changelog/scheduling" },
@@ -62,6 +62,11 @@ const changelogSubItems: SubMenuItem[] = [
   { title: "Multi-Language Guide", path: "/changelog/language" },
   { title: "GPS & Location Guide", path: "/changelog/gps" },
   { title: "Property Manager Guide", path: "/changelog/property-manager" },
+  { title: "CSR Guide", path: "/changelog/csr" },
+  { title: "Mobile-First Guide", path: "/changelog/mobile-design" },
+  { title: "Technician Registration Guide", path: "/changelog/technician-registration" },
+  { title: "Job Board Guide", path: "/changelog/job-board" },
+  { title: "Payroll Guide", path: "/changelog/payroll" },
 ];
 
 

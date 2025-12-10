@@ -437,18 +437,18 @@ export default function SuperUserGoalsOverview() {
             <TabsContent value="summary" className="space-y-6">
               <div className="su-card" data-testid="card-summary-dashboard">
                 <div className="su-card-header">
-                  <h3 className="font-semibold text-gray-800 dark:text-white/90">At-a-Glance View</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">All key metrics in one place</p>
+                  <h3 className="text-xl md:text-2xl font-semibold text-foreground">At-a-Glance View</h3>
+                  <p className="text-sm text-muted-foreground">All key metrics in one place</p>
                 </div>
                 <div className="su-card-body">
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm" data-testid="table-summary">
                       <thead>
                         <tr className="border-b border-gray-200 dark:border-gray-700">
-                          <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400">Metric</th>
-                          <th className="text-right py-3 px-4 font-medium text-gray-600 dark:text-gray-400">Goal</th>
-                          <th className="text-right py-3 px-4 font-medium text-gray-600 dark:text-gray-400">Actual</th>
-                          <th className="text-center py-3 px-4 font-medium text-gray-600 dark:text-gray-400">Status</th>
+                          <th className="text-left py-3 px-4 font-medium text-muted-foreground">Metric</th>
+                          <th className="text-right py-3 px-4 font-medium text-muted-foreground">Goal</th>
+                          <th className="text-right py-3 px-4 font-medium text-muted-foreground">Actual</th>
+                          <th className="text-center py-3 px-4 font-medium text-muted-foreground">Status</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -456,11 +456,11 @@ export default function SuperUserGoalsOverview() {
                           const StatusIcon = getStatusConfig(m.status).icon;
                           return (
                             <tr key={m.id} className="border-b border-gray-100 dark:border-gray-800" data-testid={`row-metric-${m.id}`}>
-                              <td className="py-3 px-4 font-medium text-gray-800 dark:text-white/90">{m.name}</td>
-                              <td className="py-3 px-4 text-right text-gray-600 dark:text-gray-300">
+                              <td className="py-3 px-4 font-medium text-foreground">{m.name}</td>
+                              <td className="py-3 px-4 text-right text-muted-foreground">
                                 {typeof m.goal === 'number' && m.goal >= 1 ? m.goal.toLocaleString() : m.goal}{m.unit}
                               </td>
-                              <td className="py-3 px-4 text-right text-gray-600 dark:text-gray-300">
+                              <td className="py-3 px-4 text-right text-muted-foreground">
                                 {typeof m.current === 'number' && m.current >= 1 ? m.current.toLocaleString() : m.current}{m.unit}
                               </td>
                               <td className="py-3 px-4 text-center">
@@ -473,11 +473,11 @@ export default function SuperUserGoalsOverview() {
                           const StatusIcon = getStatusConfig(m.status).icon;
                           return (
                             <tr key={m.id} className="border-b border-gray-100 dark:border-gray-800" data-testid={`row-metric-${m.id}`}>
-                              <td className="py-3 px-4 font-medium text-gray-800 dark:text-white/90">{m.name}</td>
-                              <td className="py-3 px-4 text-right text-gray-600 dark:text-gray-300">
+                              <td className="py-3 px-4 font-medium text-foreground">{m.name}</td>
+                              <td className="py-3 px-4 text-right text-muted-foreground">
                                 {m.unit === '$' ? `$${typeof m.goal === 'number' ? m.goal.toLocaleString() : m.goal}` : m.goal}
                               </td>
-                              <td className="py-3 px-4 text-right text-gray-600 dark:text-gray-300">
+                              <td className="py-3 px-4 text-right text-muted-foreground">
                                 {m.unit === '$' ? `$${typeof m.current === 'number' ? m.current.toLocaleString() : m.current}` : m.current}
                               </td>
                               <td className="py-3 px-4 text-center">
@@ -497,7 +497,7 @@ export default function SuperUserGoalsOverview() {
                   <div className="su-card-header">
                     <div className="flex items-center gap-2">
                       <Bell className="h-5 w-5 text-amber-500" />
-                      <h3 className="font-semibold text-gray-800 dark:text-white/90">Trigger Escalations</h3>
+                      <h3 className="text-xl md:text-2xl font-semibold text-foreground">Trigger Escalations</h3>
                     </div>
                   </div>
                   <div className="su-card-body">
@@ -506,8 +506,8 @@ export default function SuperUserGoalsOverview() {
                         <div key={idx} className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50" data-testid={`row-trigger-${idx}`}>
                           <AlertCircle className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-800 dark:text-white/90">{t.condition}</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">{t.alert} → {t.action}</p>
+                            <p className="text-sm font-medium text-foreground">{t.condition}</p>
+                            <p className="text-xs text-muted-foreground">{t.alert} → {t.action}</p>
                           </div>
                         </div>
                       ))}
@@ -519,15 +519,15 @@ export default function SuperUserGoalsOverview() {
                   <div className="su-card-header">
                     <div className="flex items-center gap-2">
                       <Calendar className="h-5 w-5 text-blue-500" />
-                      <h3 className="font-semibold text-gray-800 dark:text-white/90">Review Cadence</h3>
+                      <h3 className="text-xl md:text-2xl font-semibold text-foreground">Review Cadence</h3>
                     </div>
                   </div>
                   <div className="su-card-body">
                     <div className="space-y-3">
                       {reviewCadence.map((r, idx) => (
                         <div key={idx} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50" data-testid={`row-cadence-${idx}`}>
-                          <span className="font-medium text-gray-800 dark:text-white/90">{r.frequency}</span>
-                          <span className="text-sm text-gray-600 dark:text-gray-400">{r.review}</span>
+                          <span className="font-medium text-foreground">{r.frequency}</span>
+                          <span className="text-sm text-muted-foreground">{r.review}</span>
                         </div>
                       ))}
                     </div>
@@ -553,7 +553,7 @@ export default function SuperUserGoalsOverview() {
                             <div className={`p-2 rounded-lg ${statusConfig.bg}`}>
                               <Icon className={`h-5 w-5 ${statusConfig.color}`} />
                             </div>
-                            <h3 className="font-semibold text-gray-800 dark:text-white/90">{metric.name}</h3>
+                            <h3 className="text-xl md:text-2xl font-semibold text-foreground">{metric.name}</h3>
                           </div>
                           <Badge className={statusConfig.badge}>
                             <StatusIcon className="h-3 w-3 mr-1" />
@@ -563,17 +563,17 @@ export default function SuperUserGoalsOverview() {
                       </div>
                       <div className="su-card-body space-y-4">
                         <div className="flex items-baseline justify-between">
-                          <span className="text-3xl font-bold text-gray-800 dark:text-white/90">
+                          <span className="text-3xl font-bold text-foreground">
                             {metric.current.toLocaleString()}{metric.unit === '%' ? '%' : ''}
                           </span>
-                          <span className="text-gray-500 dark:text-gray-400">
+                          <span className="text-muted-foreground">
                             of {metric.goal.toLocaleString()}{metric.unit === '%' ? '%' : ''}
                           </span>
                         </div>
                         
                         <div className="space-y-2">
                           <Progress value={Math.min(progress, 100)} className="h-2" />
-                          <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                          <div className="flex justify-between text-xs text-muted-foreground">
                             <span>{progress.toFixed(1)}% complete</span>
                             <span>Goal: {metric.goalDate}</span>
                           </div>
@@ -582,14 +582,14 @@ export default function SuperUserGoalsOverview() {
                         {metric.daysLeft > 0 && (
                           <div className="grid grid-cols-2 gap-4 pt-2 border-t border-gray-100 dark:border-gray-800">
                             <div>
-                              <p className="text-xs text-gray-500 dark:text-gray-400">Remaining</p>
-                              <p className="font-medium text-gray-800 dark:text-white/90">
+                              <p className="text-xs text-muted-foreground">Remaining</p>
+                              <p className="font-medium text-foreground">
                                 {remaining.toLocaleString()} · {metric.daysLeft} days
                               </p>
                             </div>
                             <div>
-                              <p className="text-xs text-gray-500 dark:text-gray-400">Rate (Need vs Actual)</p>
-                              <p className="font-medium text-gray-800 dark:text-white/90">
+                              <p className="text-xs text-muted-foreground">Rate (Need vs Actual)</p>
+                              <p className="font-medium text-foreground">
                                 {metric.requiredRate}/day vs {metric.actualRate}/day
                               </p>
                             </div>
@@ -620,17 +620,17 @@ export default function SuperUserGoalsOverview() {
                             <div className={`p-2 rounded-lg ${statusConfig.bg}`}>
                               <Icon className={`h-5 w-5 ${statusConfig.color}`} />
                             </div>
-                            <h3 className="font-semibold text-gray-800 dark:text-white/90 text-sm">{metric.name}</h3>
+                            <h3 className="text-xl md:text-2xl font-semibold text-foreground text-sm">{metric.name}</h3>
                           </div>
                           <StatusIcon className={`h-5 w-5 ${statusConfig.color}`} />
                         </div>
                       </div>
                       <div className="su-card-body space-y-3">
                         <div className="flex items-baseline justify-between">
-                          <span className="text-2xl font-bold text-gray-800 dark:text-white/90">
+                          <span className="text-2xl font-bold text-foreground">
                             {metric.unit === '$' ? `$${numCurrent.toLocaleString()}` : metric.current}
                           </span>
-                          <span className="text-sm text-gray-500 dark:text-gray-400">
+                          <span className="text-sm text-muted-foreground">
                             Goal: {metric.unit === '$' ? `$${numGoal.toLocaleString()}` : metric.goal}
                           </span>
                         </div>
@@ -639,7 +639,7 @@ export default function SuperUserGoalsOverview() {
                           <Progress value={Math.min(progress, 100)} className="h-1.5" />
                         )}
 
-                        <p className="text-xs text-gray-500 dark:text-gray-400">{metric.description}</p>
+                        <p className="text-xs text-muted-foreground">{metric.description}</p>
                       </div>
                     </div>
                   );
@@ -648,8 +648,8 @@ export default function SuperUserGoalsOverview() {
 
               <div className="su-card" data-testid="card-pricing-model">
                 <div className="su-card-header">
-                  <h3 className="font-semibold text-gray-800 dark:text-white/90">Pricing Model</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Current subscription structure</p>
+                  <h3 className="text-xl md:text-2xl font-semibold text-foreground">Pricing Model</h3>
+                  <p className="text-sm text-muted-foreground">Current subscription structure</p>
                 </div>
                 <div className="su-card-body">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -674,33 +674,33 @@ export default function SuperUserGoalsOverview() {
                   <div className="su-card-header">
                     <div className="flex items-center gap-2">
                       <Building2 className="h-5 w-5 text-amber-500" />
-                      <h3 className="font-semibold text-gray-800 dark:text-white/90">Buildings by Location</h3>
+                      <h3 className="text-xl md:text-2xl font-semibold text-foreground">Buildings by Location</h3>
                     </div>
                   </div>
                   <div className="su-card-body">
                     <div className="space-y-4">
                       <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
-                        <span className="font-medium text-gray-800 dark:text-white/90">Total</span>
-                        <span className="text-xl font-bold text-gray-800 dark:text-white/90">{geographicData.buildings.total}</span>
+                        <span className="font-medium text-foreground">Total</span>
+                        <span className="text-xl font-bold text-foreground">{geographicData.buildings.total}</span>
                       </div>
                       <div className="space-y-2">
-                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">By Country</p>
+                        <p className="text-xs font-medium text-muted-foreground uppercase">By Country</p>
                         {geographicData.buildings.byCountry.map((c) => (
                           <div key={c.name} className="flex items-center justify-between py-2 px-3">
                             <div className="flex items-center gap-2">
                               <MapPin className="h-4 w-4 text-gray-400" />
                               <span className="text-gray-700 dark:text-gray-300">{c.name}</span>
                             </div>
-                            <span className="font-medium text-gray-800 dark:text-white/90">{c.count}</span>
+                            <span className="font-medium text-foreground">{c.count}</span>
                           </div>
                         ))}
                       </div>
                       <div className="space-y-2">
-                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">By Province/State</p>
+                        <p className="text-xs font-medium text-muted-foreground uppercase">By Province/State</p>
                         {geographicData.buildings.byProvince.map((p) => (
                           <div key={p.name} className="flex items-center justify-between py-2 px-3">
                             <span className="text-gray-700 dark:text-gray-300">{p.name}</span>
-                            <span className="font-medium text-gray-800 dark:text-white/90">{p.count}</span>
+                            <span className="font-medium text-foreground">{p.count}</span>
                           </div>
                         ))}
                       </div>
@@ -712,20 +712,20 @@ export default function SuperUserGoalsOverview() {
                   <div className="su-card-header">
                     <div className="flex items-center gap-2">
                       <Users className="h-5 w-5 text-blue-500" />
-                      <h3 className="font-semibold text-gray-800 dark:text-white/90">Tech Accounts by Location</h3>
+                      <h3 className="text-xl md:text-2xl font-semibold text-foreground">Tech Accounts by Location</h3>
                     </div>
                   </div>
                   <div className="su-card-body">
                     <div className="space-y-4">
                       <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
-                        <span className="font-medium text-gray-800 dark:text-white/90">Total</span>
+                        <span className="font-medium text-foreground">Total</span>
                         <div className="text-right">
-                          <span className="text-xl font-bold text-gray-800 dark:text-white/90">{geographicData.techs.total}</span>
-                          <span className="text-sm text-gray-500 dark:text-gray-400 ml-2">/ {geographicData.techs.goal}</span>
+                          <span className="text-xl font-bold text-foreground">{geographicData.techs.total}</span>
+                          <span className="text-sm text-muted-foreground ml-2">/ {geographicData.techs.goal}</span>
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">By Country</p>
+                        <p className="text-xs font-medium text-muted-foreground uppercase">By Country</p>
                         {geographicData.techs.byCountry.map((c) => (
                           <div key={c.name} className="flex items-center justify-between py-2 px-3">
                             <div className="flex items-center gap-2">
@@ -733,8 +733,8 @@ export default function SuperUserGoalsOverview() {
                               <span className="text-gray-700 dark:text-gray-300">{c.name}</span>
                             </div>
                             <div>
-                              <span className="font-medium text-gray-800 dark:text-white/90">{c.count}</span>
-                              <span className="text-sm text-gray-500 dark:text-gray-400 ml-1">/ {c.goal}</span>
+                              <span className="font-medium text-foreground">{c.count}</span>
+                              <span className="text-sm text-muted-foreground ml-1">/ {c.goal}</span>
                             </div>
                           </div>
                         ))}
@@ -747,20 +747,20 @@ export default function SuperUserGoalsOverview() {
                   <div className="su-card-header">
                     <div className="flex items-center gap-2">
                       <Target className="h-5 w-5 text-purple-500" />
-                      <h3 className="font-semibold text-gray-800 dark:text-white/90">Employer Accounts by Location</h3>
+                      <h3 className="text-xl md:text-2xl font-semibold text-foreground">Employer Accounts by Location</h3>
                     </div>
                   </div>
                   <div className="su-card-body">
                     <div className="space-y-4">
                       <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
-                        <span className="font-medium text-gray-800 dark:text-white/90">Total</span>
+                        <span className="font-medium text-foreground">Total</span>
                         <div className="text-right">
-                          <span className="text-xl font-bold text-gray-800 dark:text-white/90">{geographicData.employers.total}</span>
-                          <span className="text-sm text-gray-500 dark:text-gray-400 ml-2">/ {geographicData.employers.goal}</span>
+                          <span className="text-xl font-bold text-foreground">{geographicData.employers.total}</span>
+                          <span className="text-sm text-muted-foreground ml-2">/ {geographicData.employers.goal}</span>
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">By Country</p>
+                        <p className="text-xs font-medium text-muted-foreground uppercase">By Country</p>
                         {geographicData.employers.byCountry.map((c) => (
                           <div key={c.name} className="flex items-center justify-between py-2 px-3">
                             <div className="flex items-center gap-2">
@@ -768,8 +768,8 @@ export default function SuperUserGoalsOverview() {
                               <span className="text-gray-700 dark:text-gray-300">{c.name}</span>
                             </div>
                             <div>
-                              <span className="font-medium text-gray-800 dark:text-white/90">{c.count}</span>
-                              <span className="text-sm text-gray-500 dark:text-gray-400 ml-1">/ {c.goal}</span>
+                              <span className="font-medium text-foreground">{c.count}</span>
+                              <span className="text-sm text-muted-foreground ml-1">/ {c.goal}</span>
                             </div>
                           </div>
                         ))}
@@ -782,24 +782,24 @@ export default function SuperUserGoalsOverview() {
                   <div className="su-card-header">
                     <div className="flex items-center gap-2">
                       <Building2 className="h-5 w-5 text-teal-500" />
-                      <h3 className="font-semibold text-gray-800 dark:text-white/90">Property Manager Accounts</h3>
+                      <h3 className="text-xl md:text-2xl font-semibold text-foreground">Property Manager Accounts</h3>
                     </div>
                   </div>
                   <div className="su-card-body">
                     <div className="space-y-4">
                       <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
-                        <span className="font-medium text-gray-800 dark:text-white/90">Total</span>
-                        <span className="text-xl font-bold text-gray-800 dark:text-white/90">{geographicData.propertyManagers.total}</span>
+                        <span className="font-medium text-foreground">Total</span>
+                        <span className="text-xl font-bold text-foreground">{geographicData.propertyManagers.total}</span>
                       </div>
                       <div className="space-y-2">
-                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">By Country</p>
+                        <p className="text-xs font-medium text-muted-foreground uppercase">By Country</p>
                         {geographicData.propertyManagers.byCountry.map((c) => (
                           <div key={c.name} className="flex items-center justify-between py-2 px-3">
                             <div className="flex items-center gap-2">
                               <MapPin className="h-4 w-4 text-gray-400" />
                               <span className="text-gray-700 dark:text-gray-300">{c.name}</span>
                             </div>
-                            <span className="font-medium text-gray-800 dark:text-white/90">{c.count}</span>
+                            <span className="font-medium text-foreground">{c.count}</span>
                           </div>
                         ))}
                       </div>
@@ -813,13 +813,13 @@ export default function SuperUserGoalsOverview() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="su-card" data-testid="card-cac">
                   <div className="su-card-header">
-                    <h3 className="font-semibold text-gray-800 dark:text-white/90">Customer Acquisition Cost</h3>
+                    <h3 className="text-xl md:text-2xl font-semibold text-foreground">Customer Acquisition Cost</h3>
                   </div>
                   <div className="su-card-body space-y-3">
-                    <div className="text-3xl font-bold text-gray-800 dark:text-white/90">
+                    <div className="text-3xl font-bold text-foreground">
                       ${unitEconomics.cac.value.toLocaleString()}
                     </div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-sm text-muted-foreground">
                       Goal: &lt;${unitEconomics.cac.goal.toLocaleString()}
                     </p>
                     <Badge className={getStatusConfig(unitEconomics.cac.status).badge}>
@@ -830,13 +830,13 @@ export default function SuperUserGoalsOverview() {
 
                 <div className="su-card" data-testid="card-ltv">
                   <div className="su-card-header">
-                    <h3 className="font-semibold text-gray-800 dark:text-white/90">Lifetime Value (LTV)</h3>
+                    <h3 className="text-xl md:text-2xl font-semibold text-foreground">Lifetime Value (LTV)</h3>
                   </div>
                   <div className="su-card-body space-y-3">
                     <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
                       ${unitEconomics.ltv.value.toLocaleString()}
                     </div>
-                    <div className="space-y-1 text-xs text-gray-500 dark:text-gray-400">
+                    <div className="space-y-1 text-xs text-muted-foreground">
                       <p>ARPU: ${unitEconomics.ltv.arpu}/mo</p>
                       <p>Gross Margin: {(unitEconomics.ltv.margin * 100).toFixed(0)}%</p>
                       <p>Avg Lifespan: {unitEconomics.ltv.lifespan} years</p>
@@ -846,13 +846,13 @@ export default function SuperUserGoalsOverview() {
 
                 <div className="su-card" data-testid="card-ltv-cac">
                   <div className="su-card-header">
-                    <h3 className="font-semibold text-gray-800 dark:text-white/90">LTV:CAC Ratio</h3>
+                    <h3 className="text-xl md:text-2xl font-semibold text-foreground">LTV:CAC Ratio</h3>
                   </div>
                   <div className="su-card-body space-y-3">
-                    <div className="text-3xl font-bold text-gray-800 dark:text-white/90">
+                    <div className="text-3xl font-bold text-foreground">
                       {unitEconomics.ltvCac.value !== null ? `${unitEconomics.ltvCac.value}:1` : '—'}
                     </div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-sm text-muted-foreground">
                       Goal: &gt;{unitEconomics.ltvCac.goal}x (target: {unitEconomics.ltvCac.target}x+)
                     </p>
                   </div>
@@ -860,13 +860,13 @@ export default function SuperUserGoalsOverview() {
 
                 <div className="su-card" data-testid="card-payback">
                   <div className="su-card-header">
-                    <h3 className="font-semibold text-gray-800 dark:text-white/90">CAC Payback</h3>
+                    <h3 className="text-xl md:text-2xl font-semibold text-foreground">CAC Payback</h3>
                   </div>
                   <div className="su-card-body space-y-3">
-                    <div className="text-3xl font-bold text-gray-800 dark:text-white/90">
+                    <div className="text-3xl font-bold text-foreground">
                       {unitEconomics.payback.value !== null ? `${unitEconomics.payback.value} mo` : '—'}
                     </div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-sm text-muted-foreground">
                       Goal: &lt;{unitEconomics.payback.goal} months
                     </p>
                     <p className="text-xs text-gray-400">
@@ -883,9 +883,9 @@ export default function SuperUserGoalsOverview() {
                   <div className="su-card-header">
                     <div className="flex items-center gap-2">
                       <Target className="h-5 w-5 text-blue-500" />
-                      <h3 className="font-semibold text-gray-800 dark:text-white/90">Employer Engagement</h3>
+                      <h3 className="text-xl md:text-2xl font-semibold text-foreground">Employer Engagement</h3>
                     </div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Last 30 days</p>
+                    <p className="text-sm text-muted-foreground">Last 30 days</p>
                   </div>
                   <div className="su-card-body">
                     <div className="space-y-3">
@@ -897,9 +897,9 @@ export default function SuperUserGoalsOverview() {
                         { label: "Time Entries", value: engagementMetrics.employers.timeEntriesLogged, goal: "—" },
                       ].map((item) => (
                         <div key={item.label} className="flex items-center justify-between py-2">
-                          <span className="text-sm text-gray-600 dark:text-gray-400">{item.label}</span>
+                          <span className="text-sm text-muted-foreground">{item.label}</span>
                           <div className="text-right">
-                            <span className="font-medium text-gray-800 dark:text-white/90">{item.value}</span>
+                            <span className="font-medium text-foreground">{item.value}</span>
                             <span className="text-xs text-gray-400 ml-2">({item.goal})</span>
                           </div>
                         </div>
@@ -912,9 +912,9 @@ export default function SuperUserGoalsOverview() {
                   <div className="su-card-header">
                     <div className="flex items-center gap-2">
                       <Users className="h-5 w-5 text-purple-500" />
-                      <h3 className="font-semibold text-gray-800 dark:text-white/90">Tech Engagement</h3>
+                      <h3 className="text-xl md:text-2xl font-semibold text-foreground">Tech Engagement</h3>
                     </div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Last 30 days</p>
+                    <p className="text-sm text-muted-foreground">Last 30 days</p>
                   </div>
                   <div className="su-card-body">
                     <div className="space-y-3">
@@ -925,9 +925,9 @@ export default function SuperUserGoalsOverview() {
                         { label: "Profile Completeness", value: `${engagementMetrics.techs.profileCompleteness}%`, goal: ">80%" },
                       ].map((item) => (
                         <div key={item.label} className="flex items-center justify-between py-2">
-                          <span className="text-sm text-gray-600 dark:text-gray-400">{item.label}</span>
+                          <span className="text-sm text-muted-foreground">{item.label}</span>
                           <div className="text-right">
-                            <span className="font-medium text-gray-800 dark:text-white/90">{item.value}</span>
+                            <span className="font-medium text-foreground">{item.value}</span>
                             <span className="text-xs text-gray-400 ml-2">({item.goal})</span>
                           </div>
                         </div>
@@ -940,9 +940,9 @@ export default function SuperUserGoalsOverview() {
                   <div className="su-card-header">
                     <div className="flex items-center gap-2">
                       <Building2 className="h-5 w-5 text-teal-500" />
-                      <h3 className="font-semibold text-gray-800 dark:text-white/90">PM Engagement</h3>
+                      <h3 className="text-xl md:text-2xl font-semibold text-foreground">PM Engagement</h3>
                     </div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Last 30 days</p>
+                    <p className="text-sm text-muted-foreground">Last 30 days</p>
                   </div>
                   <div className="su-card-body">
                     <div className="space-y-3">
@@ -952,9 +952,9 @@ export default function SuperUserGoalsOverview() {
                         { label: "Reports Viewed", value: engagementMetrics.propertyManagers.reportsViewed, goal: "—" },
                       ].map((item) => (
                         <div key={item.label} className="flex items-center justify-between py-2">
-                          <span className="text-sm text-gray-600 dark:text-gray-400">{item.label}</span>
+                          <span className="text-sm text-muted-foreground">{item.label}</span>
                           <div className="text-right">
-                            <span className="font-medium text-gray-800 dark:text-white/90">{item.value}</span>
+                            <span className="font-medium text-foreground">{item.value}</span>
                             <span className="text-xs text-gray-400 ml-2">({item.goal})</span>
                           </div>
                         </div>
@@ -968,29 +968,29 @@ export default function SuperUserGoalsOverview() {
                 <div className="su-card-header">
                   <div className="flex items-center gap-2">
                     <Gauge className="h-5 w-5 text-amber-500" />
-                    <h3 className="font-semibold text-gray-800 dark:text-white/90">Engagement Health Score</h3>
+                    <h3 className="text-xl md:text-2xl font-semibold text-foreground">Engagement Health Score</h3>
                   </div>
                 </div>
                 <div className="su-card-body">
                   <div className="flex items-center gap-8">
                     <div className="text-center">
-                      <div className="text-5xl font-bold text-gray-800 dark:text-white/90">
+                      <div className="text-5xl font-bold text-foreground">
                         {engagementMetrics.healthScore}
                       </div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">/ 100</p>
+                      <p className="text-sm text-muted-foreground">/ 100</p>
                     </div>
                     <div className="flex-1 space-y-2">
                       <div className="flex items-center gap-3">
                         <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                        <span className="text-sm text-gray-600 dark:text-gray-400">0-40: Low engagement (Churn risk)</span>
+                        <span className="text-sm text-muted-foreground">0-40: Low engagement (Churn risk)</span>
                       </div>
                       <div className="flex items-center gap-3">
                         <div className="w-3 h-3 rounded-full bg-amber-500"></div>
-                        <span className="text-sm text-gray-600 dark:text-gray-400">41-70: Moderate (Monitor)</span>
+                        <span className="text-sm text-muted-foreground">41-70: Moderate (Monitor)</span>
                       </div>
                       <div className="flex items-center gap-3">
                         <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
-                        <span className="text-sm text-gray-600 dark:text-gray-400">71-100: High (Healthy)</span>
+                        <span className="text-sm text-muted-foreground">71-100: High (Healthy)</span>
                       </div>
                     </div>
                   </div>
@@ -1001,31 +1001,31 @@ export default function SuperUserGoalsOverview() {
             <TabsContent value="goals" className="space-y-6">
               <div className="su-card" data-testid="card-smart-goals">
                 <div className="su-card-header">
-                  <h3 className="font-semibold text-gray-800 dark:text-white/90">Year 1 SMART Goals</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Launch → Dec 31, 2026</p>
+                  <h3 className="text-xl md:text-2xl font-semibold text-foreground">Year 1 SMART Goals</h3>
+                  <p className="text-sm text-muted-foreground">Launch → Dec 31, 2026</p>
                 </div>
                 <div className="su-card-body">
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm" data-testid="table-smart-goals">
                       <thead>
                         <tr className="border-b border-gray-200 dark:border-gray-700">
-                          <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400">Goal</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400">Specific</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400">Measurable</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400">Achievable</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400">Relevant</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400">Time-bound</th>
+                          <th className="text-left py-3 px-4 font-medium text-muted-foreground">Goal</th>
+                          <th className="text-left py-3 px-4 font-medium text-muted-foreground">Specific</th>
+                          <th className="text-left py-3 px-4 font-medium text-muted-foreground">Measurable</th>
+                          <th className="text-left py-3 px-4 font-medium text-muted-foreground">Achievable</th>
+                          <th className="text-left py-3 px-4 font-medium text-muted-foreground">Relevant</th>
+                          <th className="text-left py-3 px-4 font-medium text-muted-foreground">Time-bound</th>
                         </tr>
                       </thead>
                       <tbody>
                         {smartGoals.map((g) => (
                           <tr key={g.goal} className="border-b border-gray-100 dark:border-gray-800" data-testid={`row-goal-${g.goal.toLowerCase().replace(/\s+/g, '-')}`}>
-                            <td className="py-3 px-4 font-medium text-gray-800 dark:text-white/90">{g.goal}</td>
-                            <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{g.specific}</td>
-                            <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{g.measurable}</td>
-                            <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{g.achievable}</td>
-                            <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{g.relevant}</td>
-                            <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{g.timeBound}</td>
+                            <td className="py-3 px-4 font-medium text-foreground">{g.goal}</td>
+                            <td className="py-3 px-4 text-muted-foreground">{g.specific}</td>
+                            <td className="py-3 px-4 text-muted-foreground">{g.measurable}</td>
+                            <td className="py-3 px-4 text-muted-foreground">{g.achievable}</td>
+                            <td className="py-3 px-4 text-muted-foreground">{g.relevant}</td>
+                            <td className="py-3 px-4 text-muted-foreground">{g.timeBound}</td>
                           </tr>
                         ))}
                       </tbody>
