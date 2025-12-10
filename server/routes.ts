@@ -1591,38 +1591,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if current price already exists on subscription
       const existingItem = subscription.items.data.find(item => item.price.id === addonPriceId);
 
-      let newQuantityOnCurrentPrice: number;
       if (existingItem) {
         // Update quantity of existing subscription item
         const currentQuantity = existingItem.quantity || 0;
         const targetQuantity = currentQuantity + seatsToAdd;
         console.log(`[Stripe] Extra seats already on subscription. Updating quantity from ${currentQuantity} to ${targetQuantity}`);
-        const updatedItem = await stripe.subscriptionItems.update(existingItem.id, {
+        await stripe.subscriptionItems.update(existingItem.id, {
           quantity: targetQuantity,
           proration_behavior: 'create_prorations',
         });
-        newQuantityOnCurrentPrice = updatedItem.quantity || targetQuantity;
       } else {
         // Create new subscription item with requested quantity
         console.log(`[Stripe] Adding ${seatsToAdd} extra seat(s) as new subscription item`);
-        const newItem = await stripe.subscriptionItems.create({
+        await stripe.subscriptionItems.create({
           subscription: user.stripeSubscriptionId,
           price: addonPriceId,
           quantity: seatsToAdd,
           proration_behavior: 'create_prorations',
         });
-        newQuantityOnCurrentPrice = newItem.quantity || seatsToAdd;
       }
 
-      // Total seats = existing seats on legacy prices + seats on current price
-      const totalSeats = totalExistingSeats - (existingItem?.quantity || 0) + newQuantityOnCurrentPrice;
+      // CRITICAL: Re-fetch subscription to count ALL seats across ALL price tiers (Stripe is source of truth)
+      const verifySubscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
+      let totalSeats = 0;
+      for (const item of verifySubscription.items.data) {
+        if (item.price.id === addonPriceId || legacySeatPriceIds.includes(item.price.id)) {
+          totalSeats += item.quantity || 0;
+        }
+      }
 
-      // Update user's additional seats count in database with total from all seat items
+      // Update user's additional seats count in database to match Stripe's verified total
       await storage.updateUser(user.id, {
         additionalSeatsCount: totalSeats,
       });
 
-      console.log(`[Stripe] ${seatsToAdd} extra seat(s) added successfully. Total additional seats: ${totalSeats}`);
+      console.log(`[Stripe] ${seatsToAdd} extra seat(s) added successfully. Total seats across all tiers: ${totalSeats}`);
       res.json({
         success: true,
         message: `${seatsToAdd} seat(s) added successfully`,
@@ -1870,6 +1873,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   /**
    * Remove one extra seat from subscription
    * POST /api/stripe/remove-addon-seats
+   * 
+   * IMPORTANT: Supports both current and legacy seat price IDs
+   * After update, re-fetches Stripe to count ALL seats (source of truth)
    */
   app.post("/api/stripe/remove-addon-seats", requireAuth, async (req: Request, res: Response) => {
     try {
@@ -1890,50 +1896,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
       const currency = subscription.currency.toLowerCase() as 'usd' | 'cad';
 
-      // Get extra seats price ID
+      // Get current extra seats price ID
       const addonConfig = ADDON_CONFIG.extra_seats;
-      const addonPriceId = currency === 'usd' ? addonConfig.priceIdUSD : addonConfig.priceIdCAD;
+      const currentPriceId = currency === 'usd' ? addonConfig.priceIdUSD : addonConfig.priceIdCAD;
+      
+      // Legacy seat price IDs (must support for existing customers)
+      const legacyPriceId = currency === 'usd' 
+        ? 'price_1SWDH4BzDsOltscrMxt5u3ij'  // Old USD seat price ($19/month)
+        : 'price_1SZG7KBzDsOltscrAcGW9Vuw'; // Old CAD seat price ($19/month)
+      
+      // All seat price IDs to check
+      const allSeatPriceIds = [currentPriceId, legacyPriceId];
 
       console.log(`[Stripe] Removing one extra seat from subscription ${user.stripeSubscriptionId}`);
 
-      // Find the subscription item for extra seats
-      const existingItem = subscription.items.data.find(item => item.price.id === addonPriceId);
+      // Find ANY seat subscription item (current or legacy)
+      let existingItem = subscription.items.data.find(item => item.price.id === currentPriceId);
+      let isLegacy = false;
+      
+      if (!existingItem) {
+        existingItem = subscription.items.data.find(item => item.price.id === legacyPriceId);
+        isLegacy = true;
+      }
 
       if (!existingItem) {
+        console.error('[Stripe] No seat item found. Available items:', 
+          subscription.items.data.map(item => ({ id: item.id, priceId: item.price.id, quantity: item.quantity }))
+        );
         return res.status(404).json({ message: "Extra seats subscription item not found" });
       }
 
-      let newQuantity = 0;
       const currentQuantity = existingItem.quantity || 1;
+      console.log(`[Stripe] Found seat item on ${isLegacy ? 'legacy' : 'current'} price. Quantity: ${currentQuantity}`);
 
       if (currentQuantity > 1) {
         // Decrement quantity by 1
         console.log(`[Stripe] Reducing seats from ${currentQuantity} to ${currentQuantity - 1}`);
-        const updatedItem = await stripe.subscriptionItems.update(existingItem.id, {
+        await stripe.subscriptionItems.update(existingItem.id, {
           quantity: currentQuantity - 1,
           proration_behavior: 'create_prorations',
         });
-        newQuantity = updatedItem.quantity || 0;
       } else {
         // Remove the subscription item entirely
-        console.log(`[Stripe] Removing last seat`);
+        console.log(`[Stripe] Removing last seat from this price tier`);
         await stripe.subscriptionItems.del(existingItem.id, {
           proration_behavior: 'create_prorations',
         });
-        newQuantity = 0;
       }
 
-      // Update database with new quantity
+      // CRITICAL: Re-fetch subscription to count ALL seats across ALL price tiers (Stripe is source of truth)
+      const verifySubscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
+      let totalSeatsInStripe = 0;
+      for (const item of verifySubscription.items.data) {
+        if (allSeatPriceIds.includes(item.price.id)) {
+          totalSeatsInStripe += item.quantity || 0;
+        }
+      }
+
+      // Update database to match Stripe's verified total
       await storage.updateUser(user.id, {
-        additionalSeatsCount: newQuantity,
+        additionalSeatsCount: totalSeatsInStripe,
       });
 
-      console.log(`[Stripe] Extra seat removed successfully. Remaining seats: ${newQuantity}`);
+      console.log(`[Stripe] Extra seat removed successfully. Total remaining seats across all tiers: ${totalSeatsInStripe}`);
       res.json({
         success: true,
         message: "Extra seat removed successfully",
-        remainingSeats: newQuantity,
-        totalExtraSeats: newQuantity,
+        remainingSeats: totalSeatsInStripe,
+        totalExtraSeats: totalSeatsInStripe,
       });
     } catch (error: any) {
       console.error('[Stripe] Remove seat error:', error);
