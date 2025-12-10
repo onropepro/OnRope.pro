@@ -50,7 +50,11 @@ import {
   Sparkles,
   ParkingCircle,
   Wrench,
-  AppWindow
+  AppWindow,
+  Brush,
+  ClipboardCheck,
+  Warehouse,
+  SprayCan
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
@@ -116,16 +120,44 @@ export default function ProjectsGuide() {
             Supported Job Types
           </h2>
           
-          <div className="grid md:grid-cols-3 gap-3">
+          <div className="grid md:grid-cols-2 gap-3">
             <Card>
               <CardContent className="pt-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                    <AppWindow className="w-5 h-5 text-action-600 dark:text-action-400" />
+                    <span className="material-icons text-action-600 dark:text-action-400">window</span>
                   </div>
                   <div>
                     <p className="font-medium">Window Cleaning</p>
-                    <p className="text-xs text-muted-foreground">Drop-based tracking</p>
+                    <p className="text-xs text-muted-foreground">Drop-based (N/E/S/W)</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                    <span className="material-icons text-action-600 dark:text-action-400">air</span>
+                  </div>
+                  <div>
+                    <p className="font-medium">Exterior Dryer Vent Cleaning</p>
+                    <p className="text-xs text-muted-foreground">Drop-based (N/E/S/W)</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                    <span className="material-icons text-action-600 dark:text-action-400">water_drop</span>
+                  </div>
+                  <div>
+                    <p className="font-medium">Building Wash / Pressure Washing</p>
+                    <p className="text-xs text-muted-foreground">Drop-based (N/E/S/W)</p>
                   </div>
                 </div>
               </CardContent>
@@ -135,11 +167,25 @@ export default function ProjectsGuide() {
               <CardContent className="pt-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                    <Wind className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                    <span className="material-icons text-gray-600 dark:text-gray-400">cleaning_services</span>
                   </div>
                   <div>
-                    <p className="font-medium">Dryer Vent Cleaning</p>
-                    <p className="text-xs text-muted-foreground">Drop-based tracking</p>
+                    <p className="font-medium">General Pressure Washing</p>
+                    <p className="text-xs text-muted-foreground">Hours-based</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                    <span className="material-icons text-gray-600 dark:text-gray-400">home_repair_service</span>
+                  </div>
+                  <div>
+                    <p className="font-medium">Gutter Cleaning</p>
+                    <p className="text-xs text-muted-foreground">Hours-based</p>
                   </div>
                 </div>
               </CardContent>
@@ -149,11 +195,11 @@ export default function ProjectsGuide() {
               <CardContent className="pt-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center">
-                    <Building2 className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                    <span className="material-icons text-amber-600 dark:text-amber-400">meeting_room</span>
                   </div>
                   <div>
-                    <p className="font-medium">Building Wash</p>
-                    <p className="text-xs text-muted-foreground">Drop-based tracking</p>
+                    <p className="font-medium">In-Suite Dryer Vent Cleaning</p>
+                    <p className="text-xs text-muted-foreground">Unit-based</p>
                   </div>
                 </div>
               </CardContent>
@@ -163,11 +209,11 @@ export default function ProjectsGuide() {
               <CardContent className="pt-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
-                    <ParkingCircle className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                    <span className="material-icons text-purple-600 dark:text-purple-400">local_parking</span>
                   </div>
                   <div>
-                    <p className="font-medium">Parkade Cleaning</p>
-                    <p className="text-xs text-muted-foreground">Stall-based tracking</p>
+                    <p className="font-medium">Parkade Pressure Cleaning</p>
+                    <p className="text-xs text-muted-foreground">Stall-based</p>
                   </div>
                 </div>
               </CardContent>
@@ -176,26 +222,40 @@ export default function ProjectsGuide() {
             <Card>
               <CardContent className="pt-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900 flex items-center justify-center">
-                    <Search className="w-5 h-5 text-green-600 dark:text-green-400" />
+                  <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                    <span className="material-icons text-gray-600 dark:text-gray-400">storefront</span>
+                  </div>
+                  <div>
+                    <p className="font-medium">Ground Window Cleaning</p>
+                    <p className="text-xs text-muted-foreground">Hours-based</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                    <span className="material-icons text-gray-600 dark:text-gray-400">format_paint</span>
+                  </div>
+                  <div>
+                    <p className="font-medium">Painting</p>
+                    <p className="text-xs text-muted-foreground">Hours-based</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                    <span className="material-icons text-gray-600 dark:text-gray-400">fact_check</span>
                   </div>
                   <div>
                     <p className="font-medium">Inspection</p>
-                    <p className="text-xs text-muted-foreground">Hours-based tracking</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-red-100 dark:bg-red-900 flex items-center justify-center">
-                    <Wrench className="w-5 h-5 text-red-600 dark:text-red-400" />
-                  </div>
-                  <div>
-                    <p className="font-medium">Repairs</p>
-                    <p className="text-xs text-muted-foreground">Hours-based tracking</p>
+                    <p className="text-xs text-muted-foreground">Hours-based</p>
                   </div>
                 </div>
               </CardContent>
