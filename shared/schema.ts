@@ -288,6 +288,7 @@ export const buildingInstructions = pgTable("building_instructions", {
   conciergeHours: text("concierge_hours"), // Hours of operation for concierge
   maintenanceName: varchar("maintenance_name"),
   maintenancePhone: varchar("maintenance_phone"),
+  councilMemberUnits: text("council_member_units"), // Floor/unit numbers of council members
   
   // Parking
   staffParkingInstructions: text("staff_parking_instructions"), // Where staff can park

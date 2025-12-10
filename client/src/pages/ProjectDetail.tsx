@@ -149,6 +149,7 @@ export default function ProjectDetail() {
     conciergeHours: "",
     maintenanceName: "",
     maintenancePhone: "",
+    councilMemberUnits: "",
     staffParkingInstructions: "",
   });
 
@@ -281,6 +282,7 @@ export default function ProjectDetail() {
         conciergeHours: (buildingData.instructions as any).conciergeHours || "",
         maintenanceName: buildingData.instructions.maintenanceName || "",
         maintenancePhone: buildingData.instructions.maintenancePhone || "",
+        councilMemberUnits: (buildingData.instructions as any).councilMemberUnits || "",
         staffParkingInstructions: (buildingData.instructions as any).staffParkingInstructions || "",
       });
     }
@@ -1535,6 +1537,15 @@ export default function ProjectDetail() {
                                       {buildingData.instructions.maintenancePhone}
                                     </a>
                                   )}
+                                </div>
+                              </div>
+                            )}
+                            {(buildingData.instructions as any).councilMemberUnits && (
+                              <div className="flex gap-3">
+                                <span className="material-icons text-sm text-muted-foreground shrink-0 mt-0.5">groups</span>
+                                <div>
+                                  <p className="text-xs font-medium text-muted-foreground">{t('projectDetail.buildingInstructions.councilMemberUnits', 'Council Member Units')}</p>
+                                  <p className="text-sm">{(buildingData.instructions as any).councilMemberUnits}</p>
                                 </div>
                               </div>
                             )}
@@ -4038,6 +4049,18 @@ export default function ProjectDetail() {
                     data-testid="input-maintenance-phone"
                   />
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="councilMemberUnits">{t('projectDetail.buildingInstructions.councilMemberUnits', 'Council Member Units')}</Label>
+                <Input
+                  id="councilMemberUnits"
+                  placeholder={t('projectDetail.buildingInstructions.councilMemberUnitsPlaceholder', 'e.g., Unit 301, 502, 1205')}
+                  value={instructionsForm.councilMemberUnits}
+                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, councilMemberUnits: e.target.value }))}
+                  data-testid="input-council-units"
+                />
+                <p className="text-xs text-muted-foreground">{t('projectDetail.buildingInstructions.councilMemberUnitsHint', 'Floor/unit numbers where council members reside')}</p>
               </div>
             </div>
 

@@ -70,6 +70,7 @@ export default function BuildingPortal() {
     conciergeHours: "",
     maintenanceName: "",
     maintenancePhone: "",
+    councilMemberUnits: "",
     staffParkingInstructions: "",
   });
 
@@ -114,6 +115,7 @@ export default function BuildingPortal() {
         conciergeHours: (buildingInstructions as any).conciergeHours || "",
         maintenanceName: buildingInstructions.maintenanceName || "",
         maintenancePhone: buildingInstructions.maintenancePhone || "",
+        councilMemberUnits: (buildingInstructions as any).councilMemberUnits || "",
         staffParkingInstructions: (buildingInstructions as any).staffParkingInstructions || "",
       });
     }
@@ -515,6 +517,15 @@ export default function BuildingPortal() {
                           </div>
                         </div>
                       )}
+                      {(buildingInstructions as any)?.councilMemberUnits && (
+                        <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                          <span className="material-icons text-primary mt-0.5" style={{ fontSize: '20px' }}>groups</span>
+                          <div>
+                            <p className="font-medium text-sm">Council Member Units</p>
+                            <p className="text-sm">{(buildingInstructions as any).councilMemberUnits}</p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
@@ -759,6 +770,18 @@ export default function BuildingPortal() {
                     data-testid="input-maintenance-phone"
                   />
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="councilMemberUnits">Council Member Units</Label>
+                <Input
+                  id="councilMemberUnits"
+                  placeholder="e.g., Unit 301, 502, 1205"
+                  value={instructionsForm.councilMemberUnits}
+                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, councilMemberUnits: e.target.value }))}
+                  data-testid="input-council-units"
+                />
+                <p className="text-xs text-muted-foreground">Floor/unit numbers where council members reside</p>
               </div>
             </div>
 
