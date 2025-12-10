@@ -1956,6 +1956,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   /**
    * Remove multiple seats with employee suspension
    * POST /api/stripe/remove-seats
+   * 
+   * TRANSACTION SAFETY: Operations are ordered to ensure consistency:
+   * 1. Validate all inputs
+   * 2. Suspend employees in DB (reversible)
+   * 3. Update seat count in DB (reversible)
+   * 4. Update Stripe subscription (if this fails, rollback DB changes)
    */
   app.post("/api/stripe/remove-seats", requireAuth, async (req: Request, res: Response) => {
     try {
@@ -1978,8 +1984,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid quantity" });
       }
 
-      if (!employeeIds || !Array.isArray(employeeIds) || employeeIds.length !== quantity) {
-        return res.status(400).json({ message: "Must select employees equal to the number of seats to remove" });
+      if (!employeeIds || !Array.isArray(employeeIds)) {
+        return res.status(400).json({ message: "Employee IDs must be provided as an array" });
+      }
+
+      // CRITICAL FIX: Deduplicate employee IDs to prevent seat count mismatch
+      const uniqueEmployeeIds = [...new Set(employeeIds as string[])];
+      if (uniqueEmployeeIds.length !== quantity) {
+        return res.status(400).json({ 
+          message: `Must select ${quantity} unique employees to remove ${quantity} seat(s). You selected ${uniqueEmployeeIds.length} unique employee(s).` 
+        });
       }
 
       const paidSeats = user.additionalSeatsCount || 0;
@@ -1988,7 +2002,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Validate all employees belong to this company and are active (not suspended or terminated)
-      for (const empId of employeeIds) {
+      const employeesToSuspend: { id: string; name: string }[] = [];
+      for (const empId of uniqueEmployeeIds) {
         const emp = await storage.getUserById(empId);
         if (!emp) {
           return res.status(400).json({ message: `Employee ${empId} not found` });
@@ -2002,77 +2017,133 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (emp.terminatedDate) {
           return res.status(400).json({ message: `Employee ${emp.name} is terminated and cannot be suspended` });
         }
+        employeesToSuspend.push({ id: emp.id, name: emp.name });
       }
 
       // Get current subscription to determine currency
       const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
       const currency = subscription.currency.toLowerCase() as 'usd' | 'cad';
 
-      // Get extra seats price ID
+      // CRITICAL FIX: Support both current AND legacy seat price IDs
+      // Current prices: $34.95/seat (new pricing model)
+      // Legacy prices: $19/seat (old pricing model - some customers may still have these)
       const addonConfig = ADDON_CONFIG.extra_seats;
-      const addonPriceId = currency === 'usd' ? addonConfig.priceIdUSD : addonConfig.priceIdCAD;
+      const currentPriceId = currency === 'usd' ? addonConfig.priceIdUSD : addonConfig.priceIdCAD;
+      
+      // Legacy seat price IDs from scratchpad
+      const legacyPriceIds = {
+        usd: 'price_1SWDH4BzDsOltscrMxt5u3ij', // $19/month legacy USD
+        cad: 'price_1SZG7KBzDsOltscrAcGW9Vuw', // $19/month legacy CAD
+      };
+      const legacyPriceId = currency === 'usd' ? legacyPriceIds.usd : legacyPriceIds.cad;
 
       console.log(`[Stripe] Removing ${quantity} extra seats from subscription ${user.stripeSubscriptionId}`);
 
-      // Find the subscription item for extra seats
-      const existingItem = subscription.items.data.find(item => item.price.id === addonPriceId);
+      // Find the subscription item for extra seats (check both current and legacy price IDs)
+      let existingItem = subscription.items.data.find(item => item.price.id === currentPriceId);
+      let isLegacyPrice = false;
+      let actualPricePerSeat = 34.95;
+      
+      if (!existingItem) {
+        // Try legacy price ID
+        existingItem = subscription.items.data.find(item => item.price.id === legacyPriceId);
+        if (existingItem) {
+          isLegacyPrice = true;
+          actualPricePerSeat = 19.00; // Legacy price
+          console.log(`[Stripe] Found legacy seat price ID: ${legacyPriceId}`);
+        }
+      }
 
       if (!existingItem) {
-        return res.status(404).json({ message: "Extra seats subscription item not found" });
+        // Log all subscription items for debugging
+        console.error('[Stripe] Could not find seat subscription item. Available items:', 
+          subscription.items.data.map(item => ({ id: item.id, priceId: item.price.id, quantity: item.quantity }))
+        );
+        return res.status(404).json({ 
+          message: "Extra seats subscription item not found. Please contact support if you believe this is an error." 
+        });
       }
 
       const currentQuantity = existingItem.quantity || 0;
       const newQuantity = Math.max(0, currentQuantity - quantity);
 
-      let creditAmount = 0;
-
-      if (newQuantity > 0) {
-        // Reduce quantity
-        console.log(`[Stripe] Reducing seats from ${currentQuantity} to ${newQuantity}`);
-        await stripe.subscriptionItems.update(existingItem.id, {
-          quantity: newQuantity,
-          proration_behavior: 'create_prorations',
-        });
-      } else {
-        // Remove the subscription item entirely
-        console.log(`[Stripe] Removing all seats`);
-        await stripe.subscriptionItems.del(existingItem.id, {
-          proration_behavior: 'create_prorations',
-        });
-      }
-
-      // Calculate estimated credit (prorated)
+      // Calculate estimated credit (prorated) using actual price
       const now = new Date();
       const periodEnd = new Date(subscription.current_period_end * 1000);
       const daysRemaining = Math.max(0, Math.ceil((periodEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
-      const dailyRate = 34.95 / 30; // Approximate daily rate
-      creditAmount = Math.round(quantity * dailyRate * daysRemaining * 100) / 100;
+      const dailyRate = actualPricePerSeat / 30;
+      const creditAmount = Math.round(quantity * dailyRate * daysRemaining * 100) / 100;
 
-      // Suspend the selected employees
+      // TRANSACTION SAFETY: Suspend employees and update DB FIRST, then Stripe
+      // This way, if Stripe fails, we can rollback the DB changes
       const suspendedAt = new Date();
-      for (const empId of employeeIds) {
+      const previousSeatCount = user.additionalSeatsCount || 0;
+
+      // Step 1: Suspend all employees in DB
+      console.log(`[Stripe] Step 1: Suspending ${employeesToSuspend.length} employees in DB`);
+      for (const emp of employeesToSuspend) {
         await db.update(users)
           .set({
             suspendedAt: suspendedAt,
             suspendedBy: user.id,
           })
-          .where(eq(users.id, empId));
-        console.log(`[Stripe] Suspended employee ${empId}`);
+          .where(eq(users.id, emp.id));
+        console.log(`[Stripe] Suspended employee ${emp.id} (${emp.name})`);
       }
 
-      // Update database with new seat count
+      // Step 2: Update seat count in DB
+      console.log(`[Stripe] Step 2: Updating seat count in DB from ${previousSeatCount} to ${newQuantity}`);
       await storage.updateUser(user.id, {
         additionalSeatsCount: newQuantity,
       });
 
-      console.log(`[Stripe] ${quantity} seats removed successfully. Remaining paid seats: ${newQuantity}. Credit: $${creditAmount}`);
+      // Step 3: Update Stripe subscription (with rollback on failure)
+      try {
+        if (newQuantity > 0) {
+          console.log(`[Stripe] Step 3: Reducing Stripe seats from ${currentQuantity} to ${newQuantity}`);
+          await stripe.subscriptionItems.update(existingItem.id, {
+            quantity: newQuantity,
+            proration_behavior: 'create_prorations',
+          });
+        } else {
+          console.log(`[Stripe] Step 3: Removing all seats from Stripe subscription`);
+          await stripe.subscriptionItems.del(existingItem.id, {
+            proration_behavior: 'create_prorations',
+          });
+        }
+      } catch (stripeError: any) {
+        // ROLLBACK: Stripe failed, revert DB changes
+        console.error('[Stripe] Stripe update failed, rolling back DB changes:', stripeError.message);
+        
+        // Rollback employee suspensions
+        for (const emp of employeesToSuspend) {
+          await db.update(users)
+            .set({
+              suspendedAt: null,
+              suspendedBy: null,
+            })
+            .where(eq(users.id, emp.id));
+          console.log(`[Stripe] Rollback: Unsuspended employee ${emp.id}`);
+        }
+        
+        // Rollback seat count
+        await storage.updateUser(user.id, {
+          additionalSeatsCount: previousSeatCount,
+        });
+        console.log(`[Stripe] Rollback: Restored seat count to ${previousSeatCount}`);
+        
+        throw new Error(`Stripe update failed: ${stripeError.message}. All changes have been rolled back.`);
+      }
+
+      console.log(`[Stripe] ${quantity} seats removed successfully. Remaining paid seats: ${newQuantity}. Credit: $${creditAmount}. Legacy price: ${isLegacyPrice}`);
       res.json({
         success: true,
         message: `${quantity} seat(s) removed successfully`,
         seatsRemoved: quantity,
         remainingPaidSeats: newQuantity,
-        suspendedEmployees: employeeIds.length,
+        suspendedEmployees: employeesToSuspend.length,
         creditAmount: creditAmount.toFixed(2),
+        isLegacyPrice,
       });
     } catch (error: any) {
       console.error('[Stripe] Remove seats error:', error);
