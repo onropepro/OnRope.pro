@@ -3,8 +3,8 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications } from "@shared/schema";
-import { eq, sql, and, or, isNull, gt, desc, inArray } from "drizzle-orm";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications } from "@shared/schema";
+import { eq, sql, and, or, isNull, gt, desc, asc, inArray } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import multer from "multer";
@@ -4271,6 +4271,188 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('[SuperUser] Batch geocode error:', error);
       res.status(500).json({ message: "Failed to batch geocode buildings" });
+    }
+  });
+
+  // ==================== BUILDING INSTRUCTIONS ====================
+
+  // Get building with instructions by strata plan number (for project detail page)
+  app.get("/api/buildings/by-strata/:strataPlanNumber", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { strataPlanNumber } = req.params;
+      const user = await storage.getUserById(req.session.userId!);
+      
+      if (!user) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      const building = await storage.getBuildingByStrata(strataPlanNumber);
+      if (!building) {
+        return res.json({ building: null, instructions: null });
+      }
+
+      const instructions = await storage.getBuildingInstructions(building.id);
+      
+      // Remove sensitive data
+      const { passwordHash, ...buildingData } = building;
+      
+      res.json({ building: buildingData, instructions: instructions || null });
+    } catch (error) {
+      console.error('[Buildings] Get by strata error:', error);
+      res.status(500).json({ message: "Failed to get building data" });
+    }
+  });
+
+  // Get building instructions by building ID (accessible to building managers, companies with projects, and superuser)
+  app.get("/api/buildings/:buildingId/instructions", async (req: Request, res: Response) => {
+    try {
+      const { buildingId } = req.params;
+
+      // SuperUser can access all
+      if (req.session.userId === 'superuser') {
+        const instructions = await storage.getBuildingInstructions(buildingId);
+        return res.json(instructions || null);
+      }
+
+      // Building manager session (uses buildingId, not userId)
+      if (req.session.role === 'building' && req.session.buildingId) {
+        // Building managers can only access their own building's instructions
+        if (req.session.buildingId === buildingId) {
+          const instructions = await storage.getBuildingInstructions(buildingId);
+          return res.json(instructions || null);
+        }
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      // Regular user session
+      if (!req.session.userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      const user = await storage.getUserById(req.session.userId);
+      if (!user) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      // Company owners can access buildings they have projects for
+      if (user.role === 'company') {
+        const building = await storage.getBuildingById(buildingId);
+        if (building) {
+          const projects = await storage.getProjectsByCompany(user.id);
+          const hasProjectForBuilding = projects.some(p => 
+            p.strataPlanNumber && 
+            p.strataPlanNumber.toUpperCase().replace(/\s/g, '') === 
+            building.strataPlanNumber.toUpperCase().replace(/\s/g, '')
+          );
+          if (hasProjectForBuilding) {
+            const instructions = await storage.getBuildingInstructions(buildingId);
+            return res.json(instructions || null);
+          }
+        }
+      }
+
+      return res.status(403).json({ message: "Access denied" });
+    } catch (error) {
+      console.error('[BuildingInstructions] Get error:', error);
+      res.status(500).json({ message: "Failed to get building instructions" });
+    }
+  });
+
+  // Create or update building instructions
+  app.post("/api/buildings/:buildingId/instructions", async (req: Request, res: Response) => {
+    try {
+      const { buildingId } = req.params;
+
+      // SuperUser can update any building
+      if (req.session.userId === 'superuser') {
+        const instructions = await storage.upsertBuildingInstructions({
+          buildingId,
+          ...req.body,
+          createdByUserId: 'superuser',
+          createdByRole: 'superuser',
+        });
+        return res.json(instructions);
+      }
+
+      // Building manager session (uses buildingId, not userId)
+      if (req.session.role === 'building' && req.session.buildingId) {
+        // Building managers can only update their own building's instructions
+        if (req.session.buildingId === buildingId) {
+          const instructions = await storage.upsertBuildingInstructions({
+            buildingId,
+            ...req.body,
+            createdByUserId: null, // Building managers don't have user IDs
+            createdByRole: 'building_manager',
+          });
+          return res.json(instructions);
+        }
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      // Regular user session
+      if (!req.session.userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      const user = await storage.getUserById(req.session.userId);
+      if (!user) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      // Company owners can update buildings they have projects for
+      if (user.role === 'company') {
+        const building = await storage.getBuildingById(buildingId);
+        if (building) {
+          const projects = await storage.getProjectsByCompany(user.id);
+          const hasProjectForBuilding = projects.some(p => 
+            p.strataPlanNumber && 
+            p.strataPlanNumber.toUpperCase().replace(/\s/g, '') === 
+            building.strataPlanNumber.toUpperCase().replace(/\s/g, '')
+          );
+          if (hasProjectForBuilding) {
+            const instructions = await storage.upsertBuildingInstructions({
+              buildingId,
+              ...req.body,
+              createdByUserId: user.id,
+              createdByRole: 'company',
+            });
+            return res.json(instructions);
+          }
+        }
+      }
+
+      return res.status(403).json({ message: "Access denied" });
+    } catch (error) {
+      console.error('[BuildingInstructions] Upsert error:', error);
+      res.status(500).json({ message: "Failed to save building instructions" });
+    }
+  });
+
+  // Delete building instructions (SuperUser and building managers only)
+  app.delete("/api/buildings/:buildingId/instructions", async (req: Request, res: Response) => {
+    try {
+      const { buildingId } = req.params;
+
+      // SuperUser can delete any
+      if (req.session.userId === 'superuser') {
+        await storage.deleteBuildingInstructions(buildingId);
+        return res.json({ success: true });
+      }
+
+      // Building manager session (uses buildingId, not userId)
+      if (req.session.role === 'building' && req.session.buildingId) {
+        // Building managers can only delete their own building's instructions
+        if (req.session.buildingId === buildingId) {
+          await storage.deleteBuildingInstructions(buildingId);
+          return res.json({ success: true });
+        }
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      return res.status(403).json({ message: "Access denied" });
+    } catch (error) {
+      console.error('[BuildingInstructions] Delete error:', error);
+      res.status(500).json({ message: "Failed to delete building instructions" });
     }
   });
 
@@ -10380,6 +10562,94 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Validation error", errors: error.errors });
       }
       console.error("Create resident reply error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Equipment Catalog routes - shared database of gear that builds over time
+  app.get("/api/equipment-catalog", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { type } = req.query;
+      
+      if (!type || typeof type !== 'string') {
+        return res.status(400).json({ message: "Equipment type is required" });
+      }
+      
+      // Fetch all catalog items for this equipment type, ordered by usage count (most popular first)
+      const items = await db.select()
+        .from(equipmentCatalog)
+        .where(eq(equipmentCatalog.equipmentType, type))
+        .orderBy(desc(equipmentCatalog.usageCount), asc(equipmentCatalog.brand), asc(equipmentCatalog.model));
+      
+      res.json({ items });
+    } catch (error) {
+      console.error("Get equipment catalog error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Add new item to equipment catalog (when user selects "Other")
+  app.post("/api/equipment-catalog", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const { equipmentType, brand, model } = req.body;
+      
+      if (!equipmentType || !brand || !model) {
+        return res.status(400).json({ message: "Equipment type, brand, and model are required" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      // Try to insert, if it already exists just return the existing item
+      const [existingItem] = await db.select()
+        .from(equipmentCatalog)
+        .where(and(
+          eq(equipmentCatalog.equipmentType, equipmentType),
+          eq(equipmentCatalog.brand, brand),
+          eq(equipmentCatalog.model, model)
+        ));
+      
+      if (existingItem) {
+        // Increment usage count
+        await db.update(equipmentCatalog)
+          .set({ usageCount: sql`${equipmentCatalog.usageCount} + 1` })
+          .where(eq(equipmentCatalog.id, existingItem.id));
+        return res.json({ item: existingItem, isNew: false });
+      }
+      
+      // Create new catalog entry
+      const [newItem] = await db.insert(equipmentCatalog).values({
+        equipmentType,
+        brand,
+        model,
+        isPrePopulated: false,
+        addedByCompanyId: companyId,
+        usageCount: 1,
+      }).returning();
+      
+      res.json({ item: newItem, isNew: true });
+    } catch (error) {
+      console.error("Add equipment catalog error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Increment usage count when a catalog item is selected
+  app.patch("/api/equipment-catalog/:id/use", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      await db.update(equipmentCatalog)
+        .set({ usageCount: sql`${equipmentCatalog.usageCount} + 1` })
+        .where(eq(equipmentCatalog.id, id));
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Increment usage count error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

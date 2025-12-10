@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
@@ -17,7 +17,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertGearItemSchema, type InsertGearItem, type GearItem, type GearAssignment, type GearSerialNumber } from "@shared/schema";
-import { ArrowLeft, Plus, Pencil, X, Trash2, Shield, Cable, Link2, Gauge, TrendingUp, HardHat, Hand, Fuel, Scissors, PaintBucket, Droplets, CircleDot, Lock, Anchor, MoreHorizontal, Users, ShieldAlert, AlertTriangle, FileWarning, FileDown, Wrench } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, X, Trash2, Shield, Cable, Link2, Gauge, TrendingUp, HardHat, Hand, Fuel, Scissors, PaintBucket, Droplets, CircleDot, Lock, Anchor, Zap, MoreHorizontal, Users, ShieldAlert, AlertTriangle, FileWarning, FileDown, Wrench, Search, ChevronDown, ChevronRight } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Label } from "@/components/ui/label";
 import { hasFinancialAccess, canViewCSR, canAccessInventory, canManageInventory, canAssignGear, canViewGearAssignments } from "@/lib/permissions";
 import HarnessInspectionForm from "./HarnessInspectionForm";
@@ -32,7 +33,8 @@ const getDateLocale = () => i18n.language?.startsWith('fr') ? fr : enUS;
 const gearTypes = [
   { name: "Harness", icon: Shield },
   { name: "Rope", icon: Cable },
-  { name: "Carabiner", icon: Link2 },
+  { name: "Carabiner - Steel", icon: Link2 },
+  { name: "Carabiner - Aluminum", icon: Link2 },
   { name: "Descender", icon: Gauge },
   { name: "Ascender", icon: TrendingUp },
   { name: "Helmet", icon: HardHat },
@@ -45,6 +47,7 @@ const gearTypes = [
   { name: "Suction cup", icon: CircleDot },
   { name: "Back up device", icon: Lock },
   { name: "Lanyard", icon: Anchor },
+  { name: "Shock absorber", icon: Zap },
   { name: "Other", icon: MoreHorizontal }
 ];
 
@@ -68,7 +71,9 @@ export default function Inventory() {
   const [itemToDelete, setItemToDelete] = useState<GearItem | null>(null);
   const [customType, setCustomType] = useState("");
   const [addItemStep, setAddItemStep] = useState(1);
-  const [activeTab, setActiveTab] = useState("my-gear");
+  const [activeTab, setActiveTab] = useState("");
+  const [inventorySearch, setInventorySearch] = useState("");
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
   const [inspectionFilter, setInspectionFilter] = useState<"week" | "month" | "all" | "combined">("week");
   
   // Assignment dialog state
@@ -125,6 +130,13 @@ export default function Inventory() {
   const [correctiveAction, setCorrectiveAction] = useState("");
   const [damageNotes, setDamageNotes] = useState("");
 
+  // Equipment catalog state - for smart gear picker
+  const [selectedCatalogItem, setSelectedCatalogItem] = useState<{ id: string; brand: string; model: string } | null>(null);
+  const [showOtherDescender, setShowOtherDescender] = useState(false);
+  const [customBrand, setCustomBrand] = useState("");
+  const [customModel, setCustomModel] = useState("");
+  const [catalogSearch, setCatalogSearch] = useState("");
+
   // Fetch current user
   const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
@@ -133,6 +145,17 @@ export default function Inventory() {
   const currentUser = userData?.user;
   const canViewFinancials = hasFinancialAccess(currentUser);
   const hasInventoryAccess = canAccessInventory(currentUser);
+
+  // Set default tab based on user role - company owners go directly to manage gear
+  useEffect(() => {
+    if (currentUser && !activeTab) {
+      if (currentUser.role === 'company') {
+        setActiveTab("manage");
+      } else {
+        setActiveTab("my-gear");
+      }
+    }
+  }, [currentUser, activeTab]);
 
   // Redirect users without inventory access permission
   if (userData && !hasInventoryAccess) {
@@ -196,6 +219,75 @@ export default function Inventory() {
   // Fetch equipment damage reports
   const { data: damageReportsData, isLoading: damageReportsLoading } = useQuery<{ reports: any[] }>({
     queryKey: ["/api/equipment-damage-reports"],
+  });
+
+  // Equipment types that have catalog support (all except Gas powered equipment, Soap, and Other)
+  const CATALOG_SUPPORTED_TYPES = [
+    "Descender", "Harness", "Rope", "Carabiner - Steel", "Carabiner - Aluminum",
+    "Ascender", "Helmet", "Gloves", "Work positioning device", "Squeegee rubbers",
+    "Applicators", "Suction cup", "Back up device", "Lanyard", "Shock absorber"
+  ];
+
+  // Fetch equipment catalogs for smart gear picker
+  const { data: descenderCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
+    queryKey: ["/api/equipment-catalog", { type: "Descender" }],
+    queryFn: async () => (await fetch("/api/equipment-catalog?type=Descender")).json(),
+  });
+  const { data: harnessCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
+    queryKey: ["/api/equipment-catalog", { type: "Harness" }],
+    queryFn: async () => (await fetch("/api/equipment-catalog?type=Harness")).json(),
+  });
+  const { data: ropeCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
+    queryKey: ["/api/equipment-catalog", { type: "Rope" }],
+    queryFn: async () => (await fetch("/api/equipment-catalog?type=Rope")).json(),
+  });
+  const { data: steelCarabinerCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
+    queryKey: ["/api/equipment-catalog", { type: "Carabiner - Steel" }],
+    queryFn: async () => (await fetch("/api/equipment-catalog?type=Carabiner%20-%20Steel")).json(),
+  });
+  const { data: aluminumCarabinerCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
+    queryKey: ["/api/equipment-catalog", { type: "Carabiner - Aluminum" }],
+    queryFn: async () => (await fetch("/api/equipment-catalog?type=Carabiner%20-%20Aluminum")).json(),
+  });
+  const { data: ascenderCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
+    queryKey: ["/api/equipment-catalog", { type: "Ascender" }],
+    queryFn: async () => (await fetch("/api/equipment-catalog?type=Ascender")).json(),
+  });
+  const { data: helmetCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
+    queryKey: ["/api/equipment-catalog", { type: "Helmet" }],
+    queryFn: async () => (await fetch("/api/equipment-catalog?type=Helmet")).json(),
+  });
+  const { data: glovesCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
+    queryKey: ["/api/equipment-catalog", { type: "Gloves" }],
+    queryFn: async () => (await fetch("/api/equipment-catalog?type=Gloves")).json(),
+  });
+  const { data: workPositioningCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
+    queryKey: ["/api/equipment-catalog", { type: "Work positioning device" }],
+    queryFn: async () => (await fetch("/api/equipment-catalog?type=Work%20positioning%20device")).json(),
+  });
+  const { data: squeegeeCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
+    queryKey: ["/api/equipment-catalog", { type: "Squeegee rubbers" }],
+    queryFn: async () => (await fetch("/api/equipment-catalog?type=Squeegee%20rubbers")).json(),
+  });
+  const { data: applicatorsCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
+    queryKey: ["/api/equipment-catalog", { type: "Applicators" }],
+    queryFn: async () => (await fetch("/api/equipment-catalog?type=Applicators")).json(),
+  });
+  const { data: suctionCupCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
+    queryKey: ["/api/equipment-catalog", { type: "Suction cup" }],
+    queryFn: async () => (await fetch("/api/equipment-catalog?type=Suction%20cup")).json(),
+  });
+  const { data: backupDeviceCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
+    queryKey: ["/api/equipment-catalog", { type: "Back up device" }],
+    queryFn: async () => (await fetch("/api/equipment-catalog?type=Back%20up%20device")).json(),
+  });
+  const { data: lanyardCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
+    queryKey: ["/api/equipment-catalog", { type: "Lanyard" }],
+    queryFn: async () => (await fetch("/api/equipment-catalog?type=Lanyard")).json(),
+  });
+  const { data: shockAbsorberCatalog } = useQuery<{ items: { id: string; brand: string; model: string; usageCount: number }[] }>({
+    queryKey: ["/api/equipment-catalog", { type: "Shock absorber" }],
+    queryFn: async () => (await fetch("/api/equipment-catalog?type=Shock%20absorber")).json(),
   });
 
   // Create damage report mutation
@@ -521,6 +613,33 @@ export default function Inventory() {
     },
   });
 
+  // Get catalog for current equipment type (must be after form is defined)
+  const getCurrentCatalog = () => {
+    const equipType = form.watch("equipmentType");
+    switch (equipType) {
+      case "Descender": return descenderCatalog?.items || [];
+      case "Harness": return harnessCatalog?.items || [];
+      case "Rope": return ropeCatalog?.items || [];
+      case "Carabiner - Steel": return steelCarabinerCatalog?.items || [];
+      case "Carabiner - Aluminum": return aluminumCarabinerCatalog?.items || [];
+      case "Ascender": return ascenderCatalog?.items || [];
+      case "Helmet": return helmetCatalog?.items || [];
+      case "Gloves": return glovesCatalog?.items || [];
+      case "Work positioning device": return workPositioningCatalog?.items || [];
+      case "Squeegee rubbers": return squeegeeCatalog?.items || [];
+      case "Applicators": return applicatorsCatalog?.items || [];
+      case "Suction cup": return suctionCupCatalog?.items || [];
+      case "Back up device": return backupDeviceCatalog?.items || [];
+      case "Lanyard": return lanyardCatalog?.items || [];
+      case "Shock absorber": return shockAbsorberCatalog?.items || [];
+      default: return [];
+    }
+  };
+
+  // Check if current equipment type has catalog support
+  const watchedEquipmentType = form.watch("equipmentType");
+  const hasCatalogSupport = CATALOG_SUPPORTED_TYPES.includes(watchedEquipmentType || "");
+
   const addItemMutation = useMutation({
     mutationFn: async (data: Partial<InsertGearItem>) => {
       return apiRequest("POST", "/api/gear-items", data);
@@ -567,6 +686,12 @@ export default function Inventory() {
       setCurrentDateInService("");
       setAssignEmployeeId("");
       setAssignQuantity("1");
+      // Reset descender picker state
+      setSelectedCatalogItem(null);
+      setShowOtherDescender(false);
+      setCustomBrand("");
+      setCustomModel("");
+      setCatalogSearch("");
     },
     onError: (error: any) => {
       toast({
@@ -626,7 +751,23 @@ export default function Inventory() {
     },
   });
 
-  const handleAddItem = (data: Partial<InsertGearItem>) => {
+  const handleAddItem = async (data: Partial<InsertGearItem>) => {
+    // If adding custom gear for a catalog-supported type, save it to the shared catalog first
+    const equipType = data.equipmentType || "";
+    if (CATALOG_SUPPORTED_TYPES.includes(equipType) && showOtherDescender && data.brand && data.model) {
+      try {
+        await apiRequest("POST", "/api/equipment-catalog", {
+          equipmentType: equipType,
+          brand: data.brand,
+          model: data.model,
+        });
+        // Invalidate catalog cache so new item appears next time
+        queryClient.invalidateQueries({ queryKey: ["/api/equipment-catalog"] });
+      } catch (err) {
+        console.log("Item added to catalog or already exists");
+      }
+    }
+    
     // Extract just the serial number strings for legacy compatibility
     const serialNumberStrings = serialEntries.map(e => e.serialNumber);
     const finalData: any = {
@@ -1082,20 +1223,28 @@ export default function Inventory() {
     return assignments.some(a => a.employeeId === currentUser?.id);
   });
 
+  // Helper function to calculate item value - handles ropes (length × pricePerFeet) and other items (itemPrice × quantity)
+  const calculateItemValue = (item: any): number => {
+    if (item.equipmentType === "Rope" && item.ropeLength && item.pricePerFeet) {
+      // For ropes: value = length × price per foot × quantity
+      const length = parseFloat(item.ropeLength || "0");
+      const pricePerFoot = parseFloat(item.pricePerFeet || "0");
+      const qty = item.quantity || 1;
+      return length * pricePerFoot * qty;
+    } else {
+      // For other items: value = itemPrice × quantity
+      const price = parseFloat(item.itemPrice || "0");
+      const qty = item.quantity || 1;
+      return price * qty;
+    }
+  };
+
   const totalMyItems = myGear.reduce((sum: number, item: any) => sum + (item.quantity || 0), 0);
-  const totalMyValue = myGear.reduce((sum: number, item: any) => {
-    const price = parseFloat(item.itemPrice || "0");
-    const qty = item.quantity || 0;
-    return sum + (price * qty);
-  }, 0);
+  const totalMyValue = myGear.reduce((sum: number, item: any) => sum + calculateItemValue(item), 0);
 
   // Calculate total value of ALL inventory items
   const totalAllItems = allGearItems.reduce((sum: number, item: any) => sum + (item.quantity || 0), 0);
-  const totalAllValue = allGearItems.reduce((sum: number, item: any) => {
-    const price = parseFloat(item.itemPrice || "0");
-    const qty = item.quantity || 0;
-    return sum + (price * qty);
-  }, 0);
+  const totalAllValue = allGearItems.reduce((sum: number, item: any) => sum + calculateItemValue(item), 0);
 
   const EQUIPMENT_ICONS: Record<string, string> = {
     Harness: "security",
@@ -1821,22 +1970,123 @@ export default function Inventory() {
               </CardHeader>
             </Card>
 
-            {/* View Inventory Section */}
-            <Card>
-              <CardHeader>
-                <CardTitle>{t('inventory.allInventoryItems', 'All Inventory Items')}</CardTitle>
-                <CardDescription>{t('inventory.viewAllItems', 'View all gear items in the system')}</CardDescription>
-              </CardHeader>
-              <CardContent>
+            {/* Search Bar */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder={t('inventory.searchInventory', 'Search by brand, model, or type...')}
+                value={inventorySearch}
+                onChange={(e) => setInventorySearch(e.target.value)}
+                className="pl-10"
+                data-testid="input-inventory-search"
+              />
+              {inventorySearch && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                  onClick={() => setInventorySearch("")}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+
+            {/* View Inventory Section - Grouped by Equipment Type */}
             {isLoading ? (
-              <div className="text-center py-8 text-muted-foreground">{t('inventory.loading', 'Loading inventory...')}</div>
+              <Card>
+                <CardContent className="py-8">
+                  <div className="text-center text-muted-foreground">{t('inventory.loading', 'Loading inventory...')}</div>
+                </CardContent>
+              </Card>
             ) : !gearData?.items || gearData.items.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                {t('inventory.empty.manageGear', 'No items in inventory yet. Click "Add Item to Inventory" to get started.')}
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {gearData.items.map((item) => (
+              <Card>
+                <CardContent className="py-8">
+                  <div className="text-center text-muted-foreground">
+                    {t('inventory.empty.manageGear', 'No items in inventory yet. Click "Add Item to Inventory" to get started.')}
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (() => {
+              // Filter items based on search
+              const searchLower = inventorySearch.toLowerCase();
+              const filteredItems = inventorySearch 
+                ? gearData.items.filter(item => 
+                    (item.brand?.toLowerCase().includes(searchLower)) ||
+                    (item.model?.toLowerCase().includes(searchLower)) ||
+                    (item.equipmentType?.toLowerCase().includes(searchLower)) ||
+                    (item.notes?.toLowerCase().includes(searchLower))
+                  )
+                : gearData.items;
+
+              if (filteredItems.length === 0) {
+                return (
+                  <Card>
+                    <CardContent className="py-8">
+                      <div className="text-center text-muted-foreground">
+                        {t('inventory.noSearchResults', 'No items match your search.')}
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              }
+
+              // Group filtered items by equipment type
+              const grouped = filteredItems.reduce((groups: Record<string, typeof gearData.items>, item) => {
+                const type = item.equipmentType || "Other";
+                if (!groups[type]) groups[type] = [];
+                groups[type].push(item);
+                return groups;
+              }, {});
+
+              return (
+                <div className="space-y-2">
+                  {Object.entries(grouped)
+                    .sort(([a], [b]) => a.localeCompare(b))
+                    .map(([equipmentType, items]) => {
+                      const typeIcon = EQUIPMENT_ICONS[equipmentType] || "build";
+                      const totalQty = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+                      const typeValue = items.reduce((sum, item) => sum + calculateItemValue(item), 0);
+                      const isExpanded = expandedSections[equipmentType] ?? true;
+                      
+                      return (
+                        <Collapsible 
+                          key={equipmentType} 
+                          open={isExpanded}
+                          onOpenChange={(open) => setExpandedSections(prev => ({ ...prev, [equipmentType]: open }))}
+                        >
+                          <Card>
+                            <CollapsibleTrigger asChild>
+                              <CardHeader className="pb-3 cursor-pointer hover-elevate">
+                                <div className="flex items-center justify-between gap-2">
+                                  <div className="flex items-center gap-3">
+                                    <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                                      <span className="material-icons text-primary">{typeIcon}</span>
+                                    </div>
+                                    <div>
+                                      <CardTitle className="text-lg">{equipmentType}</CardTitle>
+                                      <CardDescription>
+                                        {totalQty} {totalQty === 1 ? t('inventory.item', 'item') : t('inventory.items', 'items')}
+                                        {canViewFinancials && typeValue > 0 && (
+                                          <span className="ml-2 text-primary font-medium">
+                                            • ${typeValue.toFixed(2)}
+                                          </span>
+                                        )}
+                                      </CardDescription>
+                                    </div>
+                                  </div>
+                                  {isExpanded ? (
+                                    <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                                  ) : (
+                                    <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                                  )}
+                                </div>
+                              </CardHeader>
+                            </CollapsibleTrigger>
+                            <CollapsibleContent>
+                              <CardContent className="pt-0">
+                                <div className="space-y-2">
+                                  {items.map((item) => (
                   <Card key={item.id} className="bg-muted/30" data-testid={`item-${item.id}`}>
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between gap-4">
@@ -1889,16 +2139,29 @@ export default function Inventory() {
                             </div>
                           </div>
                           <div>
-                            {canViewFinancials && item.itemPrice && (
+                            {canViewFinancials && (item.itemPrice || (item.equipmentType === "Rope" && item.ropeLength && item.pricePerFeet)) && (
                               <div className="space-y-0.5 mb-1">
-                                <div className="text-sm font-semibold text-primary">
-                                  ${parseFloat(item.itemPrice).toFixed(2)} each
-                                </div>
-                                {item.quantity && item.quantity > 1 && (
-                                  <div className="text-sm font-medium text-primary/80">
-                                    Total: ${(parseFloat(item.itemPrice) * item.quantity).toFixed(2)}
-                                  </div>
-                                )}
+                                {item.equipmentType === "Rope" && item.ropeLength && item.pricePerFeet ? (
+                                  <>
+                                    <div className="text-xs text-muted-foreground">
+                                      {item.ropeLength}ft @ ${parseFloat(item.pricePerFeet).toFixed(2)}/ft
+                                    </div>
+                                    <div className="text-sm font-semibold text-primary">
+                                      Value: ${(parseFloat(item.ropeLength) * parseFloat(item.pricePerFeet) * (item.quantity || 1)).toFixed(2)}
+                                    </div>
+                                  </>
+                                ) : item.itemPrice ? (
+                                  <>
+                                    <div className="text-sm font-semibold text-primary">
+                                      ${parseFloat(item.itemPrice).toFixed(2)} each
+                                    </div>
+                                    {item.quantity && item.quantity > 1 && (
+                                      <div className="text-sm font-medium text-primary/80">
+                                        Total: ${(parseFloat(item.itemPrice) * item.quantity).toFixed(2)}
+                                      </div>
+                                    )}
+                                  </>
+                                ) : null}
                               </div>
                             )}
                             {item.notes && (
@@ -1938,11 +2201,17 @@ export default function Inventory() {
                       </div>
                     </CardContent>
                   </Card>
-                ))}
-              </div>
-                )}
-              </CardContent>
-            </Card>
+                                  ))}
+                                </div>
+                              </CardContent>
+                            </CollapsibleContent>
+                          </Card>
+                        </Collapsible>
+                      );
+                    })}
+                </div>
+              );
+            })()}
           </TabsContent>
           )}
 
@@ -2347,33 +2616,207 @@ export default function Inventory() {
                 <>
                   <div className="flex-1 min-h-0 overflow-y-auto px-1 space-y-4">
 
-              <FormField
-                control={form.control}
-                name="brand"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('inventory.brand', 'Brand')}</FormLabel>
-                    <FormControl>
-                      <Input placeholder={t('inventory.placeholders.brand', 'e.g., Petzl')} {...field} value={field.value || ""} data-testid="input-brand" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Smart Gear Picker - shows list of common gear for supported types */}
+              {hasCatalogSupport && !showOtherDescender && (
+                <div className="space-y-3">
+                  <FormLabel>
+                    {t('inventory.selectEquipment', 'Select')} {form.watch("equipmentType")}
+                  </FormLabel>
+                  <div className="relative">
+                    <Input
+                      placeholder={t('inventory.searchGear', 'Search by brand or model...')}
+                      value={catalogSearch}
+                      onChange={(e) => setCatalogSearch(e.target.value)}
+                      className="pr-8"
+                      data-testid="input-catalog-search"
+                    />
+                    {catalogSearch && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6"
+                        onClick={() => setCatalogSearch("")}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-1 gap-2 max-h-[35vh] overflow-y-auto pr-1">
+                    {getCurrentCatalog()
+                      .filter((item) => {
+                        if (!catalogSearch) return true;
+                        const search = catalogSearch.toLowerCase();
+                        return item.brand.toLowerCase().includes(search) || 
+                               item.model.toLowerCase().includes(search);
+                      })
+                      .map((item) => {
+                        const equipType = form.watch("equipmentType");
+                        const IconComponent = equipType === "Harness" ? Shield : 
+                                             equipType === "Rope" ? Cable : 
+                                             equipType === "Carabiner" ? Link2 : Gauge;
+                        return (
+                          <Card
+                            key={item.id}
+                            className={`cursor-pointer hover-elevate active-elevate-2 transition-all ${
+                              selectedCatalogItem?.id === item.id ? "bg-primary/10 border-primary border-2" : ""
+                            }`}
+                            onClick={() => {
+                              setSelectedCatalogItem(item);
+                              form.setValue("brand", item.brand);
+                              form.setValue("model", item.model);
+                              apiRequest("PATCH", `/api/equipment-catalog/${item.id}/use`);
+                            }}
+                            data-testid={`card-gear-${item.brand.toLowerCase()}-${item.model.toLowerCase().replace(/\s+/g, "-")}`}
+                          >
+                            <CardContent className="p-3 flex items-center gap-3">
+                              <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${
+                                selectedCatalogItem?.id === item.id ? "bg-primary text-primary-foreground" : "bg-muted"
+                              }`}>
+                                <IconComponent className="h-5 w-5" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="font-medium text-sm">{item.brand}</div>
+                                <div className="text-xs text-muted-foreground truncate">{item.model}</div>
+                              </div>
+                              {selectedCatalogItem?.id === item.id && (
+                                <div className="text-primary">
+                                  <span className="material-icons text-lg">check_circle</span>
+                                </div>
+                              )}
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
+                    {/* Other option */}
+                    <Card
+                      className="cursor-pointer hover-elevate active-elevate-2 transition-all border-dashed"
+                      onClick={() => {
+                        setShowOtherDescender(true);
+                        setSelectedCatalogItem(null);
+                        form.setValue("brand", "");
+                        form.setValue("model", "");
+                      }}
+                      data-testid="card-gear-other"
+                    >
+                      <CardContent className="p-3 flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-lg flex items-center justify-center bg-muted">
+                          <Plus className="h-5 w-5" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-medium text-sm">{t('inventory.otherGear', 'Other / Not Listed')}</div>
+                          <div className="text-xs text-muted-foreground">{t('inventory.addNewGear', 'Add new gear to the shared database')}</div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              )}
 
-              <FormField
-                control={form.control}
-                name="model"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('inventory.model', 'Model')}</FormLabel>
-                    <FormControl>
-                      <Input placeholder={t('inventory.placeholders.model', "e.g., I'D S")} {...field} value={field.value || ""} data-testid="input-model" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Custom Gear Entry - when "Other" is selected for catalog-supported types */}
+              {hasCatalogSupport && showOtherDescender && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setShowOtherDescender(false);
+                        setCustomBrand("");
+                        setCustomModel("");
+                      }}
+                      data-testid="button-back-to-gear-list"
+                    >
+                      <ArrowLeft className="h-4 w-4 mr-1" />
+                      {t('common.back', 'Back')}
+                    </Button>
+                    <span className="text-sm text-muted-foreground">
+                      {t('inventory.addCustomGear', 'Add Custom')} {form.watch("equipmentType")}
+                    </span>
+                  </div>
+                  <FormField
+                    control={form.control}
+                    name="brand"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('inventory.brand', 'Brand')}</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder={t('inventory.placeholders.brand', 'e.g., Petzl')} 
+                            {...field} 
+                            value={field.value || ""} 
+                            onChange={(e) => {
+                              field.onChange(e);
+                              setCustomBrand(e.target.value);
+                            }}
+                            data-testid="input-brand" 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="model"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('inventory.model', 'Model')}</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder={t('inventory.placeholders.model', "e.g., I'D S")} 
+                            {...field} 
+                            value={field.value || ""} 
+                            onChange={(e) => {
+                              field.onChange(e);
+                              setCustomModel(e.target.value);
+                            }}
+                            data-testid="input-model" 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {t('inventory.catalogNoteGeneric', 'This item will be saved to the shared database for all companies to use.')}
+                  </p>
+                </div>
+              )}
+
+              {/* Standard Brand/Model fields for non-catalog items */}
+              {!hasCatalogSupport && (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="brand"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('inventory.brand', 'Brand')}</FormLabel>
+                        <FormControl>
+                          <Input placeholder={t('inventory.placeholders.brand', 'e.g., Petzl')} {...field} value={field.value || ""} data-testid="input-brand" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="model"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('inventory.model', 'Model')}</FormLabel>
+                        <FormControl>
+                          <Input placeholder={t('inventory.placeholders.model', "e.g., I'D S")} {...field} value={field.value || ""} data-testid="input-model" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              )}
 
               <FormField
                 control={form.control}
@@ -2400,52 +2843,77 @@ export default function Inventory() {
                 )}
               />
 
-              {/* Rope-specific fields */}
+              {/* Rope-specific fields - Pricing */}
               {form.watch("equipmentType") === "Rope" && (
                 <>
-                  <FormField
-                    control={form.control}
-                    name="ropeLength"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('inventory.ropeLength', 'Rope Length (feet)')}</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            placeholder={t('inventory.placeholders.ropeLength', 'Enter rope length')}
-                            {...field}
-                            value={field.value || ""}
-                            data-testid="input-rope-length"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <div className="bg-primary/5 border border-primary/20 rounded-md p-4 space-y-4">
+                    <div className="text-sm font-semibold text-primary flex items-center gap-2">
+                      <span className="material-icons text-sm">straighten</span>
+                      {t('inventory.ropePricing', 'Rope Pricing')}
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="ropeLength"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t('inventory.lengthPerRope', 'Length Per Rope (ft)')}</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                placeholder="e.g., 400"
+                                {...field}
+                                value={field.value || ""}
+                                data-testid="input-rope-length"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                  <FormField
-                    control={form.control}
-                    name="pricePerFeet"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('inventory.pricePerFoot', 'Price Per Foot')}</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            placeholder={t('inventory.placeholders.pricePerFoot', 'Enter price per foot')}
-                            {...field}
-                            value={field.value || ""}
-                            data-testid="input-price-per-feet"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
+                      <FormField
+                        control={form.control}
+                        name="pricePerFeet"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t('inventory.pricePerFoot', 'Price Per Foot ($)')}</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                placeholder="e.g., 1.45"
+                                {...field}
+                                value={field.value || ""}
+                                data-testid="input-price-per-feet"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* Live calculation preview */}
+                    {form.watch("ropeLength") && form.watch("pricePerFeet") && form.watch("quantity") && (
+                      <div className="bg-background border rounded-md p-3 mt-2">
+                        <div className="text-xs text-muted-foreground mb-1">
+                          {t('inventory.calculatedValue', 'Calculated Value')}:
+                        </div>
+                        <div className="text-lg font-bold text-primary">
+                          {form.watch("quantity")} {form.watch("quantity") === 1 ? 'rope' : 'ropes'} × {form.watch("ropeLength")}ft × ${form.watch("pricePerFeet")}/ft = ${(
+                            parseFloat(form.watch("quantity")?.toString() || "0") *
+                            parseFloat(form.watch("ropeLength") || "0") *
+                            parseFloat(form.watch("pricePerFeet") || "0")
+                          ).toFixed(2)}
+                        </div>
+                      </div>
                     )}
-                  />
+                  </div>
 
                   <div className="border-t pt-4 mt-4">
                     <div className="text-sm font-medium mb-3">{t('inventory.assignToEmployee', 'Assign to Employee (Optional)')}</div>

@@ -31,8 +31,10 @@ import { format } from "date-fns";
 import { fr, enUS } from "date-fns/locale";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { parseLocalDate, formatTimestampDate, getTodayString, formatDurationMs } from "@/lib/dateUtils";
-import type { Project } from "@shared/schema";
+import type { Project, Building, BuildingInstructions } from "@shared/schema";
 import { IRATA_TASK_TYPES } from "@shared/schema";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { KeyRound, DoorOpen, Phone, User, Wrench, FileText, ChevronDown, ChevronRight, Save } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -130,6 +132,27 @@ export default function ProjectDetail() {
     buildingName: string;
     buildingAddress: string;
   } | null>(null);
+  
+  // Building instructions state
+  const [buildingInstructionsOpen, setBuildingInstructionsOpen] = useState(false);
+  const [showEditInstructionsDialog, setShowEditInstructionsDialog] = useState(false);
+  const [instructionsForm, setInstructionsForm] = useState({
+    buildingAccess: "",
+    keysAndFob: "",
+    keysReturnPolicy: "",
+    roofAccess: "",
+    specialRequests: "",
+    buildingManagerName: "",
+    buildingManagerPhone: "",
+    conciergeNames: "",
+    conciergePhone: "",
+    conciergeHours: "",
+    maintenanceName: "",
+    maintenancePhone: "",
+    councilMemberUnits: "",
+    tradeParkingInstructions: "",
+    tradeParkingSpots: "",
+  });
 
   const endDayForm = useForm<EndDayFormData>({
     resolver: zodResolver(endDaySchema),
@@ -227,6 +250,69 @@ export default function ProjectDetail() {
   });
 
   const hasHarnessInspectionToday = harnessInspectionTodayData?.hasInspectionToday ?? false;
+
+  // Fetch building data and instructions
+  const projectStrataPlan = (projectData?.project as any)?.strataPlanNumber;
+  const { data: buildingData, isLoading: isLoadingBuilding } = useQuery<{
+    building: Building | null;
+    instructions: BuildingInstructions | null;
+  }>({
+    queryKey: ["/api/buildings/by-strata", projectStrataPlan],
+    queryFn: async () => {
+      if (!projectStrataPlan) return { building: null, instructions: null };
+      const response = await fetch(`/api/buildings/by-strata/${encodeURIComponent(projectStrataPlan)}`, { credentials: "include" });
+      if (!response.ok) return { building: null, instructions: null };
+      return response.json();
+    },
+    enabled: !!projectStrataPlan,
+  });
+
+  // Initialize instructions form when data loads
+  useEffect(() => {
+    if (buildingData?.instructions) {
+      setInstructionsForm({
+        buildingAccess: buildingData.instructions.buildingAccess || "",
+        keysAndFob: buildingData.instructions.keysAndFob || "",
+        keysReturnPolicy: (buildingData.instructions as any).keysReturnPolicy || "",
+        roofAccess: buildingData.instructions.roofAccess || "",
+        specialRequests: buildingData.instructions.specialRequests || "",
+        buildingManagerName: buildingData.instructions.buildingManagerName || "",
+        buildingManagerPhone: buildingData.instructions.buildingManagerPhone || "",
+        conciergeNames: buildingData.instructions.conciergeNames || "",
+        conciergePhone: buildingData.instructions.conciergePhone || "",
+        conciergeHours: (buildingData.instructions as any).conciergeHours || "",
+        maintenanceName: buildingData.instructions.maintenanceName || "",
+        maintenancePhone: buildingData.instructions.maintenancePhone || "",
+        councilMemberUnits: (buildingData.instructions as any).councilMemberUnits || "",
+        tradeParkingInstructions: (buildingData.instructions as any).tradeParkingInstructions || "",
+        tradeParkingSpots: (buildingData.instructions as any).tradeParkingSpots?.toString() || "",
+      });
+    }
+  }, [buildingData?.instructions]);
+
+  // Save building instructions mutation
+  const saveInstructionsMutation = useMutation({
+    mutationFn: async (data: typeof instructionsForm) => {
+      if (!buildingData?.building?.id) throw new Error("Building not found");
+      const response = await apiRequest("POST", `/api/buildings/${buildingData.building.id}/instructions`, data);
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: t('projectDetail.buildingInstructions.saved', 'Instructions Saved'),
+        description: t('projectDetail.buildingInstructions.savedDesc', 'Building instructions have been updated.'),
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/buildings/by-strata", projectStrataPlan] });
+      setShowEditInstructionsDialog(false);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: t('projectDetail.toasts.error', 'Error'),
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
 
   // Check for active work session on this project
   useEffect(() => {
@@ -1327,6 +1413,203 @@ export default function ProjectDetail() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Building Instructions Section */}
+        {buildingData?.building && (
+          <Card className="glass-card border-0 shadow-premium">
+            <Collapsible open={buildingInstructionsOpen} onOpenChange={setBuildingInstructionsOpen}>
+              <CardHeader className="pb-3">
+                <CollapsibleTrigger className="flex items-center justify-between w-full" data-testid="trigger-building-instructions">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-primary" />
+                    {t('projectDetail.buildingInstructions.title', 'Building Instructions')}
+                  </CardTitle>
+                  <div className="flex items-center gap-2">
+                    {currentUser?.role === "company" && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowEditInstructionsDialog(true);
+                        }}
+                        data-testid="button-edit-building-instructions"
+                      >
+                        <span className="material-icons text-sm">edit</span>
+                      </Button>
+                    )}
+                    {buildingInstructionsOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                  </div>
+                </CollapsibleTrigger>
+              </CardHeader>
+              <CollapsibleContent>
+                <CardContent className="pt-0">
+                  {buildingData?.instructions ? (
+                    <div className="space-y-4">
+                      {/* Access Information */}
+                      <div className="space-y-3">
+                        {buildingData.instructions.buildingAccess && (
+                          <div className="flex gap-3">
+                            <DoorOpen className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+                            <div>
+                              <p className="text-xs font-medium text-muted-foreground">{t('projectDetail.buildingInstructions.buildingAccess', 'Building Access')}</p>
+                              <p className="text-sm">{buildingData.instructions.buildingAccess}</p>
+                            </div>
+                          </div>
+                        )}
+                        {buildingData.instructions.keysAndFob && (
+                          <div className="flex gap-3">
+                            <KeyRound className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+                            <div>
+                              <p className="text-xs font-medium text-muted-foreground">{t('projectDetail.buildingInstructions.keysAndFob', 'Keys/Fob Location')}</p>
+                              <p className="text-sm">{buildingData.instructions.keysAndFob}</p>
+                              {(buildingData.instructions as any).keysReturnPolicy && (
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {t('projectDetail.buildingInstructions.returnBy', 'Return')}: {
+                                    (buildingData.instructions as any).keysReturnPolicy === 'end_of_day' ? t('projectDetail.buildingInstructions.endOfDay', 'End of Every Day') :
+                                    (buildingData.instructions as any).keysReturnPolicy === 'end_of_week' ? t('projectDetail.buildingInstructions.endOfWeek', 'End of Week') :
+                                    (buildingData.instructions as any).keysReturnPolicy === 'end_of_project' ? t('projectDetail.buildingInstructions.endOfProject', 'End of Project') :
+                                    t('projectDetail.buildingInstructions.keepUntilComplete', 'Keep Until Work Complete')
+                                  }
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                        {buildingData.instructions.roofAccess && (
+                          <div className="flex gap-3">
+                            <span className="material-icons text-sm text-muted-foreground shrink-0 mt-0.5">roofing</span>
+                            <div>
+                              <p className="text-xs font-medium text-muted-foreground">{t('projectDetail.buildingInstructions.roofAccess', 'Roof Access')}</p>
+                              <p className="text-sm">{buildingData.instructions.roofAccess}</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Contacts */}
+                      {(buildingData.instructions.buildingManagerName || buildingData.instructions.conciergeNames || buildingData.instructions.maintenanceName) && (
+                        <>
+                          <Separator />
+                          <div className="space-y-3">
+                            {buildingData.instructions.buildingManagerName && (
+                              <div className="flex gap-3">
+                                <User className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+                                <div>
+                                  <p className="text-xs font-medium text-muted-foreground">{t('projectDetail.buildingInstructions.buildingManager', 'Building Manager')}</p>
+                                  <p className="text-sm">{buildingData.instructions.buildingManagerName}</p>
+                                  {buildingData.instructions.buildingManagerPhone && (
+                                    <a href={`tel:${buildingData.instructions.buildingManagerPhone}`} className="text-sm text-primary flex items-center gap-1 mt-0.5">
+                                      <Phone className="h-3 w-3" />
+                                      {buildingData.instructions.buildingManagerPhone}
+                                    </a>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                            {buildingData.instructions.conciergeNames && (
+                              <div className="flex gap-3">
+                                <span className="material-icons text-sm text-muted-foreground shrink-0 mt-0.5">support_agent</span>
+                                <div>
+                                  <p className="text-xs font-medium text-muted-foreground">{t('projectDetail.buildingInstructions.concierge', 'Concierge')}</p>
+                                  <p className="text-sm">{buildingData.instructions.conciergeNames}</p>
+                                  {buildingData.instructions.conciergePhone && (
+                                    <a href={`tel:${buildingData.instructions.conciergePhone}`} className="text-sm text-primary flex items-center gap-1 mt-0.5">
+                                      <Phone className="h-3 w-3" />
+                                      {buildingData.instructions.conciergePhone}
+                                    </a>
+                                  )}
+                                  {(buildingData.instructions as any).conciergeHours && (
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                      {t('projectDetail.buildingInstructions.hours', 'Hours')}: {(buildingData.instructions as any).conciergeHours}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                            {buildingData.instructions.maintenanceName && (
+                              <div className="flex gap-3">
+                                <Wrench className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+                                <div>
+                                  <p className="text-xs font-medium text-muted-foreground">{t('projectDetail.buildingInstructions.maintenance', 'Maintenance')}</p>
+                                  <p className="text-sm">{buildingData.instructions.maintenanceName}</p>
+                                  {buildingData.instructions.maintenancePhone && (
+                                    <a href={`tel:${buildingData.instructions.maintenancePhone}`} className="text-sm text-primary flex items-center gap-1 mt-0.5">
+                                      <Phone className="h-3 w-3" />
+                                      {buildingData.instructions.maintenancePhone}
+                                    </a>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                            {(buildingData.instructions as any).councilMemberUnits && (
+                              <div className="flex gap-3">
+                                <span className="material-icons text-sm text-muted-foreground shrink-0 mt-0.5">groups</span>
+                                <div>
+                                  <p className="text-xs font-medium text-muted-foreground">{t('projectDetail.buildingInstructions.councilMemberUnits', 'Council Member Units')}</p>
+                                  <p className="text-sm">{(buildingData.instructions as any).councilMemberUnits}</p>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      )}
+
+                      {/* Trade Parking */}
+                      {((buildingData.instructions as any).tradeParkingInstructions || (buildingData.instructions as any).tradeParkingSpots) && (
+                        <>
+                          <Separator />
+                          <div className="flex gap-3">
+                            <span className="material-icons text-sm text-muted-foreground shrink-0 mt-0.5">local_parking</span>
+                            <div>
+                              <p className="text-xs font-medium text-muted-foreground">{t('projectDetail.buildingInstructions.tradeParking', 'Trade Parking')}</p>
+                              {(buildingData.instructions as any).tradeParkingSpots && (
+                                <p className="text-sm font-medium">{(buildingData.instructions as any).tradeParkingSpots} {t('projectDetail.buildingInstructions.spotsAvailable', 'spot(s) available')}</p>
+                              )}
+                              {(buildingData.instructions as any).tradeParkingInstructions && (
+                                <p className="text-sm whitespace-pre-wrap">{(buildingData.instructions as any).tradeParkingInstructions}</p>
+                              )}
+                            </div>
+                          </div>
+                        </>
+                      )}
+
+                      {/* Special Requests */}
+                      {buildingData.instructions.specialRequests && (
+                        <>
+                          <Separator />
+                          <div className="flex gap-3">
+                            <span className="material-icons text-sm text-muted-foreground shrink-0 mt-0.5">warning</span>
+                            <div>
+                              <p className="text-xs font-medium text-muted-foreground">{t('projectDetail.buildingInstructions.specialRequests', 'Special Requests')}</p>
+                              <p className="text-sm whitespace-pre-wrap">{buildingData.instructions.specialRequests}</p>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="text-center py-6 text-muted-foreground">
+                      <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <p className="text-sm">{t('projectDetail.buildingInstructions.noInstructions', 'No building instructions available')}</p>
+                      {currentUser?.role === "company" && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="mt-3"
+                          onClick={() => setShowEditInstructionsDialog(true)}
+                          data-testid="button-add-building-instructions"
+                        >
+                          {t('projectDetail.buildingInstructions.addInstructions', 'Add Instructions')}
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </CollapsibleContent>
+            </Collapsible>
+          </Card>
+        )}
 
         {/* Analytics - Target Performance & Work Session History */}
         {(isManagement || canViewWorkHistory) && (
@@ -3605,6 +3888,259 @@ export default function ProjectDetail() {
             >
               <span className="material-icons mr-2 text-sm">save</span>
               {saveIrataTaskLogMutation.isPending ? t('projectDetail.dialogs.irataTask.saving', 'Saving...') : t('projectDetail.dialogs.irataTask.save', 'Save to Logbook')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Building Instructions Dialog */}
+      <Dialog open={showEditInstructionsDialog} onOpenChange={setShowEditInstructionsDialog}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5 text-primary" />
+              {t('projectDetail.buildingInstructions.editTitle', 'Edit Building Instructions')}
+            </DialogTitle>
+            <DialogDescription>
+              {t('projectDetail.buildingInstructions.editDescription', 'Add access details and contact information for this building. This information will be visible to all company employees working on projects at this building.')}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            {/* Access Information */}
+            <div className="space-y-3">
+              <h4 className="text-sm font-medium flex items-center gap-2">
+                <DoorOpen className="h-4 w-4" />
+                {t('projectDetail.buildingInstructions.accessInfo', 'Access Information')}
+              </h4>
+              
+              <div className="space-y-2">
+                <Label htmlFor="buildingAccess">{t('projectDetail.buildingInstructions.buildingAccess', 'Building Access')}</Label>
+                <Textarea
+                  id="buildingAccess"
+                  placeholder={t('projectDetail.buildingInstructions.buildingAccessPlaceholder', 'How to enter the building (e.g., main entrance code, parking instructions)...')}
+                  value={instructionsForm.buildingAccess}
+                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, buildingAccess: e.target.value }))}
+                  data-testid="input-building-access"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="keysAndFob">{t('projectDetail.buildingInstructions.keysAndFob', 'Keys/Fob Location')}</Label>
+                <Textarea
+                  id="keysAndFob"
+                  placeholder={t('projectDetail.buildingInstructions.keysAndFobPlaceholder', 'Where to pick up/return keys or fobs...')}
+                  value={instructionsForm.keysAndFob}
+                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, keysAndFob: e.target.value }))}
+                  data-testid="input-keys-fob"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="keysReturnPolicy">{t('projectDetail.buildingInstructions.keysReturnPolicy', 'Keys/Fob Return Policy')}</Label>
+                <Select
+                  value={instructionsForm.keysReturnPolicy}
+                  onValueChange={(value) => setInstructionsForm(prev => ({ ...prev, keysReturnPolicy: value }))}
+                >
+                  <SelectTrigger data-testid="select-keys-return">
+                    <SelectValue placeholder={t('projectDetail.buildingInstructions.selectReturnPolicy', 'Select when to return keys...')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="end_of_day">{t('projectDetail.buildingInstructions.endOfDay', 'End of Every Day')}</SelectItem>
+                    <SelectItem value="end_of_week">{t('projectDetail.buildingInstructions.endOfWeek', 'End of Week')}</SelectItem>
+                    <SelectItem value="end_of_project">{t('projectDetail.buildingInstructions.endOfProject', 'End of Project')}</SelectItem>
+                    <SelectItem value="keep_until_complete">{t('projectDetail.buildingInstructions.keepUntilComplete', 'Keep Until Work Complete')}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="roofAccess">{t('projectDetail.buildingInstructions.roofAccess', 'Roof Access')}</Label>
+                <Textarea
+                  id="roofAccess"
+                  placeholder={t('projectDetail.buildingInstructions.roofAccessPlaceholder', 'How to access the roof (e.g., stairwell, elevator, key required)...')}
+                  value={instructionsForm.roofAccess}
+                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, roofAccess: e.target.value }))}
+                  data-testid="input-roof-access"
+                />
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Contacts */}
+            <div className="space-y-3">
+              <h4 className="text-sm font-medium flex items-center gap-2">
+                <Phone className="h-4 w-4" />
+                {t('projectDetail.buildingInstructions.contacts', 'Contacts')}
+              </h4>
+              
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="buildingManagerName">{t('projectDetail.buildingInstructions.buildingManagerName', 'Building Manager Name')}</Label>
+                  <Input
+                    id="buildingManagerName"
+                    placeholder={t('projectDetail.buildingInstructions.namePlaceholder', 'Name')}
+                    value={instructionsForm.buildingManagerName}
+                    onChange={(e) => setInstructionsForm(prev => ({ ...prev, buildingManagerName: e.target.value }))}
+                    data-testid="input-bm-name"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="buildingManagerPhone">{t('projectDetail.buildingInstructions.phone', 'Phone')}</Label>
+                  <Input
+                    id="buildingManagerPhone"
+                    type="tel"
+                    placeholder={t('projectDetail.buildingInstructions.phonePlaceholder', 'Phone number')}
+                    value={instructionsForm.buildingManagerPhone}
+                    onChange={(e) => setInstructionsForm(prev => ({ ...prev, buildingManagerPhone: e.target.value }))}
+                    data-testid="input-bm-phone"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="conciergeNames">{t('projectDetail.buildingInstructions.conciergeName', 'Concierge Name(s)')}</Label>
+                  <Input
+                    id="conciergeNames"
+                    placeholder={t('projectDetail.buildingInstructions.namePlaceholder', 'Name')}
+                    value={instructionsForm.conciergeNames}
+                    onChange={(e) => setInstructionsForm(prev => ({ ...prev, conciergeNames: e.target.value }))}
+                    data-testid="input-concierge-names"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="conciergePhone">{t('projectDetail.buildingInstructions.phone', 'Phone')}</Label>
+                  <Input
+                    id="conciergePhone"
+                    type="tel"
+                    placeholder={t('projectDetail.buildingInstructions.phonePlaceholder', 'Phone number')}
+                    value={instructionsForm.conciergePhone}
+                    onChange={(e) => setInstructionsForm(prev => ({ ...prev, conciergePhone: e.target.value }))}
+                    data-testid="input-concierge-phone"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="conciergeHours">{t('projectDetail.buildingInstructions.conciergeHours', 'Concierge Hours of Operation')}</Label>
+                <Input
+                  id="conciergeHours"
+                  placeholder={t('projectDetail.buildingInstructions.conciergeHoursPlaceholder', 'e.g., Mon-Fri 8am-8pm, Sat-Sun 9am-5pm')}
+                  value={instructionsForm.conciergeHours}
+                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, conciergeHours: e.target.value }))}
+                  data-testid="input-concierge-hours"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="maintenanceName">{t('projectDetail.buildingInstructions.maintenanceName', 'Maintenance Name')}</Label>
+                  <Input
+                    id="maintenanceName"
+                    placeholder={t('projectDetail.buildingInstructions.namePlaceholder', 'Name')}
+                    value={instructionsForm.maintenanceName}
+                    onChange={(e) => setInstructionsForm(prev => ({ ...prev, maintenanceName: e.target.value }))}
+                    data-testid="input-maintenance-name"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="maintenancePhone">{t('projectDetail.buildingInstructions.phone', 'Phone')}</Label>
+                  <Input
+                    id="maintenancePhone"
+                    type="tel"
+                    placeholder={t('projectDetail.buildingInstructions.phonePlaceholder', 'Phone number')}
+                    value={instructionsForm.maintenancePhone}
+                    onChange={(e) => setInstructionsForm(prev => ({ ...prev, maintenancePhone: e.target.value }))}
+                    data-testid="input-maintenance-phone"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="councilMemberUnits">{t('projectDetail.buildingInstructions.councilMemberUnits', 'Council Member Units')}</Label>
+                <Input
+                  id="councilMemberUnits"
+                  placeholder={t('projectDetail.buildingInstructions.councilMemberUnitsPlaceholder', 'e.g., Unit 301, 502, 1205')}
+                  value={instructionsForm.councilMemberUnits}
+                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, councilMemberUnits: e.target.value }))}
+                  data-testid="input-council-units"
+                />
+                <p className="text-xs text-muted-foreground">{t('projectDetail.buildingInstructions.councilMemberUnitsHint', 'Floor/unit numbers where council members reside')}</p>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Trade Parking */}
+            <div className="space-y-3">
+              <Label className="flex items-center gap-2">
+                <span className="material-icons text-sm">local_parking</span>
+                {t('projectDetail.buildingInstructions.tradeParking', 'Trade Parking')}
+              </Label>
+              <div className="space-y-2">
+                <Label htmlFor="tradeParkingSpots">{t('projectDetail.buildingInstructions.tradeParkingSpots', 'Number of Trade Parking Spots')}</Label>
+                <Input
+                  id="tradeParkingSpots"
+                  type="number"
+                  min="0"
+                  placeholder={t('projectDetail.buildingInstructions.tradeParkingSpotsPlaceholder', 'e.g., 2')}
+                  value={instructionsForm.tradeParkingSpots}
+                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, tradeParkingSpots: e.target.value }))}
+                  data-testid="input-trade-parking-spots"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="tradeParkingInstructions">{t('projectDetail.buildingInstructions.tradeParkingInstructions', 'Trade Parking Instructions')}</Label>
+                <Textarea
+                  id="tradeParkingInstructions"
+                  placeholder={t('projectDetail.buildingInstructions.tradeParkingPlaceholder', 'Where trades can park (e.g., visitor parking, loading zone, street parking with permit)...')}
+                  value={instructionsForm.tradeParkingInstructions}
+                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, tradeParkingInstructions: e.target.value }))}
+                  data-testid="input-trade-parking"
+                />
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Special Requests */}
+            <div className="space-y-2">
+              <Label htmlFor="specialRequests" className="flex items-center gap-2">
+                <span className="material-icons text-sm">warning</span>
+                {t('projectDetail.buildingInstructions.specialRequests', 'Special Requests')}
+              </Label>
+              <Textarea
+                id="specialRequests"
+                placeholder={t('projectDetail.buildingInstructions.specialRequestsPlaceholder', 'Any special instructions or requirements (e.g., noise restrictions, time limits, areas to avoid)...')}
+                value={instructionsForm.specialRequests}
+                onChange={(e) => setInstructionsForm(prev => ({ ...prev, specialRequests: e.target.value }))}
+                className="min-h-24"
+                data-testid="input-special-requests"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowEditInstructionsDialog(false)}
+              data-testid="button-cancel-instructions"
+            >
+              {t('common.cancel', 'Cancel')}
+            </Button>
+            <Button
+              type="button"
+              onClick={() => saveInstructionsMutation.mutate(instructionsForm)}
+              disabled={saveInstructionsMutation.isPending}
+              data-testid="button-save-instructions"
+            >
+              <Save className="h-4 w-4 mr-2" />
+              {saveInstructionsMutation.isPending 
+                ? t('common.saving', 'Saving...') 
+                : t('common.save', 'Save')}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -268,6 +268,50 @@ export const insertBuildingSchema = createInsertSchema(buildings).omit({
 export type Building = typeof buildings.$inferSelect;
 export type InsertBuilding = z.infer<typeof insertBuildingSchema>;
 
+// Building Instructions - Access info, keys/fob, roof access, contact info, special requests
+export const buildingInstructions = pgTable("building_instructions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  buildingId: varchar("building_id").notNull().references(() => buildings.id, { onDelete: "cascade" }),
+  
+  // Instruction categories
+  buildingAccess: text("building_access"), // How to access the building
+  keysAndFob: text("keys_and_fob"), // Where to get keys or fob
+  keysReturnPolicy: varchar("keys_return_policy"), // When to return keys: end_of_day, end_of_week, end_of_project
+  roofAccess: text("roof_access"), // How to access the roof
+  specialRequests: text("special_requests"), // Special requests or instructions
+  
+  // Contact information
+  buildingManagerName: varchar("building_manager_name"),
+  buildingManagerPhone: varchar("building_manager_phone"),
+  conciergeNames: text("concierge_names"), // Could be multiple, stored as text (comma-separated or JSON)
+  conciergePhone: varchar("concierge_phone"),
+  conciergeHours: text("concierge_hours"), // Hours of operation for concierge
+  maintenanceName: varchar("maintenance_name"),
+  maintenancePhone: varchar("maintenance_phone"),
+  councilMemberUnits: text("council_member_units"), // Floor/unit numbers of council members
+  
+  // Parking
+  tradeParkingInstructions: text("trade_parking_instructions"), // Where trades can park
+  tradeParkingSpots: integer("trade_parking_spots"), // Number of trade parking spots available
+  
+  // Tracking
+  createdByUserId: varchar("created_by_user_id").references(() => users.id),
+  createdByRole: varchar("created_by_role"), // building_manager | company | superuser
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_building_instructions_building").on(table.buildingId),
+]);
+
+export const insertBuildingInstructionsSchema = createInsertSchema(buildingInstructions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type BuildingInstructions = typeof buildingInstructions.$inferSelect;
+export type InsertBuildingInstructions = z.infer<typeof insertBuildingInstructionsSchema>;
+
 // Property Manager Company Links - junction table for property managers to access multiple companies via property manager codes
 export const propertyManagerCompanyLinks = pgTable("property_manager_company_links", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -470,6 +514,23 @@ export const gearItems = pgTable("gear_items", {
   index("IDX_gear_items_employee").on(table.employeeId),
   index("IDX_gear_items_company").on(table.companyId),
   index("IDX_gear_items_type").on(table.equipmentType),
+]);
+
+// Equipment catalog table - shared database of gear models that builds over time
+// Pre-populated with industry-standard equipment, grows when users add custom items
+export const equipmentCatalog = pgTable("equipment_catalog", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  equipmentType: varchar("equipment_type").notNull(), // descender, ascender, harness, etc.
+  brand: varchar("brand").notNull(),
+  model: varchar("model").notNull(),
+  isPrePopulated: boolean("is_pre_populated").notNull().default(false), // True for industry-standard items
+  addedByCompanyId: varchar("added_by_company_id").references(() => users.id, { onDelete: "set null" }), // Company that added this (null for pre-populated)
+  usageCount: integer("usage_count").notNull().default(0), // How many times this has been selected
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_equipment_catalog_type").on(table.equipmentType),
+  index("IDX_equipment_catalog_brand").on(table.brand),
+  sql`UNIQUE ("equipment_type", "brand", "model")`,
 ]);
 
 // Gear assignments table - tracks which employees have which gear and how many
@@ -1596,6 +1657,11 @@ export const insertGearItemSchema = createInsertSchema(gearItems).omit({
   updatedAt: true,
 });
 
+export const insertEquipmentCatalogSchema = createInsertSchema(equipmentCatalog).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const insertGearAssignmentSchema = createInsertSchema(gearAssignments).omit({
   id: true,
   createdAt: true,
@@ -1841,6 +1907,9 @@ export type InsertNonBillableWorkSession = z.infer<typeof insertNonBillableWorkS
 
 export type GearItem = typeof gearItems.$inferSelect;
 export type InsertGearItem = z.infer<typeof insertGearItemSchema>;
+
+export type EquipmentCatalog = typeof equipmentCatalog.$inferSelect;
+export type InsertEquipmentCatalog = z.infer<typeof insertEquipmentCatalogSchema>;
 
 export type GearAssignment = typeof gearAssignments.$inferSelect;
 export type InsertGearAssignment = z.infer<typeof insertGearAssignmentSchema>;
