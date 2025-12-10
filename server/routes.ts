@@ -2074,12 +2074,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const dailyRate = actualPricePerSeat / 30;
       const creditAmount = Math.round(quantity * dailyRate * daysRemaining * 100) / 100;
 
-      // TRANSACTION SAFETY: Suspend employees and update DB FIRST, then Stripe
-      // This way, if Stripe fails, we can rollback the DB changes
+      // TRANSACTION SAFETY: 
+      // 1. Suspend employees in DB first (reversible)
+      // 2. Update Stripe (with fresh data check)
+      // 3. Update DB seat count to match Stripe (source of truth)
+      // 4. Rollback employees if Stripe fails
       const suspendedAt = new Date();
       const previousSeatCount = user.additionalSeatsCount || 0;
+      let finalSeatCount = previousSeatCount; // Will be updated after Stripe succeeds
 
-      // Step 1: Suspend all employees in DB
+      // Step 1: Suspend all employees in DB (do this first, it's reversible)
       console.log(`[Stripe] Step 1: Suspending ${employeesToSuspend.length} employees in DB`);
       for (const emp of employeesToSuspend) {
         await db.update(users)
@@ -2091,31 +2095,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`[Stripe] Suspended employee ${emp.id} (${emp.name})`);
       }
 
-      // Step 2: Update seat count in DB
-      console.log(`[Stripe] Step 2: Updating seat count in DB from ${previousSeatCount} to ${newQuantity}`);
-      await storage.updateUser(user.id, {
-        additionalSeatsCount: newQuantity,
-      });
-
-      // Step 3: Update Stripe subscription (with rollback on failure)
+      // Step 2: Update Stripe subscription
+      // CRITICAL: Re-fetch subscription to get LATEST quantity to prevent race conditions
       try {
-        if (newQuantity > 0) {
-          console.log(`[Stripe] Step 3: Reducing Stripe seats from ${currentQuantity} to ${newQuantity}`);
-          await stripe.subscriptionItems.update(existingItem.id, {
-            quantity: newQuantity,
+        const freshSubscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
+        
+        // Find the seat item again in the fresh subscription
+        let freshSeatItem = freshSubscription.items.data.find(item => item.price.id === currentPriceId);
+        if (!freshSeatItem) {
+          freshSeatItem = freshSubscription.items.data.find(item => item.price.id === legacyPriceId);
+        }
+        
+        if (!freshSeatItem) {
+          throw new Error("Seat subscription item no longer exists. Subscription may have been modified.");
+        }
+        
+        // Calculate the new quantity based on FRESH data
+        const freshCurrentQuantity = freshSeatItem.quantity || 0;
+        const freshNewQuantity = Math.max(0, freshCurrentQuantity - quantity);
+        
+        console.log(`[Stripe] Step 2: Fresh check - Current Stripe quantity: ${freshCurrentQuantity}, removing: ${quantity}, new: ${freshNewQuantity}`);
+        
+        // Verify we're not trying to remove more seats than available
+        if (freshCurrentQuantity < quantity) {
+          throw new Error(`Race condition detected: Only ${freshCurrentQuantity} seats available in Stripe, but trying to remove ${quantity}. Please try again.`);
+        }
+        
+        if (freshNewQuantity > 0) {
+          console.log(`[Stripe] Reducing Stripe seats from ${freshCurrentQuantity} to ${freshNewQuantity}`);
+          await stripe.subscriptionItems.update(freshSeatItem.id, {
+            quantity: freshNewQuantity,
             proration_behavior: 'create_prorations',
           });
         } else {
-          console.log(`[Stripe] Step 3: Removing all seats from Stripe subscription`);
-          await stripe.subscriptionItems.del(existingItem.id, {
+          console.log(`[Stripe] Removing all seats from Stripe subscription`);
+          await stripe.subscriptionItems.del(freshSeatItem.id, {
             proration_behavior: 'create_prorations',
           });
         }
-      } catch (stripeError: any) {
-        // ROLLBACK: Stripe failed, revert DB changes
-        console.error('[Stripe] Stripe update failed, rolling back DB changes:', stripeError.message);
         
-        // Rollback employee suspensions
+        // Step 3: Post-update verification - get ACTUAL Stripe state as source of truth
+        const verifySubscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
+        let verifySeatItem = verifySubscription.items.data.find(item => item.price.id === currentPriceId);
+        if (!verifySeatItem) {
+          verifySeatItem = verifySubscription.items.data.find(item => item.price.id === legacyPriceId);
+        }
+        const verifyQuantity = verifySeatItem?.quantity || 0;
+        
+        // Log if there's any unexpected variance (concurrent updates)
+        if (verifyQuantity !== freshNewQuantity) {
+          console.warn(`[Stripe] NOTE: Expected ${freshNewQuantity} seats, Stripe shows ${verifyQuantity} (likely concurrent update)`);
+        }
+        
+        // Step 4: Update DB to match Stripe (Stripe is always source of truth)
+        finalSeatCount = verifyQuantity;
+        console.log(`[Stripe] Step 4: Updating DB seat count to match Stripe: ${finalSeatCount}`);
+        await storage.updateUser(user.id, {
+          additionalSeatsCount: finalSeatCount,
+        });
+        
+        console.log(`[Stripe] Verification complete. DB synced to Stripe quantity: ${verifyQuantity}`);
+        
+      } catch (stripeError: any) {
+        // ROLLBACK: Stripe failed or race condition detected, revert employee suspensions
+        console.error('[Stripe] Stripe update failed, rolling back employee suspensions:', stripeError.message);
+        
+        // Rollback employee suspensions only (we haven't updated DB seat count yet)
         for (const emp of employeesToSuspend) {
           await db.update(users)
             .set({
@@ -2126,21 +2171,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log(`[Stripe] Rollback: Unsuspended employee ${emp.id}`);
         }
         
-        // Rollback seat count
-        await storage.updateUser(user.id, {
-          additionalSeatsCount: previousSeatCount,
-        });
-        console.log(`[Stripe] Rollback: Restored seat count to ${previousSeatCount}`);
-        
         throw new Error(`Stripe update failed: ${stripeError.message}. All changes have been rolled back.`);
       }
 
-      console.log(`[Stripe] ${quantity} seats removed successfully. Remaining paid seats: ${newQuantity}. Credit: $${creditAmount}. Legacy price: ${isLegacyPrice}`);
+      console.log(`[Stripe] ${quantity} seats removed successfully. Remaining paid seats: ${finalSeatCount}. Credit: $${creditAmount}. Legacy price: ${isLegacyPrice}`);
       res.json({
         success: true,
         message: `${quantity} seat(s) removed successfully`,
         seatsRemoved: quantity,
-        remainingPaidSeats: newQuantity,
+        remainingPaidSeats: finalSeatCount,
         suspendedEmployees: employeesToSuspend.length,
         creditAmount: creditAmount.toFixed(2),
         isLegacyPrice,
