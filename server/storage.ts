@@ -3555,6 +3555,19 @@ export class Storage {
   }
 
   /**
+   * Update building password and set passwordChangedAt timestamp
+   */
+  async updateBuildingPassword(buildingId: string, newPasswordHash: string): Promise<void> {
+    await db.update(buildings)
+      .set({ 
+        passwordHash: newPasswordHash, 
+        passwordChangedAt: new Date(),
+        updatedAt: new Date()
+      })
+      .where(eq(buildings.id, buildingId));
+  }
+
+  /**
    * Get all buildings (for SuperUser)
    */
   async getAllBuildings(): Promise<Building[]> {

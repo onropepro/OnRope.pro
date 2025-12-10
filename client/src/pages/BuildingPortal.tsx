@@ -28,6 +28,7 @@ interface BuildingData {
   totalProjects: number;
   projectsCompleted: number;
   createdAt: string;
+  passwordChangedAt: string | null;
 }
 
 interface ProjectHistoryItem {
@@ -57,6 +58,12 @@ export default function BuildingPortal() {
   const [strataPlanNumber, setStrataPlanNumber] = useState("");
   const [password, setPassword] = useState("");
   const [showInstructionsDialog, setShowInstructionsDialog] = useState(false);
+  const [showChangePasswordDialog, setShowChangePasswordDialog] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
   const [instructionsForm, setInstructionsForm] = useState({
     buildingAccess: "",
     keysAndFob: "",
@@ -167,6 +174,58 @@ export default function BuildingPortal() {
       });
     },
   });
+
+  const changePasswordMutation = useMutation({
+    mutationFn: async (data: typeof passwordForm) => {
+      const response = await apiRequest("POST", "/api/building/change-password", data);
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Password Changed",
+        description: "Your password has been updated successfully.",
+      });
+      setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+      setShowChangePasswordDialog(false);
+      queryClient.invalidateQueries({ queryKey: ["/api/building/portal"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Password Change Failed",
+        description: error.message || "Failed to change password. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleChangePassword = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all password fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      toast({
+        title: "Passwords Don't Match",
+        description: "New password and confirmation must match.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (passwordForm.newPassword.length < 6) {
+      toast({
+        title: "Password Too Short",
+        description: "Password must be at least 6 characters long.",
+        variant: "destructive",
+      });
+      return;
+    }
+    changePasswordMutation.mutate(passwordForm);
+  };
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -382,15 +441,48 @@ export default function BuildingPortal() {
               </p>
             </div>
           </div>
-          <Button 
-            variant="outline" 
-            onClick={handleLogout}
-            data-testid="button-logout"
-          >
-            <LogOut className="mr-2 h-4 w-4" />
-            Logout
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowChangePasswordDialog(true)}
+              data-testid="button-change-password"
+            >
+              <Lock className="mr-2 h-4 w-4" />
+              Change Password
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={handleLogout}
+              data-testid="button-logout"
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              Logout
+            </Button>
+          </div>
         </div>
+
+        {/* Password Change Warning Banner - shown until password is changed */}
+        {building && !building.passwordChangedAt && (
+          <div className="flex items-start gap-3 p-4 rounded-lg bg-amber-50 dark:bg-amber-950/50 border border-amber-300 dark:border-amber-700">
+            <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <h4 className="font-medium text-amber-800 dark:text-amber-200">Security Notice: Please Change Your Password</h4>
+              <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+                Your account is using the default password (your strata number). For security reasons, please change your password to something unique and secure.
+              </p>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="mt-3 border-amber-400 text-amber-700 hover:bg-amber-100 dark:border-amber-600 dark:text-amber-300 dark:hover:bg-amber-900/50"
+                onClick={() => setShowChangePasswordDialog(true)}
+                data-testid="button-change-password-banner"
+              >
+                <Lock className="mr-2 h-4 w-4" />
+                Change Password Now
+              </Button>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card>
@@ -973,6 +1065,88 @@ export default function BuildingPortal() {
               )}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Change Password Dialog */}
+      <Dialog open={showChangePasswordDialog} onOpenChange={setShowChangePasswordDialog}>
+        <DialogContent className="max-w-md" data-testid="dialog-change-password">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Lock className="h-5 w-5" />
+              Change Password
+            </DialogTitle>
+            <DialogDescription>
+              Enter your current password and choose a new secure password.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleChangePassword} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="currentPassword">Current Password</Label>
+              <Input
+                id="currentPassword"
+                type="password"
+                value={passwordForm.currentPassword}
+                onChange={(e) => setPasswordForm(prev => ({ ...prev, currentPassword: e.target.value }))}
+                placeholder="Enter your current password"
+                data-testid="input-current-password"
+              />
+              <p className="text-xs text-muted-foreground">
+                Your current password is your strata number if you haven't changed it before.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="newPassword">New Password</Label>
+              <Input
+                id="newPassword"
+                type="password"
+                value={passwordForm.newPassword}
+                onChange={(e) => setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }))}
+                placeholder="Enter new password (min 6 characters)"
+                data-testid="input-new-password"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm New Password</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                value={passwordForm.confirmPassword}
+                onChange={(e) => setPasswordForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                placeholder="Confirm new password"
+                data-testid="input-confirm-password"
+              />
+            </div>
+            <DialogFooter className="gap-2 pt-4">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => {
+                  setShowChangePasswordDialog(false);
+                  setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+                }}
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit"
+                disabled={changePasswordMutation.isPending}
+                data-testid="button-submit-password-change"
+              >
+                {changePasswordMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Changing...
+                  </>
+                ) : (
+                  <>
+                    <Lock className="h-4 w-4 mr-2" />
+                    Change Password
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
     </div>

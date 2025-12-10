@@ -221,6 +221,7 @@ export const buildings = pgTable("buildings", {
   // Login credentials - strata number is the username
   strataPlanNumber: varchar("strata_plan_number").notNull().unique(), // Unique identifier and login username
   passwordHash: text("password_hash").notNull(), // Hashed password (defaults to strata number initially)
+  passwordChangedAt: timestamp("password_changed_at"), // When password was changed from default (null = still using default)
   
   // Building details
   buildingName: varchar("building_name"),

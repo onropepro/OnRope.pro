@@ -5263,6 +5263,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Building portal: Change password
+  app.post("/api/building/change-password", requireAuth, async (req: Request, res: Response) => {
+    try {
+      // Check if this is a building session
+      if (req.session.role !== 'building' || !req.session.buildingId) {
+        return res.status(403).json({ message: "Access denied. Building login required." });
+      }
+
+      const { currentPassword, newPassword, confirmPassword } = req.body;
+
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        return res.status(400).json({ message: "All password fields are required" });
+      }
+
+      if (newPassword !== confirmPassword) {
+        return res.status(400).json({ message: "New passwords do not match" });
+      }
+
+      if (newPassword.length < 6) {
+        return res.status(400).json({ message: "Password must be at least 6 characters long" });
+      }
+
+      const building = await storage.getBuildingById(req.session.buildingId);
+      
+      if (!building) {
+        return res.status(404).json({ message: "Building not found" });
+      }
+
+      // Verify current password
+      const bcrypt = await import('bcrypt');
+      const isCurrentPasswordValid = await bcrypt.compare(currentPassword, building.passwordHash);
+      
+      if (!isCurrentPasswordValid) {
+        return res.status(401).json({ message: "Current password is incorrect" });
+      }
+
+      // Don't allow new password to be the same as strata number
+      if (newPassword === building.strataPlanNumber) {
+        return res.status(400).json({ message: "New password cannot be the same as your strata number" });
+      }
+
+      // Hash and save new password
+      const newPasswordHash = await bcrypt.hash(newPassword, 10);
+      await storage.updateBuildingPassword(building.id, newPasswordHash);
+
+      res.json({ 
+        success: true, 
+        message: "Password changed successfully",
+        passwordChangedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('[Building] Change password error:', error);
+      res.status(500).json({ message: "Failed to change password" });
+    }
+  });
+
   // Update user profile
   app.patch("/api/user/profile", requireAuth, async (req: Request, res: Response) => {
     try {
