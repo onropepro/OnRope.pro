@@ -100,11 +100,11 @@ export class Storage {
     return bcrypt.compare(plainPassword, hashedPassword);
   }
 
-  async getAllEmployees(companyId: string): Promise<User[]> {
+  async getAllEmployees(companyId: string): Promise<(User & { connectionStatus?: string })[]> {
     // Get all employees created by this company (exclude residents and company owner)
     // Include BOTH:
     // 1. Users with companyId set to this company (primary employees)
-    // 2. PLUS technicians connected via employer_connections table (secondary employees)
+    // 2. PLUS technicians connected via employer_connections table (secondary employees) - including suspended
     
     // Get primary employees (companyId matches)
     const primaryEmployees = await db.select().from(users)
@@ -117,27 +117,35 @@ export class Storage {
       )
       .orderBy(desc(users.createdAt));
     
-    // Get secondary employees (connected via employer_connections)
+    // Get secondary employees (connected via employer_connections) - include both active AND suspended
     const secondaryConnections = await db.select({
       user: users,
+      connectionStatus: technicianEmployerConnections.status,
     }).from(technicianEmployerConnections)
       .innerJoin(users, eq(technicianEmployerConnections.technicianId, users.id))
       .where(
         and(
           eq(technicianEmployerConnections.companyId, companyId),
-          eq(technicianEmployerConnections.status, "active")
+          or(
+            eq(technicianEmployerConnections.status, "active"),
+            eq(technicianEmployerConnections.status, "suspended")
+          )
         )
       );
     
-    const secondaryEmployees = secondaryConnections.map(c => c.user);
-    
     // Combine and deduplicate (in case someone appears in both)
-    const allEmployees = [...primaryEmployees];
+    const allEmployees: (User & { connectionStatus?: string })[] = primaryEmployees.map(e => ({
+      ...e,
+      connectionStatus: e.suspendedAt ? 'suspended' : 'active'
+    }));
     const primaryIds = new Set(primaryEmployees.map(e => e.id));
     
-    for (const employee of secondaryEmployees) {
-      if (!primaryIds.has(employee.id)) {
-        allEmployees.push(employee);
+    for (const conn of secondaryConnections) {
+      if (!primaryIds.has(conn.user.id)) {
+        allEmployees.push({
+          ...conn.user,
+          connectionStatus: conn.connectionStatus,
+        });
       }
     }
     

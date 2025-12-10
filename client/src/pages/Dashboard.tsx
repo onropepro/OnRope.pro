@@ -5872,7 +5872,10 @@ export default function Dashboard() {
                 <div className="space-y-2">
                   <h3 className="text-lg font-medium">{t('dashboard.employees.activeEmployees', 'Active Employees')}</h3>
                   {(() => {
-                    const activeEmployees = employees.filter((emp: any) => !emp.terminatedDate && !emp.suspendedAt);
+                    // Exclude both primary suspended (suspendedAt) and secondary suspended (connectionStatus)
+                    const activeEmployees = employees.filter((emp: any) => 
+                      !emp.terminatedDate && !emp.suspendedAt && emp.connectionStatus !== 'suspended'
+                    );
                     
                     if (activeEmployees.length === 0) {
                       return (
@@ -6141,7 +6144,10 @@ export default function Dashboard() {
 
                 {/* Suspended Employees - Seat removed but can be reactivated */}
                 {(() => {
-                  const suspendedEmployees = employees.filter((emp: any) => emp.suspendedAt && !emp.terminatedDate);
+                  // Check both primary (suspendedAt) and secondary (connectionStatus) suspensions
+                  const suspendedEmployees = employees.filter((emp: any) => 
+                    (emp.suspendedAt || emp.connectionStatus === 'suspended') && !emp.terminatedDate
+                  );
                   
                   if (suspendedEmployees.length > 0) {
                     return (
