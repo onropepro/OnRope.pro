@@ -463,9 +463,9 @@ export default function TechnicianLogin() {
           <div className="container mx-auto px-6 lg:px-8">
             <div className="max-w-4xl mx-auto text-center">
               {/* Pill Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8">
-                <HardHat className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium text-primary">For IRATA & SPRAT Technicians</span>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-rust-600/10 border border-rust-600/20 mb-8">
+                <HardHat className="w-4 h-4 text-rust-600" />
+                <span className="text-sm font-medium text-rust-600">For IRATA & SPRAT Technicians</span>
               </div>
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
