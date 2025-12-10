@@ -994,7 +994,7 @@ export default function Changelog() {
               <BackButton size="icon" />
               <MainMenuButton size="icon" />
             <div className="flex-1">
-              <h1 className="text-2xl sm:text-3xl font-bold">Platform Changelog</h1>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold">Platform Changelog</h1>
               <p className="text-sm text-muted-foreground mt-1">
                 Development progress and feature overview
               </p>
@@ -1101,8 +1101,8 @@ export default function Changelog() {
         <Card className="mb-8">
           <CardHeader>
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-[#989C94]/10 ring-1 ring-[#989C94]/20">
-                <Wrench className="h-5 w-5" style={{ color: '#989C94' }} />
+              <div className="p-2.5 rounded-xl bg-neutral-400/10 dark:bg-neutral-500/20 ring-1 ring-neutral-400/20 dark:ring-neutral-500/20">
+                <Wrench className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />
               </div>
               <div>
                 <CardTitle className="text-xl">Services Managed</CardTitle>
