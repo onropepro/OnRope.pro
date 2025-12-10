@@ -97,38 +97,168 @@ export default function TimeTrackingGuide() {
 
         {/* Problems Solved */}
         <section className="space-y-4">
-          <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2 text-green-900 dark:text-green-100">
-                <CheckCircle2 className="w-5 h-5" />
-                Problems Solved
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-green-900 dark:text-green-100">
-              <ul className="space-y-2 text-sm">
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span><strong>Inaccurate time records:</strong> GPS-verified clock-in/out with precise timestamps eliminates timesheet fraud. Location pins confirm employees are at the actual job site, not clocking in from home or a coffee shop.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span><strong>Manual hour calculations:</strong> Automatic billable vs non-billable hour tracking for payroll accuracy</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span><strong>Piece work complexity:</strong> Integrated drop tracking feeds directly into technician compensation</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span><strong>Missing work output data:</strong> End-of-day forms capture drops, units, or completion percentages by job type</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span><strong>No visibility into active workers:</strong> Real-time dashboard shows who is currently working on which projects</span>
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 text-green-900 dark:text-green-100">
+            <CheckCircle2 className="w-6 h-6" />
+            Problems Solved
+          </h2>
+
+          <div className="space-y-6">
+            {/* Problem 1 - GPS Verification */}
+            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+                  "I suspect some guys are clocking in from their truck before they even get to the building"
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
+                <div>
+                  <p className="font-semibold">The Pain:</p>
+                  <p>Paper timesheets are easy to fudge. An employee says they started at 8:00 AM, but did they really? You have no way to verify if they were at the job site or still at the coffee shop.</p>
+                </div>
+                <div className="bg-green-100 dark:bg-green-900 p-3 rounded italic">
+                  "The GPS pins point them on a map. So you can see that the guy actually clocked in at the building and not at the boss's place half hour earlier. Same for clock out."
+                </div>
+                <div>
+                  <p className="font-semibold">The Solution:</p>
+                  <p>GPS coordinates are captured at both clock-in and clock-out. Location pins confirm employees are at the actual job site, not clocking in from home or a coffee shop. This eliminates timesheet fraud with verifiable, timestamped location data.</p>
+                </div>
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="font-medium">GPS-verified timestamps eliminate "phantom hours." Pay only for actual on-site work.</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Problem 2 - Billable Hours */}
+            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+                  "I have no idea how many hours my guys spent driving around versus actually working"
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
+                <div>
+                  <p className="font-semibold">The Pain:</p>
+                  <p>You pay your crew for 40 hours but have no visibility into how much time they spent on revenue-generating work versus running errands, picking up supplies, or waiting around. Your profitability per project is a guess.</p>
+                </div>
+                <div className="bg-green-100 dark:bg-green-900 p-3 rounded italic">
+                  "Go ask Jeff tomorrow. How many hours were the guys driving around, moving gear from one building to another, picking up soap for another guy, bringing a piece of gear someone forgot at the shop? No clue. He wouldn't even know."
+                </div>
+                <div>
+                  <p className="font-semibold">The Solution:</p>
+                  <p>Non-billable hours are tracked separately with automatic categorization. The dashboard shows your billable vs non-billable ratio by week, month, and year—giving you clear visibility into labor efficiency.</p>
+                </div>
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="font-medium">Accurate cost of goods sold for every project. Identify and reduce non-productive time.</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Problem 3 - Status Calls */}
+            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+                  "Every day I'm calling my techs asking where they're at on the building"
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
+                <div>
+                  <p className="font-semibold">The Pain:</p>
+                  <p>You have 5 projects running and zero visibility into progress. You call each tech individually, they give vague answers, you try to piece together where things stand. Hours wasted daily.</p>
+                </div>
+                <div className="bg-green-100 dark:bg-green-900 p-3 rounded italic">
+                  "There is not a day that goes by that Jeff doesn't call one person per project to see where they're at or text them... Probably 90 of his phone calls are with the techs being like, when will you be done? Where are you at? Why is this not done?"
+                </div>
+                <div>
+                  <p className="font-semibold">The Solution:</p>
+                  <p>End-of-day forms capture drops completed, completion percentages, and shortfall reasons automatically. Project dashboards show real-time progress without a single phone call.</p>
+                </div>
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="font-medium">Eliminate 90% of status-check phone calls. Know instantly if a project is on track or falling behind—and why.</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Problem 4 - Budget Overruns */}
+            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+                  "The building went 20 hours over budget and I don't really know why"
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
+                <div>
+                  <p className="font-semibold">The Pain:</p>
+                  <p>A project finishes, you're way over labor budget, and you can't reconstruct what happened. Was it weather? Lazy workers? Bad estimate? You move on to the next job never knowing.</p>
+                </div>
+                <div className="bg-green-100 dark:bg-green-900 p-3 rounded italic">
+                  "At the end of the building, you're just pissed off because your building went 20 hours over budget and you don't really know why. You know it was wetter. You know the guy was not feeling well someday. You don't really know. Move on. Next building."
+                </div>
+                <div>
+                  <p className="font-semibold">The Solution:</p>
+                  <p>Every work session logs hours worked, drops completed, and shortfall reasons. Project analytics show exactly where time was spent. Next year, you can look back and say "last time this building took 120 hours with Tommy and Damien, but they had weather delays for 3 days."</p>
+                </div>
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="font-medium">Data-driven post-mortems. Accurate re-quoting for repeat jobs. Stop losing money without understanding why.</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Problem 5 - Performance Data */}
+            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+                  "One guy is crushing it while another coasts—and I can't prove it"
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
+                <div>
+                  <p className="font-semibold">The Pain:</p>
+                  <p>Your gut says Tommy does 5 drops per day while another employee barely does 1. They work the same hours, you pay them the same, but productivity is wildly different. Without data, you can't have the conversation.</p>
+                </div>
+                <div className="bg-green-100 dark:bg-green-900 p-3 rounded italic">
+                  "Now it's just like, why didn't you do your drops? Well, look on OnRopePro, it's all there, it's all explained. Oh, okay, thanks."
+                </div>
+                <div>
+                  <p className="font-semibold">The Solution:</p>
+                  <p>Per-employee performance tracking shows drops completed per shift, target achievement rates, and reasons for shortfalls. Automatic shortfall prompts ensure accountability—employees must explain if they miss targets.</p>
+                </div>
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="font-medium">Objective performance data for coaching conversations. High performers feel recognized. Lazy employees either improve or self-select out.</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Problem 6 - Piece Work Tracking */}
+            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+                  "I pay people by the drop but tracking it is a nightmare"
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
+                <div>
+                  <p className="font-semibold">The Pain:</p>
+                  <p>Some projects use piece work (pay per drop instead of hourly). Tracking this manually means reconciling drop counts with timesheets, calculating compensation, and hoping you didn't miss anything.</p>
+                </div>
+                <div className="bg-green-100 dark:bg-green-900 p-3 rounded italic">
+                  "Piece work is... some companies pay per drop. They'll have a budget, let's say $10,000 for a building. They allow $6,000 for the guys. So that $6,000 is spread into drops. If you scroll around on Facebook all day and do one drop, you get paid for one drop."
+                </div>
+                <div>
+                  <p className="font-semibold">The Solution:</p>
+                  <p>Toggle "Piece Work" on any project and set the price per drop. When employees end their session and enter drops completed, payroll automatically calculates: 3 drops x $70/drop = $210. Marked as piece work in payroll reporting.</p>
+                </div>
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="font-medium">Zero manual calculation. Piece work and hourly employees can work the same project. Payroll exports are accurate automatically.</span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </section>
 
         <Separator />
