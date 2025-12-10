@@ -118,12 +118,13 @@ export default function Schedule() {
   const jobs = jobsData?.jobs || [];
 
   // Fetch employees for assignment
-  const { data: employeesData } = useQuery<{ employees: User[] }>({
+  const { data: employeesData } = useQuery<{ employees: (User & { connectionStatus?: string })[] }>({
     queryKey: ["/api/employees"],
   });
   // Filter out suspended and terminated employees from schedule
+  // Check both users.suspendedAt (primary) and connectionStatus (PLUS multi-employer)
   const employees = (employeesData?.employees || []).filter(e => 
-    !e.suspendedAt && !e.terminatedDate
+    !e.suspendedAt && !e.terminatedDate && e.connectionStatus !== 'suspended'
   );
 
   // Fetch employee time off entries
