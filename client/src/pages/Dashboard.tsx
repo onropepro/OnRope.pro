@@ -1537,6 +1537,11 @@ export default function Dashboard() {
             setShowOtherElevationFields(true);
           }
           
+          // Set the client selection from the quote if available
+          if (quoteData.clientId) {
+            setSelectedClientForProject(quoteData.clientId);
+          }
+          
           // Open the project creation dialog
           setShowProjectDialog(true);
           

@@ -1278,6 +1278,9 @@ export const quotes = pgTable("quotes", {
   strataManagerName: varchar("strata_manager_name"),
   strataManagerAddress: text("strata_manager_address"),
   
+  // Client reference (optional) - links to clients table for project conversion
+  clientId: varchar("client_id").references(() => clients.id, { onDelete: "set null" }),
+  
   // Photo attachments - support multiple photos
   photoUrls: text("photo_urls").array().default(sql`ARRAY[]::text[]`), // Array of photo URLs in object storage
   
