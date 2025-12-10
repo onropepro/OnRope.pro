@@ -3422,7 +3422,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           additionalSeats,
           seatsUsed: activeEmployeeCount,
           seatsAvailable: seatLimit === -1 ? -1 : Math.max(0, seatLimit - activeEmployeeCount),
-          atSeatLimit: seatLimit > 0 && activeEmployeeCount >= seatLimit
+          atSeatLimit: seatLimit === 0 || (seatLimit > 0 && activeEmployeeCount >= seatLimit)
         }
       });
     } catch (error) {
@@ -5848,7 +5848,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           additionalSeats,
           seatsUsed: activeEmployeeCount,
           seatsAvailable: seatLimit === -1 ? -1 : Math.max(0, seatLimit - activeEmployeeCount),
-          atSeatLimit: seatLimit > 0 && activeEmployeeCount >= seatLimit
+          atSeatLimit: seatLimit === 0 || (seatLimit > 0 && activeEmployeeCount >= seatLimit)
         }
       });
     } catch (error) {
@@ -5907,7 +5907,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           additionalSeats,
           seatsUsed: employeeCount,
           seatsAvailable: seatLimit === -1 ? -1 : Math.max(0, seatLimit - employeeCount),
-          atSeatLimit: seatLimit > 0 && employeeCount >= seatLimit
+          atSeatLimit: seatLimit === 0 || (seatLimit > 0 && employeeCount >= seatLimit)
         }
       });
     } catch (error) {

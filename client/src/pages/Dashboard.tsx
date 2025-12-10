@@ -736,6 +736,7 @@ export default function Dashboard() {
   };
   const [showProjectDialog, setShowProjectDialog] = useState(false);
   const [showEmployeeDialog, setShowEmployeeDialog] = useState(false);
+  const [showPurchaseSeatsDialog, setShowPurchaseSeatsDialog] = useState(false);
   const [showEditEmployeeDialog, setShowEditEmployeeDialog] = useState(false);
   const [showEmployeeDetailDialog, setShowEmployeeDetailDialog] = useState(false);
   const [employeeToEdit, setEmployeeToEdit] = useState<any | null>(null);
