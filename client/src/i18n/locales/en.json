@@ -2885,7 +2885,7 @@
       "backToLogin": "Back to Login"
     },
     "main": {
-      "title": "Choose Your License Tier",
+      "title": "Simple, Transparent Pricing",
       "subtitle": "Start your 30-day free trial today"
     },
     "tier": {
@@ -2901,7 +2901,8 @@
       "prioritySupport": "Priority Support",
       "customIntegrations": "Custom Integrations",
       "processing": "Processing...",
-      "select": "Select {{name}}"
+      "select": "Select {{name}}",
+      "startTrial": "Start Free Trial"
     },
     "nextSteps": {
       "title": "What happens next?",

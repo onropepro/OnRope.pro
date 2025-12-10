@@ -131,7 +131,7 @@ export default function GetLicense() {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-12 max-w-7xl">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold mb-4">{t('getLicense.main.title', 'Choose Your License Tier')}</h2>
+          <h2 className="text-4xl font-bold mb-4">{t('getLicense.main.title', 'Simple, Transparent Pricing')}</h2>
           <p className="text-xl text-muted-foreground">
             {t('getLicense.main.subtitle', 'Start your 30-day free trial today')}
           </p>
@@ -142,113 +142,89 @@ export default function GetLicense() {
           )}
         </div>
 
-        {/* Pricing Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {(Object.keys(TIER_CONFIG) as Array<keyof typeof TIER_CONFIG>).map((tierKey) => {
-            const tier = TIER_CONFIG[tierKey];
-            const price = currency === 'cad' ? tier.priceCAD : tier.priceUSD;
-            const isProcessing = processingTier === tierKey;
-            const isEnterprise = tierKey === 'enterprise';
-            const isPremium = tierKey === 'premium';
+        {/* Single Plan Card - Centered */}
+        <div className="flex justify-center">
+          <Card 
+            className="relative border-primary border-2 shadow-lg max-w-md w-full"
+            data-testid="card-tier-onropepro"
+          >
+            <CardHeader className="text-center">
+              <CardTitle className="text-3xl">OnRopePro</CardTitle>
+              <CardDescription>
+                <div className="mt-4">
+                  <span className="text-5xl font-bold text-foreground">
+                    $99
+                  </span>
+                  <span className="text-muted-foreground ml-2">
+                    {currencySymbol}/month
+                  </span>
+                </div>
+                <div className="mt-3 space-y-1">
+                  <Badge variant="secondary" className="text-xs">
+                    {t('getLicense.tier.freeTrial', '30-Day Free Trial')}
+                  </Badge>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    + $34.95/month per additional employee seat
+                  </p>
+                </div>
+              </CardDescription>
+            </CardHeader>
 
-            return (
-              <Card 
-                key={tierKey} 
-                className={`relative ${isPremium ? 'border-primary border-2 shadow-lg' : ''}`}
-                data-testid={`card-tier-${tierKey}`}
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-start gap-2">
+                  <span className="material-icons text-primary text-sm mt-0.5">check_circle</span>
+                  <span className="text-sm">
+                    <strong>{t('getLicense.tier.unlimited', 'Unlimited')}</strong> {t('getLicense.tier.projects', 'Projects')}
+                  </span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="material-icons text-primary text-sm mt-0.5">check_circle</span>
+                  <span className="text-sm">
+                    {t('getLicense.tier.gpsTracking', 'GPS Tracking & Time Clock')}
+                  </span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="material-icons text-primary text-sm mt-0.5">check_circle</span>
+                  <span className="text-sm">{t('getLicense.tier.safetyCompliance', 'Safety Compliance Tools')}</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="material-icons text-primary text-sm mt-0.5">check_circle</span>
+                  <span className="text-sm">{t('getLicense.tier.residentPortal', 'Resident Portal')}</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="material-icons text-primary text-sm mt-0.5">check_circle</span>
+                  <span className="text-sm">Full Project Management Suite</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="material-icons text-primary text-sm mt-0.5">check_circle</span>
+                  <span className="text-sm">Client & Building Management</span>
+                </div>
+              </div>
+            </CardContent>
+
+            <CardFooter>
+              <Button
+                className="w-full h-12 text-base"
+                variant="default"
+                onClick={() => handleSelectTier('basic')}
+                disabled={processingTier === 'basic'}
+                data-testid="button-select-onropepro"
               >
-                {isPremium && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <Badge className="px-4 py-1 bg-primary text-primary-foreground">
-                      {t('getLicense.tier.mostPopular', 'Most Popular')}
-                    </Badge>
-                  </div>
+                {processingTier === 'basic' ? (
+                  <>
+                    <span className="material-icons mr-2 animate-spin">sync</span>
+                    {t('getLicense.tier.processing', 'Processing...')}
+                  </>
+                ) : (
+                  <>
+                    <span className="material-icons mr-2">shopping_cart</span>
+                    {t('getLicense.tier.startTrial', 'Start Free Trial')}
+                  </>
                 )}
-                
-                <CardHeader>
-                  <CardTitle className="text-2xl">{tier.name}</CardTitle>
-                  <CardDescription>
-                    <div className="mt-4">
-                      <span className="text-4xl font-bold text-foreground">
-                        ${price}
-                      </span>
-                      <span className="text-muted-foreground ml-2">
-                        {currencySymbol}/month
-                      </span>
-                    </div>
-                    <div className="mt-2 text-sm">
-                      <Badge variant="secondary" className="text-xs">
-                        {t('getLicense.tier.freeTrial', '30-Day Free Trial')}
-                      </Badge>
-                    </div>
-                  </CardDescription>
-                </CardHeader>
-
-                <CardContent className="space-y-4">
-                  <div className="space-y-3">
-                    <div className="flex items-start gap-2">
-                      <span className="material-icons text-primary text-sm mt-0.5">check_circle</span>
-                      <span className="text-sm">
-                        <strong>{tier.maxProjects === -1 ? t('getLicense.tier.unlimited', 'Unlimited') : tier.maxProjects}</strong> {t('getLicense.tier.projects', 'Projects')}
-                      </span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <span className="material-icons text-primary text-sm mt-0.5">check_circle</span>
-                      <span className="text-sm">
-                        <strong>{tier.maxSeats === -1 ? t('getLicense.tier.unlimited', 'Unlimited') : tier.maxSeats}</strong> {t('getLicense.tier.employeeSeats', 'Employee Seats')}
-                      </span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <span className="material-icons text-primary text-sm mt-0.5">check_circle</span>
-                      <span className="text-sm">{t('getLicense.tier.gpsTracking', 'GPS Tracking & Time Clock')}</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <span className="material-icons text-primary text-sm mt-0.5">check_circle</span>
-                      <span className="text-sm">{t('getLicense.tier.safetyCompliance', 'Safety Compliance Tools')}</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <span className="material-icons text-primary text-sm mt-0.5">check_circle</span>
-                      <span className="text-sm">{t('getLicense.tier.residentPortal', 'Resident Portal')}</span>
-                    </div>
-                    {isEnterprise && (
-                      <>
-                        <div className="flex items-start gap-2">
-                          <span className="material-icons text-primary text-sm mt-0.5">check_circle</span>
-                          <span className="text-sm">{t('getLicense.tier.prioritySupport', 'Priority Support')}</span>
-                        </div>
-                        <div className="flex items-start gap-2">
-                          <span className="material-icons text-primary text-sm mt-0.5">check_circle</span>
-                          <span className="text-sm">{t('getLicense.tier.customIntegrations', 'Custom Integrations')}</span>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </CardContent>
-
-                <CardFooter>
-                  <Button
-                    className="w-full h-12 text-base"
-                    variant={isPremium ? "default" : "outline"}
-                    onClick={() => handleSelectTier(tierKey)}
-                    disabled={isProcessing}
-                    data-testid={`button-select-${tierKey}`}
-                  >
-                    {isProcessing ? (
-                      <>
-                        <span className="material-icons mr-2 animate-spin">sync</span>
-                        {t('getLicense.tier.processing', 'Processing...')}
-                      </>
-                    ) : (
-                      <>
-                        <span className="material-icons mr-2">shopping_cart</span>
-                        {t('getLicense.tier.select', 'Select {{name}}', { name: tier.name })}
-                      </>
-                    )}
-                  </Button>
-                </CardFooter>
-              </Card>
-            );
-          })}
+              </Button>
+            </CardFooter>
+          </Card>
         </div>
 
         {/* Trial Details */}
