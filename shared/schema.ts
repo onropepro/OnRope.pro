@@ -163,7 +163,8 @@ export const users = pgTable("users", {
   licenseKey: varchar("license_key"), // Current license key (COMPANY-XXXXX-XXXXX-XXXXX-[1-4])
   
   // Add-ons tracking (company role only)
-  additionalSeatsCount: integer("additional_seats_count").default(0), // Number of extra seats purchased
+  additionalSeatsCount: integer("additional_seats_count").default(0), // Number of extra seats purchased (paid via Stripe)
+  giftedSeatsCount: integer("gifted_seats_count").default(0), // Number of seats gifted by SuperUser (free forever)
   additionalProjectsCount: integer("additional_projects_count").default(0), // Number of extra projects purchased
   whitelabelBrandingActive: boolean("whitelabel_branding_active").default(false), // Whether white-label branding is active
   
