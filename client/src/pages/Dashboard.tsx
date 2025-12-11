@@ -5036,6 +5036,7 @@ export default function Dashboard() {
                 onOpenChange={setShowPurchaseSeatsDialog}
                 currentSeats={employeesData?.seatInfo?.seatLimit || 0}
                 onPurchaseSuccess={() => {
+                  queryClient.invalidateQueries({ queryKey: ["/api/employees/all"] });
                   queryClient.invalidateQueries({ queryKey: ["/api/employees"] });
                   queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
                 }}
