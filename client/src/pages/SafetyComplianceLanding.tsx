@@ -91,20 +91,20 @@ export default function SafetyComplianceLanding() {
           <CardContent className="p-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-sky-600">2 sec</div>
-                <div className="text-sm text-muted-foreground mt-1">Inspection time</div>
+                <div className="text-3xl md:text-4xl font-bold text-sky-600">0</div>
+                <div className="text-sm text-muted-foreground mt-1">Missing forms</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-emerald-600">7 yrs</div>
-                <div className="text-sm text-muted-foreground mt-1">Record retention</div>
+                <div className="text-3xl md:text-4xl font-bold text-emerald-600">0</div>
+                <div className="text-sm text-muted-foreground mt-1">Failed audits</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl md:text-4xl font-bold text-violet-600">20+</div>
                 <div className="text-sm text-muted-foreground mt-1">Safety topics</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-amber-600">4 clicks</div>
-                <div className="text-sm text-muted-foreground mt-1">Audit PDF export</div>
+                <div className="text-3xl md:text-4xl font-bold text-amber-600">&#8734;</div>
+                <div className="text-sm text-muted-foreground mt-1">Searchable history</div>
               </div>
             </div>
           </CardContent>
