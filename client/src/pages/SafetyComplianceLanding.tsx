@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
+import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import {
   Shield,
   CheckCircle2,
@@ -31,14 +32,93 @@ import {
   Signature,
   Calendar,
   Quote,
-  UserX
+  UserX,
+  Globe
 } from "lucide-react";
 
 export default function SafetyComplianceLanding() {
   const [expandedProblems, setExpandedProblems] = useState<string[]>([]);
+  const [, setLocation] = useLocation();
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="flex items-center justify-between px-6 md:px-8 py-4 border-b bg-background/80 backdrop-blur-sm sticky top-0 z-50">
+        <div className="flex items-center">
+          <Link href="/">
+            <img src={onRopeProLogo} alt="OnRopePro" className="h-16 object-contain cursor-pointer" />
+          </Link>
+        </div>
+        
+        <nav className="hidden lg:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
+          <Button
+            variant="ghost"
+            className="text-sm font-medium"
+            onClick={() => setLocation("/employer")}
+            data-testid="nav-employer"
+          >
+            Employer
+          </Button>
+          <Button
+            variant="ghost"
+            className="text-sm font-medium"
+            onClick={() => setLocation("/technician-login")}
+            data-testid="nav-technician"
+          >
+            Technician
+          </Button>
+          <Button
+            variant="ghost"
+            className="text-sm font-medium"
+            onClick={() => setLocation("#")}
+            data-testid="nav-property-manager"
+          >
+            Property Manager
+          </Button>
+          <Button
+            variant="ghost"
+            className="text-sm font-medium"
+            onClick={() => setLocation("/link")}
+            data-testid="nav-resident"
+          >
+            Resident
+          </Button>
+          <Button
+            variant="ghost"
+            className="text-sm font-medium"
+            onClick={() => setLocation("/building-portal")}
+            data-testid="nav-building-manager"
+          >
+            Building Manager
+          </Button>
+          <Button
+            variant="ghost"
+            className="text-sm font-medium bg-accent"
+            onClick={() => setLocation("/modules/safety-compliance")}
+            data-testid="nav-modules"
+          >
+            Modules
+          </Button>
+        </nav>
+        
+        <div className="flex items-center gap-3">
+          <Button 
+            variant="ghost"
+            onClick={() => setLocation("/")}
+            data-testid="button-sign-in-header"
+          >
+            Sign In
+          </Button>
+          <Button 
+            onClick={() => setLocation("/pricing")}
+            className="bg-[#A3320B]"
+            data-testid="button-get-started-header"
+          >
+            Get Started
+          </Button>
+        </div>
+      </header>
+
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-sky-600 via-sky-700 to-blue-900 text-white">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMtOS45NDEgMC0xOCA4LjA1OS0xOCAxOHM4LjA1OSAxOCAxOCAxOGM5Ljk0MSAwIDE4LTguMDU5IDE4LTE4cy04LjA1OS0xOC0xOC0xOHptMCAzMmMtNy43MzIgMC0xNC02LjI2OC0xNC0xNHM2LjI2OC0xNCAxNC0xNHMxNCA2LjI2OCAxNCAxNC02LjI2OCAxNC0xNCAxNHoiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wMykiLz48L2c+PC9zdmc+')] opacity-30"></div>
@@ -165,7 +245,7 @@ export default function SafetyComplianceLanding() {
                 <div className="w-12 h-12 rounded-lg bg-sky-100 dark:bg-sky-900 flex items-center justify-center mb-3">
                   <HardHat className="w-6 h-6 text-sky-600" />
                 </div>
-                <CardTitle className="text-xl">Every Harness Inspection. Every Day.</CardTitle>
+                <CardTitle className="text-xl">Every Harness Inspection. Every Day. No Exceptions.</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm text-muted-foreground">
                 <p>Before any technician starts a work session, they complete a digital inspection on their phone.</p>

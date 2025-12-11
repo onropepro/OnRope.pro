@@ -226,6 +226,14 @@ export default function Login() {
           >
             Building Manager
           </Button>
+          <Button
+            variant="ghost"
+            className="text-sm font-medium"
+            onClick={() => setLocation("/modules/safety-compliance")}
+            data-testid="nav-modules"
+          >
+            Modules
+          </Button>
         </nav>
         
         {/* Actions - Right */}
