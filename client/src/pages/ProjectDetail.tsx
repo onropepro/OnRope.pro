@@ -546,12 +546,8 @@ export default function ProjectDetail() {
       queryClient.invalidateQueries({ queryKey: ["/api/my-drops-today"] });
       endDayForm.reset();
       
-      // Show log hours prompt for rope access technicians to log their tasks
-      if (currentUser?.role === "rope_access_tech" || currentUser?.irataLevel) {
-        setShowLogHoursPrompt(true);
-      } else {
-        toast({ title: t('projectDetail.toasts.sessionEnded', 'Work session ended'), description: t('projectDetail.toasts.greatWork', 'Great work today!') });
-      }
+      // Show log hours prompt for all users to log their rope access hours if applicable
+      setShowLogHoursPrompt(true);
     },
     onError: (error: Error) => {
       toast({ title: t('projectDetail.toasts.error', 'Error'), description: error.message, variant: "destructive" });
