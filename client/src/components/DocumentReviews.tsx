@@ -449,6 +449,8 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
   const [selectedSWP, setSelectedSWP] = useState<SafeWorkProcedure | null>(null);
   const [isPracticeDialogOpen, setIsPracticeDialogOpen] = useState(false);
   const [selectedPractice, setSelectedPractice] = useState<SafeWorkPractice | null>(null);
+  const [isUnifiedDialogOpen, setIsUnifiedDialogOpen] = useState(false);
+  const [unifiedDocumentUrl, setUnifiedDocumentUrl] = useState<string | null>(null);
 
   const { data: reviewsData, isLoading } = useQuery<{ reviews: DocumentReviewSignature[] }>({
     queryKey: ['/api/document-reviews/my'],
@@ -480,7 +482,11 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
       queryClient.invalidateQueries({ queryKey: ['/api/csr'] });
       queryClient.invalidateQueries({ queryKey: ['/api/company-safety-rating'] });
       setIsSignDialogOpen(false);
+      setIsUnifiedDialogOpen(false);
       setSelectedReview(null);
+      setUnifiedDocumentUrl(null);
+      setSelectedSWP(null);
+      setSelectedPractice(null);
       toast({
         title: "Document Signed",
         description: "Your signature has been recorded.",
@@ -546,17 +552,23 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
   const handleViewDocument = (review: DocumentReviewSignature) => {
     const url = getDocumentUrl(review);
     
+    // Always open the unified dialog - shows document + signing in one place
+    setSelectedReview(review);
+    markViewedMutation.mutate(review.id);
+    
     if (url) {
-      window.open(url, '_blank');
-      markViewedMutation.mutate(review.id);
-      setSelectedReview(review);
+      // PDF or uploaded document - show in unified dialog with iframe
+      setUnifiedDocumentUrl(url);
+      setSelectedSWP(null);
+      setSelectedPractice(null);
+      setIsUnifiedDialogOpen(true);
     } else if (review.documentType === 'safe_work_procedure') {
       const swpTemplate = findSWPTemplate(review.documentName);
       if (swpTemplate) {
         setSelectedSWP(swpTemplate);
-        setSelectedReview(review);
-        setIsSWPDialogOpen(true);
-        markViewedMutation.mutate(review.id);
+        setUnifiedDocumentUrl(null);
+        setSelectedPractice(null);
+        setIsUnifiedDialogOpen(true);
       } else {
         toast({
           variant: "destructive",
@@ -568,9 +580,9 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
       const practiceTemplate = findPracticeTemplate(review.documentName);
       if (practiceTemplate) {
         setSelectedPractice(practiceTemplate);
-        setSelectedReview(review);
-        setIsPracticeDialogOpen(true);
-        markViewedMutation.mutate(review.id);
+        setUnifiedDocumentUrl(null);
+        setSelectedSWP(null);
+        setIsUnifiedDialogOpen(true);
       } else {
         toast({
           variant: "destructive",
@@ -1089,6 +1101,243 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
               <PenLine className="h-4 w-4 mr-2" />
               {t('documents.proceedToSign', 'Proceed to Sign')}
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Unified Document View + Sign Dialog */}
+      <Dialog open={isUnifiedDialogOpen} onOpenChange={(open) => {
+        setIsUnifiedDialogOpen(open);
+        if (!open) {
+          setSelectedReview(null);
+          setUnifiedDocumentUrl(null);
+          setSelectedSWP(null);
+          setSelectedPractice(null);
+          signatureRef.current?.clear();
+          setIsSignatureEmpty(true);
+        }
+      }}>
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5 text-primary" />
+              {selectedReview?.documentName || t('documents.document', 'Document')}
+            </DialogTitle>
+            <DialogDescription>
+              {getDocumentTypeLabel(selectedReview?.documentType || '')}
+              {' - '}
+              {t('documents.reviewAndSign', 'Review the document below, then sign at the bottom to complete.')}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="flex-1 overflow-hidden flex flex-col min-h-0">
+            {/* Document Content Area */}
+            <div className="flex-1 min-h-0 mb-4">
+              {unifiedDocumentUrl ? (
+                <iframe
+                  src={unifiedDocumentUrl}
+                  className="w-full h-full min-h-[300px] border rounded-lg bg-white"
+                  style={{ height: 'calc(50vh - 100px)' }}
+                  title={selectedReview?.documentName || 'Document'}
+                />
+              ) : selectedSWP ? (
+                <ScrollArea className="h-full max-h-[calc(50vh-100px)] pr-4">
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-semibold text-sm mb-2">{t('documents.scope', 'Scope')}</h4>
+                      <p className="text-sm text-muted-foreground">{selectedSWP.scope}</p>
+                    </div>
+                    <Separator />
+                    <div>
+                      <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4 text-amber-500" />
+                        {t('documents.hazardsIdentified', 'Hazards Identified')}
+                      </h4>
+                      <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                        {selectedSWP.hazards.map((hazard, idx) => (
+                          <li key={idx}>{hazard}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                        <Shield className="h-4 w-4 text-emerald-500" />
+                        {t('documents.controlMeasures', 'Control Measures')}
+                      </h4>
+                      <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                        {selectedSWP.controlMeasures.map((measure, idx) => (
+                          <li key={idx}>{measure}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                        <HardHat className="h-4 w-4 text-blue-500" />
+                        {t('documents.ppe', 'PPE Required')}
+                      </h4>
+                      <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                        {selectedSWP.ppe.map((item, idx) => (
+                          <li key={idx}>{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                        <ClipboardList className="h-4 w-4 text-purple-500" />
+                        {t('documents.workProcedure', 'Work Procedure')}
+                      </h4>
+                      <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
+                        {selectedSWP.workProcedure.map((step, idx) => (
+                          <li key={idx}>{step}</li>
+                        ))}
+                      </ol>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                        <Phone className="h-4 w-4 text-red-500" />
+                        {t('documents.emergencyProcedures', 'Emergency Procedures')}
+                      </h4>
+                      <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                        {selectedSWP.emergencyProcedures.map((proc, idx) => (
+                          <li key={idx}>{proc}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </ScrollArea>
+              ) : selectedPractice ? (
+                <ScrollArea className="h-full max-h-[calc(50vh-100px)] pr-4">
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                        <Lightbulb className="h-4 w-4 text-amber-500" />
+                        Key Principles
+                      </h4>
+                      <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                        {selectedPractice.keyPrinciples.map((principle, idx) => (
+                          <li key={idx}>{principle}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <Separator />
+                    <div>
+                      <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                        <ClipboardList className="h-4 w-4 text-blue-500" />
+                        Requirements
+                      </h4>
+                      <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                        {selectedPractice.requirements.map((req, idx) => (
+                          <li key={idx}>{req}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                          <Check className="h-4 w-4 text-emerald-500" />
+                          Do
+                        </h4>
+                        <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                          {selectedPractice.doList.map((item, idx) => (
+                            <li key={idx}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                          <AlertCircle className="h-4 w-4 text-red-500" />
+                          Don't
+                        </h4>
+                        <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                          {selectedPractice.dontList.map((item, idx) => (
+                            <li key={idx}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                        <Phone className="h-4 w-4 text-red-500" />
+                        Emergency Actions
+                      </h4>
+                      <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                        {selectedPractice.emergencyActions.map((action, idx) => (
+                          <li key={idx}>{action}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </ScrollArea>
+              ) : (
+                <div className="flex items-center justify-center h-48 text-muted-foreground">
+                  {t('documents.noDocumentContent', 'Document content not available')}
+                </div>
+              )}
+            </div>
+
+            {/* Signature Section - Always at bottom */}
+            {selectedReview && !selectedReview.signedAt && (
+              <div className="border-t pt-4 space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  {t('documents.signingAcknowledgment', 'By signing below, you acknowledge that you have read and understood the document.')}
+                </p>
+                
+                <div className="border rounded-lg p-2 bg-white">
+                  <SignatureCanvas
+                    ref={signatureRef}
+                    canvasProps={{
+                      className: 'w-full h-32 cursor-crosshair',
+                      style: { width: '100%', height: '128px' },
+                    }}
+                    backgroundColor="white"
+                    onBegin={() => setIsSignatureEmpty(false)}
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleClearSignature}
+                    data-testid="button-clear-signature-unified"
+                  >
+                    {t('common.clear', 'Clear')}
+                  </Button>
+                  <p className="text-xs text-muted-foreground">
+                    {t('documents.signWithMouse', 'Sign with your mouse or touch')}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setIsUnifiedDialogOpen(false)}
+              data-testid="button-close-unified"
+            >
+              {t('common.close', 'Close')}
+            </Button>
+            {selectedReview && !selectedReview.signedAt && (
+              <Button
+                onClick={handleSignDocument}
+                disabled={signDocumentMutation.isPending || isSignatureEmpty}
+                data-testid="button-sign-unified"
+              >
+                {signDocumentMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    {t('documents.signing', 'Signing...')}
+                  </>
+                ) : (
+                  <>
+                    <PenLine className="h-4 w-4 mr-2" />
+                    {t('documents.submitSignature', 'Submit Signature')}
+                  </>
+                )}
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
