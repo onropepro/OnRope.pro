@@ -2506,16 +2506,6 @@ export default function ProjectDetail() {
                 </div>
               )}
 
-              {/* Create Toolbox Meeting Button */}
-              <Button
-                variant="default"
-                className="w-full h-12 gap-2"
-                onClick={() => setLocation(`/toolbox-meeting?projectId=${id}`)}
-                data-testid="button-create-toolbox-meeting"
-              >
-                <span className="material-icons text-lg">assignment</span>
-                {t('projectDetail.toolbox.conductMeeting', 'Conduct Toolbox Meeting')}
-              </Button>
             </div>
 
             <Separator />
