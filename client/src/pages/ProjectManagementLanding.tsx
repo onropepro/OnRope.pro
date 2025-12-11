@@ -25,7 +25,14 @@ import {
   ChevronsUpDown,
   Crown,
   Home as HomeIcon,
-  Wrench
+  Wrench,
+  Sparkles,
+  Compass,
+  Eye,
+  DollarSign,
+  Search,
+  Camera,
+  GitBranch
 } from "lucide-react";
 
 const ALL_ACCORDION_ITEMS = [
@@ -289,69 +296,173 @@ export default function ProjectManagementLanding() {
 
       <Separator className="my-8" />
 
-      {/* Features */}
+      {/* Key Features */}
       <section className="py-16 md:py-20 px-4 max-w-5xl mx-auto space-y-8">
         <div>
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">How It Works</h2>
-          <div className="grid md:grid-cols-2 gap-6">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-6">
+            <Sparkles className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+            Key Features
+          </h2>
+          
+          <div className="grid md:grid-cols-2 gap-4">
             <Card>
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-3">
-                  <MapPin className="w-5 h-5 text-emerald-600" />
-                  <CardTitle className="text-lg">4-Direction Elevation Tracking</CardTitle>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0">
+                    <Compass className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Directional Drop Tracking</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Track progress on each building elevation (N/E/S/W) independently. Perfect for high-rise window cleaning with different access requirements per side.
+                    </p>
+                  </div>
                 </div>
-              </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">Track North, East, South, and West independently with separate drop counts, crew assignments, and completion status.</CardContent>
+              </CardContent>
             </Card>
-
+            
             <Card>
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-3">
-                  <BarChart3 className="w-5 h-5 text-emerald-600" />
-                  <CardTitle className="text-lg">Real-Time Progress Dashboard</CardTitle>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900 flex items-center justify-center shrink-0">
+                    <BarChart3 className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Real-Time Progress Dashboard</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      See every project's completion percentage, days remaining, and assigned crew. Updates automatically as work sessions are logged.
+                    </p>
+                  </div>
                 </div>
-              </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">See every project's completion percentage, days remaining, and assigned crew. Updates automatically as work sessions are logged.</CardContent>
+              </CardContent>
             </Card>
-
+            
             <Card>
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-3">
-                  <Target className="w-5 h-5 text-emerald-600" />
-                  <CardTitle className="text-lg">Flexible Tracking Methods</CardTitle>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-action-100 dark:bg-action-900 flex items-center justify-center shrink-0">
+                    <Target className="w-5 h-5 text-action-600 dark:text-action-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Flexible Tracking Methods</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Drop-based for window cleaning, hours-based for repairs, unit-based for suites. The system adapts to each job type.
+                    </p>
+                  </div>
                 </div>
-              </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">Drop-based for window cleaning, hours-based for repairs, unit-based for suites. The system adapts to your job type.</CardContent>
+              </CardContent>
             </Card>
-
+            
             <Card>
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-3">
-                  <Users className="w-5 h-5 text-emerald-600" />
-                  <CardTitle className="text-lg">Crew Assignment & Scheduling</CardTitle>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0">
+                    <Users className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Crew Assignment & Scheduling</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Assign technicians to specific projects and elevations. Color-coded project bars show scheduling conflicts instantly.
+                    </p>
+                  </div>
                 </div>
-              </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">Assign technicians to specific projects and elevations. Color-coded project bars show scheduling conflicts instantly.</CardContent>
+              </CardContent>
             </Card>
-
+            
             <Card>
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-3">
-                  <Calendar className="w-5 h-5 text-emerald-600" />
-                  <CardTitle className="text-lg">Client & Resident Visibility</CardTitle>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-sky-100 dark:bg-sky-900 flex items-center justify-center shrink-0">
+                    <Eye className="w-5 h-5 text-sky-600 dark:text-sky-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Client & Resident Visibility</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Property managers and residents check progress themselves. Photo galleries and completion status reduce status calls by 60-70%.
+                    </p>
+                  </div>
                 </div>
-              </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">Property managers and residents check progress themselves through dedicated portals. Status calls drop 60-70%.</CardContent>
+              </CardContent>
             </Card>
-
+            
             <Card>
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-3">
-                  <TrendingUp className="w-5 h-5 text-emerald-600" />
-                  <CardTitle className="text-lg">Performance Analytics</CardTitle>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
+                    <TrendingUp className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Performance Analytics</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Track drops or units completed per shift by technician. Identify top performers and coach underperformers with objective data.
+                    </p>
+                  </div>
                 </div>
-              </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">Track drops or units completed per shift by technician. Identify top performers and coach underperformers with objective data.</CardContent>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center shrink-0">
+                    <DollarSign className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Piece Work Mode</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Enable piece work compensation for drop-based projects. Set rate per drop, and payroll calculates automatically.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-teal-100 dark:bg-teal-900 flex items-center justify-center shrink-0">
+                    <Search className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Project Archive & Search</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Completed projects archive automatically but remain searchable. Historical data powers accurate future quoting.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-orange-100 dark:bg-orange-900 flex items-center justify-center shrink-0">
+                    <Camera className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Photo Documentation</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Attach photos to work sessions showing completed work. Before/after galleries accessible to building managers and residents.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-cyan-100 dark:bg-cyan-900 flex items-center justify-center shrink-0">
+                    <GitBranch className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Status Workflow</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Projects move through Draft, Active, On Hold, Completed, and Archived stages. Pause projects for weather or client requests.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
             </Card>
           </div>
         </div>

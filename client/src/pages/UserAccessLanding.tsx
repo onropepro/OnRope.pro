@@ -30,7 +30,11 @@ import {
   UserX,
   AlertTriangle,
   Database,
-  ShieldCheck
+  ShieldCheck,
+  Sparkles,
+  UserCog,
+  History,
+  Filter
 } from "lucide-react";
 
 export default function UserAccessLanding() {
@@ -300,48 +304,111 @@ export default function UserAccessLanding() {
         </Card>
       </section>
 
-      {/* Key Features - How It Works */}
+      {/* Key Features */}
       <section className="py-16 md:py-20 px-4 max-w-5xl mx-auto space-y-8">
         <div>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">How It Works</h2>
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-6">
+            <Sparkles className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            Key Features
+          </h2>
           <p className="text-muted-foreground leading-relaxed text-base mb-8">
             Enterprise-grade permission controls that scale from 5 people to 500. Define who can view, edit, or create any data type. Changes take effect immediately.
           </p>
           
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-2 gap-4">
             <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Role-Based Access Control</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <p>Define custom roles or use built-in templates (Owner, Supervisor, Admin, Technician, Office). Assign permissions for each module: Projects, Payroll, Safety, Time Tracking, Scheduling, Reports, and Billing.</p>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900 flex items-center justify-center shrink-0">
+                    <UserCog className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Role-Based Access Control</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Define custom roles or use built-in templates. Assign permissions for each module: Projects, Payroll, Safety, Time Tracking, and more.
+                    </p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
-
+            
             <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Data-Level Filtering</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <p>Supervisors see projects they manage, not all projects. Technicians see only their own time entries. Building managers see only their buildings. Data automatically filters based on role and scope.</p>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0">
+                    <Filter className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Data-Level Filtering</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Supervisors see projects they manage. Technicians see only their own time entries. Data automatically filters based on role and scope.
+                    </p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
-
+            
             <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Financial Visibility Control</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <p>Show labor hours without hourly rates. Display project budgets without profit margins. Grant invoice processing without access to cost data. Complete separation of operational and financial visibility.</p>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0">
+                    <DollarSign className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Financial Visibility Control</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Show labor hours without hourly rates. Display budgets without profit margins. Complete separation of operational and financial visibility.
+                    </p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
-
+            
             <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Audit Logs & History</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <p>Every data access recorded with timestamp and user. See who viewed what, when. Modified data shows before/after values. Perfect for compliance and dispute resolution.</p>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-sky-100 dark:bg-sky-900 flex items-center justify-center shrink-0">
+                    <History className="w-5 h-5 text-sky-600 dark:text-sky-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Audit Logs & History</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Every data access recorded with timestamp and user. Modified data shows before/after values. Perfect for compliance and dispute resolution.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center shrink-0">
+                    <Layers className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Multi-Tenant Architecture</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Complete data isolation between companies. Each organization sees only their own employees, projects, and financial data.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
+                    <ShieldCheck className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Instant Permission Updates</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Changes take effect immediately. Revoke access and the user loses visibility on their next page load. No delays.
+                    </p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>

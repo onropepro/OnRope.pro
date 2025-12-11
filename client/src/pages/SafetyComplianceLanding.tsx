@@ -35,7 +35,10 @@ import {
   Quote,
   UserX,
   Globe,
-  Lock
+  Lock,
+  Sparkles,
+  Smartphone,
+  RefreshCw
 } from "lucide-react";
 
 export default function SafetyComplianceLanding() {
@@ -544,48 +547,111 @@ export default function SafetyComplianceLanding() {
         </div>
       </section>
 
-      {/* Key Features - How It Works */}
+      {/* Key Features */}
       <section className="py-16 md:py-20 px-4 max-w-5xl mx-auto space-y-8">
         <div>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">How It Works</h2>
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-6">
+            <Sparkles className="w-5 h-5 text-sky-600 dark:text-sky-400" />
+            Key Features
+          </h2>
           <p className="text-muted-foreground leading-relaxed text-base mb-8">
             Digital safety documentation that keeps your team safer and your business protected. From equipment tracking to compliance audits, everything in one integrated system.
           </p>
           
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-2 gap-4">
             <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Mobile-First Inspections</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <p>Technicians complete harness and equipment inspections on their phones. Guided checklists with photos and notes. Takes 2 minutes. Automatic timestamps and signatures included.</p>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-sky-100 dark:bg-sky-900 flex items-center justify-center shrink-0">
+                    <Smartphone className="w-5 h-5 text-sky-600 dark:text-sky-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Mobile-First Inspections</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Technicians complete harness and equipment inspections on their phones. Guided checklists with photos and notes. Takes 2 minutes.
+                    </p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
-
+            
             <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Toolbox Meeting Tracking</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <p>Run daily or weekly toolbox meetings. Topics from 20+ safety subjects. Technicians sign attendance digitally. Records searchable by date, topic, attendees, project, or location.</p>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0">
+                    <Users className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Toolbox Meeting Tracking</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Run daily or weekly toolbox meetings. Topics from 20+ safety subjects. Technicians sign attendance digitally.
+                    </p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
-
+            
             <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Equipment Lifecycle Management</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <p>Track purchase dates, service life, retirement dates. Equipment fails inspection? Automatically flagged and removed from availability. Predict replacement needs.</p>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0">
+                    <RefreshCw className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Equipment Lifecycle Management</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Track purchase dates, service life, retirement dates. Failed equipment automatically flagged and removed from availability.
+                    </p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
-
+            
             <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Audit-Ready PDFs</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <p>Search by equipment, technician, date, or project. Export comprehensive reports instantly. Include photos, signatures, timestamps, and compliance status. Ready for insurance or IRATA audits.</p>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900 flex items-center justify-center shrink-0">
+                    <Download className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Audit-Ready PDFs</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Search by equipment, technician, date, or project. Export comprehensive reports instantly. Ready for insurance or IRATA audits.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
+                    <AlertTriangle className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Automatic Flagging</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Equipment that fails inspection gets flagged immediately. Retirement workflows trigger automatically.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center shrink-0">
+                    <Signature className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Digital Signatures</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Every inspection and meeting includes timestamped digital signatures. Complete audit trail for compliance.
+                    </p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
