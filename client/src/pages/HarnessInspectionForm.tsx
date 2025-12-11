@@ -54,6 +54,15 @@ export default function HarnessInspectionForm() {
   const urlParams = new URLSearchParams(searchString);
   const projectIdFromUrl = urlParams.get('projectId');
 
+  // Navigation helper - returns to project if opened from one
+  const handleNavigateBack = () => {
+    if (projectIdFromUrl) {
+      setLocation(`/projects/${projectIdFromUrl}`);
+    } else {
+      setLocation("/safety-forms");
+    }
+  };
+
   // Initialize all equipment findings with default "pass" values
   const initializeFindings = (): EquipmentFindings => {
     const initialized: EquipmentFindings = {};
@@ -351,7 +360,11 @@ export default function HarnessInspectionForm() {
       });
       queryClient.invalidateQueries({ queryKey: ["/api/my-harness-inspections"] });
       queryClient.invalidateQueries({ queryKey: ["/api/harness-inspections"] });
-      setLocation("/dashboard");
+      // Invalidate project-specific if opened from project
+      if (projectIdFromUrl) {
+        queryClient.invalidateQueries({ queryKey: ["/api/projects", projectIdFromUrl, "harness-inspections"] });
+      }
+      handleNavigateBack();
     },
     onError: (error: Error) => {
       toast({ 
@@ -372,7 +385,7 @@ export default function HarnessInspectionForm() {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto py-6 px-4 max-w-4xl">
         <div className="flex items-center gap-4 mb-6">
-          <BackButton size="icon" to="/safety-forms" />
+          <BackButton size="icon" to={projectIdFromUrl ? `/projects/${projectIdFromUrl}` : "/safety-forms"} />
           <MainMenuButton size="icon" />
           <div className="flex items-center gap-3">
             <ClipboardCheck className="h-8 w-8 text-primary" />
@@ -922,7 +935,7 @@ export default function HarnessInspectionForm() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setLocation("/dashboard")}
+                onClick={handleNavigateBack}
                 className="flex-1"
                 data-testid="button-cancel"
               >
