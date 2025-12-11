@@ -1022,6 +1022,11 @@ export default function Dashboard() {
     queryKey: ["/api/toolbox-meetings"],
   });
 
+  // Fetch FLHA forms
+  const { data: flhaFormsData } = useQuery({
+    queryKey: ["/api/flha-forms"],
+  });
+
   // Fetch accepted team invitations (for owner notification)
   const { data: acceptedInvitationsData, refetch: refetchAcceptedInvitations } = useQuery<{
     invitations: Array<{
@@ -1224,6 +1229,7 @@ export default function Dashboard() {
   const complaints = complaintsData?.complaints || [];
   const harnessInspections = harnessInspectionsData?.inspections || [];
   const toolboxMeetings = toolboxMeetingsData?.meetings || [];
+  const flhaForms = flhaFormsData?.forms || [];
   const companyDocuments = companyDocumentsData?.documents || [];
   
   // Check if specific company documents are uploaded
@@ -4518,6 +4524,20 @@ export default function Dashboard() {
                                           {hasMeetings ? 'check_circle' : 'cancel'}
                                         </span>
                                         <span className="text-base text-muted-foreground">{t('dashboard.projects.toolboxMeeting', 'Toolbox Meeting')}</span>
+                                      </div>
+                                    );
+                                  })()}
+                                  
+                                  {/* FLHA Forms */}
+                                  {(() => {
+                                    const projectFLHAs = flhaForms.filter((f: any) => f.projectId === project.id);
+                                    const hasFLHAs = projectFLHAs.length > 0;
+                                    return (
+                                      <div className="flex items-center gap-1.5" title={hasFLHAs ? `${projectFLHAs.length} ${t('dashboard.projects.flhaForms', 'FLHA form(s)')}` : t('dashboard.projects.noFlhaForms', 'No FLHA forms')}>
+                                        <span className={`material-icons text-lg ${hasFLHAs ? 'text-green-500' : 'text-red-500'}`}>
+                                          {hasFLHAs ? 'check_circle' : 'cancel'}
+                                        </span>
+                                        <span className="text-base text-muted-foreground">{t('dashboard.projects.flha', 'FLHA')}</span>
                                       </div>
                                     );
                                   })()}
