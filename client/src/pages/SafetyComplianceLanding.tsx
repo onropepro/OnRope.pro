@@ -57,7 +57,7 @@ export default function SafetyComplianceLanding() {
       if (current1 > 0) { current1--; setCount1(current1); }
       if (current2 > 0) { current2--; setCount2(current2); }
       if (current3 > 0) { current3--; setCount3(current3); }
-    }, 30);
+    }, 150);
 
     return () => clearInterval(interval);
   }, []);
@@ -183,7 +183,7 @@ export default function SafetyComplianceLanding() {
             </Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              The IRATA auditor is here.<br />
+              WorkSafeBC just pulled into the parking lot.<br />
               <span className="text-sky-200">Are you ready?</span>
             </h1>
             
