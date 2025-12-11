@@ -5078,7 +5078,7 @@ export default function Dashboard() {
                                 Free Trial - Billing Notice
                               </p>
                               <p className="text-sm text-amber-800 dark:text-amber-200 mb-3">
-                                You're currently on a <strong>30-day free trial</strong>. Your first {baseSeatLimit} seats are included free. Each additional seat is billed at <strong>$34.95/month</strong> when your trial ends.
+                                You're currently on a <strong>30-day free trial</strong>. You have {baseSeatLimit} gifted seats. Each additional seat is billed at <strong>$34.95/month</strong> when your trial ends.
                               </p>
                               <div className="bg-white dark:bg-amber-900 rounded-md p-3 border border-amber-200 dark:border-amber-700">
                                 <div className="flex justify-between items-center text-sm mb-2">
@@ -5087,7 +5087,7 @@ export default function Dashboard() {
                                 </div>
                                 <div className="flex justify-between items-center text-sm mb-2">
                                   <span className="text-amber-700 dark:text-amber-300">
-                                    Included seats (free):
+                                    Gifted seats (free):
                                   </span>
                                   <span className="font-medium text-amber-900 dark:text-amber-100">
                                     {baseSeatLimit} seats
