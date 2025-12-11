@@ -32,7 +32,8 @@ import {
   Scan,
   Check,
   FileDown,
-  Lock
+  Lock,
+  Edit2
 } from "lucide-react";
 import { jsPDF } from "jspdf";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -155,6 +156,13 @@ const translations = {
     projectInfo: "Project Information",
     workInfo: "Work Information",
     close: "Close",
+    editBaselineHours: "Edit Baseline Hours",
+    editBaselineHoursDesc: "Enter the total rope access hours you had in your logbook when you created your account. This becomes your starting point.",
+    baselineHoursUpdated: "Baseline Hours Updated",
+    baselineHoursUpdatedDesc: "Your baseline hours have been saved.",
+    currentBaseline: "Current Baseline",
+    newBaseline: "New Baseline Hours",
+    saveBaseline: "Save Baseline",
   },
   fr: {
     title: "Mes heures enregistrées",
@@ -269,6 +277,13 @@ const translations = {
     projectInfo: "Informations du projet",
     workInfo: "Informations de travail",
     close: "Fermer",
+    editBaselineHours: "Modifier les heures de base",
+    editBaselineHoursDesc: "Entrez le total des heures d'acces sur corde que vous aviez dans votre carnet lors de la creation de votre compte.",
+    baselineHoursUpdated: "Heures de base mises a jour",
+    baselineHoursUpdatedDesc: "Vos heures de base ont ete enregistrees.",
+    currentBaseline: "Base actuelle",
+    newBaseline: "Nouvelles heures de base",
+    saveBaseline: "Enregistrer",
   }
 };
 
@@ -353,6 +368,10 @@ export default function TechnicianLoggedHours() {
   // Session details dialog state
   const [selectedLog, setSelectedLog] = useState<IrataTaskLog | null>(null);
   const [showLogDetailsDialog, setShowLogDetailsDialog] = useState(false);
+  
+  // Baseline hours edit state
+  const [showBaselineDialog, setShowBaselineDialog] = useState(false);
+  const [newBaselineHours, setNewBaselineHours] = useState("");
 
   const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
@@ -442,6 +461,28 @@ export default function TechnicianLoggedHours() {
       toast({
         title: t.previousHoursDeleted,
         description: t.previousHoursDeletedDesc,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: t.error,
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateBaselineMutation = useMutation({
+    mutationFn: async (hours: number) => {
+      return apiRequest("PATCH", "/api/my-irata-baseline-hours", { baselineHours: hours });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      setShowBaselineDialog(false);
+      setNewBaselineHours("");
+      toast({
+        title: t.baselineHoursUpdated,
+        description: t.baselineHoursUpdatedDesc,
       });
     },
     onError: (error: Error) => {
@@ -1086,10 +1127,18 @@ export default function TechnicianLoggedHours() {
               
               {/* Hours Breakdown */}
               <div className="grid grid-cols-2 gap-4 pt-3 border-t">
-                <div className="text-center p-2 rounded-lg bg-muted/50">
+                <button
+                  onClick={() => {
+                    setNewBaselineHours(baselineHours.toString());
+                    setShowBaselineDialog(true);
+                  }}
+                  className="text-center p-2 rounded-lg bg-muted/50 hover-elevate cursor-pointer group relative"
+                  data-testid="button-edit-baseline"
+                >
+                  <Edit2 className="w-3 h-3 absolute top-2 right-2 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                   <p className="text-lg font-semibold" data-testid="text-baseline-hours">{baselineHours.toFixed(1)} {t.hr}</p>
                   <p className="text-xs text-muted-foreground">{t.baselineHours}</p>
-                </div>
+                </button>
                 <div className="text-center p-2 rounded-lg bg-muted/50">
                   <p className="text-lg font-semibold" data-testid="text-session-hours">{totalLoggedHours.toFixed(1)} {t.hr}</p>
                   <p className="text-xs text-muted-foreground">{t.fromWorkSessions}</p>
@@ -1935,6 +1984,81 @@ export default function TechnicianLoggedHours() {
               data-testid="button-close-log-details"
             >
               {t.close}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Baseline Hours Dialog */}
+      <Dialog open={showBaselineDialog} onOpenChange={setShowBaselineDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Clock className="w-5 h-5" />
+              {t.editBaselineHours}
+            </DialogTitle>
+            <DialogDescription>
+              {t.editBaselineHoursDesc}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="p-3 bg-muted/50 rounded-lg text-center">
+              <p className="text-sm text-muted-foreground">{t.currentBaseline}</p>
+              <p className="text-2xl font-bold">{baselineHours.toFixed(1)} {t.hr}</p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="baseline-hours">{t.newBaseline}</Label>
+              <Input
+                id="baseline-hours"
+                type="number"
+                min="0"
+                step="0.25"
+                value={newBaselineHours}
+                onChange={(e) => setNewBaselineHours(e.target.value)}
+                placeholder="0"
+                className="text-lg"
+                data-testid="input-baseline-hours"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowBaselineDialog(false);
+                setNewBaselineHours("");
+              }}
+              data-testid="button-cancel-baseline"
+            >
+              {t.cancel}
+            </Button>
+            <Button
+              onClick={() => {
+                const hours = parseFloat(newBaselineHours);
+                if (isNaN(hours) || hours < 0) {
+                  toast({
+                    title: t.error,
+                    description: t.hoursRequired,
+                    variant: "destructive",
+                  });
+                  return;
+                }
+                updateBaselineMutation.mutate(hours);
+              }}
+              disabled={updateBaselineMutation.isPending}
+              data-testid="button-save-baseline"
+            >
+              {updateBaselineMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {t.saving}
+                </>
+              ) : (
+                t.saveBaseline
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
