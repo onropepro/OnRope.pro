@@ -3228,9 +3228,31 @@ export default function ProjectDetail() {
                     </div>
                     
                     <div className="border-t pt-4 mt-2">
-                      <h4 className="font-medium text-sm mb-2">{t('projectDetail.dialogs.editProject.completedDropsAdjustments', 'Completed Drops Adjustments')}</h4>
+                      <h4 className="font-medium text-sm mb-2">{t('projectDetail.dialogs.editProject.completedDropsSection', 'Completed Drops')}</h4>
                       <p className="text-xs text-muted-foreground mb-3">
-                        {t('projectDetail.dialogs.editProject.adjustmentsHelp', 'Use these to correct mistakes in employee drop entries. Enter positive or negative numbers to adjust the calculated totals.')}
+                        {t('projectDetail.dialogs.editProject.completedDropsHelp', 'Current completed drops from work sessions. Use the adjustment fields to correct employee mistakes.')}
+                      </p>
+                      <div className="grid grid-cols-4 gap-3 mb-4">
+                        <div className="text-center p-2 bg-muted/50 rounded-md">
+                          <div className="text-xs text-muted-foreground">{t('projectDetail.directions.north', 'North')}</div>
+                          <div className="text-lg font-bold" data-testid="display-completed-north">{completedDropsNorth}</div>
+                        </div>
+                        <div className="text-center p-2 bg-muted/50 rounded-md">
+                          <div className="text-xs text-muted-foreground">{t('projectDetail.directions.east', 'East')}</div>
+                          <div className="text-lg font-bold" data-testid="display-completed-east">{completedDropsEast}</div>
+                        </div>
+                        <div className="text-center p-2 bg-muted/50 rounded-md">
+                          <div className="text-xs text-muted-foreground">{t('projectDetail.directions.south', 'South')}</div>
+                          <div className="text-lg font-bold" data-testid="display-completed-south">{completedDropsSouth}</div>
+                        </div>
+                        <div className="text-center p-2 bg-muted/50 rounded-md">
+                          <div className="text-xs text-muted-foreground">{t('projectDetail.directions.west', 'West')}</div>
+                          <div className="text-lg font-bold" data-testid="display-completed-west">{completedDropsWest}</div>
+                        </div>
+                      </div>
+                      <h4 className="font-medium text-sm mb-2">{t('projectDetail.dialogs.editProject.adjustments', 'Adjustments')}</h4>
+                      <p className="text-xs text-muted-foreground mb-3">
+                        {t('projectDetail.dialogs.editProject.adjustmentsHelp', 'Enter positive or negative numbers to adjust the totals above.')}
                       </p>
                       <div className="grid grid-cols-2 gap-3">
                         <div>
