@@ -7,9 +7,9 @@ channel = "stable-25_05"
 packages = ["zip", "glib", "nspr", "nss", "at-spi2-atk", "cups", "libdrm", "libxkbcommon", "mesa", "pango", "xorg.libX11", "xorg.libXcomposite", "xorg.libXdamage", "xorg.libXext", "xorg.libXfixes", "xorg.libXrandr", "xorg.libxcb", "alsa-lib", "chromium", "unzip"]
 
 [deployment]
-deploymentTarget = "scheduled"
+deploymentTarget = "autoscale"
 build = ["npm", "run", "build"]
-run = ["npx", "tsx", "server/backup-database.ts"]
+run = ["npm", "run", "start"]
 
 [[ports]]
 localPort = 5000

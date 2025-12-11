@@ -10,6 +10,12 @@ import { SESSION_SECRET, SESSION_COOKIE_NAME } from "./session-config";
 
 const app = express();
 
+// Health check endpoint - responds immediately for deployment health checks
+// This must be before any middleware that requires database connections
+app.get('/health', (_req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 // Trust proxy - required for secure cookies behind Replit's HTTPS proxy
 app.set('trust proxy', 1);
 
