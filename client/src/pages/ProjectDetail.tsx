@@ -3048,7 +3048,7 @@ export default function ProjectDetail() {
             </DialogDescription>
           </DialogHeader>
           {project && (
-            <form onSubmit={async (e) => {
+            <form key={`edit-project-${project.id}-${project.dropsAdjustmentNorth}-${project.dropsAdjustmentEast}-${project.dropsAdjustmentSouth}-${project.dropsAdjustmentWest}`} onSubmit={async (e) => {
               e.preventDefault();
               const formData = new FormData(e.currentTarget);
               
