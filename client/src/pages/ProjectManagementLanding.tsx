@@ -358,6 +358,163 @@ export default function ProjectManagementLanding() {
 
       <Separator className="my-8" />
 
+      {/* Module Integration Points */}
+      <section className="py-16 md:py-20 px-4 max-w-5xl mx-auto space-y-8">
+        <div>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Talks To Everything Else</h2>
+          <p className="text-muted-foreground leading-relaxed text-base mb-8">
+            Projects are the operational hub connecting multiple OnRopePro modules. When data enters one place, it flows everywhere it needs to go.
+          </p>
+          
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Employee Management</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                <div>
+                  <p className="font-medium text-foreground">What Connects:</p>
+                  <p className="text-muted-foreground mt-1">Crew assignments pull directly from your employee directory. System filters by qualification level (IRATA Level 2+). Performance metrics from work sessions feed back into employee records.</p>
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">Why It Matters:</p>
+                  <p className="text-muted-foreground mt-1">Ensure qualified crew assigned every time. Performance reviews backed by objective data. Career progression tracked through project complexity.</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Work Sessions & Time Tracking</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                <div>
+                  <p className="font-medium text-foreground">What Connects:</p>
+                  <p className="text-muted-foreground mt-1">When technicians log work sessions on a project, data automatically populates payroll timesheets. Drop counts, hours, or units convert directly to wages. No transcription required.</p>
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">Why It Matters:</p>
+                  <p className="text-muted-foreground mt-1">87-93% reduction in payroll errors. 15-25 hours per week saved. Zero disputes because system timestamps everything.</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Payroll</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                <div>
+                  <p className="font-medium text-foreground">What Connects:</p>
+                  <p className="text-muted-foreground mt-1">Project-specific tracking feeds payroll calculations. Drop-based projects calculate piece work pay. Hours-based projects calculate hourly wages. Payroll module pulls all session data without manual entry.</p>
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">Why It Matters:</p>
+                  <p className="text-muted-foreground mt-1">Payroll runs in 30 minutes instead of 4-8 hours. Employees see exactly how their pay was calculated. Disputes drop to near zero.</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Safety & Compliance</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                <div>
+                  <p className="font-medium text-foreground">What Connects:</p>
+                  <p className="text-muted-foreground mt-1">Each project links to required safety documentation: Rope Access Plans, Job Safety Analyses, Toolbox Meetings, Anchor Inspections. Attach directly to the relevant project.</p>
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">Why It Matters:</p>
+                  <p className="text-muted-foreground mt-1">Building managers download compliance docs instantly. Complete audit trail for insurance. 10-20% insurance premium discount with documented safety program.</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Job Schedule & Calendar</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                <div>
+                  <p className="font-medium text-foreground">What Connects:</p>
+                  <p className="text-muted-foreground mt-1">Creating a project with date range and assigned employees automatically generates calendar entries. Drag-and-drop rescheduling syncs back to project assignments. Conflict detection flags double-bookings.</p>
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">Why It Matters:</p>
+                  <p className="text-muted-foreground mt-1">Zero redundant data entry. Impossible to forget calendar entries. 5-10 hours per week saved. Prevent $2,000-$5,000 double-booking disasters.</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Buildings Database</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                <div>
+                  <p className="font-medium text-foreground">What Connects:</p>
+                  <p className="text-muted-foreground mt-1">Projects link to building records containing address, contact info, access instructions, and historical maintenance data. System pulls existing building data automatically for repeat clients.</p>
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">Why It Matters:</p>
+                  <p className="text-muted-foreground mt-1">No re-entering building details. Complete history of all work at each location. Property managers see building's maintenance timeline in one place.</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Resident Portal</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                <div>
+                  <p className="font-medium text-foreground">What Connects:</p>
+                  <p className="text-muted-foreground mt-1">Residents register with building-specific codes. They see progress on projects affecting their building, filtered to show only their elevation. Feedback submissions link directly to the relevant project.</p>
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">Why It Matters:</p>
+                  <p className="text-muted-foreground mt-1">Residents self-serve instead of calling. Complaints route directly to you with project context. Status calls drop 60-70%.</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Documents Repository</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                <div>
+                  <p className="font-medium text-foreground">What Connects:</p>
+                  <p className="text-muted-foreground mt-1">Project-specific documents store in centralized repository with project tags. Safety docs, contracts, photos, reports all link back to their project. Search by project name, date, or type.</p>
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">Why It Matters:</p>
+                  <p className="text-muted-foreground mt-1">Everything in one place. Insurance audits take minutes instead of hours. No more digging through email or truck compartments.</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      <Separator className="my-8" />
+
+      {/* Archive & Analytics */}
+      <section className="py-16 md:py-20 px-4 max-w-4xl mx-auto space-y-8">
+        <div>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Historical Data Makes Future Quotes Accurate</h2>
+          <p className="text-muted-foreground leading-relaxed text-base">
+            Completed projects are archived, not deleted. Search by building name, job type, date range, assigned employees, or completion status. Pull up analytics showing average drops per day, labor hours per building type, project duration trends.
+          </p>
+          <p className="text-muted-foreground leading-relaxed text-base mt-4">
+            "Last time we did a 20-story window wash, it took 14 days with 2 techs averaging 8 drops per day." No more guessing. No more underbidding by 50%. No more overbidding by 30% and leaving money on the table.
+          </p>
+        </div>
+      </section>
+
+      <Separator className="my-8" />
+
       {/* Problems Solved */}
       <section className="py-16 md:py-20 px-4 max-w-4xl mx-auto space-y-8">
         <div className="flex items-center justify-between flex-wrap gap-4">
