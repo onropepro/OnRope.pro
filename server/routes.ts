@@ -13588,9 +13588,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const flhaForms = await storage.getFlhaFormsByCompany(companyId);
       
-      // Add project names to FLHA forms
+      // Add project names to FLHA forms (using buildingName which is the display name for projects)
       const projects = await storage.getProjectsByCompany(companyId);
-      const projectMap = new Map(projects.map(p => [p.id, p.projectName]));
+      const projectMap = new Map(projects.map(p => [p.id, p.buildingName]));
       
       const flhaFormsWithProjectNames = flhaForms.map(flha => ({
         ...flha,
