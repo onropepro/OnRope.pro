@@ -183,7 +183,7 @@ export default function SafetyComplianceLanding() {
             </Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              Your auditor just pulled<br />
+              WorkSafeBC just pulled<br />
               into the parking lot.<br />
               <span className="text-sky-200">Are you ready?</span>
             </h1>
@@ -237,7 +237,7 @@ export default function SafetyComplianceLanding() {
                 <div className="text-sm text-muted-foreground mt-1">Sleepless nights</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-amber-600 relative inline-block glow-infinity">∞</div>
+                <div className="text-3xl md:text-4xl font-bold text-amber-600">∞</div>
                 <div className="text-sm text-muted-foreground mt-1">Searchable history</div>
               </div>
             </div>
