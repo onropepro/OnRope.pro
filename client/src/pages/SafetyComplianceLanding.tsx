@@ -29,7 +29,9 @@ import {
   TrendingDown,
   BookOpen,
   Signature,
-  Calendar
+  Calendar,
+  Quote,
+  UserX
 } from "lucide-react";
 
 export default function SafetyComplianceLanding() {
@@ -425,6 +427,64 @@ export default function SafetyComplianceLanding() {
         </div>
       </section>
 
+      {/* Social Proof Section */}
+      <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+            What Operators Are Saying
+          </h2>
+          <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
+            Real feedback from rope access companies using the Safety & Compliance module.
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            <TestimonialCard
+              quote="The first time an insurance auditor asked for our inspection records and I exported six months of documentation in thirty seconds, I knew we'd never go back to paper."
+            />
+            <TestimonialCard
+              quote="I used to spend Sunday nights worrying about whether we'd covered our bases. Now I just check the dashboard. Everything's there or it isn't, and there's no ambiguity."
+            />
+            <TestimonialCard
+              quote="A property manager called asking for proof we'd done a toolbox meeting before working on their building. I sent the PDF while we were still on the phone. That's the kind of professionalism that keeps contracts."
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Not For Everyone Section */}
+      <section className="py-16 md:py-20 px-4">
+        <div className="max-w-4xl mx-auto">
+          <Card className="border-slate-300 dark:border-slate-700">
+            <CardContent className="p-8 md:p-10">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center">
+                  <UserX className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+                </div>
+                <h2 className="text-2xl md:text-3xl font-bold">Not For Everyone</h2>
+              </div>
+              
+              <div className="space-y-4 text-muted-foreground">
+                <p className="text-lg font-medium text-foreground">
+                  This software isn't for every rope access company.
+                </p>
+                <p>
+                  If you're running crews without proper inspections, OnRopePro will expose that. If your toolbox meetings are fiction, the system will make that obvious. If equipment stays in rotation after it should have been retired, there will be a record.
+                </p>
+                <p className="font-medium text-foreground">
+                  The transparency is the point.
+                </p>
+                <p>
+                  OnRopePro is built for operators who actually care about keeping their technicians safe. Companies that want to prove they're doing things right. Companies that welcome audits because they know what the auditor will find.
+                </p>
+                <p className="text-foreground font-medium">
+                  If you'd rather not have visibility into your own safety compliance, keep using paper forms. They're much easier to lose.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
       {/* Objection Handling */}
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-4xl mx-auto">
@@ -522,6 +582,19 @@ function ObjectionCard({ question, answer }: { question: string; answer: string 
           "{question}"
         </h3>
         <p className="text-muted-foreground text-sm pl-6">{answer}</p>
+      </CardContent>
+    </Card>
+  );
+}
+
+function TestimonialCard({ quote }: { quote: string }) {
+  return (
+    <Card className="bg-white dark:bg-slate-800">
+      <CardContent className="p-6">
+        <Quote className="w-8 h-8 text-sky-200 dark:text-sky-800 mb-3" />
+        <p className="text-muted-foreground text-sm leading-relaxed italic">
+          "{quote}"
+        </p>
       </CardContent>
     </Card>
   );
