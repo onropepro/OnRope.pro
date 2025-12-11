@@ -367,6 +367,13 @@ export const projects = pgTable("projects", {
   totalDropsSouth: integer("total_drops_south").default(0),
   totalDropsWest: integer("total_drops_west").default(0),
   
+  // Completed drops adjustments (added to calculated totals from work sessions/drop logs)
+  // Use these to correct mistakes in employee entries - can be positive or negative
+  dropsAdjustmentNorth: integer("drops_adjustment_north").default(0),
+  dropsAdjustmentEast: integer("drops_adjustment_east").default(0),
+  dropsAdjustmentSouth: integer("drops_adjustment_south").default(0),
+  dropsAdjustmentWest: integer("drops_adjustment_west").default(0),
+  
   dailyDropTarget: integer("daily_drop_target"),
   floorCount: integer("floor_count"),
   buildingHeight: varchar("building_height"), // e.g., "25 floors", "100m", "300ft" - for IRATA logbook hours
@@ -2077,7 +2084,8 @@ export const IRATA_TASK_TYPES = [
 export type IrataTaskType = typeof IRATA_TASK_TYPES[number]['id'];
 
 // Historical/Previous Hours - for technicians to log work from before joining platform
-// These hours are tracked separately and NOT counted toward certification totals
+// countsTowardTotal: false = Previous hours (reference only, NOT counted)
+// countsTowardTotal: true = Manual hours (when employer doesn't use OnRopePro, counted in total)
 export const historicalHours = pgTable("historical_hours", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   employeeId: varchar("employee_id").notNull().references(() => users.id, { onDelete: "cascade" }),
@@ -2102,6 +2110,9 @@ export const historicalHours = pgTable("historical_hours", {
   
   // Company name at time of work (for reference, not linked)
   previousEmployer: varchar("previous_employer"),
+  
+  // Whether these hours count toward total (true = manual hours, false = previous/reference only)
+  countsTowardTotal: boolean("counts_toward_total").default(false).notNull(),
   
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => ({

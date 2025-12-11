@@ -32,7 +32,8 @@ import {
   Scan,
   Check,
   FileDown,
-  Lock
+  Lock,
+  Edit2
 } from "lucide-react";
 import { jsPDF } from "jspdf";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -46,10 +47,17 @@ const translations = {
     title: "My Logged Hours",
     backToPortal: "Back to Portal",
     totalHours: "Total Hours",
-    combinedTotal: "Combined Total (Baseline + Sessions)",
+    combinedTotal: "Combined Total (Baseline + Sessions + Manual)",
     baselineHours: "Baseline Hours",
     fromWorkSessions: "From Work Sessions",
     workSessions: "Work Sessions",
+    manualHours: "Manual Hours",
+    manualHoursNote: "Hours added when employer doesn't use OnRopePro (counted in total)",
+    addManualHours: "Add Manual Hours",
+    noManualHours: "No manual hours recorded",
+    noManualHoursDesc: "Add hours here when your employer doesn't use OnRopePro. These hours count toward your total.",
+    manualHoursAdded: "Manual Hours Added",
+    manualHoursAddedDesc: "Your hours have been added to your total.",
     previousHours: "Previous Hours",
     previousHoursNote: "Hours from previous work (not counted in total)",
     addPreviousHours: "Add Previous Hours",
@@ -94,6 +102,9 @@ const translations = {
     enterHours: "Enter hours worked",
     enterBuildingName: "Enter building name",
     enterBuildingAddress: "Enter building address",
+    buildingNamePlaceholder: "Enter building name",
+    buildingAddressPlaceholder: "Enter building address",
+    previousEmployer: "Employer",
     tasksRequired: "Please select at least one task",
     hoursRequired: "Please enter hours worked",
     dateRequired: "Please enter start and end dates",
@@ -103,6 +114,12 @@ const translations = {
     scanLogbook: "Scan Logbook Page",
     scanning: "Analyzing...",
     scanLogbookDesc: "Take a photo of your logbook page to automatically extract entries",
+    scanExplanationTitle: "How Logbook Scanning Works",
+    scanExplanationStep1: "Take a clear photo of your IRATA/SPRAT logbook page",
+    scanExplanationStep2: "Our AI will analyze the image and extract the entries",
+    scanExplanationStep3: "Review and edit the extracted data before saving",
+    scanExplanationTip: "For best results, ensure good lighting and that the entire page is visible in the photo.",
+    continueToScan: "Continue to Scan",
     reviewScannedEntries: "Review Scanned Entries",
     reviewScannedDesc: "Review and confirm the entries extracted from your logbook",
     foundEntries: "Found {count} entries",
@@ -155,22 +172,36 @@ const translations = {
     projectInfo: "Project Information",
     workInfo: "Work Information",
     close: "Close",
+    editBaselineHours: "Edit Baseline Hours",
+    editBaselineHoursDesc: "Enter the total rope access hours you had in your logbook when you created your account. This becomes your starting point.",
+    baselineHoursUpdated: "Baseline Hours Updated",
+    baselineHoursUpdatedDesc: "Your baseline hours have been saved.",
+    currentBaseline: "Current Baseline",
+    newBaseline: "New Baseline Hours",
+    saveBaseline: "Save Baseline",
   },
   fr: {
     title: "Mes heures enregistrées",
     backToPortal: "Retour au portail",
     totalHours: "Total des heures",
-    combinedTotal: "Total combiné (Base + Sessions)",
+    combinedTotal: "Total combine (Base + Sessions + Manuelles)",
     baselineHours: "Heures de base",
     fromWorkSessions: "Des sessions de travail",
     workSessions: "Sessions de travail",
-    previousHours: "Heures précédentes",
-    previousHoursNote: "Heures de travail précédent (non comptabilisées dans le total)",
-    addPreviousHours: "Ajouter des heures précédentes",
+    manualHours: "Heures manuelles",
+    manualHoursNote: "Heures ajoutees quand l'employeur n'utilise pas OnRopePro (comptees dans le total)",
+    addManualHours: "Ajouter des heures manuelles",
+    noManualHours: "Aucune heure manuelle enregistree",
+    noManualHoursDesc: "Ajoutez des heures ici quand votre employeur n'utilise pas OnRopePro. Ces heures comptent dans votre total.",
+    manualHoursAdded: "Heures manuelles ajoutees",
+    manualHoursAddedDesc: "Vos heures ont ete ajoutees a votre total.",
+    previousHours: "Heures precedentes",
+    previousHoursNote: "Heures de travail precedent (non comptabilisees dans le total)",
+    addPreviousHours: "Ajouter des heures precedentes",
     noWorkSessions: "Aucune session de travail",
-    noWorkSessionsDesc: "Vos sessions de travail apparaîtront ici après vos pointages.",
-    noPreviousHours: "Aucune heure précédente enregistrée",
-    noPreviousHoursDesc: "Ajoutez des expériences de travail historiques qui ne seront pas comptabilisées dans vos totaux.",
+    noWorkSessionsDesc: "Vos sessions de travail apparaitront ici apres vos pointages.",
+    noPreviousHours: "Aucune heure precedente enregistree",
+    noPreviousHoursDesc: "Ajoutez des experiences de travail historiques qui ne seront pas comptabilisees dans vos totaux.",
     loading: "Chargement...",
     hours: "heures",
     hr: "h",
@@ -208,6 +239,9 @@ const translations = {
     enterHours: "Entrez les heures travaillées",
     enterBuildingName: "Entrez le nom du bâtiment",
     enterBuildingAddress: "Entrez l'adresse du bâtiment",
+    buildingNamePlaceholder: "Entrez le nom du bâtiment",
+    buildingAddressPlaceholder: "Entrez l'adresse du bâtiment",
+    previousEmployer: "Employeur",
     tasksRequired: "Veuillez sélectionner au moins une tâche",
     hoursRequired: "Veuillez entrer les heures travaillées",
     dateRequired: "Veuillez entrer les dates de début et de fin",
@@ -216,7 +250,13 @@ const translations = {
     logbookDisclaimer: "Ceci est un outil de suivi personnel pour vous aider à surveiller vos heures d'accès sur corde. Vous devez toujours enregistrer toutes vos heures dans votre carnet IRATA/SPRAT officiel - ce journal numérique ne le remplace pas et n'est pas valide pour les fins de certification.",
     scanLogbook: "Scanner une page",
     scanning: "Analyse...",
-    scanLogbookDesc: "Prenez une photo de votre page de carnet pour extraire automatiquement les entrées",
+    scanLogbookDesc: "Prenez une photo de votre page de carnet pour extraire automatiquement les entrees",
+    scanExplanationTitle: "Comment fonctionne la numerisation",
+    scanExplanationStep1: "Prenez une photo claire de votre page de carnet IRATA/SPRAT",
+    scanExplanationStep2: "Notre IA analysera l'image et extraira les entrees",
+    scanExplanationStep3: "Verifiez et modifiez les donnees extraites avant de sauvegarder",
+    scanExplanationTip: "Pour de meilleurs resultats, assurez-vous d'un bon eclairage et que la page entiere est visible.",
+    continueToScan: "Continuer vers le scan",
     reviewScannedEntries: "Vérifier les entrées scannées",
     reviewScannedDesc: "Vérifiez et confirmez les entrées extraites de votre carnet",
     foundEntries: "{count} entrées trouvées",
@@ -269,6 +309,13 @@ const translations = {
     projectInfo: "Informations du projet",
     workInfo: "Informations de travail",
     close: "Fermer",
+    editBaselineHours: "Modifier les heures de base",
+    editBaselineHoursDesc: "Entrez le total des heures d'acces sur corde que vous aviez dans votre carnet lors de la creation de votre compte.",
+    baselineHoursUpdated: "Heures de base mises a jour",
+    baselineHoursUpdatedDesc: "Vos heures de base ont ete enregistrees.",
+    currentBaseline: "Base actuelle",
+    newBaseline: "Nouvelles heures de base",
+    saveBaseline: "Enregistrer",
   }
 };
 
@@ -353,6 +400,16 @@ export default function TechnicianLoggedHours() {
   // Session details dialog state
   const [selectedLog, setSelectedLog] = useState<IrataTaskLog | null>(null);
   const [showLogDetailsDialog, setShowLogDetailsDialog] = useState(false);
+  
+  // Baseline hours edit state
+  const [showBaselineDialog, setShowBaselineDialog] = useState(false);
+  const [newBaselineHours, setNewBaselineHours] = useState("");
+  
+  // Manual hours dialog state (for when employer doesn't use OnRopePro)
+  const [showManualHoursDialog, setShowManualHoursDialog] = useState(false);
+  
+  // Scan explanation dialog state
+  const [showScanExplanationDialog, setShowScanExplanationDialog] = useState(false);
 
   const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
@@ -385,6 +442,10 @@ export default function TechnicianLoggedHours() {
   const sessions = logsData?.sessions || [];
   const historicalHours = historicalData?.historicalHours || [];
 
+  // Separate manual hours (countsTowardTotal: true) from previous hours (countsTowardTotal: false)
+  const manualHoursEntries = historicalHours.filter((entry: HistoricalHours) => entry.countsTowardTotal === true);
+  const previousHoursEntries = historicalHours.filter((entry: HistoricalHours) => entry.countsTowardTotal !== true);
+
   // Baseline hours from user profile
   const baselineHours = user?.irataBaselineHours ? parseFloat(user.irataBaselineHours) || 0 : 0;
   
@@ -393,13 +454,18 @@ export default function TechnicianLoggedHours() {
     return sum + parseFloat(session.hoursWorked || "0");
   }, 0);
 
+  // Manual hours (counted in total - for when employer doesn't use OnRopePro)
+  const totalManualHours = manualHoursEntries.reduce((sum: number, entry: HistoricalHours) => {
+    return sum + parseFloat(entry.hoursWorked || "0");
+  }, 0);
+
   // Previous/historical hours (not counted in certification totals)
-  const totalHistoricalHours = historicalHours.reduce((sum: number, entry: HistoricalHours) => {
+  const totalHistoricalHours = previousHoursEntries.reduce((sum: number, entry: HistoricalHours) => {
     return sum + parseFloat(entry.hoursWorked || "0");
   }, 0);
   
-  // Combined total = baseline + work sessions (excludes historical)
-  const combinedTotalHours = baselineHours + totalLoggedHours;
+  // Combined total = baseline + work sessions + manual hours (excludes previous/historical)
+  const combinedTotalHours = baselineHours + totalLoggedHours + totalManualHours;
 
   const addHistoricalMutation = useMutation({
     mutationFn: async (data: {
@@ -412,16 +478,19 @@ export default function TechnicianLoggedHours() {
       previousEmployer: string | null;
       notes: string | null;
       tasksPerformed: string[];
+      countsTowardTotal?: boolean;
     }) => {
       return apiRequest("POST", "/api/my-historical-hours", data);
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["/api/my-historical-hours"] });
       setShowAddDialog(false);
+      setShowManualHoursDialog(false);
       resetForm();
+      const isManual = variables.countsTowardTotal;
       toast({
-        title: t.previousHoursAdded,
-        description: t.previousHoursAddedDesc,
+        title: isManual ? t.manualHoursAdded : t.previousHoursAdded,
+        description: isManual ? t.manualHoursAddedDesc : t.previousHoursAddedDesc,
       });
     },
     onError: (error: Error) => {
@@ -453,6 +522,28 @@ export default function TechnicianLoggedHours() {
     },
   });
 
+  const updateBaselineMutation = useMutation({
+    mutationFn: async (hours: number) => {
+      return apiRequest("PATCH", "/api/my-irata-baseline-hours", { baselineHours: hours });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      setShowBaselineDialog(false);
+      setNewBaselineHours("");
+      toast({
+        title: t.baselineHoursUpdated,
+        description: t.baselineHoursUpdatedDesc,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: t.error,
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   const resetForm = () => {
     setFormData({
       startDate: "",
@@ -467,7 +558,7 @@ export default function TechnicianLoggedHours() {
     setSelectedTasks([]);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (countsTowardTotal: boolean = false) => {
     if (!formData.startDate || !formData.endDate) {
       toast({ title: t.error, description: t.dateRequired, variant: "destructive" });
       return;
@@ -491,6 +582,7 @@ export default function TechnicianLoggedHours() {
       previousEmployer: formData.previousEmployer || null,
       notes: formData.notes || null,
       tasksPerformed: selectedTasks,
+      countsTowardTotal,
     });
   };
 
@@ -1086,10 +1178,18 @@ export default function TechnicianLoggedHours() {
               
               {/* Hours Breakdown */}
               <div className="grid grid-cols-2 gap-4 pt-3 border-t">
-                <div className="text-center p-2 rounded-lg bg-muted/50">
+                <button
+                  onClick={() => {
+                    setNewBaselineHours(baselineHours.toString());
+                    setShowBaselineDialog(true);
+                  }}
+                  className="text-center p-2 rounded-lg bg-muted/50 hover-elevate cursor-pointer group relative"
+                  data-testid="button-edit-baseline"
+                >
+                  <Edit2 className="w-3 h-3 absolute top-2 right-2 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                   <p className="text-lg font-semibold" data-testid="text-baseline-hours">{baselineHours.toFixed(1)} {t.hr}</p>
                   <p className="text-xs text-muted-foreground">{t.baselineHours}</p>
-                </div>
+                </button>
                 <div className="text-center p-2 rounded-lg bg-muted/50">
                   <p className="text-lg font-semibold" data-testid="text-session-hours">{totalLoggedHours.toFixed(1)} {t.hr}</p>
                   <p className="text-xs text-muted-foreground">{t.fromWorkSessions}</p>
@@ -1141,12 +1241,15 @@ export default function TechnicianLoggedHours() {
         </Card>
 
         <Tabs defaultValue="work-sessions" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="work-sessions" data-testid="tab-work-sessions">
               {t.workSessions} ({sessions.length})
             </TabsTrigger>
+            <TabsTrigger value="manual-hours" data-testid="tab-manual-hours">
+              {t.manualHours} ({manualHoursEntries.length})
+            </TabsTrigger>
             <TabsTrigger value="previous-hours" data-testid="tab-previous-hours">
-              {t.previousHours} ({historicalHours.length})
+              {t.previousHours} ({previousHoursEntries.length})
             </TabsTrigger>
           </TabsList>
 
@@ -1246,6 +1349,127 @@ export default function TechnicianLoggedHours() {
             )}
           </TabsContent>
 
+          {/* Manual Hours Tab - for when employer doesn't use OnRopePro */}
+          <TabsContent value="manual-hours" className="mt-4 space-y-4">
+            <Card className="bg-muted/30 border-dashed">
+              <CardContent className="p-4">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div>
+                    <p className="font-medium">{t.manualHours}</p>
+                    <p className="text-sm text-muted-foreground">{t.manualHoursNote}</p>
+                    {manualHoursEntries.length > 0 && (
+                      <p className="text-sm font-medium mt-1">
+                        {t.totalHours}: {totalManualHours.toFixed(1)} {t.hr}
+                      </p>
+                    )}
+                  </div>
+                  <Button
+                    onClick={() => setShowManualHoursDialog(true)}
+                    className="gap-2"
+                    data-testid="button-add-manual-hours"
+                  >
+                    <Plus className="w-4 h-4" />
+                    {t.addManualHours}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {manualHoursEntries.length === 0 ? (
+              <Card>
+                <CardContent className="p-8 text-center">
+                  <Clock className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+                  <p className="font-medium text-muted-foreground">{t.noManualHours}</p>
+                  <p className="text-sm text-muted-foreground mt-1">{t.noManualHoursDesc}</p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-3">
+                {manualHoursEntries.map((entry) => (
+                  <Card key={entry.id}>
+                    <CardContent className="p-4">
+                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Calendar className="w-4 h-4 text-muted-foreground" />
+                            <span className="text-sm">
+                              {format(parseLocalDate(entry.startDate), 'PP', { locale: dateLocale })} {t.to} {format(parseLocalDate(entry.endDate), 'PP', { locale: dateLocale })}
+                            </span>
+                            <Badge variant="secondary">
+                              {parseFloat(entry.hoursWorked).toFixed(1)} {t.hr}
+                            </Badge>
+                          </div>
+                          
+                          {(entry.buildingName || entry.buildingAddress) && (
+                            <div className="flex items-start gap-2 mb-2">
+                              <Building className="w-4 h-4 text-muted-foreground mt-0.5" />
+                              <div>
+                                {entry.buildingName && <p className="font-medium">{entry.buildingName}</p>}
+                                {entry.buildingAddress && (
+                                  <p className="text-sm text-muted-foreground">{entry.buildingAddress}</p>
+                                )}
+                                {entry.buildingHeight && (
+                                  <p className="text-sm text-muted-foreground">{t.buildingHeight}: {entry.buildingHeight}</p>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {entry.previousEmployer && (
+                            <p className="text-sm text-muted-foreground mb-2">
+                              {t.employer}: {entry.previousEmployer}
+                            </p>
+                          )}
+                          
+                          <div className="flex flex-wrap gap-1">
+                            {(entry.tasksPerformed || []).map((taskId) => (
+                              <Badge key={taskId} variant="outline" className="text-xs">
+                                <span className="material-icons text-xs mr-1">{getTaskIcon(taskId)}</span>
+                                {getTaskLabel(taskId, language)}
+                              </Badge>
+                            ))}
+                          </div>
+                          
+                          {entry.notes && (
+                            <p className="text-sm text-muted-foreground mt-2 italic">{entry.notes}</p>
+                          )}
+                        </div>
+                        
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-destructive"
+                              data-testid={`button-delete-manual-${entry.id}`}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>{t.delete}</AlertDialogTitle>
+                              <AlertDialogDescription>{t.confirmDelete}</AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>{t.cancelDelete}</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => deleteHistoricalMutation.mutate(entry.id)}
+                                className="bg-destructive text-destructive-foreground"
+                              >
+                                {t.deleteConfirm}
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
           <TabsContent value="previous-hours" className="mt-4 space-y-4">
             <Card className="bg-muted/30 border-dashed">
               <CardContent className="p-4">
@@ -1253,7 +1477,7 @@ export default function TechnicianLoggedHours() {
                   <div>
                     <p className="font-medium">{t.previousHours}</p>
                     <p className="text-sm text-muted-foreground">{t.previousHoursNote}</p>
-                    {historicalHours.length > 0 && (
+                    {previousHoursEntries.length > 0 && (
                       <p className="text-sm font-medium mt-1">
                         {t.totalHours}: {totalHistoricalHours.toFixed(1)} {t.hr}
                       </p>
@@ -1272,7 +1496,7 @@ export default function TechnicianLoggedHours() {
                     />
                     <Button
                       variant="outline"
-                      onClick={() => logbookInputRef.current?.click()}
+                      onClick={() => setShowScanExplanationDialog(true)}
                       disabled={isScanning}
                       className="gap-2"
                       data-testid="button-scan-logbook"
@@ -1302,7 +1526,7 @@ export default function TechnicianLoggedHours() {
               </CardContent>
             </Card>
 
-            {historicalHours.length === 0 ? (
+            {previousHoursEntries.length === 0 ? (
               <Card>
                 <CardContent className="p-8 text-center">
                   <Clock className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" />
@@ -1312,7 +1536,7 @@ export default function TechnicianLoggedHours() {
               </Card>
             ) : (
               <div className="space-y-3">
-                {historicalHours.map((entry) => (
+                {previousHoursEntries.map((entry) => (
                   <Card key={entry.id}>
                     <CardContent className="p-4">
                       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
@@ -1534,7 +1758,7 @@ export default function TechnicianLoggedHours() {
               {t.cancel}
             </Button>
             <Button
-              onClick={handleSubmit}
+              onClick={() => handleSubmit(false)}
               disabled={addHistoricalMutation.isPending}
               data-testid="button-save-previous-hours"
             >
@@ -1546,6 +1770,226 @@ export default function TechnicianLoggedHours() {
               ) : (
                 t.save
               )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Manual Hours Dialog - for hours when employer doesn't use OnRopePro */}
+      <Dialog open={showManualHoursDialog} onOpenChange={setShowManualHoursDialog}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{t.addManualHours}</DialogTitle>
+            <DialogDescription>{t.manualHoursNote}</DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6 py-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="manualStartDate">{t.startDate} *</Label>
+                <Input
+                  id="manualStartDate"
+                  type="date"
+                  value={formData.startDate}
+                  onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                  data-testid="input-manual-start-date"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="manualEndDate">{t.endDate} *</Label>
+                <Input
+                  id="manualEndDate"
+                  type="date"
+                  value={formData.endDate}
+                  onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                  data-testid="input-manual-end-date"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="manualHoursWorked">{t.hoursWorked} *</Label>
+              <Input
+                id="manualHoursWorked"
+                type="number"
+                step="0.25"
+                min="0.25"
+                placeholder="8"
+                value={formData.hoursWorked}
+                onChange={(e) => setFormData({ ...formData, hoursWorked: e.target.value })}
+                data-testid="input-manual-hours"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="manualBuildingName">{t.buildingName}</Label>
+              <Input
+                id="manualBuildingName"
+                placeholder={t.buildingNamePlaceholder}
+                value={formData.buildingName}
+                onChange={(e) => setFormData({ ...formData, buildingName: e.target.value })}
+                data-testid="input-manual-building"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="manualBuildingAddress">{t.buildingAddress}</Label>
+              <Input
+                id="manualBuildingAddress"
+                placeholder={t.buildingAddressPlaceholder}
+                value={formData.buildingAddress}
+                onChange={(e) => setFormData({ ...formData, buildingAddress: e.target.value })}
+                data-testid="input-manual-address"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="manualBuildingHeight">{t.buildingHeight}</Label>
+              <Input
+                id="manualBuildingHeight"
+                placeholder="20 floors / 65m"
+                value={formData.buildingHeight}
+                onChange={(e) => setFormData({ ...formData, buildingHeight: e.target.value })}
+                data-testid="input-manual-height"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t.tasksPerformed} *</Label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-[200px] overflow-y-auto">
+                {IRATA_TASK_TYPES.map(task => (
+                  <div
+                    key={task.id}
+                    onClick={() => toggleTask(task.id)}
+                    className={`flex items-center gap-2 p-2 rounded-md cursor-pointer border transition-colors ${
+                      selectedTasks.includes(task.id)
+                        ? 'border-primary bg-primary/10'
+                        : 'border-transparent hover:bg-muted'
+                    }`}
+                    data-testid={`task-manual-${task.id}`}
+                  >
+                    <Checkbox
+                      checked={selectedTasks.includes(task.id)}
+                      onCheckedChange={() => toggleTask(task.id)}
+                    />
+                    <span className="text-sm">{getTaskLabel(task.id, language)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="manualEmployer">{t.previousEmployer}</Label>
+              <Input
+                id="manualEmployer"
+                placeholder={t.employerPlaceholder}
+                value={formData.previousEmployer}
+                onChange={(e) => setFormData({ ...formData, previousEmployer: e.target.value })}
+                data-testid="input-manual-employer"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="manualNotes">{t.notes}</Label>
+              <Textarea
+                id="manualNotes"
+                placeholder={t.notesPlaceholder}
+                value={formData.notes}
+                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                rows={3}
+                data-testid="input-manual-notes"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowManualHoursDialog(false);
+                resetForm();
+              }}
+              data-testid="button-cancel-manual"
+            >
+              {t.cancel}
+            </Button>
+            <Button
+              onClick={() => handleSubmit(true)}
+              disabled={addHistoricalMutation.isPending}
+              data-testid="button-save-manual-hours"
+            >
+              {addHistoricalMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {t.saving}
+                </>
+              ) : (
+                t.save
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Scan Explanation Dialog */}
+      <Dialog open={showScanExplanationDialog} onOpenChange={setShowScanExplanationDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Camera className="w-5 h-5" />
+              {t.scanExplanationTitle}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+                  <span className="text-xs font-semibold text-primary">1</span>
+                </div>
+                <p className="text-sm">{t.scanExplanationStep1}</p>
+              </div>
+              
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+                  <span className="text-xs font-semibold text-primary">2</span>
+                </div>
+                <p className="text-sm">{t.scanExplanationStep2}</p>
+              </div>
+              
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+                  <span className="text-xs font-semibold text-primary">3</span>
+                </div>
+                <p className="text-sm">{t.scanExplanationStep3}</p>
+              </div>
+            </div>
+            
+            <div className="bg-muted/50 rounded-lg p-3">
+              <p className="text-sm text-muted-foreground">
+                <strong>Tip:</strong> {t.scanExplanationTip}
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowScanExplanationDialog(false)}
+              data-testid="button-cancel-scan"
+            >
+              {t.cancel}
+            </Button>
+            <Button
+              onClick={() => {
+                setShowScanExplanationDialog(false);
+                logbookInputRef.current?.click();
+              }}
+              className="gap-2"
+              data-testid="button-continue-scan"
+            >
+              <Camera className="w-4 h-4" />
+              {t.continueToScan}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1935,6 +2379,81 @@ export default function TechnicianLoggedHours() {
               data-testid="button-close-log-details"
             >
               {t.close}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Baseline Hours Dialog */}
+      <Dialog open={showBaselineDialog} onOpenChange={setShowBaselineDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Clock className="w-5 h-5" />
+              {t.editBaselineHours}
+            </DialogTitle>
+            <DialogDescription>
+              {t.editBaselineHoursDesc}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="p-3 bg-muted/50 rounded-lg text-center">
+              <p className="text-sm text-muted-foreground">{t.currentBaseline}</p>
+              <p className="text-2xl font-bold">{baselineHours.toFixed(1)} {t.hr}</p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="baseline-hours">{t.newBaseline}</Label>
+              <Input
+                id="baseline-hours"
+                type="number"
+                min="0"
+                step="0.25"
+                value={newBaselineHours}
+                onChange={(e) => setNewBaselineHours(e.target.value)}
+                placeholder="0"
+                className="text-lg"
+                data-testid="input-baseline-hours"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowBaselineDialog(false);
+                setNewBaselineHours("");
+              }}
+              data-testid="button-cancel-baseline"
+            >
+              {t.cancel}
+            </Button>
+            <Button
+              onClick={() => {
+                const hours = parseFloat(newBaselineHours);
+                if (isNaN(hours) || hours < 0) {
+                  toast({
+                    title: t.error,
+                    description: t.hoursRequired,
+                    variant: "destructive",
+                  });
+                  return;
+                }
+                updateBaselineMutation.mutate(hours);
+              }}
+              disabled={updateBaselineMutation.isPending}
+              data-testid="button-save-baseline"
+            >
+              {updateBaselineMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {t.saving}
+                </>
+              ) : (
+                t.saveBaseline
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

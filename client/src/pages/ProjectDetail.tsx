@@ -669,13 +669,18 @@ export default function ProjectDetail() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/harness-inspections"] });
       setShowHarnessInspectionDialog(false);
-      setShowStartDayDialog(true);
+      // Start work session directly without a second confirmation
+      if (id) {
+        startDayMutation.mutate(id);
+      }
     },
     onError: (error: Error) => {
       console.error("Error creating not applicable inspection:", error);
-      // Still proceed to start day dialog even if this fails
+      // Still proceed to start work session even if this fails
       setShowHarnessInspectionDialog(false);
-      setShowStartDayDialog(true);
+      if (id) {
+        startDayMutation.mutate(id);
+      }
     },
   });
 
@@ -1046,11 +1051,11 @@ export default function ProjectDetail() {
       : (project.totalDropsNorth ?? 0) + (project.totalDropsEast ?? 0) + 
         (project.totalDropsSouth ?? 0) + (project.totalDropsWest ?? 0);  // For window cleaning, use elevation drops
     
-    // Calculate completed drops from work sessions (elevation-specific)
-    completedDropsNorth = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedNorth ?? 0), 0);
-    completedDropsEast = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedEast ?? 0), 0);
-    completedDropsSouth = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedSouth ?? 0), 0);
-    completedDropsWest = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedWest ?? 0), 0);
+    // Calculate completed drops from work sessions (elevation-specific) + adjustments
+    completedDropsNorth = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedNorth ?? 0), 0) + (project.dropsAdjustmentNorth ?? 0);
+    completedDropsEast = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedEast ?? 0), 0) + (project.dropsAdjustmentEast ?? 0);
+    completedDropsSouth = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedSouth ?? 0), 0) + (project.dropsAdjustmentSouth ?? 0);
+    completedDropsWest = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedWest ?? 0), 0) + (project.dropsAdjustmentWest ?? 0);
     
     completedDrops = completedDropsNorth + completedDropsEast + completedDropsSouth + completedDropsWest;
     
@@ -1066,14 +1071,27 @@ export default function ProjectDetail() {
     return totalSessionDrops >= project.dailyDropTarget;
   }).length;
   
+  // Valid Reason: below target but has a valid shortfall reason code (not 'other' and not empty)
+  const validReasonCount = completedSessions.filter((s: any) => {
+    const totalSessionDrops = (s.dropsCompletedNorth ?? 0) + (s.dropsCompletedEast ?? 0) + 
+                              (s.dropsCompletedSouth ?? 0) + (s.dropsCompletedWest ?? 0);
+    const isBelowTarget = totalSessionDrops < project.dailyDropTarget;
+    const hasValidReasonCode = s.validShortfallReasonCode && s.validShortfallReasonCode !== '' && s.validShortfallReasonCode !== 'other';
+    return isBelowTarget && hasValidReasonCode;
+  }).length;
+  
+  // Below Target: below target without a valid reason code
   const belowTargetCount = completedSessions.filter((s: any) => {
     const totalSessionDrops = (s.dropsCompletedNorth ?? 0) + (s.dropsCompletedEast ?? 0) + 
                               (s.dropsCompletedSouth ?? 0) + (s.dropsCompletedWest ?? 0);
-    return totalSessionDrops < project.dailyDropTarget;
+    const isBelowTarget = totalSessionDrops < project.dailyDropTarget;
+    const hasValidReasonCode = s.validShortfallReasonCode && s.validShortfallReasonCode !== '' && s.validShortfallReasonCode !== 'other';
+    return isBelowTarget && !hasValidReasonCode;
   }).length;
   
   const pieData = [
     { name: t('projectDetail.progress.targetMet', 'Target Met'), value: targetMetCount, color: "hsl(var(--primary))" },
+    { name: t('projectDetail.progress.validReason', 'Valid Reason'), value: validReasonCount, color: "hsl(var(--warning))" },
     { name: t('projectDetail.progress.belowTarget', 'Below Target'), value: belowTargetCount, color: "hsl(var(--destructive))" },
   ];
 
@@ -2781,11 +2799,14 @@ export default function ProjectDetail() {
               variant="default"
               onClick={() => {
                 setShowHarnessInspectionDialog(false);
-                setShowStartDayDialog(true);
+                if (id) {
+                  startDayMutation.mutate(id);
+                }
               }}
+              disabled={startDayMutation.isPending}
               data-testid="button-harness-yes"
             >
-              {t('common.yes', 'Yes')}
+              {startDayMutation.isPending ? t('projectDetail.workSession.starting', 'Starting...') : t('common.yes', 'Yes')}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -3027,7 +3048,7 @@ export default function ProjectDetail() {
             </DialogDescription>
           </DialogHeader>
           {project && (
-            <form onSubmit={async (e) => {
+            <form key={`edit-project-${project.id}-${project.dropsAdjustmentNorth}-${project.dropsAdjustmentEast}-${project.dropsAdjustmentSouth}-${project.dropsAdjustmentWest}`} onSubmit={async (e) => {
               e.preventDefault();
               const formData = new FormData(e.currentTarget);
               
@@ -3054,6 +3075,11 @@ export default function ProjectDetail() {
                   updateData.totalDropsSouth = formData.get('totalDropsSouth') ? parseInt(formData.get('totalDropsSouth') as string) : 0;
                   updateData.totalDropsWest = formData.get('totalDropsWest') ? parseInt(formData.get('totalDropsWest') as string) : 0;
                   updateData.dailyDropTarget = formData.get('dailyDropTarget') ? parseInt(formData.get('dailyDropTarget') as string) : 0;
+                  // Completed drops adjustments
+                  updateData.dropsAdjustmentNorth = formData.get('dropsAdjustmentNorth') ? parseInt(formData.get('dropsAdjustmentNorth') as string) : 0;
+                  updateData.dropsAdjustmentEast = formData.get('dropsAdjustmentEast') ? parseInt(formData.get('dropsAdjustmentEast') as string) : 0;
+                  updateData.dropsAdjustmentSouth = formData.get('dropsAdjustmentSouth') ? parseInt(formData.get('dropsAdjustmentSouth') as string) : 0;
+                  updateData.dropsAdjustmentWest = formData.get('dropsAdjustmentWest') ? parseInt(formData.get('dropsAdjustmentWest') as string) : 0;
                 }
                 
                 // Add in-suite fields
@@ -3077,7 +3103,9 @@ export default function ProjectDetail() {
                 
                 if (!response.ok) throw new Error('Failed to update project');
                 
-                queryClient.invalidateQueries({ queryKey: ["/api/projects", id] });
+                // Wait for queries to refetch before closing dialog so UI updates immediately
+                await queryClient.invalidateQueries({ queryKey: ["/api/projects", id] });
+                await queryClient.refetchQueries({ queryKey: ["/api/projects", id] });
                 toast({ title: t('projectDetail.dialogs.editProject.updateSuccess', 'Project updated successfully') });
                 setShowEditDialog(false);
               } catch (error) {
@@ -3212,6 +3240,77 @@ export default function ProjectDetail() {
                       <p className="text-xs text-muted-foreground mt-1">
                         {t('projectDetail.dialogs.editProject.dailyDropTargetHelp', 'Drops per technician per day')}
                       </p>
+                    </div>
+                    
+                    <div className="border-t pt-4 mt-2">
+                      <h4 className="font-medium text-sm mb-2">{t('projectDetail.dialogs.editProject.completedDropsSection', 'Completed Drops (from work sessions)')}</h4>
+                      <p className="text-xs text-muted-foreground mb-3">
+                        {t('projectDetail.dialogs.editProject.completedDropsHelp', 'Raw drops logged by employees. Use adjustments below to correct mistakes.')}
+                      </p>
+                      <div className="grid grid-cols-4 gap-3 mb-4">
+                        <div className="text-center p-2 bg-muted/50 rounded-md">
+                          <div className="text-xs text-muted-foreground">{t('projectDetail.directions.north', 'North')}</div>
+                          <div className="text-lg font-bold" data-testid="display-completed-north">{completedDropsNorth - (project.dropsAdjustmentNorth ?? 0)}</div>
+                        </div>
+                        <div className="text-center p-2 bg-muted/50 rounded-md">
+                          <div className="text-xs text-muted-foreground">{t('projectDetail.directions.east', 'East')}</div>
+                          <div className="text-lg font-bold" data-testid="display-completed-east">{completedDropsEast - (project.dropsAdjustmentEast ?? 0)}</div>
+                        </div>
+                        <div className="text-center p-2 bg-muted/50 rounded-md">
+                          <div className="text-xs text-muted-foreground">{t('projectDetail.directions.south', 'South')}</div>
+                          <div className="text-lg font-bold" data-testid="display-completed-south">{completedDropsSouth - (project.dropsAdjustmentSouth ?? 0)}</div>
+                        </div>
+                        <div className="text-center p-2 bg-muted/50 rounded-md">
+                          <div className="text-xs text-muted-foreground">{t('projectDetail.directions.west', 'West')}</div>
+                          <div className="text-lg font-bold" data-testid="display-completed-west">{completedDropsWest - (project.dropsAdjustmentWest ?? 0)}</div>
+                        </div>
+                      </div>
+                      <h4 className="font-medium text-sm mb-2">{t('projectDetail.dialogs.editProject.adjustments', 'Adjustments')}</h4>
+                      <p className="text-xs text-muted-foreground mb-3">
+                        {t('projectDetail.dialogs.editProject.adjustmentsHelp', 'Enter positive or negative numbers to adjust the totals above.')}
+                      </p>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label htmlFor="dropsAdjustmentNorth">{t('projectDetail.directions.northAdjustment', 'North Adj.')}</Label>
+                          <Input
+                            id="dropsAdjustmentNorth"
+                            name="dropsAdjustmentNorth"
+                            type="number"
+                            defaultValue={project.dropsAdjustmentNorth || 0}
+                            data-testid="input-edit-adjustment-north"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="dropsAdjustmentEast">{t('projectDetail.directions.eastAdjustment', 'East Adj.')}</Label>
+                          <Input
+                            id="dropsAdjustmentEast"
+                            name="dropsAdjustmentEast"
+                            type="number"
+                            defaultValue={project.dropsAdjustmentEast || 0}
+                            data-testid="input-edit-adjustment-east"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="dropsAdjustmentSouth">{t('projectDetail.directions.southAdjustment', 'South Adj.')}</Label>
+                          <Input
+                            id="dropsAdjustmentSouth"
+                            name="dropsAdjustmentSouth"
+                            type="number"
+                            defaultValue={project.dropsAdjustmentSouth || 0}
+                            data-testid="input-edit-adjustment-south"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="dropsAdjustmentWest">{t('projectDetail.directions.westAdjustment', 'West Adj.')}</Label>
+                          <Input
+                            id="dropsAdjustmentWest"
+                            name="dropsAdjustmentWest"
+                            type="number"
+                            defaultValue={project.dropsAdjustmentWest || 0}
+                            data-testid="input-edit-adjustment-west"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </>
                 )}

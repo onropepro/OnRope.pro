@@ -8907,6 +8907,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (req.body.totalStalls !== undefined) allowedUpdates.totalStalls = req.body.totalStalls;
       if (req.body.stallsPerDay !== undefined) allowedUpdates.stallsPerDay = req.body.stallsPerDay;
       
+      // Add drop adjustment fields for correcting employee entries
+      if (req.body.dropsAdjustmentNorth !== undefined) allowedUpdates.dropsAdjustmentNorth = req.body.dropsAdjustmentNorth;
+      if (req.body.dropsAdjustmentEast !== undefined) allowedUpdates.dropsAdjustmentEast = req.body.dropsAdjustmentEast;
+      if (req.body.dropsAdjustmentSouth !== undefined) allowedUpdates.dropsAdjustmentSouth = req.body.dropsAdjustmentSouth;
+      if (req.body.dropsAdjustmentWest !== undefined) allowedUpdates.dropsAdjustmentWest = req.body.dropsAdjustmentWest;
+      
       const updatedProject = await storage.updateProject(id, allowedUpdates);
       res.json({ project: updatedProject });
     } catch (error) {
@@ -10972,7 +10978,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Get my historical hours (previous work not counted toward totals)
   // Only technicians can access historical hours
-  app.get("/api/my-historical-hours", requireAuth, requireRole("rope_access_tech"), async (req: Request, res: Response) => {
+  app.get("/api/my-historical-hours", requireAuth, requireRole("company", "rope_access_tech", "owner_ceo", "operations_manager", "general_supervisor", "rope_access_supervisor"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       
@@ -11005,10 +11011,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     tasksPerformed: z.array(z.string()).min(1, "At least one task is required"),
     notes: z.string().optional().nullable(),
     previousEmployer: z.string().optional().nullable(),
+    countsTowardTotal: z.boolean().optional().default(false), // true = manual hours (counted), false = previous hours (reference only)
   });
   
   // Only technicians can add historical hours
-  app.post("/api/my-historical-hours", requireAuth, requireRole("rope_access_tech"), async (req: Request, res: Response) => {
+  app.post("/api/my-historical-hours", requireAuth, requireRole("company", "rope_access_tech", "owner_ceo", "operations_manager", "general_supervisor", "rope_access_supervisor"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       
@@ -11037,6 +11044,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         tasksPerformed: data.tasksPerformed,
         notes: data.notes || null,
         previousEmployer: data.previousEmployer || null,
+        countsTowardTotal: data.countsTowardTotal ?? false,
       });
       
       res.json({ historicalHours: entry, message: "Previous hours added successfully" });
@@ -11047,7 +11055,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Delete historical hours entry - only technicians can delete their own entries
-  app.delete("/api/my-historical-hours/:id", requireAuth, requireRole("rope_access_tech"), async (req: Request, res: Response) => {
+  app.delete("/api/my-historical-hours/:id", requireAuth, requireRole("company", "rope_access_tech", "owner_ceo", "operations_manager", "general_supervisor", "rope_access_supervisor"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       
@@ -11076,7 +11084,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Scan logbook page with Gemini AI to extract historical hours entries
   const { analyzeLogbookPage } = await import("./gemini");
   
-  app.post("/api/my-historical-hours/scan-logbook", requireAuth, requireRole("rope_access_tech"), imageUpload.single('image'), async (req: Request, res: Response) => {
+  app.post("/api/my-historical-hours/scan-logbook", requireAuth, requireRole("company", "rope_access_tech", "owner_ceo", "operations_manager", "general_supervisor", "rope_access_supervisor"), imageUpload.single('image'), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       
@@ -11123,7 +11131,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Bulk create historical hours entries (for committing scanned logbook entries)
-  app.post("/api/my-historical-hours/bulk", requireAuth, requireRole("rope_access_tech"), async (req: Request, res: Response) => {
+  app.post("/api/my-historical-hours/bulk", requireAuth, requireRole("company", "rope_access_tech", "owner_ceo", "operations_manager", "general_supervisor", "rope_access_supervisor"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       

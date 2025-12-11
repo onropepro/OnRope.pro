@@ -1153,6 +1153,7 @@ export default function TechnicianPortal() {
   
   // Employer selection state (for PLUS members with multiple employers)
   const [showEmployerSelectDialog, setShowEmployerSelectDialog] = useState(false);
+  const [showReferralInfoDialog, setShowReferralInfoDialog] = useState(false);
   const [selectedEmployerId, setSelectedEmployerId] = useState<string | null>(null);
   
   // Query for employer connections (for PLUS members)
@@ -1741,14 +1742,13 @@ export default function TechnicianPortal() {
             {/* Referral Code in Top Bar */}
             {user?.referralCode && (
               <div className="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded-md bg-primary/10 border border-primary/20">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span className="text-xs text-muted-foreground cursor-help underline decoration-dotted underline-offset-2">{t.yourReferralCode}:</span>
-                  </TooltipTrigger>
-                  <TooltipContent className="max-w-xs">
-                    <p className="text-sm">{t.shareReferralCode}</p>
-                  </TooltipContent>
-                </Tooltip>
+                <button
+                  onClick={() => setShowReferralInfoDialog(true)}
+                  className="text-xs text-muted-foreground cursor-pointer underline decoration-dotted underline-offset-2 hover:text-primary transition-colors"
+                  data-testid="button-referral-info"
+                >
+                  {t.yourReferralCode}:
+                </button>
                 <span className="font-mono font-bold text-sm text-primary" data-testid="header-referral-code">
                   {user.referralCode}
                 </span>
@@ -2016,53 +2016,23 @@ export default function TechnicianPortal() {
                   </Badge>
                 )}
               </button>
+              
+              {/* My Logged Hours - Same style as other quick actions */}
+              <button
+                onClick={() => setLocation("/technician-logged-hours")}
+                className="p-4 rounded-lg border bg-gradient-to-br from-primary/5 to-primary/10 hover-elevate text-left"
+                data-testid="quick-action-logged-hours"
+              >
+                <Clock className="w-8 h-8 text-primary mb-2" />
+                <p className="font-medium text-sm">{t.myLoggedHours}</p>
+                <p className="text-xs text-muted-foreground">{t.viewLoggedHoursDesc}</p>
+                {(combinedTotalHours > 0 || workSessionHours > 0) && (
+                  <p className="text-sm font-bold text-primary mt-1" data-testid="text-home-total-logged-hours">
+                    {combinedTotalHours.toFixed(1)} {t.totalHoursLabel}
+                  </p>
+                )}
+              </button>
             </div>
-
-            {/* My Logged Hours Card */}
-            <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
-              <CardContent className="p-4">
-                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-primary/10 rounded-lg">
-                      <Clock className="w-6 h-6 text-primary" />
-                    </div>
-                    <div className="space-y-1">
-                      <p className="font-semibold text-base">{t.myLoggedHours}</p>
-                      <p className="text-sm text-muted-foreground">{t.viewLoggedHoursDesc}</p>
-                      <p className="text-xs text-primary/80 font-medium">{t.loggedHoursFeatures}</p>
-                      {(combinedTotalHours > 0 || workSessionHours > 0) && (
-                        <div className="pt-2">
-                          <p className="text-lg font-bold text-primary" data-testid="text-home-total-logged-hours">
-                            {combinedTotalHours.toFixed(1)} {t.totalHoursLabel}
-                          </p>
-                          {workSessionHours > 0 && baselineHours > 0 && (
-                            <p className="text-xs text-muted-foreground">
-                              {baselineHours.toFixed(1)} {t.baselinePlus} {workSessionHours.toFixed(1)} {t.fromSessions}
-                            </p>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <Button
-                    onClick={() => setLocation("/technician-logged-hours")}
-                    className="gap-2 whitespace-nowrap"
-                    data-testid="button-home-view-logged-hours"
-                  >
-                    {t.viewLoggedHours}
-                    <ArrowRight className="w-4 h-4" />
-                  </Button>
-                </div>
-                <div className="mt-4 p-3 bg-red-500/15 border border-red-500/40 rounded-lg">
-                  <div className="flex items-start gap-2">
-                    <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
-                    <p className="text-xs text-red-700 dark:text-red-300">
-                      {t.logbookDisclaimer}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
           </>
         )}
 
@@ -5331,6 +5301,83 @@ export default function TechnicianPortal() {
           <DialogFooter>
             <Button onClick={() => setShowFeedbackSuccess(false)} data-testid="button-close-feedback-success">
               {t.cancel}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Referral Code Info Dialog */}
+      <Dialog open={showReferralInfoDialog} onOpenChange={setShowReferralInfoDialog}>
+        <DialogContent className="sm:max-w-lg" data-testid="dialog-referral-info">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Share2 className="w-5 h-5 text-primary" />
+              {t.yourReferralCode}
+            </DialogTitle>
+            <DialogDescription>
+              {t.shareReferralCode}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="p-4 bg-primary/10 rounded-lg text-center">
+              <p className="text-sm text-muted-foreground mb-2">{t.yourReferralCode}</p>
+              <p className="text-2xl font-mono font-bold text-primary tracking-wider">{user?.referralCode}</p>
+              <Button
+                variant={codeCopied ? "default" : "outline"}
+                size="sm"
+                onClick={handleCopyReferralCode}
+                className="mt-3 gap-2"
+                data-testid="button-dialog-copy-code"
+              >
+                {codeCopied ? <CheckCircle2 className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                {codeCopied ? t.codeCopied : t.copyCode}
+              </Button>
+            </div>
+            
+            <div className="space-y-3">
+              <h4 className="font-semibold flex items-center gap-2">
+                <Crown className="w-4 h-4 text-amber-500" />
+                {language === 'en' ? 'How to Earn PLUS Access' : 'Comment obtenir PLUS'}
+              </h4>
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <p>{language === 'en' 
+                  ? 'Refer one technician who signs up using your code and you will unlock PLUS access.'
+                  : 'Parrainez un technicien qui s\'inscrit avec votre code et vous debloquerez PLUS.'}</p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <h4 className="font-semibold flex items-center gap-2">
+                <Star className="w-4 h-4 text-amber-500" />
+                {language === 'en' ? 'PLUS Benefits' : 'Avantages PLUS'}
+              </h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  {language === 'en' ? 'Certification expiry alerts (60 and 30 day warnings)' : 'Alertes d\'expiration de certification'}
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  {language === 'en' ? 'Unlimited employer connections' : 'Connexions employeurs illimitees'}
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  {language === 'en' ? 'Enhanced IRATA task logging' : 'Journalisation IRATA amelioree'}
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  {language === 'en' ? 'Exportable work history (PDF)' : 'Historique de travail exportable (PDF)'}
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  {language === 'en' ? 'Profile visibility to employers' : 'Visibilite du profil aux employeurs'}
+                </li>
+              </ul>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setShowReferralInfoDialog(false)} data-testid="button-close-referral-info">
+              {t.close}
             </Button>
           </DialogFooter>
         </DialogContent>
