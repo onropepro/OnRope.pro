@@ -128,7 +128,8 @@ export default function FlhaForm() {
   });
 
   const currentUser = userData?.user;
-  const employees = (employeesData?.employees || []);
+  // Filter out suspended employees - they should not appear anywhere in the app
+  const employees = (employeesData?.employees || []).filter((e: any) => !e.suspendedAt);
 
   // Helper for local date formatting
   const getLocalDateString = () => {
