@@ -257,8 +257,42 @@ export default function SafetyComplianceLanding() {
         </div>
       </section>
 
-      {/* Problems Solved Section */}
+      {/* Not For Everyone Section */}
       <section className="py-16 md:py-20 px-4">
+        <div className="max-w-4xl mx-auto">
+          <Card className="border-slate-300 dark:border-slate-700">
+            <CardContent className="p-8 md:p-10">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center">
+                  <UserX className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+                </div>
+                <h2 className="text-2xl md:text-3xl font-bold">Not For Everyone</h2>
+              </div>
+              
+              <div className="space-y-4 text-muted-foreground">
+                <p className="text-lg font-medium text-foreground">
+                  This software isn't for every rope access company.
+                </p>
+                <p>
+                  If you're running crews without proper inspections, OnRopePro will expose that. If your toolbox meetings are fiction, the system will make that obvious. If equipment stays in rotation after it should have been retired, there will be a record.
+                </p>
+                <p className="font-medium text-foreground">
+                  The transparency is the point.
+                </p>
+                <p>
+                  OnRopePro is built for operators who actually care about keeping their technicians safe. Companies that want to prove they're doing things right. Companies that welcome audits because they know what the auditor will find.
+                </p>
+                <p className="text-foreground font-medium">
+                  If you'd rather not have visibility into your own safety compliance, keep using paper forms. They're much easier to lose.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* Problems Solved Section */}
+      <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
             Who This Is For
@@ -374,9 +408,9 @@ export default function SafetyComplianceLanding() {
                   <TrendingDown className="w-6 h-6 text-emerald-600" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg text-emerald-900 dark:text-emerald-100">10-20% Insurance Premium Savings</h3>
+                  <h3 className="font-bold text-lg text-emerald-900 dark:text-emerald-100">Insurance Carriers Want Documentation</h3>
                   <p className="text-sm text-emerald-800 dark:text-emerald-200 mt-1">
-                    Insurance carriers reward documented safety culture. Complete inspection records demonstrate systematic risk management.
+                    When your insurance carrier audits your safety program, they're looking for evidence of systematic risk management. Complete records demonstrate exactly that.
                   </p>
                 </div>
               </CardContent>
@@ -448,40 +482,6 @@ export default function SafetyComplianceLanding() {
               quote="A property manager called asking for proof we'd done a toolbox meeting before working on their building. I sent the PDF while we were still on the phone. That's the kind of professionalism that keeps contracts."
             />
           </div>
-        </div>
-      </section>
-
-      {/* Not For Everyone Section */}
-      <section className="py-16 md:py-20 px-4">
-        <div className="max-w-4xl mx-auto">
-          <Card className="border-slate-300 dark:border-slate-700">
-            <CardContent className="p-8 md:p-10">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center">
-                  <UserX className="w-5 h-5 text-slate-600 dark:text-slate-400" />
-                </div>
-                <h2 className="text-2xl md:text-3xl font-bold">Not For Everyone</h2>
-              </div>
-              
-              <div className="space-y-4 text-muted-foreground">
-                <p className="text-lg font-medium text-foreground">
-                  This software isn't for every rope access company.
-                </p>
-                <p>
-                  If you're running crews without proper inspections, OnRopePro will expose that. If your toolbox meetings are fiction, the system will make that obvious. If equipment stays in rotation after it should have been retired, there will be a record.
-                </p>
-                <p className="font-medium text-foreground">
-                  The transparency is the point.
-                </p>
-                <p>
-                  OnRopePro is built for operators who actually care about keeping their technicians safe. Companies that want to prove they're doing things right. Companies that welcome audits because they know what the auditor will find.
-                </p>
-                <p className="text-foreground font-medium">
-                  If you'd rather not have visibility into your own safety compliance, keep using paper forms. They're much easier to lose.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </section>
 
