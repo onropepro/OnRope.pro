@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -111,6 +111,19 @@ export default function FlhaForm() {
   const [selectedSignatureEmployee, setSelectedSignatureEmployee] = useState<string>("");
   const signatureCanvasRef = useRef<SignatureCanvas>(null);
 
+  // Get projectId from URL query parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  const preselectedProjectId = urlParams.get('projectId') || "";
+
+  // Navigate back - if opened from project, go back to project; otherwise go to safety forms
+  const handleNavigateBack = () => {
+    if (preselectedProjectId) {
+      navigate(`/projects/${preselectedProjectId}`);
+    } else {
+      navigate("/safety-forms");
+    }
+  };
+
   const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
   });
@@ -124,7 +137,8 @@ export default function FlhaForm() {
   });
 
   const currentUser = userData?.user;
-  const employees = (employeesData?.employees || []);
+  // Filter out suspended employees - they should not appear anywhere in the app
+  const employees = (employeesData?.employees || []).filter((e: any) => !e.suspendedAt);
 
   // Helper for local date formatting
   const getLocalDateString = () => {
@@ -135,7 +149,7 @@ export default function FlhaForm() {
   const form = useForm<FlhaFormValues>({
     resolver: zodResolver(flhaFormSchema),
     defaultValues: {
-      projectId: "",
+      projectId: preselectedProjectId,
       assessmentDate: getLocalDateString(),
       assessorName: "",
       jobDescription: "",
@@ -171,6 +185,24 @@ export default function FlhaForm() {
       emergencyContacts: "",
     },
   });
+
+  // Auto-fill assessor name from current user and location from project
+  useEffect(() => {
+    if (currentUser?.name && !form.getValues('assessorName')) {
+      form.setValue('assessorName', currentUser.name);
+    }
+  }, [currentUser, form]);
+
+  useEffect(() => {
+    const projects = projectsData?.projects || [];
+    const selectedProjectId = form.getValues('projectId');
+    if (selectedProjectId && projects.length > 0) {
+      const project = projects.find(p => p.id === selectedProjectId);
+      if (project?.buildingAddress && !form.getValues('location')) {
+        form.setValue('location', project.buildingAddress);
+      }
+    }
+  }, [projectsData, preselectedProjectId, form]);
 
   const handleEmployeeToggle = (employeeId: string) => {
     setSelectedEmployees(prev =>
@@ -286,7 +318,7 @@ export default function FlhaForm() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate("/safety-forms")}
+            onClick={handleNavigateBack}
             data-testid="button-back"
           >
             <ArrowLeft className="h-5 w-5" />
@@ -721,7 +753,7 @@ export default function FlhaForm() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => navigate("/safety-forms")}
+                    onClick={handleNavigateBack}
                     data-testid="button-cancel"
                   >
                     {t('safetyForms.flha.cancel', 'Cancel')}

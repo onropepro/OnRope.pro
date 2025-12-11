@@ -72,6 +72,19 @@ export default function ToolboxMeetingForm() {
   const [selectedSignatureEmployee, setSelectedSignatureEmployee] = useState<string>("");
   const signatureCanvasRef = useRef<SignatureCanvas>(null);
 
+  // Get projectId from URL query parameter for auto-fill
+  const urlParams = new URLSearchParams(window.location.search);
+  const preselectedProjectId = urlParams.get('projectId') || "";
+
+  // Navigate back - if opened from project, go back to project; otherwise go to documents
+  const handleNavigateBack = () => {
+    if (preselectedProjectId) {
+      navigate(`/projects/${preselectedProjectId}`);
+    } else {
+      navigate("/documents");
+    }
+  };
+
   const topics = [
     { id: "topicFallProtection", label: t('safetyForms.toolbox.topics.fallProtection', 'Fall Protection and Rescue Procedures') },
     { id: "topicAnchorPoints", label: t('safetyForms.toolbox.topics.anchorPoints', 'Anchor Point Selection and Inspection') },
@@ -103,10 +116,11 @@ export default function ToolboxMeetingForm() {
     queryKey: ["/api/employees"],
   });
 
-  const { data: currentUser } = useQuery<{ id: number; firstName: string; lastName: string; fullName?: string }>({
+  const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
   });
 
+  const currentUser = userData?.user;
   const employees = (employeesData?.employees || []);
 
   const getLocalDateString = () => {
@@ -117,7 +131,7 @@ export default function ToolboxMeetingForm() {
   const form = useForm<ToolboxMeetingFormValues>({
     resolver: zodResolver(toolboxMeetingFormSchema),
     defaultValues: {
-      projectId: "",
+      projectId: preselectedProjectId,
       meetingDate: getLocalDateString(),
       conductedByName: "",
       attendees: [],
@@ -147,11 +161,8 @@ export default function ToolboxMeetingForm() {
   });
 
   useEffect(() => {
-    if (currentUser) {
-      const fullName = currentUser.fullName || `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim();
-      if (fullName && !form.getValues("conductedByName")) {
-        form.setValue("conductedByName", fullName);
-      }
+    if (currentUser?.name && !form.getValues("conductedByName")) {
+      form.setValue("conductedByName", currentUser.name);
     }
   }, [currentUser, form]);
 
@@ -271,8 +282,13 @@ export default function ToolboxMeetingForm() {
         title: t('safetyForms.toolbox.toasts.success', 'Success'),
         description: t('safetyForms.toolbox.toasts.meetingRecorded', 'Toolbox meeting recorded successfully'),
       });
+      // Invalidate both global and project-specific toolbox meetings
       queryClient.invalidateQueries({ queryKey: ["/api/toolbox-meetings"] });
-      navigate("/dashboard");
+      if (data?.meeting?.projectId) {
+        queryClient.invalidateQueries({ queryKey: ["/api/projects", data.meeting.projectId, "toolbox-meetings"] });
+      }
+      // Navigate back to project if opened from project, otherwise to dashboard
+      handleNavigateBack();
     },
     onError: (error: Error) => {
       console.error('[Toolbox Meeting] Error:', error);
@@ -328,7 +344,7 @@ export default function ToolboxMeetingForm() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate("/safety-forms")}
+            onClick={handleNavigateBack}
             data-testid="button-back"
           >
             <ArrowLeft className="h-5 w-5" />

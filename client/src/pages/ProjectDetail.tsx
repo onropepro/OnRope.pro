@@ -115,6 +115,7 @@ export default function ProjectDetail() {
   const [isMissedStall, setIsMissedStall] = useState(false);
   const [missedStallNumber, setMissedStallNumber] = useState("");
   const [selectedMeeting, setSelectedMeeting] = useState<any>(null);
+  const [documentsExpanded, setDocumentsExpanded] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [selectedSession, setSelectedSession] = useState<any>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
@@ -245,6 +246,12 @@ export default function ProjectDetail() {
     enabled: !!id,
   });
 
+  // Fetch FLHA forms for this project
+  const { data: flhaFormsData } = useQuery<{ flhaForms: any[] }>({
+    queryKey: ["/api/projects", id, "flha-forms"],
+    enabled: !!id,
+  });
+
   // Fetch job comments for this project
   const { data: commentsData } = useQuery({
     queryKey: ["/api/projects", id, "comments"],
@@ -349,6 +356,7 @@ export default function ProjectDetail() {
   let complaints: any[] = [];
   let photos: any[] = [];
   let toolboxMeetings: any[] = [];
+  let flhaForms: any[] = [];
   let jobComments: any[] = [];
 
   try {
@@ -358,6 +366,7 @@ export default function ProjectDetail() {
     complaints = complaintsData?.complaints || [];
     photos = photosData?.photos || [];
     toolboxMeetings = toolboxMeetingsData?.meetings || [];
+    flhaForms = flhaFormsData?.flhaForms || [];
     jobComments = commentsData?.comments || [];
   } catch (err) {
     console.error("Error extracting data:", err);
@@ -1112,6 +1121,9 @@ export default function ProjectDetail() {
             </Button>
             <div className="flex-1">
               <h1 className="text-xl font-bold">{project.buildingName}</h1>
+              {project.buildingAddress && (
+                <p className="text-xs text-muted-foreground mt-0.5">{project.buildingAddress}</p>
+              )}
               <div className="flex items-center gap-2 mt-1">
                 <p className="text-xs text-muted-foreground">
                   {project.strataPlanNumber} - {project.jobType.replace(/_/g, ' ')}
@@ -2023,12 +2035,32 @@ export default function ProjectDetail() {
           </Card>
         )}
 
-        {/* Project Documents and Photos - Combined Card */}
+        {/* Project Documents and Photos - Collapsible Combined Card */}
         <Card className="glass-card border-0 shadow-premium">
-          <CardHeader>
-            <CardTitle className="text-base">{t('projectDetail.documents.title', 'Project Documents & Photos')}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
+          <Collapsible open={documentsExpanded} onOpenChange={setDocumentsExpanded}>
+            <CardHeader className="pb-0">
+              <CollapsibleTrigger asChild>
+                <button
+                  className="w-full flex items-center justify-between hover-elevate active-elevate-2 rounded-md p-2 -m-2"
+                  data-testid="button-toggle-documents"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="material-icons text-primary">folder</span>
+                    <CardTitle className="text-base">{t('projectDetail.documents.title', 'Project Documents & Photos')}</CardTitle>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary" className="text-xs">
+                      {photos.length + toolboxMeetings.length + flhaForms.length} {t('projectDetail.documents.items', 'items')}
+                    </Badge>
+                    <span className={`material-icons text-muted-foreground transition-transform duration-200 ${documentsExpanded ? 'rotate-180' : ''}`}>
+                      expand_more
+                    </span>
+                  </div>
+                </button>
+              </CollapsibleTrigger>
+            </CardHeader>
+            <CollapsibleContent>
+              <CardContent className="space-y-6 pt-4">
             
             {/* Rope Access Plan Section - Only visible to users with safety document permission */}
             {canViewSafetyDocuments(currentUser) && (
@@ -2474,18 +2506,64 @@ export default function ProjectDetail() {
                 </div>
               )}
 
-              {/* Create Toolbox Meeting Button */}
-              <Button
-                variant="default"
-                className="w-full h-12 gap-2"
-                onClick={() => setLocation("/toolbox-meeting")}
-                data-testid="button-create-toolbox-meeting"
-              >
-                <span className="material-icons text-lg">assignment</span>
-                {t('projectDetail.toolbox.conductMeeting', 'Conduct Toolbox Meeting')}
-              </Button>
             </div>
-          </CardContent>
+
+            <Separator />
+
+            {/* FLHA Forms Section */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="material-icons text-orange-600 dark:text-orange-400">warning</span>
+                  <h3 className="font-medium">{t('projectDetail.flha.title', 'FLHA Forms')}</h3>
+                </div>
+                <Badge variant="secondary" className="text-xs">
+                  {flhaForms.length} {flhaForms.length === 1 ? t('projectDetail.flha.form', 'form') : t('projectDetail.flha.formsPlural', 'forms')}
+                </Badge>
+              </div>
+
+              {/* FLHA List */}
+              {flhaForms.length > 0 && (
+                <div className="space-y-2">
+                  {flhaForms.slice(0, 3).map((flha: any) => (
+                    <Card
+                      key={flha.id}
+                      className="hover-elevate"
+                      data-testid={`flha-form-${flha.id}`}
+                    >
+                      <CardContent className="p-3">
+                        <div className="flex items-start justify-between gap-2 mb-1">
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-medium">
+                              {format(parseLocalDate(flha.assessmentDate), 'MMMM d, yyyy', { locale: getDateLocale() })}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {t('projectDetail.flha.assessor', 'Assessor')}: {flha.assessorName}
+                            </div>
+                          </div>
+                          <Badge variant="outline" className="text-xs bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20">
+                            {t('projectDetail.flha.completed', 'Completed')}
+                          </Badge>
+                        </div>
+                        {flha.location && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {t('projectDetail.flha.location', 'Location')}: {flha.location}
+                          </p>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+                  {flhaForms.length > 3 && (
+                    <p className="text-xs text-muted-foreground text-center">
+                      +{flhaForms.length - 3} {t('projectDetail.flha.more', 'more forms')}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+              </CardContent>
+            </CollapsibleContent>
+          </Collapsible>
         </Card>
 
         {/* Resident Feedback Card */}

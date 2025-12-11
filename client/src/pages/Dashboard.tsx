@@ -1229,7 +1229,7 @@ export default function Dashboard() {
   const complaints = complaintsData?.complaints || [];
   const harnessInspections = harnessInspectionsData?.inspections || [];
   const toolboxMeetings = toolboxMeetingsData?.meetings || [];
-  const flhaForms = flhaFormsData?.forms || [];
+  const flhaForms = flhaFormsData?.flhaForms || [];
   const companyDocuments = companyDocumentsData?.documents || [];
   
   // Check if specific company documents are uploaded
