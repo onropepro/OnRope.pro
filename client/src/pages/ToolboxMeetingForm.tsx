@@ -72,6 +72,19 @@ export default function ToolboxMeetingForm() {
   const [selectedSignatureEmployee, setSelectedSignatureEmployee] = useState<string>("");
   const signatureCanvasRef = useRef<SignatureCanvas>(null);
 
+  // Get projectId from URL query parameter for auto-fill
+  const urlParams = new URLSearchParams(window.location.search);
+  const preselectedProjectId = urlParams.get('projectId') || "";
+
+  // Navigate back - if opened from project, go back to project; otherwise go to documents
+  const handleNavigateBack = () => {
+    if (preselectedProjectId) {
+      navigate(`/projects/${preselectedProjectId}`);
+    } else {
+      navigate("/documents");
+    }
+  };
+
   const topics = [
     { id: "topicFallProtection", label: t('safetyForms.toolbox.topics.fallProtection', 'Fall Protection and Rescue Procedures') },
     { id: "topicAnchorPoints", label: t('safetyForms.toolbox.topics.anchorPoints', 'Anchor Point Selection and Inspection') },
@@ -117,7 +130,7 @@ export default function ToolboxMeetingForm() {
   const form = useForm<ToolboxMeetingFormValues>({
     resolver: zodResolver(toolboxMeetingFormSchema),
     defaultValues: {
-      projectId: "",
+      projectId: preselectedProjectId,
       meetingDate: getLocalDateString(),
       conductedByName: "",
       attendees: [],
@@ -328,7 +341,7 @@ export default function ToolboxMeetingForm() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate("/safety-forms")}
+            onClick={handleNavigateBack}
             data-testid="button-back"
           >
             <ArrowLeft className="h-5 w-5" />
