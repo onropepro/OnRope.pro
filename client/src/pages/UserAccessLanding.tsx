@@ -142,29 +142,41 @@ export default function UserAccessLanding() {
               Modules
             </Button>
             {showModulesMenu && (
-              <div className="absolute top-full left-0 mt-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg shadow-lg p-2 w-56 z-50">
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start text-sm"
-                  onClick={() => {
-                    setLocation("/modules/safety-compliance");
-                    setShowModulesMenu(false);
-                  }}
-                  data-testid="nav-safety-compliance"
-                >
-                  Safety & Compliance
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start text-sm"
-                  onClick={() => {
-                    setLocation("/modules/user-access-authentication");
-                    setShowModulesMenu(false);
-                  }}
-                  data-testid="nav-user-access"
-                >
-                  User Access & Authentication
-                </Button>
+              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl p-4 w-[480px] z-50">
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    className="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors text-left group"
+                    onClick={() => {
+                      setLocation("/modules/safety-compliance");
+                      setShowModulesMenu(false);
+                    }}
+                    data-testid="nav-safety-compliance"
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-sky-100 dark:bg-sky-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                      <Shield className="w-5 h-5 text-sky-600" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-sm">Safety & Compliance</div>
+                      <div className="text-xs text-muted-foreground mt-0.5">Harness inspections, toolbox meetings, audit-ready exports</div>
+                    </div>
+                  </button>
+                  <button
+                    className="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors text-left group"
+                    onClick={() => {
+                      setLocation("/modules/user-access-authentication");
+                      setShowModulesMenu(false);
+                    }}
+                    data-testid="nav-user-access"
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                      <Lock className="w-5 h-5 text-indigo-600" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-sm">User Access & Authentication</div>
+                      <div className="text-xs text-muted-foreground mt-0.5">Granular permissions, role-based access, audit trails</div>
+                    </div>
+                  </button>
+                </div>
               </div>
             )}
           </div>
