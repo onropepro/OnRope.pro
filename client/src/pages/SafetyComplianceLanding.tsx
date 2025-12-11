@@ -140,11 +140,15 @@ export default function SafetyComplianceLanding() {
           >
             Building Manager
           </Button>
-          <div className="relative" ref={modulesMenuRef}>
+          <div 
+            className="relative" 
+            ref={modulesMenuRef}
+            onMouseEnter={() => setShowModulesMenu(true)}
+            onMouseLeave={() => setShowModulesMenu(false)}
+          >
             <Button
               variant="ghost"
               className="text-sm font-medium"
-              onClick={() => setShowModulesMenu(!showModulesMenu)}
               data-testid="nav-modules"
             >
               Modules
