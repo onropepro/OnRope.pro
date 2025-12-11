@@ -13587,7 +13587,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const flhaForms = await storage.getFlhaFormsByCompany(companyId);
-      res.json({ flhaForms });
+      
+      // Add project names to FLHA forms
+      const projects = await storage.getProjects(companyId);
+      const projectMap = new Map(projects.map(p => [p.id, p.projectName]));
+      
+      const flhaFormsWithProjectNames = flhaForms.map(flha => ({
+        ...flha,
+        projectName: projectMap.get(flha.projectId) || null,
+      }));
+      
+      res.json({ flhaForms: flhaFormsWithProjectNames });
     } catch (error) {
       console.error("Get FLHA forms error:", error);
       res.status(500).json({ message: "Internal server error" });
