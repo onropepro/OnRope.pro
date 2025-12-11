@@ -367,6 +367,13 @@ export const projects = pgTable("projects", {
   totalDropsSouth: integer("total_drops_south").default(0),
   totalDropsWest: integer("total_drops_west").default(0),
   
+  // Completed drops adjustments (added to calculated totals from work sessions/drop logs)
+  // Use these to correct mistakes in employee entries - can be positive or negative
+  dropsAdjustmentNorth: integer("drops_adjustment_north").default(0),
+  dropsAdjustmentEast: integer("drops_adjustment_east").default(0),
+  dropsAdjustmentSouth: integer("drops_adjustment_south").default(0),
+  dropsAdjustmentWest: integer("drops_adjustment_west").default(0),
+  
   dailyDropTarget: integer("daily_drop_target"),
   floorCount: integer("floor_count"),
   buildingHeight: varchar("building_height"), // e.g., "25 floors", "100m", "300ft" - for IRATA logbook hours

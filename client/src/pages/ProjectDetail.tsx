@@ -3054,6 +3054,11 @@ export default function ProjectDetail() {
                   updateData.totalDropsSouth = formData.get('totalDropsSouth') ? parseInt(formData.get('totalDropsSouth') as string) : 0;
                   updateData.totalDropsWest = formData.get('totalDropsWest') ? parseInt(formData.get('totalDropsWest') as string) : 0;
                   updateData.dailyDropTarget = formData.get('dailyDropTarget') ? parseInt(formData.get('dailyDropTarget') as string) : 0;
+                  // Completed drops adjustments
+                  updateData.dropsAdjustmentNorth = formData.get('dropsAdjustmentNorth') ? parseInt(formData.get('dropsAdjustmentNorth') as string) : 0;
+                  updateData.dropsAdjustmentEast = formData.get('dropsAdjustmentEast') ? parseInt(formData.get('dropsAdjustmentEast') as string) : 0;
+                  updateData.dropsAdjustmentSouth = formData.get('dropsAdjustmentSouth') ? parseInt(formData.get('dropsAdjustmentSouth') as string) : 0;
+                  updateData.dropsAdjustmentWest = formData.get('dropsAdjustmentWest') ? parseInt(formData.get('dropsAdjustmentWest') as string) : 0;
                 }
                 
                 // Add in-suite fields
@@ -3212,6 +3217,55 @@ export default function ProjectDetail() {
                       <p className="text-xs text-muted-foreground mt-1">
                         {t('projectDetail.dialogs.editProject.dailyDropTargetHelp', 'Drops per technician per day')}
                       </p>
+                    </div>
+                    
+                    <div className="border-t pt-4 mt-2">
+                      <h4 className="font-medium text-sm mb-2">{t('projectDetail.dialogs.editProject.completedDropsAdjustments', 'Completed Drops Adjustments')}</h4>
+                      <p className="text-xs text-muted-foreground mb-3">
+                        {t('projectDetail.dialogs.editProject.adjustmentsHelp', 'Use these to correct mistakes in employee drop entries. Enter positive or negative numbers to adjust the calculated totals.')}
+                      </p>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label htmlFor="dropsAdjustmentNorth">{t('projectDetail.directions.northAdjustment', 'North Adj.')}</Label>
+                          <Input
+                            id="dropsAdjustmentNorth"
+                            name="dropsAdjustmentNorth"
+                            type="number"
+                            defaultValue={project.dropsAdjustmentNorth || 0}
+                            data-testid="input-edit-adjustment-north"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="dropsAdjustmentEast">{t('projectDetail.directions.eastAdjustment', 'East Adj.')}</Label>
+                          <Input
+                            id="dropsAdjustmentEast"
+                            name="dropsAdjustmentEast"
+                            type="number"
+                            defaultValue={project.dropsAdjustmentEast || 0}
+                            data-testid="input-edit-adjustment-east"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="dropsAdjustmentSouth">{t('projectDetail.directions.southAdjustment', 'South Adj.')}</Label>
+                          <Input
+                            id="dropsAdjustmentSouth"
+                            name="dropsAdjustmentSouth"
+                            type="number"
+                            defaultValue={project.dropsAdjustmentSouth || 0}
+                            data-testid="input-edit-adjustment-south"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="dropsAdjustmentWest">{t('projectDetail.directions.westAdjustment', 'West Adj.')}</Label>
+                          <Input
+                            id="dropsAdjustmentWest"
+                            name="dropsAdjustmentWest"
+                            type="number"
+                            defaultValue={project.dropsAdjustmentWest || 0}
+                            data-testid="input-edit-adjustment-west"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </>
                 )}

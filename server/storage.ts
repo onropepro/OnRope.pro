@@ -752,13 +752,25 @@ export class Storage {
       )
     );
     
+    // Get adjustments from project table (for correcting employee mistakes)
+    const projectResult = await db.select({
+      adjNorth: projects.dropsAdjustmentNorth,
+      adjEast: projects.dropsAdjustmentEast,
+      adjSouth: projects.dropsAdjustmentSouth,
+      adjWest: projects.dropsAdjustmentWest,
+    })
+    .from(projects)
+    .where(eq(projects.id, projectId))
+    .limit(1);
+    
     const dropLogsData = dropLogsResult[0] || { north: 0, east: 0, south: 0, west: 0 };
     const workSessionsData = workSessionsResult[0] || { north: 0, east: 0, south: 0, west: 0 };
+    const adjustments = projectResult[0] || { adjNorth: 0, adjEast: 0, adjSouth: 0, adjWest: 0 };
     
-    const north = Number(dropLogsData.north) + Number(workSessionsData.north);
-    const east = Number(dropLogsData.east) + Number(workSessionsData.east);
-    const south = Number(dropLogsData.south) + Number(workSessionsData.south);
-    const west = Number(dropLogsData.west) + Number(workSessionsData.west);
+    const north = Number(dropLogsData.north) + Number(workSessionsData.north) + Number(adjustments.adjNorth || 0);
+    const east = Number(dropLogsData.east) + Number(workSessionsData.east) + Number(adjustments.adjEast || 0);
+    const south = Number(dropLogsData.south) + Number(workSessionsData.south) + Number(adjustments.adjSouth || 0);
+    const west = Number(dropLogsData.west) + Number(workSessionsData.west) + Number(adjustments.adjWest || 0);
     
     return {
       north,
