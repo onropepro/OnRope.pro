@@ -2,6 +2,7 @@
 import { useState, useEffect, useLayoutEffect, useMemo, useRef, useContext } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { useLanguage } from "@/hooks/use-language";
 import { BrandingContext } from "@/App";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
@@ -748,6 +749,7 @@ function NotificationBell() {
 
 export default function Dashboard() {
   const { t } = useTranslation();
+  const { currentLanguage, changeLanguage } = useLanguage();
   const [activeTab, setActiveTab] = useState("");
   
   const { brandColors: contextBrandColors, brandingActive } = useContext(BrandingContext);
@@ -3188,6 +3190,17 @@ export default function Dashboard() {
               <NotificationBell />
             )}
             <CSRBadge user={currentUser} />
+            {/* Language Toggle Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => changeLanguage(currentLanguage === 'en' ? 'fr' : 'en')}
+              className="gap-1"
+              data-testid="button-language-toggle"
+            >
+              <span className="material-icons text-lg">translate</span>
+              <span className="text-xs font-medium">{currentLanguage === 'en' ? 'FR' : 'EN'}</span>
+            </Button>
             <RefreshButton />
             <Button variant="ghost" size="icon" data-testid="button-logout" onClick={() => setShowLogoutDialog(true)}>
               <span className="material-icons text-xl sm:text-2xl">logout</span>
