@@ -149,7 +149,7 @@ export default function SafetyComplianceLanding() {
               Modules
             </Button>
             {showModulesMenu && (
-              <div className="absolute top-full left-0 mt-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg shadow-lg p-2 w-48 z-50">
+              <div className="absolute top-full left-0 mt-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg shadow-lg p-2 w-56 z-50">
                 <Button
                   variant="ghost"
                   className="w-full justify-start text-sm"
@@ -160,6 +160,17 @@ export default function SafetyComplianceLanding() {
                   data-testid="nav-safety-compliance"
                 >
                   Safety & Compliance
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start text-sm"
+                  onClick={() => {
+                    setLocation("/modules/user-access-authentication");
+                    setShowModulesMenu(false);
+                  }}
+                  data-testid="nav-user-access"
+                >
+                  User Access & Authentication
                 </Button>
               </div>
             )}
