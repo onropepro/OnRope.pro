@@ -1596,66 +1596,6 @@ export default function UserAccessGuide() {
 
         <section className="space-y-4">
           <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
-            <Clock className="w-5 h-5 text-action-600 dark:text-action-400" />
-            Upcoming Features
-          </h2>
-
-          <div className="grid md:grid-cols-2 gap-4">
-            <Card>
-              <CardHeader className="pb-2">
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className="text-xs">Q1 2026</Badge>
-                  <CardTitle className="text-base">Feedback Response Time Tracking</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="text-base space-y-2">
-                <p className="text-muted-foreground text-xs">Planned metrics:</p>
-                <ul className="list-disc list-inside text-sm space-y-0.5">
-                  <li>Time from submission to first view</li>
-                  <li>Time from submission to first response</li>
-                  <li>Time from submission to closure</li>
-                  <li>Average response time per project/building</li>
-                  <li>SLA tracking and alerts</li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-2">
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className="text-xs">Q2 2026</Badge>
-                  <CardTitle className="text-base">Building Manager Document Upload</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="text-base space-y-2">
-                <p className="text-muted-foreground text-xs">Planned capabilities:</p>
-                <ul className="list-disc list-inside text-sm space-y-0.5">
-                  <li>Building managers upload building-specific docs</li>
-                  <li>Certificate of Insurance management</li>
-                  <li>Building access instructions</li>
-                  <li>Document expiry tracking & renewal notifications</li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card className="md:col-span-2">
-              <CardHeader className="pb-2">
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="text-xs">Concept</Badge>
-                  <CardTitle className="text-base">Custom Permission Templates</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="text-base space-y-2">
-                <p className="text-muted-foreground text-xs">Save common permission configurations as templates for quick-apply when creating similar roles. Example templates: "Field Supervisor," "Office Admin," "Safety Officer"</p>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
-
-        <Separator />
-
-        <section className="space-y-4">
-          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Info className="w-5 h-5 text-action-600 dark:text-action-400" />
             Terminology & Naming
           </h2>
