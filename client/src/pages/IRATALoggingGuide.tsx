@@ -137,7 +137,7 @@ export default function IRATALoggingGuide() {
             Rope Access Task Types
           </h2>
           <p className="text-muted-foreground text-sm">
-            The system includes 20+ canonical rope access task types recognized in the industry.
+            The system includes 20 canonical rope access task types recognized in the industry and defined in the IRATA standards.
           </p>
 
           <div className="grid md:grid-cols-2 gap-4">
@@ -163,15 +163,35 @@ export default function IRATALoggingGuide() {
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span>Rope to Rope Transfer</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   <span>Deviation</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <span>Re-anchor</span>
+                  <span>Re-Anchor</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   <span>Aid Climbing</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span>Edge Transition</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span>Knot Passing</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span>Mid-Rope Changeover</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span>Horizontal Traverse</span>
                 </div>
               </CardContent>
             </Card>
@@ -180,7 +200,7 @@ export default function IRATALoggingGuide() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                   <Target className="w-4 h-4 text-orange-600" />
-                  Rigging & Setup
+                  Rigging & Load Operations
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-base space-y-2">
@@ -190,46 +210,15 @@ export default function IRATALoggingGuide() {
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <span>Anchor Systems</span>
+                  <span>Hauling</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <span>Rope Protection</span>
+                  <span>Lowering</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <span>Equipment Setup</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <span>Hauling Systems</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
-                  <Target className="w-4 h-4 text-red-600" />
-                  Rescue & Emergency
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-base space-y-2">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <span>Rescue Techniques</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <span>Casualty Handling</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <span>First Aid at Height</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <span>Self-Rescue</span>
+                  <span>Tensioned Rope Work</span>
                 </div>
               </CardContent>
             </Card>
@@ -248,19 +237,30 @@ export default function IRATALoggingGuide() {
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <span>Painting/Coating</span>
+                  <span>Building Inspection</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <span>Inspection</span>
+                  <span>Maintenance Work</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
+                  <Target className="w-4 h-4 text-red-600" />
+                  Emergency & Other
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-base space-y-2">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span>Rescue Technique</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <span>Installation</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <span>Maintenance</span>
+                  <span>Other</span>
                 </div>
               </CardContent>
             </Card>
