@@ -85,6 +85,12 @@ type RecentChange = {
 
 const recentChangesData: RecentChange[] = [
   {
+    date: "December 11, 2025",
+    title: "Security: Replaced Vulnerable PDF Library",
+    description: "Replaced html-pdf-node with Playwright for PDF generation to address critical CVE in lodash.pick@4.4.0 dependency. Quote PDF export and email functionality now uses a more secure and modern approach",
+    type: "fix"
+  },
+  {
     date: "December 10, 2025",
     title: "Feature Guide Navigation Sidebar",
     description: "All 18 changelog feature guides now include a persistent left navigation sidebar for easy browsing between guides. Removed redundant Back and Main Menu buttons. Improved text readability with proper 16px body text sizing across all guide pages",
