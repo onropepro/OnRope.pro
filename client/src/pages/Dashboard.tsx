@@ -4969,8 +4969,11 @@ export default function Dashboard() {
                                     }
                                   }
                                   
+                                  // Show gifted seats info when available
+                                  const giftedInfo = giftedSeats > 0 ? ` • ${giftedSeats} gifted` : '';
+                                  
                                   return employeesData.seatInfo.seatLimit === -1
-                                    ? `${employeesData.seatInfo.seatsUsed} ${t('dashboard.employeeSeats.seatsUsed', 'seats used')} • ${t('dashboard.employeeSeats.unlimited', 'Unlimited available')}`
+                                    ? `${employeesData.seatInfo.seatsUsed} ${t('dashboard.employeeSeats.seatsUsed', 'seats used')} • ${t('dashboard.employeeSeats.unlimited', 'Unlimited available')}${giftedInfo}`
                                     : `${t('dashboard.employeeSeats.used', '{{used}} of {{total}} used', { used: employeesData.seatInfo.seatsUsed, total: employeesData.seatInfo.seatLimit })} • ${t('dashboard.employeeSeats.seatsRemaining', '{{count}} seat(s) remaining', { count: seatsRemaining })}${additionalInfo}`;
                                 })()
                               : t('dashboard.employeeSeats.manageCapacity', 'Manage your employee capacity')
