@@ -245,6 +245,12 @@ export default function ProjectDetail() {
     enabled: !!id,
   });
 
+  // Fetch FLHA forms for this project
+  const { data: flhaFormsData } = useQuery<{ flhaForms: any[] }>({
+    queryKey: ["/api/projects", id, "flha-forms"],
+    enabled: !!id,
+  });
+
   // Fetch job comments for this project
   const { data: commentsData } = useQuery({
     queryKey: ["/api/projects", id, "comments"],
@@ -349,6 +355,7 @@ export default function ProjectDetail() {
   let complaints: any[] = [];
   let photos: any[] = [];
   let toolboxMeetings: any[] = [];
+  let flhaForms: any[] = [];
   let jobComments: any[] = [];
 
   try {
@@ -358,6 +365,7 @@ export default function ProjectDetail() {
     complaints = complaintsData?.complaints || [];
     photos = photosData?.photos || [];
     toolboxMeetings = toolboxMeetingsData?.meetings || [];
+    flhaForms = flhaFormsData?.flhaForms || [];
     jobComments = commentsData?.comments || [];
   } catch (err) {
     console.error("Error extracting data:", err);
@@ -2486,6 +2494,71 @@ export default function ProjectDetail() {
               >
                 <span className="material-icons text-lg">assignment</span>
                 {t('projectDetail.toolbox.conductMeeting', 'Conduct Toolbox Meeting')}
+              </Button>
+            </div>
+
+            <Separator />
+
+            {/* FLHA Forms Section */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="material-icons text-orange-600 dark:text-orange-400">warning</span>
+                  <h3 className="font-medium">{t('projectDetail.flha.title', 'FLHA Forms')}</h3>
+                </div>
+                <Badge variant="secondary" className="text-xs">
+                  {flhaForms.length} {flhaForms.length === 1 ? t('projectDetail.flha.form', 'form') : t('projectDetail.flha.formsPlural', 'forms')}
+                </Badge>
+              </div>
+
+              {/* FLHA List */}
+              {flhaForms.length > 0 && (
+                <div className="space-y-2">
+                  {flhaForms.slice(0, 3).map((flha: any) => (
+                    <Card
+                      key={flha.id}
+                      className="hover-elevate"
+                      data-testid={`flha-form-${flha.id}`}
+                    >
+                      <CardContent className="p-3">
+                        <div className="flex items-start justify-between gap-2 mb-1">
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-medium">
+                              {format(parseLocalDate(flha.assessmentDate), 'MMMM d, yyyy', { locale: getDateLocale() })}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {t('projectDetail.flha.assessor', 'Assessor')}: {flha.assessorName}
+                            </div>
+                          </div>
+                          <Badge variant="outline" className="text-xs bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20">
+                            {t('projectDetail.flha.completed', 'Completed')}
+                          </Badge>
+                        </div>
+                        {flha.location && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {t('projectDetail.flha.location', 'Location')}: {flha.location}
+                          </p>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+                  {flhaForms.length > 3 && (
+                    <p className="text-xs text-muted-foreground text-center">
+                      +{flhaForms.length - 3} {t('projectDetail.flha.more', 'more forms')}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Create FLHA Button */}
+              <Button
+                variant="outline"
+                className="w-full h-12 gap-2 border-orange-500/30 text-orange-700 dark:text-orange-400"
+                onClick={() => setLocation(`/flha-form?projectId=${id}`)}
+                data-testid="button-create-flha"
+              >
+                <span className="material-icons text-lg">warning</span>
+                {t('projectDetail.flha.createForm', 'Complete FLHA Form')}
               </Button>
             </div>
           </CardContent>
