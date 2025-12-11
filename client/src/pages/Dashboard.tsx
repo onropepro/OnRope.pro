@@ -4997,22 +4997,35 @@ export default function Dashboard() {
                 </Card>
               )}
               
-              {/* Create Employee Button */}
-              <Button 
-                className="w-full h-12 gap-2" 
-                data-testid="button-create-employee"
-                disabled={userIsReadOnly}
-                onClick={() => {
-                  if (employeesData?.seatInfo?.atSeatLimit) {
-                    setShowPurchaseSeatsDialog(true);
-                  } else {
-                    setShowEmployeeDialog(true);
-                  }
-                }}
-              >
-                <span className="material-icons">person_add</span>
-                {t('dashboard.employeeSeats.addNewEmployee', 'Add New Employee')}
-              </Button>
+              {/* Employee Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Button 
+                  className="flex-1 h-12 gap-2" 
+                  data-testid="button-create-employee"
+                  disabled={userIsReadOnly}
+                  onClick={() => {
+                    if (employeesData?.seatInfo?.atSeatLimit) {
+                      setShowPurchaseSeatsDialog(true);
+                    } else {
+                      setShowEmployeeDialog(true);
+                    }
+                  }}
+                >
+                  <span className="material-icons">person_add</span>
+                  {t('dashboard.employeeSeats.addNewEmployee', 'Add New Employee')}
+                </Button>
+                
+                <Button 
+                  variant="outline"
+                  className="flex-1 h-12 gap-2" 
+                  data-testid="button-get-more-seats"
+                  disabled={userIsReadOnly}
+                  onClick={() => setShowPurchaseSeatsDialog(true)}
+                >
+                  <span className="material-icons">add_circle</span>
+                  {t('dashboard.employeeSeats.getMoreSeats', 'Get More Seats')}
+                </Button>
+              </div>
               
               {/* Purchase Seats Dialog - shown when no seats available */}
               <PurchaseSeatsDialog
