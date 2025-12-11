@@ -1428,6 +1428,7 @@ export default function Dashboard() {
       dropsSouth: "0",
       dropsWest: "0",
       shortfallReason: "",
+      ropeAccessTaskHours: "",
     },
   });
 
