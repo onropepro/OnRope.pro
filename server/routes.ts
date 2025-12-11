@@ -3879,7 +3879,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const paidSeats = company.additionalSeatsCount || 0;
       const giftedSeats = company.giftedSeatsCount || 0;
       const totalAdditionalSeats = paidSeats + giftedSeats;
-      const baseSeatLimit = limitsCheck.limits.maxSeats - totalAdditionalSeats;
+      // baseSeatLimit is always 2 (the free included seats), not derived from seatLimit
+      const baseSeatLimit = 2;
       const seatLimit = limitsCheck.limits.maxSeats;
       
       res.json({ 
@@ -6503,7 +6504,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const giftedSeats = companyOwner.giftedSeatsCount || 0;
       const totalAdditionalSeats = paidSeats + giftedSeats;
       const seatLimit = limitsCheck.limits.maxSeats;
-      const baseSeatLimit = seatLimit - totalAdditionalSeats;
+      // baseSeatLimit is always 2 (the free included seats), not derived from seatLimit
+      const baseSeatLimit = 2;
       
       res.json({ 
         employees: employeesWithoutPasswords,
@@ -6566,7 +6568,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const giftedSeats = companyOwner?.giftedSeatsCount || 0;
       const totalAdditionalSeats = paidSeats + giftedSeats;
       const seatLimit = limitsCheck.limits.maxSeats;
-      const baseSeatLimit = seatLimit - totalAdditionalSeats;
+      // baseSeatLimit is always 2 (the free included seats), not derived from seatLimit
+      const baseSeatLimit = 2;
       
       res.json({ 
         employees: activeEmployees,
