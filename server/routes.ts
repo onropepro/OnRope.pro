@@ -11005,6 +11005,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     tasksPerformed: z.array(z.string()).min(1, "At least one task is required"),
     notes: z.string().optional().nullable(),
     previousEmployer: z.string().optional().nullable(),
+    countsTowardTotal: z.boolean().optional().default(false), // true = manual hours (counted), false = previous hours (reference only)
   });
   
   // Only technicians can add historical hours
@@ -11037,6 +11038,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         tasksPerformed: data.tasksPerformed,
         notes: data.notes || null,
         previousEmployer: data.previousEmployer || null,
+        countsTowardTotal: data.countsTowardTotal ?? false,
       });
       
       res.json({ historicalHours: entry, message: "Previous hours added successfully" });

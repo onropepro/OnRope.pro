@@ -2077,7 +2077,8 @@ export const IRATA_TASK_TYPES = [
 export type IrataTaskType = typeof IRATA_TASK_TYPES[number]['id'];
 
 // Historical/Previous Hours - for technicians to log work from before joining platform
-// These hours are tracked separately and NOT counted toward certification totals
+// countsTowardTotal: false = Previous hours (reference only, NOT counted)
+// countsTowardTotal: true = Manual hours (when employer doesn't use OnRopePro, counted in total)
 export const historicalHours = pgTable("historical_hours", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   employeeId: varchar("employee_id").notNull().references(() => users.id, { onDelete: "cascade" }),
@@ -2102,6 +2103,9 @@ export const historicalHours = pgTable("historical_hours", {
   
   // Company name at time of work (for reference, not linked)
   previousEmployer: varchar("previous_employer"),
+  
+  // Whether these hours count toward total (true = manual hours, false = previous/reference only)
+  countsTowardTotal: boolean("counts_toward_total").default(false).notNull(),
   
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => ({
