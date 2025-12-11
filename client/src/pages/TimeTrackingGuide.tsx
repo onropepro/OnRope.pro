@@ -118,314 +118,178 @@ export default function TimeTrackingGuide() {
         <Separator />
 
         {/* Problems Solved */}
-        <section className="space-y-4">
-          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 text-green-900 dark:text-green-100">
-            <CheckCircle2 className="w-6 h-6" />
-            Problems Solved
-          </h2>
+        <section className="space-y-8">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
+              <CheckCircle2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+              Problems Solved
+            </h2>
+            <Button onClick={toggleAll} variant="outline" data-testid="button-toggle-all-accordions">
+              <ChevronsUpDown className="w-4 h-4 mr-2" />
+              {allExpanded ? "Collapse All" : "Expand All"}
+            </Button>
+          </div>
 
-          <div className="space-y-6">
-            {/* Problem 1 - GPS Verification */}
-            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+          {/* For Company Owners */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 pb-2 border-b">
+              <DollarSign className="w-5 h-5 text-amber-500" />
+              <h3 className="text-xl md:text-2xl font-semibold">For Company Owners</h3>
+            </div>
+
+            <Accordion type="multiple" value={openItems} onValueChange={setOpenItems} className="space-y-3">
+              <AccordionItem value="owner-1" className="border rounded-lg px-4 data-[state=open]:bg-white dark:data-[state=open]:bg-white/10">
+                <AccordionTrigger className="text-left font-medium py-4">
                   "I suspect some guys are clocking in from their truck before they even get to the building"
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
-                <div>
-                  <p className="font-semibold">The Pain:</p>
-                  <p>Paper timesheets are easy to fudge. An employee says they started at 8:00 AM, but did they really? You have no way to verify if they were at the job site or still at the coffee shop.</p>
-                </div>
-                <div className="bg-green-100 dark:bg-green-900 p-3 rounded italic">
-                  "The GPS pins point them on a map. So you can see that the guy actually clocked in at the building and not at the boss's place half hour earlier. Same for clock out."
-                </div>
-                <div>
-                  <p className="font-semibold">The Solution:</p>
-                  <p>GPS coordinates are captured at both clock-in and clock-out. Location pins confirm employees are at the actual job site, not clocking in from home or a coffee shop. This eliminates timesheet fraud with verifiable, timestamped location data.</p>
-                </div>
-                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span className="font-medium">GPS-verified timestamps eliminate "phantom hours." Pay only for actual on-site work.</span>
-                </div>
-              </CardContent>
-            </Card>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground space-y-4 pb-4">
+                  <p><span className="font-medium text-foreground">The Pain:</span> Paper timesheets are easy to fudge. An employee says they started at 8:00 AM, but did they really? You have no way to verify if they were at the job site or still at the coffee shop.</p>
+                  <p><span className="font-medium text-foreground">Real Example:</span> "The GPS pins point them on a map. So you can see that the guy actually clocked in at the building and not at the boss's place half hour earlier. Same for clock out."</p>
+                  <p><span className="font-medium text-foreground">Solution:</span> GPS coordinates are captured at both clock-in and clock-out. Location pins confirm employees are at the actual job site, not clocking in from home or a coffee shop.</p>
+                  <p><span className="font-medium text-foreground">Benefit:</span> GPS-verified timestamps eliminate "phantom hours." Pay only for actual on-site work.</p>
+                </AccordionContent>
+              </AccordionItem>
 
-            {/* Problem 2 - Billable Hours */}
-            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+              <AccordionItem value="owner-2" className="border rounded-lg px-4 data-[state=open]:bg-white dark:data-[state=open]:bg-white/10">
+                <AccordionTrigger className="text-left font-medium py-4">
                   "I have no idea how many hours my guys spent driving around versus actually working"
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
-                <div>
-                  <p className="font-semibold">The Pain:</p>
-                  <p>You pay your crew for 40 hours but have no visibility into how much time they spent on revenue-generating work versus running errands, picking up supplies, or waiting around. Your profitability per project is a guess.</p>
-                </div>
-                <div className="bg-green-100 dark:bg-green-900 p-3 rounded italic">
-                  "Go ask Jeff tomorrow. How many hours were the guys driving around, moving gear from one building to another, picking up soap for another guy, bringing a piece of gear someone forgot at the shop? No clue. He wouldn't even know."
-                </div>
-                <div>
-                  <p className="font-semibold">The Solution:</p>
-                  <p>Non-billable hours are tracked separately with automatic categorization. The dashboard shows your billable vs non-billable ratio by week, month, and year—giving you clear visibility into labor efficiency.</p>
-                </div>
-                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span className="font-medium">Accurate cost of goods sold for every project. Identify and reduce non-productive time.</span>
-                </div>
-              </CardContent>
-            </Card>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground space-y-4 pb-4">
+                  <p><span className="font-medium text-foreground">The Pain:</span> You pay your crew for 40 hours but have no visibility into how much time they spent on revenue-generating work versus running errands, picking up supplies, or waiting around.</p>
+                  <p><span className="font-medium text-foreground">Real Example:</span> "Go ask Jeff tomorrow. How many hours were the guys driving around, moving gear from one building to another, picking up soap for another guy? No clue. He wouldn't even know."</p>
+                  <p><span className="font-medium text-foreground">Solution:</span> Non-billable hours are tracked separately with automatic categorization. The dashboard shows your billable vs non-billable ratio by week, month, and year.</p>
+                  <p><span className="font-medium text-foreground">Benefit:</span> Accurate cost of goods sold for every project. Identify and reduce non-productive time.</p>
+                </AccordionContent>
+              </AccordionItem>
 
-            {/* Problem 3 - Status Calls */}
-            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+              <AccordionItem value="owner-3" className="border rounded-lg px-4 data-[state=open]:bg-white dark:data-[state=open]:bg-white/10">
+                <AccordionTrigger className="text-left font-medium py-4">
                   "Every day I'm calling my techs asking where they're at on the building"
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
-                <div>
-                  <p className="font-semibold">The Pain:</p>
-                  <p>You have 5 projects running and zero visibility into progress. You call each tech individually, they give vague answers, you try to piece together where things stand. Hours wasted daily.</p>
-                </div>
-                <div className="bg-green-100 dark:bg-green-900 p-3 rounded italic">
-                  "There is not a day that goes by that Jeff doesn't call one person per project to see where they're at or text them... Probably 90 of his phone calls are with the techs being like, when will you be done? Where are you at? Why is this not done?"
-                </div>
-                <div>
-                  <p className="font-semibold">The Solution:</p>
-                  <p>End-of-day forms capture drops completed, completion percentages, and shortfall reasons automatically. Project dashboards show real-time progress without a single phone call.</p>
-                </div>
-                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span className="font-medium">Eliminate 90% of status-check phone calls. Know instantly if a project is on track or falling behind—and why.</span>
-                </div>
-              </CardContent>
-            </Card>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground space-y-4 pb-4">
+                  <p><span className="font-medium text-foreground">The Pain:</span> You have 5 projects running and zero visibility into progress. You call each tech individually, they give vague answers, you try to piece together where things stand.</p>
+                  <p><span className="font-medium text-foreground">Real Example:</span> "There is not a day that goes by that Jeff doesn't call one person per project to see where they're at... Probably 90 of his phone calls are with the techs being like, when will you be done?"</p>
+                  <p><span className="font-medium text-foreground">Solution:</span> End-of-day forms capture drops completed, completion percentages, and shortfall reasons automatically. Project dashboards show real-time progress without a single phone call.</p>
+                  <p><span className="font-medium text-foreground">Benefit:</span> Eliminate 90% of status-check phone calls. Know instantly if a project is on track or falling behind, and why.</p>
+                </AccordionContent>
+              </AccordionItem>
 
-            {/* Problem 4 - Budget Overruns */}
-            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+              <AccordionItem value="owner-4" className="border rounded-lg px-4 data-[state=open]:bg-white dark:data-[state=open]:bg-white/10">
+                <AccordionTrigger className="text-left font-medium py-4">
                   "The building went 20 hours over budget and I don't really know why"
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
-                <div>
-                  <p className="font-semibold">The Pain:</p>
-                  <p>A project finishes, you're way over labor budget, and you can't reconstruct what happened. Was it weather? Lazy workers? Bad estimate? You move on to the next job never knowing.</p>
-                </div>
-                <div className="bg-green-100 dark:bg-green-900 p-3 rounded italic">
-                  "At the end of the building, you're just pissed off because your building went 20 hours over budget and you don't really know why. You know it was wetter. You know the guy was not feeling well someday. You don't really know. Move on. Next building."
-                </div>
-                <div>
-                  <p className="font-semibold">The Solution:</p>
-                  <p>Every work session logs hours worked, drops completed, and shortfall reasons. Project analytics show exactly where time was spent. Next year, you can look back and say "last time this building took 120 hours with Tommy and Damien, but they had weather delays for 3 days."</p>
-                </div>
-                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span className="font-medium">Data-driven post-mortems. Accurate re-quoting for repeat jobs. Stop losing money without understanding why.</span>
-                </div>
-              </CardContent>
-            </Card>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground space-y-4 pb-4">
+                  <p><span className="font-medium text-foreground">The Pain:</span> A project finishes, you're way over labor budget, and you can't reconstruct what happened. Was it weather? Lazy workers? Bad estimate? You move on to the next job never knowing.</p>
+                  <p><span className="font-medium text-foreground">Real Example:</span> "At the end of the building, you're just pissed off because your building went 20 hours over budget and you don't really know why. Move on. Next building."</p>
+                  <p><span className="font-medium text-foreground">Solution:</span> Every work session logs hours worked, drops completed, and shortfall reasons. Project analytics show exactly where time was spent.</p>
+                  <p><span className="font-medium text-foreground">Benefit:</span> Data-driven post-mortems. Accurate re-quoting for repeat jobs. Stop losing money without understanding why.</p>
+                </AccordionContent>
+              </AccordionItem>
 
-            {/* Problem 5 - Performance Data */}
-            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
-                  "One guy is crushing it while another coasts—and I can't prove it"
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
-                <div>
-                  <p className="font-semibold">The Pain:</p>
-                  <p>Your gut says Tommy does 5 drops per day while another employee barely does 1. They work the same hours, you pay them the same, but productivity is wildly different. Without data, you can't have the conversation.</p>
-                </div>
-                <div className="bg-green-100 dark:bg-green-900 p-3 rounded italic">
-                  "Now it's just like, why didn't you do your drops? Well, look on OnRopePro, it's all there, it's all explained. Oh, okay, thanks."
-                </div>
-                <div>
-                  <p className="font-semibold">The Solution:</p>
-                  <p>Per-employee performance tracking shows drops completed per shift, target achievement rates, and reasons for shortfalls. Automatic shortfall prompts ensure accountability—employees must explain if they miss targets.</p>
-                </div>
-                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span className="font-medium">Objective performance data for coaching conversations. High performers feel recognized. Lazy employees either improve or self-select out.</span>
-                </div>
-              </CardContent>
-            </Card>
+              <AccordionItem value="owner-5" className="border rounded-lg px-4 data-[state=open]:bg-white dark:data-[state=open]:bg-white/10">
+                <AccordionTrigger className="text-left font-medium py-4">
+                  "One guy is crushing it while another coasts, and I can't prove it"
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground space-y-4 pb-4">
+                  <p><span className="font-medium text-foreground">The Pain:</span> Your gut says Tommy does 5 drops per day while another employee barely does 1. They work the same hours, you pay them the same, but productivity is wildly different.</p>
+                  <p><span className="font-medium text-foreground">Real Example:</span> "Now it's just like, why didn't you do your drops? Well, look on OnRopePro, it's all there, it's all explained. Oh, okay, thanks."</p>
+                  <p><span className="font-medium text-foreground">Solution:</span> Per-employee performance tracking shows drops completed per shift, target achievement rates, and reasons for shortfalls. Automatic shortfall prompts ensure accountability.</p>
+                  <p><span className="font-medium text-foreground">Benefit:</span> Objective performance data for coaching conversations. High performers feel recognized. Underperformers either improve or self-select out.</p>
+                </AccordionContent>
+              </AccordionItem>
 
-            {/* Problem 6 - Piece Work Tracking */}
-            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+              <AccordionItem value="owner-6" className="border rounded-lg px-4 data-[state=open]:bg-white dark:data-[state=open]:bg-white/10">
+                <AccordionTrigger className="text-left font-medium py-4">
                   "I pay people by the drop but tracking it is a nightmare"
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
-                <div>
-                  <p className="font-semibold">The Pain:</p>
-                  <p>Some projects use piece work (pay per drop instead of hourly). Tracking this manually means reconciling drop counts with timesheets, calculating compensation, and hoping you didn't miss anything.</p>
-                </div>
-                <div className="bg-green-100 dark:bg-green-900 p-3 rounded italic">
-                  "Piece work is... some companies pay per drop. They'll have a budget, let's say $10,000 for a building. They allow $6,000 for the guys. So that $6,000 is spread into drops. If you scroll around on Facebook all day and do one drop, you get paid for one drop."
-                </div>
-                <div>
-                  <p className="font-semibold">The Solution:</p>
-                  <p>Toggle "Piece Work" on any project and set the price per drop. When employees end their session and enter drops completed, payroll automatically calculates: 3 drops x $70/drop = $210. Marked as piece work in payroll reporting.</p>
-                </div>
-                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span className="font-medium">Zero manual calculation. Piece work and hourly employees can work the same project. Payroll exports are accurate automatically.</span>
-                </div>
-              </CardContent>
-            </Card>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground space-y-4 pb-4">
+                  <p><span className="font-medium text-foreground">The Pain:</span> Some projects use piece work (pay per drop instead of hourly). Tracking this manually means reconciling drop counts with timesheets, calculating compensation, and hoping you didn't miss anything.</p>
+                  <p><span className="font-medium text-foreground">Real Example:</span> "Piece work is... some companies pay per drop. They'll have a budget, let's say $10,000 for a building. They allow $6,000 for the guys. So that $6,000 is spread into drops."</p>
+                  <p><span className="font-medium text-foreground">Solution:</span> Toggle "Piece Work" on any project and set the price per drop. When employees end their session and enter drops completed, payroll automatically calculates: 3 drops x $70/drop = $210.</p>
+                  <p><span className="font-medium text-foreground">Benefit:</span> Zero manual calculation. Piece work and hourly employees can work the same project. Payroll exports are accurate automatically.</p>
+                </AccordionContent>
+              </AccordionItem>
 
-            {/* Problem 7 - Payroll Processing */}
-            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+              <AccordionItem value="owner-7" className="border rounded-lg px-4 data-[state=open]:bg-white dark:data-[state=open]:bg-white/10">
+                <AccordionTrigger className="text-left font-medium py-4">
                   "Payroll takes forever because I'm deciphering texts and timesheets"
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
-                <div>
-                  <p className="font-semibold">The Pain:</p>
-                  <p>Every pay period, you're collecting timesheets from paper forms, text messages, emails, and memory. Then you're entering it all into payroll manually. Overtime calculations happen in your head. Mistakes happen. The whole process takes 6-10 hours for a 15-person crew.</p>
-                </div>
-                <div className="bg-green-100 dark:bg-green-900 p-3 rounded italic">
-                  "Tommy texts 'worked 9.5 hours Tuesday, building was rough.' Sarah's paper timesheet says '8 hours Monday, 10 hours Wednesday.' You have three texts you can't find, one timesheet that's illegible, and Friday's hours aren't submitted yet. Payroll is due in 2 hours."
-                </div>
-                <div>
-                  <p className="font-semibold">The Solution:</p>
-                  <p>Work sessions are logged in real-time with automatic overtime calculation. The system tracks regular hours (0-8), overtime hours (8-12), and double-time hours (12+) based on your company's rules. Payroll page shows a complete breakdown for each employee—exportable in one click.</p>
-                </div>
-                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span className="font-medium">Payroll processing time reduced by 87-93%. Overtime calculated automatically. Export to your payroll provider in seconds.</span>
-                </div>
-              </CardContent>
-            </Card>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground space-y-4 pb-4">
+                  <p><span className="font-medium text-foreground">The Pain:</span> Every pay period, you're collecting timesheets from paper forms, text messages, emails, and memory. Then you're entering it all into payroll manually. The whole process takes 6-10 hours for a 15-person crew.</p>
+                  <p><span className="font-medium text-foreground">Real Example:</span> "Tommy texts 'worked 9.5 hours Tuesday, building was rough.' Sarah's paper timesheet says '8 hours Monday, 10 hours Wednesday.' You have three texts you can't find, one timesheet that's illegible, and Friday's hours aren't submitted yet. Payroll is due in 2 hours."</p>
+                  <p><span className="font-medium text-foreground">Solution:</span> Work sessions are logged in real-time with automatic overtime calculation. The system tracks regular hours (0-8), overtime hours (8-12), and double-time hours (12+) based on your company's rules.</p>
+                  <p><span className="font-medium text-foreground">Benefit:</span> Payroll processing time reduced by 87-93%. Overtime calculated automatically. Export to your payroll provider in seconds.</p>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </div>
 
-          {/* For Technicians Section */}
-          <div className="mt-8 space-y-4">
-            <div className="flex items-center gap-3 pb-2 border-b border-green-200 dark:border-green-800">
+          {/* For Technicians */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 pb-2 border-b">
               <HardHat className="w-5 h-5 text-orange-500" />
-              <h3 className="text-xl md:text-2xl font-semibold text-green-900 dark:text-green-100">For Technicians</h3>
+              <h3 className="text-xl md:text-2xl font-semibold">For Technicians</h3>
             </div>
 
-            {/* Problem 8 - IRATA Logbook */}
-            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+            <Accordion type="multiple" value={openItems} onValueChange={setOpenItems} className="space-y-3">
+              <AccordionItem value="tech-1" className="border rounded-lg px-4 data-[state=open]:bg-white dark:data-[state=open]:bg-white/10">
+                <AccordionTrigger className="text-left font-medium py-4">
                   "I forgot to fill out my logbook and now I can't remember what tasks I did"
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
-                <div>
-                  <p className="font-semibold">The Pain:</p>
-                  <p>IRATA and SPRAT certifications require detailed task logging—hours spent on rope transfers, rescues, ascending, rigging, etc. You're supposed to log these daily, but life gets busy. Two months later, you're filling out your logbook from memory, guessing what days you did rope transfers versus re-anchors.</p>
-                </div>
-                <div className="bg-green-100 dark:bg-green-900 p-3 rounded italic">
-                  "Your IRATA recertification is in 3 weeks. You open your logbook—last entry was 6 months ago. You've done hundreds of hours of rope work since then. You guess at task breakdowns and hope the assessor doesn't ask detailed questions."
-                </div>
-                <div>
-                  <p className="font-semibold">The Solution:</p>
-                  <p>After ending each work session, you're prompted to log your IRATA/SPRAT task hours by category (20+ task types available). This data accumulates in your profile. When it's time to update your official logbook, you have a detailed record of exactly what tasks you performed and when.</p>
-                </div>
-                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span className="font-medium">Accurate certification tracking without daily logbook discipline. Recertification prep takes 30 minutes instead of 3 hours of guessing.</span>
-                </div>
-              </CardContent>
-            </Card>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground space-y-4 pb-4">
+                  <p><span className="font-medium text-foreground">The Pain:</span> IRATA and SPRAT certifications require detailed task logging. You're supposed to log these daily, but life gets busy. Two months later, you're filling out your logbook from memory.</p>
+                  <p><span className="font-medium text-foreground">Real Example:</span> "Your IRATA recertification is in 3 weeks. You open your logbook, last entry was 6 months ago. You've done hundreds of hours of rope work since then. You guess at task breakdowns and hope the assessor doesn't ask detailed questions."</p>
+                  <p><span className="font-medium text-foreground">Solution:</span> After ending each work session, you're prompted to log your IRATA/SPRAT task hours by category (20+ task types available). This data accumulates in your profile.</p>
+                  <p><span className="font-medium text-foreground">Benefit:</span> Accurate certification tracking without daily logbook discipline. Recertification prep takes 30 minutes instead of 3 hours of guessing.</p>
+                </AccordionContent>
+              </AccordionItem>
 
-            {/* Problem 9 - Fair Performance Evaluation */}
-            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+              <AccordionItem value="tech-2" className="border rounded-lg px-4 data-[state=open]:bg-white dark:data-[state=open]:bg-white/10">
+                <AccordionTrigger className="text-left font-medium py-4">
                   "My boss thinks I'm slacking when I legitimately couldn't hit target"
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
-                <div>
-                  <p className="font-semibold">The Pain:</p>
-                  <p>You're evaluated on drops per day, but some days are impossible. Wind picks up at noon, you lose half the afternoon. Building access gets blocked for 2 hours. You hit 2 drops instead of your 4-drop target. Without documentation, it looks like you underperformed.</p>
-                </div>
-                <div className="bg-green-100 dark:bg-green-900 p-3 rounded italic">
-                  "I could fix that easily just by adding a bunch of automatic reasons that you can select like weather delays... if one of those are selected, it will not affect their performance."
-                </div>
-                <div>
-                  <p className="font-semibold">The Solution:</p>
-                  <p>When you don't meet your daily target, the system requires a shortfall reason before you can close your session. Weather delays, equipment issues, building access problems—all documented. Certain reasons are "performance-protected" and don't negatively impact your productivity metrics.</p>
-                </div>
-                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span className="font-medium">Your legitimate challenges are documented, not forgotten. Weather delays don't hurt your performance score.</span>
-                </div>
-              </CardContent>
-            </Card>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground space-y-4 pb-4">
+                  <p><span className="font-medium text-foreground">The Pain:</span> You're evaluated on drops per day, but some days are impossible. Wind picks up at noon, you lose half the afternoon. Building access gets blocked for 2 hours. Without documentation, it looks like you underperformed.</p>
+                  <p><span className="font-medium text-foreground">Real Example:</span> "I could fix that easily just by adding a bunch of automatic reasons that you can select like weather delays... if one of those are selected, it will not affect their performance."</p>
+                  <p><span className="font-medium text-foreground">Solution:</span> When you don't meet your daily target, the system requires a shortfall reason before you can close your session. Certain reasons are "performance-protected" and don't negatively impact your productivity metrics.</p>
+                  <p><span className="font-medium text-foreground">Benefit:</span> Your legitimate challenges are documented, not forgotten. Weather delays don't hurt your performance score.</p>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </div>
 
-          {/* For Operations Managers Section */}
-          <div className="mt-8 space-y-4">
-            <div className="flex items-center gap-3 pb-2 border-b border-green-200 dark:border-green-800">
+          {/* For Operations Managers */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 pb-2 border-b">
               <Users className="w-5 h-5 text-blue-500" />
-              <h3 className="text-xl md:text-2xl font-semibold text-green-900 dark:text-green-100">For Operations Managers</h3>
+              <h3 className="text-xl md:text-2xl font-semibold">For Operations Managers</h3>
             </div>
 
-            {/* Problem 10 - Worker Visibility */}
-            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+            <Accordion type="multiple" value={openItems} onValueChange={setOpenItems} className="space-y-3">
+              <AccordionItem value="ops-1" className="border rounded-lg px-4 data-[state=open]:bg-white dark:data-[state=open]:bg-white/10">
+                <AccordionTrigger className="text-left font-medium py-4">
                   "I have 15 workers across 6 sites and no idea who's where"
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
-                <div>
-                  <p className="font-semibold">The Pain:</p>
-                  <p>You're managing multiple crews across multiple buildings. Someone calls in sick, someone finishes early, someone hasn't clocked in and you don't know if they're late or just forgot. You're texting and calling trying to build a mental picture of who's where.</p>
-                </div>
-                <div className="bg-green-100 dark:bg-green-900 p-3 rounded italic">
-                  "It's 9:15 AM. You see 12 of 15 workers have clocked in. Are the other 3 late? Did they forget to clock in? Are they sick? You start making calls. Tommy forgot his phone. Sarah's stuck in traffic. Mike forgot to clock in. You just spent 30 minutes on basic attendance."
-                </div>
-                <div>
-                  <p className="font-semibold">The Solution:</p>
-                  <p>Real-time Active Workers dashboard shows everyone currently clocked in, which project they're working on, and when they started. Missing workers are immediately visible—you know who to follow up with.</p>
-                </div>
-                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span className="font-medium">Attendance tracking in seconds, not 30 minutes. Know exactly who's where without phone calls.</span>
-                </div>
-              </CardContent>
-            </Card>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground space-y-4 pb-4">
+                  <p><span className="font-medium text-foreground">The Pain:</span> You're managing multiple crews across multiple buildings. Someone calls in sick, someone finishes early, someone hasn't clocked in and you don't know if they're late or just forgot.</p>
+                  <p><span className="font-medium text-foreground">Real Example:</span> "It's 9:15 AM. You see 12 of 15 workers have clocked in. Are the other 3 late? Did they forget to clock in? Are they sick? You start making calls. You just spent 30 minutes on basic attendance."</p>
+                  <p><span className="font-medium text-foreground">Solution:</span> Real-time Active Workers dashboard shows everyone currently clocked in, which project they're working on, and when they started. Missing workers are immediately visible.</p>
+                  <p><span className="font-medium text-foreground">Benefit:</span> Attendance tracking in seconds, not 30 minutes. Know exactly who's where without phone calls.</p>
+                </AccordionContent>
+              </AccordionItem>
 
-            {/* Problem 11 - Clock-Out Corrections */}
-            <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">
+              <AccordionItem value="ops-2" className="border rounded-lg px-4 data-[state=open]:bg-white dark:data-[state=open]:bg-white/10">
+                <AccordionTrigger className="text-left font-medium py-4">
                   "A tech forgot to clock out and now their hours are wrong"
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-green-900 dark:text-green-100 space-y-3 text-sm">
-                <div>
-                  <p className="font-semibold">The Pain:</p>
-                  <p>Employees forget to clock out. They close the app and go home. Next morning, you see a 16-hour work session that's obviously wrong. Now you're playing detective—calling the employee, checking when they actually left, manually adjusting the record.</p>
-                </div>
-                <div className="bg-green-100 dark:bg-green-900 p-3 rounded italic">
-                  "Tommy's session shows 15.5 hours yesterday. He definitely didn't work that long—he left around 5 PM. But the system has him clocked out at 9:30 PM. You call Tommy, he doesn't remember exactly when he left. You guess at 5:15 PM and manually adjust."
-                </div>
-                <div>
-                  <p className="font-semibold">The Solution:</p>
-                  <p>Users with financial permissions (owners, ops managers, accounting) can edit completed sessions. Adjust start time, end time, drops completed, and billable status. The system automatically recalculates hours breakdown (regular, overtime, double-time) and payroll amounts.</p>
-                </div>
-                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span className="font-medium">Fix clock-out errors in 30 seconds without complicated workarounds. Payroll stays accurate.</span>
-                </div>
-              </CardContent>
-            </Card>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground space-y-4 pb-4">
+                  <p><span className="font-medium text-foreground">The Pain:</span> Employees forget to clock out. They close the app and go home. Next morning, you see a 16-hour work session that's obviously wrong. Now you're playing detective.</p>
+                  <p><span className="font-medium text-foreground">Real Example:</span> "Tommy's session shows 15.5 hours yesterday. He definitely didn't work that long. But the system has him clocked out at 9:30 PM. You call Tommy, he doesn't remember exactly when he left."</p>
+                  <p><span className="font-medium text-foreground">Solution:</span> Users with financial permissions can edit completed sessions. Adjust start time, end time, drops completed, and billable status. The system automatically recalculates hours breakdown.</p>
+                  <p><span className="font-medium text-foreground">Benefit:</span> Fix clock-out errors in 30 seconds without complicated workarounds. Payroll stays accurate.</p>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </div>
         </section>
 
@@ -968,6 +832,87 @@ export default function TimeTrackingGuide() {
               </div>
               <p className="text-xs font-semibold text-center">Payroll</p>
             </div>
+          </div>
+        </section>
+
+        <Separator />
+
+        {/* Module Integration Points */}
+        <section className="space-y-4">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
+            <Layers className="w-5 h-5 text-violet-600 dark:text-violet-400" />
+            Module Integration Points
+          </h2>
+          <p className="text-muted-foreground text-base">
+            Work sessions connect to these core modules, creating a unified data flow across the platform:
+          </p>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <Card className="border">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Users className="w-4 h-4 text-blue-500" />
+                  Employee Directory
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-xs text-muted-foreground">
+                Sessions link to employee profiles for rate lookup, IRATA level tracking, and role-based visibility. Updates to employee hourly rates automatically apply to future sessions.
+              </CardContent>
+            </Card>
+            <Card className="border">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <DollarSign className="w-4 h-4 text-green-500" />
+                  Payroll Module
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-xs text-muted-foreground">
+                Completed sessions flow directly into the Payroll page with automatic overtime calculation. Regular/OT/DT hours, piece work earnings, and billable status are all computed automatically.
+              </CardContent>
+            </Card>
+            <Card className="border">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-red-500" />
+                  Safety Compliance
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-xs text-muted-foreground">
+                Daily harness inspection is required before clock-in. Failed inspections block work and notify supervisors. Inspection history is logged for compliance auditing.
+              </CardContent>
+            </Card>
+            <Card className="border">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-purple-500" />
+                  Project Scheduling
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-xs text-muted-foreground">
+                Sessions are tied to specific projects. Drop counts and completion percentages update project progress automatically, enabling accurate forecasting and resource allocation.
+              </CardContent>
+            </Card>
+            <Card className="border">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-amber-500" />
+                  Performance Analytics
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-xs text-muted-foreground">
+                Session data feeds into employee performance metrics: drops per day, target achievement rates, and shortfall patterns. Protected reasons are excluded from negative scoring.
+              </CardContent>
+            </Card>
+            <Card className="border">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <ClipboardCheck className="w-4 h-4 text-teal-500" />
+                  IRATA/SPRAT Logging
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-xs text-muted-foreground">
+                After each session, technicians can log task-specific hours for certification tracking. Data accumulates in their profile for easy logbook updates during recertification.
+              </CardContent>
+            </Card>
           </div>
         </section>
 
