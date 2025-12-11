@@ -25,7 +25,13 @@ import {
   Info,
   BookOpen,
   Camera,
-  ChevronsUpDown
+  ChevronsUpDown,
+  Layers,
+  FolderOpen,
+  BarChart3,
+  DollarSign,
+  Shield,
+  Users
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -948,6 +954,126 @@ export default function IRATALoggingGuide() {
                 <p className="text-sm text-muted-foreground">
                   Shift hours are your total time at work. Task hours are the actual time performing rope access activities. An 8-hour shift might only include 6-7 hours of actual rope work after breaks, travel, and ground prep. Log task hours, not shift hours.
                 </p>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        <Separator />
+
+        {/* Module Integration Points */}
+        <section className="space-y-6">
+          <div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-2 flex items-center gap-2">
+              <Layers className="w-6 h-6 text-violet-600 dark:text-violet-400" />
+              Module Integration Points
+            </h2>
+            <p className="text-muted-foreground leading-relaxed text-base">
+              IRATA/SPRAT task logging connects directly with work sessions, payroll, and career development. Hours logged here flow into multiple systems for accurate tracking and certification progression.
+            </p>
+          </div>
+
+          <Card className="bg-violet-50 dark:bg-violet-950 border-violet-200 dark:border-violet-800 mb-4">
+            <CardContent className="pt-6">
+              <p className="italic">"Your logbook is your professional passport. Every hour logged today is evidence for your next certification level tomorrow."</p>
+              <p className="text-sm font-medium mt-2 text-muted-foreground">, IRATA certification philosophy</p>
+            </CardContent>
+          </Card>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-violet-600" />
+                  <CardTitle className="text-base">Work Sessions & Time Tracking</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-sm text-muted-foreground">Task logging triggers automatically when ending a work session. Hours from the session become the starting point for IRATA hour allocation. Seamless transition from clocking out to logging rope time.</p>
+                <div className="flex items-center gap-2 text-sm">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span className="font-medium">Zero duplicate data entry required</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <DollarSign className="w-5 h-5 text-violet-600" />
+                  <CardTitle className="text-base">Payroll & Compensation</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-sm text-muted-foreground">Work session hours feed payroll calculations while task hours track certification progress separately. Same shift, different purposes. Owners see billable time, technicians see career advancement.</p>
+                <div className="flex items-center gap-2 text-sm">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span>Shift hours and task hours tracked independently</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-violet-600" />
+                  <CardTitle className="text-base">Safety & Compliance</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-sm text-muted-foreground">Harness inspections link to work sessions. IRATA logged hours include safety context. During audits, assessors can see that your logged rope hours occurred with proper safety protocols in place.</p>
+                <div className="flex items-center gap-2 text-sm">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span>Complete safety trail for every logged hour</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <FolderOpen className="w-5 h-5 text-violet-600" />
+                  <CardTitle className="text-base">Project Management</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-sm text-muted-foreground">Each logged task links to the project where work was performed. Your logbook shows not just hours and tasks, but building names and project types for complete work history context.</p>
+                <div className="flex items-center gap-2 text-sm">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span>Full project context in certification records</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <Users className="w-5 h-5 text-violet-600" />
+                  <CardTitle className="text-base">Employee Profiles</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-sm text-muted-foreground">IRATA certification level displays on technician profiles. Logged hours accumulate toward next level requirements. Owners see crew qualification levels when assigning teams to projects.</p>
+                <div className="flex items-center gap-2 text-sm">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span className="font-medium">Real-time certification level visibility</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5 text-violet-600" />
+                  <CardTitle className="text-base">Analytics & Reporting</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-sm text-muted-foreground">Hours logged flow into company-wide analytics. Owners see skill distribution across their workforce. Identify gaps in team capabilities and plan training investments based on actual logged experience.</p>
+                <div className="flex items-center gap-2 text-sm">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span>Data-driven workforce development</span>
+                </div>
               </CardContent>
             </Card>
           </div>
