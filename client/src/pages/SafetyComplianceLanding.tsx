@@ -52,7 +52,7 @@ export default function SafetyComplianceLanding() {
   useEffect(() => {
     const start1 = Math.floor(Math.random() * 100) + 50;
     const start2 = Math.floor(Math.random() * 80) + 40;
-    const start3 = Math.floor(Math.random() * 120) + 80;
+    const start3 = Math.floor(Math.random() * 100) + 50;
 
     let current1 = start1, current2 = start2, current3 = start3;
     setCount1(current1);
@@ -250,7 +250,7 @@ export default function SafetyComplianceLanding() {
               </div>
               <div className="text-center">
                 <div 
-                  className={`text-3xl md:text-4xl font-bold text-amber-600 transition-transform duration-500 ${allZero ? 'rotate-90' : ''}`}
+                  className="text-3xl md:text-4xl font-bold text-amber-600 transition-opacity duration-300"
                   style={{ display: 'inline-block' }}
                 >
                   {allZero ? '∞' : '8'}
