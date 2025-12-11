@@ -1071,14 +1071,27 @@ export default function ProjectDetail() {
     return totalSessionDrops >= project.dailyDropTarget;
   }).length;
   
+  // Valid Reason: below target but has a valid shortfall reason code (not 'other' and not empty)
+  const validReasonCount = completedSessions.filter((s: any) => {
+    const totalSessionDrops = (s.dropsCompletedNorth ?? 0) + (s.dropsCompletedEast ?? 0) + 
+                              (s.dropsCompletedSouth ?? 0) + (s.dropsCompletedWest ?? 0);
+    const isBelowTarget = totalSessionDrops < project.dailyDropTarget;
+    const hasValidReasonCode = s.validShortfallReasonCode && s.validShortfallReasonCode !== '' && s.validShortfallReasonCode !== 'other';
+    return isBelowTarget && hasValidReasonCode;
+  }).length;
+  
+  // Below Target: below target without a valid reason code
   const belowTargetCount = completedSessions.filter((s: any) => {
     const totalSessionDrops = (s.dropsCompletedNorth ?? 0) + (s.dropsCompletedEast ?? 0) + 
                               (s.dropsCompletedSouth ?? 0) + (s.dropsCompletedWest ?? 0);
-    return totalSessionDrops < project.dailyDropTarget;
+    const isBelowTarget = totalSessionDrops < project.dailyDropTarget;
+    const hasValidReasonCode = s.validShortfallReasonCode && s.validShortfallReasonCode !== '' && s.validShortfallReasonCode !== 'other';
+    return isBelowTarget && !hasValidReasonCode;
   }).length;
   
   const pieData = [
     { name: t('projectDetail.progress.targetMet', 'Target Met'), value: targetMetCount, color: "hsl(var(--primary))" },
+    { name: t('projectDetail.progress.validReason', 'Valid Reason'), value: validReasonCount, color: "hsl(var(--warning))" },
     { name: t('projectDetail.progress.belowTarget', 'Below Target'), value: belowTargetCount, color: "hsl(var(--destructive))" },
   ];
 
