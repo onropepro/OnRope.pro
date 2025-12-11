@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import {
@@ -39,6 +39,42 @@ import {
 export default function SafetyComplianceLanding() {
   const [expandedProblems, setExpandedProblems] = useState<string[]>([]);
   const [, setLocation] = useLocation();
+  const [showModulesMenu, setShowModulesMenu] = useState(false);
+  const [count1, setCount1] = useState(0);
+  const [count2, setCount2] = useState(0);
+  const [count3, setCount3] = useState(0);
+  const modulesMenuRef = useRef<HTMLDivElement>(null);
+
+  // Initialize countdown numbers
+  useEffect(() => {
+    const start1 = Math.floor(Math.random() * 100) + 50;
+    const start2 = Math.floor(Math.random() * 80) + 40;
+    const start3 = Math.floor(Math.random() * 120) + 80;
+
+    let current1 = start1, current2 = start2, current3 = start3;
+    
+    const interval = setInterval(() => {
+      if (current1 > 0) { current1--; setCount1(current1); }
+      if (current2 > 0) { current2--; setCount2(current2); }
+      if (current3 > 0) { current3--; setCount3(current3); }
+    }, 30);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (modulesMenuRef.current && !modulesMenuRef.current.contains(e.target as Node)) {
+        setShowModulesMenu(false);
+      }
+    };
+    
+    if (showModulesMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [showModulesMenu]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -91,14 +127,31 @@ export default function SafetyComplianceLanding() {
           >
             Building Manager
           </Button>
-          <Button
-            variant="ghost"
-            className="text-sm font-medium bg-accent"
-            onClick={() => setLocation("/modules/safety-compliance")}
-            data-testid="nav-modules"
-          >
-            Modules
-          </Button>
+          <div className="relative" ref={modulesMenuRef}>
+            <Button
+              variant="ghost"
+              className="text-sm font-medium"
+              onClick={() => setShowModulesMenu(!showModulesMenu)}
+              data-testid="nav-modules"
+            >
+              Modules
+            </Button>
+            {showModulesMenu && (
+              <div className="absolute top-full left-0 mt-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg shadow-lg p-2 w-48 z-50">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start text-sm"
+                  onClick={() => {
+                    setLocation("/modules/safety-compliance");
+                    setShowModulesMenu(false);
+                  }}
+                  data-testid="nav-safety-compliance"
+                >
+                  Safety & Compliance
+                </Button>
+              </div>
+            )}
+          </div>
         </nav>
         
         <div className="flex items-center gap-3">
@@ -171,19 +224,19 @@ export default function SafetyComplianceLanding() {
           <CardContent className="p-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-sky-600">0</div>
+                <div className="text-3xl md:text-4xl font-bold text-sky-600">{count1}</div>
                 <div className="text-sm text-muted-foreground mt-1">Missing forms</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-emerald-600">0</div>
+                <div className="text-3xl md:text-4xl font-bold text-emerald-600">{count2}</div>
                 <div className="text-sm text-muted-foreground mt-1">Failed audits</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-violet-600">0</div>
+                <div className="text-3xl md:text-4xl font-bold text-violet-600">{count3}</div>
                 <div className="text-sm text-muted-foreground mt-1">Sleepless nights</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-amber-600">&#8734;</div>
+                <div className="text-3xl md:text-4xl font-bold text-amber-600 relative inline-block glow-infinity">∞</div>
                 <div className="text-sm text-muted-foreground mt-1">Searchable history</div>
               </div>
             </div>

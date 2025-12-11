@@ -4,6 +4,56 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Glowing infinity animation */
+@keyframes orbiting {
+  from {
+    transform: rotate(0deg) translateX(12px) rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg) translateX(12px) rotate(-360deg);
+  }
+}
+
+@keyframes glowing {
+  0%, 100% {
+    box-shadow: 0 0 4px rgba(251, 146, 60, 0.4), 0 0 8px rgba(251, 146, 60, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 8px rgba(251, 146, 60, 0.6), 0 0 16px rgba(251, 146, 60, 0.4);
+  }
+}
+
+.glow-infinity {
+  position: relative;
+  filter: drop-shadow(0 0 2px rgba(251, 146, 60, 0.3));
+}
+
+.glow-infinity::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, rgba(251, 146, 60, 0.8), rgba(251, 146, 60, 0.2), transparent);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1px));
+  animation: orbiting 4s linear infinite;
+}
+
+.glow-infinity::after {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  background: rgba(251, 146, 60, 0.9);
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(251, 146, 60, 0.8), 0 0 12px rgba(251, 146, 60, 0.4);
+  animation: orbiting 4s linear infinite;
+}
+
 /* SuperUser Section - TailAdmin Styling with Outfit Font */
 .superuser-root {
   font-family: 'Outfit', sans-serif;

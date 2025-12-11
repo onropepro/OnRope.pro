@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -35,6 +35,8 @@ export default function Login() {
   const [isAnimating, setIsAnimating] = useState(false);
   const [landingLanguage, setLandingLanguage] = useState<'en' | 'fr'>('en');
   const [roiEmployeeCount, setRoiEmployeeCount] = useState(12);
+  const [showModulesMenu, setShowModulesMenu] = useState(false);
+  const modulesMenuRef = useRef<HTMLDivElement>(null);
 
   // Initialize landing page language from its own storage key (separate from user preference)
   useEffect(() => {
@@ -77,6 +79,20 @@ export default function Login() {
     }, 2500);
     return () => clearInterval(interval);
   }, []);
+
+  // Close modules menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (modulesMenuRef.current && !modulesMenuRef.current.contains(e.target as Node)) {
+        setShowModulesMenu(false);
+      }
+    };
+    
+    if (showModulesMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [showModulesMenu]);
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -226,14 +242,31 @@ export default function Login() {
           >
             Building Manager
           </Button>
-          <Button
-            variant="ghost"
-            className="text-sm font-medium"
-            onClick={() => setLocation("/modules/safety-compliance")}
-            data-testid="nav-modules"
-          >
-            Modules
-          </Button>
+          <div className="relative" ref={modulesMenuRef}>
+            <Button
+              variant="ghost"
+              className="text-sm font-medium"
+              onClick={() => setShowModulesMenu(!showModulesMenu)}
+              data-testid="nav-modules"
+            >
+              Modules
+            </Button>
+            {showModulesMenu && (
+              <div className="absolute top-full left-0 mt-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg shadow-lg p-2 w-48 z-50">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start text-sm"
+                  onClick={() => {
+                    setLocation("/modules/safety-compliance");
+                    setShowModulesMenu(false);
+                  }}
+                  data-testid="nav-safety-compliance"
+                >
+                  Safety & Compliance
+                </Button>
+              </div>
+            )}
+          </div>
         </nav>
         
         {/* Actions - Right */}
