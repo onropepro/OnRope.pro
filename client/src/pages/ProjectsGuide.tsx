@@ -375,6 +375,114 @@ export default function ProjectsGuide() {
 
         <Separator />
 
+        {/* Key Features Section */}
+        <section className="space-y-4">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+            Key Features
+          </h2>
+          
+          <div className="grid md:grid-cols-2 gap-4">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900 flex items-center justify-center shrink-0">
+                    <Compass className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Directional Drop Tracking</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Track progress on each building elevation (N/E/S/W) independently. Perfect for high-rise window cleaning with different access requirements per side.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0">
+                    <BarChart3 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Real-Time Progress Dashboard</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      See every project's completion percentage, days remaining, and assigned crew. Updates automatically as work sessions are logged.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-action-100 dark:bg-action-900 flex items-center justify-center shrink-0">
+                    <Grid3X3 className="w-5 h-5 text-action-600 dark:text-action-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Flexible Tracking Methods</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Drop-based, hours-based, or unit-based tracking. The system adapts to each job type for accurate progress and payroll calculation.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0">
+                    <Users className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Crew Assignment & Scheduling</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Assign technicians to specific projects and elevations. See who's working where and prevent double-booking your best crew.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center shrink-0">
+                    <Eye className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Client & Resident Visibility</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Property managers and residents check progress themselves. Photo galleries and completion status reduce status calls by 60-70%.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
+                    <TrendingUp className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Performance Analytics</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Track drops/units completed per shift by technician. Identify top performers and coach underperformers with objective data.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        <Separator />
+
         {/* Problems Solved */}
         <section className="space-y-8">
           <div className="flex items-center justify-between flex-wrap gap-4">

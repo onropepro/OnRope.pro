@@ -122,6 +122,114 @@ export default function UserAccessGuide() {
 
         <Separator />
 
+        {/* Key Features Section */}
+        <section className="space-y-4">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
+            <Shield className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+            Key Features
+          </h2>
+          
+          <div className="grid md:grid-cols-2 gap-4">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900 flex items-center justify-center shrink-0">
+                    <Layers className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Multi-Tenant Architecture</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Complete data isolation between companies. Each organization sees only their own employees, projects, and financial data.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0">
+                    <UserCog className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Granular Permissions</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Customize exactly what each employee can view and edit. Separate operational access from financial visibility.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-action-100 dark:bg-action-900 flex items-center justify-center shrink-0">
+                    <Building2 className="w-5 h-5 text-action-600 dark:text-action-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Building-Level Accounts</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Property managers use building accounts that persist through staff turnover. No vendor coordination when managers change.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0">
+                    <HardHat className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">IRATA Level Tracking</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Track IRATA/SPRAT certification levels for each technician. Filter by qualification when assigning crews to projects.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center shrink-0">
+                    <Home className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Resident Portal</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Building occupants check progress themselves. Real-time visibility reduces status calls to property managers by 60-70%.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
+                    <ShieldCheck className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Role-Based Access Control</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Define roles with customizable capabilities. Same role title at different companies can have entirely different permissions.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        <Separator />
+
         <section className="space-y-8">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
