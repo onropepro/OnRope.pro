@@ -285,7 +285,7 @@ export default function ToolboxMeetingForm() {
       // Invalidate both global and project-specific toolbox meetings
       queryClient.invalidateQueries({ queryKey: ["/api/toolbox-meetings"] });
       if (data?.meeting?.projectId) {
-        queryClient.invalidateQueries({ queryKey: [`/api/projects/${data.meeting.projectId}/toolbox-meetings`] });
+        queryClient.invalidateQueries({ queryKey: ["/api/projects", data.meeting.projectId, "toolbox-meetings"] });
       }
       // Navigate back to project if opened from project, otherwise to dashboard
       handleNavigateBack();
