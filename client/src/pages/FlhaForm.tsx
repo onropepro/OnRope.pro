@@ -111,6 +111,10 @@ export default function FlhaForm() {
   const [selectedSignatureEmployee, setSelectedSignatureEmployee] = useState<string>("");
   const signatureCanvasRef = useRef<SignatureCanvas>(null);
 
+  // Get projectId from URL query parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  const preselectedProjectId = urlParams.get('projectId') || "";
+
   const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
   });
@@ -135,7 +139,7 @@ export default function FlhaForm() {
   const form = useForm<FlhaFormValues>({
     resolver: zodResolver(flhaFormSchema),
     defaultValues: {
-      projectId: "",
+      projectId: preselectedProjectId,
       assessmentDate: getLocalDateString(),
       assessorName: "",
       jobDescription: "",
