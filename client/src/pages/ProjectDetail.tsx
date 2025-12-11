@@ -1051,11 +1051,11 @@ export default function ProjectDetail() {
       : (project.totalDropsNorth ?? 0) + (project.totalDropsEast ?? 0) + 
         (project.totalDropsSouth ?? 0) + (project.totalDropsWest ?? 0);  // For window cleaning, use elevation drops
     
-    // Calculate completed drops from work sessions (elevation-specific)
-    completedDropsNorth = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedNorth ?? 0), 0);
-    completedDropsEast = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedEast ?? 0), 0);
-    completedDropsSouth = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedSouth ?? 0), 0);
-    completedDropsWest = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedWest ?? 0), 0);
+    // Calculate completed drops from work sessions (elevation-specific) + adjustments
+    completedDropsNorth = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedNorth ?? 0), 0) + (project.dropsAdjustmentNorth ?? 0);
+    completedDropsEast = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedEast ?? 0), 0) + (project.dropsAdjustmentEast ?? 0);
+    completedDropsSouth = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedSouth ?? 0), 0) + (project.dropsAdjustmentSouth ?? 0);
+    completedDropsWest = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedWest ?? 0), 0) + (project.dropsAdjustmentWest ?? 0);
     
     completedDrops = completedDropsNorth + completedDropsEast + completedDropsSouth + completedDropsWest;
     
@@ -3090,7 +3090,9 @@ export default function ProjectDetail() {
                 
                 if (!response.ok) throw new Error('Failed to update project');
                 
-                queryClient.invalidateQueries({ queryKey: ["/api/projects", id] });
+                // Wait for queries to refetch before closing dialog so UI updates immediately
+                await queryClient.invalidateQueries({ queryKey: ["/api/projects", id] });
+                await queryClient.refetchQueries({ queryKey: ["/api/projects", id] });
                 toast({ title: t('projectDetail.dialogs.editProject.updateSuccess', 'Project updated successfully') });
                 setShowEditDialog(false);
               } catch (error) {
@@ -3228,26 +3230,26 @@ export default function ProjectDetail() {
                     </div>
                     
                     <div className="border-t pt-4 mt-2">
-                      <h4 className="font-medium text-sm mb-2">{t('projectDetail.dialogs.editProject.completedDropsSection', 'Completed Drops')}</h4>
+                      <h4 className="font-medium text-sm mb-2">{t('projectDetail.dialogs.editProject.completedDropsSection', 'Completed Drops (from work sessions)')}</h4>
                       <p className="text-xs text-muted-foreground mb-3">
-                        {t('projectDetail.dialogs.editProject.completedDropsHelp', 'Current completed drops from work sessions. Use the adjustment fields to correct employee mistakes.')}
+                        {t('projectDetail.dialogs.editProject.completedDropsHelp', 'Raw drops logged by employees. Use adjustments below to correct mistakes.')}
                       </p>
                       <div className="grid grid-cols-4 gap-3 mb-4">
                         <div className="text-center p-2 bg-muted/50 rounded-md">
                           <div className="text-xs text-muted-foreground">{t('projectDetail.directions.north', 'North')}</div>
-                          <div className="text-lg font-bold" data-testid="display-completed-north">{completedDropsNorth}</div>
+                          <div className="text-lg font-bold" data-testid="display-completed-north">{completedDropsNorth - (project.dropsAdjustmentNorth ?? 0)}</div>
                         </div>
                         <div className="text-center p-2 bg-muted/50 rounded-md">
                           <div className="text-xs text-muted-foreground">{t('projectDetail.directions.east', 'East')}</div>
-                          <div className="text-lg font-bold" data-testid="display-completed-east">{completedDropsEast}</div>
+                          <div className="text-lg font-bold" data-testid="display-completed-east">{completedDropsEast - (project.dropsAdjustmentEast ?? 0)}</div>
                         </div>
                         <div className="text-center p-2 bg-muted/50 rounded-md">
                           <div className="text-xs text-muted-foreground">{t('projectDetail.directions.south', 'South')}</div>
-                          <div className="text-lg font-bold" data-testid="display-completed-south">{completedDropsSouth}</div>
+                          <div className="text-lg font-bold" data-testid="display-completed-south">{completedDropsSouth - (project.dropsAdjustmentSouth ?? 0)}</div>
                         </div>
                         <div className="text-center p-2 bg-muted/50 rounded-md">
                           <div className="text-xs text-muted-foreground">{t('projectDetail.directions.west', 'West')}</div>
-                          <div className="text-lg font-bold" data-testid="display-completed-west">{completedDropsWest}</div>
+                          <div className="text-lg font-bold" data-testid="display-completed-west">{completedDropsWest - (project.dropsAdjustmentWest ?? 0)}</div>
                         </div>
                       </div>
                       <h4 className="font-medium text-sm mb-2">{t('projectDetail.dialogs.editProject.adjustments', 'Adjustments')}</h4>
