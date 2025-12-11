@@ -115,6 +115,15 @@ export default function FlhaForm() {
   const urlParams = new URLSearchParams(window.location.search);
   const preselectedProjectId = urlParams.get('projectId') || "";
 
+  // Navigate back - if opened from project, go back to project; otherwise go to safety forms
+  const handleNavigateBack = () => {
+    if (preselectedProjectId) {
+      navigate(`/projects/${preselectedProjectId}`);
+    } else {
+      navigate("/safety-forms");
+    }
+  };
+
   const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
   });
@@ -309,7 +318,7 @@ export default function FlhaForm() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate("/safety-forms")}
+            onClick={handleNavigateBack}
             data-testid="button-back"
           >
             <ArrowLeft className="h-5 w-5" />
@@ -744,7 +753,7 @@ export default function FlhaForm() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => navigate("/safety-forms")}
+                    onClick={handleNavigateBack}
                     data-testid="button-cancel"
                   >
                     {t('safetyForms.flha.cancel', 'Cancel')}
