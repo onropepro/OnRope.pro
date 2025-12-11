@@ -22,6 +22,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { jsPDF } from "jspdf";
 import JSZip from "jszip";
+import { addProfessionalHeader, addSectionHeader, addFooter, getBrandColors, type BrandingConfig } from "@/lib/pdfBranding";
 import { downloadMethodStatement } from "@/pages/MethodStatementForm";
 import { formatLocalDate, formatLocalDateLong, formatLocalDateMedium, parseLocalDate, formatTimestampDate, formatLocalDateShort } from "@/lib/dateUtils";
 import { format } from "date-fns";
@@ -3079,7 +3080,7 @@ export default function Documents() {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-    let yPosition = 20;
+    const margin = 15;
 
     const addMultilineText = (lines: string[], currentY: number, lineHeight: number = 6): number => {
       let y = currentY;
@@ -3088,75 +3089,85 @@ export default function Documents() {
           doc.addPage();
           y = 20;
         }
-        doc.text(line, 20, y);
+        doc.text(line, margin, y);
         y += lineHeight;
       }
       return y;
     };
 
-    // Header
-    doc.setFillColor(251, 146, 60); // Orange
-    
-    // Add company branding if active
-    const brandingHeight = addCompanyBranding(doc, pageWidth);
-    const headerHeight = 35 + brandingHeight; // Dynamic height based on branding
-    doc.rect(0, 0, pageWidth, headerHeight, 'F');
-    
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(20);
-    doc.setFont('helvetica', 'bold');
-    doc.text('FIELD LEVEL HAZARD ASSESSMENT', pageWidth / 2, 15 + brandingHeight, { align: 'center' });
-    doc.setFontSize(12);
+    const branding: BrandingConfig = {
+      companyName: currentUser?.companyName,
+      whitelabelBrandingActive: currentUser?.whitelabelBrandingActive,
+      brandingLogoUrl: currentUser?.brandingLogoUrl,
+      brandingColors: currentUser?.brandingColors
+    };
+
+    const headerResult = await addProfessionalHeader(
+      doc,
+      'FIELD LEVEL HAZARD ASSESSMENT',
+      'Rope Access Safety Documentation',
+      branding
+    );
+
+    let yPosition = headerResult.contentStartY;
+    const { primaryColor, accentColor } = headerResult;
+
+    yPosition = addSectionHeader(doc, 'Assessment Information', yPosition, primaryColor);
+
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
-    doc.text('Rope Access Safety Documentation', pageWidth / 2, 25 + brandingHeight, { align: 'center' });
-
-    yPosition = 45 + brandingHeight;
-
-    // Assessment Details
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Assessment Information', 20, yPosition);
-    yPosition += 8;
-
-    doc.setFont('helvetica', 'normal');
+    doc.text('Date:', margin, yPosition);
+    doc.setTextColor(30, 30, 30);
     doc.setFontSize(10);
-    doc.text(`Date: ${formatLocalDateLong(flha.assessmentDate)}`, 20, yPosition);
+    doc.text(formatLocalDateLong(flha.assessmentDate), margin + 35, yPosition);
     yPosition += 6;
 
-    doc.text(`Assessor: ${flha.assessorName}`, 20, yPosition);
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(9);
+    doc.text('Assessor:', margin, yPosition);
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(10);
+    doc.text(flha.assessorName || 'N/A', margin + 35, yPosition);
     yPosition += 6;
 
-    doc.text(`Location: ${flha.location}`, 20, yPosition);
-    yPosition += 6;
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(9);
+    doc.text('Location:', margin, yPosition);
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(10);
+    const locationLines = doc.splitTextToSize(flha.location || 'N/A', pageWidth - margin * 2 - 35);
+    doc.text(locationLines, margin + 35, yPosition);
+    yPosition += locationLines.length * 5 + 1;
 
     if (flha.workArea) {
-      doc.text(`Work Area: ${flha.workArea}`, 20, yPosition);
+      doc.setTextColor(80, 80, 80);
+      doc.setFontSize(9);
+      doc.text('Work Area:', margin, yPosition);
+      doc.setTextColor(30, 30, 30);
+      doc.setFontSize(10);
+      doc.text(flha.workArea, margin + 35, yPosition);
       yPosition += 6;
     }
 
     yPosition += 4;
-
-    // Job Description
-    doc.setFont('helvetica', 'bold');
-    doc.text('Job Description:', 20, yPosition);
-    yPosition += 6;
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(9);
+    doc.text('Job Description:', margin, yPosition);
+    yPosition += 5;
     
-    doc.setFont('helvetica', 'normal');
-    const jobDescLines = doc.splitTextToSize(flha.jobDescription, pageWidth - 40);
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(10);
+    const jobDescLines = doc.splitTextToSize(flha.jobDescription || 'N/A', pageWidth - margin * 2);
     yPosition = addMultilineText(jobDescLines, yPosition);
-    yPosition += 10;
+    yPosition += 8;
 
-    // Identified Hazards
-    if (yPosition > pageHeight - 30) {
+    if (yPosition > pageHeight - 40) {
       doc.addPage();
       yPosition = 20;
     }
 
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
-    doc.text('Identified Hazards', 20, yPosition);
-    yPosition += 8;
+    yPosition = addSectionHeader(doc, 'Identified Hazards', yPosition, primaryColor);
 
     const hazardsList = [];
     if (flha.hazardFalling) hazardsList.push('Falls from Height');
@@ -3172,40 +3183,39 @@ export default function Documents() {
     if (flha.hazardPowerTools) hazardsList.push('Power Tool Operation at Height');
     if (flha.hazardPublic) hazardsList.push('Public Interaction / Access');
 
-    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(30, 30, 30);
     doc.setFontSize(10);
-    hazardsList.forEach((hazard, index) => {
+    hazardsList.forEach((hazard) => {
       if (yPosition > pageHeight - 30) {
         doc.addPage();
         yPosition = 20;
       }
-      doc.text(`• ${hazard}`, 25, yPosition);
+      doc.setFillColor(accentColor.r, accentColor.g, accentColor.b);
+      doc.circle(margin + 2, yPosition - 1.5, 1.5, 'F');
+      doc.text(hazard, margin + 8, yPosition);
       yPosition += 6;
     });
 
     if (flha.additionalHazards) {
-      yPosition += 4;
-      doc.setFont('helvetica', 'bold');
-      doc.text('Additional Hazards:', 20, yPosition);
-      yPosition += 6;
-      
-      doc.setFont('helvetica', 'normal');
-      const additionalHazardsLines = doc.splitTextToSize(flha.additionalHazards, pageWidth - 40);
+      yPosition += 3;
+      doc.setTextColor(80, 80, 80);
+      doc.setFontSize(9);
+      doc.text('Additional:', margin, yPosition);
+      yPosition += 5;
+      doc.setTextColor(30, 30, 30);
+      doc.setFontSize(10);
+      const additionalHazardsLines = doc.splitTextToSize(flha.additionalHazards, pageWidth - margin * 2);
       yPosition = addMultilineText(additionalHazardsLines, yPosition);
     }
 
-    yPosition += 10;
+    yPosition += 8;
 
-    // Controls Implemented
-    if (yPosition > pageHeight - 30) {
+    if (yPosition > pageHeight - 40) {
       doc.addPage();
       yPosition = 20;
     }
 
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
-    doc.text('Controls Implemented', 20, yPosition);
-    yPosition += 8;
+    yPosition = addSectionHeader(doc, 'Controls Implemented', yPosition, primaryColor);
 
     const controlsList = [];
     if (flha.controlPPE) controlsList.push('Proper PPE (Harness, Helmet, etc.)');
@@ -3219,82 +3229,86 @@ export default function Documents() {
     if (flha.controlPermits) controlsList.push('Work Permits Obtained');
     if (flha.controlInspections) controlsList.push('Pre-work Equipment Inspections');
 
-    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(30, 30, 30);
     doc.setFontSize(10);
     controlsList.forEach((control) => {
       if (yPosition > pageHeight - 30) {
         doc.addPage();
         yPosition = 20;
       }
-      doc.text(`• ${control}`, 25, yPosition);
+      doc.setFillColor(accentColor.r, accentColor.g, accentColor.b);
+      doc.circle(margin + 2, yPosition - 1.5, 1.5, 'F');
+      doc.text(control, margin + 8, yPosition);
       yPosition += 6;
     });
 
     if (flha.additionalControls) {
-      yPosition += 4;
-      doc.setFont('helvetica', 'bold');
-      doc.text('Additional Controls:', 20, yPosition);
-      yPosition += 6;
-      
-      doc.setFont('helvetica', 'normal');
-      const additionalControlsLines = doc.splitTextToSize(flha.additionalControls, pageWidth - 40);
+      yPosition += 3;
+      doc.setTextColor(80, 80, 80);
+      doc.setFontSize(9);
+      doc.text('Additional:', margin, yPosition);
+      yPosition += 5;
+      doc.setTextColor(30, 30, 30);
+      doc.setFontSize(10);
+      const additionalControlsLines = doc.splitTextToSize(flha.additionalControls, pageWidth - margin * 2);
       yPosition = addMultilineText(additionalControlsLines, yPosition);
     }
 
-    yPosition += 10;
+    yPosition += 8;
 
-    // Risk Assessment
-    if (yPosition > pageHeight - 30) {
+    if (yPosition > pageHeight - 40) {
       doc.addPage();
       yPosition = 20;
     }
 
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
-    doc.text('Risk Assessment', 20, yPosition);
-    yPosition += 8;
+    yPosition = addSectionHeader(doc, 'Risk Assessment', yPosition, primaryColor);
 
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(9);
     if (flha.riskLevelBefore) {
-      doc.text(`Risk Level (Before Controls): ${flha.riskLevelBefore.toUpperCase()}`, 20, yPosition);
+      doc.text('Before Controls:', margin, yPosition);
+      doc.setTextColor(30, 30, 30);
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'bold');
+      doc.text(flha.riskLevelBefore.toUpperCase(), margin + 40, yPosition);
+      doc.setFont('helvetica', 'normal');
       yPosition += 6;
     }
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(9);
     if (flha.riskLevelAfter) {
-      doc.text(`Risk Level (After Controls): ${flha.riskLevelAfter.toUpperCase()}`, 20, yPosition);
+      doc.text('After Controls:', margin, yPosition);
+      doc.setTextColor(30, 30, 30);
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'bold');
+      doc.text(flha.riskLevelAfter.toUpperCase(), margin + 40, yPosition);
+      doc.setFont('helvetica', 'normal');
       yPosition += 6;
     }
 
     yPosition += 4;
 
-    // Emergency Contacts
     if (flha.emergencyContacts) {
-      if (yPosition > pageHeight - 30) {
+      if (yPosition > pageHeight - 40) {
         doc.addPage();
         yPosition = 20;
       }
 
-      doc.setFont('helvetica', 'bold');
-      doc.text('Emergency Contacts:', 20, yPosition);
-      yPosition += 6;
-      
-      doc.setFont('helvetica', 'normal');
-      const emergencyContactsLines = doc.splitTextToSize(flha.emergencyContacts, pageWidth - 40);
+      yPosition = addSectionHeader(doc, 'Emergency Contacts', yPosition, primaryColor);
+      doc.setTextColor(30, 30, 30);
+      doc.setFontSize(10);
+      const emergencyContactsLines = doc.splitTextToSize(flha.emergencyContacts, pageWidth - margin * 2);
       yPosition = addMultilineText(emergencyContactsLines, yPosition);
-      yPosition += 10;
+      yPosition += 8;
     }
 
-    // Signatures
     if (flha.signatures && flha.signatures.length > 0) {
-      if (yPosition > pageHeight - 30) {
+      if (yPosition > pageHeight - 40) {
         doc.addPage();
         yPosition = 20;
       }
 
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(11);
-      doc.text('Team Member Signatures', 20, yPosition);
-      yPosition += 10;
+      yPosition = addSectionHeader(doc, 'Team Member Signatures', yPosition, primaryColor);
 
       for (const sig of flha.signatures) {
         if (yPosition > pageHeight - 50) {
@@ -3302,30 +3316,28 @@ export default function Documents() {
           yPosition = 20;
         }
 
-        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(30, 30, 30);
         doc.setFontSize(10);
-        doc.text(sig.employeeName, 20, yPosition);
+        doc.setFont('helvetica', 'bold');
+        doc.text(sig.employeeName, margin, yPosition);
+        doc.setFont('helvetica', 'normal');
         yPosition += 5;
 
         try {
-          doc.addImage(sig.signatureDataUrl, 'PNG', 20, yPosition, 60, 20);
+          doc.addImage(sig.signatureDataUrl, 'PNG', margin, yPosition, 60, 20);
         } catch (error) {
           console.error('Error adding signature image:', error);
         }
         yPosition += 25;
 
+        doc.setDrawColor(accentColor.r, accentColor.g, accentColor.b);
         doc.setLineWidth(0.5);
-        doc.line(20, yPosition, 80, yPosition);
+        doc.line(margin, yPosition, margin + 80, yPosition);
         yPosition += 10;
       }
     }
 
-    // Footer
-    const footerY = pageHeight - 15;
-    doc.setFontSize(8);
-    doc.setTextColor(100, 100, 100);
-    doc.setFont('helvetica', 'italic');
-    doc.text('This is an official FLHA record. Keep for compliance purposes.', pageWidth / 2, footerY, { align: 'center' });
+    addFooter(doc, branding, accentColor);
 
     doc.save(`FLHA_${flha.assessmentDate}.pdf`);
   };
