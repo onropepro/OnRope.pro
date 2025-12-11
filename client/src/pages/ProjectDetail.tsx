@@ -1112,6 +1112,9 @@ export default function ProjectDetail() {
             </Button>
             <div className="flex-1">
               <h1 className="text-xl font-bold">{project.buildingName}</h1>
+              {project.buildingAddress && (
+                <p className="text-xs text-muted-foreground mt-0.5">{project.buildingAddress}</p>
+              )}
               <div className="flex items-center gap-2 mt-1">
                 <p className="text-xs text-muted-foreground">
                   {project.strataPlanNumber} - {project.jobType.replace(/_/g, ' ')}
