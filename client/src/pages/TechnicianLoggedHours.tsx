@@ -102,6 +102,9 @@ const translations = {
     enterHours: "Enter hours worked",
     enterBuildingName: "Enter building name",
     enterBuildingAddress: "Enter building address",
+    buildingNamePlaceholder: "Enter building name",
+    buildingAddressPlaceholder: "Enter building address",
+    previousEmployer: "Previous Employer",
     tasksRequired: "Please select at least one task",
     hoursRequired: "Please enter hours worked",
     dateRequired: "Please enter start and end dates",
@@ -236,6 +239,9 @@ const translations = {
     enterHours: "Entrez les heures travaillées",
     enterBuildingName: "Entrez le nom du bâtiment",
     enterBuildingAddress: "Entrez l'adresse du bâtiment",
+    buildingNamePlaceholder: "Entrez le nom du bâtiment",
+    buildingAddressPlaceholder: "Entrez l'adresse du bâtiment",
+    previousEmployer: "Employeur précédent",
     tasksRequired: "Veuillez sélectionner au moins une tâche",
     hoursRequired: "Veuillez entrer les heures travaillées",
     dateRequired: "Veuillez entrer les dates de début et de fin",
@@ -1851,22 +1857,22 @@ export default function TechnicianLoggedHours() {
             <div className="space-y-2">
               <Label>{t.tasksPerformed} *</Label>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-[200px] overflow-y-auto">
-                {IRATA_TASK_TYPES.map(taskId => (
+                {IRATA_TASK_TYPES.map(task => (
                   <div
-                    key={taskId}
-                    onClick={() => toggleTask(taskId)}
+                    key={task.id}
+                    onClick={() => toggleTask(task.id)}
                     className={`flex items-center gap-2 p-2 rounded-md cursor-pointer border transition-colors ${
-                      selectedTasks.includes(taskId)
+                      selectedTasks.includes(task.id)
                         ? 'border-primary bg-primary/10'
                         : 'border-transparent hover:bg-muted'
                     }`}
-                    data-testid={`task-manual-${taskId}`}
+                    data-testid={`task-manual-${task.id}`}
                   >
                     <Checkbox
-                      checked={selectedTasks.includes(taskId)}
-                      onCheckedChange={() => toggleTask(taskId)}
+                      checked={selectedTasks.includes(task.id)}
+                      onCheckedChange={() => toggleTask(task.id)}
                     />
-                    <span className="text-sm">{getTaskLabel(taskId, language)}</span>
+                    <span className="text-sm">{getTaskLabel(task.id, language)}</span>
                   </div>
                 ))}
               </div>
