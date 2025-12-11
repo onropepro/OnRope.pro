@@ -3002,7 +3002,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         birthday,
         specialMedicalConditions,
         irataBaselineHours,
+        irataHoursAtLastUpgrade,
+        irataLastUpgradeDate,
         irataExpirationDate,
+        spratBaselineHours,
+        spratHoursAtLastUpgrade,
+        spratLastUpgradeDate,
         spratExpirationDate,
         ropeAccessSpecialties,
       } = req.body;
@@ -3044,7 +3049,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (birthday !== undefined) updateData.birthday = birthday || null;
       if (driversLicenseExpiry !== undefined) updateData.driversLicenseExpiry = driversLicenseExpiry || null;
       if (irataBaselineHours !== undefined) updateData.irataBaselineHours = irataBaselineHours || "0";
+      if (irataHoursAtLastUpgrade !== undefined) updateData.irataHoursAtLastUpgrade = irataHoursAtLastUpgrade || null;
+      if (irataLastUpgradeDate !== undefined) updateData.irataLastUpgradeDate = irataLastUpgradeDate || null;
       if (irataExpirationDate !== undefined) updateData.irataExpirationDate = irataExpirationDate || null;
+      if (spratBaselineHours !== undefined) updateData.spratBaselineHours = spratBaselineHours || "0";
+      if (spratHoursAtLastUpgrade !== undefined) updateData.spratHoursAtLastUpgrade = spratHoursAtLastUpgrade || null;
+      if (spratLastUpgradeDate !== undefined) updateData.spratLastUpgradeDate = spratLastUpgradeDate || null;
       if (spratExpirationDate !== undefined) updateData.spratExpirationDate = spratExpirationDate || null;
       if (ropeAccessSpecialties !== undefined) updateData.ropeAccessSpecialties = Array.isArray(ropeAccessSpecialties) ? ropeAccessSpecialties : [];
 
