@@ -63,6 +63,9 @@ import { useLocation } from "wouter";
 
 const ALL_ACCORDION_ITEMS = [
   "owner-1", "owner-2", "owner-3", "owner-4", "owner-5", "owner-6", "owner-7", "owner-8",
+  "manager-1", "manager-2",
+  "resident-1",
+  "tech-1", "tech-2", "tech-3",
   "add-1", "add-2", "add-3", "add-4", "add-5"
 ];
 
@@ -508,6 +511,120 @@ export default function ProjectsGuide() {
                     <p><span className="font-medium text-foreground">Real Example:</span> Building manager calls Tuesday morning: "Mrs. Johnson in Unit 802 wants to know when you'll finish her elevation. She's having family visit this weekend." You don't have the answer immediately—you're at another job site. You have to check with your crew, call back later. Building manager perceives you as disorganized. Mrs. Johnson complains to strata council. Relationship strained.</p>
                     <p><span className="font-medium text-foreground">Solution:</span> Building manager portal with identical visibility to your internal dashboard. They log in anytime, see real-time progress by elevation, review before/after photo galleries, check upcoming schedules, and download safety documentation—without calling you. "South Elevation: 73% complete. Expected completion: Dec 8. View 47 progress photos."</p>
                     <p><span className="font-medium text-foreground">Benefit:</span> Status call volume drops 80% (from 8 calls/week to 1-2). Building managers perceive you as tech-savvy and professional—"most organized contractor we work with." Stronger client relationships. 15-25% higher contract renewal rates. Referrals to other buildings they manage.</p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
+
+          {/* For Building Managers & Property Managers Section */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 pb-2 border-b">
+              <Building2 className="w-5 h-5 text-blue-500" />
+              <h3 className="text-xl md:text-2xl font-semibold">For Building Managers & Property Managers</h3>
+            </div>
+            
+            <Accordion type="multiple" value={openItems} onValueChange={setOpenItems} className="space-y-3">
+              <AccordionItem value="manager-1" className={`border rounded-lg px-4 ${openItems.includes("manager-1") ? "bg-white dark:bg-white/10" : ""}`}>
+                <AccordionTrigger className="hover:no-underline py-4">
+                  <span className="text-left font-medium text-base">"Residents bombard me with 'When will you be done?' questions"</span>
+                </AccordionTrigger>
+                <AccordionContent className="pb-4">
+                  <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
+                    <p>You receive 15-30 status calls per week during building maintenance projects. Residents assume the worst because they have no visibility. You become frustrated playing telephone between the contractor and 40 units. Your professional reputation suffers even though the crew is working efficiently.</p>
+                    <p><span className="font-medium text-foreground">Real Example:</span> Unit 402 has a birthday party on Sunday and demands the crew not work near their windows that day. They call you at 8 PM on Friday with this restriction. You scramble to contact the contractor, who then reschedules their crew—2 hours of chaos that could have been avoided.</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> Resident-facing portal showing real-time progress (4-elevation visual system), upcoming work schedules ("We'll be near your unit Wednesday 9am-3pm"), and expected completion dates. Residents submit feedback directly without you as middleman.</p>
+                    <p><span className="font-medium text-foreground">Benefit:</span> Your time saved (20+ hours/month per active project). Resident complaints drop 60-70%. The contractor looks professional and transparent. Contract renewals increase 15-25%.</p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="manager-2" className={`border rounded-lg px-4 ${openItems.includes("manager-2") ? "bg-white dark:bg-white/10" : ""}`}>
+                <AccordionTrigger className="hover:no-underline py-4">
+                  <span className="text-left font-medium text-base">"I have no direct visibility into contractor progress"</span>
+                </AccordionTrigger>
+                <AccordionContent className="pb-4">
+                  <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
+                    <p>You've hired a rope access company to complete window washing. You have no way to verify they're actually working efficiently or meeting timeline commitments without physically visiting the building or constantly calling the company owner. When residents or building owners ask for updates, you're reliant on the contractor's word.</p>
+                    <p><span className="font-medium text-foreground">Real Example:</span> Building owner asks: "How's the window washing project going? Are they on track to finish by month-end?" You have to say "I'll call them and find out" instead of "Let me check the portal—they're 68% complete, ahead of schedule."</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> Self-service portal access showing the exact same dashboard the rope access company sees. Real-time progress, crew assignments, safety documentation, photo documentation—all at your fingertips.</p>
+                    <p><span className="font-medium text-foreground">Benefit:</span> Answer resident and owner questions instantly without contractor contact. Verify contractor performance objectively. Build confidence in your vendor selection. Demonstrate professional property management through technology adoption.</p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
+
+          {/* For Building Residents Section */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 pb-2 border-b">
+              <HomeIcon className="w-5 h-5 text-teal-500" />
+              <h3 className="text-xl md:text-2xl font-semibold">For Building Residents</h3>
+            </div>
+            
+            <Accordion type="multiple" value={openItems} onValueChange={setOpenItems} className="space-y-3">
+              <AccordionItem value="resident-1" className={`border rounded-lg px-4 ${openItems.includes("resident-1") ? "bg-white dark:bg-white/10" : ""}`}>
+                <AccordionTrigger className="hover:no-underline py-4">
+                  <span className="text-left font-medium text-base">"I have no idea when they'll finish MY elevation"</span>
+                </AccordionTrigger>
+                <AccordionContent className="pb-4">
+                  <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
+                    <p>There are workers hanging on ropes outside your building. You don't know when they'll be near your unit. You don't know if they're behind schedule or ahead. You're planning a family gathering this weekend but don't know if there will be strangers outside your windows. Your only option is to call the property manager repeatedly.</p>
+                    <p><span className="font-medium text-foreground">Real Example:</span> You have a birthday party on Sunday. You want to make sure the rope access crew won't be working outside your unit that day (south elevation, 8th floor). You call the property manager. They don't know. They call the rope access company. It takes 2 days to get an answer. By then, you've already worried for 48 hours.</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> Resident portal showing progress specific to YOUR elevation. "South Elevation: 45% complete. Expected to reach your floor (8th) on Thursday Dec 12. Entire elevation complete by Dec 15." Schedule shows they won't be working Sunday.</p>
+                    <p><span className="font-medium text-foreground">Benefit:</span> Peace of mind through transparency. Plan your life around construction schedules. Submit feedback directly if issues arise. No need to bother property manager for basic status updates.</p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
+
+          {/* For Rope Access Technicians Section */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 pb-2 border-b">
+              <Wrench className="w-5 h-5 text-orange-500" />
+              <h3 className="text-xl md:text-2xl font-semibold">For Rope Access Technicians</h3>
+            </div>
+            
+            <Accordion type="multiple" value={openItems} onValueChange={setOpenItems} className="space-y-3">
+              <AccordionItem value="tech-1" className={`border rounded-lg px-4 ${openItems.includes("tech-1") ? "bg-white dark:bg-white/10" : ""}`}>
+                <AccordionTrigger className="hover:no-underline py-4">
+                  <span className="text-left font-medium text-base">"I don't know what my daily target is"</span>
+                </AccordionTrigger>
+                <AccordionContent className="pb-4">
+                  <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
+                    <p>You show up to the job site. You start working. You're not sure if you're working fast enough or too slow. Are you meeting expectations? Will the boss be disappointed? You have no benchmark to measure yourself against.</p>
+                    <p><span className="font-medium text-foreground">Real Example:</span> You complete 3 drops in a day. You think that's good. Your supervisor seems frustrated when reviewing progress. Later you find out the target was 5 drops/day. Nobody told you. You feel blindsided.</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> Mobile app shows your assigned projects with clear daily targets. "Marina Towers - Window Cleaning. Your target: 5 drops/day. Yesterday you completed: 4 drops."</p>
+                    <p><span className="font-medium text-foreground">Benefit:</span> Clear expectations. Self-manage your pace. Know if you're on track before supervisor feedback. Feel confident you're meeting standards.</p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="tech-2" className={`border rounded-lg px-4 ${openItems.includes("tech-2") ? "bg-white dark:bg-white/10" : ""}`}>
+                <AccordionTrigger className="hover:no-underline py-4">
+                  <span className="text-left font-medium text-base">"I have no visibility into my own performance"</span>
+                </AccordionTrigger>
+                <AccordionContent className="pb-4">
+                  <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
+                    <p>You're working hard, but you have no idea how you compare to other technicians or to your own past performance. Are you improving? Are you falling behind? You get vague feedback from supervisors ("doing good" or "need to pick up the pace") but no concrete data.</p>
+                    <p><span className="font-medium text-foreground">Real Example:</span> Annual review time. Supervisor says "Your performance has been inconsistent this year." You're confused—you felt like you worked hard. No objective data to reference. You don't know what to improve.</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> Performance dashboard showing your drops/day average, target achievement rate, historical trends. "This month: 4.8 drops/day average, 86% target achievement. Last month: 4.1 drops/day, 72% target achievement. You're improving!"</p>
+                    <p><span className="font-medium text-foreground">Benefit:</span> Objective self-assessment. Recognition for improvement. Clear areas for growth. Fair performance reviews based on data, not perception.</p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="tech-3" className={`border rounded-lg px-4 ${openItems.includes("tech-3") ? "bg-white dark:bg-white/10" : ""}`}>
+                <AccordionTrigger className="hover:no-underline py-4">
+                  <span className="text-left font-medium text-base">"I don't know where I'm working tomorrow"</span>
+                </AccordionTrigger>
+                <AccordionContent className="pb-4">
+                  <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
+                    <p>You finish work today. You ask your supervisor "Where am I working tomorrow?" They say "I'll text you tonight." 9 PM rolls around—no text. You text them. They're busy. You go to bed not knowing where to show up in the morning. 6 AM you get a text: "Marina Towers, be there by 7:30."</p>
+                    <p><span className="font-medium text-foreground">Real Example:</span> You show up to the wrong building because you misunderstood yesterday's hurried verbal instructions. You waste 45 minutes driving to the correct site. You start late. Your supervisor is frustrated. Your day is off to a bad start.</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> Mobile app shows your upcoming assignments. "Tomorrow: Marina Towers - Window Cleaning, 8:00 AM - 4:00 PM. Thursday: Ocean View Apartments - Caulking, 8:00 AM - 4:00 PM."</p>
+                    <p><span className="font-medium text-foreground">Benefit:</span> Plan your commute the night before. Know what equipment to bring. No confusion or miscommunication. Professional clarity about your schedule.</p>
                   </div>
                 </AccordionContent>
               </AccordionItem>
