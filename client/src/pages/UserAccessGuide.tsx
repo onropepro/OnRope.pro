@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -40,11 +41,31 @@ import {
   Fingerprint,
   KeyRound,
   User,
-  ShieldCheck
+  ShieldCheck,
+  ChevronsUpDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+const ALL_ACCORDION_ITEMS = [
+  "owner-1", "owner-2", "owner-3", "owner-4", "owner-5", "owner-6",
+  "ops-1",
+  "bm-1", "bm-2", "bm-3", "bm-4",
+  "res-1", "res-2", "res-3",
+  "sec-1", "sec-2"
+];
+
 export default function UserAccessGuide() {
+  const [openItems, setOpenItems] = useState<string[]>([]);
+  const allExpanded = openItems.length === ALL_ACCORDION_ITEMS.length;
+
+  const toggleAll = () => {
+    if (allExpanded) {
+      setOpenItems([]);
+    } else {
+      setOpenItems([...ALL_ACCORDION_ITEMS]);
+    }
+  };
+
   return (
     <ChangelogGuideLayout 
       title="User Access & Authentication Guide"
@@ -101,11 +122,21 @@ export default function UserAccessGuide() {
         <Separator />
 
         <section className="space-y-8">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-2">Problems Solved</h2>
-            <p className="text-muted-foreground leading-relaxed text-base">
-              Real challenges addressed by OnRopePro's User Access & Authentication module.
-            </p>
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold mb-2">Problems Solved</h2>
+              <p className="text-muted-foreground leading-relaxed text-base">
+                Real challenges addressed by OnRopePro's User Access & Authentication module.
+              </p>
+            </div>
+            <Button 
+              variant="outline" 
+              onClick={toggleAll}
+              data-testid="button-toggle-all-accordions"
+            >
+              <ChevronsUpDown className="w-4 h-4 mr-2" />
+              {allExpanded ? "Collapse All" : "Expand All"}
+            </Button>
           </div>
 
           {/* Company Owners Section */}
@@ -115,8 +146,8 @@ export default function UserAccessGuide() {
               <h3 className="text-xl md:text-2xl font-semibold">For Rope Access Company Owners</h3>
             </div>
             
-            <Accordion type="single" collapsible className="space-y-3">
-              <AccordionItem value="owner-1" className="border rounded-lg px-4">
+            <Accordion type="multiple" value={openItems} onValueChange={setOpenItems} className="space-y-3">
+              <AccordionItem value="owner-1" className={`border rounded-lg px-4 ${openItems.includes("owner-1") ? "bg-white dark:bg-white/10" : ""}`}>
                 <AccordionTrigger className="hover:no-underline py-4">
                   <span className="text-left font-medium text-base">Supervisors accidentally seeing everyone's pay rates</span>
                 </AccordionTrigger>
@@ -130,7 +161,7 @@ export default function UserAccessGuide() {
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="owner-2" className="border rounded-lg px-4">
+              <AccordionItem value="owner-2" className={`border rounded-lg px-4 ${openItems.includes("owner-2") ? "bg-white dark:bg-white/10" : ""}`}>
                 <AccordionTrigger className="hover:no-underline py-4">
                   <span className="text-left font-medium text-base">Financial data visible to people who shouldn't see it</span>
                 </AccordionTrigger>
@@ -144,7 +175,7 @@ export default function UserAccessGuide() {
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="owner-3" className="border rounded-lg px-4">
+              <AccordionItem value="owner-3" className={`border rounded-lg px-4 ${openItems.includes("owner-3") ? "bg-white dark:bg-white/10" : ""}`}>
                 <AccordionTrigger className="hover:no-underline py-4">
                   <span className="text-left font-medium text-base">Can't track IRATA certifications</span>
                 </AccordionTrigger>
@@ -158,7 +189,7 @@ export default function UserAccessGuide() {
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="owner-4" className="border rounded-lg px-4">
+              <AccordionItem value="owner-4" className={`border rounded-lg px-4 ${openItems.includes("owner-4") ? "bg-white dark:bg-white/10" : ""}`}>
                 <AccordionTrigger className="hover:no-underline py-4">
                   <span className="text-left font-medium text-base">No control over who can edit/delete projects</span>
                 </AccordionTrigger>
@@ -172,7 +203,7 @@ export default function UserAccessGuide() {
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="owner-5" className="border rounded-lg px-4">
+              <AccordionItem value="owner-5" className={`border rounded-lg px-4 ${openItems.includes("owner-5") ? "bg-white dark:bg-white/10" : ""}`}>
                 <AccordionTrigger className="hover:no-underline py-4">
                   <span className="text-left font-medium text-base">Crew members changing data they shouldn't access</span>
                 </AccordionTrigger>
@@ -186,7 +217,7 @@ export default function UserAccessGuide() {
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="owner-6" className="border rounded-lg px-4">
+              <AccordionItem value="owner-6" className={`border rounded-lg px-4 ${openItems.includes("owner-6") ? "bg-white dark:bg-white/10" : ""}`}>
                 <AccordionTrigger className="hover:no-underline py-4">
                   <span className="text-left font-medium text-base">Subscription limit monitoring</span>
                 </AccordionTrigger>
@@ -209,8 +240,8 @@ export default function UserAccessGuide() {
               <h3 className="text-xl md:text-2xl font-semibold">For Operations Managers & Supervisors</h3>
             </div>
             
-            <Accordion type="single" collapsible className="space-y-3">
-              <AccordionItem value="ops-1" className="border rounded-lg px-4">
+            <Accordion type="multiple" value={openItems} onValueChange={setOpenItems} className="space-y-3">
+              <AccordionItem value="ops-1" className={`border rounded-lg px-4 ${openItems.includes("ops-1") ? "bg-white dark:bg-white/10" : ""}`}>
                 <AccordionTrigger className="hover:no-underline py-4">
                   <span className="text-left font-medium text-base">Need to delegate responsibility but can't give full access</span>
                 </AccordionTrigger>
@@ -233,8 +264,8 @@ export default function UserAccessGuide() {
               <h3 className="text-xl md:text-2xl font-semibold">For Building Managers & Property Managers</h3>
             </div>
             
-            <Accordion type="single" collapsible className="space-y-3">
-              <AccordionItem value="bm-1" className="border rounded-lg px-4">
+            <Accordion type="multiple" value={openItems} onValueChange={setOpenItems} className="space-y-3">
+              <AccordionItem value="bm-1" className={`border rounded-lg px-4 ${openItems.includes("bm-1") ? "bg-white dark:bg-white/10" : ""}`}>
                 <AccordionTrigger className="hover:no-underline py-4">
                   <span className="text-left font-medium text-base">Administrative burden from tenant turnover</span>
                 </AccordionTrigger>
@@ -248,7 +279,7 @@ export default function UserAccessGuide() {
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="bm-2" className="border rounded-lg px-4">
+              <AccordionItem value="bm-2" className={`border rounded-lg px-4 ${openItems.includes("bm-2") ? "bg-white dark:bg-white/10" : ""}`}>
                 <AccordionTrigger className="hover:no-underline py-4">
                   <span className="text-left font-medium text-base">Residents calling constantly during maintenance work</span>
                 </AccordionTrigger>
@@ -262,7 +293,7 @@ export default function UserAccessGuide() {
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="bm-3" className="border rounded-lg px-4">
+              <AccordionItem value="bm-3" className={`border rounded-lg px-4 ${openItems.includes("bm-3") ? "bg-white dark:bg-white/10" : ""}`}>
                 <AccordionTrigger className="hover:no-underline py-4">
                   <span className="text-left font-medium text-base">Feedback escalating to building managers instead of vendors</span>
                 </AccordionTrigger>
@@ -276,7 +307,7 @@ export default function UserAccessGuide() {
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="bm-4" className="border rounded-lg px-4">
+              <AccordionItem value="bm-4" className={`border rounded-lg px-4 ${openItems.includes("bm-4") ? "bg-white dark:bg-white/10" : ""}`}>
                 <AccordionTrigger className="hover:no-underline py-4">
                   <span className="text-left font-medium text-base">Building managers don't see your value - scattered communication</span>
                 </AccordionTrigger>
@@ -299,8 +330,8 @@ export default function UserAccessGuide() {
               <h3 className="text-xl md:text-2xl font-semibold">For Building Residents</h3>
             </div>
             
-            <Accordion type="single" collapsible className="space-y-3">
-              <AccordionItem value="res-1" className="border rounded-lg px-4">
+            <Accordion type="multiple" value={openItems} onValueChange={setOpenItems} className="space-y-3">
+              <AccordionItem value="res-1" className={`border rounded-lg px-4 ${openItems.includes("res-1") ? "bg-white dark:bg-white/10" : ""}`}>
                 <AccordionTrigger className="hover:no-underline py-4">
                   <span className="text-left font-medium text-base">No transparency into work progress</span>
                 </AccordionTrigger>
@@ -314,7 +345,7 @@ export default function UserAccessGuide() {
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="res-2" className="border rounded-lg px-4">
+              <AccordionItem value="res-2" className={`border rounded-lg px-4 ${openItems.includes("res-2") ? "bg-white dark:bg-white/10" : ""}`}>
                 <AccordionTrigger className="hover:no-underline py-4">
                   <span className="text-left font-medium text-base">No record of feedback resolution</span>
                 </AccordionTrigger>
@@ -328,7 +359,7 @@ export default function UserAccessGuide() {
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="res-3" className="border rounded-lg px-4">
+              <AccordionItem value="res-3" className={`border rounded-lg px-4 ${openItems.includes("res-3") ? "bg-white dark:bg-white/10" : ""}`}>
                 <AccordionTrigger className="hover:no-underline py-4">
                   <span className="text-left font-medium text-base">3-day resolution times from phone tag</span>
                 </AccordionTrigger>
@@ -351,8 +382,8 @@ export default function UserAccessGuide() {
               <h3 className="text-xl md:text-2xl font-semibold">Security & Data Protection</h3>
             </div>
             
-            <Accordion type="single" collapsible className="space-y-3">
-              <AccordionItem value="sec-1" className="border rounded-lg px-4">
+            <Accordion type="multiple" value={openItems} onValueChange={setOpenItems} className="space-y-3">
+              <AccordionItem value="sec-1" className={`border rounded-lg px-4 ${openItems.includes("sec-1") ? "bg-white dark:bg-white/10" : ""}`}>
                 <AccordionTrigger className="hover:no-underline py-4">
                   <span className="text-left font-medium text-base">Multi-tenant data isolation</span>
                 </AccordionTrigger>
@@ -366,7 +397,7 @@ export default function UserAccessGuide() {
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="sec-2" className="border rounded-lg px-4">
+              <AccordionItem value="sec-2" className={`border rounded-lg px-4 ${openItems.includes("sec-2") ? "bg-white dark:bg-white/10" : ""}`}>
                 <AccordionTrigger className="hover:no-underline py-4">
                   <span className="text-left font-medium text-base">Password security</span>
                 </AccordionTrigger>
