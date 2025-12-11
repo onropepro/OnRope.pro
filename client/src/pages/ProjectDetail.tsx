@@ -669,13 +669,18 @@ export default function ProjectDetail() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/harness-inspections"] });
       setShowHarnessInspectionDialog(false);
-      setShowStartDayDialog(true);
+      // Start work session directly without a second confirmation
+      if (id) {
+        startDayMutation.mutate(id);
+      }
     },
     onError: (error: Error) => {
       console.error("Error creating not applicable inspection:", error);
-      // Still proceed to start day dialog even if this fails
+      // Still proceed to start work session even if this fails
       setShowHarnessInspectionDialog(false);
-      setShowStartDayDialog(true);
+      if (id) {
+        startDayMutation.mutate(id);
+      }
     },
   });
 
@@ -2781,11 +2786,14 @@ export default function ProjectDetail() {
               variant="default"
               onClick={() => {
                 setShowHarnessInspectionDialog(false);
-                setShowStartDayDialog(true);
+                if (id) {
+                  startDayMutation.mutate(id);
+                }
               }}
+              disabled={startDayMutation.isPending}
               data-testid="button-harness-yes"
             >
-              {t('common.yes', 'Yes')}
+              {startDayMutation.isPending ? t('projectDetail.workSession.starting', 'Starting...') : t('common.yes', 'Yes')}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
