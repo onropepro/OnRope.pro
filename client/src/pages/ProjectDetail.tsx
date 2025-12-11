@@ -128,6 +128,7 @@ export default function ProjectDetail() {
   const [showIrataTaskDialog, setShowIrataTaskDialog] = useState(false);
   const [selectedIrataTasks, setSelectedIrataTasks] = useState<string[]>([]);
   const [irataTaskNotes, setIrataTaskNotes] = useState("");
+  const [ropeAccessTaskHours, setRopeAccessTaskHours] = useState("");
   const [endedSessionData, setEndedSessionData] = useState<{
     sessionId: string;
     hoursWorked: number;
@@ -169,8 +170,6 @@ export default function ProjectDetail() {
       manualCompletionPercentage: "0",
       validShortfallReasonCode: "",
       shortfallReason: "",
-      logRopeAccessHours: false,
-      ropeAccessTaskHours: "",
     },
   });
 
@@ -500,10 +499,6 @@ export default function ProjectDetail() {
           : null;
       }
       
-      // Add rope access task hours if user chose to log them
-      if (data.logRopeAccessHours && data.ropeAccessTaskHours) {
-        payload.ropeAccessTaskHours = parseFloat(data.ropeAccessTaskHours);
-      }
       
       console.log("📤 Sending clock-out data to backend:", payload);
       
@@ -546,12 +541,8 @@ export default function ProjectDetail() {
       queryClient.invalidateQueries({ queryKey: ["/api/my-drops-today"] });
       endDayForm.reset();
       
-      // Show log hours prompt for rope access technicians to log their tasks
-      if (currentUser?.role === "rope_access_tech" || currentUser?.irataLevel) {
-        setShowLogHoursPrompt(true);
-      } else {
-        toast({ title: t('projectDetail.toasts.sessionEnded', 'Work session ended'), description: t('projectDetail.toasts.greatWork', 'Great work today!') });
-      }
+      // Show log hours prompt for all users to log their rope access hours if applicable
+      setShowLogHoursPrompt(true);
     },
     onError: (error: Error) => {
       toast({ title: t('projectDetail.toasts.error', 'Error'), description: error.message, variant: "destructive" });
@@ -564,6 +555,7 @@ export default function ProjectDetail() {
       workSessionId: string; 
       tasksPerformed: string[];
       notes?: string;
+      ropeAccessTaskHours?: number;
     }) => {
       return apiRequest("POST", "/api/irata-task-logs", data);
     },
@@ -572,6 +564,7 @@ export default function ProjectDetail() {
       setShowIrataTaskDialog(false);
       setSelectedIrataTasks([]);
       setIrataTaskNotes("");
+      setRopeAccessTaskHours("");
       setEndedSessionData(null);
       toast({ title: t('projectDetail.toasts.sessionEnded', 'Work session ended'), description: t('projectDetail.toasts.irataTasksLogged', 'IRATA tasks logged successfully') });
     },
@@ -587,10 +580,26 @@ export default function ProjectDetail() {
       return;
     }
     
+    // Validate rope access hours if provided
+    let validatedHours: number | undefined = undefined;
+    if (ropeAccessTaskHours && ropeAccessTaskHours.trim() !== "") {
+      const hours = parseFloat(ropeAccessTaskHours);
+      if (isNaN(hours) || hours < 0 || hours > 24) {
+        toast({ title: t('projectDetail.toasts.error', 'Error'), description: "Rope access hours must be between 0 and 24", variant: "destructive" });
+        return;
+      }
+      if ((hours * 4) % 1 !== 0) {
+        toast({ title: t('projectDetail.toasts.error', 'Error'), description: "Hours must be in quarter-hour increments", variant: "destructive" });
+        return;
+      }
+      validatedHours = hours;
+    }
+    
     saveIrataTaskLogMutation.mutate({
       workSessionId: endedSessionData.sessionId,
       tasksPerformed: selectedIrataTasks,
       notes: irataTaskNotes || undefined,
+      ropeAccessTaskHours: validatedHours,
     });
   };
 
@@ -603,6 +612,7 @@ export default function ProjectDetail() {
   // User declines to log hours
   const handleDeclineLogHours = () => {
     setShowLogHoursPrompt(false);
+    setRopeAccessTaskHours("");
     setEndedSessionData(null);
     toast({ title: t('projectDetail.toasts.sessionEnded', 'Work session ended'), description: t('projectDetail.toasts.greatWork', 'Great work today!') });
   };
@@ -612,6 +622,7 @@ export default function ProjectDetail() {
     setShowIrataTaskDialog(false);
     setSelectedIrataTasks([]);
     setIrataTaskNotes("");
+    setRopeAccessTaskHours("");
     setEndedSessionData(null);
     toast({ title: t('projectDetail.toasts.sessionEnded', 'Work session ended'), description: t('projectDetail.toasts.greatWork', 'Great work today!') });
   };
@@ -773,30 +784,6 @@ export default function ProjectDetail() {
 
   const onEndDaySubmit = (data: EndDayFormData) => {
     const isHoursBased = project.jobType === "general_pressure_washing" || project.jobType === "ground_window_cleaning";
-    
-    // Validate rope access hours if user chose to log them
-    if (data.logRopeAccessHours) {
-      // Require a value when toggle is on
-      if (!data.ropeAccessTaskHours || data.ropeAccessTaskHours.trim() === "") {
-        endDayForm.setError("ropeAccessTaskHours", {
-          message: "Please enter your rope access hours"
-        });
-        return;
-      }
-      const hours = parseFloat(data.ropeAccessTaskHours);
-      if (isNaN(hours) || hours < 0 || hours > 24) {
-        endDayForm.setError("ropeAccessTaskHours", {
-          message: "Please enter valid hours between 0 and 24"
-        });
-        return;
-      }
-      if ((hours * 4) % 1 !== 0) {
-        endDayForm.setError("ropeAccessTaskHours", {
-          message: "Hours must be in quarter-hour increments (0.25, 0.5, 0.75, etc.)"
-        });
-        return;
-      }
-    }
     
     if (isHoursBased) {
       // For hours-based projects, validate percentage
@@ -3784,59 +3771,6 @@ export default function ProjectDetail() {
                 );
               })()}
 
-              {/* Rope Access Hours Toggle and Input */}
-              <div className="border-t pt-4 mt-4">
-                <FormField
-                  control={endDayForm.control}
-                  name="logRopeAccessHours"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
-                      <div className="space-y-0.5">
-                        <FormLabel>{t('projectDetail.dialogs.endDay.logRopeAccessHours', 'Log rope access hours for your logbook?')}</FormLabel>
-                        <FormDescription className="text-xs">
-                          {t('projectDetail.dialogs.endDay.logRopeAccessHoursDesc', 'Track actual time on ropes for IRATA/SPRAT certification')}
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          data-testid="switch-log-rope-access-hours"
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                
-                {endDayForm.watch("logRopeAccessHours") && (
-                  <FormField
-                    control={endDayForm.control}
-                    name="ropeAccessTaskHours"
-                    render={({ field }) => (
-                      <FormItem className="mt-3">
-                        <FormLabel>{t('projectDetail.dialogs.endDay.ropeAccessHoursLabel', 'Rope Access Task Hours')}</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            min="0"
-                            max="24"
-                            step="0.25"
-                            placeholder="e.g., 6.5"
-                            {...field}
-                            data-testid="input-rope-access-hours"
-                            className="h-12 text-xl"
-                          />
-                        </FormControl>
-                        <FormDescription className="text-xs">
-                          {t('projectDetail.dialogs.endDay.ropeAccessHoursHint', 'Enter in quarter-hour increments. Excludes lunch, breaks, and downtime.')}
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
-              </div>
-
               <div className="flex gap-2">
                 <Button
                   type="button"
@@ -4009,6 +3943,25 @@ export default function ProjectDetail() {
                 </span>
               </div>
             )}
+
+            {/* Rope Access Task Hours */}
+            <div>
+              <Label className="text-sm font-medium mb-2 block">{t('projectDetail.dialogs.irataTask.ropeAccessHours', 'Rope Access Task Hours (Optional)')}</Label>
+              <Input
+                type="number"
+                min="0"
+                max="24"
+                step="0.25"
+                placeholder="e.g., 6.5"
+                value={ropeAccessTaskHours}
+                onChange={(e) => setRopeAccessTaskHours(e.target.value)}
+                data-testid="input-irata-rope-access-hours"
+                className="h-12"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                {t('projectDetail.dialogs.irataTask.ropeAccessHoursHint', 'Enter in quarter-hour increments. Excludes lunch, breaks, and downtime.')}
+              </p>
+            </div>
 
             {/* Notes */}
             <div>

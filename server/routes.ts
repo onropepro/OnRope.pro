@@ -10216,6 +10216,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
                               (session.dropsCompletedSouth || 0) + 
                               (session.dropsCompletedWest || 0);
             
+            // Get IRATA task log for this session if exists
+            const irataTaskLog = await storage.getIrataTaskLogByWorkSession(session.id);
+            
             return {
               ...session,
               hoursWorked,
@@ -10228,6 +10231,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
               buildingAddress: project?.buildingAddress || null,
               buildingHeight: project?.buildingHeight || null,
               companyName,
+              // Include IRATA task log data
+              tasksPerformed: irataTaskLog?.tasksPerformed || [],
+              notes: irataTaskLog?.notes || null,
+              ropeAccessTaskHours: irataTaskLog?.ropeAccessTaskHours || null,
             };
           })
       );
