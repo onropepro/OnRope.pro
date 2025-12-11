@@ -1,6 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { useState } from "react";
 
 
 import ChangelogGuideLayout from "@/components/ChangelogGuideLayout";
@@ -35,6 +37,355 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
+
+// Problems Solved - Stakeholder Segmented Component
+function ProblemsSolvedSection() {
+  const [expandedSections, setExpandedSections] = useState<string[]>([]);
+  
+  const expandAll = () => {
+    setExpandedSections([
+      "tech-1", "tech-2", "tech-3",
+      "owner-1", "owner-2", "owner-3", "owner-4", "owner-5",
+      "pm-1", "pm-2"
+    ]);
+  };
+  
+  const collapseAll = () => {
+    setExpandedSections([]);
+  };
+
+  return (
+    <section className="space-y-6">
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
+          <CheckCircle2 className="w-6 h-6 text-green-600 dark:text-green-400" />
+          Problems Solved
+        </h2>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={expandAll} data-testid="button-expand-all-problems">
+            Expand All
+          </Button>
+          <Button variant="outline" size="sm" onClick={collapseAll} data-testid="button-collapse-all-problems">
+            Collapse All
+          </Button>
+        </div>
+      </div>
+      <p className="text-muted-foreground">
+        Real problems from real rope access professionals, solved through digital safety documentation.
+      </p>
+
+      {/* For Rope Access Technicians */}
+      <Card className="border-2 border-red-200 dark:border-red-900">
+        <CardHeader className="pb-2 bg-red-50 dark:bg-red-950">
+          <CardTitle className="text-xl flex items-center gap-2 text-red-900 dark:text-red-100">
+            <HardHat className="w-5 h-5" />
+            For Rope Access Technicians
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-4">
+          <Accordion type="multiple" value={expandedSections} onValueChange={setExpandedSections}>
+            <AccordionItem value="tech-1">
+              <AccordionTrigger className="text-left" data-testid="accordion-tech-1">
+                <span className="font-semibold">"Safety paperwork is annoying and slows me down"</span>
+              </AccordionTrigger>
+              <AccordionContent className="space-y-4 text-sm">
+                <div className="space-y-2">
+                  <p className="font-semibold text-red-700 dark:text-red-300">The Pain:</p>
+                  <p>You arrive at site ready to work. Before you can start, you're supposed to fill out a paper form with your harness serial number, date of manufacture, and checkboxes for 11 equipment categories. It's the same form every day. You have to dig through your gear bag to find serial numbers. Most guys just skip it or fill it out at the end of the day (or not at all).</p>
+                </div>
+                <div className="bg-muted p-3 rounded text-xs italic">
+                  <strong>Real Example:</strong> "I promise you, people skip them because I do. More often than not I just put my harness on and go. Unless I had a doubt that something may have happened to it."
+                </div>
+                <div className="space-y-2">
+                  <p className="font-semibold text-green-700 dark:text-green-300">The Solution:</p>
+                  <p>Your personal kit is saved once with all serial numbers. During inspection, the system loads your kit automatically. For a passing inspection, you just scroll down and hit submit. It takes seconds, not minutes.</p>
+                </div>
+                <div className="bg-green-50 dark:bg-green-950 p-3 rounded border border-green-200 dark:border-green-800">
+                  <p className="font-semibold flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600" />
+                    The Benefit:
+                  </p>
+                  <p className="mt-1">Two-second inspections instead of five-minute paper hassles. Your equipment history follows you. If you change employers, your inspection records and certifications come with you.</p>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="tech-2">
+              <AccordionTrigger className="text-left" data-testid="accordion-tech-2">
+                <span className="font-semibold">"If I find damaged equipment, reporting it is a hassle"</span>
+              </AccordionTrigger>
+              <AccordionContent className="space-y-4 text-sm">
+                <div className="space-y-2">
+                  <p className="font-semibold text-red-700 dark:text-red-300">The Pain:</p>
+                  <p>You notice a core shot in your rope or wear on your harness. Now you have to stop work, find your supervisor, fill out paperwork, and hope someone actually removes that gear from service. Meanwhile, the damaged equipment might get used by someone else.</p>
+                </div>
+                <div className="bg-muted p-3 rounded text-xs italic">
+                  <strong>Real Example:</strong> Damaged equipment sitting in the gear room because nobody logged it properly. Next technician grabs it, doesn't notice the damage, and now it's a safety incident waiting to happen.
+                </div>
+                <div className="space-y-2">
+                  <p className="font-semibold text-green-700 dark:text-green-300">The Solution:</p>
+                  <p>Mark the item as FAIL during your inspection. That equipment is automatically tagged as retired in inventory. It cannot be selected for future inspections until reviewed and cleared by management. One tap removes dangerous gear from circulation.</p>
+                </div>
+                <div className="bg-green-50 dark:bg-green-950 p-3 rounded border border-green-200 dark:border-green-800">
+                  <p className="font-semibold flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600" />
+                    The Benefit:
+                  </p>
+                  <p className="mt-1">Zero chance of damaged equipment being reused. You're protected. Your coworkers are protected. No paperwork chase required.</p>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="tech-3">
+              <AccordionTrigger className="text-left" data-testid="accordion-tech-3">
+                <span className="font-semibold">"I don't have proof of my safety record when switching jobs"</span>
+              </AccordionTrigger>
+              <AccordionContent className="space-y-4 text-sm">
+                <div className="space-y-2">
+                  <p className="font-semibold text-red-700 dark:text-red-300">The Pain:</p>
+                  <p>You've been doing inspections, attending toolbox meetings, and maintaining a clean safety record for three years. When you apply to a new company, you have nothing to show for it. Your safety history stayed with your old employer (if they even kept records).</p>
+                </div>
+                <div className="space-y-2">
+                  <p className="font-semibold text-green-700 dark:text-green-300">The Solution:</p>
+                  <p>Your safety documentation, inspection history, and certifications are tied to your technician profile, not your employer. When you join a new company, your verified safety record comes with you.</p>
+                </div>
+                <div className="bg-green-50 dark:bg-green-950 p-3 rounded border border-green-200 dark:border-green-800">
+                  <p className="font-semibold flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600" />
+                    The Benefit:
+                  </p>
+                  <p className="mt-1">Portable professional identity. Better technicians can prove they're better. Companies can verify your safety record before hiring.</p>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </CardContent>
+      </Card>
+
+      {/* For Rope Access Company Owners */}
+      <Card className="border-2 border-blue-200 dark:border-blue-900">
+        <CardHeader className="pb-2 bg-blue-50 dark:bg-blue-950">
+          <CardTitle className="text-xl flex items-center gap-2 text-blue-900 dark:text-blue-100">
+            <Building2 className="w-5 h-5" />
+            For Rope Access Company Owners
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-4">
+          <Accordion type="multiple" value={expandedSections} onValueChange={setExpandedSections}>
+            <AccordionItem value="owner-1">
+              <AccordionTrigger className="text-left" data-testid="accordion-owner-1">
+                <span className="font-semibold">"I don't know if my crews are actually doing their safety checks"</span>
+              </AccordionTrigger>
+              <AccordionContent className="space-y-4 text-sm">
+                <div className="space-y-2">
+                  <p className="font-semibold text-red-700 dark:text-red-300">The Pain:</p>
+                  <p>You tell everyone to do their harness inspections. You have a policy. But when you're not on site, how do you know? Are they actually inspecting or just saying they did? If someone gets hurt, "we have a policy" isn't going to hold up when there's no documentation.</p>
+                </div>
+                <div className="space-y-2">
+                  <p className="font-semibold text-green-700 dark:text-green-300">The Solution:</p>
+                  <p>The employer dashboard shows every work session and whether a harness inspection form was actually submitted, not just whether someone clicked "yes I did it." Green checkmarks only appear when real forms are completed.</p>
+                </div>
+                <div className="bg-green-50 dark:bg-green-950 p-3 rounded border border-green-200 dark:border-green-800">
+                  <p className="font-semibold flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600" />
+                    The Benefit:
+                  </p>
+                  <p className="mt-1">Actual visibility, not assumed compliance. If an employee lies about doing their check, you can see the gap. If WorkSafeBC investigates, you have timestamped proof of who did what.</p>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="owner-2">
+              <AccordionTrigger className="text-left" data-testid="accordion-owner-2">
+                <span className="font-semibold">"Paper forms get lost, and I need to keep them for 7 years"</span>
+              </AccordionTrigger>
+              <AccordionContent className="space-y-4 text-sm">
+                <div className="space-y-2">
+                  <p className="font-semibold text-red-700 dark:text-red-300">The Pain:</p>
+                  <p>Regulations require you to retain safety documentation for years. Paper forms get coffee-stained, lost in truck cabs, misfiled, or destroyed. When an auditor asks for records from 2022, you're digging through boxes hoping you can find something.</p>
+                </div>
+                <div className="bg-muted p-3 rounded text-xs italic">
+                  <strong>Real Example:</strong> "A form every day with harness serial number, date of manufacture, bunch of check marks, all paper. Everyone has their own form. We sign it and it's getting stored for like seven years or something."
+                </div>
+                <div className="space-y-2">
+                  <p className="font-semibold text-green-700 dark:text-green-300">The Solution:</p>
+                  <p>Digital forms with legally-binding signatures stored permanently. Searchable by date, employee, project, or equipment. Export to PDF instantly for any audit request.</p>
+                </div>
+                <div className="bg-green-50 dark:bg-green-950 p-3 rounded border border-green-200 dark:border-green-800">
+                  <p className="font-semibold flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600" />
+                    The Benefit:
+                  </p>
+                  <p className="mt-1">Seven years of documentation accessible in seconds. No storage boxes. No lost forms. Instant audit response capability.</p>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="owner-3">
+              <AccordionTrigger className="text-left" data-testid="accordion-owner-3">
+                <span className="font-semibold">"I don't know my company's actual safety compliance status"</span>
+              </AccordionTrigger>
+              <AccordionContent className="space-y-4 text-sm">
+                <div className="space-y-2">
+                  <p className="font-semibold text-red-700 dark:text-red-300">The Pain:</p>
+                  <p>You think you're a safe company. You have policies. But are your crews actually following them? Are all the required documents uploaded? Have employees reviewed and signed the safety manual? You're flying blind.</p>
+                </div>
+                <div className="space-y-2">
+                  <p className="font-semibold text-green-700 dark:text-green-300">The Solution:</p>
+                  <p>Company Safety Rating (CSR) provides real-time visibility into compliance gaps. Missing harness inspections? CSR drops. No health & safety manual uploaded? CSR drops. Employees haven't signed document reviews? You see it immediately.</p>
+                </div>
+                <div className="bg-green-50 dark:bg-green-950 p-3 rounded border border-green-200 dark:border-green-800">
+                  <p className="font-semibold flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600" />
+                    The Benefit:
+                  </p>
+                  <p className="mt-1">Real-time compliance visibility. No more guessing. Address gaps before they become incidents or audit failures.</p>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="owner-4">
+              <AccordionTrigger className="text-left" data-testid="accordion-owner-4">
+                <span className="font-semibold">"Incident reports don't get filed until days later (or never)"</span>
+              </AccordionTrigger>
+              <AccordionContent className="space-y-4 text-sm">
+                <div className="space-y-2">
+                  <p className="font-semibold text-red-700 dark:text-red-300">The Pain:</p>
+                  <p>Something happens on site. Maybe a near-miss, maybe minor damage. Crews keep working. "We'll report it later." Later becomes tomorrow. Tomorrow becomes next week. Details get fuzzy. The incident never gets documented, or the report is filed so late that critical details are wrong.</p>
+                </div>
+                <div className="space-y-2">
+                  <p className="font-semibold text-green-700 dark:text-green-300">The Solution:</p>
+                  <p>Mobile-first incident reporting. Capture details immediately while they're fresh. Photos, witness statements, root cause analysis, all on the phone, all timestamped, all stored permanently.</p>
+                </div>
+                <div className="bg-green-50 dark:bg-green-950 p-3 rounded border border-green-200 dark:border-green-800">
+                  <p className="font-semibold flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600" />
+                    The Benefit:
+                  </p>
+                  <p className="mt-1">Accurate incident documentation. Legal protection. Evidence for corrective actions. No more "what happened again?" conversations three days later.</p>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="owner-5">
+              <AccordionTrigger className="text-left" data-testid="accordion-owner-5">
+                <span className="font-semibold">"When clients request an audit, I scramble to find documentation"</span>
+              </AccordionTrigger>
+              <AccordionContent className="space-y-4 text-sm">
+                <div className="space-y-2">
+                  <p className="font-semibold text-red-700 dark:text-red-300">The Pain:</p>
+                  <p>A flower pot gets knocked off a balcony. A resident complains. WorkSafeBC gets involved. Insurance company requests documentation. Client demands to see your safety records. Now you're digging through filing cabinets, calling supervisors, trying to piece together what happened.</p>
+                </div>
+                <div className="bg-muted p-3 rounded text-xs italic">
+                  <strong>Real Example:</strong> "There was an incident on their building... the guy is coming down and he knocks a flower pot that was on some railing and the flower pot fell on one of the residents' head and now it's a big deal and then everybody needs everybody's insurance and paperwork and WorkSafe BC gets involved."
+                </div>
+                <div className="space-y-2">
+                  <p className="font-semibold text-green-700 dark:text-green-300">The Solution:</p>
+                  <p>All safety documentation instantly available. Harness inspections, toolbox meetings, FLHAs, incident reports, searchable and exportable as professional PDFs with embedded signatures.</p>
+                </div>
+                <div className="bg-green-50 dark:bg-green-950 p-3 rounded border border-green-200 dark:border-green-800">
+                  <p className="font-semibold flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600" />
+                    The Benefit:
+                  </p>
+                  <p className="mt-1">Audit response in minutes, not days. Professional documentation impresses clients and regulators. Legal protection through comprehensive records.</p>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </CardContent>
+      </Card>
+
+      {/* For Property Managers & Building Owners */}
+      <Card className="border-2 border-green-200 dark:border-green-900">
+        <CardHeader className="pb-2 bg-green-50 dark:bg-green-950">
+          <CardTitle className="text-xl flex items-center gap-2 text-green-900 dark:text-green-100">
+            <Building2 className="w-5 h-5" />
+            For Property Managers & Building Owners
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-4">
+          <Accordion type="multiple" value={expandedSections} onValueChange={setExpandedSections}>
+            <AccordionItem value="pm-1">
+              <AccordionTrigger className="text-left" data-testid="accordion-pm-1">
+                <span className="font-semibold">"I have no way to verify if contractors are actually following safety procedures"</span>
+              </AccordionTrigger>
+              <AccordionContent className="space-y-4 text-sm">
+                <div className="space-y-2">
+                  <p className="font-semibold text-red-700 dark:text-red-300">The Pain:</p>
+                  <p>You hire a rope access company to wash windows. You assume they're safe because they said so. But how would you know? If something goes wrong, a worker falls, equipment damages the building, a resident gets hurt, you're exposed. "We thought they were following safety procedures" isn't a defense.</p>
+                </div>
+                <div className="bg-muted p-3 rounded text-xs italic">
+                  <strong>Real Example:</strong> OSHA penalties for failing to ensure contractor safety compliance can reach $156,259 per violation. Building owners can be held liable for contractor safety failures on their property.
+                </div>
+                <div className="space-y-2">
+                  <p className="font-semibold text-green-700 dark:text-green-300">The Solution:</p>
+                  <p>Property managers can view the Company Safety Rating (CSR) for any vendor working on their building. See whether inspections are being done, whether toolbox meetings are happening, whether documentation is complete.</p>
+                </div>
+                <div className="bg-green-50 dark:bg-green-950 p-3 rounded border border-green-200 dark:border-green-800">
+                  <p className="font-semibold flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600" />
+                    The Benefit:
+                  </p>
+                  <p className="mt-1">Vendor accountability. Due diligence documentation. Liability protection through verified compliance visibility.</p>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="pm-2">
+              <AccordionTrigger className="text-left" data-testid="accordion-pm-2">
+                <span className="font-semibold">"I can't compare vendor safety records when choosing contractors"</span>
+              </AccordionTrigger>
+              <AccordionContent className="space-y-4 text-sm">
+                <div className="space-y-2">
+                  <p className="font-semibold text-red-700 dark:text-red-300">The Pain:</p>
+                  <p>Three companies bid on your window washing contract. They all claim to be "safety focused." How do you actually compare? You're choosing based on price and promises, not verified safety performance.</p>
+                </div>
+                <div className="space-y-2">
+                  <p className="font-semibold text-green-700 dark:text-green-300">The Solution:</p>
+                  <p>CSR scores provide objective, verifiable safety metrics. Compare vendors based on documented compliance, not marketing claims.</p>
+                </div>
+                <div className="bg-green-50 dark:bg-green-950 p-3 rounded border border-green-200 dark:border-green-800">
+                  <p className="font-semibold flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600" />
+                    The Benefit:
+                  </p>
+                  <p className="mt-1">Data-driven vendor selection. Choose the safest contractors, not just the cheapest. Protect your building and residents with verified compliance.</p>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </CardContent>
+      </Card>
+
+      {/* Important Disclaimer */}
+      <Card className="border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950">
+        <CardContent className="pt-4 text-base text-amber-900 dark:text-amber-100">
+          <p className="flex items-center gap-2 font-semibold">
+            <AlertTriangle className="w-4 h-4" />
+            Important: Safety Compliance Responsibility
+          </p>
+          <p className="mt-2 text-sm">
+            OnRopePro helps document safety procedures, but <strong>you remain fully responsible for workplace safety and regulatory compliance.</strong> This software does not replace qualified safety professionals, IRATA/SPRAT training, equipment inspections by certified inspectors, or adherence to all applicable OSHA/WorkSafeBC regulations. Consult with qualified safety consultants to ensure your operations meet all legal requirements.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Who This Isn't For */}
+      <Card className="border-gray-200 dark:border-gray-800">
+        <CardContent className="pt-4 text-base">
+          <p className="flex items-center gap-2 font-semibold">
+            <XCircle className="w-4 h-4 text-red-600" />
+            Not for Unsafe Companies
+          </p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            If you're a company that doesn't prioritize worker safety, this software isn't for you. OnRopePro is built for companies that care about keeping their technicians safe. The transparency is a feature, not a bug. If you don't want visibility into your safety compliance, keep using paper forms.
+          </p>
+        </CardContent>
+      </Card>
+    </section>
+  );
+}
 
 export default function SafetyGuide() {
   return (
@@ -106,45 +457,8 @@ export default function SafetyGuide() {
 
         <Separator />
 
-        {/* Problems Solved */}
-        <section className="space-y-4">
-          <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2 text-green-900 dark:text-green-100">
-                <CheckCircle2 className="w-5 h-5" />
-                Problems Solved
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-green-900 dark:text-green-100">
-              <ul className="space-y-2 text-sm">
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span><strong>Skipped safety checks:</strong> Hard gate enforcement ensures no one can start work without completing daily harness inspections. Daily toolbox meetings are tracked per project and impact your Company Safety Rating.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span><strong>Paper-based documentation:</strong> Digital forms with legally-binding signatures replace error-prone paper records</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span><strong>Compliance tracking gaps:</strong> Company Safety Rating (CSR) provides real-time visibility into safety compliance, exposing same-day coverage gaps</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span><strong>Property manager trust:</strong> CSR is visible to property managers evaluating contractors, demonstrating your commitment to safety documentation</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span><strong>Incident report delays:</strong> Mobile-first incident reporting captures details immediately on site</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span><strong>Client audit requests:</strong> Professional PDF exports available instantly for OSHA and insurance requirements</span>
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
-        </section>
+        {/* Problems Solved - Stakeholder Segmented */}
+        <ProblemsSolvedSection />
 
         <Separator />
 
