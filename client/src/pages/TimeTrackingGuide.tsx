@@ -1,6 +1,13 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { useLocation } from "wouter";
 import ChangelogGuideLayout from "@/components/ChangelogGuideLayout";
 import {
@@ -29,12 +36,26 @@ import {
   ClipboardCheck,
   Smartphone,
   Key,
-  HardHat
+  HardHat,
+  Layers,
+  ChevronsUpDown
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+const ALL_ACCORDION_ITEMS = [
+  "owner-1", "owner-2", "owner-3", "owner-4", "owner-5", "owner-6", "owner-7",
+  "tech-1", "tech-2",
+  "ops-1", "ops-2"
+];
+
 export default function TimeTrackingGuide() {
   const [, navigate] = useLocation();
+  const [openItems, setOpenItems] = useState<string[]>([]);
+  const allExpanded = openItems.length === ALL_ACCORDION_ITEMS.length;
+
+  const toggleAll = () => {
+    setOpenItems(allExpanded ? [] : [...ALL_ACCORDION_ITEMS]);
+  };
 
   return (
     <ChangelogGuideLayout 
