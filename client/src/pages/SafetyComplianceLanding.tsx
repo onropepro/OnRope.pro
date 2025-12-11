@@ -544,6 +544,56 @@ export default function SafetyComplianceLanding() {
         </div>
       </section>
 
+      {/* Key Features - How It Works */}
+      <section className="py-16 md:py-20 px-4 max-w-5xl mx-auto space-y-8">
+        <div>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">How It Works</h2>
+          <p className="text-muted-foreground leading-relaxed text-base mb-8">
+            Digital safety documentation that keeps your team safer and your business protected. From equipment tracking to compliance audits, everything in one integrated system.
+          </p>
+          
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Mobile-First Inspections</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm text-muted-foreground">
+                <p>Technicians complete harness and equipment inspections on their phones. Guided checklists with photos and notes. Takes 2 minutes. Automatic timestamps and signatures included.</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Toolbox Meeting Tracking</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm text-muted-foreground">
+                <p>Run daily or weekly toolbox meetings. Topics from 20+ safety subjects. Technicians sign attendance digitally. Records searchable by date, topic, attendees, project, or location.</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Equipment Lifecycle Management</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm text-muted-foreground">
+                <p>Track purchase dates, service life, retirement dates. Equipment fails inspection? Automatically flagged and removed from availability. Predict replacement needs.</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Audit-Ready PDFs</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm text-muted-foreground">
+                <p>Search by equipment, technician, date, or project. Export comprehensive reports instantly. Include photos, signatures, timestamps, and compliance status. Ready for insurance or IRATA audits.</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      <Separator className="my-8" />
+
       {/* Features Grid */}
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-5xl mx-auto">

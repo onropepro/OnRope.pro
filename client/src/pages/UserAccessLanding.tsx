@@ -300,6 +300,120 @@ export default function UserAccessLanding() {
         </Card>
       </section>
 
+      {/* Key Features - How It Works */}
+      <section className="py-16 md:py-20 px-4 max-w-5xl mx-auto space-y-8">
+        <div>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">How It Works</h2>
+          <p className="text-muted-foreground leading-relaxed text-base mb-8">
+            Enterprise-grade permission controls that scale from 5 people to 500. Define who can view, edit, or create any data type. Changes take effect immediately.
+          </p>
+          
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Role-Based Access Control</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm text-muted-foreground">
+                <p>Define custom roles or use built-in templates (Owner, Supervisor, Admin, Technician, Office). Assign permissions for each module: Projects, Payroll, Safety, Time Tracking, Scheduling, Reports, and Billing.</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Data-Level Filtering</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm text-muted-foreground">
+                <p>Supervisors see projects they manage, not all projects. Technicians see only their own time entries. Building managers see only their buildings. Data automatically filters based on role and scope.</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Financial Visibility Control</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm text-muted-foreground">
+                <p>Show labor hours without hourly rates. Display project budgets without profit margins. Grant invoice processing without access to cost data. Complete separation of operational and financial visibility.</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Audit Logs & History</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm text-muted-foreground">
+                <p>Every data access recorded with timestamp and user. See who viewed what, when. Modified data shows before/after values. Perfect for compliance and dispute resolution.</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      <Separator className="my-8" />
+
+      {/* Module Integration Points */}
+      <section className="py-16 md:py-20 px-4 max-w-5xl mx-auto space-y-8">
+        <div>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Permissions Flow Through Everything</h2>
+          <p className="text-muted-foreground leading-relaxed text-base mb-8">
+            User access controls aren't a feature. They're the foundation. When you grant someone project creation rights, they can create projects. When you withhold financial visibility, dashboards, reports, and data exports all respect that decision.
+          </p>
+          
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Employee Directory</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm text-muted-foreground">
+                <p><strong className="text-foreground">What Connects:</strong> Only owners create employees and assign roles.</p>
+                <p><strong className="text-foreground">Why It Matters:</strong> Prevents unauthorized hiring. Controls who has system access.</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Payroll & Time Tracking</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm text-muted-foreground">
+                <p><strong className="text-foreground">What Connects:</strong> Supervisors see hours worked. Technicians see only their own time. Owners see full payroll cost visibility.</p>
+                <p><strong className="text-foreground">Why It Matters:</strong> 100% confidentiality maintained across all roles.</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Safety & Compliance</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm text-muted-foreground">
+                <p><strong className="text-foreground">What Connects:</strong> Technicians submit documents. Safety officers review. Owners see audit trails. Building managers see approval status.</p>
+                <p><strong className="text-foreground">Why It Matters:</strong> Clear responsibility chain with appropriate visibility at each level.</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Scheduling & Projects</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm text-muted-foreground">
+                <p><strong className="text-foreground">What Connects:</strong> Owners create and assign. Supervisors manage their projects. Technicians see scheduled work. Residents see progress.</p>
+                <p><strong className="text-foreground">Why It Matters:</strong> Data scope limits automatically by role and assigned resources.</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Analytics & Reporting</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm text-muted-foreground">
+                <p><strong className="text-foreground">What Connects:</strong> Owners see full financial and productivity analytics. Building managers see their building's data. Technicians see personal metrics.</p>
+                <p><strong className="text-foreground">Why It Matters:</strong> Reporting respects permission boundaries completely.</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      <Separator className="my-8" />
+
       {/* Problem Section */}
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
