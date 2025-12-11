@@ -282,8 +282,13 @@ export default function ToolboxMeetingForm() {
         title: t('safetyForms.toolbox.toasts.success', 'Success'),
         description: t('safetyForms.toolbox.toasts.meetingRecorded', 'Toolbox meeting recorded successfully'),
       });
+      // Invalidate both global and project-specific toolbox meetings
       queryClient.invalidateQueries({ queryKey: ["/api/toolbox-meetings"] });
-      navigate("/dashboard");
+      if (data?.meeting?.projectId) {
+        queryClient.invalidateQueries({ queryKey: [`/api/projects/${data.meeting.projectId}/toolbox-meetings`] });
+      }
+      // Navigate back to project if opened from project, otherwise to dashboard
+      handleNavigateBack();
     },
     onError: (error: Error) => {
       console.error('[Toolbox Meeting] Error:', error);
