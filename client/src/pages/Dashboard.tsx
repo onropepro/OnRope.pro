@@ -2801,17 +2801,6 @@ export default function Dashboard() {
       category: "team",
     },
     {
-      id: "my-account",
-      label: t('dashboard.cards.myAccount.label', 'My Account'),
-      description: t('dashboard.cards.myAccount.description', 'Subscription & billing'),
-      icon: "settings",
-      onClick: () => setLocation("/profile"),
-      testId: "button-nav-my-account",
-      isVisible: (user: any) => user?.role === 'company', // Company owners only
-      borderColor: "#6366f1",
-      category: "financial",
-    },
-    {
       id: "projects",
       label: t('dashboard.cards.projects.label', 'Projects'),
       description: t('dashboard.cards.projects.description', 'Active projects'),
@@ -3173,6 +3162,19 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
+            {/* My Account Button */}
+            {currentUser?.role === 'company' && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setLocation("/profile")}
+                className="gap-1.5 hidden sm:flex"
+                data-testid="button-header-my-account"
+              >
+                <span className="material-icons text-lg">settings</span>
+                <span className="text-xs">{t('dashboard.cards.myAccount.label', 'My Account')}</span>
+              </Button>
+            )}
             {/* Notification Bell - Company owners only */}
             {currentUser?.role === 'company' && (
               <NotificationBell />
