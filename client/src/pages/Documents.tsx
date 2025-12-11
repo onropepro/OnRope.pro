@@ -2696,13 +2696,12 @@ export default function Documents() {
   };
 
   // PDF generation for damage reports
-  const downloadDamageReportPdf = (report: any) => {
+  const downloadDamageReportPdf = async (report: any) => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-    let yPosition = 20;
+    const margin = 15;
 
-    // Helper function to add multi-line text with pagination
     const addMultilineText = (lines: string[], currentY: number, lineHeight: number = 6): number => {
       let y = currentY;
       for (const line of lines) {
@@ -2710,68 +2709,87 @@ export default function Documents() {
           doc.addPage();
           y = 20;
         }
-        doc.text(line, 20, y);
+        doc.text(line, margin, y);
         y += lineHeight;
       }
       return y;
     };
 
-    // Header - Orange for damage report
-    doc.setFillColor(251, 146, 60); // Orange
-    
-    // Add company branding if active (using shared helper)
-    const brandingHeight = addCompanyBranding(doc, pageWidth);
-    const headerHeight = 35 + brandingHeight;
-    doc.rect(0, 0, pageWidth, headerHeight, 'F');
+    const branding: BrandingConfig = {
+      companyName: currentUser?.companyName,
+      whitelabelBrandingActive: currentUser?.whitelabelBrandingActive,
+      brandingLogoUrl: currentUser?.brandingLogoUrl,
+      brandingColors: currentUser?.brandingColors
+    };
 
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(20);
-    doc.setFont('helvetica', 'bold');
-    doc.text('EQUIPMENT DAMAGE REPORT', pageWidth / 2, 15 + brandingHeight, { align: 'center' });
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'normal');
-    doc.text(report.equipmentRetired ? 'Equipment Retirement Document' : 'Damage Documentation Record', pageWidth / 2, 25 + brandingHeight, { align: 'center' });
+    const headerResult = await addProfessionalHeader(
+      doc,
+      'EQUIPMENT DAMAGE REPORT',
+      report.equipmentRetired ? 'Equipment Retirement Document' : 'Damage Documentation Record',
+      branding
+    );
 
-    yPosition = 45 + brandingHeight;
+    let yPosition = headerResult.contentStartY;
+    const { primaryColor, accentColor } = headerResult;
 
-    // Equipment Information Section
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Equipment Information', 20, yPosition);
-    yPosition += 8;
+    yPosition = addSectionHeader(doc, 'Equipment Information', yPosition, primaryColor);
 
-    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(9);
+    doc.text('Type:', margin, yPosition);
+    doc.setTextColor(30, 30, 30);
     doc.setFontSize(10);
-    doc.text(`Equipment Type: ${report.equipmentType || 'N/A'}`, 20, yPosition);
+    doc.text(report.equipmentType || 'N/A', margin + 30, yPosition);
     yPosition += 6;
-    doc.text(`Brand: ${report.equipmentBrand || 'N/A'}`, 20, yPosition);
+
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(9);
+    doc.text('Brand:', margin, yPosition);
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(10);
+    doc.text(report.equipmentBrand || 'N/A', margin + 30, yPosition);
     yPosition += 6;
-    doc.text(`Model: ${report.equipmentModel || 'N/A'}`, 20, yPosition);
+
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(9);
+    doc.text('Model:', margin, yPosition);
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(10);
+    doc.text(report.equipmentModel || 'N/A', margin + 30, yPosition);
     yPosition += 6;
+
     if (report.serialNumber) {
-      doc.text(`Serial Number: ${report.serialNumber}`, 20, yPosition);
+      doc.setTextColor(80, 80, 80);
+      doc.setFontSize(9);
+      doc.text('Serial #:', margin, yPosition);
+      doc.setTextColor(30, 30, 30);
+      doc.setFontSize(10);
+      doc.text(report.serialNumber, margin + 30, yPosition);
       yPosition += 6;
     }
-    yPosition += 4;
+    yPosition += 6;
 
-    // Damage Details Section
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(12);
-    doc.text('Damage Details', 20, yPosition);
-    yPosition += 8;
+    yPosition = addSectionHeader(doc, 'Damage Details', yPosition, primaryColor);
 
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
     const discoveredDateStr = report.discoveredDate 
       ? format(new Date(report.discoveredDate), 'MMMM d, yyyy') 
       : 'N/A';
-    doc.text(`Date Discovered: ${discoveredDateStr}`, 20, yPosition);
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(9);
+    doc.text('Discovered:', margin, yPosition);
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(10);
+    doc.text(discoveredDateStr, margin + 30, yPosition);
     yPosition += 6;
-    doc.text(`Reported By: ${report.reporterName || 'Unknown'}`, 20, yPosition);
+
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(9);
+    doc.text('Reported By:', margin, yPosition);
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(10);
+    doc.text(report.reporterName || 'Unknown', margin + 30, yPosition);
     yPosition += 6;
-    
-    // Severity badge
+
     const severityColors: Record<string, [number, number, number]> = {
       minor: [34, 197, 94],
       moderate: [251, 191, 36],
@@ -2779,94 +2797,88 @@ export default function Documents() {
       critical: [239, 68, 68]
     };
     const severityColor = severityColors[report.damageSeverity] || [100, 100, 100];
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(9);
+    doc.text('Severity:', margin, yPosition);
     doc.setTextColor(severityColor[0], severityColor[1], severityColor[2]);
     doc.setFont('helvetica', 'bold');
-    doc.text(`Severity: ${(report.damageSeverity || 'unknown').toUpperCase()}`, 20, yPosition);
+    doc.setFontSize(10);
+    doc.text((report.damageSeverity || 'unknown').toUpperCase(), margin + 30, yPosition);
+    doc.setFont('helvetica', 'normal');
     yPosition += 8;
 
-    // Damage description
-    doc.setTextColor(0, 0, 0);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Description of Damage:', 20, yPosition);
-    yPosition += 6;
-    doc.setFont('helvetica', 'normal');
-    const descLines = doc.splitTextToSize(report.damageDescription || 'No description provided.', pageWidth - 40);
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(9);
+    doc.text('Description:', margin, yPosition);
+    yPosition += 5;
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(10);
+    const descLines = doc.splitTextToSize(report.damageDescription || 'No description provided.', pageWidth - margin * 2);
     yPosition = addMultilineText(descLines, yPosition);
     yPosition += 4;
 
     if (report.damageLocation) {
-      doc.setFont('helvetica', 'bold');
-      doc.text('Location on Equipment:', 20, yPosition);
-      yPosition += 6;
-      doc.setFont('helvetica', 'normal');
-      const locationLines = doc.splitTextToSize(report.damageLocation, pageWidth - 40);
+      doc.setTextColor(80, 80, 80);
+      doc.setFontSize(9);
+      doc.text('Location:', margin, yPosition);
+      yPosition += 5;
+      doc.setTextColor(30, 30, 30);
+      doc.setFontSize(10);
+      const locationLines = doc.splitTextToSize(report.damageLocation, pageWidth - margin * 2);
       yPosition = addMultilineText(locationLines, yPosition);
       yPosition += 4;
     }
 
     if (report.correctiveAction) {
-      doc.setFont('helvetica', 'bold');
-      doc.text('Corrective Action Taken:', 20, yPosition);
-      yPosition += 6;
-      doc.setFont('helvetica', 'normal');
-      const actionLines = doc.splitTextToSize(report.correctiveAction, pageWidth - 40);
+      doc.setTextColor(80, 80, 80);
+      doc.setFontSize(9);
+      doc.text('Corrective Action:', margin, yPosition);
+      yPosition += 5;
+      doc.setTextColor(30, 30, 30);
+      doc.setFontSize(10);
+      const actionLines = doc.splitTextToSize(report.correctiveAction, pageWidth - margin * 2);
       yPosition = addMultilineText(actionLines, yPosition);
       yPosition += 4;
     }
 
-    // Retirement Section (if applicable)
     if (report.equipmentRetired) {
       yPosition += 4;
-      doc.setFillColor(254, 226, 226); // Light red
-      doc.rect(15, yPosition - 5, pageWidth - 30, 30, 'F');
+      doc.setFillColor(254, 226, 226);
+      doc.rect(margin, yPosition - 5, pageWidth - margin * 2, 30, 'F');
       
       doc.setTextColor(185, 28, 28);
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(12);
-      doc.text('EQUIPMENT RETIRED', 20, yPosition + 3);
+      doc.text('EQUIPMENT RETIRED', margin + 5, yPosition + 3);
       yPosition += 10;
       
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(10);
-      doc.setTextColor(0, 0, 0);
-      doc.text('Reason for Retirement:', 20, yPosition);
-      yPosition += 6;
-      const retireLines = doc.splitTextToSize(report.retirementReason || 'No reason provided.', pageWidth - 40);
-      yPosition = addMultilineText(retireLines, yPosition);
+      doc.setTextColor(30, 30, 30);
+      doc.text('Reason:', margin + 5, yPosition);
+      yPosition += 5;
+      const retireLines = doc.splitTextToSize(report.retirementReason || 'No reason provided.', pageWidth - margin * 2 - 10);
+      for (const line of retireLines) {
+        doc.text(line, margin + 5, yPosition);
+        yPosition += 5;
+      }
       yPosition += 8;
     }
 
     if (report.notes) {
-      doc.setFont('helvetica', 'bold');
+      yPosition += 4;
+      doc.setTextColor(80, 80, 80);
+      doc.setFontSize(9);
+      doc.text('Additional Notes:', margin, yPosition);
+      yPosition += 5;
+      doc.setTextColor(30, 30, 30);
       doc.setFontSize(10);
-      doc.text('Additional Notes:', 20, yPosition);
-      yPosition += 6;
-      doc.setFont('helvetica', 'normal');
-      const notesLines = doc.splitTextToSize(report.notes, pageWidth - 40);
+      const notesLines = doc.splitTextToSize(report.notes, pageWidth - margin * 2);
       yPosition = addMultilineText(notesLines, yPosition);
     }
 
-    // Footer
-    const pageCount = doc.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      doc.setFontSize(8);
-      doc.setTextColor(100, 100, 100);
-      doc.text(
-        `Equipment Damage Report - Page ${i} of ${pageCount}`,
-        pageWidth / 2,
-        pageHeight - 10,
-        { align: 'center' }
-      );
-      doc.text(
-        `Generated: ${format(new Date(), 'MMM d, yyyy')}`,
-        pageWidth - 20,
-        pageHeight - 10,
-        { align: 'right' }
-      );
-    }
+    addFooter(doc, branding, accentColor);
 
-    // Save
     const dateStr = report.discoveredDate 
       ? format(new Date(report.discoveredDate), 'yyyy-MM-dd')
       : format(new Date(), 'yyyy-MM-dd');
@@ -2884,9 +2896,8 @@ export default function Documents() {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-    let yPosition = 20;
+    const margin = 15;
 
-    // Helper function to add multi-line text with pagination
     const addMultilineText = (lines: string[], currentY: number, lineHeight: number = 6): number => {
       let y = currentY;
       for (const line of lines) {
@@ -2894,57 +2905,63 @@ export default function Documents() {
           doc.addPage();
           y = 20;
         }
-        doc.text(line, 20, y);
+        doc.text(line, margin, y);
         y += lineHeight;
       }
       return y;
     };
 
-    // Header - Title
-    doc.setFillColor(14, 165, 233); // Ocean blue
-    
-    // Add company branding if active
-    const brandingHeight = addCompanyBranding(doc, pageWidth);
-    const headerHeight = 35 + brandingHeight; // Dynamic height based on branding
-    doc.rect(0, 0, pageWidth, headerHeight, 'F');
-    
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(22);
-    doc.setFont('helvetica', 'bold');
-    doc.text('DAILY TOOLBOX MEETING RECORD', pageWidth / 2, 15 + brandingHeight, { align: 'center' });
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
-    doc.text('Official Safety Meeting Documentation', pageWidth / 2, 25 + brandingHeight, { align: 'center' });
+    const branding: BrandingConfig = {
+      companyName: currentUser?.companyName,
+      whitelabelBrandingActive: currentUser?.whitelabelBrandingActive,
+      brandingLogoUrl: currentUser?.brandingLogoUrl,
+      brandingColors: currentUser?.brandingColors
+    };
 
-    yPosition = 45 + brandingHeight;
+    const headerResult = await addProfessionalHeader(
+      doc,
+      'DAILY TOOLBOX MEETING',
+      'Official Safety Meeting Documentation',
+      branding
+    );
 
-    // Meeting Details Section
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Meeting Information', 20, yPosition);
-    yPosition += 8;
+    let yPosition = headerResult.contentStartY;
+    const { primaryColor, accentColor } = headerResult;
 
-    doc.setFont('helvetica', 'normal');
+    yPosition = addSectionHeader(doc, 'Meeting Information', yPosition, primaryColor);
+
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(9);
+    doc.text('Date:', margin, yPosition);
+    doc.setTextColor(30, 30, 30);
     doc.setFontSize(10);
-    doc.text(`Date: ${formatLocalDate(meeting.meetingDate, { 
+    doc.text(formatLocalDate(meeting.meetingDate, { 
       weekday: 'long', 
       year: 'numeric', 
       month: 'long', 
       day: 'numeric' 
-    })}`, 20, yPosition);
+    }), margin + 35, yPosition);
     yPosition += 6;
 
-    doc.text(`Conducted By: ${meeting.conductedByName}`, 20, yPosition);
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(9);
+    doc.text('Conducted By:', margin, yPosition);
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(10);
+    doc.text(meeting.conductedByName || 'N/A', margin + 35, yPosition);
     yPosition += 6;
 
-    // Attendees with wrapping
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(9);
+    doc.text('Attendees:', margin, yPosition);
+    yPosition += 5;
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(10);
     const attendeesText = Array.isArray(meeting.attendees) ? meeting.attendees.join(', ') : meeting.attendees;
-    const attendeesLines = doc.splitTextToSize(`Attendees: ${attendeesText}`, pageWidth - 40);
+    const attendeesLines = doc.splitTextToSize(attendeesText || 'N/A', pageWidth - margin * 2);
     yPosition = addMultilineText(attendeesLines, yPosition);
     yPosition += 8;
 
-    // Topics Discussed Section
     const topics = [];
     if (meeting.topicFallProtection) topics.push('Fall Protection and Rescue Procedures');
     if (meeting.topicAnchorPoints) topics.push('Anchor Point Selection and Inspection');
@@ -2967,76 +2984,63 @@ export default function Documents() {
     if (meeting.topicSiteHazards) topics.push('Site-Specific Hazards');
     if (meeting.topicBuddySystem) topics.push('Buddy System and Supervision');
 
-    if (yPosition > pageHeight - 30) {
+    if (yPosition > pageHeight - 40) {
       doc.addPage();
       yPosition = 20;
     }
 
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
-    doc.text('Topics Discussed', 20, yPosition);
-    yPosition += 8;
+    yPosition = addSectionHeader(doc, 'Topics Discussed', yPosition, primaryColor);
 
-    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(30, 30, 30);
     doc.setFontSize(10);
     topics.forEach((topic, index) => {
       if (yPosition > pageHeight - 30) {
         doc.addPage();
         yPosition = 20;
       }
-      doc.text(`${index + 1}. ${topic}`, 25, yPosition);
+      doc.setFillColor(accentColor.r, accentColor.g, accentColor.b);
+      doc.circle(margin + 2, yPosition - 1.5, 1.5, 'F');
+      doc.text(topic, margin + 8, yPosition);
       yPosition += 6;
     });
 
     yPosition += 4;
 
-    // Custom Topic
     if (meeting.customTopic) {
-      if (yPosition > pageHeight - 30) {
+      if (yPosition > pageHeight - 40) {
         doc.addPage();
         yPosition = 20;
       }
       
-      doc.setFont('helvetica', 'bold');
-      doc.text('Custom Topic:', 20, yPosition);
-      yPosition += 6;
-      
-      doc.setFont('helvetica', 'normal');
-      const customTopicLines = doc.splitTextToSize(meeting.customTopic, pageWidth - 40);
+      yPosition = addSectionHeader(doc, 'Custom Topic', yPosition, primaryColor);
+      doc.setTextColor(30, 30, 30);
+      doc.setFontSize(10);
+      const customTopicLines = doc.splitTextToSize(meeting.customTopic, pageWidth - margin * 2);
       yPosition = addMultilineText(customTopicLines, yPosition);
       yPosition += 8;
     }
 
-    // Additional Notes
     if (meeting.additionalNotes) {
-      if (yPosition > pageHeight - 30) {
+      if (yPosition > pageHeight - 40) {
         doc.addPage();
         yPosition = 20;
       }
       
-      doc.setFont('helvetica', 'bold');
-      doc.text('Additional Notes:', 20, yPosition);
-      yPosition += 6;
-      
-      doc.setFont('helvetica', 'normal');
-      const notesLines = doc.splitTextToSize(meeting.additionalNotes, pageWidth - 40);
+      yPosition = addSectionHeader(doc, 'Additional Notes', yPosition, primaryColor);
+      doc.setTextColor(30, 30, 30);
+      doc.setFontSize(10);
+      const notesLines = doc.splitTextToSize(meeting.additionalNotes, pageWidth - margin * 2);
       yPosition = addMultilineText(notesLines, yPosition);
       yPosition += 8;
     }
 
-    // Signatures Section
     if (meeting.signatures && meeting.signatures.length > 0) {
-      yPosition += 10;
-      
-      if (yPosition > pageHeight - 30) {
+      if (yPosition > pageHeight - 40) {
         doc.addPage();
         yPosition = 20;
       }
 
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(11);
-      doc.text('Attendee Signatures', 20, yPosition);
-      yPosition += 10;
+      yPosition = addSectionHeader(doc, 'Attendee Signatures', yPosition, primaryColor);
 
       for (const sig of meeting.signatures) {
         if (yPosition > pageHeight - 50) {
@@ -3044,35 +3048,29 @@ export default function Documents() {
           yPosition = 20;
         }
 
-        // Employee name
-        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(30, 30, 30);
         doc.setFontSize(10);
-        doc.text(sig.employeeName, 20, yPosition);
+        doc.setFont('helvetica', 'bold');
+        doc.text(sig.employeeName, margin, yPosition);
+        doc.setFont('helvetica', 'normal');
         yPosition += 5;
 
-        // Add signature image
         try {
-          doc.addImage(sig.signatureDataUrl, 'PNG', 20, yPosition, 60, 20);
+          doc.addImage(sig.signatureDataUrl, 'PNG', margin, yPosition, 60, 20);
         } catch (error) {
           console.error('Error adding signature image:', error);
         }
         yPosition += 25;
 
-        // Line under signature
+        doc.setDrawColor(accentColor.r, accentColor.g, accentColor.b);
         doc.setLineWidth(0.5);
-        doc.line(20, yPosition, 80, yPosition);
+        doc.line(margin, yPosition, margin + 80, yPosition);
         yPosition += 10;
       }
     }
 
-    // Footer
-    const footerY = pageHeight - 15;
-    doc.setFontSize(8);
-    doc.setTextColor(100, 100, 100);
-    doc.setFont('helvetica', 'italic');
-    doc.text('This is an official safety meeting record. Keep for compliance purposes.', pageWidth / 2, footerY, { align: 'center' });
+    addFooter(doc, branding, accentColor);
 
-    // Save PDF
     doc.save(`Toolbox_Meeting_${meeting.meetingDate}.pdf`);
   };
 
