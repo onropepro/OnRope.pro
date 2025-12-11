@@ -3344,14 +3344,12 @@ export default function Documents() {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-    let yPosition = 20;
+    const margin = 15;
     
-    // Find all kit items if this is part of a kit inspection
     const kitItems = inspection.kitInspectionId && allInspections
       ? allInspections.filter((i: any) => i.kitInspectionId === inspection.kitInspectionId)
       : [];
 
-    // Helper function to add multi-line text with pagination
     const addMultilineText = (lines: string[], currentY: number, lineHeight: number = 6): number => {
       let y = currentY;
       for (const line of lines) {
@@ -3359,13 +3357,12 @@ export default function Documents() {
           doc.addPage();
           y = 20;
         }
-        doc.text(line, 20, y);
+        doc.text(line, margin, y);
         y += lineHeight;
       }
       return y;
     };
 
-    // Helper to check and add new page if needed
     const checkPageBreak = (requiredSpace: number = 30): number => {
       if (yPosition > pageHeight - requiredSpace) {
         doc.addPage();
@@ -3374,67 +3371,77 @@ export default function Documents() {
       return yPosition;
     };
 
-    // Header - Title
-    doc.setFillColor(14, 165, 233); // Ocean blue
-    
-    // Add company branding if active
-    const brandingHeight = addCompanyBranding(doc, pageWidth);
-    const headerHeight = 35 + brandingHeight; // Dynamic height based on branding
-    doc.rect(0, 0, pageWidth, headerHeight, 'F');
-    
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(20);
-    doc.setFont('helvetica', 'bold');
-    doc.text('ROPE ACCESS EQUIPMENT', pageWidth / 2, 15 + brandingHeight, { align: 'center' });
-    doc.text('INSPECTION RECORD', pageWidth / 2, 23 + brandingHeight, { align: 'center' });
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'normal');
-    doc.text('Official Safety Equipment Documentation', pageWidth / 2, 30 + brandingHeight, { align: 'center' });
+    const branding: BrandingConfig = {
+      companyName: currentUser?.companyName,
+      whitelabelBrandingActive: currentUser?.whitelabelBrandingActive,
+      brandingLogoUrl: currentUser?.brandingLogoUrl,
+      brandingColors: currentUser?.brandingColors
+    };
 
-    yPosition = 45 + brandingHeight;
+    const headerResult = await addProfessionalHeader(
+      doc,
+      'EQUIPMENT INSPECTION',
+      'Official Safety Equipment Documentation',
+      branding
+    );
 
-    // Inspection Details Section
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Inspection Information', 20, yPosition);
-    yPosition += 8;
+    let yPosition = headerResult.contentStartY;
+    const { primaryColor, accentColor } = headerResult;
 
-    doc.setFont('helvetica', 'normal');
+    yPosition = addSectionHeader(doc, 'Inspection Information', yPosition, primaryColor);
+
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(9);
+    doc.text('Date:', margin, yPosition);
+    doc.setTextColor(30, 30, 30);
     doc.setFontSize(10);
-    doc.text(`Inspection Date: ${formatLocalDateLong(inspection.inspectionDate)}`, 20, yPosition);
+    doc.text(formatLocalDateLong(inspection.inspectionDate), margin + 35, yPosition);
     yPosition += 6;
 
-    doc.text(`Inspector: ${inspection.inspectorName}`, 20, yPosition);
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(9);
+    doc.text('Inspector:', margin, yPosition);
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(10);
+    doc.text(inspection.inspectorName || 'N/A', margin + 35, yPosition);
     yPosition += 6;
 
-    doc.text(`Manufacturer: ${inspection.manufacturer || 'N/A'}`, 20, yPosition);
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(9);
+    doc.text('Manufacturer:', margin, yPosition);
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(10);
+    doc.text(inspection.manufacturer || 'N/A', margin + 35, yPosition);
     yPosition += 6;
 
-    doc.text(`Equipment ID: ${inspection.equipmentId || 'N/A'}`, 20, yPosition);
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(9);
+    doc.text('Equipment ID:', margin, yPosition);
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(10);
+    doc.text(inspection.equipmentId || 'N/A', margin + 35, yPosition);
     yPosition += 6;
 
-    doc.text(`Date in Service: ${inspection.dateInService || 'N/A'}`, 20, yPosition);
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(9);
+    doc.text('In Service:', margin, yPosition);
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(10);
+    doc.text(inspection.dateInService || 'N/A', margin + 35, yPosition);
     yPosition += 12;
 
-    // Kit Inspection Summary - Show all equipment if this is a kit inspection
     if (kitItems.length > 1) {
       yPosition = checkPageBreak(30);
       
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(11);
-      doc.setTextColor(14, 165, 233); // Ocean blue
-      doc.text('KIT INSPECTION', 20, yPosition);
-      yPosition += 6;
+      yPosition = addSectionHeader(doc, 'Kit Inspection', yPosition, primaryColor);
       
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(9);
       doc.setTextColor(100, 100, 100);
-      doc.text(`${kitItems.length} items inspected together`, 20, yPosition);
+      doc.text(`${kitItems.length} items inspected together`, margin, yPosition);
       yPosition += 8;
       
-      // List all equipment in the kit
-      doc.setTextColor(0, 0, 0);
+      doc.setTextColor(30, 30, 30);
       doc.setFontSize(10);
       
       for (let i = 0; i < kitItems.length; i++) {
@@ -3447,13 +3454,12 @@ export default function Documents() {
         
         if (isCurrentItem) {
           doc.setFont('helvetica', 'bold');
-          doc.text(`${equipmentDesc} (this document)`, 25, yPosition);
+          doc.text(`${equipmentDesc} (this document)`, margin + 5, yPosition);
           doc.setFont('helvetica', 'normal');
         } else {
-          doc.text(equipmentDesc, 25, yPosition);
+          doc.text(equipmentDesc, margin + 5, yPosition);
         }
         
-        // Show pass/fail badge for each item
         const itemStatus = item.overallStatus?.toUpperCase() || 'N/A';
         const badgeX = 150;
         if (itemStatus === 'PASS') {
@@ -3472,43 +3478,31 @@ export default function Documents() {
         doc.text(itemStatus, badgeX + 9, yPosition, { align: 'center' });
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(10);
-        doc.setTextColor(0, 0, 0);
+        doc.setTextColor(30, 30, 30);
         
         yPosition += 6;
       }
       yPosition += 6;
     }
 
-    // Inspection Result
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(12);
     const status = inspection.overallStatus?.toUpperCase() || 'N/A';
     if (status === 'PASS') {
-      doc.setTextColor(34, 197, 94); // Green
+      doc.setTextColor(34, 197, 94);
     } else if (status === 'FAIL') {
-      doc.setTextColor(239, 68, 68); // Red
+      doc.setTextColor(239, 68, 68);
     } else {
-      doc.setTextColor(234, 179, 8); // Yellow
+      doc.setTextColor(234, 179, 8);
     }
-    doc.text(`INSPECTION RESULT: ${status}`, 20, yPosition);
+    doc.text(`INSPECTION RESULT: ${status}`, margin, yPosition);
     yPosition += 15;
 
-    // Detailed Inspection Findings Section
     const equipmentFindings = inspection.equipmentFindings;
     if (equipmentFindings && typeof equipmentFindings === 'object' && Object.keys(equipmentFindings).length > 0) {
       yPosition = checkPageBreak(40);
       
-      doc.setTextColor(0, 0, 0);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(12);
-      doc.text('DETAILED INSPECTION CHECKLIST', 20, yPosition);
-      yPosition += 3;
-      
-      // Draw underline
-      doc.setDrawColor(14, 165, 233);
-      doc.setLineWidth(0.5);
-      doc.line(20, yPosition, pageWidth - 20, yPosition);
-      yPosition += 10;
+      yPosition = addSectionHeader(doc, 'Detailed Inspection Checklist', yPosition, primaryColor);
 
       // Iterate through each category in the findings
       for (const categoryKey of Object.keys(equipmentFindings)) {
@@ -3614,36 +3608,21 @@ export default function Documents() {
       }
     }
 
-    // Comments Section
     if (inspection.comments) {
       yPosition = checkPageBreak(30);
       
-      doc.setTextColor(0, 0, 0);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(11);
-      doc.text('Additional Comments:', 20, yPosition);
-      yPosition += 6;
+      yPosition = addSectionHeader(doc, 'Additional Comments', yPosition, primaryColor);
 
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(10);
-      const commentsLines = doc.splitTextToSize(inspection.comments, pageWidth - 40);
+      doc.setTextColor(30, 30, 30);
+      const commentsLines = doc.splitTextToSize(inspection.comments, pageWidth - margin * 2);
       yPosition = addMultilineText(commentsLines, yPosition);
       yPosition += 8;
     }
 
-    // Footer on each page
-    const totalPages = doc.getNumberOfPages();
-    for (let i = 1; i <= totalPages; i++) {
-      doc.setPage(i);
-      const footerY = pageHeight - 15;
-      doc.setFontSize(8);
-      doc.setTextColor(100, 100, 100);
-      doc.setFont('helvetica', 'italic');
-      doc.text('This is an official equipment inspection record. Keep for compliance purposes.', pageWidth / 2, footerY, { align: 'center' });
-      doc.text(`Page ${i} of ${totalPages}`, pageWidth - 20, footerY, { align: 'right' });
-    }
+    addFooter(doc, branding, accentColor);
 
-    // Save PDF
     doc.save(`Equipment_Inspection_${inspection.inspectionDate}.pdf`);
   };
 
@@ -3651,7 +3630,7 @@ export default function Documents() {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-    let yPosition = 20;
+    const margin = 15;
 
     const addMultilineText = (lines: string[], currentY: number, lineHeight: number = 6): number => {
       let y = currentY;
@@ -3660,105 +3639,134 @@ export default function Documents() {
           doc.addPage();
           y = 20;
         }
-        doc.text(line, 20, y);
+        doc.text(line, margin, y);
         y += lineHeight;
       }
       return y;
     };
 
-    // Header
-    doc.setFillColor(239, 68, 68); // Red for incidents
-    
-    const brandingHeight = addCompanyBranding(doc, pageWidth);
-    const headerHeight = 35 + brandingHeight;
-    doc.rect(0, 0, pageWidth, headerHeight, 'F');
-    
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(20);
-    doc.setFont('helvetica', 'bold');
-    doc.text('INCIDENT REPORT', pageWidth / 2, 15 + brandingHeight, { align: 'center' });
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'normal');
-    doc.text('Official Incident Documentation and Investigation', pageWidth / 2, 25 + brandingHeight, { align: 'center' });
+    const branding: BrandingConfig = {
+      companyName: currentUser?.companyName,
+      whitelabelBrandingActive: currentUser?.whitelabelBrandingActive,
+      brandingLogoUrl: currentUser?.brandingLogoUrl,
+      brandingColors: currentUser?.brandingColors
+    };
 
-    yPosition = 45 + brandingHeight;
+    const headerResult = await addProfessionalHeader(
+      doc,
+      'INCIDENT REPORT',
+      'Official Incident Documentation and Investigation',
+      branding
+    );
 
-    // Basic Information Section
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Incident Information', 20, yPosition);
-    yPosition += 8;
+    let yPosition = headerResult.contentStartY;
+    const { primaryColor, accentColor } = headerResult;
 
-    doc.setFont('helvetica', 'normal');
+    yPosition = addSectionHeader(doc, 'Incident Information', yPosition, primaryColor);
+
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(9);
+    doc.text('Date:', margin, yPosition);
+    doc.setTextColor(30, 30, 30);
     doc.setFontSize(10);
-    doc.text(`Date: ${formatLocalDateLong(report.incidentDate)}`, 20, yPosition);
+    doc.text(formatLocalDateLong(report.incidentDate), margin + 35, yPosition);
     yPosition += 6;
 
-    doc.text(`Time: ${report.incidentTime || 'N/A'}`, 20, yPosition);
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(9);
+    doc.text('Time:', margin, yPosition);
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(10);
+    doc.text(report.incidentTime || 'N/A', margin + 35, yPosition);
     yPosition += 6;
 
-    doc.text(`Location: ${report.location || 'N/A'}`, 20, yPosition);
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(9);
+    doc.text('Location:', margin, yPosition);
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(10);
+    doc.text(report.location || 'N/A', margin + 35, yPosition);
     yPosition += 6;
 
     if (report.projectName) {
-      doc.text(`Project: ${report.projectName}`, 20, yPosition);
+      doc.setTextColor(80, 80, 80);
+      doc.setFontSize(9);
+      doc.text('Project:', margin, yPosition);
+      doc.setTextColor(30, 30, 30);
+      doc.setFontSize(10);
+      doc.text(report.projectName, margin + 35, yPosition);
       yPosition += 6;
     }
 
-    doc.text(`Reported By: ${report.reportedByName}`, 20, yPosition);
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(9);
+    doc.text('Reported By:', margin, yPosition);
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(10);
+    doc.text(report.reportedByName || 'N/A', margin + 35, yPosition);
     yPosition += 6;
 
-    doc.text(`Report Date: ${formatLocalDate(report.reportDate)}`, 20, yPosition);
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(9);
+    doc.text('Report Date:', margin, yPosition);
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(10);
+    doc.text(formatLocalDate(report.reportDate), margin + 35, yPosition);
     yPosition += 10;
 
-    // Description
     if (report.description) {
       if (yPosition > pageHeight - 30) {
         doc.addPage();
         yPosition = 20;
       }
       
-      doc.setFont('helvetica', 'bold');
-      doc.text('Incident Description:', 20, yPosition);
-      yPosition += 6;
-      
+      yPosition = addSectionHeader(doc, 'Incident Description', yPosition, primaryColor);
       doc.setFont('helvetica', 'normal');
-      const descLines = doc.splitTextToSize(report.description, pageWidth - 40);
+      doc.setFontSize(10);
+      doc.setTextColor(30, 30, 30);
+      const descLines = doc.splitTextToSize(report.description, pageWidth - margin * 2);
       yPosition = addMultilineText(descLines, yPosition);
       yPosition += 10;
     }
 
-    // Incident Classification
     if (yPosition > pageHeight - 30) {
       doc.addPage();
       yPosition = 20;
     }
 
-    doc.setFont('helvetica', 'bold');
-    doc.text('Incident Classification', 20, yPosition);
-    yPosition += 8;
+    yPosition = addSectionHeader(doc, 'Incident Classification', yPosition, primaryColor);
 
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Type: ${report.incidentType || 'N/A'}`, 20, yPosition);
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(9);
+    doc.text('Type:', margin, yPosition);
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(10);
+    doc.text(report.incidentType || 'N/A', margin + 35, yPosition);
     yPosition += 6;
 
-    doc.text(`Severity: ${report.severity || 'N/A'}`, 20, yPosition);
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(9);
+    doc.text('Severity:', margin, yPosition);
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(10);
+    doc.text(report.severity || 'N/A', margin + 35, yPosition);
     yPosition += 6;
 
-    doc.text(`Immediate Cause: ${report.immediateCause || 'N/A'}`, 20, yPosition);
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(9);
+    doc.text('Immediate Cause:', margin, yPosition);
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(10);
+    doc.text(report.immediateCause || 'N/A', margin + 45, yPosition);
     yPosition += 10;
 
-    // People Involved
     if (report.peopleInvolved && report.peopleInvolved.length > 0) {
       if (yPosition > pageHeight - 30) {
         doc.addPage();
         yPosition = 20;
       }
 
-      doc.setFont('helvetica', 'bold');
-      doc.text('People Involved', 20, yPosition);
-      yPosition += 8;
+      yPosition = addSectionHeader(doc, 'People Involved', yPosition, primaryColor);
 
       report.peopleInvolved.forEach((person: any, index: number) => {
         if (yPosition > pageHeight - 50) {
@@ -3768,27 +3776,28 @@ export default function Documents() {
 
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(10);
-        doc.text(`Person ${index + 1}:`, 25, yPosition);
+        doc.setTextColor(30, 30, 30);
+        doc.text(`Person ${index + 1}:`, margin, yPosition);
         yPosition += 6;
 
         doc.setFont('helvetica', 'normal');
-        doc.text(`Name: ${person.name}`, 30, yPosition);
+        doc.text(`Name: ${person.name}`, margin + 10, yPosition);
         yPosition += 5;
-        doc.text(`Role: ${person.role}`, 30, yPosition);
+        doc.text(`Role: ${person.role}`, margin + 10, yPosition);
         yPosition += 5;
 
         if (person.injuryType && person.injuryType !== 'none') {
-          doc.text(`Injury Type: ${person.injuryType}`, 30, yPosition);
+          doc.text(`Injury Type: ${person.injuryType}`, margin + 10, yPosition);
           yPosition += 5;
         }
 
         if (person.bodyPartAffected) {
-          doc.text(`Body Part Affected: ${person.bodyPartAffected}`, 30, yPosition);
+          doc.text(`Body Part Affected: ${person.bodyPartAffected}`, margin + 10, yPosition);
           yPosition += 5;
         }
 
         if (person.medicalTreatment) {
-          doc.text(`Medical Treatment: ${person.medicalTreatment}`, 30, yPosition);
+          doc.text(`Medical Treatment: ${person.medicalTreatment}`, margin + 10, yPosition);
           yPosition += 5;
         }
 
@@ -3798,50 +3807,43 @@ export default function Documents() {
       yPosition += 5;
     }
 
-    // Root Cause Analysis
     if (report.rootCause) {
       if (yPosition > pageHeight - 30) {
         doc.addPage();
         yPosition = 20;
       }
 
-      doc.setFont('helvetica', 'bold');
-      doc.text('Root Cause Analysis:', 20, yPosition);
-      yPosition += 6;
-
+      yPosition = addSectionHeader(doc, 'Root Cause Analysis', yPosition, primaryColor);
       doc.setFont('helvetica', 'normal');
-      const rootCauseLines = doc.splitTextToSize(report.rootCause, pageWidth - 40);
+      doc.setFontSize(10);
+      doc.setTextColor(30, 30, 30);
+      const rootCauseLines = doc.splitTextToSize(report.rootCause, pageWidth - margin * 2);
       yPosition = addMultilineText(rootCauseLines, yPosition);
       yPosition += 10;
     }
 
-    // Contributing Factors
     if (report.contributingFactors) {
       if (yPosition > pageHeight - 30) {
         doc.addPage();
         yPosition = 20;
       }
 
-      doc.setFont('helvetica', 'bold');
-      doc.text('Contributing Factors:', 20, yPosition);
-      yPosition += 6;
-
+      yPosition = addSectionHeader(doc, 'Contributing Factors', yPosition, primaryColor);
       doc.setFont('helvetica', 'normal');
-      const factorsLines = doc.splitTextToSize(report.contributingFactors, pageWidth - 40);
+      doc.setFontSize(10);
+      doc.setTextColor(30, 30, 30);
+      const factorsLines = doc.splitTextToSize(report.contributingFactors, pageWidth - margin * 2);
       yPosition = addMultilineText(factorsLines, yPosition);
       yPosition += 10;
     }
 
-    // Corrective Actions
     if (report.correctiveActionItems && report.correctiveActionItems.length > 0) {
       if (yPosition > pageHeight - 30) {
         doc.addPage();
         yPosition = 20;
       }
 
-      doc.setFont('helvetica', 'bold');
-      doc.text('Corrective Actions', 20, yPosition);
-      yPosition += 8;
+      yPosition = addSectionHeader(doc, 'Corrective Actions', yPosition, primaryColor);
 
       report.correctiveActionItems.forEach((action: any, index: number) => {
         if (yPosition > pageHeight - 40) {
@@ -3851,124 +3853,122 @@ export default function Documents() {
 
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(10);
-        doc.text(`Action ${index + 1}:`, 25, yPosition);
+        doc.setTextColor(30, 30, 30);
+        doc.text(`Action ${index + 1}:`, margin, yPosition);
         yPosition += 6;
 
         doc.setFont('helvetica', 'normal');
-        const actionLines = doc.splitTextToSize(action.action, pageWidth - 50);
+        const actionLines = doc.splitTextToSize(action.action, pageWidth - margin * 2 - 15);
         actionLines.forEach((line: string) => {
-          doc.text(line, 30, yPosition);
+          doc.text(line, margin + 10, yPosition);
           yPosition += 5;
         });
 
-        doc.text(`Assigned To: ${action.assignedTo}`, 30, yPosition);
+        doc.text(`Assigned To: ${action.assignedTo}`, margin + 10, yPosition);
         yPosition += 5;
-        doc.text(`Due Date: ${formatLocalDate(action.dueDate)}`, 30, yPosition);
+        doc.text(`Due Date: ${formatLocalDate(action.dueDate)}`, margin + 10, yPosition);
         yPosition += 5;
-        doc.text(`Status: ${action.status}`, 30, yPosition);
+        doc.text(`Status: ${action.status}`, margin + 10, yPosition);
         yPosition += 8;
       });
     }
 
-    // Regulatory Information
     if (report.reportableToRegulator || report.regulatorNotificationDate) {
       if (yPosition > pageHeight - 30) {
         doc.addPage();
         yPosition = 20;
       }
 
-      doc.setFont('helvetica', 'bold');
-      doc.text('Regulatory Reporting', 20, yPosition);
-      yPosition += 8;
+      yPosition = addSectionHeader(doc, 'Regulatory Reporting', yPosition, primaryColor);
 
       doc.setFont('helvetica', 'normal');
-      doc.text(`Reportable to Regulator: ${report.reportableToRegulator ? 'Yes' : 'No'}`, 20, yPosition);
+      doc.setFontSize(10);
+      doc.setTextColor(30, 30, 30);
+      doc.text(`Reportable to Regulator: ${report.reportableToRegulator ? 'Yes' : 'No'}`, margin, yPosition);
       yPosition += 6;
 
       if (report.regulatorNotificationDate) {
-        doc.text(`Notification Date: ${formatLocalDate(report.regulatorNotificationDate)}`, 20, yPosition);
+        doc.text(`Notification Date: ${formatLocalDate(report.regulatorNotificationDate)}`, margin, yPosition);
         yPosition += 6;
       }
 
       if (report.regulatorReferenceNumber) {
-        doc.text(`Reference Number: ${report.regulatorReferenceNumber}`, 20, yPosition);
+        doc.text(`Reference Number: ${report.regulatorReferenceNumber}`, margin, yPosition);
         yPosition += 6;
       }
 
       yPosition += 5;
     }
 
-    // Supervisor Review
     if (report.supervisorReviewDate) {
       if (yPosition > pageHeight - 30) {
         doc.addPage();
         yPosition = 20;
       }
 
-      doc.setFont('helvetica', 'bold');
-      doc.text('Supervisor Review', 20, yPosition);
-      yPosition += 8;
+      yPosition = addSectionHeader(doc, 'Supervisor Review', yPosition, primaryColor);
 
       doc.setFont('helvetica', 'normal');
-      doc.text(`Reviewed By: ${report.supervisorReviewedBy || 'N/A'}`, 20, yPosition);
+      doc.setFontSize(10);
+      doc.setTextColor(30, 30, 30);
+      doc.text(`Reviewed By: ${report.supervisorReviewedBy || 'N/A'}`, margin, yPosition);
       yPosition += 6;
-      doc.text(`Review Date: ${formatLocalDate(report.supervisorReviewDate)}`, 20, yPosition);
+      doc.text(`Review Date: ${formatLocalDate(report.supervisorReviewDate)}`, margin, yPosition);
       yPosition += 6;
 
       if (report.supervisorComments) {
-        doc.setFont('helvetica', 'bold');
-        doc.text('Comments:', 20, yPosition);
-        yPosition += 6;
+        doc.setTextColor(80, 80, 80);
+        doc.setFontSize(9);
+        doc.text('Comments:', margin, yPosition);
+        yPosition += 5;
 
         doc.setFont('helvetica', 'normal');
-        const commentsLines = doc.splitTextToSize(report.supervisorComments, pageWidth - 40);
+        doc.setFontSize(10);
+        doc.setTextColor(30, 30, 30);
+        const commentsLines = doc.splitTextToSize(report.supervisorComments, pageWidth - margin * 2);
         yPosition = addMultilineText(commentsLines, yPosition);
         yPosition += 8;
       }
     }
 
-    // Management Review
     if (report.managementReviewDate) {
       if (yPosition > pageHeight - 30) {
         doc.addPage();
         yPosition = 20;
       }
 
-      doc.setFont('helvetica', 'bold');
-      doc.text('Management Review', 20, yPosition);
-      yPosition += 8;
+      yPosition = addSectionHeader(doc, 'Management Review', yPosition, primaryColor);
 
       doc.setFont('helvetica', 'normal');
-      doc.text(`Reviewed By: ${report.managementReviewedBy || 'N/A'}`, 20, yPosition);
+      doc.setFontSize(10);
+      doc.setTextColor(30, 30, 30);
+      doc.text(`Reviewed By: ${report.managementReviewedBy || 'N/A'}`, margin, yPosition);
       yPosition += 6;
-      doc.text(`Review Date: ${formatLocalDate(report.managementReviewDate)}`, 20, yPosition);
+      doc.text(`Review Date: ${formatLocalDate(report.managementReviewDate)}`, margin, yPosition);
       yPosition += 6;
 
       if (report.managementComments) {
-        doc.setFont('helvetica', 'bold');
-        doc.text('Comments:', 20, yPosition);
-        yPosition += 6;
+        doc.setTextColor(80, 80, 80);
+        doc.setFontSize(9);
+        doc.text('Comments:', margin, yPosition);
+        yPosition += 5;
 
         doc.setFont('helvetica', 'normal');
-        const commentsLines = doc.splitTextToSize(report.managementComments, pageWidth - 40);
+        doc.setFontSize(10);
+        doc.setTextColor(30, 30, 30);
+        const commentsLines = doc.splitTextToSize(report.managementComments, pageWidth - margin * 2);
         yPosition = addMultilineText(commentsLines, yPosition);
         yPosition += 8;
       }
     }
 
-    // Signatures Section
     if (report.signatures && report.signatures.length > 0) {
-      yPosition += 10;
-
       if (yPosition > pageHeight - 30) {
         doc.addPage();
         yPosition = 20;
       }
 
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(11);
-      doc.text('Signatures', 20, yPosition);
-      yPosition += 10;
+      yPosition = addSectionHeader(doc, 'Signatures', yPosition, primaryColor);
 
       for (const sig of report.signatures) {
         if (yPosition > pageHeight - 50) {
@@ -3976,30 +3976,28 @@ export default function Documents() {
           yPosition = 20;
         }
 
-        doc.setFont('helvetica', 'normal');
+        doc.setFont('helvetica', 'bold');
         doc.setFontSize(10);
-        doc.text(`${sig.role}: ${sig.name}`, 20, yPosition);
+        doc.setTextColor(30, 30, 30);
+        doc.text(`${sig.role}: ${sig.name}`, margin, yPosition);
+        doc.setFont('helvetica', 'normal');
         yPosition += 5;
 
         try {
-          doc.addImage(sig.signatureDataUrl, 'PNG', 20, yPosition, 60, 20);
+          doc.addImage(sig.signatureDataUrl, 'PNG', margin, yPosition, 60, 20);
         } catch (error) {
           console.error('Error adding signature image:', error);
         }
         yPosition += 25;
 
+        doc.setDrawColor(accentColor.r, accentColor.g, accentColor.b);
         doc.setLineWidth(0.5);
-        doc.line(20, yPosition, 80, yPosition);
+        doc.line(margin, yPosition, margin + 80, yPosition);
         yPosition += 10;
       }
     }
 
-    // Footer
-    const footerY = pageHeight - 15;
-    doc.setFontSize(8);
-    doc.setTextColor(100, 100, 100);
-    doc.setFont('helvetica', 'italic');
-    doc.text('This is an official incident report. Keep for compliance and regulatory purposes.', pageWidth / 2, footerY, { align: 'center' });
+    addFooter(doc, branding, accentColor);
 
     doc.save(`Incident_Report_${report.incidentDate}.pdf`);
   };
