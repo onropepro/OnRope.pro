@@ -15818,25 +15818,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 </body>
 </html>`;
 
-      // Generate PDF using html-pdf-node
-      const htmlPdf = await import('html-pdf-node');
-      const pdfOptions = { 
-        format: 'A4' as const,
-        printBackground: true,
-        margin: { top: '20px', right: '20px', bottom: '20px', left: '20px' }
-      };
+      // Generate PDF using Playwright
+      const { chromium } = await import('playwright');
       
       let pdfBuffer: Buffer;
       try {
-        const pdfResult = await htmlPdf.default.generatePdf(
-          { content: pdfHtmlContent }, 
-          pdfOptions
-        );
-        pdfBuffer = Buffer.isBuffer(pdfResult) ? pdfResult : (pdfResult as any).content || pdfResult;
-        
-        if (!Buffer.isBuffer(pdfBuffer)) {
-          throw new Error("PDF generation did not return a valid buffer");
-        }
+        const browser = await chromium.launch({ headless: true });
+        const page = await browser.newPage();
+        await page.setContent(pdfHtmlContent, { waitUntil: 'networkidle' });
+        pdfBuffer = await page.pdf({
+          format: 'A4',
+          printBackground: true,
+          margin: { top: '20px', right: '20px', bottom: '20px', left: '20px' }
+        });
+        await browser.close();
       } catch (pdfError) {
         console.error("Quote PDF generation error:", pdfError);
         return res.status(500).json({ message: "Failed to generate PDF. Please try again." });
@@ -16502,27 +16497,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 </body>
 </html>`;
 
-      // Generate PDF using html-pdf-node
-      const htmlPdf = await import('html-pdf-node');
-      const pdfOptions = { 
-        format: 'A4' as const,
-        printBackground: true,
-        margin: { top: '20px', right: '20px', bottom: '20px', left: '20px' }
-      };
+      // Generate PDF using Playwright
+      const { chromium } = await import('playwright');
       
       let pdfBuffer: Buffer;
       try {
-        // html-pdf-node returns { content: <Buffer> } when content is passed
-        const pdfResult = await htmlPdf.default.generatePdf(
-          { content: pdfHtmlContent }, 
-          pdfOptions
-        );
-        // Extract the actual buffer - may be direct Buffer or { content: Buffer }
-        pdfBuffer = Buffer.isBuffer(pdfResult) ? pdfResult : (pdfResult as any).content || pdfResult;
-        
-        if (!Buffer.isBuffer(pdfBuffer)) {
-          throw new Error("PDF generation did not return a valid buffer");
-        }
+        const browser = await chromium.launch({ headless: true });
+        const page = await browser.newPage();
+        await page.setContent(pdfHtmlContent, { waitUntil: 'networkidle' });
+        pdfBuffer = await page.pdf({
+          format: 'A4',
+          printBackground: true,
+          margin: { top: '20px', right: '20px', bottom: '20px', left: '20px' }
+        });
+        await browser.close();
       } catch (pdfError) {
         console.error("PDF generation error:", pdfError);
         return res.status(500).json({ message: "Failed to generate PDF. Please try again." });
