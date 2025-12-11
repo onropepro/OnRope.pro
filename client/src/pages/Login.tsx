@@ -243,7 +243,7 @@ export default function Login() {
             Building Manager
           </Button>
           <div 
-            className="relative" 
+            className="relative pb-2" 
             ref={modulesMenuRef}
             onMouseEnter={() => setShowModulesMenu(true)}
             onMouseLeave={() => setShowModulesMenu(false)}
@@ -256,7 +256,7 @@ export default function Login() {
               Modules
             </Button>
             {showModulesMenu && (
-              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl p-4 w-[480px] z-50">
+              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-0 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl p-4 w-[480px] z-50">
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     className="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors text-left group"
