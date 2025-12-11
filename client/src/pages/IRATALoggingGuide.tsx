@@ -244,24 +244,24 @@ export default function IRATALoggingGuide() {
 
         {/* Problems Solved - Stakeholder Segmented with Accordions */}
         <section className="space-y-8">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div>
+          <div>
+            <div className="flex items-center justify-between flex-wrap gap-4">
               <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
                 <CheckCircle2 className="w-6 h-6 text-emerald-600" />
                 Problems Solved
               </h2>
-              <p className="text-muted-foreground mt-2">
-                The IRATA/SPRAT Task Logging module solves different problems for different users. Find your role below.
-              </p>
+              <Button 
+                onClick={toggleAll} 
+                variant="outline"
+                data-testid="button-toggle-all-accordions"
+              >
+                <ChevronsUpDown className="w-4 h-4 mr-2" />
+                {allExpanded ? "Collapse All" : "Expand All"}
+              </Button>
             </div>
-            <Button 
-              onClick={toggleAll} 
-              variant="outline"
-              data-testid="button-toggle-all-accordions"
-            >
-              <ChevronsUpDown className="w-4 h-4 mr-2" />
-              {allExpanded ? "Collapse All" : "Expand All"}
-            </Button>
+            <p className="text-muted-foreground mt-2">
+              The IRATA/SPRAT Task Logging module solves different problems for different users. Find your role below.
+            </p>
           </div>
 
           {/* For Rope Access Technicians */}
