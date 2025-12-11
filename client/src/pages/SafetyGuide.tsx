@@ -56,47 +56,48 @@ export default function SafetyGuide() {
             <CardHeader className="pb-2">
               <CardTitle className="text-xl md:text-2xl flex items-center gap-2 text-amber-900 dark:text-amber-100">
                 <AlertTriangle className="w-5 h-5" />
-                The Golden Rule: No Inspection, No Work
+                The Golden Rule: Complete Safety Documentation
               </CardTitle>
             </CardHeader>
             <CardContent className="text-amber-900 dark:text-amber-100 space-y-4">
               <div className="bg-white dark:bg-amber-900 rounded-lg p-4 text-center">
                 <p className="text-xl md:text-2xl font-mono font-bold">
-                  Harness Inspection Required Before Starting Work Session
+                  No Documentation Gaps
                 </p>
               </div>
               
               <div className="space-y-2 text-sm">
-                <p><strong>This rule is absolute.</strong> When a technician clicks "Start Day" on any project:</p>
+                <p><strong>Every work session requires supporting safety documentation.</strong> The system tracks compliance across three key areas:</p>
                 <ul className="list-disc list-inside space-y-1 ml-2">
-                  <li>System checks: Has this employee completed a harness inspection <strong>today</strong>?</li>
-                  <li>If <strong>NO</strong>: Redirected to complete harness inspection first</li>
-                  <li>If <strong>YES</strong>: Work session can proceed</li>
+                  <li><strong>Harness Inspections</strong>: Daily equipment verification before work begins</li>
+                  <li><strong>Toolbox Meetings</strong>: Daily team safety briefings for each project</li>
+                  <li><strong>Company Documentation</strong>: Health & Safety Manual, Company Policy, Certificate of Insurance</li>
                 </ul>
               </div>
 
               <div className="bg-amber-100 dark:bg-amber-800 rounded-lg p-3 text-sm">
                 <p className="font-semibold flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4" />
-                  Safety Critical
+                  Visible to Property Managers
                 </p>
-                <p className="mt-1">This is a <strong>hard gate</strong> - not a warning. Workers physically cannot start clocking time without a valid inspection for the current date. This protects workers and ensures compliance.</p>
+                <p className="mt-1">Missing documentation creates gaps visible in your Company Safety Rating (CSR). Property managers can view your compliance status when evaluating contractors.</p>
               </div>
 
               <div className="grid md:grid-cols-3 gap-3 text-sm">
                 <div className="bg-white dark:bg-amber-900 rounded p-3 text-center">
                   <HardHat className="w-8 h-8 mx-auto mb-2 text-amber-600" />
-                  <p className="font-bold">Step 1</p>
-                  <p className="text-xs">Complete Harness Inspection</p>
-                </div>
-                <div className="bg-white dark:bg-amber-900 rounded p-3 text-center flex flex-col items-center justify-center">
-                  <ArrowRight className="w-8 h-8 text-amber-600 mb-2" />
-                  <p className="text-xs">Then...</p>
+                  <p className="font-bold">Harness Inspections</p>
+                  <p className="text-xs">Daily before work</p>
                 </div>
                 <div className="bg-white dark:bg-amber-900 rounded p-3 text-center">
-                  <Clock className="w-8 h-8 mx-auto mb-2 text-green-600" />
-                  <p className="font-bold">Step 2</p>
-                  <p className="text-xs">Start Work Session</p>
+                  <Users className="w-8 h-8 mx-auto mb-2 text-action-600" />
+                  <p className="font-bold">Toolbox Meetings</p>
+                  <p className="text-xs">Daily per project</p>
+                </div>
+                <div className="bg-white dark:bg-amber-900 rounded p-3 text-center">
+                  <FileText className="w-8 h-8 mx-auto mb-2 text-purple-600" />
+                  <p className="font-bold">Company Docs</p>
+                  <p className="text-xs">Current and uploaded</p>
                 </div>
               </div>
             </CardContent>
@@ -134,7 +135,7 @@ export default function SafetyGuide() {
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span><strong>Client audit requests:</strong> Professional PDF exports available instantly for IRATA, OSHA, and insurance requirements</span>
+                  <span><strong>Client audit requests:</strong> Professional PDF exports available instantly for OSHA and insurance requirements</span>
                 </li>
               </ul>
             </CardContent>
@@ -230,48 +231,60 @@ export default function SafetyGuide() {
 
         <Separator />
 
-        {/* 7-Day Coverage Window */}
+        {/* Toolbox Meetings: Daily Safety Briefings */}
         <section className="space-y-4">
           <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-            The 7-Day Toolbox Meeting Coverage Window
+            <Users className="w-5 h-5 text-action-600 dark:text-action-400" />
+            Toolbox Meetings: Daily Safety Briefings
           </h2>
           
-          <Card className="border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-950">
-            <CardContent className="pt-6 text-emerald-900 dark:text-emerald-100 space-y-4">
-              <div className="bg-white dark:bg-emerald-900 rounded-lg p-4 text-center">
+          <Card className="border-2 border-action-500 bg-action-50 dark:bg-action-950">
+            <CardContent className="pt-6 text-action-900 dark:text-action-100 space-y-4">
+              <div className="bg-white dark:bg-action-900 rounded-lg p-4 text-center">
                 <p className="text-xl font-mono font-bold">
-                  One Meeting Covers Work Within 7 Days (Either Direction)
+                  Daily Briefings for Every Active Project
                 </p>
               </div>
 
-              <div className="text-sm space-y-2">
-                <p>A toolbox meeting on <strong>Monday, Dec 2</strong> covers all work sessions from:</p>
-                <div className="flex flex-wrap gap-2 justify-center">
-                  <Badge variant="outline" className="bg-emerald-100 dark:bg-emerald-800">Nov 25</Badge>
-                  <Badge variant="outline" className="bg-emerald-100 dark:bg-emerald-800">Nov 26</Badge>
-                  <Badge variant="outline" className="bg-emerald-100 dark:bg-emerald-800">Nov 27</Badge>
-                  <Badge variant="outline" className="bg-emerald-100 dark:bg-emerald-800">Nov 28</Badge>
-                  <Badge variant="outline" className="bg-emerald-100 dark:bg-emerald-800">Nov 29</Badge>
-                  <Badge variant="outline" className="bg-emerald-100 dark:bg-emerald-800">Nov 30</Badge>
-                  <Badge variant="outline" className="bg-emerald-100 dark:bg-emerald-800">Dec 1</Badge>
-                  <Badge className="bg-emerald-600">Dec 2 (Meeting)</Badge>
-                  <Badge variant="outline" className="bg-emerald-100 dark:bg-emerald-800">Dec 3</Badge>
-                  <Badge variant="outline" className="bg-emerald-100 dark:bg-emerald-800">Dec 4</Badge>
-                  <Badge variant="outline" className="bg-emerald-100 dark:bg-emerald-800">Dec 5</Badge>
-                  <Badge variant="outline" className="bg-emerald-100 dark:bg-emerald-800">Dec 6</Badge>
-                  <Badge variant="outline" className="bg-emerald-100 dark:bg-emerald-800">Dec 7</Badge>
-                  <Badge variant="outline" className="bg-emerald-100 dark:bg-emerald-800">Dec 8</Badge>
-                  <Badge variant="outline" className="bg-emerald-100 dark:bg-emerald-800">Dec 9</Badge>
+              <div className="text-sm space-y-3">
+                <p><strong>Toolbox meetings are available in every project</strong> and serve as the primary team safety briefing mechanism.</p>
+                
+                <div className="grid md:grid-cols-2 gap-3">
+                  <div className="bg-action-100 dark:bg-action-800 rounded p-3">
+                    <p className="font-semibold flex items-center gap-2 mb-2">
+                      <CheckCircle2 className="w-4 h-4" />
+                      When to Hold Meetings
+                    </p>
+                    <ul className="list-disc list-inside space-y-1 text-xs">
+                      <li>At least once daily for every active job</li>
+                      <li>Whenever conditions change (weather, location, new hazards)</li>
+                      <li>When equipment or procedures change</li>
+                      <li>At the start of new project phases</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-action-100 dark:bg-action-800 rounded p-3">
+                    <p className="font-semibold flex items-center gap-2 mb-2">
+                      <FileText className="w-4 h-4" />
+                      Topics to Cover
+                    </p>
+                    <ul className="list-disc list-inside space-y-1 text-xs">
+                      <li>PPE requirements and condition</li>
+                      <li>Rope and anchor inspection reminders</li>
+                      <li>Weather precautions</li>
+                      <li>Emergency procedures</li>
+                      <li>Site-specific hazards</li>
+                    </ul>
+                  </div>
                 </div>
               </div>
 
-              <div className="bg-emerald-100 dark:bg-emerald-800 rounded-lg p-3 text-sm">
+              <div className="bg-action-100 dark:bg-action-800 rounded-lg p-3 text-sm">
                 <p className="font-semibold flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4" />
-                  Practical Implication
+                  <Info className="w-4 h-4" />
+                  How It Works
                 </p>
-                <p className="mt-1">Hold a toolbox meeting at the start of a project, and all work sessions for the next 7 days are automatically covered. A meeting can even be held <em>after</em> work sessions and still provide retroactive coverage (within the 7-day window).</p>
+                <p className="mt-1">Anyone with project access can create a toolbox meeting. Select all attendees present, and <strong>all selected attendees must sign</strong> before the meeting can be submitted. Each meeting is timestamped and tied to the specific project.</p>
               </div>
             </CardContent>
           </Card>
@@ -322,6 +335,16 @@ export default function SafetyGuide() {
                 </div>
                 <p><strong>Signature:</strong> Single technician (inspector)</p>
                 <p><strong>CSR Impact:</strong> 25% maximum penalty for missing inspections</p>
+                <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded p-3 text-sm space-y-2">
+                  <p className="flex items-center gap-2 text-blue-900 dark:text-blue-100">
+                    <Zap className="w-4 h-4" />
+                    <strong>Speed Note:</strong> For routine passing inspections, completion takes seconds. The form defaults to PASS and technicians simply scroll and submit. Only failed items require detailed notes.
+                  </p>
+                  <p className="flex items-center gap-2 text-blue-900 dark:text-blue-100">
+                    <Package className="w-4 h-4" />
+                    <strong>Auto-Retirement:</strong> When equipment is marked as FAIL, it is automatically tagged as retired in the Inventory module. Failed equipment cannot be selected for future inspections until reviewed and cleared.
+                  </p>
+                </div>
               </CardContent>
             </Card>
 
@@ -335,16 +358,17 @@ export default function SafetyGuide() {
                   </CardTitle>
                   <div className="flex gap-2">
                     <Badge className="bg-action-600">Team Document</Badge>
-                    <Badge variant="outline">7-Day Coverage</Badge>
+                    <Badge variant="outline">Daily Per Project</Badge>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="text-base space-y-2">
-                <p><strong>Purpose:</strong> Pre-work safety briefing covering hazards, procedures, and emergency plans.</p>
+                <p><strong>Purpose:</strong> Daily team safety briefing covering hazards, procedures, and emergency plans specific to that day's work.</p>
                 <div className="bg-muted p-3 rounded text-sm">
                   <p><strong>Key Fields:</strong> Meeting topic, safety topics discussed, attendee list, signatures from all attendees</p>
                 </div>
                 <p><strong>Signature:</strong> All attendees must sign (enforced by system)</p>
+                <p><strong>Frequency:</strong> One meeting daily per active project. Additional meetings required when conditions change.</p>
                 <p><strong>CSR Impact:</strong> 25% maximum penalty for uncovered work sessions</p>
               </CardContent>
             </Card>
@@ -357,7 +381,10 @@ export default function SafetyGuide() {
                     <AlertCircle className="w-5 h-5 text-amber-600" />
                     3. FLHA (Field Level Hazard Assessment)
                   </CardTitle>
-                  <Badge variant="outline">Optional</Badge>
+                  <div className="flex gap-2">
+                    <Badge variant="outline">Optional</Badge>
+                    <Badge variant="secondary" className="text-xs">Daily Requirement Coming Soon</Badge>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="text-base space-y-2">
@@ -366,7 +393,7 @@ export default function SafetyGuide() {
                   <p><strong>Key Fields:</strong> Location, work description, identified hazards, control measures, weather conditions</p>
                 </div>
                 <p><strong>Signature:</strong> Assessor signature required</p>
-                <p><strong>CSR Impact:</strong> Does not directly impact CSR (best practice documentation)</p>
+                <p><strong>CSR Impact:</strong> Does not directly impact CSR currently (best practice documentation). FLHA will become a daily requirement and impact CSR in a future update.</p>
               </CardContent>
             </Card>
 
@@ -458,7 +485,7 @@ export default function SafetyGuide() {
                     </div>
                     <Badge className="bg-action-600">Up to 25%</Badge>
                   </div>
-                  <p className="text-xs text-muted-foreground ml-6">Work sessions without meeting coverage within 7-day window</p>
+                  <p className="text-xs text-muted-foreground ml-6">Work sessions without a same-day toolbox meeting for that project</p>
 
                   <div className="flex items-center justify-between p-3 bg-purple-50 dark:bg-purple-950 rounded border border-purple-200 dark:border-purple-800">
                     <div className="flex items-center gap-2">
@@ -592,9 +619,9 @@ export default function SafetyGuide() {
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <Badge className="bg-blue-600">Workflow 2</Badge>
-                    <CardTitle>Create Toolbox Meeting</CardTitle>
+                    <CardTitle>Create Toolbox Meeting (Daily)</CardTitle>
                   </div>
-                  <Badge variant="outline">Covers 7 Days</Badge>
+                  <Badge variant="outline">Required Daily</Badge>
                 </div>
               </CardHeader>
               <CardContent className="text-base space-y-3">
@@ -608,7 +635,7 @@ export default function SafetyGuide() {
                   <li>Click <strong>Submit Meeting</strong></li>
                 </ol>
                 <div className="bg-muted p-3 rounded text-sm">
-                  <strong>Result:</strong> Meeting saved. All work sessions within 7 days (before and after) are now covered for this project.
+                  <strong>Result:</strong> Meeting saved and timestamped for that day's work. Hold additional meetings whenever conditions change (weather, location, hazards).
                 </div>
               </CardContent>
             </Card>
@@ -946,8 +973,8 @@ export default function SafetyGuide() {
             <div className="flex gap-3">
               <Calendar className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="font-semibold">7-Day Coverage Window</p>
-                <p className="text-base text-muted-foreground">One toolbox meeting covers work within 7 days either direction.</p>
+                <p className="font-semibold">Daily Toolbox Meetings</p>
+                <p className="text-base text-muted-foreground">One meeting daily per active project. Additional meetings when conditions change.</p>
               </div>
             </div>
 
@@ -994,8 +1021,8 @@ export default function SafetyGuide() {
             <div className="flex gap-3">
               <Building2 className="w-5 h-5 text-gray-600 dark:text-gray-400 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="font-semibold">White-Label Branding</p>
-                <p className="text-base text-muted-foreground">Company name appears on PDF headers when branding active.</p>
+                <p className="font-semibold">White-Label Branding <Badge variant="secondary" className="text-xs ml-1">Coming Soon</Badge></p>
+                <p className="text-base text-muted-foreground">Company logo and name on PDF headers when white-label branding is active.</p>
               </div>
             </div>
           </div>
