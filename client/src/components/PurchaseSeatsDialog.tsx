@@ -11,13 +11,19 @@ interface PurchaseSeatsDialogProps {
   onOpenChange: (open: boolean) => void;
   currentSeats: number;
   onPurchaseSuccess?: () => void;
+  isTrialing?: boolean;
+  seatsUsed?: number;
+  baseSeatLimit?: number;
 }
 
 export function PurchaseSeatsDialog({ 
   open, 
   onOpenChange, 
   currentSeats,
-  onPurchaseSuccess 
+  onPurchaseSuccess,
+  isTrialing = false,
+  seatsUsed = 0,
+  baseSeatLimit = 2
 }: PurchaseSeatsDialogProps) {
   const { toast } = useToast();
   const [quantity, setQuantity] = useState(1);
@@ -80,6 +86,54 @@ export function PurchaseSeatsDialog({
                 : `You've used all ${currentSeats} of your employee seats. Purchase additional seats to add more team members.`}
             </DialogDescription>
           </DialogHeader>
+          
+          {/* Trial Billing Warning */}
+          {isTrialing && (() => {
+            // Calculate billable seats: seats used minus the free base seats, plus the new seats being added
+            const currentBillableSeats = Math.max(0, seatsUsed - baseSeatLimit);
+            const newBillableSeats = currentBillableSeats + quantity;
+            
+            return (
+              <div className="p-4 bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-lg">
+                <div className="flex items-start gap-3">
+                  <span className="material-icons text-amber-600 dark:text-amber-400 text-xl mt-0.5">warning</span>
+                  <div className="flex-1">
+                    <p className="font-semibold text-amber-900 dark:text-amber-100 mb-1">
+                      Free Trial - Billing Notice
+                    </p>
+                    <p className="text-sm text-amber-800 dark:text-amber-200 mb-3">
+                      You're currently on a <strong>30-day free trial</strong>. Your first {baseSeatLimit} seats are included free. Each additional seat is billed at <strong>$34.95/month</strong> when your trial ends.
+                    </p>
+                    <div className="bg-white dark:bg-amber-900 rounded-md p-3 border border-amber-200 dark:border-amber-700">
+                      <div className="flex justify-between items-center text-sm mb-2">
+                        <span className="text-amber-700 dark:text-amber-300">Base subscription:</span>
+                        <span className="font-medium text-amber-900 dark:text-amber-100">$99.00/mo</span>
+                      </div>
+                      <div className="flex justify-between items-center text-sm mb-2">
+                        <span className="text-amber-700 dark:text-amber-300">Included seats (free):</span>
+                        <span className="font-medium text-amber-900 dark:text-amber-100">{baseSeatLimit} seats</span>
+                      </div>
+                      <div className="flex justify-between items-center text-sm mb-2">
+                        <span className="text-amber-700 dark:text-amber-300">Additional paid seats after adding:</span>
+                        <span className="font-medium text-amber-900 dark:text-amber-100">
+                          {newBillableSeats} x $34.95 = ${(newBillableSeats * 34.95).toFixed(2)}/mo
+                        </span>
+                      </div>
+                      <div className="border-t border-amber-200 dark:border-amber-700 pt-2 mt-2">
+                        <div className="flex justify-between items-center">
+                          <span className="font-semibold text-amber-900 dark:text-amber-100">Projected monthly cost after trial:</span>
+                          <span className="font-bold text-lg text-amber-900 dark:text-amber-100">
+                            ${(99 + newBillableSeats * 34.95).toFixed(2)}/mo
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+          
           <div className="py-4 space-y-4">
             <div className="p-4 bg-muted/50 rounded-lg space-y-4">
               <div className="flex items-center justify-between gap-4">
