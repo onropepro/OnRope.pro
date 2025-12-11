@@ -8,6 +8,17 @@ The Rope Access Management Platform is an enterprise-grade, mobile-first web app
 - Development Approach: Iterative development with frequent feedback loops
 - Interaction: Collaborative interaction requiring approval for major architectural changes
 - Code Management: No code deletion without explicit permission
+- Documentation Accuracy: Systematic audit of all safety & compliance guide documentation to match codebase implementation (source of truth)
+
+## Documentation Verification Status
+User is systematically auditing all safety & compliance guide documentation for accuracy against codebase:
+
+**Completed Audits:**
+- ✅ **IRATALoggingGuide.tsx** - FIXED: Updated to reflect all 20 canonical IRATA_TASK_TYPES from schema.ts (removed 9 invented types, added 8 missing types)
+- ✅ **FLHA Forms** - VERIFIED: Fully implemented in code (database table, backend routes, frontend form, documentation accurate)
+
+**Pending Fixes:**
+- ⚠️ **7-Day Toolbox Meeting Coverage Window** (SafetyGuide.tsx, lines 233-278) - NOT IMPLEMENTED: Documentation describes a 7-day coverage feature that has no corresponding database fields, backend logic, or schema definition. Will update later with correct implementation details.
 
 ## System Architecture
 The platform is built with a React 18 frontend (TypeScript, Wouter for routing), a Node.js Express.js backend, and a PostgreSQL database with Drizzle ORM. Styling uses Tailwind CSS and Shadcn UI, featuring a premium SaaS aesthetic with glass-morphism effects, refined shadows, and a mobile-first responsive strategy. Authentication is custom session-based with secure cookie storage.
