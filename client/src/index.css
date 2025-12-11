@@ -30,13 +30,16 @@
 .glow-infinity::after {
   content: '';
   position: absolute;
-  inset: -6px;
+  top: 50%;
+  left: 50%;
   width: 4px;
   height: 4px;
+  margin: -2px 0 0 -2px;
   background: rgba(251, 146, 60, 0.85);
   border-radius: 50%;
   box-shadow: 0 0 4px rgba(251, 146, 60, 0.6), inset 0 0 2px rgba(255, 255, 255, 0.4);
   animation: dotOrbit 6s linear infinite;
+  transform-origin: center;
 }
 
 /* SuperUser Section - TailAdmin Styling with Outfit Font */

@@ -183,7 +183,8 @@ export default function SafetyComplianceLanding() {
             </Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              WorkSafeBC just pulled into the parking lot.<br />
+              Your auditor just pulled<br />
+              into the parking lot.<br />
               <span className="text-sky-200">Are you ready?</span>
             </h1>
             
