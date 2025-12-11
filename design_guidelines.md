@@ -1,5 +1,9 @@
 # Design Guidelines: Premium Enterprise Rope Access SaaS Platform
 
+## Resources
+
+- **Brand Palette Visual:** `attached_assets/OnRopePro-Brand-Palette.pdf` — High-resolution color swatches and hex values for all primary, accent, and surface colors
+
 ## Design Approach
 
 **Reference Systems:** Linear (clean hierarchy, refined spacing), Notion (sophisticated neutrals, data density), Monday.com (vibrant accents, dashboard polish)  
