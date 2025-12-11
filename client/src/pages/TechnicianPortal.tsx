@@ -1741,7 +1741,7 @@ export default function TechnicianPortal() {
             {/* Referral Code in Top Bar */}
             {user?.referralCode && (
               <div className="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded-md bg-primary/10 border border-primary/20">
-                <span className="text-xs text-muted-foreground">{language === 'en' ? 'Code:' : 'Code:'}</span>
+                <span className="text-xs text-muted-foreground">{language === 'en' ? 'Referral:' : 'Parrainage:'}</span>
                 <span className="font-mono font-bold text-sm text-primary" data-testid="header-referral-code">
                   {user.referralCode}
                 </span>
