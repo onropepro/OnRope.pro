@@ -2690,6 +2690,13 @@ export default function Dashboard() {
     // Validate rope access hours if user chose to log them
     let ropeAccessHoursValue: number | undefined = undefined;
     if (data.logRopeAccessHours) {
+      // Require a value when toggle is on
+      if (!data.ropeAccessTaskHours || data.ropeAccessTaskHours.trim() === "") {
+        endDayForm.setError("ropeAccessTaskHours", {
+          message: "Please enter your rope access hours"
+        });
+        return;
+      }
       const hours = parseFloat(data.ropeAccessTaskHours);
       if (isNaN(hours) || hours < 0 || hours > 24) {
         endDayForm.setError("ropeAccessTaskHours", {
