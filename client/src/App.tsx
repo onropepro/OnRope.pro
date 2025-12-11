@@ -74,6 +74,7 @@ import CSRGuide from "@/pages/CSRGuide";
 import TechnicianRegistrationGuide from "@/pages/TechnicianRegistrationGuide";
 import PayrollGuide from "@/pages/PayrollGuide";
 import MobileDesignGuide from "@/pages/MobileDesignGuide";
+import SafetyComplianceLanding from "@/pages/SafetyComplianceLanding";
 import JobBoardGuide from "@/pages/JobBoardGuide";
 import Pricing from "@/pages/Pricing";
 import ROICalculator from "@/pages/ROICalculator";
@@ -329,6 +330,7 @@ function Router() {
       <Route path="/changelog/project-management" component={ProjectsGuide} />
       <Route path="/changelog/inventory" component={InventoryGuide} />
       <Route path="/changelog/safety" component={SafetyGuide} />
+      <Route path="/modules/safety-compliance" component={SafetyComplianceLanding} />
       <Route path="/changelog/user-access" component={UserAccessGuide} />
       <Route path="/changelog/projects" component={ProjectsGuide} />
       <Route path="/changelog/time-tracking" component={TimeTrackingGuide} />

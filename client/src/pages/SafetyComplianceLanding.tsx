@@ -1,0 +1,528 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { useState } from "react";
+import { Link } from "wouter";
+import {
+  Shield,
+  CheckCircle2,
+  Clock,
+  FileText,
+  Users,
+  ArrowRight,
+  AlertTriangle,
+  Package,
+  ClipboardCheck,
+  Building2,
+  Gauge,
+  Download,
+  HardHat,
+  Search,
+  Camera,
+  XCircle,
+  Timer,
+  ChevronRight,
+  Briefcase,
+  Scale,
+  TrendingDown,
+  BookOpen,
+  Signature,
+  Calendar
+} from "lucide-react";
+
+export default function SafetyComplianceLanding() {
+  const [expandedProblems, setExpandedProblems] = useState<string[]>([]);
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-sky-600 via-sky-700 to-blue-900 text-white">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMtOS45NDEgMC0xOCA4LjA1OS0xOCAxOHM4LjA1OSAxOCAxOCAxOGM5Ljk0MSAwIDE4LTguMDU5IDE4LTE4cy04LjA1OS0xOC0xOC0xOHptMCAzMmMtNy43MzIgMC0xNC02LjI2OC0xNC0xNHM2LjI2OC0xNCAxNC0xNHMxNCA2LjI2OCAxNCAxNC02LjI2OCAxNC0xNCAxNHoiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wMykiLz48L2c+PC9zdmc+')] opacity-30"></div>
+        
+        <div className="relative max-w-6xl mx-auto px-4 py-20 md:py-28">
+          <div className="text-center space-y-6">
+            <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-module-label">
+              Safety & Compliance Module
+            </Badge>
+            
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
+              The IRATA auditor is here.<br />
+              <span className="text-sky-200">Are you ready?</span>
+            </h1>
+            
+            <p className="text-xl md:text-2xl text-sky-100 max-w-3xl mx-auto leading-relaxed">
+              Daily harness inspections. Toolbox meetings. Equipment tracking. Digital signatures.
+              <br className="hidden md:block" />
+              <strong>All searchable. All exportable. All defensible.</strong>
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+              <Button size="lg" className="bg-white text-sky-700 hover:bg-sky-50" asChild data-testid="button-hero-trial">
+                <Link href="/register">
+                  Start Your Free Trial
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Link>
+              </Button>
+              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-hero-guide">
+                <Link href="/changelog/safety">
+                  Read the Full Guide
+                  <BookOpen className="ml-2 w-5 h-5" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+        
+        {/* Wave separator */}
+        <div className="absolute bottom-0 left-0 right-0">
+          <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto">
+            <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" className="fill-background"/>
+          </svg>
+        </div>
+      </section>
+
+      {/* Stats Panel */}
+      <section className="relative z-10 -mt-8 max-w-5xl mx-auto px-4">
+        <Card className="shadow-xl border-0">
+          <CardContent className="p-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-bold text-sky-600">2 sec</div>
+                <div className="text-sm text-muted-foreground mt-1">Inspection time</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-bold text-emerald-600">7 yrs</div>
+                <div className="text-sm text-muted-foreground mt-1">Record retention</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-bold text-violet-600">20+</div>
+                <div className="text-sm text-muted-foreground mt-1">Safety topics</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-bold text-amber-600">4 clicks</div>
+                <div className="text-sm text-muted-foreground mt-1">Audit PDF export</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* The Problem Section */}
+      <section className="py-16 md:py-20 px-4">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
+            The Scramble You Know Too Well
+          </h2>
+          
+          <Card className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+            <CardContent className="p-6 md:p-8 space-y-4 text-muted-foreground">
+              <p className="text-lg leading-relaxed">
+                Most rope access operators know exactly what happens when the auditor asks for six months of harness inspections.
+              </p>
+              <p>
+                The truck gets searched. The binder gets dug out. Someone says "I think Dave had that folder." Half the forms are missing. The ones you find have coffee stains and illegible handwriting.
+              </p>
+              <p>
+                You pass the audit. Barely. And you promise yourself you'll get organized.
+              </p>
+              <p className="font-medium text-foreground">
+                Until next time, when the exact same scramble happens again.
+              </p>
+              <Separator className="my-6" />
+              <p>
+                Meanwhile, your insurance carrier wants proof of your safety culture. Your property manager wants documentation before every job. And if someone gets hurt, the first question a lawyer asks is:
+              </p>
+              <blockquote className="border-l-4 border-rose-500 pl-4 py-2 bg-rose-50 dark:bg-rose-950 rounded-r text-rose-900 dark:text-rose-100 font-medium">
+                "Can you prove you conducted the required inspections?"
+              </blockquote>
+              <p className="text-foreground font-medium">
+                Paper forms can't protect you. Filing cabinets can't protect you. The best technicians in the world can't protect you if there's no record of what they did.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* Solution Section */}
+      <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+            What This Module Does
+          </h2>
+          <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
+            Complete safety documentation that creates itself through daily use.
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* Harness Inspections */}
+            <Card className="relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-sky-500 to-blue-600"></div>
+              <CardHeader>
+                <div className="w-12 h-12 rounded-lg bg-sky-100 dark:bg-sky-900 flex items-center justify-center mb-3">
+                  <HardHat className="w-6 h-6 text-sky-600" />
+                </div>
+                <CardTitle className="text-xl">Every Harness Inspection. Every Day.</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm text-muted-foreground">
+                <p>Before any technician starts a work session, they complete a digital inspection on their phone.</p>
+                <ul className="space-y-2">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
+                    <span>Webbing, buckles, stitching, D-rings, labels checked</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
+                    <span>Pass/fail recorded for each item</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
+                    <span>Photos attached for wear or damage</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
+                    <span>Failed equipment auto-flagged for retirement</span>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            {/* Toolbox Meetings */}
+            <Card className="relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-600"></div>
+              <CardHeader>
+                <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center mb-3">
+                  <Users className="w-6 h-6 text-emerald-600" />
+                </div>
+                <CardTitle className="text-xl">Toolbox Meetings That Actually Happened</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm text-muted-foreground">
+                <p>Choose from 20+ rope access safety topics and document who attended.</p>
+                <ul className="space-y-2">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
+                    <span>Fall protection, rescue, anchors, weather</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
+                    <span>Digital signatures or checkbox confirmation</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
+                    <span>Daily coverage tracked automatically</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
+                    <span>Never wonder if you're compliant</span>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            {/* Audit PDFs */}
+            <Card className="relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 to-purple-600"></div>
+              <CardHeader>
+                <div className="w-12 h-12 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center mb-3">
+                  <Download className="w-6 h-6 text-violet-600" />
+                </div>
+                <CardTitle className="text-xl">Audit-Ready PDFs in Four Clicks</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm text-muted-foreground">
+                <p>When the IRATA auditor calls, you don't panic. You search and export.</p>
+                <ul className="space-y-2">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
+                    <span>Search by date, technician, or serial number</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
+                    <span>Professional PDFs with embedded signatures</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
+                    <span>Same PDFs for insurance and property managers</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
+                    <span>Legal protection if anything goes to court</span>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Problems Solved Section */}
+      <section className="py-16 md:py-20 px-4">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+            Who This Is For
+          </h2>
+          <p className="text-center text-muted-foreground text-lg mb-10 max-w-2xl mx-auto">
+            Real problems from operators just like you.
+          </p>
+
+          <Accordion type="multiple" value={expandedProblems} onValueChange={setExpandedProblems} className="space-y-4">
+            <AccordionItem value="organized" className="border rounded-lg px-4 bg-card">
+              <AccordionTrigger className="text-left" data-testid="accordion-organized">
+                <div className="flex items-center gap-3">
+                  <Clock className="w-5 h-5 text-amber-600 shrink-0" />
+                  <span className="font-semibold">For the operator who's "been meaning to get organized"</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="space-y-3 text-muted-foreground pb-4">
+                <p>You've said it for years. You'll fix the filing system. You'll buy better binders. You'll make everyone fill out the forms properly.</p>
+                <p>But the season starts, you're short-staffed, jobs stack up, and safety paperwork becomes "something we'll catch up on later."</p>
+                <p className="text-foreground font-medium">The problem isn't discipline. The problem is that paper systems require constant effort to maintain. Digital systems require one-time setup and then they just work.</p>
+                <p>Your techs complete inspections on their phones while waiting for the elevator. The records exist whether you're paying attention or not.</p>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="audit" className="border rounded-lg px-4 bg-card">
+              <AccordionTrigger className="text-left" data-testid="accordion-audit">
+                <div className="flex items-center gap-3">
+                  <ClipboardCheck className="w-5 h-5 text-sky-600 shrink-0" />
+                  <span className="font-semibold">For the operator who's been through an audit</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="space-y-3 text-muted-foreground pb-4">
+                <p>You know the sick feeling when someone asks for documentation you're not 100% sure you have.</p>
+                <p>You've made promises to yourself about how next time will be different.</p>
+                <p className="text-foreground font-medium">Here's how next time actually becomes different: the records create themselves. Daily. Automatically. With timestamps and signatures that can't be disputed.</p>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="liability" className="border rounded-lg px-4 bg-card">
+              <AccordionTrigger className="text-left" data-testid="accordion-liability">
+                <div className="flex items-center gap-3">
+                  <Scale className="w-5 h-5 text-rose-600 shrink-0" />
+                  <span className="font-semibold">For the operator worried about liability</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="space-y-3 text-muted-foreground pb-4">
+                <p>Rope access work is dangerous. Everyone knows it. That's why IRATA and SPRAT exist. That's why inspections are mandatory.</p>
+                <p>But mandatory and documented are not the same thing.</p>
+                <p className="text-foreground font-medium">If a harness fails and someone gets hurt, the investigation starts with one question: can you prove you inspected it? Can you prove you trained your people? Can you prove you discussed the specific hazards of this specific job?</p>
+                <p>With paper forms, you're hoping the right pieces of paper exist and can be found. With digital records, you know exactly what exists because you can search for it.</p>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
+      </section>
+
+      {/* Features Grid */}
+      <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+            Everything You Need
+          </h2>
+          <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
+            Complete safety documentation in one integrated system.
+          </p>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <FeatureCard
+              icon={Package}
+              title="Equipment Inventory"
+              description="Track every harness, lanyard, descender, ascender, and rope. Serial numbers, manufacturers, purchase dates, service life remaining."
+            />
+            <FeatureCard
+              icon={ClipboardCheck}
+              title="Daily Inspection Checklists"
+              description="Digital forms guide technicians through every required check. Binary pass/fail for each item with notes and photos."
+            />
+            <FeatureCard
+              icon={AlertTriangle}
+              title="Automatic Flagging"
+              description="Equipment that fails inspection gets flagged immediately. Retirement workflows trigger automatically."
+            />
+            <FeatureCard
+              icon={BookOpen}
+              title="20+ Safety Topics"
+              description="Fall protection, weather assessment, rescue procedures, anchor inspection, load calculations, and more."
+            />
+            <FeatureCard
+              icon={Signature}
+              title="Digital Signatures"
+              description="Attendance at toolbox meetings verified with legally binding signatures. Timestamps captured automatically."
+            />
+            <FeatureCard
+              icon={Search}
+              title="Searchable History"
+              description="Find any inspection by date, technician, equipment serial number, or project. No more digging through boxes."
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Quantified Benefits */}
+      <section className="py-16 md:py-20 px-4">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+            Measurable Results
+          </h2>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card className="border-emerald-200 dark:border-emerald-900 bg-emerald-50/50 dark:bg-emerald-950/50">
+              <CardContent className="p-6 flex gap-4">
+                <div className="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0">
+                  <TrendingDown className="w-6 h-6 text-emerald-600" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg text-emerald-900 dark:text-emerald-100">10-20% Insurance Premium Savings</h3>
+                  <p className="text-sm text-emerald-800 dark:text-emerald-200 mt-1">
+                    Insurance carriers reward documented safety culture. Complete inspection records demonstrate systematic risk management.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-sky-200 dark:border-sky-900 bg-sky-50/50 dark:bg-sky-950/50">
+              <CardContent className="p-6 flex gap-4">
+                <div className="w-12 h-12 rounded-full bg-sky-100 dark:bg-sky-900 flex items-center justify-center shrink-0">
+                  <Timer className="w-6 h-6 text-sky-600" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg text-sky-900 dark:text-sky-100">Audit Preparation: Days to Minutes</h3>
+                  <p className="text-sm text-sky-800 dark:text-sky-200 mt-1">
+                    The scramble before an IRATA audit used to take days. Now it takes minutes. Search. Export. Done.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-violet-200 dark:border-violet-900 bg-violet-50/50 dark:bg-violet-950/50">
+              <CardContent className="p-6 flex gap-4">
+                <div className="w-12 h-12 rounded-full bg-violet-100 dark:bg-violet-900 flex items-center justify-center shrink-0">
+                  <Shield className="w-6 h-6 text-violet-600" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg text-violet-900 dark:text-violet-100">Liability Protection</h3>
+                  <p className="text-sm text-violet-800 dark:text-violet-200 mt-1">
+                    In accident investigations, documented proof of due diligence changes everything. Demonstrate exactly what happened.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-amber-200 dark:border-amber-900 bg-amber-50/50 dark:bg-amber-950/50">
+              <CardContent className="p-6 flex gap-4">
+                <div className="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0">
+                  <Gauge className="w-6 h-6 text-amber-600" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg text-amber-900 dark:text-amber-100">Equipment ROI Tracking</h3>
+                  <p className="text-sm text-amber-800 dark:text-amber-200 mt-1">
+                    Know exactly how long each piece of equipment lasts in service. Predict replacement needs. Budget accurately.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Objection Handling */}
+      <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+            Common Questions
+          </h2>
+
+          <div className="space-y-6">
+            <ObjectionCard
+              question="My techs hate paperwork."
+              answer="So do everyone's techs. That's why this works. Completing an inspection on a phone takes less than two minutes. It's faster than filling out a paper form, and they don't have to remember to bring the forms back to the office."
+            />
+            <ObjectionCard
+              question="We're too small to need software."
+              answer="The smaller you are, the more every audit matters. One failed IRATA audit. One insurance coverage gap. One lawsuit where you can't prove due diligence. The cost of any of those is more than years of software."
+            />
+            <ObjectionCard
+              question="Paper has worked fine so far."
+              answer="Has it? Or have you just been lucky? Every operator who lost their certification or lost a lawsuit thought paper was working fine right up until it wasn't."
+            />
+            <ObjectionCard
+              question="I don't have time to set this up."
+              answer="Initial setup takes an afternoon. Add your equipment. Add your techs. After that, the system maintains itself through daily use. The time you save over the next month pays back the setup time ten times over."
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="py-20 md:py-28 px-4 bg-gradient-to-br from-sky-600 via-sky-700 to-blue-900 text-white">
+        <div className="max-w-3xl mx-auto text-center space-y-6">
+          <h2 className="text-3xl md:text-4xl font-bold">
+            Stop wondering if you're compliant.<br />
+            <span className="text-sky-200">Start knowing.</span>
+          </h2>
+          <p className="text-xl text-sky-100">
+            Every harness inspection. Every toolbox meeting. Every signature.
+            <br />
+            Searchable, exportable, and ready for whatever audit comes next.
+          </p>
+          <div className="pt-4">
+            <Button size="lg" className="bg-white text-sky-700 hover:bg-sky-50" asChild data-testid="button-final-cta">
+              <Link href="/register">
+                Start Your Free Trial
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Link>
+            </Button>
+            <p className="text-sm text-sky-200 mt-4">
+              Free 90-day trial for Founding Members. No credit card required.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Disclaimer */}
+      <section className="py-8 px-4 border-t">
+        <div className="max-w-4xl mx-auto">
+          <Card className="border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950">
+            <CardContent className="p-4 text-sm text-amber-900 dark:text-amber-100">
+              <p className="flex items-center gap-2 font-semibold mb-2">
+                <AlertTriangle className="w-4 h-4" />
+                Important: Safety Compliance Responsibility
+              </p>
+              <p>
+                OnRopePro helps document safety procedures, but you remain fully responsible for workplace safety and regulatory compliance. This software does not replace qualified safety professionals, IRATA/SPRAT training, equipment inspections by certified inspectors, or adherence to all applicable OSHA/WorkSafeBC regulations.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function FeatureCard({ icon: Icon, title, description }: { icon: any; title: string; description: string }) {
+  return (
+    <Card className="hover:shadow-md transition-shadow">
+      <CardContent className="p-5">
+        <div className="w-10 h-10 rounded-lg bg-sky-100 dark:bg-sky-900 flex items-center justify-center mb-3">
+          <Icon className="w-5 h-5 text-sky-600" />
+        </div>
+        <h3 className="font-semibold mb-2">{title}</h3>
+        <p className="text-sm text-muted-foreground">{description}</p>
+      </CardContent>
+    </Card>
+  );
+}
+
+function ObjectionCard({ question, answer }: { question: string; answer: string }) {
+  return (
+    <Card>
+      <CardContent className="p-5">
+        <h3 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+          <ChevronRight className="w-4 h-4 text-sky-600" />
+          "{question}"
+        </h3>
+        <p className="text-muted-foreground text-sm pl-6">{answer}</p>
+      </CardContent>
+    </Card>
+  );
+}
