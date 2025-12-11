@@ -5471,22 +5471,45 @@ export default function Documents() {
                                   <div className="font-medium text-sm truncate">{review.documentName}</div>
                                   <div className="text-xs text-muted-foreground">{formatDocType(review.documentType)}</div>
                                 </div>
-                                <div className="text-right text-xs space-y-1">
-                                  {review.viewedAt && (
-                                    <div className="flex items-center gap-1 text-muted-foreground">
-                                      <Eye className="h-3 w-3" />
-                                      {formatTimestamp(review.viewedAt)}
+                                <div className="flex items-center gap-2">
+                                  {/* Show action buttons only for the current user's own documents */}
+                                  {employee.employeeId === currentUser?.id && !review.signedAt && (
+                                    <div className="flex items-center gap-2">
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          // Find the document URL and open it
+                                          const doc = requiredDocs.find((d: any) => d.id === review.documentId);
+                                          if (doc?.fileUrl) {
+                                            window.open(doc.fileUrl, '_blank');
+                                          }
+                                        }}
+                                        data-testid={`button-view-doc-${review.id}`}
+                                      >
+                                        <Eye className="h-4 w-4 mr-1" />
+                                        {t('common.view', 'View')}
+                                      </Button>
                                     </div>
                                   )}
-                                  {review.signedAt && (
-                                    <div className="flex items-center gap-1 text-primary">
-                                      <PenLine className="h-3 w-3" />
-                                      {formatTimestamp(review.signedAt)}
-                                    </div>
-                                  )}
-                                  {!review.viewedAt && !review.signedAt && (
-                                    <div className="text-muted-foreground">{t('documents.notViewed', 'Not viewed')}</div>
-                                  )}
+                                  <div className="text-right text-xs space-y-1">
+                                    {review.viewedAt && (
+                                      <div className="flex items-center gap-1 text-muted-foreground">
+                                        <Eye className="h-3 w-3" />
+                                        {formatTimestamp(review.viewedAt)}
+                                      </div>
+                                    )}
+                                    {review.signedAt && (
+                                      <div className="flex items-center gap-1 text-primary">
+                                        <PenLine className="h-3 w-3" />
+                                        {formatTimestamp(review.signedAt)}
+                                      </div>
+                                    )}
+                                    {!review.viewedAt && !review.signedAt && (
+                                      <div className="text-muted-foreground">{t('documents.notViewed', 'Not viewed')}</div>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                             ))}
