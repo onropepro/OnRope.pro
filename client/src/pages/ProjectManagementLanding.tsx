@@ -6,6 +6,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
+import ropeAccessSoftwareImg from "@assets/rope-access-software_1765481835892.jpg";
 import {
   Briefcase,
   CheckCircle2,
@@ -281,6 +282,25 @@ export default function ProjectManagementLanding() {
           <p className="text-muted-foreground leading-relaxed text-base">
             High-rise window cleaning doesn't happen all at once. The north elevation might be 80% done while the south hasn't started. OnRopePro tracks North, East, South, and West independently. See exactly which directions are complete, in progress, or waiting. Your supervisor knows where to send the crew. Your client sees real progress instead of vague percentages.
           </p>
+        </div>
+      </section>
+
+      {/* Software in Action Image */}
+      <section className="py-12 md:py-16 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="relative rounded-xl overflow-hidden shadow-2xl">
+            <img 
+              src={ropeAccessSoftwareImg} 
+              alt="OnRopePro project management software shown on tablet with rope access technician working on high-rise building" 
+              className="w-full h-auto object-cover"
+              data-testid="img-software-showcase"
+            />
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6 md:p-8">
+              <p className="text-white text-lg md:text-xl font-medium">
+                Real-time elevation tracking. From any device. At any height.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
