@@ -592,6 +592,294 @@ export default function ProjectsGuide() {
 
         <Separator />
 
+        {/* Performance & Productivity Gains */}
+        <section className="space-y-6">
+          <div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-2 flex items-center gap-2">
+              <TrendingUp className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+              Performance & Productivity Gains
+            </h2>
+            <p className="text-muted-foreground leading-relaxed text-base">
+              Measurable improvements that directly impact your bottom line.
+            </p>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card className="border-emerald-200 dark:border-emerald-800">
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <Eye className="w-5 h-5 text-emerald-600" />
+                  <CardTitle className="text-base">Employee Productivity Visibility</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-emerald-600 mb-2">15-25%</div>
+                <p className="text-sm text-muted-foreground">Improvement through performance tracking. See who's crushing it and who needs coaching—backed by objective data, not gut feeling.</p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-emerald-200 dark:border-emerald-800">
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <Users className="w-5 h-5 text-emerald-600" />
+                  <CardTitle className="text-base">Crew Utilization Optimization</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-emerald-600 mb-2">10-15%</div>
+                <p className="text-sm text-muted-foreground">Reduction in idle time through better scheduling. No more techs sitting around waiting for assignments or showing up to the wrong site.</p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-emerald-200 dark:border-emerald-800">
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <Zap className="w-5 h-5 text-emerald-600" />
+                  <CardTitle className="text-base">Project Completion Speed</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-emerald-600 mb-2">20-30%</div>
+                <p className="text-sm text-muted-foreground">Faster completion through coordination and accountability. Clear targets, real-time tracking, and visible performance create natural motivation.</p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-emerald-200 dark:border-emerald-800">
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-emerald-600" />
+                  <CardTitle className="text-base">Quote-to-Project Cycle Time</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-emerald-600 mb-2">75%</div>
+                <p className="text-sm text-muted-foreground">Reduction in quote preparation time—from 45 minutes to 10 minutes. Historical data makes estimating fast and accurate.</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card className="bg-emerald-50 dark:bg-emerald-950 border-emerald-200 dark:border-emerald-800">
+            <CardContent className="pt-6">
+              <h4 className="font-semibold mb-3 flex items-center gap-2">
+                <DollarSign className="w-5 h-5 text-emerald-600" />
+                Annual Revenue Impact
+              </h4>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="p-4 bg-white dark:bg-emerald-900 rounded-lg">
+                  <p className="text-sm text-muted-foreground mb-1">Additional Revenue (More Projects/Year)</p>
+                  <p className="text-2xl font-bold text-emerald-600">$100K - $200K</p>
+                  <p className="text-xs text-muted-foreground mt-1">20-25% more projects completed annually</p>
+                </div>
+                <div className="p-4 bg-white dark:bg-emerald-900 rounded-lg">
+                  <p className="text-sm text-muted-foreground mb-1">Labor Cost Reduction</p>
+                  <p className="text-2xl font-bold text-emerald-600">$50K - $75K</p>
+                  <p className="text-xs text-muted-foreground mt-1">Better crew utilization eliminates waste</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        <Separator />
+
+        {/* Client Relationship Benefits */}
+        <section className="space-y-6">
+          <div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-2 flex items-center gap-2">
+              <MessageSquare className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              Client Relationship Benefits
+            </h2>
+            <p className="text-muted-foreground leading-relaxed text-base">
+              Build trust and retain clients through professional transparency.
+            </p>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Card>
+              <CardContent className="pt-6 text-center">
+                <div className="text-3xl font-bold text-blue-600 mb-2">60-70%</div>
+                <p className="font-medium text-sm">Resident Complaint Reduction</p>
+                <p className="text-xs text-muted-foreground mt-1">Self-service portal eliminates "When will you be done?" calls</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6 text-center">
+                <div className="text-3xl font-bold text-blue-600 mb-2">15-25%</div>
+                <p className="font-medium text-sm">Contract Renewal Increase</p>
+                <p className="text-xs text-muted-foreground mt-1">Professional transparency builds lasting relationships</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6 text-center">
+                <div className="text-3xl font-bold text-blue-600 mb-2">30-40%</div>
+                <p className="font-medium text-sm">More Referrals</p>
+                <p className="text-xs text-muted-foreground mt-1">Happy building managers tell their colleagues</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6 text-center">
+                <div className="text-3xl font-bold text-blue-600 mb-2">20+ hrs</div>
+                <p className="font-medium text-sm">Manager Time Saved</p>
+                <p className="text-xs text-muted-foreground mt-1">Per month per active project</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
+            <CardContent className="pt-6">
+              <h4 className="font-semibold mb-3">Contract Retention Value</h4>
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-sm">Lost Contract Impact</p>
+                    <p className="text-sm text-muted-foreground">Each lost contract = $30K-$50K annual revenue loss</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-sm">Protected Revenue</p>
+                    <p className="text-sm text-muted-foreground">15-25% higher retention = 4-6 additional renewals/year = <span className="font-bold text-blue-600">$200K protected revenue</span></p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-l-4 border-l-blue-500">
+            <CardContent className="pt-6">
+              <p className="italic text-muted-foreground">"Most professional contractor we work with"</p>
+              <p className="text-sm font-medium mt-2">— What building managers say about OnRopePro users</p>
+            </CardContent>
+          </Card>
+        </section>
+
+        <Separator />
+
+        {/* Module Integration Points */}
+        <section className="space-y-6">
+          <div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-2 flex items-center gap-2">
+              <Layers className="w-6 h-6 text-violet-600 dark:text-violet-400" />
+              Module Integration Points
+            </h2>
+            <p className="text-muted-foreground leading-relaxed text-base">
+              Projects are the operational orchestration hub connecting multiple OnRopePro modules. Everything is linked with everything.
+            </p>
+          </div>
+
+          <Card className="bg-violet-50 dark:bg-violet-950 border-violet-200 dark:border-violet-800 mb-4">
+            <CardContent className="pt-6">
+              <p className="italic">"Everything is linked with everything. If you do one thing, it does something else for you somewhere else. Like the guys work, but it fills the payroll."</p>
+              <p className="text-sm font-medium mt-2 text-muted-foreground">— Core OnRopePro design philosophy</p>
+            </CardContent>
+          </Card>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <Users className="w-5 h-5 text-violet-600" />
+                  <CardTitle className="text-base">Employee Management</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-sm text-muted-foreground">Crew assignments pull from employee directory with qualification filtering (IRATA Level, certifications). Performance metrics generated from project work sessions.</p>
+                <div className="flex items-center gap-2 text-sm">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span>Ensure qualified crew assigned for safety + client confidence</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <DollarSign className="w-5 h-5 text-violet-600" />
+                  <CardTitle className="text-base">Payroll & Time Tracking</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-sm text-muted-foreground">Work sessions auto-populate payroll timesheets. Drop counts, hours, or units convert to wages automatically. Piece-work rates calculated.</p>
+                <div className="flex items-center gap-2 text-sm">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span className="font-medium">87-93% payroll error reduction</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-violet-600" />
+                  <CardTitle className="text-base">Safety & Compliance</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-sm text-muted-foreground">Project-specific Rope Access Plans, Toolbox Meetings, and Anchor Inspections linked directly. Building managers download safety docs instantly.</p>
+                <div className="flex items-center gap-2 text-sm">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span>10-20% insurance premium discount potential</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-violet-600" />
+                  <CardTitle className="text-base">Scheduling & Calendar</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-sm text-muted-foreground">Project creation automatically generates calendar entries. Drag-and-drop editing syncs back to projects. Conflict detection across all assignments.</p>
+                <div className="flex items-center gap-2 text-sm">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span className="font-medium">5-10 hours/week saved on scheduling</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="w-5 h-5 text-violet-600" />
+                  <CardTitle className="text-base">Feedback Management</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-sm text-muted-foreground">Residents submit feedback tied to specific projects. Building managers see feedback in project context. Company responses visible to all stakeholders.</p>
+                <div className="flex items-center gap-2 text-sm">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span className="font-medium">60-70% reduction in complaint volume</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5 text-violet-600" />
+                  <CardTitle className="text-base">Analytics & Reporting</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-sm text-muted-foreground">Historical project data feeds quote accuracy models. Performance trends identify training opportunities. Profitability analysis per project type.</p>
+                <div className="flex items-center gap-2 text-sm">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span className="font-medium">15-20% more accurate quoting</span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        <Separator />
+
         <section className="space-y-4">
           <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <Grid3X3 className="w-5 h-5 text-purple-600 dark:text-purple-400" />
