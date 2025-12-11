@@ -179,8 +179,8 @@ export default function SafetyComplianceLanding() {
                 <div className="text-sm text-muted-foreground mt-1">Failed audits</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-violet-600">20+</div>
-                <div className="text-sm text-muted-foreground mt-1">Safety topics</div>
+                <div className="text-3xl md:text-4xl font-bold text-violet-600">0</div>
+                <div className="text-sm text-muted-foreground mt-1">Sleepless nights</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl md:text-4xl font-bold text-amber-600">&#8734;</div>
