@@ -77,6 +77,10 @@ export default function IncidentReportForm() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
+  // Get projectId from URL if opened from project detail
+  const urlParams = new URLSearchParams(window.location.search);
+  const projectIdFromUrl = urlParams.get('projectId');
+  
   // People Involved State
   const [peopleInvolved, setPeopleInvolved] = useState<PersonInvolved[]>([]);
   const [showAddPersonDialog, setShowAddPersonDialog] = useState(false);
@@ -117,13 +121,22 @@ export default function IncidentReportForm() {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   };
 
+  // Navigation helper - returns to project if opened from one
+  const handleNavigateBack = () => {
+    if (projectIdFromUrl) {
+      navigate(`/projects/${projectIdFromUrl}`);
+    } else {
+      navigate("/documents");
+    }
+  };
+
   const form = useForm<IncidentReportFormValues>({
     resolver: zodResolver(incidentReportFormSchema),
     defaultValues: {
       incidentDate: getLocalDateString(),
       incidentTime: "",
       location: "",
-      projectId: "",
+      projectId: projectIdFromUrl || "",
       reportedByName: "",
       reportDate: getLocalDateString(),
       description: "",
@@ -259,11 +272,15 @@ export default function IncidentReportForm() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/incident-reports"] });
+      // Also invalidate project-specific incident reports if opened from project
+      if (projectIdFromUrl) {
+        queryClient.invalidateQueries({ queryKey: ["/api/projects", projectIdFromUrl, "incident-reports"] });
+      }
       toast({
         title: t('incidentReport.toasts.reportSaved', 'Report Saved'),
         description: t('incidentReport.toasts.reportSavedDesc', 'Incident report has been saved successfully'),
       });
-      navigate("/documents");
+      handleNavigateBack();
     },
     onError: (error: Error) => {
       toast({
@@ -294,12 +311,12 @@ export default function IncidentReportForm() {
         <div className="mb-6">
           <Button
             variant="ghost"
-            onClick={() => navigate("/documents")}
+            onClick={handleNavigateBack}
             className="mb-2"
             data-testid="back-to-documents"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            {t('incidentReport.backToDocuments', 'Back to Documents')}
+            {projectIdFromUrl ? t('incidentReport.backToProject', 'Back to Project') : t('incidentReport.backToDocuments', 'Back to Documents')}
           </Button>
           <div className="flex items-center gap-3">
             <AlertTriangle className="h-8 w-8 text-destructive" />
@@ -906,7 +923,7 @@ export default function IncidentReportForm() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => navigate("/documents")}
+                onClick={handleNavigateBack}
                 data-testid="cancel-button"
               >
                 {t('incidentReport.buttons.cancel', 'Cancel')}
