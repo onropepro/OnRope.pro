@@ -15,10 +15,13 @@ run = ["npx", "tsx", "server/backup-database.ts"]
 localPort = 5000
 externalPort = 80
 
+<<<<<<< HEAD
 [[ports]]
 localPort = 36573
 externalPort = 3000
 
+=======
+>>>>>>> 05bd0d09cbaa04c07dec3f6fbae6679435545af3
 [env]
 PORT = "5000"
 

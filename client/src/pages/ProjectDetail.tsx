@@ -1658,7 +1658,7 @@ export default function ProjectDetail() {
               <Button
                 variant="outline"
                 className="h-auto py-4 flex flex-col items-center gap-2"
-                onClick={() => setLocation(`/flha?projectId=${id}`)}
+                onClick={() => setLocation(`/flha-form?projectId=${id}`)}
                 data-testid="button-flha"
               >
                 <span className="material-icons text-2xl text-green-600">assignment</span>

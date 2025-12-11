@@ -3002,7 +3002,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         birthday,
         specialMedicalConditions,
         irataBaselineHours,
+        irataHoursAtLastUpgrade,
+        irataLastUpgradeDate,
         irataExpirationDate,
+        spratBaselineHours,
+        spratHoursAtLastUpgrade,
+        spratLastUpgradeDate,
         spratExpirationDate,
         ropeAccessSpecialties,
       } = req.body;
@@ -3044,7 +3049,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (birthday !== undefined) updateData.birthday = birthday || null;
       if (driversLicenseExpiry !== undefined) updateData.driversLicenseExpiry = driversLicenseExpiry || null;
       if (irataBaselineHours !== undefined) updateData.irataBaselineHours = irataBaselineHours || "0";
+      if (irataHoursAtLastUpgrade !== undefined) updateData.irataHoursAtLastUpgrade = irataHoursAtLastUpgrade || null;
+      if (irataLastUpgradeDate !== undefined) updateData.irataLastUpgradeDate = irataLastUpgradeDate || null;
       if (irataExpirationDate !== undefined) updateData.irataExpirationDate = irataExpirationDate || null;
+      if (spratBaselineHours !== undefined) updateData.spratBaselineHours = spratBaselineHours || "0";
+      if (spratHoursAtLastUpgrade !== undefined) updateData.spratHoursAtLastUpgrade = spratHoursAtLastUpgrade || null;
+      if (spratLastUpgradeDate !== undefined) updateData.spratLastUpgradeDate = spratLastUpgradeDate || null;
       if (spratExpirationDate !== undefined) updateData.spratExpirationDate = spratExpirationDate || null;
       if (ropeAccessSpecialties !== undefined) updateData.ropeAccessSpecialties = Array.isArray(ropeAccessSpecialties) ? ropeAccessSpecialties : [];
 
@@ -13198,10 +13208,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ? Math.round(((totalRequiredSignatures - signedReviews) / totalRequiredSignatures) * 5)
         : 0;
       
+      // 6. Project Safety Documentation Rating
+      // Tracks per-project safety documents: Anchor Inspection, Rope Access Plan, FLHA
+      // Each active project should have these documents - penalty proportional to missing docs
+      const flhaForms = await storage.getFlhaFormsByCompany(companyId);
+      
+      let projectsWithAnchorInspection = 0;
+      let projectsWithRopeAccessPlan = 0;
+      let projectsWithFLHA = 0;
+      let activeProjectCount = 0;
+      
+      for (const project of projects) {
+        // Skip deleted projects entirely - they should not contribute to any counts
+        if (project.status === 'deleted') continue;
+        
+        // Only count active projects
+        activeProjectCount++;
+        
+        if (project.anchorInspectionCertificateUrl) {
+          projectsWithAnchorInspection++;
+        }
+        if (project.ropeAccessPlanUrl) {
+          projectsWithRopeAccessPlan++;
+        }
+        // Check if project has at least one FLHA form
+        const projectFLHAs = flhaForms.filter((f: any) => f.projectId === project.id);
+        if (projectFLHAs.length > 0) {
+          projectsWithFLHA++;
+        }
+      }
+      
+      // Calculate project documentation rating
+      // Each of the 3 document types contributes equally (33.3% each)
+      // Total required = activeProjectCount * 3 (anchor, rope access plan, FLHA)
+      const totalProjectDocsRequired = activeProjectCount * 3;
+      const totalProjectDocsPresent = projectsWithAnchorInspection + projectsWithRopeAccessPlan + projectsWithFLHA;
+      
+      // If no active projects, 100% compliance
+      const projectDocumentationRating = totalProjectDocsRequired > 0
+        ? Math.round((totalProjectDocsPresent / totalProjectDocsRequired) * 100)
+        : 100;
+      // Max 20% penalty for missing project documents
+      const projectDocumentationPenalty = totalProjectDocsRequired > 0
+        ? Math.round(((totalProjectDocsRequired - totalProjectDocsPresent) / totalProjectDocsRequired) * 20)
+        : 0;
+      
       // Calculate overall CSR: Start at 100%, subtract penalties
-      // Max penalty is 80% (25% docs, 25% toolbox, 25% harness, 5% document reviews)
+      // Max penalty is 100% (25% docs, 25% toolbox, 25% harness, 5% document reviews, 20% project docs)
       // Project completion is shown but doesn't penalize
-      const totalPenalty = documentationPenalty + toolboxPenalty + harnessPenalty + documentReviewPenalty + projectPenalty;
+      const totalPenalty = documentationPenalty + toolboxPenalty + harnessPenalty + documentReviewPenalty + projectDocumentationPenalty + projectPenalty;
       const overallCSR = Math.max(0, 100 - totalPenalty);
       
       res.json({
@@ -13211,6 +13266,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           toolboxMeetingRating,
           harnessInspectionRating,
           documentReviewRating,
+          projectDocumentationRating,
           projectCompletionRating
         },
         details: {
@@ -13226,7 +13282,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           documentReviewsTotalEmployees: totalEmployees,
           documentReviewsTotalDocs: totalRequiredDocs,
           projectCount,
-          totalProjectProgress: projectCount > 0 ? Math.round(totalProjectProgress / projectCount) : 100
+          totalProjectProgress: projectCount > 0 ? Math.round(totalProjectProgress / projectCount) : 100,
+          projectsWithAnchorInspection,
+          projectsWithRopeAccessPlan,
+          projectsWithFLHA,
+          activeProjectCount
         }
       });
     } catch (error) {

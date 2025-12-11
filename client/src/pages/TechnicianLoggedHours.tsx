@@ -111,6 +111,29 @@ const translations = {
     unknownProject: "Unknown Project",
     importantNotice: "Important Notice",
     logbookDisclaimer: "This is a personal tracking tool to help you monitor your rope access hours. You must still record all hours in your official IRATA/SPRAT logbook - this digital log does not replace it and is not valid for certification purposes.",
+    certificationProgress: "Next Level Progress",
+    certificationProgressDesc: "Track your hours and time toward certification upgrade",
+    hoursAtLastUpgrade: "Hours at Last Certification",
+    dateOfLastUpgrade: "Date of Last Certification",
+    hoursTowardUpgrade: "Hours Toward Upgrade",
+    timeTowardUpgrade: "Time Toward Upgrade",
+    hoursRemaining: "hours remaining",
+    monthsRemaining: "months remaining",
+    daysRemaining: "days remaining",
+    eligibleForUpgrade: "Eligible for upgrade!",
+    setBaseline: "Set Baseline",
+    updateBaseline: "Update Baseline",
+    irataRequirements: "IRATA requires 1,000 hours and 1 year between levels",
+    spratRequirements: "SPRAT requires 500 hours and 6 months between levels",
+    currentLevel: "Current Level",
+    nextLevel: "Next Level",
+    notSet: "Not set",
+    level1: "Level 1",
+    level2: "Level 2",
+    level3: "Level 3",
+    maxLevel: "Already at highest level",
+    baselineSaved: "Baseline Saved",
+    baselineSavedDesc: "Your certification baseline has been updated.",
     scanLogbook: "Scan Logbook Page",
     scanning: "Analyzing...",
     scanLogbookDesc: "Take a photo of your logbook page to automatically extract entries",
@@ -248,6 +271,29 @@ const translations = {
     unknownProject: "Projet inconnu",
     importantNotice: "Avis important",
     logbookDisclaimer: "Ceci est un outil de suivi personnel pour vous aider à surveiller vos heures d'accès sur corde. Vous devez toujours enregistrer toutes vos heures dans votre carnet IRATA/SPRAT officiel - ce journal numérique ne le remplace pas et n'est pas valide pour les fins de certification.",
+    certificationProgress: "Progression vers le niveau suivant",
+    certificationProgressDesc: "Suivez vos heures et votre temps pour la mise à niveau",
+    hoursAtLastUpgrade: "Heures à la dernière certification",
+    dateOfLastUpgrade: "Date de la dernière certification",
+    hoursTowardUpgrade: "Heures vers la mise à niveau",
+    timeTowardUpgrade: "Temps vers la mise à niveau",
+    hoursRemaining: "heures restantes",
+    monthsRemaining: "mois restants",
+    daysRemaining: "jours restants",
+    eligibleForUpgrade: "Éligible pour la mise à niveau!",
+    setBaseline: "Définir la base",
+    updateBaseline: "Mettre à jour la base",
+    irataRequirements: "IRATA exige 1 000 heures et 1 an entre les niveaux",
+    spratRequirements: "SPRAT exige 500 heures et 6 mois entre les niveaux",
+    currentLevel: "Niveau actuel",
+    nextLevel: "Niveau suivant",
+    notSet: "Non défini",
+    level1: "Niveau 1",
+    level2: "Niveau 2",
+    level3: "Niveau 3",
+    maxLevel: "Déjà au niveau le plus élevé",
+    baselineSaved: "Base enregistrée",
+    baselineSavedDesc: "Votre base de certification a été mise à jour.",
     scanLogbook: "Scanner une page",
     scanning: "Analyse...",
     scanLogbookDesc: "Prenez une photo de votre page de carnet pour extraire automatiquement les entrees",
@@ -405,6 +451,13 @@ export default function TechnicianLoggedHours() {
   const [showBaselineDialog, setShowBaselineDialog] = useState(false);
   const [newBaselineHours, setNewBaselineHours] = useState("");
   
+  // Certification upgrade baseline dialog state
+  const [showCertBaselineDialog, setShowCertBaselineDialog] = useState(false);
+  const [certBaselineHours, setCertBaselineHours] = useState("");
+  const [certBaselineDate, setCertBaselineDate] = useState("");
+  const [certType, setCertType] = useState<'irata' | 'sprat'>('irata');
+  const [isSavingCertBaseline, setIsSavingCertBaseline] = useState(false);
+  
   // Manual hours dialog state (for when employer doesn't use OnRopePro)
   const [showManualHoursDialog, setShowManualHoursDialog] = useState(false);
   
@@ -466,6 +519,113 @@ export default function TechnicianLoggedHours() {
   
   // Combined total = baseline + work sessions + manual hours (excludes previous/historical)
   const combinedTotalHours = baselineHours + totalLoggedHours + totalManualHours;
+
+  // Certification upgrade progress calculations
+  const irataLevel = user?.irataLevel || null;
+  const spratLevel = user?.spratLevel || null;
+  const irataHoursAtLastUpgrade = user?.irataHoursAtLastUpgrade ? parseFloat(user.irataHoursAtLastUpgrade) : null;
+  const irataLastUpgradeDate = user?.irataLastUpgradeDate || null;
+  const spratHoursAtLastUpgrade = user?.spratHoursAtLastUpgrade ? parseFloat(user.spratHoursAtLastUpgrade) : null;
+  const spratLastUpgradeDate = user?.spratLastUpgradeDate || null;
+
+  // Calculate progress toward next level
+  const calculateUpgradeProgress = (
+    certType: 'irata' | 'sprat',
+    currentLevel: string | null,
+    hoursAtLastUpgrade: number | null,
+    lastUpgradeDate: string | null,
+    totalHours: number
+  ) => {
+    const requiredHours = certType === 'irata' ? 1000 : 500;
+    const requiredMonths = certType === 'irata' ? 12 : 6;
+    
+    // Parse current level (e.g., "Level 1" -> 1)
+    const levelMatch = currentLevel?.match(/(\d)/);
+    const levelNum = levelMatch ? parseInt(levelMatch[1]) : 0;
+    
+    // If already Level 3 or no level set, no upgrade available
+    if (levelNum >= 3 || levelNum === 0) {
+      return { isMaxLevel: levelNum >= 3, noLevel: levelNum === 0, hoursProgress: 0, timeProgress: 0, hoursRemaining: 0, monthsRemaining: 0, eligible: false };
+    }
+    
+    // Calculate hours since last upgrade
+    const hoursSinceUpgrade = hoursAtLastUpgrade !== null 
+      ? Math.max(0, totalHours - hoursAtLastUpgrade)
+      : totalHours; // If not set, use total hours
+    
+    // Calculate months since last upgrade
+    let monthsSinceUpgrade = 0;
+    if (lastUpgradeDate) {
+      const upgradeDate = new Date(lastUpgradeDate);
+      const now = new Date();
+      monthsSinceUpgrade = (now.getFullYear() - upgradeDate.getFullYear()) * 12 + (now.getMonth() - upgradeDate.getMonth());
+    }
+    
+    const hoursProgress = Math.min(100, (hoursSinceUpgrade / requiredHours) * 100);
+    const timeProgress = Math.min(100, (monthsSinceUpgrade / requiredMonths) * 100);
+    const hoursRemaining = Math.max(0, requiredHours - hoursSinceUpgrade);
+    const monthsRemaining = Math.max(0, requiredMonths - monthsSinceUpgrade);
+    const eligible = hoursSinceUpgrade >= requiredHours && monthsSinceUpgrade >= requiredMonths;
+    
+    return {
+      isMaxLevel: false,
+      noLevel: false,
+      hoursProgress,
+      timeProgress,
+      hoursRemaining,
+      monthsRemaining,
+      hoursSinceUpgrade,
+      monthsSinceUpgrade,
+      requiredHours,
+      requiredMonths,
+      eligible,
+      nextLevel: levelNum + 1,
+      currentLevelNum: levelNum,
+      baselineSet: hoursAtLastUpgrade !== null && lastUpgradeDate !== null
+    };
+  };
+
+  const irataProgress = calculateUpgradeProgress('irata', irataLevel, irataHoursAtLastUpgrade, irataLastUpgradeDate, combinedTotalHours);
+  const spratProgress = calculateUpgradeProgress('sprat', spratLevel, spratHoursAtLastUpgrade, spratLastUpgradeDate, combinedTotalHours);
+
+  // Mutation to save certification baseline
+  const saveCertBaselineMutation = useMutation({
+    mutationFn: async (data: { 
+      irataHoursAtLastUpgrade?: string | null;
+      irataLastUpgradeDate?: string | null;
+      spratHoursAtLastUpgrade?: string | null;
+      spratLastUpgradeDate?: string | null;
+    }) => {
+      return await apiRequest('/api/technician/profile', {
+        method: 'PATCH',
+        body: JSON.stringify({
+          name: user?.name,
+          email: user?.email,
+          employeePhoneNumber: user?.employeePhoneNumber,
+          emergencyContactName: user?.emergencyContactName,
+          emergencyContactPhone: user?.emergencyContactPhone,
+          ...data
+        }),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+      toast({
+        title: t.baselineSaved,
+        description: t.baselineSavedDesc,
+      });
+      setShowCertBaselineDialog(false);
+      setIsSavingCertBaseline(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: t.error,
+        description: error.message || "Failed to save baseline",
+        variant: "destructive",
+      });
+      setIsSavingCertBaseline(false);
+    },
+  });
 
   const addHistoricalMutation = useMutation({
     mutationFn: async (data: {
@@ -1149,6 +1309,176 @@ export default function TechnicianLoggedHours() {
             </div>
           </div>
         </div>
+
+        {/* Certification Upgrade Progress Card */}
+        {(irataLevel || spratLevel) && (
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <span className="material-icons text-primary">trending_up</span>
+                {t.certificationProgress}
+              </CardTitle>
+              <CardDescription>{t.certificationProgressDesc}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* IRATA Progress */}
+              {irataLevel && !irataProgress.isMaxLevel && !irataProgress.noLevel && (
+                <div className="space-y-3 p-3 rounded-lg bg-muted/30">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="font-semibold">IRATA</Badge>
+                      <span className="text-sm text-muted-foreground">
+                        {t.currentLevel}: {irataLevel} → {t.level1.replace('1', String(irataProgress.nextLevel || 2))}
+                      </span>
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => {
+                        setCertType('irata');
+                        setCertBaselineHours(irataHoursAtLastUpgrade?.toString() || '');
+                        setCertBaselineDate(irataLastUpgradeDate || '');
+                        setShowCertBaselineDialog(true);
+                      }}
+                      data-testid="button-set-irata-baseline"
+                    >
+                      <Edit2 className="w-3 h-3 mr-1" />
+                      {irataProgress.baselineSet ? t.updateBaseline : t.setBaseline}
+                    </Button>
+                  </div>
+                  
+                  {irataProgress.baselineSet ? (
+                    <>
+                      {irataProgress.eligible ? (
+                        <div className="flex items-center gap-2 p-2 rounded-md bg-green-500/10 border border-green-500/30">
+                          <CheckCircle2 className="w-5 h-5 text-green-600" />
+                          <span className="font-semibold text-green-700 dark:text-green-400">{t.eligibleForUpgrade}</span>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <div>
+                            <div className="flex justify-between text-sm mb-1">
+                              <span>{t.hoursTowardUpgrade}: {Math.round(irataProgress.hoursSinceUpgrade || 0)} / {irataProgress.requiredHours}</span>
+                              <span className="text-muted-foreground">{Math.round(irataProgress.hoursRemaining)} {t.hoursRemaining}</span>
+                            </div>
+                            <div className="h-2 bg-muted rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-primary rounded-full transition-all"
+                                style={{ width: `${irataProgress.hoursProgress}%` }}
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <div className="flex justify-between text-sm mb-1">
+                              <span>{t.timeTowardUpgrade}: {irataProgress.monthsSinceUpgrade || 0} / {irataProgress.requiredMonths} {t.monthsRemaining.split(' ')[1]}</span>
+                              <span className="text-muted-foreground">{irataProgress.monthsRemaining} {t.monthsRemaining}</span>
+                            </div>
+                            <div className="h-2 bg-muted rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-blue-500 rounded-full transition-all"
+                                style={{ width: `${irataProgress.timeProgress}%` }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      <p className="text-xs text-muted-foreground">{t.irataRequirements}</p>
+                    </>
+                  ) : (
+                    <p className="text-sm text-muted-foreground italic">
+                      {t.setBaseline} to track your progress toward Level {irataProgress.nextLevel}
+                    </p>
+                  )}
+                </div>
+              )}
+              
+              {/* SPRAT Progress */}
+              {spratLevel && !spratProgress.isMaxLevel && !spratProgress.noLevel && (
+                <div className="space-y-3 p-3 rounded-lg bg-muted/30">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="font-semibold">SPRAT</Badge>
+                      <span className="text-sm text-muted-foreground">
+                        {t.currentLevel}: {spratLevel} → {t.level1.replace('1', String(spratProgress.nextLevel || 2))}
+                      </span>
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => {
+                        setCertType('sprat');
+                        setCertBaselineHours(spratHoursAtLastUpgrade?.toString() || '');
+                        setCertBaselineDate(spratLastUpgradeDate || '');
+                        setShowCertBaselineDialog(true);
+                      }}
+                      data-testid="button-set-sprat-baseline"
+                    >
+                      <Edit2 className="w-3 h-3 mr-1" />
+                      {spratProgress.baselineSet ? t.updateBaseline : t.setBaseline}
+                    </Button>
+                  </div>
+                  
+                  {spratProgress.baselineSet ? (
+                    <>
+                      {spratProgress.eligible ? (
+                        <div className="flex items-center gap-2 p-2 rounded-md bg-green-500/10 border border-green-500/30">
+                          <CheckCircle2 className="w-5 h-5 text-green-600" />
+                          <span className="font-semibold text-green-700 dark:text-green-400">{t.eligibleForUpgrade}</span>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <div>
+                            <div className="flex justify-between text-sm mb-1">
+                              <span>{t.hoursTowardUpgrade}: {Math.round(spratProgress.hoursSinceUpgrade || 0)} / {spratProgress.requiredHours}</span>
+                              <span className="text-muted-foreground">{Math.round(spratProgress.hoursRemaining)} {t.hoursRemaining}</span>
+                            </div>
+                            <div className="h-2 bg-muted rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-primary rounded-full transition-all"
+                                style={{ width: `${spratProgress.hoursProgress}%` }}
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <div className="flex justify-between text-sm mb-1">
+                              <span>{t.timeTowardUpgrade}: {spratProgress.monthsSinceUpgrade || 0} / {spratProgress.requiredMonths} {t.monthsRemaining.split(' ')[1]}</span>
+                              <span className="text-muted-foreground">{spratProgress.monthsRemaining} {t.monthsRemaining}</span>
+                            </div>
+                            <div className="h-2 bg-muted rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-blue-500 rounded-full transition-all"
+                                style={{ width: `${spratProgress.timeProgress}%` }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      <p className="text-xs text-muted-foreground">{t.spratRequirements}</p>
+                    </>
+                  ) : (
+                    <p className="text-sm text-muted-foreground italic">
+                      {t.setBaseline} to track your progress toward Level {spratProgress.nextLevel}
+                    </p>
+                  )}
+                </div>
+              )}
+              
+              {/* Show max level message */}
+              {irataLevel && irataProgress.isMaxLevel && (
+                <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/30">
+                  <Badge variant="outline" className="font-semibold">IRATA</Badge>
+                  <span className="text-sm text-muted-foreground">{t.maxLevel}</span>
+                </div>
+              )}
+              {spratLevel && spratProgress.isMaxLevel && (
+                <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/30">
+                  <Badge variant="outline" className="font-semibold">SPRAT</Badge>
+                  <span className="text-sm text-muted-foreground">{t.maxLevel}</span>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         <Card>
           <CardContent className="p-4">
@@ -2453,6 +2783,119 @@ export default function TechnicianLoggedHours() {
                 </>
               ) : (
                 t.saveBaseline
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Certification Upgrade Baseline Dialog */}
+      <Dialog open={showCertBaselineDialog} onOpenChange={setShowCertBaselineDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <span className="material-icons text-primary">trending_up</span>
+              {certType === 'irata' ? 'IRATA' : 'SPRAT'} {t.certificationProgress}
+            </DialogTitle>
+            <DialogDescription>
+              {certType === 'irata' ? t.irataRequirements : t.spratRequirements}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="cert-baseline-hours">{t.hoursAtLastUpgrade}</Label>
+              <Input
+                id="cert-baseline-hours"
+                type="number"
+                min="0"
+                step="0.5"
+                value={certBaselineHours}
+                onChange={(e) => setCertBaselineHours(e.target.value)}
+                placeholder="0"
+                className="text-lg"
+                data-testid="input-cert-baseline-hours"
+              />
+              <p className="text-xs text-muted-foreground">
+                {language === 'en' 
+                  ? "Enter the total hours you had logged when you achieved your current level"
+                  : "Entrez le total des heures que vous aviez enregistrées lorsque vous avez obtenu votre niveau actuel"
+                }
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="cert-baseline-date">{t.dateOfLastUpgrade}</Label>
+              <Input
+                id="cert-baseline-date"
+                type="date"
+                value={certBaselineDate}
+                onChange={(e) => setCertBaselineDate(e.target.value)}
+                data-testid="input-cert-baseline-date"
+              />
+              <p className="text-xs text-muted-foreground">
+                {language === 'en'
+                  ? "The date you passed your certification or upgrade assessment"
+                  : "La date à laquelle vous avez passé votre certification ou votre évaluation de mise à niveau"
+                }
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowCertBaselineDialog(false);
+                setCertBaselineHours("");
+                setCertBaselineDate("");
+              }}
+              data-testid="button-cancel-cert-baseline"
+            >
+              {t.cancel}
+            </Button>
+            <Button
+              onClick={() => {
+                const hours = parseFloat(certBaselineHours);
+                if (isNaN(hours) || hours < 0) {
+                  toast({
+                    title: t.error,
+                    description: t.hoursRequired,
+                    variant: "destructive",
+                  });
+                  return;
+                }
+                if (!certBaselineDate) {
+                  toast({
+                    title: t.error,
+                    description: t.dateRequired,
+                    variant: "destructive",
+                  });
+                  return;
+                }
+                setIsSavingCertBaseline(true);
+                if (certType === 'irata') {
+                  saveCertBaselineMutation.mutate({
+                    irataHoursAtLastUpgrade: hours.toString(),
+                    irataLastUpgradeDate: certBaselineDate,
+                  });
+                } else {
+                  saveCertBaselineMutation.mutate({
+                    spratHoursAtLastUpgrade: hours.toString(),
+                    spratLastUpgradeDate: certBaselineDate,
+                  });
+                }
+              }}
+              disabled={isSavingCertBaseline}
+              data-testid="button-save-cert-baseline"
+            >
+              {isSavingCertBaseline ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {t.saving}
+                </>
+              ) : (
+                t.save
               )}
             </Button>
           </DialogFooter>
