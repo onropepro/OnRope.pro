@@ -46,9 +46,6 @@ export default function ProjectManagementLanding() {
   const [expandedProblems, setExpandedProblems] = useState<string[]>([]);
   const [, setLocation] = useLocation();
   const [showModulesMenu, setShowModulesMenu] = useState(false);
-  const [count1, setCount1] = useState(0);
-  const [count2, setCount2] = useState(0);
-  const [count3, setCount3] = useState(0);
   const modulesMenuRef = useRef<HTMLDivElement>(null);
   const allExpanded = expandedProblems.length === ALL_ACCORDION_ITEMS.length;
 
@@ -59,29 +56,6 @@ export default function ProjectManagementLanding() {
       setExpandedProblems([...ALL_ACCORDION_ITEMS]);
     }
   };
-
-  useEffect(() => {
-    const start1 = Math.floor(Math.random() * 60) + 40;
-    const start2 = Math.floor(Math.random() * 80) + 40;
-    const start3 = Math.floor(Math.random() * 100) + 50;
-
-    let current1 = start1, current2 = start2, current3 = start3;
-    setCount1(current1);
-    setCount2(current2);
-    setCount3(current3);
-    
-    const interval = setInterval(() => {
-      if (current1 > 0) { current1--; setCount1(current1); }
-      if (current2 > 0) { current2--; setCount2(current2); }
-      if (current3 > 0) { current3--; setCount3(current3); }
-      
-      if (current1 === 0 && current2 === 0 && current3 === 0) {
-        clearInterval(interval);
-      }
-    }, 150);
-
-    return () => clearInterval(interval);
-  }, []);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -222,7 +196,7 @@ export default function ProjectManagementLanding() {
               </Link>
             </Button>
             <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-cta-demo">
-              <Link href="/changelog/projects">
+              <Link href="/guides/projects">
                 Read the Full Guide
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
@@ -235,22 +209,30 @@ export default function ProjectManagementLanding() {
       <section className="relative z-10 -mt-8 max-w-5xl mx-auto px-4">
         <Card className="shadow-xl border-0">
           <CardContent className="p-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-emerald-600">{count1}</div>
-                <div className="text-sm text-muted-foreground mt-1">Manual status updates eliminated</div>
+                <div className="text-3xl md:text-4xl font-bold text-emerald-600">4</div>
+                <div className="text-sm text-muted-foreground mt-1">Elevations tracked independently</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-rose-600">{count2}</div>
-                <div className="text-sm text-muted-foreground mt-1">Double-booking incidents prevented</div>
+                <div className="text-3xl md:text-4xl font-bold text-blue-600">87-93%</div>
+                <div className="text-sm text-muted-foreground mt-1">Payroll errors eliminated</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-blue-600">{count3}</div>
-                <div className="text-sm text-muted-foreground mt-1">Payroll hours saved per week</div>
+                <div className="text-3xl md:text-4xl font-bold text-rose-600">60-70%</div>
+                <div className="text-sm text-muted-foreground mt-1">Fewer resident complaints</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-emerald-600">100%</div>
-                <div className="text-sm text-muted-foreground mt-1">Real-time visibility</div>
+                <div className="text-3xl md:text-4xl font-bold text-purple-600">75%</div>
+                <div className="text-sm text-muted-foreground mt-1">Faster quote preparation</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-bold text-amber-600">5-10</div>
+                <div className="text-sm text-muted-foreground mt-1">Hours saved weekly on scheduling</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-bold text-emerald-600">20-30%</div>
+                <div className="text-sm text-muted-foreground mt-1">Faster project completion</div>
               </div>
             </div>
           </CardContent>

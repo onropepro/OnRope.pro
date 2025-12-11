@@ -261,8 +261,8 @@ export default function SafetyComplianceLanding() {
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-hero-knowledgebase">
-                <Link href="#knowledgebase">
-                  Find Answers
+                <Link href="/guides/safety">
+                  Read the Full Guide
                   <BookOpen className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
