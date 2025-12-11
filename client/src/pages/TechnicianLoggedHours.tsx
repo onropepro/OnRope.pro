@@ -111,6 +111,12 @@ const translations = {
     scanLogbook: "Scan Logbook Page",
     scanning: "Analyzing...",
     scanLogbookDesc: "Take a photo of your logbook page to automatically extract entries",
+    scanExplanationTitle: "How Logbook Scanning Works",
+    scanExplanationStep1: "Take a clear photo of your IRATA/SPRAT logbook page",
+    scanExplanationStep2: "Our AI will analyze the image and extract the entries",
+    scanExplanationStep3: "Review and edit the extracted data before saving",
+    scanExplanationTip: "For best results, ensure good lighting and that the entire page is visible in the photo.",
+    continueToScan: "Continue to Scan",
     reviewScannedEntries: "Review Scanned Entries",
     reviewScannedDesc: "Review and confirm the entries extracted from your logbook",
     foundEntries: "Found {count} entries",
@@ -238,7 +244,13 @@ const translations = {
     logbookDisclaimer: "Ceci est un outil de suivi personnel pour vous aider à surveiller vos heures d'accès sur corde. Vous devez toujours enregistrer toutes vos heures dans votre carnet IRATA/SPRAT officiel - ce journal numérique ne le remplace pas et n'est pas valide pour les fins de certification.",
     scanLogbook: "Scanner une page",
     scanning: "Analyse...",
-    scanLogbookDesc: "Prenez une photo de votre page de carnet pour extraire automatiquement les entrées",
+    scanLogbookDesc: "Prenez une photo de votre page de carnet pour extraire automatiquement les entrees",
+    scanExplanationTitle: "Comment fonctionne la numerisation",
+    scanExplanationStep1: "Prenez une photo claire de votre page de carnet IRATA/SPRAT",
+    scanExplanationStep2: "Notre IA analysera l'image et extraira les entrees",
+    scanExplanationStep3: "Verifiez et modifiez les donnees extraites avant de sauvegarder",
+    scanExplanationTip: "Pour de meilleurs resultats, assurez-vous d'un bon eclairage et que la page entiere est visible.",
+    continueToScan: "Continuer vers le scan",
     reviewScannedEntries: "Vérifier les entrées scannées",
     reviewScannedDesc: "Vérifiez et confirmez les entrées extraites de votre carnet",
     foundEntries: "{count} entrées trouvées",
@@ -389,6 +401,9 @@ export default function TechnicianLoggedHours() {
   
   // Manual hours dialog state (for when employer doesn't use OnRopePro)
   const [showManualHoursDialog, setShowManualHoursDialog] = useState(false);
+  
+  // Scan explanation dialog state
+  const [showScanExplanationDialog, setShowScanExplanationDialog] = useState(false);
 
   const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
@@ -1475,7 +1490,7 @@ export default function TechnicianLoggedHours() {
                     />
                     <Button
                       variant="outline"
-                      onClick={() => logbookInputRef.current?.click()}
+                      onClick={() => setShowScanExplanationDialog(true)}
                       disabled={isScanning}
                       className="gap-2"
                       data-testid="button-scan-logbook"
@@ -1905,6 +1920,70 @@ export default function TechnicianLoggedHours() {
               ) : (
                 t.save
               )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Scan Explanation Dialog */}
+      <Dialog open={showScanExplanationDialog} onOpenChange={setShowScanExplanationDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Camera className="w-5 h-5" />
+              {t.scanExplanationTitle}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+                  <span className="text-xs font-semibold text-primary">1</span>
+                </div>
+                <p className="text-sm">{t.scanExplanationStep1}</p>
+              </div>
+              
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+                  <span className="text-xs font-semibold text-primary">2</span>
+                </div>
+                <p className="text-sm">{t.scanExplanationStep2}</p>
+              </div>
+              
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+                  <span className="text-xs font-semibold text-primary">3</span>
+                </div>
+                <p className="text-sm">{t.scanExplanationStep3}</p>
+              </div>
+            </div>
+            
+            <div className="bg-muted/50 rounded-lg p-3">
+              <p className="text-sm text-muted-foreground">
+                <strong>Tip:</strong> {t.scanExplanationTip}
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowScanExplanationDialog(false)}
+              data-testid="button-cancel-scan"
+            >
+              {t.cancel}
+            </Button>
+            <Button
+              onClick={() => {
+                setShowScanExplanationDialog(false);
+                logbookInputRef.current?.click();
+              }}
+              className="gap-2"
+              data-testid="button-continue-scan"
+            >
+              <Camera className="w-4 h-4" />
+              {t.continueToScan}
             </Button>
           </DialogFooter>
         </DialogContent>
