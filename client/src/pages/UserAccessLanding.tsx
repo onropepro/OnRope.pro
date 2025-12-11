@@ -215,9 +215,9 @@ export default function UserAccessLanding() {
             </Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              Your supervisor doesn't need<br />
-              to see what everyone makes.<br />
-              <span className="text-indigo-200">Finally delegate without exposing your payroll.</span>
+              Built for the moment you realize<br />
+              your new hire<br />
+              <span className="text-indigo-200">can see everyone's rates.</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-indigo-100 max-w-3xl mx-auto leading-relaxed">
