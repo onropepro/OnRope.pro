@@ -606,6 +606,70 @@ export default function ProjectManagementLanding() {
                 </div>
               </CardContent>
             </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Client & Property Manager Records</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                <div>
+                  <p className="font-medium text-foreground">What Connects:</p>
+                  <p className="text-muted-foreground mt-1">Projects associate with client records containing contact preferences, billing details, and communication history. Building manager portal access grants visibility into all projects at their properties.</p>
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">Why It Matters:</p>
+                  <p className="text-muted-foreground mt-1">Know which building manager prefers email versus phone. Track communication history when disputes arise. Building managers feel informed without requiring your time.</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Complaints & Feedback Management</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                <div>
+                  <p className="font-medium text-foreground">What Connects:</p>
+                  <p className="text-muted-foreground mt-1">When residents or building managers submit feedback, it attaches to the specific project. You respond within the system. The full conversation history stays linked to the project record.</p>
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">Why It Matters:</p>
+                  <p className="text-muted-foreground mt-1">No digging through email threads to find complaint context. All stakeholders see the same conversation. Professional response tracking for client retention.</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">Invoicing <Badge variant="secondary" className="text-xs">Coming Soon</Badge></CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                <div>
+                  <p className="font-medium text-foreground">What Connects:</p>
+                  <p className="text-muted-foreground mt-1">Project completion will trigger invoice generation. Labor hours and materials will auto-populate billing. Client portal will show project details matching invoice line items.</p>
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">Why It Matters:</p>
+                  <p className="text-muted-foreground mt-1">Same-day invoicing instead of 1-2 week delays. Reduced billing disputes because backup documentation is transparent. Faster payment cycles improve cash flow.</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">Quoting <Badge variant="secondary" className="text-xs">Coming Soon</Badge></CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                <div>
+                  <p className="font-medium text-foreground">What Connects:</p>
+                  <p className="text-muted-foreground mt-1">Historical project data will feed quote generation. System will suggest pricing based on similar past projects. Accepted quotes will convert directly to projects with one click.</p>
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">Why It Matters:</p>
+                  <p className="text-muted-foreground mt-1">Accurate quotes based on real historical data. 25% improvement in quote accuracy. No more underbidding or leaving money on the table.</p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
