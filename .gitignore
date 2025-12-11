@@ -4,3 +4,6 @@ dist
 server/public
 vite.config.ts.*
 *.tar.gz
+
+# Exclude template/reference assets from security scans
+attached_assets/tailadmin_template/
