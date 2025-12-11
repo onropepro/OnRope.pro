@@ -38,6 +38,7 @@ import {
   BarChart3,
   UserCog,
   Clock,
+  Calendar,
   Fingerprint,
   KeyRound,
   User,
@@ -1468,6 +1469,126 @@ export default function UserAccessGuide() {
               <span className="flex items-center gap-1"><XCircle className="w-3 h-3 text-red-400" /> Rarely Granted</span>
               <span>* Customizable by company owner</span>
             </div>
+          </div>
+        </section>
+
+        <Separator />
+
+        {/* Module Integration Points */}
+        <section className="space-y-6">
+          <div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-2 flex items-center gap-2">
+              <Layers className="w-6 h-6 text-violet-600 dark:text-violet-400" />
+              Module Integration Points
+            </h2>
+            <p className="text-muted-foreground leading-relaxed text-base">
+              User access controls are the gatekeeper across all OnRopePro modules. Permissions define not just who can access data, but what they can do with it in every other system.
+            </p>
+          </div>
+
+          <Card className="bg-violet-50 dark:bg-violet-950 border-violet-200 dark:border-violet-800 mb-4">
+            <CardContent className="pt-6">
+              <p className="italic">"Access isn't just visibility. It's capability. One permission grants, another denies, a third restricts to read-only. Everything else in the system respects that decision."</p>
+              <p className="text-sm font-medium mt-2 text-muted-foreground">, Core authentication architecture philosophy</p>
+            </CardContent>
+          </Card>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <Users className="w-5 h-5 text-violet-600" />
+                  <CardTitle className="text-base">Employee Directory</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-sm text-muted-foreground">Only company owners can create employees and assign roles. Supervisors can view employees but cannot create new ones. Permission structure ensures qualified managers cannot over-extend hiring authority.</p>
+                <div className="flex items-center gap-2 text-sm">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span>Prevents unauthorized hiring and role assignment</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <DollarSign className="w-5 h-5 text-violet-600" />
+                  <CardTitle className="text-base">Payroll & Time Tracking</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-sm text-muted-foreground">Permission controls expose financial data selectively. Supervisors see hours worked, technicians see only their own time. Company owners see full payroll cost visibility. Permission isolation prevents wage transparency between employees.</p>
+                <div className="flex items-center gap-2 text-sm">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span className="font-medium">100% payroll confidentiality maintained</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-violet-600" />
+                  <CardTitle className="text-base">Safety & Compliance</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-sm text-muted-foreground">Technicians submit safety documents (anchors, inspections). Safety officers review and approve. Company owners see audit trails. Building managers see approval status. Each role sees exactly what they need to do their job.</p>
+                <div className="flex items-center gap-2 text-sm">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span>Clear responsibility chain for safety compliance</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-violet-600" />
+                  <CardTitle className="text-base">Scheduling & Projects</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-sm text-muted-foreground">Company owners create projects and assign crews. Supervisors manage their assigned projects only. Technicians see only their scheduled work. Residents see project progress on their building. Access auto-limits data scope.</p>
+                <div className="flex items-center gap-2 text-sm">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span>Each user sees only relevant scheduled work</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="w-5 h-5 text-violet-600" />
+                  <CardTitle className="text-base">Feedback Management</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-sm text-muted-foreground">Residents submit feedback on projects. Building managers and company owners see and respond. Technicians cannot access feedback (prevents defensive reactions). Permissions ensure professional feedback handling.</p>
+                <div className="flex items-center gap-2 text-sm">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span className="font-medium">Professional feedback workflow maintained</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5 text-violet-600" />
+                  <CardTitle className="text-base">Analytics & Reporting</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-sm text-muted-foreground">Company owners see full financial and productivity analytics. Building managers see only their building's progress. Technicians see personal performance metrics. Reporting respects permission boundaries completely.</p>
+                <div className="flex items-center gap-2 text-sm">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span>Analytics data is automatically filtered by access level</span>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </section>
 
