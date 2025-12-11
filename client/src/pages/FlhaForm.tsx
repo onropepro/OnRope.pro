@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -175,6 +175,24 @@ export default function FlhaForm() {
       emergencyContacts: "",
     },
   });
+
+  // Auto-fill assessor name from current user and location from project
+  useEffect(() => {
+    if (currentUser?.name && !form.getValues('assessorName')) {
+      form.setValue('assessorName', currentUser.name);
+    }
+  }, [currentUser, form]);
+
+  useEffect(() => {
+    const projects = projectsData?.projects || [];
+    const selectedProjectId = form.getValues('projectId');
+    if (selectedProjectId && projects.length > 0) {
+      const project = projects.find(p => p.id === selectedProjectId);
+      if (project?.buildingAddress && !form.getValues('location')) {
+        form.setValue('location', project.buildingAddress);
+      }
+    }
+  }, [projectsData, preselectedProjectId, form]);
 
   const handleEmployeeToggle = (employeeId: string) => {
     setSelectedEmployees(prev =>
