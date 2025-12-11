@@ -8907,6 +8907,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (req.body.totalStalls !== undefined) allowedUpdates.totalStalls = req.body.totalStalls;
       if (req.body.stallsPerDay !== undefined) allowedUpdates.stallsPerDay = req.body.stallsPerDay;
       
+      // Add drop adjustment fields for correcting employee entries
+      if (req.body.dropsAdjustmentNorth !== undefined) allowedUpdates.dropsAdjustmentNorth = req.body.dropsAdjustmentNorth;
+      if (req.body.dropsAdjustmentEast !== undefined) allowedUpdates.dropsAdjustmentEast = req.body.dropsAdjustmentEast;
+      if (req.body.dropsAdjustmentSouth !== undefined) allowedUpdates.dropsAdjustmentSouth = req.body.dropsAdjustmentSouth;
+      if (req.body.dropsAdjustmentWest !== undefined) allowedUpdates.dropsAdjustmentWest = req.body.dropsAdjustmentWest;
+      
       const updatedProject = await storage.updateProject(id, allowedUpdates);
       res.json({ project: updatedProject });
     } catch (error) {
