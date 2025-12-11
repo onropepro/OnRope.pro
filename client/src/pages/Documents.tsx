@@ -1812,7 +1812,7 @@ const SAFE_WORK_PRACTICES: SafeWorkPractice[] = [
 // Generate PDF for Safe Work Practice with translation support
 const generateSafeWorkPracticePDF = (
   practice: SafeWorkPractice, 
-  companyName?: string, 
+  branding?: { companyName?: string; whitelabelBrandingActive?: boolean },
   translations?: {
     header: string;
     category: string;
@@ -1877,27 +1877,31 @@ const generateSafeWorkPracticePDF = (
     yPos += 5;
   };
 
+  // Calculate branding height
+  const showBranding = branding?.whitelabelBrandingActive && branding?.companyName;
+  const brandingHeight = showBranding ? 5 : 0;
+
   // Header
   doc.setFillColor(59, 130, 246); // Blue for practices
-  doc.rect(0, 0, pageWidth, 40, 'F');
+  doc.rect(0, 0, pageWidth, 40 + brandingHeight, 'F');
   
-  // Company name if provided
-  if (companyName) {
+  // Company name if white label branding is active
+  if (showBranding) {
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(9);
     doc.setFont('helvetica', 'bold');
-    doc.text(companyName.toUpperCase(), pageWidth / 2, 10, { align: 'center' });
+    doc.text(branding.companyName!.toUpperCase(), pageWidth / 2, 8, { align: 'center' });
   }
 
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(18);
   doc.setFont('helvetica', 'bold');
-  doc.text(t.header, pageWidth / 2, 22, { align: 'center' });
+  doc.text(t.header, pageWidth / 2, 22 + brandingHeight, { align: 'center' });
   
   doc.setFontSize(12);
-  doc.text(practice.title, pageWidth / 2, 32, { align: 'center' });
+  doc.text(practice.title, pageWidth / 2, 32 + brandingHeight, { align: 'center' });
 
-  yPos = 50;
+  yPos = 50 + brandingHeight;
 
   // Category badge
   doc.setFontSize(9);
@@ -1941,7 +1945,7 @@ const generateSafeWorkPracticePDF = (
 // Generate PDF for Safe Work Procedure with translation support
 const generateSafeWorkProcedurePDF = (
   procedure: SafeWorkProcedure, 
-  companyName?: string,
+  branding?: { companyName?: string; whitelabelBrandingActive?: boolean },
   translations?: {
     header: string;
     scope: string;
@@ -2012,27 +2016,31 @@ const generateSafeWorkProcedurePDF = (
     yPos += 5;
   };
 
+  // Calculate branding height
+  const showBranding = branding?.whitelabelBrandingActive && branding?.companyName;
+  const brandingHeight = showBranding ? 5 : 0;
+
   // Header
   doc.setFillColor(34, 197, 94);
-  doc.rect(0, 0, pageWidth, 40, 'F');
+  doc.rect(0, 0, pageWidth, 40 + brandingHeight, 'F');
   
-  // Company name if provided
-  if (companyName) {
+  // Company name if white label branding is active
+  if (showBranding) {
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(9);
     doc.setFont('helvetica', 'bold');
-    doc.text(companyName.toUpperCase(), pageWidth / 2, 10, { align: 'center' });
+    doc.text(branding.companyName!.toUpperCase(), pageWidth / 2, 8, { align: 'center' });
   }
 
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(18);
   doc.setFont('helvetica', 'bold');
-  doc.text(t.header, pageWidth / 2, 22, { align: 'center' });
+  doc.text(t.header, pageWidth / 2, 22 + brandingHeight, { align: 'center' });
   
   doc.setFontSize(12);
-  doc.text(procedure.title, pageWidth / 2, 32, { align: 'center' });
+  doc.text(procedure.title, pageWidth / 2, 32 + brandingHeight, { align: 'center' });
 
-  yPos = 50;
+  yPos = 50 + brandingHeight;
 
   // Description
   doc.setFontSize(10);
@@ -4612,17 +4620,32 @@ export default function Documents() {
         return false;
       };
       
-      // Header
+      // Calculate branding height
+      const showBranding = currentUser?.whitelabelBrandingActive && currentUser?.companyName;
+      const brandingHeight = showBranding ? 5 : 0;
+      
+      // Header with branding
+      doc.setFillColor(139, 92, 246); // Purple for compliance
+      doc.rect(0, 0, pageWidth, 35 + brandingHeight, 'F');
+      
+      // Company name if white label branding is active
+      if (showBranding) {
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
+        doc.text(currentUser.companyName.toUpperCase(), pageWidth / 2, 8, { align: 'center' });
+      }
+      
+      doc.setTextColor(255, 255, 255);
       doc.setFontSize(20);
       doc.setFont('helvetica', 'bold');
-      doc.text('Document Compliance Report', pageWidth / 2, yPos, { align: 'center' });
-      yPos += 8;
+      doc.text('Document Compliance Report', pageWidth / 2, 15 + brandingHeight, { align: 'center' });
       
-      doc.setFontSize(12);
+      doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
-      doc.setTextColor(80, 80, 80);
-      doc.text(data.companyName, pageWidth / 2, yPos, { align: 'center' });
-      yPos += 5;
+      doc.text(data.companyName, pageWidth / 2, 25 + brandingHeight, { align: 'center' });
+      
+      yPos = 40 + brandingHeight;
       
       doc.setFontSize(9);
       doc.text(`Generated: ${formatLocalDateLong(data.generatedAt)}`, pageWidth / 2, yPos, { align: 'center' });
@@ -6102,7 +6125,7 @@ export default function Documents() {
                                     <Button
                                       size="sm"
                                       variant="outline"
-                                      onClick={() => generateSafeWorkProcedurePDF(procedure, currentUser?.companyName)}
+                                      onClick={() => generateSafeWorkProcedurePDF(procedure, { companyName: currentUser?.companyName, whitelabelBrandingActive: currentUser?.whitelabelBrandingActive })}
                                       data-testid={`download-swp-${doc.id}`}
                                     >
                                       <Download className="h-4 w-4 mr-1" />
@@ -6200,7 +6223,7 @@ export default function Documents() {
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  onClick={() => generateSafeWorkProcedurePDF(procedure, currentUser?.companyName)}
+                                  onClick={() => generateSafeWorkProcedurePDF(procedure, { companyName: currentUser?.companyName, whitelabelBrandingActive: currentUser?.whitelabelBrandingActive })}
                                   data-testid={`preview-swp-${procedure.jobType}`}
                                 >
                                   <Eye className="h-4 w-4 mr-1" />
@@ -6423,14 +6446,14 @@ export default function Documents() {
                                       </div>
                                     </div>
                                     <DialogFooter className="mt-4">
-                                      <Button variant="outline" onClick={() => generateSafeWorkPracticePDF(practice)} data-testid={`download-preview-swpractice-${practice.id}`}>
+                                      <Button variant="outline" onClick={() => generateSafeWorkPracticePDF(practice, { companyName: currentUser?.companyName, whitelabelBrandingActive: currentUser?.whitelabelBrandingActive })} data-testid={`download-preview-swpractice-${practice.id}`}>
                                         <Download className="h-4 w-4 mr-2" />
                                         Download PDF
                                       </Button>
                                     </DialogFooter>
                                   </DialogContent>
                                 </Dialog>
-                                <Button size="sm" variant="outline" onClick={() => generateSafeWorkPracticePDF(practice)} data-testid={`download-swpractice-${practice.id}`}>
+                                <Button size="sm" variant="outline" onClick={() => generateSafeWorkPracticePDF(practice, { companyName: currentUser?.companyName, whitelabelBrandingActive: currentUser?.whitelabelBrandingActive })} data-testid={`download-swpractice-${practice.id}`}>
                                   <Download className="h-3 w-3 mr-1" />
                                   PDF
                                 </Button>
@@ -7613,7 +7636,7 @@ export default function Documents() {
                 variant="outline"
                 onClick={() => {
                   if (viewingSWPProcedure) {
-                    generateSafeWorkProcedurePDF(viewingSWPProcedure, currentUser?.companyName);
+                    generateSafeWorkProcedurePDF(viewingSWPProcedure, { companyName: currentUser?.companyName, whitelabelBrandingActive: currentUser?.whitelabelBrandingActive });
                   }
                 }}
               >

@@ -596,16 +596,13 @@ export default function TechnicianLoggedHours() {
       spratHoursAtLastUpgrade?: string | null;
       spratLastUpgradeDate?: string | null;
     }) => {
-      return await apiRequest('/api/technician/profile', {
-        method: 'PATCH',
-        body: JSON.stringify({
-          name: user?.name,
-          email: user?.email,
-          employeePhoneNumber: user?.employeePhoneNumber,
-          emergencyContactName: user?.emergencyContactName,
-          emergencyContactPhone: user?.emergencyContactPhone,
-          ...data
-        }),
+      return await apiRequest('PATCH', '/api/technician/profile', {
+        name: user?.name,
+        email: user?.email,
+        employeePhoneNumber: user?.employeePhoneNumber,
+        emergencyContactName: user?.emergencyContactName,
+        emergencyContactPhone: user?.emergencyContactPhone,
+        ...data
       });
     },
     onSuccess: () => {
@@ -801,18 +798,32 @@ export default function TechnicianLoggedHours() {
       const margin = 20;
       let yPos = 20;
 
-      // Header with PLUS badge
-      doc.setFillColor(245, 158, 11); // Amber-500
-      doc.roundedRect(margin, yPos, 35, 8, 2, 2, 'F');
-      doc.setFontSize(8);
-      doc.setTextColor(255, 255, 255);
-      doc.text(t.plusFeature, margin + 17.5, yPos + 5.5, { align: 'center' });
+      // Calculate branding height for white label support
+      const showBranding = user?.whitelabelBrandingActive && user?.companyName;
+      const brandingHeight = showBranding ? 5 : 0;
 
-      // Title
-      yPos += 15;
-      doc.setFontSize(22);
-      doc.setTextColor(0, 0, 0);
-      doc.text(t.workHistoryReport, margin, yPos);
+      // Header with branding background
+      doc.setFillColor(245, 158, 11); // Amber-500
+      doc.rect(0, 0, pageWidth, 35 + brandingHeight, 'F');
+
+      // Company name if white label branding is active
+      if (showBranding) {
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
+        doc.text(user.companyName.toUpperCase(), pageWidth / 2, 8, { align: 'center' });
+      }
+
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(18);
+      doc.setFont('helvetica', 'bold');
+      doc.text(t.workHistoryReport, pageWidth / 2, 15 + brandingHeight, { align: 'center' });
+      
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.text(t.plusFeature, pageWidth / 2, 25 + brandingHeight, { align: 'center' });
+
+      yPos = 45 + brandingHeight;
 
       // Generated date and period
       yPos += 10;
