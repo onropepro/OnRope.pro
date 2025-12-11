@@ -1738,6 +1738,28 @@ export default function TechnicianPortal() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {/* Referral Code in Top Bar */}
+            {user?.referralCode && (
+              <div className="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded-md bg-primary/10 border border-primary/20">
+                <span className="text-xs text-muted-foreground">{language === 'en' ? 'Code:' : 'Code:'}</span>
+                <span className="font-mono font-bold text-sm text-primary" data-testid="header-referral-code">
+                  {user.referralCode}
+                </span>
+                <Button
+                  variant={codeCopied ? "default" : "ghost"}
+                  size="icon"
+                  onClick={handleCopyReferralCode}
+                  className="h-6 w-6"
+                  data-testid="button-header-copy-code"
+                >
+                  {codeCopied ? (
+                    <CheckCircle2 className="w-3 h-3" />
+                  ) : (
+                    <Copy className="w-3 h-3" />
+                  )}
+                </Button>
+              </div>
+            )}
             {/* Return to Dashboard button - Only show for company owners */}
             {user.role === 'company' && (
               <Button
@@ -1987,36 +2009,6 @@ export default function TechnicianPortal() {
                   </Badge>
                 )}
               </button>
-              
-              <div
-                className="p-4 rounded-lg border bg-primary/5 text-left"
-                data-testid="quick-action-referral"
-              >
-                <Share2 className="w-8 h-8 text-primary mb-2" />
-                <p className="font-medium text-sm">{t.yourReferralCode}</p>
-                {user?.referralCode && (
-                  <div className="flex items-center gap-2 mt-1">
-                    <p className="text-lg font-mono font-bold text-primary tracking-wider" data-testid="quick-referral-code">
-                      {user.referralCode}
-                    </p>
-                    <Button
-                      variant={codeCopied ? "default" : "outline"}
-                      size="sm"
-                      onClick={handleCopyReferralCode}
-                      className="gap-1 h-7 px-2"
-                      data-testid="button-quick-copy-code"
-                    >
-                      {codeCopied ? (
-                        <CheckCircle2 className="w-3 h-3" />
-                      ) : (
-                        <Copy className="w-3 h-3" />
-                      )}
-                      <span className="text-xs">{codeCopied ? t.codeCopied : t.copyCode}</span>
-                    </Button>
-                  </div>
-                )}
-                <p className="text-xs text-muted-foreground mt-1">{t.shareReferralCode.split(' ').slice(0, 3).join(' ')}...</p>
-              </div>
             </div>
 
             {/* My Logged Hours Card */}
