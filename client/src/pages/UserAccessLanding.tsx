@@ -39,27 +39,29 @@ export default function UserAccessLanding() {
   const [count1, setCount1] = useState(0);
   const [count2, setCount2] = useState(0);
   const [count3, setCount3] = useState(0);
-  const [allZero, setAllZero] = useState(false);
+  const [controlPercentage, setControlPercentage] = useState(0);
   const modulesMenuRef = useRef<HTMLDivElement>(null);
 
-  // Initialize countdown numbers
+  // Initialize countdown numbers and count-up percentage
   useEffect(() => {
     const start1 = Math.floor(Math.random() * 80) + 40;
     const start2 = Math.floor(Math.random() * 60) + 30;
     const start3 = Math.floor(Math.random() * 70) + 35;
 
     let current1 = start1, current2 = start2, current3 = start3;
+    let currentPercentage = 0;
     setCount1(current1);
     setCount2(current2);
     setCount3(current3);
+    setControlPercentage(currentPercentage);
     
     const interval = setInterval(() => {
       if (current1 > 0) { current1--; setCount1(current1); }
       if (current2 > 0) { current2--; setCount2(current2); }
       if (current3 > 0) { current3--; setCount3(current3); }
+      if (currentPercentage < 100) { currentPercentage++; setControlPercentage(currentPercentage); }
       
-      if (current1 === 0 && current2 === 0 && current3 === 0) {
-        setAllZero(true);
+      if (current1 === 0 && current2 === 0 && current3 === 0 && currentPercentage === 100) {
         clearInterval(interval);
       }
     }, 150);
@@ -273,7 +275,7 @@ export default function UserAccessLanding() {
                   className="text-3xl md:text-4xl font-bold text-emerald-600 transition-opacity duration-300"
                   style={{ display: 'inline-block' }}
                 >
-                  {allZero ? '100%' : '0%'}
+                  {controlPercentage}%
                 </div>
                 <div className="text-sm text-muted-foreground mt-1">Control maintained</div>
               </div>
