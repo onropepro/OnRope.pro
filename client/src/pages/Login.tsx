@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { trackLogin } from "@/lib/analytics";
-import { Rocket, Play, Building2, Clock, DollarSign, Users, Shield, FileText, Calculator, FileSpreadsheet, Radio, ClipboardCheck, MessageSquare, Home, Award, Calendar, FolderOpen, Globe, TrendingUp, ArrowRight, HardHat, Lock } from "lucide-react";
+import { Rocket, Play, Building2, Clock, DollarSign, Users, Shield, FileText, Calculator, FileSpreadsheet, Radio, ClipboardCheck, MessageSquare, Home, Award, Calendar, FolderOpen, Globe, TrendingUp, ArrowRight, HardHat, Lock, Briefcase } from "lucide-react";
 import { TechnicianRegistration } from "@/components/TechnicianRegistration";
 import { Slider } from "@/components/ui/slider";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
@@ -282,12 +282,28 @@ export default function Login() {
                     }}
                     data-testid="nav-user-access"
                   >
-                    <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg group-hover:scale-110 transition-transform">
-                      <Lock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                    <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg group-hover:scale-110 transition-transform">
+                      <Lock className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                     </div>
                     <div>
                       <div className="font-medium text-sm text-slate-900 dark:text-slate-100">User Access & Authentication</div>
                       <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Role-based permissions, secure login, audit trails</div>
+                    </div>
+                  </button>
+                  <button
+                    className="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors text-left group col-span-2"
+                    onClick={() => {
+                      setLocation("/modules/project-management");
+                      setShowModulesMenu(false);
+                    }}
+                    data-testid="nav-project-management"
+                  >
+                    <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg group-hover:scale-110 transition-transform">
+                      <Briefcase className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-sm text-slate-900 dark:text-slate-100">Project Management</div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">4-elevation tracking, real-time dashboards, crew scheduling</div>
                     </div>
                   </button>
                 </div>

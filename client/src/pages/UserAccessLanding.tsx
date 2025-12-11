@@ -182,6 +182,22 @@ export default function UserAccessLanding() {
                       <div className="text-xs text-muted-foreground mt-0.5">Granular permissions, role-based access, audit trails</div>
                     </div>
                   </button>
+                  <button
+                    className="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors text-left group col-span-2"
+                    onClick={() => {
+                      setLocation("/modules/project-management");
+                      setShowModulesMenu(false);
+                    }}
+                    data-testid="nav-project-management"
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                      <Briefcase className="w-5 h-5 text-emerald-600" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-sm">Project Management</div>
+                      <div className="text-xs text-muted-foreground mt-0.5">4-elevation tracking, real-time dashboards, crew scheduling</div>
+                    </div>
+                  </button>
                 </div>
               </div>
             )}
