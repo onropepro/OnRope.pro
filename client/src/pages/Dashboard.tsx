@@ -8894,7 +8894,7 @@ export default function Dashboard() {
 
       {/* End Day Dialog with Drop Count */}
       <Dialog open={showEndDayDialog} onOpenChange={setShowEndDayDialog}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{t('dashboard.endDay.title', 'End Your Work Day')}</DialogTitle>
             <DialogDescription>
