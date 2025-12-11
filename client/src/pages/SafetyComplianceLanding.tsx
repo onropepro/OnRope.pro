@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "wouter";
+import { useSafetyAuthority } from "@/hooks/useSafetyAuthority";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import {
   Shield,
@@ -43,6 +44,7 @@ export default function SafetyComplianceLanding() {
   const [count1, setCount1] = useState(0);
   const [count2, setCount2] = useState(0);
   const [count3, setCount3] = useState(0);
+  const headline = useSafetyAuthority();
   const modulesMenuRef = useRef<HTMLDivElement>(null);
 
   // Initialize countdown numbers
@@ -183,8 +185,7 @@ export default function SafetyComplianceLanding() {
             </Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              WorkSafeBC just pulled<br />
-              into the parking lot.<br />
+              {headline}<br />
               <span className="text-sky-200">Are you ready?</span>
             </h1>
             
