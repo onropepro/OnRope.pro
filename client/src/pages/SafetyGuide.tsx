@@ -799,7 +799,7 @@ export default function SafetyGuide() {
                   <li>Discusses: Fall hazards, anchor points, weather, emergency procedures</li>
                   <li>All 4 technicians sign</li>
                 </ul>
-                <p className="text-xs bg-muted p-2 rounded">Result: Work covered from Nov 25 - Dec 9 (7 days each direction)</p>
+                <p className="text-xs bg-muted p-2 rounded">Result: Toolbox meeting saved with all attendee signatures. Meeting documented for safety records and PDF export.</p>
               </div>
 
               <div className="space-y-2 border-l-4 border-red-500 pl-4">
