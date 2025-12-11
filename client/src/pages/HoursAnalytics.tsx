@@ -147,7 +147,10 @@ export default function HoursAnalytics() {
   const allWorkSessions = workSessionsData?.sessions || [];
   const allNonBillableSessions = nonBillableData?.sessions || [];
   const projects = projectsData?.projects || [];
-  const employees = employeesData?.employees || [];
+  // Filter out suspended and terminated employees - they should not appear in analytics
+  const employees = (employeesData?.employees || []).filter((e: any) => 
+    !e.suspendedAt && e.connectionStatus !== 'suspended' && !e.terminatedDate
+  );
 
   const isLoading = isLoadingWork || isLoadingNonBillable;
 

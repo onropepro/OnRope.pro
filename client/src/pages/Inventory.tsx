@@ -524,8 +524,10 @@ export default function Inventory() {
     });
   };
   
-  // Filter for active employees only
-  const activeEmployees = (employeesData?.employees || []);
+  // Filter out suspended and terminated employees - they should not appear in inventory
+  const activeEmployees = (employeesData?.employees || []).filter((e: any) => 
+    !e.suspendedAt && e.connectionStatus !== 'suspended' && !e.terminatedDate
+  );
   
   // Helper function to get assignments for an item
   const getItemAssignments = (itemId: string) => {
@@ -2315,9 +2317,13 @@ export default function Inventory() {
                 <div className="overflow-x-auto">
                   {(() => {
                     // Filter employees: show all if has permission, otherwise only show current user
+                    // Also filter out suspended and terminated employees
+                    const allActiveEmployees = (employeesData?.employees || []).filter((emp: any) => 
+                      !emp.suspendedAt && emp.connectionStatus !== 'suspended' && !emp.terminatedDate
+                    );
                     const visibleEmployees = canViewAllInspections 
-                      ? (employeesData?.employees || [])
-                      : (employeesData?.employees || []).filter((emp: any) => emp.id === currentUser?.id);
+                      ? allActiveEmployees
+                      : allActiveEmployees.filter((emp: any) => emp.id === currentUser?.id);
                     
                     return (
                   <table className="w-full">

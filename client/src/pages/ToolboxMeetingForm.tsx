@@ -121,7 +121,10 @@ export default function ToolboxMeetingForm() {
   });
 
   const currentUser = userData?.user;
-  const employees = (employeesData?.employees || []);
+  // Filter out suspended and terminated employees - they should not appear in safety forms
+  const employees = (employeesData?.employees || []).filter((e: any) => 
+    !e.suspendedAt && e.connectionStatus !== 'suspended' && !e.terminatedDate
+  );
 
   const getLocalDateString = () => {
     const d = new Date();

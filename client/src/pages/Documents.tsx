@@ -5220,7 +5220,10 @@ export default function Documents() {
             
             // Include company owner in the staff list for compliance tracking
             // Filter out suspended employees - they should not appear in compliance tracking
-            const activeEmployees = allEmployees.filter((e: any) => e.status !== 'suspended');
+            // Check both primary suspension (suspendedAt) and secondary suspension (connectionStatus)
+            const activeEmployees = allEmployees.filter((e: any) => 
+              !e.suspendedAt && e.connectionStatus !== 'suspended' && !e.terminatedDate
+            );
             const companyOwner = currentUser?.role === 'company' ? currentUser : null;
             const allStaff = companyOwner 
               ? [companyOwner, ...activeEmployees.filter((e: any) => e.id !== companyOwner.id)]
@@ -5564,7 +5567,7 @@ export default function Documents() {
             const signedReviews = allReviews.filter((r: any) => r.signedAt);
             const activeEmployeeIds = new Set(
               allEmployees
-                .filter((e: any) => e.status !== 'suspended')
+                .filter((e: any) => !e.suspendedAt && e.connectionStatus !== 'suspended' && !e.terminatedDate)
                 .map((e: any) => e.id)
             );
             

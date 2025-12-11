@@ -137,8 +137,11 @@ export default function FlhaForm() {
   });
 
   const currentUser = userData?.user;
-  // Filter out suspended employees - they should not appear anywhere in the app
-  const employees = (employeesData?.employees || []).filter((e: any) => !e.suspendedAt);
+  // Filter out suspended and terminated employees - they should not appear anywhere in the app
+  // Check both primary suspension (suspendedAt) and secondary suspension (connectionStatus)
+  const employees = (employeesData?.employees || []).filter((e: any) => 
+    !e.suspendedAt && e.connectionStatus !== 'suspended' && !e.terminatedDate
+  );
 
   // Helper for local date formatting
   const getLocalDateString = () => {

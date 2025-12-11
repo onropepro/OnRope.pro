@@ -844,7 +844,9 @@ export default function Payroll() {
                       <SelectValue placeholder={t('payroll.employee', 'Select employee')} />
                     </SelectTrigger>
                     <SelectContent>
-                      {employeesData?.employees.map((emp) => (
+                      {employeesData?.employees
+                        .filter((emp) => !emp.suspendedAt && emp.connectionStatus !== 'suspended' && !emp.terminatedDate)
+                        .map((emp) => (
                         <SelectItem key={emp.id} value={emp.id}>
                           {emp.name} ({emp.email})
                         </SelectItem>

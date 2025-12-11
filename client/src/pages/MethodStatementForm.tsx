@@ -619,7 +619,10 @@ export default function MethodStatementForm() {
     queryKey: ["/api/custom-job-types"],
   });
 
-  const employees = (employeesData?.employees || []);
+  // Filter out suspended and terminated employees - they should not appear in safety forms
+  const employees = (employeesData?.employees || []).filter((e: any) => 
+    !e.suspendedAt && e.connectionStatus !== 'suspended' && !e.terminatedDate
+  );
   const customJobTypes = customJobTypesData?.customJobTypes || [];
 
   // Helper for local date formatting
