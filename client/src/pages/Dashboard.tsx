@@ -1237,10 +1237,18 @@ export default function Dashboard() {
     s.employeeName // Has a valid employee name (API returns employeeName field)
   );
   const targetMetCount = completedSessions.filter((s: any) => s.dropsCompleted >= s.dailyDropTarget).length;
-  const belowTargetCount = completedSessions.filter((s: any) => s.dropsCompleted < s.dailyDropTarget).length;
+  // Valid reason sessions: below target but has a valid shortfall reason code
+  const validReasonCount = completedSessions.filter((s: any) => 
+    s.dropsCompleted < s.dailyDropTarget && s.validShortfallReasonCode
+  ).length;
+  // Below target without valid reason
+  const belowTargetCount = completedSessions.filter((s: any) => 
+    s.dropsCompleted < s.dailyDropTarget && !s.validShortfallReasonCode
+  ).length;
   
   const performancePieData = [
     { name: t('dashboard.performance.targetMet', 'Target Met'), value: targetMetCount, color: "hsl(var(--primary))" },
+    { name: t('dashboard.performance.validReason', 'Valid Reason'), value: validReasonCount, color: "hsl(var(--warning))" },
     { name: t('dashboard.performance.belowTarget', 'Below Target'), value: belowTargetCount, color: "hsl(var(--destructive))" },
   ];
 
@@ -4701,10 +4709,14 @@ export default function Dashboard() {
                             <Legend />
                           </PieChart>
                         </ResponsiveContainer>
-                        <div className="grid grid-cols-2 gap-4 mt-2 w-full max-w-xs">
+                        <div className="grid grid-cols-3 gap-4 mt-2 w-full max-w-md">
                           <div className="text-center">
                             <div className="text-2xl font-bold text-primary" data-testid="performance-target-met">{targetMetCount}</div>
                             <div className="text-xs text-muted-foreground">{t('dashboard.performance.targetMet', 'Target Met')}</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400" data-testid="performance-valid-reason">{validReasonCount}</div>
+                            <div className="text-xs text-muted-foreground">{t('dashboard.performance.validReason', 'Valid Reason')}</div>
                           </div>
                           <div className="text-center">
                             <div className="text-2xl font-bold text-destructive" data-testid="performance-below-target">{belowTargetCount}</div>
@@ -4732,10 +4744,16 @@ export default function Dashboard() {
 
                         return Object.entries(sessionsByEmployee).map(([employeeName, sessions]: [string, any]) => {
                           const employeeTargetMet = sessions.filter((s: any) => s.dropsCompleted >= s.dailyDropTarget).length;
-                          const employeeBelowTarget = sessions.filter((s: any) => s.dropsCompleted < s.dailyDropTarget).length;
+                          const employeeValidReason = sessions.filter((s: any) => 
+                            s.dropsCompleted < s.dailyDropTarget && s.validShortfallReasonCode
+                          ).length;
+                          const employeeBelowTarget = sessions.filter((s: any) => 
+                            s.dropsCompleted < s.dailyDropTarget && !s.validShortfallReasonCode
+                          ).length;
                           
                           const employeePieData = [
                             { name: t('dashboard.performance.targetMet', 'Target Met'), value: employeeTargetMet, color: "hsl(var(--primary))" },
+                            { name: t('dashboard.performance.validReason', 'Valid Reason'), value: employeeValidReason, color: "hsl(var(--warning))" },
                             { name: t('dashboard.performance.belowTarget', 'Below Target'), value: employeeBelowTarget, color: "hsl(var(--destructive))" },
                           ];
 
@@ -4768,10 +4786,14 @@ export default function Dashboard() {
                                       <RechartsTooltip />
                                     </PieChart>
                                   </ResponsiveContainer>
-                                  <div className="grid grid-cols-2 gap-2 mt-2 w-full text-center">
+                                  <div className="grid grid-cols-3 gap-2 mt-2 w-full text-center">
                                     <div>
                                       <div className="text-lg font-bold text-primary">{employeeTargetMet}</div>
                                       <div className="text-xs text-muted-foreground">{t('dashboard.performance.met', 'Met')}</div>
+                                    </div>
+                                    <div>
+                                      <div className="text-lg font-bold text-yellow-600 dark:text-yellow-400">{employeeValidReason}</div>
+                                      <div className="text-xs text-muted-foreground">{t('dashboard.performance.valid', 'Valid')}</div>
                                     </div>
                                     <div>
                                       <div className="text-lg font-bold text-destructive">{employeeBelowTarget}</div>
