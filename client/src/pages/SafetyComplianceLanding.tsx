@@ -202,9 +202,9 @@ export default function SafetyComplianceLanding() {
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-hero-guide">
-                <Link href="/changelog/safety">
-                  Read the Full Guide
+              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-hero-knowledgebase">
+                <Link href="#knowledgebase">
+                  Find Answers
                   <BookOpen className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
