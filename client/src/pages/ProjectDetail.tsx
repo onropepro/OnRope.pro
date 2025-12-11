@@ -2570,17 +2570,6 @@ export default function ProjectDetail() {
                   )}
                 </div>
               )}
-
-              {/* Create FLHA Button */}
-              <Button
-                variant="outline"
-                className="w-full h-12 gap-2 border-orange-500/30 text-orange-700 dark:text-orange-400"
-                onClick={() => setLocation(`/flha-form?projectId=${id}`)}
-                data-testid="button-create-flha"
-              >
-                <span className="material-icons text-lg">warning</span>
-                {t('projectDetail.flha.createForm', 'Complete FLHA Form')}
-              </Button>
             </div>
               </CardContent>
             </CollapsibleContent>
