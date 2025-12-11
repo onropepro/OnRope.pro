@@ -32,7 +32,7 @@ import { fr, enUS } from "date-fns/locale";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { parseLocalDate, formatTimestampDate, getTodayString, formatDurationMs } from "@/lib/dateUtils";
 import type { Project, Building, BuildingInstructions } from "@shared/schema";
-import { IRATA_TASK_TYPES } from "@shared/schema";
+import { IRATA_TASK_TYPES, VALID_SHORTFALL_REASONS } from "@shared/schema";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { KeyRound, DoorOpen, Phone, User, Wrench, FileText, ChevronDown, ChevronRight, Save } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -49,6 +49,7 @@ const endDaySchema = z.object({
   dropsCompletedSouth: z.string().optional(),
   dropsCompletedWest: z.string().optional(),
   manualCompletionPercentage: z.string().optional(),
+  validShortfallReasonCode: z.string().optional(),
   shortfallReason: z.string().optional(),
 });
 
@@ -163,6 +164,7 @@ export default function ProjectDetail() {
       dropsCompletedSouth: "0",
       dropsCompletedWest: "0",
       manualCompletionPercentage: "0",
+      validShortfallReasonCode: "",
       shortfallReason: "",
     },
   });
@@ -486,6 +488,7 @@ export default function ProjectDetail() {
         payload.dropsCompletedEast = parseInt(data.dropsCompletedEast || "0");
         payload.dropsCompletedSouth = parseInt(data.dropsCompletedSouth || "0");
         payload.dropsCompletedWest = parseInt(data.dropsCompletedWest || "0");
+        payload.validShortfallReasonCode = data.validShortfallReasonCode || null;
         payload.shortfallReason = data.shortfallReason;
       }
       
@@ -780,9 +783,14 @@ export default function ProjectDetail() {
       const isParkade = project.jobType === "parkade_pressure_cleaning";
       const target = isInSuite || isParkade ? (project.suitesPerDay || project.stallsPerDay || 0) : project.dailyDropTarget;
       
-      if (totalDrops < target && !data.shortfallReason?.trim()) {
-        endDayForm.setError("shortfallReason", {
-          message: "Please explain why the daily target wasn't met"
+      // Require either a valid reason code OR a custom explanation when below target
+      const hasValidReasonCode = data.validShortfallReasonCode && data.validShortfallReasonCode !== '' && data.validShortfallReasonCode !== 'other';
+      const hasOtherWithExplanation = data.validShortfallReasonCode === 'other' && data.shortfallReason?.trim();
+      const hasCustomExplanation = !data.validShortfallReasonCode && data.shortfallReason?.trim();
+      
+      if (totalDrops < target && !hasValidReasonCode && !hasOtherWithExplanation && !hasCustomExplanation) {
+        endDayForm.setError("validShortfallReasonCode", {
+          message: "Please select a reason why the daily target wasn't met"
         });
         return;
       }
@@ -3678,24 +3686,56 @@ export default function ProjectDetail() {
                     )}
 
                     {isBelowTarget && !isHoursBasedLocal && (
-                      <FormField
-                        control={endDayForm.control}
-                        name="shortfallReason"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t('projectDetail.dialogs.endDay.shortfallReason', 'Shortfall Reason (Required)')}</FormLabel>
-                            <FormControl>
-                              <Textarea
-                                placeholder={t('projectDetail.dialogs.endDay.shortfallPlaceholder', 'Explain why the daily target wasn\'t met...')}
-                                {...field}
-                                data-testid="input-shortfall-reason"
-                                className="min-h-24"
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
+                      <>
+                        <FormField
+                          control={endDayForm.control}
+                          name="validShortfallReasonCode"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('projectDetail.dialogs.endDay.validReasonLabel', 'Why was the daily target not met?')}</FormLabel>
+                              <Select onValueChange={field.onChange} value={field.value || ""}>
+                                <FormControl>
+                                  <SelectTrigger data-testid="select-shortfall-reason">
+                                    <SelectValue placeholder={t('projectDetail.dialogs.endDay.selectReason', 'Select a reason...')} />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {VALID_SHORTFALL_REASONS.map((reason) => (
+                                    <SelectItem key={reason.code} value={reason.code} data-testid={`option-reason-${reason.code}`}>
+                                      {reason.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {t('projectDetail.dialogs.endDay.validReasonNote', 'Valid reasons (weather, safety, etc.) do not impact your performance score.')}
+                              </p>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        {endDayForm.watch("validShortfallReasonCode") === "other" && (
+                          <FormField
+                            control={endDayForm.control}
+                            name="shortfallReason"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t('projectDetail.dialogs.endDay.shortfallReason', 'Please explain (Required)')}</FormLabel>
+                                <FormControl>
+                                  <Textarea
+                                    placeholder={t('projectDetail.dialogs.endDay.shortfallPlaceholder', 'Explain why the daily target wasn\'t met...')}
+                                    {...field}
+                                    data-testid="input-shortfall-reason"
+                                    className="min-h-24"
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
                         )}
-                      />
+                      </>
                     )}
                   </>
                 );

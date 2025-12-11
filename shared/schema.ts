@@ -424,6 +424,32 @@ export const dropLogs = pgTable("drop_logs", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Valid shortfall reasons that don't impact technician performance scores
+// When a tech selects one of these, it's recorded but doesn't penalize their metrics
+export const VALID_SHORTFALL_REASONS = [
+  { code: 'weather_high_wind', label: 'Weather - High Wind', category: 'weather' },
+  { code: 'weather_snow_storm', label: 'Weather - Snow Storm', category: 'weather' },
+  { code: 'weather_heavy_rain', label: 'Weather - Heavy Rain', category: 'weather' },
+  { code: 'weather_thunderstorm', label: 'Weather - Thunderstorm', category: 'weather' },
+  { code: 'weather_extreme_temperature', label: 'Weather - Extreme Temperature', category: 'weather' },
+  { code: 'weather_lightning', label: 'Weather - Lightning', category: 'weather' },
+  { code: 'exclusion_zone_occupied', label: 'Exclusion Zone Occupied by Others', category: 'site_access' },
+  { code: 'roof_occupied', label: 'Other Trade on Roof - Unable to Rig', category: 'site_access' },
+  { code: 'required_to_leave', label: 'Required to Leave Work Site', category: 'site_access' },
+  { code: 'sick_or_ill', label: 'Sick or Ill - Had to Leave Work Site', category: 'health' },
+  { code: 'building_malfunction_elevator', label: 'Building Malfunction - Elevator Down', category: 'building' },
+  { code: 'building_malfunction_roof_access', label: 'Building Malfunction - Roof Access Blocked', category: 'building' },
+  { code: 'building_malfunction_power', label: 'Building Malfunction - Power Outage', category: 'building' },
+  { code: 'equipment_failure', label: 'Equipment Failure - Safety Concern', category: 'equipment' },
+  { code: 'emergency_evacuation', label: 'Emergency Evacuation', category: 'emergency' },
+  { code: 'client_requested_stop', label: 'Client Requested Work to Stop', category: 'client' },
+  { code: 'safety_concern', label: 'Safety Concern Identified On-Site', category: 'safety' },
+  { code: 'anchor_issue', label: 'Anchor Point Issue - Requires Inspection', category: 'safety' },
+  { code: 'other', label: 'Other Valid Reason (Explain Below)', category: 'other' },
+] as const;
+
+export type ValidShortfallReasonCode = typeof VALID_SHORTFALL_REASONS[number]['code'];
+
 // Work sessions table - tracks daily work sessions with start/end times per elevation
 export const workSessions = pgTable("work_sessions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -452,6 +478,7 @@ export const workSessions = pgTable("work_sessions", {
   doubleTimeHours: numeric("double_time_hours", { precision: 5, scale: 2 }).default('0'),
   
   shortfallReason: text("shortfall_reason"), // Required if total drops < dailyDropTarget
+  validShortfallReasonCode: varchar("valid_shortfall_reason_code", { length: 50 }), // Pre-defined valid reason code that doesn't impact performance
   
   // Manual completion percentage for hours-based job types (General Pressure Washing, Ground Window)
   manualCompletionPercentage: integer("manual_completion_percentage"), // 0-100, null if not applicable

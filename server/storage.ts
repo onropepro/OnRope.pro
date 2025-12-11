@@ -1099,7 +1099,8 @@ export class Storage {
     manualCompletionPercentage?: number,
     peaceWorkPay?: number | null,
     laborCost?: number | null,
-    employeeHourlyRate?: number | null
+    employeeHourlyRate?: number | null,
+    validShortfallReasonCode?: string
   ): Promise<WorkSession> {
     const result = await db.update(workSessions)
       .set({
@@ -1109,6 +1110,7 @@ export class Storage {
         dropsCompletedSouth,
         dropsCompletedWest,
         shortfallReason,
+        validShortfallReasonCode: validShortfallReasonCode || null,
         endLatitude: endLatitude !== null && endLatitude !== undefined ? endLatitude.toString() : null,
         endLongitude: endLongitude !== null && endLongitude !== undefined ? endLongitude.toString() : null,
         regularHours: regularHours !== undefined ? regularHours.toString() : '0',

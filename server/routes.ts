@@ -9591,7 +9591,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const { sessionId } = req.params;
-      const { dropsCompletedNorth, dropsCompletedEast, dropsCompletedSouth, dropsCompletedWest, shortfallReason, endLatitude, endLongitude, manualCompletionPercentage } = req.body;
+      const { dropsCompletedNorth, dropsCompletedEast, dropsCompletedSouth, dropsCompletedWest, shortfallReason, validShortfallReasonCode, endLatitude, endLongitude, manualCompletionPercentage } = req.body;
       
       // Get the session to verify ownership
       const activeSession = await storage.getActiveWorkSession(currentUser.id, req.params.projectId);
@@ -9666,9 +9666,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const totalDropsCompleted = north + east + south + west;
       
-      // If drops < target, require shortfall reason (only if dailyDropTarget is set)
-      if (project.dailyDropTarget && totalDropsCompleted < project.dailyDropTarget && (!shortfallReason || shortfallReason.trim() === '')) {
-        return res.status(400).json({ message: "Shortfall reason is required when drops completed is less than the daily target" });
+      // If drops < target, require either a valid reason code OR shortfall explanation (only if dailyDropTarget is set)
+      const hasValidReasonCode = validShortfallReasonCode && validShortfallReasonCode !== '' && validShortfallReasonCode !== 'other';
+      const hasOtherWithExplanation = validShortfallReasonCode === 'other' && shortfallReason?.trim();
+      const hasShortfallExplanation = shortfallReason?.trim();
+      
+      if (project.dailyDropTarget && totalDropsCompleted < project.dailyDropTarget && !hasValidReasonCode && !hasOtherWithExplanation && !hasShortfallExplanation) {
+        return res.status(400).json({ message: "A reason is required when drops completed is less than the daily target" });
       }
       
       // Calculate overtime breakdown
@@ -9705,13 +9709,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // End the session with elevation-specific drops and overtime hours
+      const shouldRecordReason = project.dailyDropTarget && totalDropsCompleted < project.dailyDropTarget;
       const session = await storage.endWorkSession(
         sessionId,
         north,
         east,
         south,
         west,
-        (project.dailyDropTarget && totalDropsCompleted < project.dailyDropTarget) ? shortfallReason : undefined,
+        shouldRecordReason ? shortfallReason : undefined,
         endLatitude || null,
         endLongitude || null,
         overtimeBreakdown.regularHours,
@@ -9720,7 +9725,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         completionPercentage,
         peaceWorkPay,
         laborCost,
-        employeeHourlyRate
+        employeeHourlyRate,
+        shouldRecordReason ? validShortfallReasonCode : undefined
       );
       
       res.json({ session });
