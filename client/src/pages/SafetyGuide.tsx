@@ -1025,13 +1025,6 @@ export default function SafetyGuide() {
               </CardContent>
             </Card>
 
-            <Card className="border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-950">
-              <CardContent className="pt-4 text-base text-emerald-900 dark:text-emerald-100 space-y-2">
-                <p className="font-semibold">Bi-Directional 7-Day Coverage</p>
-                <p>A toolbox meeting covers work sessions 7 days <em>before</em> and 7 days <em>after</em> the meeting date. A meeting on Dec 2 covers Nov 25 - Dec 9.</p>
-              </CardContent>
-            </Card>
-
             <Card className="border-purple-200 dark:border-purple-900 bg-purple-50 dark:bg-purple-950">
               <CardContent className="pt-4 text-base text-purple-900 dark:text-purple-100 space-y-2">
                 <p className="font-semibold">Signatures are Immutable</p>

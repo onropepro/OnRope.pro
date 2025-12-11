@@ -18,8 +18,11 @@ User is systematically auditing all safety & compliance guide documentation for 
 - ✅ **FLHA Forms** - VERIFIED: Fully implemented in code (database table, backend routes, frontend form, documentation accurate)
 
 **In Progress / Pending:**
-- ⚠️ **7-Day Toolbox Meeting Coverage Window** (SafetyGuide.tsx, lines 233-278) - NOT IMPLEMENTED: Documentation describes a 7-day coverage feature that has no corresponding database fields, backend logic, or schema definition. Will update later with correct implementation details.
-- ✏️ **SafetyGuide.tsx Example Scenario** - Updated "8:00 AM: Toolbox Meeting" result from "Work covered from Nov 25 - Dec 9 (7 days each direction)" to "Toolbox meeting saved with all attendee signatures. Meeting documented for safety records and PDF export." (accurate to actual implementation)
+- ⚠️ **7-Day Toolbox Meeting Coverage Window** (SafetyGuide.tsx, lines 233-278) - NOT IMPLEMENTED: Will update later with correct implementation details when toolbox meeting coverage logic is finalized.
+
+**Removed Sections:**
+- ✂️ **SafetyGuide.tsx "Bi-Directional 7-Day Coverage"** (former Important Technical Notes section) - Removed invented documentation about 7-day coverage with no code implementation. Will re-add when feature is implemented.
+- ✂️ **SafetyGuide.tsx Example Scenario** - Updated "8:00 AM: Toolbox Meeting" result to accurately reflect implementation instead of referencing unimplemented 7-day coverage.
 
 ## System Architecture
 The platform is built with a React 18 frontend (TypeScript, Wouter for routing), a Node.js Express.js backend, and a PostgreSQL database with Drizzle ORM. Styling uses Tailwind CSS and Shadcn UI, featuring a premium SaaS aesthetic with glass-morphism effects, refined shadows, and a mobile-first responsive strategy. Authentication is custom session-based with secure cookie storage.
