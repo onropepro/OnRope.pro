@@ -115,6 +115,7 @@ export default function ProjectDetail() {
   const [isMissedStall, setIsMissedStall] = useState(false);
   const [missedStallNumber, setMissedStallNumber] = useState("");
   const [selectedMeeting, setSelectedMeeting] = useState<any>(null);
+  const [documentsExpanded, setDocumentsExpanded] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [selectedSession, setSelectedSession] = useState<any>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
@@ -2034,12 +2035,32 @@ export default function ProjectDetail() {
           </Card>
         )}
 
-        {/* Project Documents and Photos - Combined Card */}
+        {/* Project Documents and Photos - Collapsible Combined Card */}
         <Card className="glass-card border-0 shadow-premium">
-          <CardHeader>
-            <CardTitle className="text-base">{t('projectDetail.documents.title', 'Project Documents & Photos')}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
+          <Collapsible open={documentsExpanded} onOpenChange={setDocumentsExpanded}>
+            <CardHeader className="pb-0">
+              <CollapsibleTrigger asChild>
+                <button
+                  className="w-full flex items-center justify-between hover-elevate active-elevate-2 rounded-md p-2 -m-2"
+                  data-testid="button-toggle-documents"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="material-icons text-primary">folder</span>
+                    <CardTitle className="text-base">{t('projectDetail.documents.title', 'Project Documents & Photos')}</CardTitle>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary" className="text-xs">
+                      {photos.length + toolboxMeetings.length + flhaForms.length} {t('projectDetail.documents.items', 'items')}
+                    </Badge>
+                    <span className={`material-icons text-muted-foreground transition-transform duration-200 ${documentsExpanded ? 'rotate-180' : ''}`}>
+                      expand_more
+                    </span>
+                  </div>
+                </button>
+              </CollapsibleTrigger>
+            </CardHeader>
+            <CollapsibleContent>
+              <CardContent className="space-y-6 pt-4">
             
             {/* Rope Access Plan Section - Only visible to users with safety document permission */}
             {canViewSafetyDocuments(currentUser) && (
@@ -2561,7 +2582,9 @@ export default function ProjectDetail() {
                 {t('projectDetail.flha.createForm', 'Complete FLHA Form')}
               </Button>
             </div>
-          </CardContent>
+              </CardContent>
+            </CollapsibleContent>
+          </Collapsible>
         </Card>
 
         {/* Resident Feedback Card */}
