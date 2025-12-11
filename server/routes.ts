@@ -9716,22 +9716,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`[LABOR COST] Session ${sessionId}: ${totalHoursWorked.toFixed(2)}hrs × $${employeeHourlyRate}/hr = $${laborCost.toFixed(2)}`);
       }
       
-      // Validate rope access task hours - REQUIRED for IRATA/SPRAT compliance
-      if (ropeAccessTaskHours === undefined || ropeAccessTaskHours === null || ropeAccessTaskHours === '') {
-        return res.status(400).json({ message: "Rope access task hours is required" });
+      // Validate rope access task hours - OPTIONAL, only validate if provided
+      let validatedRopeAccessHours: number | null = null;
+      if (ropeAccessTaskHours !== undefined && ropeAccessTaskHours !== null && ropeAccessTaskHours !== '') {
+        const hoursValue = typeof ropeAccessTaskHours === 'number' ? ropeAccessTaskHours : parseFloat(String(ropeAccessTaskHours));
+        if (isNaN(hoursValue)) {
+          return res.status(400).json({ message: "Rope access task hours must be a valid number" });
+        }
+        if (hoursValue < 0 || hoursValue > 24) {
+          return res.status(400).json({ message: "Rope access task hours must be between 0 and 24" });
+        }
+        // Enforce quarter-hour increments for IRATA/SPRAT compliance
+        if ((hoursValue * 4) % 1 !== 0) {
+          return res.status(400).json({ message: "Rope access task hours must be in quarter-hour increments (0.25, 0.5, 0.75, etc.)" });
+        }
+        validatedRopeAccessHours = hoursValue;
       }
-      const hoursValue = typeof ropeAccessTaskHours === 'number' ? ropeAccessTaskHours : parseFloat(String(ropeAccessTaskHours));
-      if (isNaN(hoursValue)) {
-        return res.status(400).json({ message: "Rope access task hours must be a valid number" });
-      }
-      if (hoursValue < 0 || hoursValue > 24) {
-        return res.status(400).json({ message: "Rope access task hours must be between 0 and 24" });
-      }
-      // Enforce quarter-hour increments for IRATA/SPRAT compliance
-      if ((hoursValue * 4) % 1 !== 0) {
-        return res.status(400).json({ message: "Rope access task hours must be in quarter-hour increments (0.25, 0.5, 0.75, etc.)" });
-      }
-      const validatedRopeAccessHours = hoursValue;
       
       // End the session with elevation-specific drops and overtime hours
       const shouldRecordReason = project.dailyDropTarget && totalDropsCompleted < project.dailyDropTarget;

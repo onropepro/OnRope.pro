@@ -295,15 +295,8 @@ const endDaySchema = z.object({
   dropsSouth: z.string().default("0"),
   dropsWest: z.string().default("0"),
   shortfallReason: z.string().optional(),
-  ropeAccessTaskHours: z.string().min(1, "Rope access task hours is required").refine(
-    (val) => {
-      const num = parseFloat(val);
-      if (isNaN(num) || num < 0 || num > 24) return false;
-      // Enforce quarter-hour increments (0.25, 0.5, 0.75, etc.)
-      return (num * 4) % 1 === 0;
-    },
-    { message: "Must be between 0 and 24 in quarter-hour increments (0.25, 0.5, 0.75, etc.)" }
-  ),
+  logRopeAccessHours: z.boolean().default(false),
+  ropeAccessTaskHours: z.string().default(""),
 });
 
 const clientSchema = z.object({
@@ -1428,6 +1421,7 @@ export default function Dashboard() {
       dropsSouth: "0",
       dropsWest: "0",
       shortfallReason: "",
+      ropeAccessTaskHours: "",
     },
   });
 
@@ -2658,6 +2652,7 @@ export default function Dashboard() {
         dropsSouth: "0",
         dropsWest: "0",
         shortfallReason: "",
+        logRopeAccessHours: false,
         ropeAccessTaskHours: "",
       });
     } else {
@@ -2668,6 +2663,7 @@ export default function Dashboard() {
         dropsSouth: "0",
         dropsWest: "0",
         shortfallReason: "",
+        logRopeAccessHours: false,
         ropeAccessTaskHours: "",
       });
     }
@@ -2691,6 +2687,25 @@ export default function Dashboard() {
     const activeProject = projects.find(p => p.id === activeSession.projectId);
     const isHoursBased = activeProject?.jobType === "general_pressure_washing" || activeProject?.jobType === "ground_window_cleaning";
     
+    // Validate rope access hours if user chose to log them
+    let ropeAccessHoursValue: number | undefined = undefined;
+    if (data.logRopeAccessHours) {
+      const hours = parseFloat(data.ropeAccessTaskHours);
+      if (isNaN(hours) || hours < 0 || hours > 24) {
+        endDayForm.setError("ropeAccessTaskHours", {
+          message: "Please enter valid hours between 0 and 24"
+        });
+        return;
+      }
+      if ((hours * 4) % 1 !== 0) {
+        endDayForm.setError("ropeAccessTaskHours", {
+          message: "Hours must be in quarter-hour increments (0.25, 0.5, 0.75, etc.)"
+        });
+        return;
+      }
+      ropeAccessHoursValue = hours;
+    }
+    
     if (isHoursBased) {
       // For hours-based projects, use percentage-based tracking
       const completionPercentage = parseInt(data.dropsNorth) || 0;
@@ -2706,11 +2721,12 @@ export default function Dashboard() {
       endDayMutation.mutate({
         sessionId: activeSession.id,
         projectId: activeSession.projectId,
-        dropsCompletedNorth: 0,
-        dropsCompletedEast: 0,
-        dropsCompletedSouth: 0,
-        dropsCompletedWest: 0,
+        dropsNorth: "0",
+        dropsEast: "0",
+        dropsSouth: "0",
+        dropsWest: "0",
         manualCompletionPercentage: completionPercentage,
+        ropeAccessTaskHours: ropeAccessHoursValue?.toString() || "",
       });
     } else {
       // For drop-based projects, use the existing logic
@@ -2738,6 +2754,7 @@ export default function Dashboard() {
         ...data,
         sessionId: activeSession.id,
         projectId: activeSession.projectId,
+        ropeAccessTaskHours: ropeAccessHoursValue?.toString() || "",
       });
     }
   };
@@ -8893,7 +8910,7 @@ export default function Dashboard() {
 
       {/* End Day Dialog with Drop Count */}
       <Dialog open={showEndDayDialog} onOpenChange={setShowEndDayDialog}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{t('dashboard.endDay.title', 'End Your Work Day')}</DialogTitle>
             <DialogDescription>
@@ -9092,33 +9109,6 @@ export default function Dashboard() {
                 }
               })()}
 
-              {/* Rope Access Task Hours - IRATA/SPRAT compliance */}
-              <FormField
-                control={endDayForm.control}
-                name="ropeAccessTaskHours"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('dashboard.endDay.ropeAccessHoursLabel', 'Rope Access Task Hours')}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        max="24"
-                        step="0.25"
-                        placeholder="0"
-                        {...field}
-                        data-testid="input-rope-access-hours"
-                        className="h-12 text-xl"
-                      />
-                    </FormControl>
-                    <FormDescription className="text-xs">
-                      {t('dashboard.endDay.ropeAccessHoursHint', 'Actual hours performing rope access tasks (excludes lunch, breaks, downtime). Important for IRATA/SPRAT certification.')}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
               {activeSession && (() => {
                 const dropsNorth = parseInt(endDayForm.watch("dropsNorth")) || 0;
                 const dropsEast = parseInt(endDayForm.watch("dropsEast")) || 0;
@@ -9147,6 +9137,59 @@ export default function Dashboard() {
                   )}
                 />
               )}
+
+              {/* Rope Access Hours Toggle and Input */}
+              <div className="border-t pt-4 mt-4">
+                <FormField
+                  control={endDayForm.control}
+                  name="logRopeAccessHours"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                      <div className="space-y-0.5">
+                        <FormLabel>{t('dashboard.endDay.logRopeAccessHours', 'Log rope access hours for your logbook?')}</FormLabel>
+                        <FormDescription className="text-xs">
+                          {t('dashboard.endDay.logRopeAccessHoursDesc', 'Track actual time on ropes for IRATA/SPRAT certification')}
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          data-testid="switch-log-rope-access-hours"
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                
+                {endDayForm.watch("logRopeAccessHours") && (
+                  <FormField
+                    control={endDayForm.control}
+                    name="ropeAccessTaskHours"
+                    render={({ field }) => (
+                      <FormItem className="mt-3">
+                        <FormLabel>{t('dashboard.endDay.ropeAccessHoursLabel', 'Rope Access Task Hours')}</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            min="0"
+                            max="24"
+                            step="0.25"
+                            placeholder="e.g., 6.5"
+                            {...field}
+                            data-testid="input-rope-access-hours"
+                            className="h-12 text-xl"
+                          />
+                        </FormControl>
+                        <FormDescription className="text-xs">
+                          {t('dashboard.endDay.ropeAccessHoursHint', 'Enter in quarter-hour increments. Excludes lunch, breaks, and downtime.')}
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+              </div>
 
               <div className="flex gap-2">
                 <Button
