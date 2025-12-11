@@ -18,6 +18,8 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n";
+import { Progress } from "@/components/ui/progress";
+import { Label } from "@/components/ui/label";
 
 // Helper to get date locale based on current language
 const getDateLocale = () => i18n.language?.startsWith('fr') ? fr : enUS;
@@ -59,8 +61,13 @@ export default function MyLoggedHours() {
   const { toast } = useToast();
   const [showBaselineDialog, setShowBaselineDialog] = useState(false);
   const [baselineInput, setBaselineInput] = useState("");
+  
+  // Certification baseline state
+  const [showCertBaselineDialog, setShowCertBaselineDialog] = useState(false);
+  const [certBaselineHours, setCertBaselineHours] = useState("");
+  const [certBaselineDate, setCertBaselineDate] = useState("");
 
-  const { data: userData, refetch: refetchUser } = useQuery({
+  const { data: userData, refetch: refetchUser } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
   });
 
@@ -107,6 +114,94 @@ export default function MyLoggedHours() {
     setBaselineInput(baselineHours.toString());
     setShowBaselineDialog(true);
   };
+
+  // Certification baseline mutation
+  const updateCertBaselineMutation = useMutation({
+    mutationFn: async ({ hours, date }: { hours: string; date: string }) => {
+      return apiRequest("PATCH", "/api/technician/profile", { 
+        name: currentUser?.name,
+        email: currentUser?.email,
+        employeePhoneNumber: currentUser?.employeePhoneNumber || "",
+        emergencyContactName: currentUser?.emergencyContactName || "",
+        emergencyContactPhone: currentUser?.emergencyContactPhone || "",
+        irataHoursAtLastUpgrade: hours,
+        irataLastUpgradeDate: date,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      refetchUser();
+      setShowCertBaselineDialog(false);
+      toast({ title: t('loggedHours.success', 'Success'), description: t('loggedHours.certBaselineUpdated', 'Certification baseline updated successfully') });
+    },
+    onError: (error: Error) => {
+      toast({ title: t('loggedHours.error', 'Error'), description: error.message, variant: "destructive" });
+    },
+  });
+
+  const openCertBaselineDialog = () => {
+    setCertBaselineHours(currentUser?.irataHoursAtLastUpgrade || "");
+    setCertBaselineDate(currentUser?.irataLastUpgradeDate || "");
+    setShowCertBaselineDialog(true);
+  };
+
+  const handleSaveCertBaseline = () => {
+    if (!certBaselineHours || !certBaselineDate) {
+      toast({ title: t('loggedHours.invalidInput', 'Invalid input'), description: t('loggedHours.enterBothFields', 'Please enter both hours and date'), variant: "destructive" });
+      return;
+    }
+    updateCertBaselineMutation.mutate({ hours: certBaselineHours, date: certBaselineDate });
+  };
+
+  // Calculate upgrade progress
+  const calculateUpgradeProgress = () => {
+    const irataLevel = parseInt(currentUser?.irataLevel || "0");
+    if (!irataLevel || irataLevel >= 3) {
+      return { isMaxLevel: irataLevel >= 3, noLevel: !irataLevel };
+    }
+
+    // Requirements: Level 1->2: 1000 hours + 12 months, Level 2->3: 1000 hours + 12 months
+    const requiredHours = 1000;
+    const requiredMonths = 12;
+
+    const hoursAtLastUpgrade = parseFloat(currentUser?.irataHoursAtLastUpgrade || "0");
+    const lastUpgradeDate = currentUser?.irataLastUpgradeDate;
+
+    // Hours since last upgrade
+    const hoursSinceUpgrade = hoursAtLastUpgrade > 0 
+      ? totalHours - hoursAtLastUpgrade 
+      : totalHours;
+
+    // Months since last upgrade
+    let monthsSinceUpgrade = 0;
+    if (lastUpgradeDate) {
+      const upgradeDate = new Date(lastUpgradeDate);
+      const now = new Date();
+      monthsSinceUpgrade = (now.getFullYear() - upgradeDate.getFullYear()) * 12 + (now.getMonth() - upgradeDate.getMonth());
+    }
+
+    const hoursProgress = Math.min(100, (hoursSinceUpgrade / requiredHours) * 100);
+    const timeProgress = Math.min(100, (monthsSinceUpgrade / requiredMonths) * 100);
+    const hoursRemaining = Math.max(0, requiredHours - hoursSinceUpgrade);
+    const monthsRemaining = Math.max(0, requiredMonths - monthsSinceUpgrade);
+    const eligible = hoursSinceUpgrade >= requiredHours && monthsSinceUpgrade >= requiredMonths;
+
+    return {
+      isMaxLevel: false,
+      noLevel: false,
+      nextLevel: irataLevel + 1,
+      hoursSinceUpgrade,
+      hoursProgress,
+      hoursRemaining,
+      monthsSinceUpgrade,
+      timeProgress,
+      monthsRemaining,
+      eligible,
+      hasBaseline: hoursAtLastUpgrade > 0 || !!lastUpgradeDate,
+    };
+  };
+
+  const upgradeProgress = calculateUpgradeProgress();
 
   const totalSessions = logs.length;
 
@@ -287,6 +382,106 @@ export default function MyLoggedHours() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Next Level Progress Section */}
+        {currentUser?.irataLevel && (
+          <Card className="mb-6 border-amber-500/30 bg-amber-500/5">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <span className="material-icons text-amber-600">military_tech</span>
+                {t('loggedHours.nextLevelProgress', 'Next Level Progress')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {upgradeProgress.isMaxLevel ? (
+                <div className="text-center py-4">
+                  <span className="material-icons text-4xl text-amber-600 mb-2">emoji_events</span>
+                  <p className="font-medium">{t('loggedHours.maxLevelReached', 'Congratulations! You have reached IRATA Level 3')}</p>
+                  <p className="text-sm text-muted-foreground">{t('loggedHours.highestLevel', 'This is the highest IRATA certification level')}</p>
+                </div>
+              ) : upgradeProgress.noLevel ? (
+                <div className="text-center py-4">
+                  <p className="text-muted-foreground">{t('loggedHours.noLevelSet', 'Set your IRATA level in your profile to track upgrade progress')}</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="text-lg px-3 py-1">
+                        {t('loggedHours.level', 'Level')} {currentUser?.irataLevel}
+                      </Badge>
+                      <span className="material-icons text-muted-foreground">arrow_forward</span>
+                      <Badge className="text-lg px-3 py-1 bg-amber-600">
+                        {t('loggedHours.level', 'Level')} {upgradeProgress.nextLevel}
+                      </Badge>
+                    </div>
+                    {upgradeProgress.eligible && (
+                      <Badge className="bg-green-600">{t('loggedHours.eligible', 'Eligible for Upgrade!')}</Badge>
+                    )}
+                  </div>
+
+                  {!upgradeProgress.hasBaseline && (
+                    <div className="bg-muted/50 rounded-md p-3 border border-dashed">
+                      <p className="text-sm text-muted-foreground mb-2">
+                        {t('loggedHours.setBaselinePrompt', 'Set your certification baseline to accurately track hours since your last upgrade')}
+                      </p>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={openCertBaselineDialog}
+                        data-testid="button-set-cert-baseline"
+                      >
+                        <span className="material-icons text-sm mr-1">edit</span>
+                        {t('loggedHours.setCertBaseline', 'Set Certification Baseline')}
+                      </Button>
+                    </div>
+                  )}
+
+                  <div className="space-y-3">
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-medium">{t('loggedHours.hoursProgress', 'Hours Progress')}</span>
+                        <span className="text-sm text-muted-foreground">
+                          {upgradeProgress.hoursSinceUpgrade?.toFixed(0) || 0} / 1000 {t('loggedHours.hrs', 'hrs')}
+                        </span>
+                      </div>
+                      <Progress value={upgradeProgress.hoursProgress || 0} className="h-2" />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {upgradeProgress.hoursRemaining?.toFixed(0) || 0} {t('loggedHours.hoursRemaining', 'hours remaining')}
+                      </p>
+                    </div>
+
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-medium">{t('loggedHours.timeProgress', 'Time at Level')}</span>
+                        <span className="text-sm text-muted-foreground">
+                          {upgradeProgress.monthsSinceUpgrade || 0} / 12 {t('loggedHours.months', 'months')}
+                        </span>
+                      </div>
+                      <Progress value={upgradeProgress.timeProgress || 0} className="h-2" />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {upgradeProgress.monthsRemaining || 0} {t('loggedHours.monthsRemaining', 'months remaining')}
+                      </p>
+                    </div>
+                  </div>
+
+                  {upgradeProgress.hasBaseline && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={openCertBaselineDialog}
+                      className="w-full"
+                      data-testid="button-update-cert-baseline"
+                    >
+                      <span className="material-icons text-sm mr-1">edit</span>
+                      {t('loggedHours.updateCertBaseline', 'Update Certification Baseline')}
+                    </Button>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {sortedTasks.length > 0 && (
           <Card className="mb-6">
@@ -507,6 +702,83 @@ export default function MyLoggedHours() {
                 <>
                   <span className="material-icons text-sm mr-1">save</span>
                   {t('loggedHours.saveHours', 'Save Hours')}
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Certification Baseline Dialog */}
+      <Dialog open={showCertBaselineDialog} onOpenChange={setShowCertBaselineDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <span className="material-icons text-amber-600">military_tech</span>
+              {t('loggedHours.certBaselineTitle', 'Certification Upgrade Baseline')}
+            </DialogTitle>
+            <DialogDescription>
+              {t('loggedHours.certBaselineDesc', 'Enter your total logbook hours and the date when you achieved your current IRATA level. This helps track your progress toward the next level.')}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div>
+              <Label className="text-sm font-medium block mb-2">
+                {t('loggedHours.hoursAtLastUpgrade', 'Total hours at time of last certification/upgrade')}
+              </Label>
+              <Input
+                type="number"
+                step="0.5"
+                min="0"
+                placeholder={t('loggedHours.hoursPlaceholder', 'e.g., 250')}
+                value={certBaselineHours}
+                onChange={(e) => setCertBaselineHours(e.target.value)}
+                data-testid="input-cert-baseline-hours"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                {t('loggedHours.hoursAtUpgradeNote', 'Your total logged hours when you passed your last IRATA assessment')}
+              </p>
+            </div>
+
+            <div>
+              <Label className="text-sm font-medium block mb-2">
+                {t('loggedHours.dateOfLastUpgrade', 'Date of last certification/upgrade')}
+              </Label>
+              <Input
+                type="date"
+                value={certBaselineDate}
+                onChange={(e) => setCertBaselineDate(e.target.value)}
+                data-testid="input-cert-baseline-date"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                {t('loggedHours.dateOfUpgradeNote', 'The date you achieved your current IRATA level')}
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowCertBaselineDialog(false)}
+              data-testid="button-cancel-cert-baseline"
+            >
+              {t('common.cancel', 'Cancel')}
+            </Button>
+            <Button 
+              onClick={handleSaveCertBaseline}
+              disabled={updateCertBaselineMutation.isPending}
+              data-testid="button-save-cert-baseline"
+            >
+              {updateCertBaselineMutation.isPending ? (
+                <>
+                  <span className="material-icons animate-spin text-sm mr-1">refresh</span>
+                  {t('common.saving', 'Saving...')}
+                </>
+              ) : (
+                <>
+                  <span className="material-icons text-sm mr-1">save</span>
+                  {t('loggedHours.saveBaseline', 'Save Baseline')}
                 </>
               )}
             </Button>
