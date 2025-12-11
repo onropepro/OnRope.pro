@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import ChangelogGuideLayout from "@/components/ChangelogGuideLayout";
 import {
   ClipboardCheck,
@@ -22,11 +24,25 @@ import {
   AlertTriangle,
   Info,
   BookOpen,
-  Camera
+  Camera,
+  ChevronsUpDown
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+const ALL_ACCORDION_ITEMS = [
+  "tech-1", "tech-2", "tech-3", "tech-4", "tech-5",
+  "owner-1", "owner-2",
+  "supervisor-1"
+];
+
 export default function IRATALoggingGuide() {
+  const [openItems, setOpenItems] = useState<string[]>([]);
+  const allExpanded = openItems.length === ALL_ACCORDION_ITEMS.length;
+
+  const toggleAll = () => {
+    setOpenItems(allExpanded ? [] : [...ALL_ACCORDION_ITEMS]);
+  };
+
   return (
     <ChangelogGuideLayout 
       title="IRATA / SPRAT Task Logging Guide"
@@ -105,7 +121,7 @@ export default function IRATALoggingGuide() {
                     Important: This Does NOT Replace Your Physical Logbook
                   </p>
                   <p className="text-red-800 dark:text-red-200 text-sm">
-                    IRATA and SPRAT still require you to maintain a physical logbook. WorkSafeBC and other regulatory bodies may request to see your written logbook on-site. OnRopePro's digital logging is a <strong>supplement</strong> that helps you maintain accurate records—not a replacement for your official certification documentation.
+                    IRATA and SPRAT still require you to maintain a physical logbook. WorkSafeBC and other regulatory bodies may request to see your written logbook on-site. OnRopePro's digital logging is a <strong>supplement</strong> that helps you maintain accurate records, not a replacement for your official certification documentation.
                   </p>
                   <p className="text-red-800 dark:text-red-200 text-sm">
                     <strong>Note:</strong> If you have no logged rope time for 6 months, your certification may be considered invalid until recertification. Consistent logging protects your credentials.
@@ -135,7 +151,7 @@ export default function IRATALoggingGuide() {
                   <div>
                     <h3 className="font-semibold">OCR Logbook Scanning</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Photograph your existing paper logbook pages. AI extracts hours and task data automatically—no manual entry required.
+                      Photograph your existing paper logbook pages. AI extracts hours and task data automatically, no manual entry required.
                     </p>
                   </div>
                 </div>
@@ -226,36 +242,238 @@ export default function IRATALoggingGuide() {
 
         <Separator />
 
-        {/* Problems Solved */}
-        <section className="space-y-4">
-          <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2 text-green-900 dark:text-green-100">
-                <CheckCircle2 className="w-5 h-5" />
+        {/* Problems Solved - Stakeholder Segmented with Accordions */}
+        <section className="space-y-8">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
+                <CheckCircle2 className="w-6 h-6 text-emerald-600" />
                 Problems Solved
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-green-900 dark:text-green-100">
-              <ul className="space-y-2 text-sm">
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span><strong>Paper logbook management:</strong> Digital IRATA / SPRAT hours tracking replaces error-prone physical logbooks</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span><strong>Certification progression tracking:</strong> View your accumulated hours toward next IRATA / SPRAT level <Badge variant="outline" className="ml-1 text-xs">Plus Feature - Coming Soon</Badge></span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span><strong>Task categorization gaps:</strong> Standardized 20+ rope access task types ensure proper hour classification</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span><strong>Lost pre-existing hours:</strong> Baseline entry allows importing historical logbook hours into the system</span>
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
+              </h2>
+              <p className="text-muted-foreground mt-2">
+                The IRATA/SPRAT Task Logging module solves different problems for different users. Find your role below.
+              </p>
+            </div>
+            <Button 
+              onClick={toggleAll} 
+              variant="outline"
+              data-testid="button-toggle-all-accordions"
+            >
+              <ChevronsUpDown className="w-4 h-4 mr-2" />
+              {allExpanded ? "Collapse All" : "Expand All"}
+            </Button>
+          </div>
+
+          {/* For Rope Access Technicians */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 pb-2 border-b">
+              <UserCheck className="w-5 h-5 text-purple-500" />
+              <h3 className="text-xl md:text-2xl font-semibold">For Rope Access Technicians</h3>
+            </div>
+
+            <Accordion 
+              type="multiple" 
+              value={openItems} 
+              onValueChange={setOpenItems}
+              className="space-y-3"
+            >
+              <AccordionItem value="tech-1" className="border rounded-lg px-4" data-testid="accordion-tech-1">
+                <AccordionTrigger className="text-left">
+                  <span className="font-medium">"I haven't updated my logbook in months"</span>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4 pb-4">
+                  <p className="text-muted-foreground">
+                    <span className="font-medium text-foreground">The Pain:</span> Opening your physical logbook every day is tedious. You put it off for a week, then two weeks, then months. When you finally try to catch up, you can't remember which buildings you worked at, what tasks you performed, or how many hours you actually spent on rope. You end up guessing, and your logbook becomes unreliable.
+                  </p>
+                  <div className="bg-muted/50 rounded p-3 border-l-2 border-purple-300">
+                    <p className="text-xs text-muted-foreground mb-1">Real Example:</p>
+                    <p className="italic text-sm">
+                      "My last entry is December 29th, 2023... Two years. Where did I work in the past year? I don't even have access to my hours anymore because I don't work there. I don't have an account. It's all gone now."
+                    </p>
+                  </div>
+                  <p className="text-muted-foreground">
+                    <span className="font-medium text-foreground">Solution:</span> OnRopePro captures your hours automatically when you clock in/out. After each session, you simply select which tasks you performed. The system builds your chronological history without you having to write anything down.
+                  </p>
+                  <p className="text-emerald-700 dark:text-emerald-400">
+                    <span className="font-medium">Benefit:</span> Never lose track of your hours again. Even if you forget to update your physical logbook, you have a complete digital record to reference when you catch up.
+                  </p>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="tech-2" className="border rounded-lg px-4" data-testid="accordion-tech-2">
+                <AccordionTrigger className="text-left">
+                  <span className="font-medium">"I just log 'descending' for everything"</span>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4 pb-4">
+                  <p className="text-muted-foreground">
+                    <span className="font-medium text-foreground">The Pain:</span> When you're catching up on weeks of logging, you can't remember which specific tasks you performed each day. Did you do a rope transfer on Tuesday or Wednesday? Was that rigging job last week or the week before? You end up putting "descending" or "window cleaning" for everything because it's easier than guessing.
+                  </p>
+                  <div className="bg-muted/50 rounded p-3 border-l-2 border-purple-300">
+                    <p className="text-xs text-muted-foreground mb-1">Real Example:</p>
+                    <p className="italic text-sm">
+                      "You'll just kind of purposely lie, like 'yeah, probably did a rope transfer that day.' I know I did that many times at a building. I knew I was at that building and I know there are rope transfer drops on that building. But which day did I do them? Don't know."
+                    </p>
+                  </div>
+                  <p className="text-muted-foreground">
+                    <span className="font-medium text-foreground">Solution:</span> Task selection happens immediately after each work session while it's fresh in your mind. The system shows you standardized task types, and you allocate your hours across what you actually did that day.
+                  </p>
+                  <p className="text-emerald-700 dark:text-emerald-400">
+                    <span className="font-medium">Benefit:</span> Build an accurate, diverse task history that actually reflects your experience, which is critical for Level 3 assessments.
+                  </p>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="tech-3" className="border rounded-lg px-4" data-testid="accordion-tech-3">
+                <AccordionTrigger className="text-left">
+                  <span className="font-medium">"I showed up to my Level 3 assessment with a weak logbook"</span>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4 pb-4">
+                  <p className="text-muted-foreground">
+                    <span className="font-medium text-foreground">The Pain:</span> You've accumulated 1,000+ hours and feel ready for Level 3. But when the assessor reviews your logbook, they see page after page of "descending" with no rope transfers, no rigging, no rescue practice. They either send you home to get more experience, or they pass you but watch you like a hawk during the entire assessment.
+                  </p>
+                  <div className="bg-muted/50 rounded p-3 border-l-2 border-purple-300">
+                    <p className="text-xs text-muted-foreground mb-1">Real Example:</p>
+                    <p className="italic text-sm">
+                      "If you show up at your certification and you show the assessor that all you did in your thousand hours of level two is descend on rope, they're gonna return you home and say go get more experience. Or you'll get the course, but the assessor will focus on you a lot."
+                    </p>
+                  </div>
+                  <p className="text-muted-foreground">
+                    <span className="font-medium text-foreground">Solution:</span> OnRopePro tracks hours by task type and shows you statistics. You can see at a glance whether you're building well-rounded experience or if you need to seek out more rope transfers, rigging, or rescue training.
+                  </p>
+                  <p className="text-emerald-700 dark:text-emerald-400">
+                    <span className="font-medium">Benefit:</span> Walk into your Level 3 assessment with confidence, backed by documented diverse experience that assessors respect.
+                  </p>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="tech-4" className="border rounded-lg px-4" data-testid="accordion-tech-4">
+                <AccordionTrigger className="text-left">
+                  <span className="font-medium">"I changed jobs and lost access to my hour records"</span>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4 pb-4">
+                  <p className="text-muted-foreground">
+                    <span className="font-medium text-foreground">The Pain:</span> You worked for a company for two years. All your hours were tracked in their system. Then you leave, and suddenly you can't access any of that data. Your physical logbook has gaps because you relied on the company's records. Now you're starting fresh with incomplete history.
+                  </p>
+                  <div className="bg-muted/50 rounded p-3 border-l-2 border-purple-300">
+                    <p className="text-xs text-muted-foreground mb-1">Real Example:</p>
+                    <p className="italic text-sm">
+                      "I don't even have access to my hours anymore because I don't work there. I don't have an account. It's all gone now. I have to..."
+                    </p>
+                  </div>
+                  <p className="text-muted-foreground">
+                    <span className="font-medium text-foreground">Solution:</span> Your IRATA/SPRAT hours belong to YOUR technician profile, not your employer. When you move to a new company, your complete hour history comes with you automatically.
+                  </p>
+                  <p className="text-emerald-700 dark:text-emerald-400">
+                    <span className="font-medium">Benefit:</span> Portable professional identity. Your career history is yours forever, regardless of which companies you work for.
+                  </p>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="tech-5" className="border rounded-lg px-4" data-testid="accordion-tech-5">
+                <AccordionTrigger className="text-left">
+                  <span className="font-medium">"Nobody actually verifies what I write in my logbook"</span>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4 pb-4">
+                  <p className="text-muted-foreground">
+                    <span className="font-medium text-foreground">The Pain:</span> You're supposed to get your logbook signed regularly by a Level 3 or supervisor. But realistically, you bring six months of entries to your boss and they just sign everything without looking. There's no actual verification that you did what you claim.
+                  </p>
+                  <div className="bg-muted/50 rounded p-3 border-l-2 border-purple-300">
+                    <p className="text-xs text-muted-foreground mb-1">Real Example:</p>
+                    <p className="italic text-sm">
+                      "I bring my book to Jeff for the past six months of work, he's just signing. He doesn't know what I did. He just signs."
+                    </p>
+                  </div>
+                  <p className="text-muted-foreground">
+                    <span className="font-medium text-foreground">Solution:</span> When hours are logged same-day and linked to actual project locations, supervisors can verify entries against known work. "Tommy was at Marina Side today, I know there's rope transfers on that building. Approve."
+                  </p>
+                  <p className="text-emerald-700 dark:text-emerald-400">
+                    <span className="font-medium">Benefit:</span> More credible records. When approvals happen in real-time against known projects, your logged hours carry more weight.
+                  </p>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
+
+          {/* For Company Owners */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 pb-2 border-b">
+              <Award className="w-5 h-5 text-amber-500" />
+              <h3 className="text-xl md:text-2xl font-semibold">For Company Owners</h3>
+            </div>
+
+            <Accordion 
+              type="multiple" 
+              value={openItems} 
+              onValueChange={setOpenItems}
+              className="space-y-3"
+            >
+              <AccordionItem value="owner-1" className="border rounded-lg px-4" data-testid="accordion-owner-1">
+                <AccordionTrigger className="text-left">
+                  <span className="font-medium">"I don't know if my techs are actually qualified"</span>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4 pb-4">
+                  <p className="text-muted-foreground">
+                    <span className="font-medium text-foreground">The Pain:</span> You hire a Level 2 tech who claims 2,000 hours of experience. But their logbook is a mess, with gaps everywhere, vague entries, and signatures from months ago. Are they actually experienced, or did they just accumulate time without developing real skills?
+                  </p>
+                  <p className="text-muted-foreground">
+                    <span className="font-medium text-foreground">Solution:</span> When techs use OnRopePro, you can see their verified hour history with task breakdowns. You know exactly how much rigging, rescue, and specialized work they've actually performed.
+                  </p>
+                  <p className="text-emerald-700 dark:text-emerald-400">
+                    <span className="font-medium">Benefit:</span> Hire with confidence. Assign techs to jobs that match their actual documented experience level.
+                  </p>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="owner-2" className="border rounded-lg px-4" data-testid="accordion-owner-2">
+                <AccordionTrigger className="text-left">
+                  <span className="font-medium">"Signing logbooks is a rubber-stamp exercise"</span>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4 pb-4">
+                  <p className="text-muted-foreground">
+                    <span className="font-medium text-foreground">The Pain:</span> Your Level 3s are supposed to verify and sign tech logbooks. In reality, techs show up with months of backlogged entries and your supervisors just sign everything. There's no meaningful quality control.
+                  </p>
+                  <p className="text-muted-foreground">
+                    <span className="font-medium text-foreground">Solution:</span> Digital approval flow means supervisors can review and approve hours daily or weekly while details are fresh. They can see which projects the tech worked on and verify the task types make sense.
+                  </p>
+                  <p className="text-emerald-700 dark:text-emerald-400">
+                    <span className="font-medium">Benefit:</span> Meaningful verification. Your company's signature on a tech's hours actually means something.
+                  </p>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
+
+          {/* For Level 3 Technicians / Supervisors */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 pb-2 border-b">
+              <ClipboardCheck className="w-5 h-5 text-action-500" />
+              <h3 className="text-xl md:text-2xl font-semibold">For Level 3 Technicians & Supervisors</h3>
+            </div>
+
+            <Accordion 
+              type="multiple" 
+              value={openItems} 
+              onValueChange={setOpenItems}
+              className="space-y-3"
+            >
+              <AccordionItem value="supervisor-1" className="border rounded-lg px-4" data-testid="accordion-supervisor-1">
+                <AccordionTrigger className="text-left">
+                  <span className="font-medium">"I'm signing off on hours I can't actually verify"</span>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4 pb-4">
+                  <p className="text-muted-foreground">
+                    <span className="font-medium text-foreground">The Pain:</span> A tech brings you six months of logbook entries to sign. You weren't on every job with them. You have no idea if they actually did rope transfers on March 15th or if they're padding their book. But you sign anyway because that's how it's always been done.
+                  </p>
+                  <p className="text-muted-foreground">
+                    <span className="font-medium text-foreground">Solution:</span> When entries are logged same-day and linked to specific projects, you can cross-reference against job records. "This tech logged rope transfers at Building X on Tuesday. I know that building has transfer points on the north elevation. Approve."
+                  </p>
+                  <p className="text-emerald-700 dark:text-emerald-400">
+                    <span className="font-medium">Benefit:</span> Sign with integrity. Your IRATA/SPRAT number on an approval actually represents verification, not just rubber-stamping.
+                  </p>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
         </section>
 
         <Separator />
@@ -484,10 +702,10 @@ export default function IRATALoggingGuide() {
                   <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
                   <div className="space-y-1">
                     <p className="font-semibold text-amber-900 dark:text-amber-100">
-                      Important: Task Hours ≠ Shift Hours
+                      Important: Task Hours are not the same as Shift Hours
                     </p>
                     <p className="text-sm text-amber-800 dark:text-amber-200">
-                      An 8-hour shift doesn't mean 8 hours of rope access tasks. Deduct lunch breaks, travel time, ground-level prep, and non-rope work. IRATA assessors review your logged tasks carefully—accuracy matters for your certification progression.
+                      An 8-hour shift doesn't mean 8 hours of rope access tasks. Deduct lunch breaks, travel time, ground-level prep, and non-rope work. IRATA assessors review your logged tasks carefully, so accuracy matters for your certification progression.
                     </p>
                   </div>
                 </div>
@@ -659,7 +877,7 @@ export default function IRATALoggingGuide() {
               <CardContent className="text-sm space-y-2">
                 <div className="flex items-start gap-2">
                   <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 shrink-0" />
-                  <span>Log full shift hours as task hours (8hr shift ≠ 8hrs of tasks)</span>
+                  <span>Log full shift hours as task hours (8hr shift is not 8hrs of tasks)</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 shrink-0" />
@@ -701,7 +919,7 @@ export default function IRATALoggingGuide() {
               <CardContent className="pt-6">
                 <h3 className="font-semibold mb-2">What happens to my hours if I change employers?</h3>
                 <p className="text-sm text-muted-foreground">
-                  Your IRATA/SPRAT hours belong to your technician profile, not your employer. When you move to a new company, your complete hour history comes with you—no re-entry required.
+                  Your IRATA/SPRAT hours belong to your technician profile, not your employer. When you move to a new company, your complete hour history comes with you, so no re-entry is required.
                 </p>
               </CardContent>
             </Card>
