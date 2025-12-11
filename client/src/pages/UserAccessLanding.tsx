@@ -174,8 +174,8 @@ export default function UserAccessLanding() {
                     }}
                     data-testid="nav-user-access"
                   >
-                    <div className="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                      <Lock className="w-5 h-5 text-indigo-600" />
+                    <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                      <Lock className="w-5 h-5 text-blue-600" />
                     </div>
                     <div>
                       <div className="font-semibold text-sm">User Access & Authentication</div>
@@ -207,7 +207,7 @@ export default function UserAccessLanding() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-900 text-white">
+      <section className="relative overflow-hidden text-white" style={{backgroundImage: 'linear-gradient(135deg, #0B64A3 0%, #0369A1 100%)'}}>
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMtOS45NDEgMC0xOCA4LjA1OS0xOCAxOHM4LjA1OSAxOCAxOCAxOGM5Ljk0MSAwIDE4LTguMDU5IDE4LTE4cy04LjA1OS0xOC0xOC0xOHptMCAzMmMtNy43MzIgMC0xNC02LjI2OC0xNC0xNHM2LjI2OC0xNCAxNC0xNHMxNCA2LjI2OCAxNCAxNC02LjI2OCAxNC0xNCAxNHoiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wMykiLz48L2c+PC9zdmc+')] opacity-30"></div>
         
         <div className="relative max-w-6xl mx-auto px-4 py-20 md:py-28">
@@ -219,17 +219,17 @@ export default function UserAccessLanding() {
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
               Built for the moment you realize<br />
               your new hire<br />
-              <span className="text-indigo-200">can see everyone's rates.</span>
+              <span className="text-blue-100">can see everyone's rates.</span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-indigo-100 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
               Grant project creation, employee scheduling, and safety<br />
               compliance access to the people who need it.<br />
               <strong>Keep hourly rates, labor costs, and profit margins visible only to you.</strong>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" className="bg-white text-indigo-700 hover:bg-indigo-50" asChild data-testid="button-hero-trial">
+              <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-hero-trial">
                 <Link href="/register">
                   Start Your 90-Day Trial
                   <ArrowRight className="ml-2 w-5 h-5" />
@@ -259,7 +259,7 @@ export default function UserAccessLanding() {
           <CardContent className="p-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-indigo-600">{count1}</div>
+                <div className="text-3xl md:text-4xl font-bold text-blue-600">{count1}</div>
                 <div className="text-sm text-muted-foreground mt-1">Exposed pay rates</div>
               </div>
               <div className="text-center">
@@ -327,10 +327,10 @@ export default function UserAccessLanding() {
           <div className="grid md:grid-cols-3 gap-6">
             {/* Granular Permissions */}
             <Card className="relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 to-purple-600"></div>
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-cyan-600"></div>
               <CardHeader>
-                <div className="w-12 h-12 rounded-lg bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center mb-3">
-                  <Layers className="w-6 h-6 text-indigo-600" />
+                <div className="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-3">
+                  <Layers className="w-6 h-6 text-blue-600" />
                 </div>
                 <CardTitle className="text-xl">Granular Permission Controls</CardTitle>
               </CardHeader>
@@ -511,8 +511,8 @@ export default function UserAccessLanding() {
             <AccordionItem value="owners" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center">
-                    <Briefcase className="w-5 h-5 text-indigo-600" />
+                  <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                    <Briefcase className="w-5 h-5 text-blue-600" />
                   </div>
                   <span className="text-lg font-semibold">For Company Owners</span>
                 </div>
@@ -666,7 +666,7 @@ export default function UserAccessLanding() {
             <Card>
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-3">
-                  <Lock className="w-5 h-5 text-indigo-600" />
+                  <Lock className="w-5 h-5 text-blue-600" />
                   <CardTitle className="text-lg">Session Management</CardTitle>
                 </div>
               </CardHeader>
@@ -726,8 +726,8 @@ export default function UserAccessLanding() {
 
           <div className="grid md:grid-cols-2 gap-4">
             <div className="flex items-start gap-4 p-4 rounded-lg bg-slate-50 dark:bg-slate-900">
-              <div className="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center shrink-0">
-                <Users className="w-5 h-5 text-indigo-600" />
+              <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0">
+                <Users className="w-5 h-5 text-blue-600" />
               </div>
               <div>
                 <h3 className="font-semibold mb-1">Employee Directory</h3>
@@ -779,17 +779,17 @@ export default function UserAccessLanding() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 md:py-20 px-4 bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-900 text-white">
+      <section className="py-16 md:py-20 px-4 text-white" style={{backgroundImage: 'linear-gradient(135deg, #0B64A3 0%, #0369A1 100%)'}}>
         <div className="max-w-3xl mx-auto text-center space-y-6">
           <h2 className="text-3xl md:text-4xl font-bold">
             Ready to Take Control?
           </h2>
-          <p className="text-lg text-indigo-100">
+          <p className="text-lg text-blue-100">
             Set up your first employee with custom permissions in under 5 minutes.<br />
             Full access. No credit card. Real data stays private from day one.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Button size="lg" className="bg-white text-indigo-700 hover:bg-indigo-50" asChild data-testid="button-cta-trial">
+            <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-cta-trial">
               <Link href="/register">
                 Start Your 90-Day Trial
                 <ArrowRight className="ml-2 w-5 h-5" />

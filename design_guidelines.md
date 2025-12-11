@@ -8,10 +8,13 @@
 ## Color Palette
 
 **Primary System:**
-- Ocean Blue: #0EA5E9 (primary actions, links, active states)
-- Deep Ocean: #0369A1 (hover states, depth)
-- Midnight: #0F172A (headers, primary text)
-- Slate: #64748B (secondary text, captions)
+- Navy Dark: #0F1629 (dark backgrounds, depth)
+- Navy Blue: #193A63 (secondary backgrounds, subtle contrast)
+- Ocean Blue: #0B64A3 (primary actions, links, active states)
+- Deep Ocean: #0369A1 (hover states, depth accents)
+- Neutral Gray: #989C94 (secondary text, borders, disabled states)
+- Light Gray: #F3F3F3 (page backgrounds, light surfaces)
+- Rust Brown: #AB4521 (call-to-action buttons, emphasis)
 
 **Accent Palette:**
 - Emerald: #10B981 (success, completed tasks)
@@ -24,12 +27,12 @@
 - Cloud: #F8FAFC (page backgrounds)
 - Mist: #E2E8F0 (subtle borders, dividers)
 - Glass White: rgba(255, 255, 255, 0.7) with 20px blur
-- Glass Dark: rgba(15, 23, 42, 0.6) with 20px blur
+- Glass Dark: rgba(15, 22, 41, 0.6) with 20px blur
 
 **Gradients:**
-- Primary: linear-gradient(135deg, #0EA5E9 0%, #0369A1 100%)
-- Accent: linear-gradient(135deg, #8B5CF6 0%, #0EA5E9 100%)
-- Subtle: linear-gradient(180deg, #F8FAFC 0%, #FFFFFF 100%)
+- Primary (Hero): linear-gradient(135deg, #0B64A3 0%, #0369A1 100%)
+- Accent: linear-gradient(135deg, #0369A1 0%, #0B64A3 100%)
+- Subtle: linear-gradient(180deg, #F3F3F3 0%, #FFFFFF 100%)
 
 ## Typography (Inter via Google Fonts)
 
