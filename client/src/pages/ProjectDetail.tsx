@@ -489,7 +489,10 @@ export default function ProjectDetail() {
         payload.dropsCompletedSouth = parseInt(data.dropsCompletedSouth || "0");
         payload.dropsCompletedWest = parseInt(data.dropsCompletedWest || "0");
         payload.validShortfallReasonCode = data.validShortfallReasonCode || null;
-        payload.shortfallReason = data.shortfallReason;
+        // Only send shortfallReason if "other" is selected or no valid code selected
+        payload.shortfallReason = (data.validShortfallReasonCode === 'other' || !data.validShortfallReasonCode) 
+          ? data.shortfallReason 
+          : null;
       }
       
       console.log("📤 Sending clock-out data to backend:", payload);
@@ -3693,7 +3696,13 @@ export default function ProjectDetail() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>{t('projectDetail.dialogs.endDay.validReasonLabel', 'Why was the daily target not met?')}</FormLabel>
-                              <Select onValueChange={field.onChange} value={field.value || ""}>
+                              <Select onValueChange={(value) => {
+                                field.onChange(value);
+                                // Clear shortfallReason when selecting a non-"other" valid reason
+                                if (value && value !== 'other') {
+                                  endDayForm.setValue('shortfallReason', '');
+                                }
+                              }} value={field.value || ""}>
                                 <FormControl>
                                   <SelectTrigger data-testid="select-shortfall-reason">
                                     <SelectValue placeholder={t('projectDetail.dialogs.endDay.selectReason', 'Select a reason...')} />
