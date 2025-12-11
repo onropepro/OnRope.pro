@@ -44,7 +44,8 @@ export default function SafetyComplianceLanding() {
   const [count1, setCount1] = useState(0);
   const [count2, setCount2] = useState(0);
   const [count3, setCount3] = useState(0);
-  const headline = useSafetyAuthority();
+  const [allZero, setAllZero] = useState(false);
+  const authorityName = useSafetyAuthority();
   const modulesMenuRef = useRef<HTMLDivElement>(null);
 
   // Initialize countdown numbers
@@ -54,11 +55,20 @@ export default function SafetyComplianceLanding() {
     const start3 = Math.floor(Math.random() * 120) + 80;
 
     let current1 = start1, current2 = start2, current3 = start3;
+    setCount1(current1);
+    setCount2(current2);
+    setCount3(current3);
     
     const interval = setInterval(() => {
       if (current1 > 0) { current1--; setCount1(current1); }
       if (current2 > 0) { current2--; setCount2(current2); }
       if (current3 > 0) { current3--; setCount3(current3); }
+      
+      // Check if all counters have reached zero
+      if (current1 === 0 && current2 === 0 && current3 === 0) {
+        setAllZero(true);
+        clearInterval(interval);
+      }
     }, 150);
 
     return () => clearInterval(interval);
@@ -185,13 +195,14 @@ export default function SafetyComplianceLanding() {
             </Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              {headline}<br />
+              {authorityName} just pulled<br />
+              into the parking lot.<br />
               <span className="text-sky-200">Are you ready?</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-sky-100 max-w-3xl mx-auto leading-relaxed">
-              Daily harness inspections. Toolbox meetings. Equipment tracking. Digital signatures.
-              <br className="hidden md:block" />
+              Daily harness inspections. Toolbox meetings.<br />
+              Equipment tracking. Digital signatures.<br />
               <strong>All searchable. All exportable. All defensible.</strong>
             </p>
             
@@ -238,7 +249,12 @@ export default function SafetyComplianceLanding() {
                 <div className="text-sm text-muted-foreground mt-1">Sleepless nights</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-amber-600">∞</div>
+                <div 
+                  className={`text-3xl md:text-4xl font-bold text-amber-600 transition-transform duration-500 ${allZero ? 'rotate-90' : ''}`}
+                  style={{ display: 'inline-block' }}
+                >
+                  {allZero ? '∞' : '8'}
+                </div>
                 <div className="text-sm text-muted-foreground mt-1">Searchable history</div>
               </div>
             </div>

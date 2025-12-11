@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
-import { getAuthorityByLocation, buildHeadline } from '@/lib/safety-authorities';
+import { getAuthorityByLocation, getAuthorityName } from '@/lib/safety-authorities';
 
 interface GeoData {
   country: string;
   region_code: string;
 }
 
-const CACHE_KEY = 'safetyAuthorityHeadline';
+const CACHE_KEY = 'safetyAuthorityName';
 
 export function useSafetyAuthority() {
-  const [headline, setHeadline] = useState("Your auditor just pulled into the parking lot.");
+  const [authorityName, setAuthorityName] = useState("Your auditor");
 
   useEffect(() => {
     async function fetchLocation() {
@@ -22,15 +22,15 @@ export function useSafetyAuthority() {
           // Format: testLocation=US,CA or testLocation=CA,BC
           const [country, region] = testLocation.split(',');
           const authority = getAuthorityByLocation(country.toUpperCase(), region.toUpperCase());
-          const newHeadline = buildHeadline(authority);
-          setHeadline(newHeadline);
+          const name = getAuthorityName(authority);
+          setAuthorityName(name);
           return;
         }
 
         // Check cache first
         const cached = sessionStorage.getItem(CACHE_KEY);
         if (cached) {
-          setHeadline(cached);
+          setAuthorityName(cached);
           return;
         }
 
@@ -45,12 +45,12 @@ export function useSafetyAuthority() {
         
         const data: GeoData = await response.json();
         const authority = getAuthorityByLocation(data.country, data.region_code);
-        const newHeadline = buildHeadline(authority);
+        const name = getAuthorityName(authority);
         
-        setHeadline(newHeadline);
-        sessionStorage.setItem(CACHE_KEY, newHeadline);
+        setAuthorityName(name);
+        sessionStorage.setItem(CACHE_KEY, name);
       } catch (error) {
-        // Silently fail to default headline
+        // Silently fail to default
         console.error('Geolocation fetch failed:', error);
       }
     }
@@ -58,5 +58,5 @@ export function useSafetyAuthority() {
     fetchLocation();
   }, []);
 
-  return headline;
+  return authorityName;
 }

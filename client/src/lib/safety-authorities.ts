@@ -88,3 +88,7 @@ export function getAuthorityByLocation(country: string, regionCode: string): Saf
 export function buildHeadline(authority: SafetyAuthority): string {
   return `${authority.name} just pulled into the parking lot.`;
 }
+
+export function getAuthorityName(authority: SafetyAuthority): string {
+  return authority.name;
+}
