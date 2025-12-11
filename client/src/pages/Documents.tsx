@@ -5219,10 +5219,12 @@ export default function Documents() {
             const allEmployees = employeesData?.employees || [];
             
             // Include company owner in the staff list for compliance tracking
+            // Filter out suspended employees - they should not appear in compliance tracking
+            const activeEmployees = allEmployees.filter((e: any) => e.status !== 'suspended');
             const companyOwner = currentUser?.role === 'company' ? currentUser : null;
             const allStaff = companyOwner 
-              ? [companyOwner, ...allEmployees.filter((e: any) => e.id !== companyOwner.id)]
-              : allEmployees;
+              ? [companyOwner, ...activeEmployees.filter((e: any) => e.id !== companyOwner.id)]
+              : activeEmployees;
             
             // Required documents that employees must sign (includes all safe work procedures AND practices)
             const requiredDocTypes = ['health_safety_manual', 'company_policy', 'safe_work_procedure', 'safe_work_practice'];
