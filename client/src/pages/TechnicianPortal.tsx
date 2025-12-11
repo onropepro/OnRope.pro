@@ -1742,14 +1742,13 @@ export default function TechnicianPortal() {
             {/* Referral Code in Top Bar */}
             {user?.referralCode && (
               <div className="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded-md bg-primary/10 border border-primary/20">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span className="text-xs text-muted-foreground cursor-help underline decoration-dotted underline-offset-2">{t.yourReferralCode}:</span>
-                  </TooltipTrigger>
-                  <TooltipContent className="max-w-xs">
-                    <p className="text-sm">{t.shareReferralCode}</p>
-                  </TooltipContent>
-                </Tooltip>
+                <button
+                  onClick={() => setShowReferralInfoDialog(true)}
+                  className="text-xs text-muted-foreground cursor-pointer underline decoration-dotted underline-offset-2 hover:text-primary transition-colors"
+                  data-testid="button-referral-info"
+                >
+                  {t.yourReferralCode}:
+                </button>
                 <span className="font-mono font-bold text-sm text-primary" data-testid="header-referral-code">
                   {user.referralCode}
                 </span>
@@ -5332,6 +5331,83 @@ export default function TechnicianPortal() {
           <DialogFooter>
             <Button onClick={() => setShowFeedbackSuccess(false)} data-testid="button-close-feedback-success">
               {t.cancel}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Referral Code Info Dialog */}
+      <Dialog open={showReferralInfoDialog} onOpenChange={setShowReferralInfoDialog}>
+        <DialogContent className="sm:max-w-lg" data-testid="dialog-referral-info">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Share2 className="w-5 h-5 text-primary" />
+              {t.yourReferralCode}
+            </DialogTitle>
+            <DialogDescription>
+              {t.shareReferralCode}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="p-4 bg-primary/10 rounded-lg text-center">
+              <p className="text-sm text-muted-foreground mb-2">{t.yourReferralCode}</p>
+              <p className="text-2xl font-mono font-bold text-primary tracking-wider">{user?.referralCode}</p>
+              <Button
+                variant={codeCopied ? "default" : "outline"}
+                size="sm"
+                onClick={handleCopyReferralCode}
+                className="mt-3 gap-2"
+                data-testid="button-dialog-copy-code"
+              >
+                {codeCopied ? <CheckCircle2 className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                {codeCopied ? t.codeCopied : t.copyCode}
+              </Button>
+            </div>
+            
+            <div className="space-y-3">
+              <h4 className="font-semibold flex items-center gap-2">
+                <Crown className="w-4 h-4 text-amber-500" />
+                {language === 'en' ? 'How to Earn PLUS Access' : 'Comment obtenir PLUS'}
+              </h4>
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <p>{language === 'en' 
+                  ? 'Refer one technician who signs up using your code and you will unlock PLUS access.'
+                  : 'Parrainez un technicien qui s\'inscrit avec votre code et vous debloquerez PLUS.'}</p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <h4 className="font-semibold flex items-center gap-2">
+                <Star className="w-4 h-4 text-amber-500" />
+                {language === 'en' ? 'PLUS Benefits' : 'Avantages PLUS'}
+              </h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  {language === 'en' ? 'Certification expiry alerts (60 and 30 day warnings)' : 'Alertes d\'expiration de certification'}
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  {language === 'en' ? 'Unlimited employer connections' : 'Connexions employeurs illimitees'}
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  {language === 'en' ? 'Enhanced IRATA task logging' : 'Journalisation IRATA amelioree'}
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  {language === 'en' ? 'Exportable work history (PDF)' : 'Historique de travail exportable (PDF)'}
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  {language === 'en' ? 'Profile visibility to employers' : 'Visibilite du profil aux employeurs'}
+                </li>
+              </ul>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setShowReferralInfoDialog(false)} data-testid="button-close-referral-info">
+              {t.close}
             </Button>
           </DialogFooter>
         </DialogContent>
