@@ -66,7 +66,7 @@ export default function UserAccessGuide() {
     }
   };
 
-  return (
+  return ( 
     <ChangelogGuideLayout 
       title="User Access & Authentication Guide"
       version="2.1"
@@ -101,8 +101,8 @@ export default function UserAccessGuide() {
               <div className="space-y-2 text-base">
                 <p><strong>Key Principles:</strong></p>
                 <ul className="list-disc list-inside space-y-1 ml-2">
-                  <li><strong>1.</strong> Each user has exactly one base role (Company Owner, Operations Manager, Supervisor, Technician, etc.)</li>
-                  <li><strong>2.</strong> Base roles provide organizational structure — they suggest typical access patterns but do NOT determine permissions</li>
+                  <li><strong>1.</strong> Each user has exactly one base role Company Owner, Operations Manager, Supervisor, Technician, etc.)</li>
+                  <li><strong>2.</strong> Base roles provide organizational structure, they suggest typical access patterns but do NOT determine permissions</li>
                   <li><strong>3.</strong> Permissions are customized per employee by the company owner, regardless of role title</li>
                   <li><strong>4.</strong> Permissions define what users can actually do with the data they can access</li>
                 </ul>
@@ -154,8 +154,8 @@ export default function UserAccessGuide() {
                 <AccordionContent className="pb-4">
                   <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>You need your supervisor to create projects and assign technicians, but the moment you give them access, they can see what every technician earns. Generic construction software forces you to choose: operational efficiency or payroll privacy.</p>
-                    <p><span className="font-medium text-foreground">Example:</span> Your operations manager needs to review project budgets to ensure profitability, but you don't want them seeing individual hourly rates. Traditional systems make this impossible—budget access automatically includes rate visibility.</p>
-                    <p><span className="font-medium text-foreground">Solution:</span> OnRopePro's flexible permission system separates operational capabilities from financial visibility. Grant your supervisor project creation rights, employee assignment capabilities, and schedule management—while keeping hourly rates, labor costs, and payroll data owner-only.</p>
+                    <p><span className="font-medium text-foreground">Example:</span> Your operations manager needs to review project budgets to ensure profitability, but you don't want them seeing individual hourly rates. Traditional systems make this impossible, budget access automatically includes rate visibility.</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> OnRopePro's flexible permission system separates operational capabilities from financial visibility. Grant your supervisor project creation rights, employee assignment capabilities, and schedule management, while keeping hourly rates, labor costs, and payroll data owner-only.</p>
                     <p><span className="font-medium text-foreground">Benefit:</span> Delegate confidently without compromising financial privacy. Supervisors manage day-to-day operations without seeing what anyone earns.</p>
                   </div>
                 </AccordionContent>
@@ -167,7 +167,7 @@ export default function UserAccessGuide() {
                 </AccordionTrigger>
                 <AccordionContent className="pb-4">
                   <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
-                    <p>Your bookkeeper needs access to generate reports. Your field supervisor needs to check if projects are on budget. But once they're in the system, they can see everything—company-wide profitability, individual employee rates, sensitive client billing margins.</p>
+                    <p>Your bookkeeper needs access to generate reports. Your field supervisor needs to check if projects are on budget. But once they're in the system, they can see everything, company-wide profitability, individual employee rates, sensitive client billing margins.</p>
                     <p><span className="font-medium text-foreground">Example:</span> You hire a new administrative assistant to help with invoicing. Within a week, they know exactly how much profit you make on each client, what your best technicians earn, and which jobs are money-losers.</p>
                     <p><span className="font-medium text-foreground">Solution:</span> Granular permission controls let you grant exactly what each employee needs. Your bookkeeper sees aggregate labor costs but not individual rates. Your supervisor sees project budgets but not company-wide profitability.</p>
                     <p><span className="font-medium text-foreground">Benefit:</span> Protect sensitive financial information while still delegating operational responsibilities. No more "all or nothing" access decisions.</p>
@@ -183,7 +183,7 @@ export default function UserAccessGuide() {
                   <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>You've got 15 technicians with different IRATA levels. Client contracts require Level 2 or higher for certain buildings. Insurance audits demand proof of certification levels. But you're tracking this in a spreadsheet that's always outdated.</p>
                     <p><span className="font-medium text-foreground">Example:</span> A client asks: "Which of your technicians are Level 2 or 3 and available next week?" You're digging through certification files, checking expiry dates, cross-referencing the schedule. This takes 30 minutes.</p>
-                    <p><span className="font-medium text-foreground">Solution:</span> Each employee profile includes IRATA level (Level 1, 2, or 3) tracked in the system. When you need to assign work or respond to client requirements, you see certification levels instantly.</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> Each employee profile includes IRATA level Level 1, 2, or 3) tracked in the system. When you need to assign work or respond to client requirements, you see certification levels instantly.</p>
                     <p><span className="font-medium text-foreground">Benefit:</span> Instant visibility into team qualifications. Respond to client questions in seconds, not minutes.</p>
                   </div>
                 </AccordionContent>
@@ -195,7 +195,7 @@ export default function UserAccessGuide() {
                 </AccordionTrigger>
                 <AccordionContent className="pb-4">
                   <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
-                    <p>Everyone with system access can modify or delete projects—including your newest technician who accidentally deleted last month's completed job when trying to log today's drops.</p>
+                    <p>Everyone with system access can modify or delete projects, including your newest technician who accidentally deleted last month's completed job when trying to log today's drops.</p>
                     <p><span className="font-medium text-foreground">Example:</span> A technician accidentally changes the North elevation from 120 drops to 12 drops. The error isn't discovered until the client questions why you only invoiced for 12 drops.</p>
                     <p><span className="font-medium text-foreground">Solution:</span> Project management permissions control who can create, edit, and delete projects. Restrict these capabilities to supervisors and managers while technicians can only log work for assigned projects.</p>
                     <p><span className="font-medium text-foreground">Benefit:</span> Protect project data integrity. Maintain accurate records for client billing and historical reference.</p>
@@ -248,7 +248,7 @@ export default function UserAccessGuide() {
                 <AccordionContent className="pb-4">
                   <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>You're coordinating 3-4 concurrent projects. You want your field supervisors to create projects and adjust schedules. But you can't give them access without exposing pay rates and company profitability.</p>
-                    <p><span className="font-medium text-foreground">Example:</span> Your most trusted supervisor handles the North Shore territory. When clients call, he has to call you to create projects. This creates bottlenecks—clients wait hours for simple project setup.</p>
+                    <p><span className="font-medium text-foreground">Example:</span> Your most trusted supervisor handles the North Shore territory. When clients call, he has to call you to create projects. This creates bottlenecks, clients wait hours for simple project setup.</p>
                     <p><span className="font-medium text-foreground">Solution:</span> Grant supervisors project creation and management permissions without financial data access. They create projects and manage schedules while rates and margins remain visible only to owners.</p>
                     <p><span className="font-medium text-foreground">Benefit:</span> Eliminate bottlenecks. Response time to clients improves from hours to minutes.</p>
                   </div>
@@ -273,7 +273,7 @@ export default function UserAccessGuide() {
                   <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>Your property management company manages 40 buildings. Building managers turnover every 6-12 months. Every time someone leaves, you contact every vendor to deactivate the old account and create a new one. This takes 2-3 days per manager change.</p>
                     <p><span className="font-medium text-foreground">Example:</span> Sarah managed Tower One for 8 months then transferred. Mike takes over. You send emails to 12 vendors. Only 4 respond within a week. Three weeks later, Sarah still has access and Mike can't log in.</p>
-                    <p><span className="font-medium text-foreground">Solution:</span> Building-level accounts eliminate individual manager account management. Each building has one permanent account. When managers change, update the password—access instantly transfers. No vendor coordination.</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> Building-level accounts eliminate individual manager account management. Each building has one permanent account. When managers change, update the password, access instantly transfers. No vendor coordination.</p>
                     <p><span className="font-medium text-foreground">Benefit:</span> Manager transitions take 30 seconds instead of 3 days.</p>
                   </div>
                 </AccordionContent>
@@ -299,7 +299,7 @@ export default function UserAccessGuide() {
                 </AccordionTrigger>
                 <AccordionContent className="pb-4">
                   <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
-                    <p>Residents encounter issues during maintenance—missed windows, water damage, scheduling conflicts. But there's no direct way to report to the maintenance company. So residents call you, and you become the middleman.</p>
+                    <p>Residents encounter issues during maintenance, missed windows, water damage, scheduling conflicts. But there's no direct way to report to the maintenance company. So residents call you, and you become the middleman.</p>
                     <p><span className="font-medium text-foreground">Example:</span> Mrs. Chen emails you photos of streaky windows. You forward to the rope access company. Three days pass with no response. Meanwhile, Mrs. Chen files strata council complaints about management responsiveness.</p>
                     <p><span className="font-medium text-foreground">Solution:</span> Centralized feedback system with building-level visibility. Residents submit feedback directly to the maintenance company. You see all feedback in real-time without being the middleman.</p>
                     <p><span className="font-medium text-foreground">Benefit:</span> Average resolution time drops from 3-5 days to 24 hours.</p>
@@ -338,7 +338,7 @@ export default function UserAccessGuide() {
                 <AccordionContent className="pb-4">
                   <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>You see maintenance equipment on the roof. Scaffolding goes up on the west side. You have no idea what's being done, when it will be done, or if it will affect your unit. So you call the building manager. So does everyone else.</p>
-                    <p><span className="font-medium text-foreground">Example:</span> You're in Unit 1847 on the east side. Monday morning you see technicians on the west side. Are they coming to your side? You need to move plants on your balcony before cleaning. You call the building manager. They don't know—they have to contact the vendor.</p>
+                    <p><span className="font-medium text-foreground">Example:</span> You're in Unit 1847 on the east side. Monday morning you see technicians on the west side. Are they coming to your side? You need to move plants on your balcony before cleaning. You call the building manager. They don't know, they have to contact the vendor.</p>
                     <p><span className="font-medium text-foreground">Solution:</span> Resident portal shows your building's project in real-time. You see which elevations are complete, view the schedule showing east elevation starts Wednesday. You move your plants Tuesday night. No calls necessary.</p>
                     <p><span className="font-medium text-foreground">Benefit:</span> Plan your schedule around maintenance work. No surprises. Reduced stress.</p>
                   </div>
@@ -366,7 +366,7 @@ export default function UserAccessGuide() {
                 <AccordionContent className="pb-4">
                   <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>The communication chain is broken: resident to building manager to maintenance company back to building manager back to resident. Each handoff adds 12-24 hours of delay.</p>
-                    <p><span className="font-medium text-foreground">Example:</span> Unit 3205 has a broken window screen. Resident emails building manager Tuesday. Manager forwards Tuesday afternoon. Company schedules repair for Thursday. Resident isn't home Thursday because nobody told them. Repair happens Friday—3 days for a 15-minute fix.</p>
+                    <p><span className="font-medium text-foreground">Example:</span> Unit 3205 has a broken window screen. Resident emails building manager Tuesday. Manager forwards Tuesday afternoon. Company schedules repair for Thursday. Resident isn't home Thursday because nobody told them. Repair happens Friday, 3 days for a 15-minute fix.</p>
                     <p><span className="font-medium text-foreground">Solution:</span> Direct resident-to-vendor feedback system cuts out the middleman while keeping building managers informed. Resident submits issue Tuesday 9am. Company sees it Tuesday 9:05am, responds at 10am. Issue resolved Wednesday 2pm.</p>
                     <p><span className="font-medium text-foreground">Benefit:</span> 3-day resolution becomes 24-hour resolution.</p>
                   </div>
@@ -405,8 +405,8 @@ export default function UserAccessGuide() {
                   <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>You require employees to create strong passwords, but you have no way to enforce it. Technicians use "password123" or their birthdate. When someone leaves, if their password was stored in plain text, it could be used on other systems.</p>
                     <p><span className="font-medium text-foreground">Example:</span> A technician creates his account with password "Rope2024". Six months later he leaves to work for a competitor. His password was stored in plain text. If someone breaches your system, they could try those passwords on your email and other platforms.</p>
-                    <p><span className="font-medium text-foreground">Solution:</span> Industry-standard bcrypt password hashing with salt rounds. Passwords are never stored in plain text—not even you can see them. Even if someone gained database access, they would see only irreversible hashes.</p>
-                    <p><span className="font-medium text-foreground">Benefit:</span> Protect employee accounts even if database is compromised. Eliminate "I forgot my password and need you to tell me what it is" requests—you literally cannot retrieve passwords, only reset them.</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> Industry-standard bcrypt password hashing with salt rounds. Passwords are never stored in plain text, not even you can see them. Even if someone gained database access, they would see only irreversible hashes.</p>
+                    <p><span className="font-medium text-foreground">Benefit:</span> Protect employee accounts even if database is compromised. Eliminate "I forgot my password and need you to tell me what it is" requests, you literally cannot retrieve passwords, only reset them.</p>
                   </div>
                 </AccordionContent>
               </AccordionItem>
@@ -432,7 +432,7 @@ export default function UserAccessGuide() {
                 </div>
               </CardHeader>
               <CardContent className="text-base space-y-2">
-                <p className="text-muted-foreground">Company owners and staff employees (operations managers, supervisors, technicians, administrative staff).</p>
+                <p className="text-muted-foreground">Company owners and staff employees operations managers, supervisors, technicians, administrative staff).</p>
                 <div className="bg-amber-50 dark:bg-amber-950 p-2 rounded text-sm space-y-1">
                   <p className="font-semibold">Authentication:</p>
                   <ul className="list-disc list-inside space-y-0.5">
@@ -460,7 +460,7 @@ export default function UserAccessGuide() {
                 </div>
               </CardHeader>
               <CardContent className="text-base space-y-2">
-                <p className="text-muted-foreground">Field technicians, supervisors, managers, specialized roles (HR, accounting, inventory).</p>
+                <p className="text-muted-foreground">Field technicians, supervisors, managers, specialized roles HR, accounting, inventory).</p>
                 <div className="bg-blue-50 dark:bg-blue-950 p-2 rounded text-sm space-y-1">
                   <p className="font-semibold">Authentication:</p>
                   <ul className="list-disc list-inside space-y-0.5">
@@ -726,7 +726,7 @@ export default function UserAccessGuide() {
             <CardContent className="text-base text-blue-900 dark:text-blue-100">
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="bg-white/50 dark:bg-blue-900/50 rounded-lg p-3">
-                  <p className="font-semibold mb-2">Before (Rope Access Technician):</p>
+                  <p className="font-semibold mb-2">Before Rope Access Technician):</p>
                   <ul className="space-y-1 text-base">
                     <li className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3 text-green-600" /> Clock in/out</li>
                     <li className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3 text-green-600" /> Log drops</li>
@@ -735,13 +735,13 @@ export default function UserAccessGuide() {
                   </ul>
                 </div>
                 <div className="bg-white/50 dark:bg-blue-900/50 rounded-lg p-3">
-                  <p className="font-semibold mb-2">After (Supervisor):</p>
+                  <p className="font-semibold mb-2">After Supervisor):</p>
                   <ul className="space-y-1 text-base">
                     <li className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3 text-green-600" /> Create projects</li>
                     <li className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3 text-green-600" /> Assign employees</li>
                     <li className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3 text-green-600" /> Review feedback</li>
-                    <li className="flex items-center gap-1"><XCircle className="w-3 h-3 text-red-500" /> Financial data (restricted)</li>
-                    <li className="flex items-center gap-1"><XCircle className="w-3 h-3 text-red-500" /> Employee rates (restricted)</li>
+                    <li className="flex items-center gap-1"><XCircle className="w-3 h-3 text-red-500" /> Financial data restricted)</li>
+                    <li className="flex items-center gap-1"><XCircle className="w-3 h-3 text-red-500" /> Employee rates restricted)</li>
                   </ul>
                 </div>
               </div>
@@ -804,7 +804,7 @@ export default function UserAccessGuide() {
                 <div className="space-y-1">
                   <div className="p-2 bg-muted rounded">Create Projects - Set up new building maintenance projects</div>
                   <div className="p-2 bg-muted rounded">Edit Projects - Modify details, targets, completion dates</div>
-                  <div className="p-2 bg-muted rounded">Delete Projects - Remove from system (with warnings)</div>
+                  <div className="p-2 bg-muted rounded">Delete Projects - Remove from system with warnings)</div>
                   <div className="p-2 bg-muted rounded">Mark Complete / View All / Assign Employees</div>
                 </div>
               </CardContent>
@@ -927,9 +927,9 @@ export default function UserAccessGuide() {
               </p>
               <p className="mt-2 text-xs"><strong>Best Practice:</strong> Grant minimum necessary permissions. You can always add more later.</p>
               <div className="mt-2 space-y-1 text-base">
-                <p className="flex items-center gap-1"><XCircle className="w-3 h-3 text-red-600" /> Giving all supervisors financial access (only budget managers need it)</p>
-                <p className="flex items-center gap-1"><XCircle className="w-3 h-3 text-red-600" /> Restricting project creation to owners only (supervisors often need this)</p>
-                <p className="flex items-center gap-1"><XCircle className="w-3 h-3 text-red-600" /> Giving technicians access to all employee data (privacy concern)</p>
+                <p className="flex items-center gap-1"><XCircle className="w-3 h-3 text-red-600" /> Giving all supervisors financial access only budget managers need it)</p>
+                <p className="flex items-center gap-1"><XCircle className="w-3 h-3 text-red-600" /> Restricting project creation to owners only supervisors often need this)</p>
+                <p className="flex items-center gap-1"><XCircle className="w-3 h-3 text-red-600" /> Giving technicians access to all employee data privacy concern)</p>
               </div>
             </CardContent>
           </Card>
@@ -957,7 +957,7 @@ export default function UserAccessGuide() {
                   <p className="font-semibold text-xs">Authentication:</p>
                   <ul className="list-disc list-inside text-sm space-y-0.5">
                     <li>Self-registration with company access code</li>
-                    <li>Unit-specific codes (e.g., "BLD2024-U207")</li>
+                    <li>Unit-specific codes e.g., "BLD2024-U207")</li>
                     <li>Each unit has permanent access code</li>
                   </ul>
                 </div>
@@ -1018,7 +1018,7 @@ export default function UserAccessGuide() {
                 <div className="space-y-1 text-base">
                   <p className="font-semibold flex items-center gap-1"><XCircle className="w-3 h-3 text-red-500" /> What they cannot do:</p>
                   <ul className="list-disc list-inside ml-3 space-y-0.5 text-muted-foreground">
-                    <li>View financial data (costs, rates, budgets)</li>
+                    <li>View financial data costs, rates, budgets)</li>
                     <li>Access employee information</li>
                     <li>Modify project details or work records</li>
                     <li>See other buildings in the system</li>
@@ -1050,7 +1050,7 @@ export default function UserAccessGuide() {
               <CardContent className="text-base space-y-3">
                 <ol className="list-decimal list-inside space-y-2">
                   <li>User navigates to registration page</li>
-                  <li>Enters company details (name, email, initial password)</li>
+                  <li>Enters company details name, email, initial password)</li>
                   <li>System creates new company record in database</li>
                   <li>Creates first user account with ultimate permissions</li>
                   <li>User receives confirmation and can log in</li>
@@ -1074,8 +1074,8 @@ export default function UserAccessGuide() {
                 <ol className="list-decimal list-inside space-y-2">
                   <li>Company owner navigates to employee management</li>
                   <li>Enters employee details: name, email, temporary password</li>
-                  <li>Adds IRATA level and hourly rate (if applicable)</li>
-                  <li>Selects base role from dropdown (standard or custom)</li>
+                  <li>Adds IRATA level and hourly rate if applicable)</li>
+                  <li>Selects base role from dropdown standard or custom)</li>
                   <li>Assigns granular permissions across all categories</li>
                   <li>Employee can immediately log in and change password</li>
                 </ol>
@@ -1097,15 +1097,15 @@ export default function UserAccessGuide() {
               <CardContent className="text-base space-y-3">
                 <ol className="list-decimal list-inside space-y-2">
                   <li>User registers as Resident or Building Manager</li>
-                  <li>Receives linking code from company (email, notice, or QR code)</li>
+                  <li>Receives linking code from company email, notice, or QR code)</li>
                   <li>Enters code on linking page during registration</li>
                   <li>System validates code and links user to specific building/unit</li>
                 </ol>
                 <div className="bg-green-50 dark:bg-green-950 p-2 rounded text-sm space-y-1">
                   <p><strong>Code Types:</strong></p>
                   <ul className="list-disc list-inside">
-                    <li>Resident codes: Unit-specific (e.g., "BLD2024-U207")</li>
-                    <li>Building manager codes: Building-level (e.g., "BLDMGR-TOWER1")</li>
+                    <li>Resident codes: Unit-specific e.g., "BLD2024-U207")</li>
+                    <li>Building manager codes: Building-level e.g., "BLDMGR-TOWER1")</li>
                   </ul>
                 </div>
               </CardContent>
@@ -1131,7 +1131,7 @@ export default function UserAccessGuide() {
                   <p><strong>Access Granted:</strong></p>
                   <ul className="list-disc list-inside">
                     <li>Read-only access to vendor company summaries</li>
-                    <li>Company Safety Rating (CSR) visibility with breakdowns</li>
+                    <li>Company Safety Rating CSR) visibility with breakdowns</li>
                     <li>My Vendors dashboard for multi-vendor management</li>
                   </ul>
                 </div>
@@ -1204,7 +1204,7 @@ export default function UserAccessGuide() {
                 <ul className="list-disc list-inside space-y-1">
                   <li>Bcrypt password hashing with salt rounds</li>
                   <li>No plain-text password storage anywhere</li>
-                  <li>Configurable password complexity (upcoming)</li>
+                  <li>Configurable password complexity upcoming)</li>
                   <li>Password change capability for all user types</li>
                 </ul>
               </CardContent>
@@ -1245,7 +1245,7 @@ export default function UserAccessGuide() {
                 <Shield className="w-4 h-4" />
                 API Protection
               </p>
-              <p className="mt-1">Every API endpoint validates: (1) User is authenticated, (2) User has required permission, (3) Requested data belongs to user's company. Financial data is additionally filtered unless user has financial permissions.</p>
+              <p className="mt-1">Every API endpoint validates: 1) User is authenticated, (2) User has required permission, (3) Requested data belongs to user's company. Financial data is additionally filtered unless user has financial permissions.</p>
             </CardContent>
           </Card>
 
@@ -1464,7 +1464,7 @@ export default function UserAccessGuide() {
             <p><strong>Legend:</strong></p>
             <div className="flex flex-wrap gap-4">
               <span className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3 text-green-600" /> Typically Granted</span>
-              <span className="flex items-center gap-1"><AlertTriangle className="w-3 h-3 text-amber-500" /> Variable (depends on config)</span>
+              <span className="flex items-center gap-1"><AlertTriangle className="w-3 h-3 text-amber-500" /> Variable depends on config)</span>
               <span className="flex items-center gap-1"><XCircle className="w-3 h-3 text-red-400" /> Rarely Granted</span>
               <span>* Customizable by company owner</span>
             </div>

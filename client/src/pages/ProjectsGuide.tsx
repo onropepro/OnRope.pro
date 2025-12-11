@@ -409,7 +409,7 @@ export default function ProjectsGuide() {
                 <AccordionContent className="pb-4">
                   <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>You're juggling window washing at Tower A, caulking at Building B, and anchor inspections at Complex C. When a client calls asking for a status update, you're guessing based on what you remember from yesterday's phone call with your supervisor. You drive site-to-site taking notes, wasting 10-15 hours per week just figuring out what's happening.</p>
-                    <p><span className="font-medium text-foreground">Real Example:</span> You bid a new project for next week, but you're not sure if your current jobs will finish on time. You don't know if Tommy is overloaded or if Sarah has capacity. You commit anyway and hope it works out—then discover you've double-booked your best crew.</p>
+                    <p><span className="font-medium text-foreground">Real Example:</span> You bid a new project for next week, but you're not sure if your current jobs will finish on time. You don't know if Tommy is overloaded or if Sarah has capacity. You commit anyway and hope it works out, then discover you've double-booked your best crew.</p>
                     <p><span className="font-medium text-foreground">Solution:</span> Real-time dashboard showing every project's progress percentage, days remaining, assigned crew, and completion forecast. Filter by status, building, or technician. Updates automatically as work sessions are logged.</p>
                     <p><span className="font-medium text-foreground">Benefit:</span> Instant oversight without site visits. Confidently quote new work based on real crew availability. Make data-driven prioritization decisions in seconds, not hours.</p>
                   </div>
@@ -418,11 +418,11 @@ export default function ProjectsGuide() {
 
               <AccordionItem value="owner-2" className={`border rounded-lg px-4 ${openItems.includes("owner-2") ? "bg-white dark:bg-white/10" : ""}`}>
                 <AccordionTrigger className="hover:no-underline py-4">
-                  <span className="text-left font-medium text-base">"One tech is crushing it while another coasts—and I can't prove it"</span>
+                  <span className="text-left font-medium text-base">"One tech is crushing it while another coasts, and I can't prove it"</span>
                 </AccordionTrigger>
                 <AccordionContent className="pb-4">
                   <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
-                    <p>Your gut says Tommy completes 5 drops per day while another employee barely does 1, but they work the same hours. Without hard data, you can't have the coaching conversation. You suspect someone's on their phone half the day, but proving it means physical surveillance—awkward and time-consuming.</p>
+                    <p>Your gut says Tommy completes 5 drops per day while another employee barely does 1, but they work the same hours. Without hard data, you can't have the coaching conversation. You suspect someone's on their phone half the day, but proving it means physical surveillance, awkward and time-consuming.</p>
                     <p><span className="font-medium text-foreground">Real Example:</span> Two techs worked the same 8-hour shift at the same building. Your client complains progress is slow. You pay both techs full wages, but you're only getting one tech's worth of productivity. The high performer feels demoralized; the underperformer coasts undetected.</p>
                     <p><span className="font-medium text-foreground">Solution:</span> Per-employee performance tracking showing drops/units completed per shift, target achievement rates (e.g., "Meeting target 87% of time"), and historical trends. Outlier detection automatically flags significant deviations from team averages.</p>
                     <p><span className="font-medium text-foreground">Benefit:</span> Objective performance data for coaching conversations. High performers feel recognized (lower turnover). Underperformers either improve or self-select out. Clients see 20-30% faster project completion.</p>
@@ -437,7 +437,7 @@ export default function ProjectsGuide() {
                 <AccordionContent className="pb-4">
                   <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>The property manager receives 15-30 status calls per week during your project. Residents assume the worst because they have no visibility. The property manager becomes frustrated playing telephone between you and 40 units. Your professional reputation suffers even though your crew is working efficiently.</p>
-                    <p><span className="font-medium text-foreground">Real Example:</span> Unit 402 has a birthday party on Sunday and demands you not work near their windows that day. The property manager calls you at 8 PM on Friday with this restriction. You scramble to reschedule your crew, move equipment, and adjust the timeline—2 hours of chaos that could have been avoided.</p>
+                    <p><span className="font-medium text-foreground">Real Example:</span> Unit 402 has a birthday party on Sunday and demands you not work near their windows that day. The property manager calls you at 8 PM on Friday with this restriction. You scramble to reschedule your crew, move equipment, and adjust the timeline, 2 hours of chaos that could have been avoided.</p>
                     <p><span className="font-medium text-foreground">Solution:</span> Resident-facing portal showing real-time progress (4-elevation visual system), upcoming work schedules ("We'll be near your unit Wednesday 9am-3pm"), photo galleries of completed work, and expected completion dates. Residents submit feedback directly without property manager middleman.</p>
                     <p><span className="font-medium text-foreground">Benefit:</span> Property manager time saved (20+ hours/month per active project). Resident complaints drop 60-70%. Your company looks professional and transparent. Contract renewals increase 15-25%. Building managers refer you to other properties.</p>
                   </div>
@@ -451,7 +451,7 @@ export default function ProjectsGuide() {
                 <AccordionContent className="pb-4">
                   <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>You win a new contract. You create the project in your system (or Excel). Then you open Google Calendar and manually block off dates. Then you text your supervisor the crew assignments. Then you update your whiteboard. Same information, four different places, wasting 30-45 minutes per project.</p>
-                    <p><span className="font-medium text-foreground">Real Example:</span> You forget to add Project #3 to the calendar. Your supervisor doesn't see it on the schedule. The client calls on the scheduled start date asking where your crew is. Embarrassing scramble ensues—you send whoever's available, not the optimal crew. Client perceives you as disorganized.</p>
+                    <p><span className="font-medium text-foreground">Real Example:</span> You forget to add Project #3 to the calendar. Your supervisor doesn't see it on the schedule. The client calls on the scheduled start date asking where your crew is. Embarrassing scramble ensues, you send whoever's available, not the optimal crew. Client perceives you as disorganized.</p>
                     <p><span className="font-medium text-foreground">Solution:</span> Creating a project with date range + assigned employees automatically populates calendar entries. Color-coded project bars show scheduling conflicts instantly. Drag-and-drop editing syncs back to project assignments in real-time.</p>
                     <p><span className="font-medium text-foreground">Benefit:</span> Zero redundant data entry. Impossible to forget calendar entries. Schedule automatically reflects project reality. 5-10 hours/week saved. No more "Oh shit, I forgot to schedule that" emergencies.</p>
                   </div>
@@ -479,24 +479,24 @@ export default function ProjectsGuide() {
                 <AccordionContent className="pb-4">
                   <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>A client asks you to quote a 15-story window wash. How many days? How many techs? You completed a similar job six months ago, but you can't remember if it took 9 days or 14 days. You can't find your notes. You guess conservatively (overbid, lose contract) or aggressively (underbid, lose money).</p>
-                    <p><span className="font-medium text-foreground">Real Example:</span> You quote 12 days for a building wash based on gut feel. Historical data would have shown you averaged 8 days for similar buildings (4.2 drops/day average). You overbid by 50%—client goes with competitor. You leave $18,000 on the table.</p>
+                    <p><span className="font-medium text-foreground">Real Example:</span> You quote 12 days for a building wash based on gut feel. Historical data would have shown you averaged 8 days for similar buildings (4.2 drops/day average). You overbid by 50%, client goes with competitor. You leave $18,000 on the table.</p>
                     <p><span className="font-medium text-foreground">Solution:</span> Searchable project archive with filters (date range, building type, job type, completion status). Analytics dashboard showing average drops/day by job type, labor hours per elevation, and project duration trends. "Similar Projects: 15-20 story window washes averaged 9.3 days, 2.4 techs, 4.1 drops/day."</p>
-                    <p><span className="font-medium text-foreground">Benefit:</span> Data-driven quoting (15-20% more accurate pricing). Faster quote preparation (75% time saved—from 45 minutes to 10 minutes). Win more contracts with competitive pricing while protecting margins. Prevent 3-5 underbids/year = $6,000-$10,000 saved.</p>
+                    <p><span className="font-medium text-foreground">Benefit:</span> Data-driven quoting (15-20% more accurate pricing). Faster quote preparation (75% time saved, from 45 minutes to 10 minutes). Win more contracts with competitive pricing while protecting margins. Prevent 3-5 underbids/year = $6,000-$10,000 saved.</p>
                   </div>
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="owner-7" className={`border rounded-lg px-4 ${openItems.includes("owner-7") ? "bg-white dark:bg-white/10" : ""}`}>
                 <AccordionTrigger className="hover:no-underline py-4">
-                  <span className="text-left font-medium text-base">"My brain is my business—and it's exhausted"</span>
+                  <span className="text-left font-medium text-base">"My brain is my business, and it's exhausted"</span>
                 </AccordionTrigger>
                 <AccordionContent className="pb-4">
                   <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>You're mentally tracking: Which projects are behind schedule and need attention. Who's assigned to which building tomorrow. Which clients owe invoices and when to follow up. Which technicians are approaching overtime thresholds. Which buildings need safety documentation before work can start. When equipment inspections are due. Resident complaints that need responses.</p>
                     <p>This cognitive overload leads to: Forgetting important details (missed deadlines, forgotten promises). Making errors under pressure (scheduling conflicts, billing mistakes). Burnout and decision fatigue (can't think strategically by 2 PM). Inability to take vacation (business collapses without your mental database).</p>
                     <p><span className="font-medium text-foreground">Real Example:</span> You wake up at 3 AM wondering if you remembered to schedule Tommy for the Tower B project starting tomorrow. You check your phone. You didn't. You can't fall back asleep. This happens 3x per week. Your partner is frustrated. Your health suffers.</p>
-                    <p><span className="font-medium text-foreground">Solution:</span> Unified system externalizes your mental database. Projects, schedules, payroll, safety docs, and client communications live in one place with automated reminders for critical tasks. "Tommy scheduled Tower B Dec 5-8" + "COI expires Dec 12—renew now" + "Unit 507 feedback awaiting response (2 days)."</p>
-                    <p><span className="font-medium text-foreground">Benefit:</span> Psychological load reduced by 60-70%. Mental bandwidth freed for strategic thinking (business growth, marketing, relationship building—not firefighting). Confidence to delegate operations to supervisors. Ability to take actual vacations without midnight panic attacks. Better sleep. Happier family.</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> Unified system externalizes your mental database. Projects, schedules, payroll, safety docs, and client communications live in one place with automated reminders for critical tasks. "Tommy scheduled Tower B Dec 5-8" + "COI expires Dec 12, renew now" + "Unit 507 feedback awaiting response (2 days)."</p>
+                    <p><span className="font-medium text-foreground">Benefit:</span> Psychological load reduced by 60-70%. Mental bandwidth freed for strategic thinking (business growth, marketing, relationship building, not firefighting). Confidence to delegate operations to supervisors. Ability to take actual vacations without midnight panic attacks. Better sleep. Happier family.</p>
                   </div>
                 </AccordionContent>
               </AccordionItem>
@@ -507,10 +507,10 @@ export default function ProjectsGuide() {
                 </AccordionTrigger>
                 <AccordionContent className="pb-4">
                   <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
-                    <p>Your building manager client has no visibility into project progress. They're fielding resident questions ("When will you finish my elevation?") and have no answers. They call/text you 5-10 times per week asking for updates. You spend 3-4 hours per week on status calls instead of productive work—and you still sound vague because you don't have instant access to current progress either.</p>
-                    <p><span className="font-medium text-foreground">Real Example:</span> Building manager calls Tuesday morning: "Mrs. Johnson in Unit 802 wants to know when you'll finish her elevation. She's having family visit this weekend." You don't have the answer immediately—you're at another job site. You have to check with your crew, call back later. Building manager perceives you as disorganized. Mrs. Johnson complains to strata council. Relationship strained.</p>
-                    <p><span className="font-medium text-foreground">Solution:</span> Building manager portal with identical visibility to your internal dashboard. They log in anytime, see real-time progress by elevation, review before/after photo galleries, check upcoming schedules, and download safety documentation—without calling you. "South Elevation: 73% complete. Expected completion: Dec 8. View 47 progress photos."</p>
-                    <p><span className="font-medium text-foreground">Benefit:</span> Status call volume drops 80% (from 8 calls/week to 1-2). Building managers perceive you as tech-savvy and professional—"most organized contractor we work with." Stronger client relationships. 15-25% higher contract renewal rates. Referrals to other buildings they manage.</p>
+                    <p>Your building manager client has no visibility into project progress. They're fielding resident questions ("When will you finish my elevation?") and have no answers. They call/text you 5-10 times per week asking for updates. You spend 3-4 hours per week on status calls instead of productive work, and you still sound vague because you don't have instant access to current progress either.</p>
+                    <p><span className="font-medium text-foreground">Real Example:</span> Building manager calls Tuesday morning: "Mrs. Johnson in Unit 802 wants to know when you'll finish her elevation. She's having family visit this weekend." You don't have the answer immediately, you're at another job site. You have to check with your crew, call back later. Building manager perceives you as disorganized. Mrs. Johnson complains to strata council. Relationship strained.</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> Building manager portal with identical visibility to your internal dashboard. They log in anytime, see real-time progress by elevation, review before/after photo galleries, check upcoming schedules, and download safety documentation, without calling you. "South Elevation: 73% complete. Expected completion: Dec 8. View 47 progress photos."</p>
+                    <p><span className="font-medium text-foreground">Benefit:</span> Status call volume drops 80% (from 8 calls/week to 1-2). Building managers perceive you as tech-savvy and professional, "most organized contractor we work with." Stronger client relationships. 15-25% higher contract renewal rates. Referrals to other buildings they manage.</p>
                   </div>
                 </AccordionContent>
               </AccordionItem>
@@ -532,7 +532,7 @@ export default function ProjectsGuide() {
                 <AccordionContent className="pb-4">
                   <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>You receive 15-30 status calls per week during building maintenance projects. Residents assume the worst because they have no visibility. You become frustrated playing telephone between the contractor and 40 units. Your professional reputation suffers even though the crew is working efficiently.</p>
-                    <p><span className="font-medium text-foreground">Real Example:</span> Unit 402 has a birthday party on Sunday and demands the crew not work near their windows that day. They call you at 8 PM on Friday with this restriction. You scramble to contact the contractor, who then reschedules their crew—2 hours of chaos that could have been avoided.</p>
+                    <p><span className="font-medium text-foreground">Real Example:</span> Unit 402 has a birthday party on Sunday and demands the crew not work near their windows that day. They call you at 8 PM on Friday with this restriction. You scramble to contact the contractor, who then reschedules their crew, 2 hours of chaos that could have been avoided.</p>
                     <p><span className="font-medium text-foreground">Solution:</span> Resident-facing portal showing real-time progress (4-elevation visual system), upcoming work schedules ("We'll be near your unit Wednesday 9am-3pm"), and expected completion dates. Residents submit feedback directly without you as middleman.</p>
                     <p><span className="font-medium text-foreground">Benefit:</span> Your time saved (20+ hours/month per active project). Resident complaints drop 60-70%. The contractor looks professional and transparent. Contract renewals increase 15-25%.</p>
                   </div>
@@ -546,8 +546,8 @@ export default function ProjectsGuide() {
                 <AccordionContent className="pb-4">
                   <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>You've hired a rope access company to complete window washing. You have no way to verify they're actually working efficiently or meeting timeline commitments without physically visiting the building or constantly calling the company owner. When residents or building owners ask for updates, you're reliant on the contractor's word.</p>
-                    <p><span className="font-medium text-foreground">Real Example:</span> Building owner asks: "How's the window washing project going? Are they on track to finish by month-end?" You have to say "I'll call them and find out" instead of "Let me check the portal—they're 68% complete, ahead of schedule."</p>
-                    <p><span className="font-medium text-foreground">Solution:</span> Self-service portal access showing the exact same dashboard the rope access company sees. Real-time progress, crew assignments, safety documentation, photo documentation—all at your fingertips.</p>
+                    <p><span className="font-medium text-foreground">Real Example:</span> Building owner asks: "How's the window washing project going? Are they on track to finish by month-end?" You have to say "I'll call them and find out" instead of "Let me check the portal, they're 68% complete, ahead of schedule."</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> Self-service portal access showing the exact same dashboard the rope access company sees. Real-time progress, crew assignments, safety documentation, photo documentation, all at your fingertips.</p>
                     <p><span className="font-medium text-foreground">Benefit:</span> Answer resident and owner questions instantly without contractor contact. Verify contractor performance objectively. Build confidence in your vendor selection. Demonstrate professional property management through technology adoption.</p>
                   </div>
                 </AccordionContent>
@@ -608,7 +608,7 @@ export default function ProjectsGuide() {
                 <AccordionContent className="pb-4">
                   <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>You're working hard, but you have no idea how you compare to other technicians or to your own past performance. Are you improving? Are you falling behind? You get vague feedback from supervisors ("doing good" or "need to pick up the pace") but no concrete data.</p>
-                    <p><span className="font-medium text-foreground">Real Example:</span> Annual review time. Supervisor says "Your performance has been inconsistent this year." You're confused—you felt like you worked hard. No objective data to reference. You don't know what to improve.</p>
+                    <p><span className="font-medium text-foreground">Real Example:</span> Annual review time. Supervisor says "Your performance has been inconsistent this year." You're confused, you felt like you worked hard. No objective data to reference. You don't know what to improve.</p>
                     <p><span className="font-medium text-foreground">Solution:</span> Performance dashboard showing your drops/day average, target achievement rate, historical trends. "This month: 4.8 drops/day average, 86% target achievement. Last month: 4.1 drops/day, 72% target achievement. You're improving!"</p>
                     <p><span className="font-medium text-foreground">Benefit:</span> Objective self-assessment. Recognition for improvement. Clear areas for growth. Fair performance reviews based on data, not perception.</p>
                   </div>
@@ -621,7 +621,7 @@ export default function ProjectsGuide() {
                 </AccordionTrigger>
                 <AccordionContent className="pb-4">
                   <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
-                    <p>You finish work today. You ask your supervisor "Where am I working tomorrow?" They say "I'll text you tonight." 9 PM rolls around—no text. You text them. They're busy. You go to bed not knowing where to show up in the morning. 6 AM you get a text: "Marina Towers, be there by 7:30."</p>
+                    <p>You finish work today. You ask your supervisor "Where am I working tomorrow?" They say "I'll text you tonight." 9 PM rolls around, no text. You text them. They're busy. You go to bed not knowing where to show up in the morning. 6 AM you get a text: "Marina Towers, be there by 7:30."</p>
                     <p><span className="font-medium text-foreground">Real Example:</span> You show up to the wrong building because you misunderstood yesterday's hurried verbal instructions. You waste 45 minutes driving to the correct site. You start late. Your supervisor is frustrated. Your day is off to a bad start.</p>
                     <p><span className="font-medium text-foreground">Solution:</span> Mobile app shows your upcoming assignments. "Tomorrow: Marina Towers - Window Cleaning, 8:00 AM - 4:00 PM. Thursday: Ocean View Apartments - Caulking, 8:00 AM - 4:00 PM."</p>
                     <p><span className="font-medium text-foreground">Benefit:</span> Plan your commute the night before. Know what equipment to bring. No confusion or miscommunication. Professional clarity about your schedule.</p>
@@ -659,7 +659,7 @@ export default function ProjectsGuide() {
                 <AccordionContent className="pb-4">
                   <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>Without calendar integration, project timelines exist only in your head or scattered across multiple tools.</p>
-                    <p><span className="font-medium text-foreground">Solution:</span> OnRopePro automatically generates visual schedules showing project duration, crew assignments, and conflicts—all synchronized with actual project data.</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> OnRopePro automatically generates visual schedules showing project duration, crew assignments, and conflicts, all synchronized with actual project data.</p>
                     <p><span className="font-medium text-foreground">Benefit:</span> Automatic calendar sync eliminates manual scheduling.</p>
                   </div>
                 </AccordionContent>
@@ -685,7 +685,7 @@ export default function ProjectsGuide() {
                 <AccordionContent className="pb-4">
                   <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>Transcribing timesheets and drop counts from paper or texts into payroll software wastes hours and introduces errors.</p>
-                    <p><span className="font-medium text-foreground">Solution:</span> Technicians log work sessions with project-specific tracking (drops, hours, units). This data automatically feeds payroll calculations—no manual timesheet transcription.</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> Technicians log work sessions with project-specific tracking (drops, hours, units). This data automatically feeds payroll calculations, no manual timesheet transcription.</p>
                     <p><span className="font-medium text-foreground">Benefit:</span> Eliminates 87-93% of payroll errors. Saves 15-25 hours/week for 10-15 person crews.</p>
                   </div>
                 </AccordionContent>
@@ -698,7 +698,7 @@ export default function ProjectsGuide() {
                 <AccordionContent className="pb-4">
                   <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
                     <p>"How's the project going?" shouldn't require a phone call, site visit, or guesswork.</p>
-                    <p><span className="font-medium text-foreground">Solution:</span> OnRopePro's visual progress system (4-elevation tracking for multi-sided buildings) shows completion percentage, photos, and remaining work at a glance. Accessible to company owners, supervisors, building managers, and residents—each with appropriate permission levels.</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> OnRopePro's visual progress system (4-elevation tracking for multi-sided buildings) shows completion percentage, photos, and remaining work at a glance. Accessible to company owners, supervisors, building managers, and residents, each with appropriate permission levels.</p>
                     <p><span className="font-medium text-foreground">Benefit:</span> Role-based visibility for all stakeholders.</p>
                   </div>
                 </AccordionContent>
@@ -731,7 +731,7 @@ export default function ProjectsGuide() {
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold text-emerald-600 mb-2">15-25%</div>
-                <p className="text-sm text-muted-foreground">Improvement through performance tracking. See who's crushing it and who needs coaching—backed by objective data, not gut feeling.</p>
+                <p className="text-sm text-muted-foreground">Improvement through performance tracking. See who's crushing it and who needs coaching, backed by objective data, not gut feeling.</p>
               </CardContent>
             </Card>
 
@@ -770,7 +770,7 @@ export default function ProjectsGuide() {
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold text-emerald-600 mb-2">75%</div>
-                <p className="text-sm text-muted-foreground">Reduction in quote preparation time—from 45 minutes to 10 minutes. Historical data makes estimating fast and accurate.</p>
+                <p className="text-sm text-muted-foreground">Reduction in quote preparation time, from 45 minutes to 10 minutes. Historical data makes estimating fast and accurate.</p>
               </CardContent>
             </Card>
           </div>
@@ -870,7 +870,7 @@ export default function ProjectsGuide() {
           <Card className="border-l-4 border-l-blue-500">
             <CardContent className="pt-6">
               <p className="italic text-muted-foreground">"Most professional contractor we work with"</p>
-              <p className="text-sm font-medium mt-2">— What building managers say about OnRopePro users</p>
+              <p className="text-sm font-medium mt-2">,  What building managers say about OnRopePro users</p>
             </CardContent>
           </Card>
         </section>
@@ -892,7 +892,7 @@ export default function ProjectsGuide() {
           <Card className="bg-violet-50 dark:bg-violet-950 border-violet-200 dark:border-violet-800 mb-4">
             <CardContent className="pt-6">
               <p className="italic">"Everything is linked with everything. If you do one thing, it does something else for you somewhere else. Like the guys work, but it fills the payroll."</p>
-              <p className="text-sm font-medium mt-2 text-muted-foreground">— Core OnRopePro design philosophy</p>
+              <p className="text-sm font-medium mt-2 text-muted-foreground">,  Core OnRopePro design philosophy</p>
             </CardContent>
           </Card>
 
