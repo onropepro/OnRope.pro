@@ -2801,17 +2801,6 @@ export default function Dashboard() {
       category: "team",
     },
     {
-      id: "my-account",
-      label: t('dashboard.cards.myAccount.label', 'My Account'),
-      description: t('dashboard.cards.myAccount.description', 'Subscription & billing'),
-      icon: "settings",
-      onClick: () => setLocation("/profile"),
-      testId: "button-nav-my-account",
-      isVisible: (user: any) => user?.role === 'company', // Company owners only
-      borderColor: "#6366f1",
-      category: "financial",
-    },
-    {
       id: "projects",
       label: t('dashboard.cards.projects.label', 'Projects'),
       description: t('dashboard.cards.projects.description', 'Active projects'),
@@ -3178,7 +3167,7 @@ export default function Dashboard() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setActiveTab("my-account")}
+                onClick={() => setLocation("/profile")}
                 className="gap-1.5 hidden sm:flex"
                 data-testid="button-header-my-account"
               >
