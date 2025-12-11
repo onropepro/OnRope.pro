@@ -14,6 +14,19 @@ export function useSafetyAuthority() {
   useEffect(() => {
     async function fetchLocation() {
       try {
+        // Check for test location parameter in URL
+        const params = new URLSearchParams(window.location.search);
+        const testLocation = params.get('testLocation');
+        
+        if (testLocation) {
+          // Format: testLocation=US,CA or testLocation=CA,BC
+          const [country, region] = testLocation.split(',');
+          const authority = getAuthorityByLocation(country.toUpperCase(), region.toUpperCase());
+          const newHeadline = buildHeadline(authority);
+          setHeadline(newHeadline);
+          return;
+        }
+
         // Check cache first
         const cached = sessionStorage.getItem(CACHE_KEY);
         if (cached) {
