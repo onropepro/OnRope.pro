@@ -1153,6 +1153,7 @@ export default function TechnicianPortal() {
   
   // Employer selection state (for PLUS members with multiple employers)
   const [showEmployerSelectDialog, setShowEmployerSelectDialog] = useState(false);
+  const [showReferralInfoDialog, setShowReferralInfoDialog] = useState(false);
   const [selectedEmployerId, setSelectedEmployerId] = useState<string | null>(null);
   
   // Query for employer connections (for PLUS members)
