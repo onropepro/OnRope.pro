@@ -9591,7 +9591,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const { sessionId } = req.params;
-      const { dropsCompletedNorth, dropsCompletedEast, dropsCompletedSouth, dropsCompletedWest, shortfallReason, validShortfallReasonCode, endLatitude, endLongitude, manualCompletionPercentage } = req.body;
+      const { dropsCompletedNorth, dropsCompletedEast, dropsCompletedSouth, dropsCompletedWest, shortfallReason, validShortfallReasonCode, endLatitude, endLongitude, manualCompletionPercentage, ropeAccessTaskHours } = req.body;
       
       // Get the session to verify ownership
       const activeSession = await storage.getActiveWorkSession(currentUser.id, req.params.projectId);
@@ -9716,6 +9716,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`[LABOR COST] Session ${sessionId}: ${totalHoursWorked.toFixed(2)}hrs × $${employeeHourlyRate}/hr = $${laborCost.toFixed(2)}`);
       }
       
+      // Validate rope access task hours - REQUIRED for IRATA/SPRAT compliance
+      if (ropeAccessTaskHours === undefined || ropeAccessTaskHours === null || ropeAccessTaskHours === '') {
+        return res.status(400).json({ message: "Rope access task hours is required" });
+      }
+      const hoursValue = typeof ropeAccessTaskHours === 'number' ? ropeAccessTaskHours : parseFloat(String(ropeAccessTaskHours));
+      if (isNaN(hoursValue)) {
+        return res.status(400).json({ message: "Rope access task hours must be a valid number" });
+      }
+      if (hoursValue < 0 || hoursValue > 24) {
+        return res.status(400).json({ message: "Rope access task hours must be between 0 and 24" });
+      }
+      // Enforce quarter-hour increments for IRATA/SPRAT compliance
+      if ((hoursValue * 4) % 1 !== 0) {
+        return res.status(400).json({ message: "Rope access task hours must be in quarter-hour increments (0.25, 0.5, 0.75, etc.)" });
+      }
+      const validatedRopeAccessHours = hoursValue;
+      
       // End the session with elevation-specific drops and overtime hours
       const shouldRecordReason = project.dailyDropTarget && totalDropsCompleted < project.dailyDropTarget;
       const session = await storage.endWorkSession(
@@ -9734,7 +9751,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         peaceWorkPay,
         laborCost,
         employeeHourlyRate,
-        shouldRecordReason ? validShortfallReasonCode : undefined
+        shouldRecordReason ? validShortfallReasonCode : undefined,
+        validatedRopeAccessHours
       );
       
       res.json({ session });

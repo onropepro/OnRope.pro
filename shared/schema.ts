@@ -490,6 +490,10 @@ export const workSessions = pgTable("work_sessions", {
   laborCost: numeric("labor_cost", { precision: 10, scale: 2 }), // Cost of labor for this session
   employeeHourlyRate: numeric("employee_hourly_rate", { precision: 10, scale: 2 }), // Snapshot of employee rate at time of session
   
+  // IRATA/SPRAT compliance: Actual rope access task hours (excludes lunch, breaks, downtime)
+  // Important distinction: 8-hour work day ≠ 8 hours performing rope access tasks
+  ropeAccessTaskHours: numeric("rope_access_task_hours", { precision: 5, scale: 2 }), // Actual hours doing rope access work
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [

@@ -1100,7 +1100,8 @@ export class Storage {
     peaceWorkPay?: number | null,
     laborCost?: number | null,
     employeeHourlyRate?: number | null,
-    validShortfallReasonCode?: string
+    validShortfallReasonCode?: string,
+    ropeAccessTaskHours?: number | null
   ): Promise<WorkSession> {
     const result = await db.update(workSessions)
       .set({
@@ -1120,6 +1121,7 @@ export class Storage {
         peaceWorkPay: peaceWorkPay !== null && peaceWorkPay !== undefined ? peaceWorkPay.toString() : null,
         laborCost: laborCost !== null && laborCost !== undefined ? laborCost.toString() : null,
         employeeHourlyRate: employeeHourlyRate !== null && employeeHourlyRate !== undefined ? employeeHourlyRate.toString() : null,
+        ropeAccessTaskHours: ropeAccessTaskHours !== null && ropeAccessTaskHours !== undefined ? ropeAccessTaskHours.toString() : null,
         updatedAt: sql`NOW()`,
       })
       .where(eq(workSessions.id, sessionId))
