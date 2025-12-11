@@ -199,7 +199,8 @@ export default function ProjectManagementLanding() {
           <Badge className="bg-emerald-500/30 text-white border border-emerald-400">Project Management Module</Badge>
           
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
-            Stop Managing Projects in Your Head
+            Stop Managing Projects<br />
+            <span className="text-emerald-100">In Your Head</span>
           </h1>
           
           <p className="text-lg md:text-xl text-emerald-100 max-w-3xl mx-auto leading-relaxed">
