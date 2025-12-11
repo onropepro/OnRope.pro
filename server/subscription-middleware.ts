@@ -31,6 +31,7 @@ export async function checkSubscriptionLimits(userId: string): Promise<{
   };
   withinGracePeriod?: boolean;
   gracePeriodEndsAt?: Date;
+  isTrialing?: boolean;
 }> {
   try {
     const user = await storage.getUserById(userId);
@@ -48,11 +49,19 @@ export async function checkSubscriptionLimits(userId: string): Promise<{
     let maxProjects = 0;
     let maxSeats = 0;
 
+    // Check if company is in trial period - unlimited seats during trial
+    // Still count actual usage for accurate telemetry/dashboards
+    const isTrialing = user.subscriptionStatus === 'trialing';
+    if (isTrialing) {
+      console.log(`[Subscription] Company ${user.id} is in trial period - unlimited seats allowed`);
+      // Continue to count usage below, but limits will be unlimited
+    }
+
     if (tier && TIER_CONFIG[tier]) {
       const tierConfig = TIER_CONFIG[tier];
       const baseLimits = {
-        projects: tierConfig.maxProjects,
-        seats: tierConfig.maxSeats,
+        projects: tierConfig.maxProjects as number,
+        seats: tierConfig.maxSeats as number,
       };
       
       // Add purchased add-ons and gifted seats to base limits
@@ -107,6 +116,16 @@ export async function checkSubscriptionLimits(userId: string): Promise<{
 
     const currentEmployees = employees.length;
     const currentProjects = projects.length;
+
+    // If trialing, override limits to unlimited but keep usage counts accurate
+    if (isTrialing) {
+      return {
+        exceeded: false,
+        limits: { maxProjects: -1, maxSeats: -1 }, // Unlimited during trial
+        usage: { currentProjects, currentEmployees }, // Accurate counts for telemetry
+        isTrialing: true,
+      };
+    }
 
     // Check if limits exceeded
     const projectsExceeded = maxProjects !== -1 && currentProjects >= maxProjects;

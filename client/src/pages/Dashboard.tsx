@@ -5043,6 +5043,47 @@ export default function Dashboard() {
                          t('dashboard.employeeForm.step2', 'Step 2 of 2: Configure access permissions')}
                       </DialogDescription>
                     </DialogHeader>
+                    
+                    {/* Trial Billing Warning - uses seatsUsed (active employees only, excludes terminated) */}
+                    {currentUser?.subscriptionStatus === 'trialing' && (
+                      <div className="mt-4 p-4 bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-lg">
+                        <div className="flex items-start gap-3">
+                          <span className="material-icons text-amber-600 dark:text-amber-400 text-xl mt-0.5">warning</span>
+                          <div className="flex-1">
+                            <p className="font-semibold text-amber-900 dark:text-amber-100 mb-1">
+                              Free Trial - Billing Notice
+                            </p>
+                            <p className="text-sm text-amber-800 dark:text-amber-200 mb-3">
+                              You're currently on a <strong>30-day free trial</strong>. Each employee you add will be billed at <strong>$34.95/month per seat</strong> when your trial ends.
+                            </p>
+                            <div className="bg-white dark:bg-amber-900 rounded-md p-3 border border-amber-200 dark:border-amber-700">
+                              <div className="flex justify-between items-center text-sm mb-2">
+                                <span className="text-amber-700 dark:text-amber-300">Base subscription:</span>
+                                <span className="font-medium text-amber-900 dark:text-amber-100">$99.00/mo</span>
+                              </div>
+                              <div className="flex justify-between items-center text-sm mb-2">
+                                <span className="text-amber-700 dark:text-amber-300">
+                                  Current active seats ({employeesData?.seatInfo?.seatsUsed || 0}) + this new seat:
+                                </span>
+                                <span className="font-medium text-amber-900 dark:text-amber-100">
+                                  {(employeesData?.seatInfo?.seatsUsed || 0) + 1} x $34.95 = ${(((employeesData?.seatInfo?.seatsUsed || 0) + 1) * 34.95).toFixed(2)}/mo
+                                </span>
+                              </div>
+                              <div className="border-t border-amber-200 dark:border-amber-700 pt-2 mt-2">
+                                <div className="flex justify-between items-center">
+                                  <span className="font-semibold text-amber-900 dark:text-amber-100">
+                                    Projected monthly cost after trial:
+                                  </span>
+                                  <span className="font-bold text-lg text-amber-900 dark:text-amber-100">
+                                    ${(99 + ((employeesData?.seatInfo?.seatsUsed || 0) + 1) * 34.95).toFixed(2)}/mo
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                   <div className="overflow-y-auto flex-1 p-6">
                     {/* Step 0: Choose mode */}
