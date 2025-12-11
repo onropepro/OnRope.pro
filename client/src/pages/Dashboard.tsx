@@ -4969,12 +4969,20 @@ export default function Dashboard() {
                                     }
                                   }
                                   
-                                  // Show gifted seats info when available
-                                  const giftedInfo = giftedSeats > 0 ? ` • ${giftedSeats} gifted` : '';
+                                  // Calculate total allocated seats (gifted + paid)
+                                  const totalAllocated = giftedSeats + paidSeats;
+                                  const seatsUsed = employeesData.seatInfo.seatsUsed;
+                                  const seatsRemainingFromAllocation = Math.max(0, totalAllocated - seatsUsed);
                                   
-                                  return employeesData.seatInfo.seatLimit === -1
-                                    ? `${employeesData.seatInfo.seatsUsed} ${t('dashboard.employeeSeats.seatsUsed', 'seats used')} • ${t('dashboard.employeeSeats.unlimited', 'Unlimited available')}${giftedInfo}`
-                                    : `${t('dashboard.employeeSeats.used', '{{used}} of {{total}} used', { used: employeesData.seatInfo.seatsUsed, total: employeesData.seatInfo.seatLimit })} • ${t('dashboard.employeeSeats.seatsRemaining', '{{count}} seat(s) remaining', { count: seatsRemaining })}${additionalInfo}`;
+                                  // During trial (unlimited), show allocated seats breakdown
+                                  if (employeesData.seatInfo.seatLimit === -1) {
+                                    if (totalAllocated > 0) {
+                                      return `${seatsUsed} of ${totalAllocated} seats used • ${seatsRemainingFromAllocation} remaining • Unlimited trial`;
+                                    }
+                                    return `${seatsUsed} ${t('dashboard.employeeSeats.seatsUsed', 'seats used')} • ${t('dashboard.employeeSeats.unlimited', 'Unlimited trial')}`;
+                                  }
+                                  
+                                  return `${t('dashboard.employeeSeats.used', '{{used}} of {{total}} used', { used: employeesData.seatInfo.seatsUsed, total: employeesData.seatInfo.seatLimit })} • ${t('dashboard.employeeSeats.seatsRemaining', '{{count}} seat(s) remaining', { count: seatsRemaining })}${additionalInfo}`;
                                 })()
                               : t('dashboard.employeeSeats.manageCapacity', 'Manage your employee capacity')
                             }
