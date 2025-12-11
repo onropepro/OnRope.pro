@@ -67,22 +67,44 @@ export function getBrandColors(brandingColors?: string[] | null): {
   return { primaryColor, secondaryColor, accentColor };
 }
 
-export async function loadLogoAsBase64(logoUrl: string): Promise<string | null> {
+export interface LogoData {
+  base64: string;
+  width: number;
+  height: number;
+  aspectRatio: number;
+}
+
+export async function loadLogoAsBase64(logoUrl: string): Promise<LogoData | null> {
   try {
     const fullUrl = logoUrl.startsWith('http') ? logoUrl : `${window.location.origin}${logoUrl}`;
     const response = await fetch(fullUrl);
     if (!response.ok) return null;
     
     const blob = await response.blob();
-    return new Promise((resolve) => {
+    const base64 = await new Promise<string | null>((resolve) => {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64 = reader.result as string;
-        resolve(base64);
-      };
+      reader.onloadend = () => resolve(reader.result as string);
       reader.onerror = () => resolve(null);
       reader.readAsDataURL(blob);
     });
+    
+    if (!base64) return null;
+    
+    const dimensions = await new Promise<{ width: number; height: number } | null>((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight });
+      img.onerror = () => resolve(null);
+      img.src = base64;
+    });
+    
+    if (!dimensions) return null;
+    
+    return {
+      base64,
+      width: dimensions.width,
+      height: dimensions.height,
+      aspectRatio: dimensions.width / dimensions.height
+    };
   } catch {
     return null;
   }
@@ -102,11 +124,11 @@ export async function addProfessionalHeader(
   
   let headerHeight = 45;
   let logoLoaded = false;
-  let logoBase64: string | null = null;
+  let logoData: LogoData | null = null;
 
   if (showBranding && branding.brandingLogoUrl) {
-    logoBase64 = await loadLogoAsBase64(branding.brandingLogoUrl);
-    if (logoBase64) {
+    logoData = await loadLogoAsBase64(branding.brandingLogoUrl);
+    if (logoData) {
       logoLoaded = true;
       headerHeight = 55;
     }
@@ -119,11 +141,25 @@ export async function addProfessionalHeader(
   doc.rect(0, headerHeight, pageWidth, 3, 'F');
 
   if (showBranding) {
-    if (logoLoaded && logoBase64) {
+    if (logoLoaded && logoData) {
       try {
-        const logoHeight = 20;
-        const logoWidth = 40;
-        doc.addImage(logoBase64, 'PNG', margin, 8, logoWidth, logoHeight);
+        const maxLogoHeight = 22;
+        const maxLogoWidth = 50;
+        
+        let logoWidth: number;
+        let logoHeight: number;
+        
+        if (logoData.aspectRatio > maxLogoWidth / maxLogoHeight) {
+          logoWidth = maxLogoWidth;
+          logoHeight = maxLogoWidth / logoData.aspectRatio;
+        } else {
+          logoHeight = maxLogoHeight;
+          logoWidth = maxLogoHeight * logoData.aspectRatio;
+        }
+        
+        const logoY = 8 + (maxLogoHeight - logoHeight) / 2;
+        
+        doc.addImage(logoData.base64, 'PNG', margin, logoY, logoWidth, logoHeight);
         
         doc.setTextColor(255, 255, 255);
         doc.setFontSize(11);
