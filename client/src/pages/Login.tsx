@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { trackLogin } from "@/lib/analytics";
-import { Rocket, Play, Building2, Clock, DollarSign, Users, Shield, FileText, Calculator, FileSpreadsheet, Radio, ClipboardCheck, MessageSquare, Home, Award, Calendar, FolderOpen, Globe, TrendingUp, ArrowRight, HardHat } from "lucide-react";
+import { Rocket, Play, Building2, Clock, DollarSign, Users, Shield, FileText, Calculator, FileSpreadsheet, Radio, ClipboardCheck, MessageSquare, Home, Award, Calendar, FolderOpen, Globe, TrendingUp, ArrowRight, HardHat, Lock } from "lucide-react";
 import { TechnicianRegistration } from "@/components/TechnicianRegistration";
 import { Slider } from "@/components/ui/slider";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
@@ -242,28 +242,55 @@ export default function Login() {
           >
             Building Manager
           </Button>
-          <div className="relative" ref={modulesMenuRef}>
+          <div 
+            className="relative" 
+            ref={modulesMenuRef}
+            onMouseEnter={() => setShowModulesMenu(true)}
+            onMouseLeave={() => setShowModulesMenu(false)}
+          >
             <Button
               variant="ghost"
               className="text-sm font-medium"
-              onClick={() => setShowModulesMenu(!showModulesMenu)}
               data-testid="nav-modules"
             >
               Modules
             </Button>
             {showModulesMenu && (
-              <div className="absolute top-full left-0 mt-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg shadow-lg p-2 w-48 z-50">
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start text-sm"
-                  onClick={() => {
-                    setLocation("/modules/safety-compliance");
-                    setShowModulesMenu(false);
-                  }}
-                  data-testid="nav-safety-compliance"
-                >
-                  Safety & Compliance
-                </Button>
+              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl p-4 w-[480px] z-50">
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    className="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors text-left group"
+                    onClick={() => {
+                      setLocation("/modules/safety-compliance");
+                      setShowModulesMenu(false);
+                    }}
+                    data-testid="nav-safety-compliance"
+                  >
+                    <div className="p-2 bg-sky-100 dark:bg-sky-900/30 rounded-lg group-hover:scale-110 transition-transform">
+                      <Shield className="w-5 h-5 text-sky-600 dark:text-sky-400" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-sm text-slate-900 dark:text-slate-100">Safety & Compliance</div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Inspections, toolbox meetings, incident tracking</div>
+                    </div>
+                  </button>
+                  <button
+                    className="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors text-left group"
+                    onClick={() => {
+                      setLocation("/modules/user-access-authentication");
+                      setShowModulesMenu(false);
+                    }}
+                    data-testid="nav-user-access"
+                  >
+                    <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg group-hover:scale-110 transition-transform">
+                      <Lock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-sm text-slate-900 dark:text-slate-100">User Access & Authentication</div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Role-based permissions, secure login, audit trails</div>
+                    </div>
+                  </button>
+                </div>
               </div>
             )}
           </div>
