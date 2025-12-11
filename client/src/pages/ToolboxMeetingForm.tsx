@@ -116,10 +116,11 @@ export default function ToolboxMeetingForm() {
     queryKey: ["/api/employees"],
   });
 
-  const { data: currentUser } = useQuery<{ id: number; firstName: string; lastName: string; fullName?: string }>({
+  const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
   });
 
+  const currentUser = userData?.user;
   const employees = (employeesData?.employees || []);
 
   const getLocalDateString = () => {
@@ -160,11 +161,8 @@ export default function ToolboxMeetingForm() {
   });
 
   useEffect(() => {
-    if (currentUser) {
-      const fullName = currentUser.fullName || `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim();
-      if (fullName && !form.getValues("conductedByName")) {
-        form.setValue("conductedByName", fullName);
-      }
+    if (currentUser?.name && !form.getValues("conductedByName")) {
+      form.setValue("conductedByName", currentUser.name);
     }
   }, [currentUser, form]);
 
