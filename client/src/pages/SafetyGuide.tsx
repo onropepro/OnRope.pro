@@ -119,7 +119,7 @@ export default function SafetyGuide() {
               <ul className="space-y-2 text-sm">
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span><strong>Skipped safety checks:</strong> Hard gate enforcement ensures no one can start work without completing daily harness inspections</span>
+                  <span><strong>Skipped safety checks:</strong> Hard gate enforcement ensures no one can start work without completing daily harness inspections. Daily toolbox meetings are tracked per project and impact your Company Safety Rating.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
@@ -127,7 +127,11 @@ export default function SafetyGuide() {
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span><strong>Compliance tracking gaps:</strong> Company Safety Rating (CSR) provides real-time visibility into safety compliance</span>
+                  <span><strong>Compliance tracking gaps:</strong> Company Safety Rating (CSR) provides real-time visibility into safety compliance, exposing same-day coverage gaps</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+                  <span><strong>Property manager trust:</strong> CSR is visible to property managers evaluating contractors, demonstrating your commitment to safety documentation</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
