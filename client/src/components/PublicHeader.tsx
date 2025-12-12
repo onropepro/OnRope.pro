@@ -8,9 +8,10 @@ import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 interface PublicHeaderProps {
   activeNav?: "employer" | "technician" | "property-manager" | "resident" | "building-manager" | "modules";
+  onSignInClick?: () => void;
 }
 
-export function PublicHeader({ activeNav }: PublicHeaderProps) {
+export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
   const { t, i18n } = useTranslation();
   const [, setLocation] = useLocation();
   const [showModulesMenu, setShowModulesMenu] = useState(false);
@@ -63,7 +64,7 @@ export function PublicHeader({ activeNav }: PublicHeaderProps) {
           <Button 
             variant="ghost"
             size="sm"
-            onClick={() => setLocation("/login")}
+            onClick={onSignInClick || (() => setLocation("/login"))}
             data-testid="button-sign-in-header"
           >
             {t('login.header.signIn', 'Sign In')}

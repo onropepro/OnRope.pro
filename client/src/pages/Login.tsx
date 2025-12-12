@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -12,11 +12,10 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { trackLogin } from "@/lib/analytics";
-import { Rocket, Play, Building2, Clock, DollarSign, Users, Shield, FileText, Calculator, FileSpreadsheet, Radio, ClipboardCheck, MessageSquare, Home, Award, Calendar, FolderOpen, TrendingUp, ArrowRight, HardHat, Lock, Briefcase } from "lucide-react";
+import { Rocket, Play, Building2, Clock, DollarSign, Users, Shield, FileText, Calculator, FileSpreadsheet, Radio, ClipboardCheck, MessageSquare, Home, Award, Calendar, FolderOpen, TrendingUp, ArrowRight, HardHat } from "lucide-react";
+import { PublicHeader } from "@/components/PublicHeader";
 import { TechnicianRegistration } from "@/components/TechnicianRegistration";
-import { InstallPWAButton } from "@/components/InstallPWAButton";
 import { Slider } from "@/components/ui/slider";
-import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 const loginSchema = z.object({
   identifier: z.string().min(1, "Email is required"),
@@ -34,27 +33,8 @@ export default function Login() {
   const [showDevTools, setShowDevTools] = useState(false);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [landingLanguage, setLandingLanguage] = useState<'en' | 'fr'>('en');
   const [roiEmployeeCount, setRoiEmployeeCount] = useState(12);
-  const [showModulesMenu, setShowModulesMenu] = useState(false);
-  const modulesMenuRef = useRef<HTMLDivElement>(null);
 
-  // Initialize landing page language from its own storage key (separate from user preference)
-  useEffect(() => {
-    const savedLandingLang = localStorage.getItem('landingPageLang') as 'en' | 'fr' | null;
-    // Default to English for landing page, only use French if explicitly set
-    const lang = savedLandingLang || 'en';
-    setLandingLanguage(lang);
-    i18n.changeLanguage(lang);
-  }, [i18n]);
-
-  // Toggle language for landing page only
-  const toggleLandingLanguage = () => {
-    const newLang = landingLanguage === 'en' ? 'fr' : 'en';
-    setLandingLanguage(newLang);
-    localStorage.setItem('landingPageLang', newLang);
-    i18n.changeLanguage(newLang);
-  };
 
   const rotatingWords = [
     t('login.rotatingWords.safetyMeeting', 'safety meeting'),
@@ -81,19 +61,6 @@ export default function Login() {
     return () => clearInterval(interval);
   }, []);
 
-  // Close modules menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (modulesMenuRef.current && !modulesMenuRef.current.contains(e.target as Node)) {
-        setShowModulesMenu(false);
-      }
-    };
-    
-    if (showModulesMenu) {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => document.removeEventListener("mousedown", handleClickOutside);
-    }
-  }, [showModulesMenu]);
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -194,152 +161,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary/5 via-background to-background flex flex-col">
-      {/* Header */}
-      <header className="flex items-center justify-between px-6 md:px-8 py-4 border-b bg-background/80 backdrop-blur-sm sticky top-0 z-50">
-        {/* Logo - Left */}
-        <div className="flex items-center">
-          <img src={onRopeProLogo} alt="OnRopePro" className="h-16 object-contain" />
-        </div>
-        
-        {/* Navigation - Center */}
-        <nav className="hidden lg:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
-          <Button
-            variant="ghost"
-            className="text-sm font-medium"
-            onClick={() => setLocation("/employer")}
-            data-testid="nav-employer"
-          >
-            Employer
-          </Button>
-          <Button
-            variant="ghost"
-            className="text-sm font-medium"
-            onClick={() => setLocation("/technician-login")}
-            data-testid="nav-technician"
-          >
-            Technician
-          </Button>
-          <Button
-            variant="ghost"
-            className="text-sm font-medium"
-            onClick={() => setLocation("#")}
-            data-testid="nav-property-manager"
-          >
-            Property Manager
-          </Button>
-          <Button
-            variant="ghost"
-            className="text-sm font-medium"
-            onClick={() => setLocation("/link")}
-            data-testid="nav-resident"
-          >
-            Resident
-          </Button>
-          <Button
-            variant="ghost"
-            className="text-sm font-medium"
-            onClick={() => setLocation("/building-portal")}
-            data-testid="nav-building-manager"
-          >
-            Building Manager
-          </Button>
-          <div 
-            className="relative pb-2" 
-            ref={modulesMenuRef}
-            onMouseEnter={() => setShowModulesMenu(true)}
-            onMouseLeave={() => setShowModulesMenu(false)}
-          >
-            <Button
-              variant="ghost"
-              className="text-sm font-medium"
-              data-testid="nav-modules"
-            >
-              Modules
-            </Button>
-            {showModulesMenu && (
-              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-0 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl p-4 w-[480px] z-50">
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    className="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors text-left group"
-                    onClick={() => {
-                      setLocation("/modules/safety-compliance");
-                      setShowModulesMenu(false);
-                    }}
-                    data-testid="nav-safety-compliance"
-                  >
-                    <div className="p-2 bg-sky-100 dark:bg-sky-900/30 rounded-lg group-hover:scale-110 transition-transform">
-                      <Shield className="w-5 h-5 text-sky-600 dark:text-sky-400" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-sm text-slate-900 dark:text-slate-100">Safety & Compliance</div>
-                      <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Inspections, toolbox meetings, incident tracking</div>
-                    </div>
-                  </button>
-                  <button
-                    className="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors text-left group"
-                    onClick={() => {
-                      setLocation("/modules/user-access-authentication");
-                      setShowModulesMenu(false);
-                    }}
-                    data-testid="nav-user-access"
-                  >
-                    <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg group-hover:scale-110 transition-transform">
-                      <Lock className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-sm text-slate-900 dark:text-slate-100">User Access & Authentication</div>
-                      <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Role-based permissions, secure login, audit trails</div>
-                    </div>
-                  </button>
-                  <button
-                    className="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors text-left group col-span-2"
-                    onClick={() => {
-                      setLocation("/modules/project-management");
-                      setShowModulesMenu(false);
-                    }}
-                    data-testid="nav-project-management"
-                  >
-                    <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg group-hover:scale-110 transition-transform">
-                      <Briefcase className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-sm text-slate-900 dark:text-slate-100">Project Management</div>
-                      <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">4-elevation tracking, real-time dashboards, crew scheduling</div>
-                    </div>
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </nav>
-        
-        {/* Actions - Right */}
-        <div className="flex items-center gap-3">
-          <InstallPWAButton />
-          <Button 
-            variant="ghost"
-            size="sm"
-            onClick={toggleLandingLanguage}
-            data-testid="button-language-toggle"
-          >
-            {landingLanguage === 'en' ? 'FR' : 'EN'}
-          </Button>
-          <Button 
-            variant="ghost"
-            onClick={() => setShowLoginForm(true)}
-            data-testid="button-sign-in-header"
-          >
-            {t('login.header.signIn', 'Sign In')}
-          </Button>
-          <Button 
-            onClick={() => setLocation("/pricing")}
-            className="bg-[#A3320B]"
-            data-testid="button-get-started-header"
-          >
-            {t('login.header.getStarted', 'Get Started')}
-          </Button>
-        </div>
-      </header>
+      <PublicHeader onSignInClick={() => setShowLoginForm(true)} />
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center text-center px-6 py-16 md:py-24" style={{ backgroundColor: '#F3F3F3' }}>
         <h1 className="text-xs md:text-sm font-semibold tracking-widest text-muted-foreground uppercase mb-1.5">
