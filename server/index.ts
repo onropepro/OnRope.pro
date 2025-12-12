@@ -68,6 +68,13 @@ declare module 'express-session' {
     oauthNonce?: string;
     oauthStateCreatedAt?: number;
     returnUrl?: string;
+    pendingOAuthRegistration?: {
+      oauthId: string;
+      oauthProvider: string;
+      email?: string;
+      name?: string;
+      profileImageUrl?: string;
+    };
   }
 }
 

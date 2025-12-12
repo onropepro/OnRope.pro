@@ -16,6 +16,8 @@ import { checkSubscriptionLimits } from "./subscription-middleware";
 import { getTodayString, toLocalDateString, parseLocalDate, getStartOfWeek, getEndOfWeek } from "./dateUtils";
 import { Resend } from "resend";
 import rateLimit from "express-rate-limit";
+import { oauthLoginHandler, oauthCallbackHandler, oauthLogoutHandler, isOAuthEnabled, initializePassport } from "./replit-passport";
+import { ENABLE_OAUTH } from "./oauth-config";
 
 // SECURITY: Rate limiting for login endpoint to prevent brute force attacks
 const loginRateLimiter = rateLimit({
@@ -442,6 +444,19 @@ async function generateReferralCode(): Promise<string> {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // ==================== OAUTH ROUTES ====================
+  await initializePassport(app);
+  
+  if (ENABLE_OAUTH) {
+    app.get("/api/oauth/login", oauthRateLimiter, oauthLoginHandler());
+    app.get("/api/oauth/callback", oauthRateLimiter, oauthCallbackHandler());
+    app.post("/api/oauth/logout", oauthLogoutHandler());
+    
+    app.get("/api/oauth/status", (_req, res) => {
+      res.json({ enabled: isOAuthEnabled() });
+    });
+  }
+  
   // ==================== ADDRESS AUTOCOMPLETE ====================
   
   // Address autocomplete endpoint using Geoapify API
