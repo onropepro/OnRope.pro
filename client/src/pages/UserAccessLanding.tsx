@@ -256,7 +256,7 @@ export default function UserAccessLanding() {
                 <div className="w-12 h-12 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center mb-3">
                   <UserCheck className="w-6 h-6 text-amber-600" />
                 </div>
-                <CardTitle className="text-xl">irata/SPRAT Level Tracking</CardTitle>
+                <CardTitle className="text-xl">IRATA/SPRAT Level Tracking</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm text-muted-foreground">
                 <p className="font-medium text-foreground">Answer client questions in seconds, not minutes.</p>
