@@ -40,14 +40,28 @@
 
 ## Typography (Inter via Google Fonts)
 
-Display: 3rem/800/1.1/-0.025em  
-H1: 2rem/700/1.25/-0.02em  
-H2: 1.5rem/600/1.3/-0.01em  
-H3: 1.125rem/600/1.4  
-Body Large: 1.0625rem/400/1.6  
-Body: 0.9375rem/400/1.5  
-Caption: 0.8125rem/500/1.4  
-Label: 0.75rem/600/1.3/0.025em (uppercase)
+**Aligned with Tailwind CSS default scale for consistency:**
+
+Display: 3rem/800/1.1/-0.025em → `text-5xl font-extrabold`  
+H1: 2.25rem/700/1.25/-0.02em → `text-4xl font-bold`  
+H2: 1.5rem/600/1.3/-0.01em → `text-2xl font-semibold`  
+H3: 1.25rem/600/1.4 → `text-xl font-semibold`  
+Body Large: 1.125rem/400/1.6 → `text-lg`  
+Body: 1rem/400/1.5 → `text-base`  
+Caption: 0.875rem/500/1.4 → `text-sm font-medium`  
+Label: 0.75rem/600/1.3/0.025em (uppercase) → `text-xs font-semibold uppercase tracking-wide`
+
+**Quick Reference:**
+| Style | Tailwind Class | Size |
+|-------|---------------|------|
+| Display | `text-5xl` | 3rem (48px) |
+| H1 | `text-4xl` | 2.25rem (36px) |
+| H2 | `text-2xl` | 1.5rem (24px) |
+| H3 | `text-xl` | 1.25rem (20px) |
+| Body Large | `text-lg` | 1.125rem (18px) |
+| Body | `text-base` | 1rem (16px) |
+| Caption | `text-sm` | 0.875rem (14px) |
+| Label | `text-xs` | 0.75rem (12px) |
 
 ## Layout & Spacing
 

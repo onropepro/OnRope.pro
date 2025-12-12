@@ -213,7 +213,7 @@ export default function ProjectManagementLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Directional Drop Tracking</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-base text-muted-foreground mt-1">
                       Track progress on each building elevation (N/E/S/W) independently. Perfect for high-rise window cleaning with different access requirements per side.
                     </p>
                   </div>
@@ -229,7 +229,7 @@ export default function ProjectManagementLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Real-Time Progress Dashboard</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-base text-muted-foreground mt-1">
                       See every project's completion percentage, days remaining, and assigned crew. Updates automatically as work sessions are logged.
                     </p>
                   </div>
@@ -245,7 +245,7 @@ export default function ProjectManagementLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Flexible Tracking Methods</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-base text-muted-foreground mt-1">
                       Drop-based for window cleaning, hours-based for repairs, unit-based for suites. The system adapts to each job type.
                     </p>
                   </div>
@@ -261,7 +261,7 @@ export default function ProjectManagementLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Crew Assignment & Scheduling</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-base text-muted-foreground mt-1">
                       Assign technicians to specific projects and elevations. Color-coded project bars show scheduling conflicts instantly.
                     </p>
                   </div>
@@ -277,7 +277,7 @@ export default function ProjectManagementLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Client & Resident Visibility</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-base text-muted-foreground mt-1">
                       Property managers and residents check progress themselves. Photo galleries and completion status reduce status calls by 60-70%.
                     </p>
                   </div>
@@ -293,7 +293,7 @@ export default function ProjectManagementLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Performance Analytics</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-base text-muted-foreground mt-1">
                       Track drops or units completed per shift by technician. Identify top performers and coach underperformers with objective data.
                     </p>
                   </div>
@@ -309,7 +309,7 @@ export default function ProjectManagementLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Piece Work Mode</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-base text-muted-foreground mt-1">
                       Enable piece work compensation for drop-based projects. Set rate per drop, and payroll calculates automatically.
                     </p>
                   </div>
@@ -325,7 +325,7 @@ export default function ProjectManagementLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Project Archive & Search</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-base text-muted-foreground mt-1">
                       Completed projects archive automatically but remain searchable. Historical data powers accurate future quoting.
                     </p>
                   </div>
@@ -341,7 +341,7 @@ export default function ProjectManagementLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Photo Documentation</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-base text-muted-foreground mt-1">
                       Attach photos to work sessions showing completed work. Before/after galleries accessible to building managers and residents.
                     </p>
                   </div>
@@ -357,7 +357,7 @@ export default function ProjectManagementLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Status Workflow</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-base text-muted-foreground mt-1">
                       Projects move through Draft, Active, On Hold, Completed, and Archived stages. Pause projects for weather or client requests.
                     </p>
                   </div>
@@ -616,7 +616,7 @@ export default function ProjectManagementLanding() {
               <AccordionTrigger className="hover:no-underline py-4">
                 <span className="text-left">"I have no idea where my 6 active projects actually stand."</span>
               </AccordionTrigger>
-              <AccordionContent className="space-y-4 text-sm text-muted-foreground pb-4">
+              <AccordionContent className="space-y-4 text-base text-muted-foreground pb-4">
                 <div>
                   <span className="font-medium text-foreground">The Pain:</span> You drive site-to-site taking notes, wasting 10-15 hours per week just figuring out what's happening. You bid new work but aren't sure if your crew will finish current jobs on time.
                 </div>
@@ -633,7 +633,7 @@ export default function ProjectManagementLanding() {
               <AccordionTrigger className="hover:no-underline py-4">
                 <span className="text-left">"One tech is crushing it while another coasts, and I can't prove it."</span>
               </AccordionTrigger>
-              <AccordionContent className="space-y-4 text-sm text-muted-foreground pb-4">
+              <AccordionContent className="space-y-4 text-base text-muted-foreground pb-4">
                 <div>
                   <span className="font-medium text-foreground">The Pain:</span> Two techs work the same 8-hour shift at the same building. You pay both full wages, but you're only getting one tech's worth of productivity. The underperformer coasts undetected.
                 </div>
@@ -650,7 +650,7 @@ export default function ProjectManagementLanding() {
               <AccordionTrigger className="hover:no-underline py-4">
                 <span className="text-left">"I create a project, then manually re-enter everything into my calendar."</span>
               </AccordionTrigger>
-              <AccordionContent className="space-y-4 text-sm text-muted-foreground pb-4">
+              <AccordionContent className="space-y-4 text-base text-muted-foreground pb-4">
                 <div>
                   <span className="font-medium text-foreground">The Pain:</span> Same information lives in four different places, wasting 30-45 minutes per project. You forget to add a project to the calendar and the client calls on the scheduled start date asking where your crew is.
                 </div>
@@ -667,7 +667,7 @@ export default function ProjectManagementLanding() {
               <AccordionTrigger className="hover:no-underline py-4">
                 <span className="text-left">"I'm guessing which techs are available next week."</span>
               </AccordionTrigger>
-              <AccordionContent className="space-y-4 text-sm text-muted-foreground pb-4">
+              <AccordionContent className="space-y-4 text-base text-muted-foreground pb-4">
                 <div>
                   <span className="font-medium text-foreground">The Pain:</span> You need to quote a new project starting Monday but aren't sure who's available. You double-book Tommy on two simultaneous jobs 40 km apart and have to scramble for emergency coverage at premium rates.
                 </div>
@@ -684,7 +684,7 @@ export default function ProjectManagementLanding() {
               <AccordionTrigger className="hover:no-underline py-4">
                 <span className="text-left">"I have no idea how long this type of job should take."</span>
               </AccordionTrigger>
-              <AccordionContent className="space-y-4 text-sm text-muted-foreground pb-4">
+              <AccordionContent className="space-y-4 text-base text-muted-foreground pb-4">
                 <div>
                   <span className="font-medium text-foreground">The Pain:</span> A client asks you to quote a 15-story window wash. You can't find your notes from the similar job six months ago. You guess and either overbid and lose the contract, or underbid and lose money.
                 </div>
@@ -701,7 +701,7 @@ export default function ProjectManagementLanding() {
               <AccordionTrigger className="hover:no-underline py-4">
                 <span className="text-left">"My brain is my business, and it's exhausted."</span>
               </AccordionTrigger>
-              <AccordionContent className="space-y-4 text-sm text-muted-foreground pb-4">
+              <AccordionContent className="space-y-4 text-base text-muted-foreground pb-4">
                 <div>
                   <span className="font-medium text-foreground">The Pain:</span> You're mentally tracking which projects are behind schedule, who's assigned where, which clients owe invoices, when inspections are due. This cognitive overload leads to burnout and inability to take vacation.
                 </div>
@@ -718,7 +718,7 @@ export default function ProjectManagementLanding() {
               <AccordionTrigger className="hover:no-underline py-4">
                 <span className="text-left">"Building managers call me constantly asking 'How's it going?'"</span>
               </AccordionTrigger>
-              <AccordionContent className="space-y-4 text-sm text-muted-foreground pb-4">
+              <AccordionContent className="space-y-4 text-base text-muted-foreground pb-4">
                 <div>
                   <span className="font-medium text-foreground">The Pain:</span> Your building manager client calls or texts 5-10 times per week asking for updates. You spend 3-4 hours per week on status calls instead of productive work and still sound vague.
                 </div>
@@ -743,7 +743,7 @@ export default function ProjectManagementLanding() {
               <AccordionTrigger className="hover:no-underline py-4">
                 <span className="text-left">"Residents bombard me with status questions."</span>
               </AccordionTrigger>
-              <AccordionContent className="space-y-4 text-sm text-muted-foreground pb-4">
+              <AccordionContent className="space-y-4 text-base text-muted-foreground pb-4">
                 <div>
                   <span className="font-medium text-foreground">The Pain:</span> You receive 15-30 status calls per week. Unit 402 calls 8 PM Friday demanding no work Sunday. You scramble to contact the contractor and adjust their crew schedule. Two hours of chaos that could have been avoided.
                 </div>
@@ -760,7 +760,7 @@ export default function ProjectManagementLanding() {
               <AccordionTrigger className="hover:no-underline py-4">
                 <span className="text-left">"I have no direct visibility into contractor progress."</span>
               </AccordionTrigger>
-              <AccordionContent className="space-y-4 text-sm text-muted-foreground pb-4">
+              <AccordionContent className="space-y-4 text-base text-muted-foreground pb-4">
                 <div>
                   <span className="font-medium text-foreground">The Pain:</span> You've hired a rope access company but have no way to verify they're working efficiently without site visits or constant calls. When residents ask for updates, you're reliant on the contractor's word.
                 </div>
@@ -785,7 +785,7 @@ export default function ProjectManagementLanding() {
               <AccordionTrigger className="hover:no-underline py-4">
                 <span className="text-left">"I have no idea when they'll finish MY elevation."</span>
               </AccordionTrigger>
-              <AccordionContent className="space-y-4 text-sm text-muted-foreground pb-4">
+              <AccordionContent className="space-y-4 text-base text-muted-foreground pb-4">
                 <div>
                   <span className="font-medium text-foreground">The Pain:</span> You're planning a family gathering this weekend but don't know if there will be strangers outside your windows. You have a birthday party Sunday and want to make sure the crew won't be working that day. It takes 2 days to get an answer.
                 </div>
@@ -810,7 +810,7 @@ export default function ProjectManagementLanding() {
               <AccordionTrigger className="hover:no-underline py-4">
                 <span className="text-left">"I don't know what my daily target is."</span>
               </AccordionTrigger>
-              <AccordionContent className="space-y-4 text-sm text-muted-foreground pb-4">
+              <AccordionContent className="space-y-4 text-base text-muted-foreground pb-4">
                 <div>
                   <span className="font-medium text-foreground">The Pain:</span> You show up to the job site and start working, but you're not sure if you're working fast enough. You complete 3 drops in a day. Later you find out the target was 5 drops per day. Nobody told you.
                 </div>
@@ -827,7 +827,7 @@ export default function ProjectManagementLanding() {
               <AccordionTrigger className="hover:no-underline py-4">
                 <span className="text-left">"I have no visibility into my own performance."</span>
               </AccordionTrigger>
-              <AccordionContent className="space-y-4 text-sm text-muted-foreground pb-4">
+              <AccordionContent className="space-y-4 text-base text-muted-foreground pb-4">
                 <div>
                   <span className="font-medium text-foreground">The Pain:</span> You're working hard, but you have no idea how you compare to other technicians or to your own past performance. Annual review time, your supervisor says "inconsistent performance" but gives no concrete data.
                 </div>
@@ -844,7 +844,7 @@ export default function ProjectManagementLanding() {
               <AccordionTrigger className="hover:no-underline py-4">
                 <span className="text-left">"I don't know where I'm working tomorrow."</span>
               </AccordionTrigger>
-              <AccordionContent className="space-y-4 text-sm text-muted-foreground pb-4">
+              <AccordionContent className="space-y-4 text-base text-muted-foreground pb-4">
                 <div>
                   <span className="font-medium text-foreground">The Pain:</span> You finish work today and ask your supervisor "Where am I working tomorrow?" They say "I'll text you tonight." 9 PM rolls around, no text. You go to bed not knowing where to show up. 6 AM you get a text: "Marina Towers, be there by 7:30."
                 </div>
