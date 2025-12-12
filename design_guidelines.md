@@ -288,6 +288,46 @@ When creating a new module landing page, verify:
 
 ---
 
+### Content Width Standards (Below Hero Section)
+
+Module pages follow a width hierarchy to create visual focus and readability:
+
+**Hero Section Container:**
+```tsx
+<div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
+```
+- `max-w-6xl` (1152px) - Full width for hero impact
+
+**Stats Panel Container:**
+```tsx
+<div className="max-w-3xl mx-auto px-4 pt-4 pb-12">
+```
+- `max-w-3xl` (768px) - Narrow for visual focus on metrics
+
+**Main Content Sections (text, features, benefits):**
+```tsx
+<section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto">
+```
+- `max-w-4xl` (896px) - Narrower width for better readability
+- Used for: The Reality/Pain section, What Changes section, Key Features, Module Integration Points
+
+**Image/Media Sections:**
+```tsx
+<section className="py-12 md:py-20 px-4 md:px-8">
+  <div className="max-w-5xl mx-auto">
+```
+- `max-w-5xl` (1024px) - Slightly wider for visual impact
+- Used for: Software showcase images, feature demonstrations
+
+**Why this hierarchy?**
+- Widest (6xl): Hero grabs attention with full-screen impact
+- Narrower (3xl): Stats are focused and distinct
+- Narrow (4xl): Body text is easier to read (60-70 characters per line)
+- Medium-wide (5xl): Images have breathing room without overwhelming text
+- Maintains visual consistency across all module pages
+
+---
+
 ### Color Reference
 
 | Element | Class | Hex Value |
