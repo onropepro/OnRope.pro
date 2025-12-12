@@ -62,30 +62,30 @@ export default function ProjectManagementLanding() {
     <div className="min-h-screen bg-white dark:bg-slate-950">
       <PublicHeader activeNav="modules" />
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-900 text-white py-24 md:py-32">
+      {/* Hero Section - Ocean Blue gradient per design guidelines */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#0B64A3] to-[#0369A1] text-white py-24">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMtOS45NDEgMC0xOCA4LjA1OS0xOCAxOHM4LjA1OSAxOCAxOCAxOGM5Ljk0MSAwIDE4LTguMDU5IDE4LTE4cy04LjA1OS0xOC0xOC0xOHptMCAzMmMtNy43MzIgMC0xNC02LjI2OC0xNC0xNHM2LjI2OC0xNCAxNC0xNHMxNCA2LjI2OCAxNCAxNC02LjI2OCAxNC0xNCAxNHoiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wMykiLz48L2c+PC9zdmc+')] opacity-30"></div>
         
-        <div className="relative z-10 max-w-5xl mx-auto px-4 text-center space-y-6">
-          <Badge className="bg-emerald-500/30 text-white border border-emerald-400">Project Management Module</Badge>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8 text-center space-y-6">
+          <Badge className="bg-white/20 text-white border border-white/40">Project Management Module</Badge>
           
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight tracking-tight">
             Stop Managing Projects<br />
-            <span className="text-emerald-100">In Your Head</span>
+            <span className="text-white/90">In Your Head</span>
           </h1>
           
-          <p className="text-lg md:text-xl text-emerald-100 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-base md:text-lg text-white/80 max-w-3xl mx-auto leading-relaxed">
             Track every building, elevation, and technician from one dashboard. See exactly where every job stands without a single phone call or site visit.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
-            <Button size="lg" className="bg-white text-emerald-700 hover:bg-emerald-50" asChild data-testid="button-cta-trial">
+            <Button size="lg" className="h-11 px-6 bg-[#AB4521] text-white border-[#AB4521]" asChild data-testid="button-cta-trial">
               <Link href="/register">
                 Start Your 90-Day Trial
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-cta-demo">
+            <Button size="lg" variant="outline" className="h-11 px-6 bg-white/10 backdrop-blur-xl border-white/40 text-white" asChild data-testid="button-cta-demo">
               <Link href="#knowledgebase">
                 Find Answers
                 <BookOpen className="ml-2 w-5 h-5" />
@@ -102,28 +102,30 @@ export default function ProjectManagementLanding() {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="relative z-10 -mt-8 max-w-5xl mx-auto px-4">
-        <Card className="shadow-xl border-0">
-          <CardContent className="p-8">
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
-              <div className="text-center">
+      {/* Stats Section - per design guidelines: rounded-3xl, shadow-xl, -mt-20, p-12, 4-col grid */}
+      <section className="relative z-10 -mt-20 max-w-7xl mx-auto px-4 md:px-8">
+        <Card className="shadow-xl rounded-3xl border border-slate-200 dark:border-slate-800">
+          <CardContent className="p-8 md:p-12">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+              <div className="text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0 md:[&:nth-child(4)]:border-r-0">
                 <div className="text-3xl md:text-4xl font-bold text-emerald-600">4</div>
                 <div className="text-sm text-muted-foreground mt-1">Elevations tracked independently</div>
               </div>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-blue-600">87-93%</div>
+              <div className="text-center border-r border-slate-200 dark:border-slate-700 md:border-r md:[&:nth-child(4)]:border-r-0">
+                <div className="text-3xl md:text-4xl font-bold text-[#0B64A3]">87-93%</div>
                 <div className="text-sm text-muted-foreground mt-1">Payroll errors eliminated</div>
               </div>
-              <div className="text-center">
+              <div className="text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0 md:[&:nth-child(4)]:border-r-0">
                 <div className="text-3xl md:text-4xl font-bold text-rose-600">60-70%</div>
                 <div className="text-sm text-muted-foreground mt-1">Fewer resident complaints</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-purple-600">75%</div>
+                <div className="text-3xl md:text-4xl font-bold text-violet-600">75%</div>
                 <div className="text-sm text-muted-foreground mt-1">Faster quote preparation</div>
               </div>
-              <div className="text-center">
+            </div>
+            <div className="grid grid-cols-2 gap-6 md:gap-8 mt-6 md:mt-8 pt-6 md:pt-8 border-t border-slate-200 dark:border-slate-700">
+              <div className="text-center border-r border-slate-200 dark:border-slate-700">
                 <div className="text-3xl md:text-4xl font-bold text-amber-600">5-10</div>
                 <div className="text-sm text-muted-foreground mt-1">Hours saved weekly on scheduling</div>
               </div>
@@ -137,13 +139,13 @@ export default function ProjectManagementLanding() {
       </section>
 
       {/* The Pain Section */}
-      <section className="py-16 md:py-20 px-4 max-w-4xl mx-auto">
+      <section className="py-12 md:py-20 px-4 md:px-8 max-w-7xl mx-auto">
         <div className="space-y-6">
-          <Card className="border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-950">
+          <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950 rounded-2xl shadow-md">
             <CardHeader>
-              <CardTitle className="text-xl md:text-2xl text-emerald-900 dark:text-emerald-100">The Reality</CardTitle>
+              <CardTitle className="text-xl md:text-2xl text-amber-900 dark:text-amber-100">The Reality</CardTitle>
             </CardHeader>
-            <CardContent className="text-emerald-900 dark:text-emerald-100 space-y-4">
+            <CardContent className="text-amber-900 dark:text-amber-100 space-y-4">
               <p>You're juggling window washing at Tower A, caulking at Building B, and anchor inspections at Complex C. A client calls asking for a status update. You're guessing.</p>
               <p>You think Tommy's finishing the north elevation today. Maybe. Sarah might have capacity next week. Probably. Your brain is your business. And it's exhausted.</p>
             </CardContent>
@@ -154,28 +156,28 @@ export default function ProjectManagementLanding() {
       <Separator className="my-8" />
 
       {/* What Changes Section */}
-      <section className="py-16 md:py-20 px-4 max-w-4xl mx-auto space-y-8">
+      <section className="py-12 md:py-20 px-4 md:px-8 max-w-7xl mx-auto space-y-8">
         <div>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Every Project. Every Elevation. Every Technician. One Screen.</h2>
-          <p className="text-muted-foreground leading-relaxed text-base">
+          <h2 className="text-2xl md:text-3xl font-bold mb-4">Every Project. Every Elevation. Every Technician. One Screen.</h2>
+          <p className="text-muted-foreground leading-relaxed">
             OnRopePro's Project Management module tracks progress the way rope access actually works. Drop-based tracking for window cleaning and building wash. Hours-based for inspections and repairs. Unit-based for parkade cleaning and in-suite services.
           </p>
-          <p className="text-muted-foreground leading-relaxed text-base mt-4">
+          <p className="text-muted-foreground leading-relaxed mt-4">
             Create a project with a date range and assigned crew, and the calendar populates automatically. Log work sessions from the field, and progress updates in real time. No duplicate data entry. No forgotten schedule conflicts. No 3 AM panic attacks.
           </p>
         </div>
 
         <div>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Buildings Have Four Sides. Your Tracking Should Too.</h2>
-          <p className="text-muted-foreground leading-relaxed text-base">
+          <h2 className="text-2xl md:text-3xl font-bold mb-4">Buildings Have Four Sides. Your Tracking Should Too.</h2>
+          <p className="text-muted-foreground leading-relaxed">
             High-rise window cleaning doesn't happen all at once. The north elevation might be 80% done while the south hasn't started. OnRopePro tracks North, East, South, and West independently. See exactly which directions are complete, in progress, or waiting. Your supervisor knows where to send the crew. Your client sees real progress instead of vague percentages.
           </p>
         </div>
       </section>
 
       {/* Software in Action Image */}
-      <section className="py-12 md:py-16 px-4">
-        <div className="max-w-6xl mx-auto">
+      <section className="py-12 md:py-20 px-4 md:px-8">
+        <div className="max-w-7xl mx-auto">
           <div className="relative rounded-xl overflow-hidden shadow-2xl">
             <img 
               src={ropeAccessSoftwareImg} 
@@ -195,16 +197,16 @@ export default function ProjectManagementLanding() {
       <Separator className="my-8" />
 
       {/* Key Features */}
-      <section className="py-16 md:py-20 px-4 max-w-5xl mx-auto space-y-8">
+      <section className="py-12 md:py-20 px-4 md:px-8 max-w-7xl mx-auto space-y-8">
         <div>
-          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-6">
-            <Sparkles className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+          <h2 className="text-2xl md:text-3xl font-bold flex items-center gap-2 mb-6">
+            <Sparkles className="w-5 h-5 text-[#0B64A3]" />
             Key Features
           </h2>
           
           <div className="grid md:grid-cols-2 gap-4">
-            <Card>
-              <CardContent className="pt-6">
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
+              <CardContent className="p-6">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0">
                     <Compass className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
@@ -219,11 +221,11 @@ export default function ProjectManagementLanding() {
               </CardContent>
             </Card>
             
-            <Card>
-              <CardContent className="pt-6">
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
+              <CardContent className="p-6">
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900 flex items-center justify-center shrink-0">
-                    <BarChart3 className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                  <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center shrink-0">
+                    <BarChart3 className="w-5 h-5 text-violet-600 dark:text-violet-400" />
                   </div>
                   <div>
                     <h3 className="font-semibold">Real-Time Progress Dashboard</h3>
@@ -235,11 +237,11 @@ export default function ProjectManagementLanding() {
               </CardContent>
             </Card>
             
-            <Card>
-              <CardContent className="pt-6">
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
+              <CardContent className="p-6">
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-action-100 dark:bg-action-900 flex items-center justify-center shrink-0">
-                    <Target className="w-5 h-5 text-action-600 dark:text-action-400" />
+                  <div className="w-10 h-10 rounded-lg bg-[#0B64A3]/10 dark:bg-[#0B64A3]/20 flex items-center justify-center shrink-0">
+                    <Target className="w-5 h-5 text-[#0B64A3]" />
                   </div>
                   <div>
                     <h3 className="font-semibold">Flexible Tracking Methods</h3>
@@ -251,8 +253,8 @@ export default function ProjectManagementLanding() {
               </CardContent>
             </Card>
             
-            <Card>
-              <CardContent className="pt-6">
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
+              <CardContent className="p-6">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0">
                     <Users className="w-5 h-5 text-amber-600 dark:text-amber-400" />
@@ -267,11 +269,11 @@ export default function ProjectManagementLanding() {
               </CardContent>
             </Card>
             
-            <Card>
-              <CardContent className="pt-6">
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
+              <CardContent className="p-6">
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-sky-100 dark:bg-sky-900 flex items-center justify-center shrink-0">
-                    <Eye className="w-5 h-5 text-sky-600 dark:text-sky-400" />
+                  <div className="w-10 h-10 rounded-lg bg-[#0B64A3]/10 dark:bg-[#0B64A3]/20 flex items-center justify-center shrink-0">
+                    <Eye className="w-5 h-5 text-[#0B64A3]" />
                   </div>
                   <div>
                     <h3 className="font-semibold">Client & Resident Visibility</h3>
@@ -283,8 +285,8 @@ export default function ProjectManagementLanding() {
               </CardContent>
             </Card>
             
-            <Card>
-              <CardContent className="pt-6">
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
+              <CardContent className="p-6">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
                     <TrendingUp className="w-5 h-5 text-rose-600 dark:text-rose-400" />
@@ -299,11 +301,11 @@ export default function ProjectManagementLanding() {
               </CardContent>
             </Card>
             
-            <Card>
-              <CardContent className="pt-6">
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
+              <CardContent className="p-6">
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center shrink-0">
-                    <DollarSign className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                  <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center shrink-0">
+                    <DollarSign className="w-5 h-5 text-violet-600 dark:text-violet-400" />
                   </div>
                   <div>
                     <h3 className="font-semibold">Piece Work Mode</h3>
@@ -315,11 +317,11 @@ export default function ProjectManagementLanding() {
               </CardContent>
             </Card>
             
-            <Card>
-              <CardContent className="pt-6">
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
+              <CardContent className="p-6">
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-teal-100 dark:bg-teal-900 flex items-center justify-center shrink-0">
-                    <Search className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+                  <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0">
+                    <Search className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                   </div>
                   <div>
                     <h3 className="font-semibold">Project Archive & Search</h3>
@@ -331,11 +333,11 @@ export default function ProjectManagementLanding() {
               </CardContent>
             </Card>
             
-            <Card>
-              <CardContent className="pt-6">
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
+              <CardContent className="p-6">
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-orange-100 dark:bg-orange-900 flex items-center justify-center shrink-0">
-                    <Camera className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+                  <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0">
+                    <Camera className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                   </div>
                   <div>
                     <h3 className="font-semibold">Photo Documentation</h3>
@@ -347,11 +349,11 @@ export default function ProjectManagementLanding() {
               </CardContent>
             </Card>
             
-            <Card>
-              <CardContent className="pt-6">
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
+              <CardContent className="p-6">
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-cyan-100 dark:bg-cyan-900 flex items-center justify-center shrink-0">
-                    <GitBranch className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
+                  <div className="w-10 h-10 rounded-lg bg-[#0B64A3]/10 dark:bg-[#0B64A3]/20 flex items-center justify-center shrink-0">
+                    <GitBranch className="w-5 h-5 text-[#0B64A3]" />
                   </div>
                   <div>
                     <h3 className="font-semibold">Status Workflow</h3>
@@ -369,15 +371,15 @@ export default function ProjectManagementLanding() {
       <Separator className="my-8" />
 
       {/* Module Integration Points */}
-      <section className="py-16 md:py-20 px-4 max-w-5xl mx-auto space-y-8">
+      <section className="py-12 md:py-20 px-4 md:px-8 max-w-7xl mx-auto space-y-8">
         <div>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Talks To Everything Else</h2>
-          <p className="text-muted-foreground leading-relaxed text-base mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold mb-4">Talks To Everything Else</h2>
+          <p className="text-muted-foreground leading-relaxed mb-8">
             Projects are the operational hub connecting multiple OnRopePro modules. When data enters one place, it flows everywhere it needs to go.
           </p>
           
           <div className="grid md:grid-cols-2 gap-6">
-            <Card>
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
               <CardHeader>
                 <CardTitle className="text-lg">Employee Management</CardTitle>
               </CardHeader>
@@ -393,7 +395,7 @@ export default function ProjectManagementLanding() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
               <CardHeader>
                 <CardTitle className="text-lg">Work Sessions & Time Tracking</CardTitle>
               </CardHeader>
@@ -409,7 +411,7 @@ export default function ProjectManagementLanding() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
               <CardHeader>
                 <CardTitle className="text-lg">Payroll</CardTitle>
               </CardHeader>
@@ -425,7 +427,7 @@ export default function ProjectManagementLanding() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
               <CardHeader>
                 <CardTitle className="text-lg">Safety & Compliance</CardTitle>
               </CardHeader>
@@ -441,7 +443,7 @@ export default function ProjectManagementLanding() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
               <CardHeader>
                 <CardTitle className="text-lg">Job Schedule & Calendar</CardTitle>
               </CardHeader>
@@ -457,7 +459,7 @@ export default function ProjectManagementLanding() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
               <CardHeader>
                 <CardTitle className="text-lg">Buildings Database</CardTitle>
               </CardHeader>
@@ -473,7 +475,7 @@ export default function ProjectManagementLanding() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
               <CardHeader>
                 <CardTitle className="text-lg">Resident Portal</CardTitle>
               </CardHeader>
@@ -489,7 +491,7 @@ export default function ProjectManagementLanding() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
               <CardHeader>
                 <CardTitle className="text-lg">Documents Repository</CardTitle>
               </CardHeader>
@@ -505,7 +507,7 @@ export default function ProjectManagementLanding() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
               <CardHeader>
                 <CardTitle className="text-lg">Client & Property Manager Records</CardTitle>
               </CardHeader>
@@ -521,7 +523,7 @@ export default function ProjectManagementLanding() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
               <CardHeader>
                 <CardTitle className="text-lg">Complaints & Feedback Management</CardTitle>
               </CardHeader>
@@ -537,7 +539,7 @@ export default function ProjectManagementLanding() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">Invoicing <Badge variant="secondary" className="text-xs">Coming Soon</Badge></CardTitle>
               </CardHeader>
@@ -553,7 +555,7 @@ export default function ProjectManagementLanding() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">Quoting <Badge variant="secondary" className="text-xs">Coming Soon</Badge></CardTitle>
               </CardHeader>
@@ -575,13 +577,13 @@ export default function ProjectManagementLanding() {
       <Separator className="my-8" />
 
       {/* Archive & Analytics */}
-      <section className="py-16 md:py-20 px-4 max-w-4xl mx-auto space-y-8">
+      <section className="py-12 md:py-20 px-4 md:px-8 max-w-7xl mx-auto space-y-8">
         <div>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Historical Data Makes Future Quotes Accurate</h2>
-          <p className="text-muted-foreground leading-relaxed text-base">
+          <h2 className="text-2xl md:text-3xl font-bold mb-4">Historical Data Makes Future Quotes Accurate</h2>
+          <p className="text-muted-foreground leading-relaxed">
             Completed projects are archived, not deleted. Search by building name, job type, date range, assigned employees, or completion status. Pull up analytics showing average drops per day, labor hours per building type, project duration trends.
           </p>
-          <p className="text-muted-foreground leading-relaxed text-base mt-4">
+          <p className="text-muted-foreground leading-relaxed mt-4">
             "Last time we did a 20-story window wash, it took 14 days with 2 techs averaging 8 drops per day." No more guessing. No more underbidding by 50%. No more overbidding by 30% and leaving money on the table.
           </p>
         </div>
@@ -590,10 +592,10 @@ export default function ProjectManagementLanding() {
       <Separator className="my-8" />
 
       {/* Problems Solved */}
-      <section className="py-16 md:py-20 px-4 max-w-4xl mx-auto space-y-8">
+      <section className="py-12 md:py-20 px-4 md:px-8 max-w-7xl mx-auto space-y-8">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h2 className="text-3xl md:text-4xl font-bold">Problems Solved</h2>
+            <h2 className="text-2xl md:text-3xl font-bold">Problems Solved</h2>
             <p className="text-muted-foreground mt-2">Real problems. Real solutions that teams actually use.</p>
           </div>
           <Button onClick={toggleAll} variant="outline" data-testid="button-toggle-all-accordions">
@@ -800,7 +802,7 @@ export default function ProjectManagementLanding() {
           {/* Technicians */}
           <div>
             <h3 className="text-xl md:text-2xl font-semibold mb-4 flex items-center gap-2 pt-8">
-              <Wrench className="w-5 h-5 text-orange-600" />
+              <Wrench className="w-5 h-5 text-amber-600" />
               For Rope Access Technicians
             </h3>
             
