@@ -33,6 +33,7 @@ import { canViewSchedule } from "@/lib/permissions";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { BrandingContext } from "@/App";
+import { DoubleBookingWarningDialog } from "@/components/DoubleBookingWarningDialog";
 
 export default function Schedule() {
   const { t, i18n } = useTranslation();
@@ -65,6 +66,14 @@ export default function Schedule() {
   
   // Mobile: collapse availability section by default
   const [availabilityOpen, setAvailabilityOpen] = useState(false);
+  
+  // Double-booking warning dialog state
+  const [conflictDialogOpen, setConflictDialogOpen] = useState(false);
+  const [conflictInfo, setConflictInfo] = useState<{
+    conflicts: Array<{ employeeId: string; employeeName: string; conflictingJob: string }>;
+    pendingAssignment: { jobId: string; employeeIds?: string[]; employeeId?: string; startDate?: string; endDate?: string } | null;
+    assignmentType: 'batch' | 'single';
+  }>({ conflicts: [], pendingAssignment: null, assignmentType: 'batch' });
 
   // Fetch current user
   const { data: currentUserData, isLoading: isLoadingUser } = useQuery<{ user: User }>({
@@ -517,17 +526,28 @@ export default function Schedule() {
 
   // Shared mutation for assigning employee with date range
   const assignEmployeeMutation = useMutation({
-    mutationFn: async ({ jobId, employeeId, startDate, endDate }: { 
+    mutationFn: async ({ jobId, employeeId, startDate, endDate, forceAssignment }: { 
       jobId: string; 
       employeeId: string; 
       startDate?: string; 
-      endDate?: string; 
+      endDate?: string;
+      forceAssignment?: boolean;
     }) => {
       return await apiRequest("POST", `/api/schedule/${jobId}/assign-employee`, { 
         employeeId, 
         startDate, 
-        endDate 
+        endDate,
+        forceAssignment
       });
+    },
+    onMutate: async (variables) => {
+      // Store the variables so we can access them in onError
+      return { 
+        jobId: variables.jobId, 
+        employeeId: variables.employeeId,
+        startDate: variables.startDate,
+        endDate: variables.endDate
+      };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
@@ -539,8 +559,34 @@ export default function Schedule() {
       setSelectedEmployeeForAssignment(null);
       setJobForAssignment(null);
       setAssignmentDates({ startDate: "", endDate: "" });
+      setConflictDialogOpen(false);
+      setConflictInfo({ conflicts: [], pendingAssignment: null, assignmentType: 'batch' });
     },
-    onError: () => {
+    onError: (error: any, _variables, context) => {
+      // Check if this is a conflict error (409)
+      const errorMessage = error?.message || '';
+      if (errorMessage.startsWith('409:')) {
+        try {
+          const jsonStr = errorMessage.substring(4).trim();
+          const errorData = JSON.parse(jsonStr);
+          if (errorData?.conflicts && errorData.conflicts.length > 0) {
+            setConflictInfo({
+              conflicts: errorData.conflicts,
+              pendingAssignment: { 
+                jobId: context?.jobId || '', 
+                employeeId: context?.employeeId,
+                startDate: context?.startDate,
+                endDate: context?.endDate
+              },
+              assignmentType: 'single'
+            });
+            setConflictDialogOpen(true);
+            return;
+          }
+        } catch (e) {
+          // Fall through to default error handling
+        }
+      }
       toast({
         title: "Error",
         description: "Failed to assign employee",
@@ -549,10 +595,14 @@ export default function Schedule() {
     },
   });
 
-  // Mutation to assign/unassign employees via drag and drop (legacy quick assign)
+  // Mutation to assign/unassign employees via drag and drop (uses /api/schedule/:id/assign for conflict detection)
   const quickAssignMutation = useMutation({
-    mutationFn: async ({ jobId, employeeIds }: { jobId: string; employeeIds: string[] }) => {
-      await apiRequest("PUT", `/api/schedule/${jobId}`, { employeeIds });
+    mutationFn: async ({ jobId, employeeIds, forceAssignment }: { jobId: string; employeeIds: string[]; forceAssignment?: boolean }) => {
+      await apiRequest("POST", `/api/schedule/${jobId}/assign`, { employeeIds, forceAssignment });
+    },
+    onMutate: async (variables) => {
+      // Store the variables so we can access them in onError
+      return { jobId: variables.jobId, employeeIds: variables.employeeIds };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
@@ -560,8 +610,32 @@ export default function Schedule() {
         title: t('schedule.assignmentCreated', 'Assignment updated'),
         description: t('schedule.assignmentCreated', 'Employee assignment has been updated'),
       });
+      setConflictDialogOpen(false);
+      setConflictInfo({ conflicts: [], pendingAssignment: null, assignmentType: 'batch' });
     },
-    onError: () => {
+    onError: (error: any, _variables, context) => {
+      // Check if this is a conflict error (409)
+      const errorMessage = error?.message || '';
+      if (errorMessage.startsWith('409:')) {
+        try {
+          const jsonStr = errorMessage.substring(4).trim();
+          const errorData = JSON.parse(jsonStr);
+          if (errorData?.conflicts && errorData.conflicts.length > 0) {
+            // Use context to get the original variables
+            const pendingJobId = context?.jobId || '';
+            const pendingEmployeeIds = context?.employeeIds || [];
+            setConflictInfo({
+              conflicts: errorData.conflicts,
+              pendingAssignment: { jobId: pendingJobId, employeeIds: pendingEmployeeIds },
+              assignmentType: 'batch'
+            });
+            setConflictDialogOpen(true);
+            return;
+          }
+        } catch (e) {
+          // Fall through to default error handling
+        }
+      }
       toast({
         title: t('schedule.error', 'Error'),
         description: t('schedule.error', 'Failed to update assignment'),
@@ -569,6 +643,27 @@ export default function Schedule() {
       });
     },
   });
+  
+  // Handler for proceeding with force assignment after conflict warning
+  const handleForceAssignment = () => {
+    if (!conflictInfo.pendingAssignment) return;
+    
+    if (conflictInfo.assignmentType === 'batch' && conflictInfo.pendingAssignment.employeeIds) {
+      quickAssignMutation.mutate({
+        jobId: conflictInfo.pendingAssignment.jobId,
+        employeeIds: conflictInfo.pendingAssignment.employeeIds,
+        forceAssignment: true
+      });
+    } else if (conflictInfo.assignmentType === 'single' && conflictInfo.pendingAssignment.employeeId) {
+      assignEmployeeMutation.mutate({
+        jobId: conflictInfo.pendingAssignment.jobId,
+        employeeId: conflictInfo.pendingAssignment.employeeId,
+        startDate: conflictInfo.pendingAssignment.startDate,
+        endDate: conflictInfo.pendingAssignment.endDate,
+        forceAssignment: true
+      });
+    }
+  };
 
   // Handle event drag/drop to reschedule jobs
   const handleEventDrop = (dropInfo: any) => {
@@ -1622,6 +1717,18 @@ export default function Schedule() {
         onOpenChange={setEditDialogOpen}
         job={selectedJob}
         employees={employees}
+      />
+
+      {/* Double Booking Warning Dialog */}
+      <DoubleBookingWarningDialog
+        open={conflictDialogOpen}
+        onClose={() => {
+          setConflictDialogOpen(false);
+          setConflictInfo({ conflicts: [], pendingAssignment: null, assignmentType: 'batch' });
+        }}
+        onProceed={handleForceAssignment}
+        conflicts={conflictInfo.conflicts}
+        isPending={quickAssignMutation.isPending || assignEmployeeMutation.isPending}
       />
 
       {/* Shared Assignment Dialog (used by drag-drop and job detail button) */}

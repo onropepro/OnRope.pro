@@ -2277,7 +2277,13 @@
     "assignedTo": "Assigné à",
     "project": "Projet",
     "noEvents": "Aucun événement planifié",
-    "conflictDetected": "Conflit d'horaire détecté"
+    "conflictDetected": "Conflit d'horaire détecté",
+    "doubleBookingWarning": {
+      "title": "Conflit d'horaire détecté",
+      "description": "Les employés suivants sont déjà programmés pour des travaux qui se chevauchent pendant cette période :",
+      "question": "Souhaitez-vous quand même procéder à la double réservation ?",
+      "proceed": "Continuer quand même"
+    }
   },
   "resident": {
     "title": "Portail résident",

@@ -16894,24 +16894,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Forbidden" });
       }
       
-      const { employeeIds } = req.body;
+      const { employeeIds, forceAssignment } = req.body;
       
       if (!Array.isArray(employeeIds)) {
         return res.status(400).json({ message: "employeeIds must be an array" });
       }
       
-      // Check for double-booking conflicts
-      const conflicts = await storage.checkEmployeeConflicts(employeeIds, job.startDate, job.endDate, req.params.id);
-      
-      if (conflicts.length > 0) {
-        return res.status(409).json({ 
-          message: "Schedule conflict detected",
-          conflicts: conflicts.map(c => ({
-            employeeId: c.employeeId,
-            employeeName: c.employeeName,
-            conflictingJob: c.conflictingJobTitle,
-          }))
-        });
+      // Check for double-booking conflicts (unless forceAssignment is true)
+      if (!forceAssignment) {
+        const conflicts = await storage.checkEmployeeConflicts(employeeIds, job.startDate, job.endDate, req.params.id);
+        
+        if (conflicts.length > 0) {
+          return res.status(409).json({ 
+            message: "Schedule conflict detected",
+            conflicts: conflicts.map(c => ({
+              employeeId: c.employeeId,
+              employeeName: c.employeeName,
+              conflictingJob: c.conflictingJobTitle,
+            }))
+          });
+        }
       }
       
       // Remove existing assignments and add new ones
@@ -16979,12 +16981,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Forbidden" });
       }
       
-      const { employeeId, startDate, endDate } = req.body;
+      const { employeeId, startDate, endDate, forceAssignment } = req.body;
       
       console.log("[ASSIGN EMPLOYEE] Received request body:", req.body);
       console.log("[ASSIGN EMPLOYEE] employeeId:", employeeId);
       console.log("[ASSIGN EMPLOYEE] startDate:", startDate);
       console.log("[ASSIGN EMPLOYEE] endDate:", endDate);
+      console.log("[ASSIGN EMPLOYEE] forceAssignment:", forceAssignment);
       
       if (!employeeId) {
         return res.status(400).json({ message: "employeeId is required" });
@@ -16996,6 +16999,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log("[ASSIGN EMPLOYEE] Parsed startDate:", parsedStartDate);
       console.log("[ASSIGN EMPLOYEE] Parsed endDate:", parsedEndDate);
+      
+      // Check for double-booking conflicts (unless forceAssignment is true)
+      if (!forceAssignment) {
+        const checkStartDate = parsedStartDate || job.startDate;
+        const checkEndDate = parsedEndDate || job.endDate;
+        
+        const conflicts = await storage.checkEmployeeConflicts([employeeId], checkStartDate, checkEndDate, req.params.jobId);
+        
+        if (conflicts.length > 0) {
+          return res.status(409).json({ 
+            message: "Schedule conflict detected",
+            conflicts: conflicts.map(c => ({
+              employeeId: c.employeeId,
+              employeeName: c.employeeName,
+              conflictingJob: c.conflictingJobTitle,
+            }))
+          });
+        }
+      }
       
       // Check if assignment already exists
       const existingAssignments = await storage.getJobAssignments(req.params.jobId);

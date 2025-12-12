@@ -2255,7 +2255,13 @@
     "assignedTo": "Assigned To",
     "project": "Project",
     "noEvents": "No events scheduled",
-    "conflictDetected": "Schedule conflict detected"
+    "conflictDetected": "Schedule conflict detected",
+    "doubleBookingWarning": {
+      "title": "Schedule Conflict Detected",
+      "description": "The following employees are already scheduled for overlapping jobs during this time:",
+      "question": "Would you like to proceed with the double-booking anyway?",
+      "proceed": "Proceed Anyway"
+    }
   },
   "resident": {
     "title": "Resident Portal",
