@@ -2847,7 +2847,7 @@ export default function Dashboard() {
       id: "past-projects",
       label: t('dashboard.cards.pastProjects.label', 'Past Projects'),
       description: t('dashboard.cards.pastProjects.description', 'Completed work'),
-      icon: "done_all",
+      icon: "task_alt",
       onClick: () => handleTabChange("past-projects"),
       testId: "button-nav-past-projects",
       isVisible: () => true, // Everyone
@@ -2892,7 +2892,7 @@ export default function Dashboard() {
       id: "performance",
       label: t('dashboard.cards.performance.label', 'Performance'),
       description: t('dashboard.cards.performance.description', 'View analytics'),
-      icon: "analytics",
+      icon: "bar_chart",
       onClick: () => handleTabChange("performance"),
       testId: "button-nav-performance",
       isVisible: (user: any) => canViewPerformance(user), // Management only
@@ -2925,7 +2925,7 @@ export default function Dashboard() {
       id: "safety-forms",
       label: t('dashboard.cards.safetyForms.label', 'Safety Forms'),
       description: t('dashboard.cards.safetyForms.description', 'Safety meeting'),
-      icon: "group",
+      icon: "groups",
       onClick: () => setLocation("/safety-forms"),
       testId: "button-safety-forms",
       isVisible: () => true, // Everyone
@@ -2958,7 +2958,7 @@ export default function Dashboard() {
       id: "schedule",
       label: t('dashboard.cards.schedule.label', 'Job Schedule'),
       description: t('dashboard.cards.schedule.description', 'Team assignments'),
-      icon: "event",
+      icon: "calendar_today",
       onClick: () => setLocation("/schedule"),
       testId: "button-schedule",
       isVisible: (user: any) => canViewSchedule(user), // Schedule permission
