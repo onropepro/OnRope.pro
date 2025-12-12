@@ -14366,6 +14366,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             status: review?.signedAt ? 'signed' : (review?.viewedAt ? 'viewed' : 'pending'),
             viewedAt: review?.viewedAt || null,
             signedAt: review?.signedAt || null,
+            signatureDataUrl: review?.signatureDataUrl || null,
           };
         });
         
