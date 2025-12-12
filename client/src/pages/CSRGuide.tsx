@@ -161,6 +161,10 @@ export default function CSRGuide() {
             <h2 className="text-xl md:text-2xl font-semibold">CSR Visibility</h2>
           </div>
 
+          <p className="text-muted-foreground mb-4">
+            Click the CSR badge in your dashboard header to view your detailed safety rating breakdown.
+          </p>
+
           <div className="grid gap-4 md:grid-cols-2">
             <Card>
               <CardHeader className="pb-2">
@@ -169,12 +173,12 @@ export default function CSRGuide() {
                   Property Manager View
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-base">
+              <CardContent className="text-base space-y-3">
+                <p className="text-muted-foreground">Property managers see your CSR when reviewing vendors:</p>
                 <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                  <li>Overall CSR percentage displayed</li>
-                  <li>Detailed breakdown by category</li>
-                  <li>Color-coded progress bars</li>
-                  <li>Access via "My Vendors" dashboard</li>
+                  <li>Overall CSR percentage badge (color indicates rating level)</li>
+                  <li>Breakdown by category with individual scores</li>
+                  <li>Access through their "My Vendors" dashboard</li>
                 </ul>
               </CardContent>
             </Card>
@@ -186,16 +190,49 @@ export default function CSRGuide() {
                   Company Dashboard
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-base">
+              <CardContent className="text-base space-y-3">
+                <p className="text-muted-foreground">Your internal CSR dialog shows:</p>
                 <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                  <li>Real-time compliance status indicators</li>
-                  <li>Quick actions to address gaps</li>
-                  <li>Category-by-category breakdown</li>
-                  <li>Trend tracking over time</li>
+                  <li>Overall score with large percentage display</li>
+                  <li>5 category breakdowns with color-coded progress bars</li>
+                  <li>Specific metrics (e.g., "3 of 7 work days covered")</li>
+                  <li>Prioritized improvement tips to boost your score</li>
                 </ul>
               </CardContent>
             </Card>
           </div>
+
+          <Card className="mt-4 bg-muted/50">
+            <CardContent className="pt-4">
+              <div className="flex items-start gap-3">
+                <Info className="w-5 h-5 text-muted-foreground mt-0.5" />
+                <div>
+                  <p className="font-semibold">Color-Coded Progress Bars</p>
+                  <p className="text-base text-muted-foreground mt-1">
+                    Each category displays a progress bar that changes color based on your performance:
+                  </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3 text-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-green-500" />
+                      <span className="text-muted-foreground">90-100% (Excellent)</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                      <span className="text-muted-foreground">70-89% (Good)</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-orange-500" />
+                      <span className="text-muted-foreground">50-69% (Warning)</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-red-500" />
+                      <span className="text-muted-foreground">Below 50% (Critical)</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </section>
 
         <Separator />
