@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Building2, Plus, Mail, Phone, LogOut, Settings, FileText, Download, AlertCircle, CheckCircle2, Clock, Upload, FileCheck, Trash2, User, Shield, Users } from "lucide-react";
+import { InstallPWAButton } from "@/components/InstallPWAButton";
 import { formatLocalDate, formatTimestampDate, formatTime, formatDurationMs } from "@/lib/dateUtils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
@@ -603,17 +604,19 @@ export default function PropertyManager() {
               {t('propertyManager.description', 'Manage your connected rope access companies and view their information')}
             </p>
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                data-testid="button-profile" 
-                className="hover-elevate h-12 w-12"
-              >
-                <User className="w-6 h-6" />
-              </Button>
-            </DropdownMenuTrigger>
+          <div className="flex items-center gap-2">
+            <InstallPWAButton />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  data-testid="button-profile" 
+                  className="hover-elevate h-12 w-12"
+                >
+                  <User className="w-6 h-6" />
+                </Button>
+              </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuItem 
                 onClick={() => {
@@ -639,7 +642,8 @@ export default function PropertyManager() {
                 {t('propertyManager.menu.logout', 'Log Out')}
               </DropdownMenuItem>
             </DropdownMenuContent>
-          </DropdownMenu>
+            </DropdownMenu>
+          </div>
         </div>
 
         <Card className="mb-6" data-testid="card-my-vendors">

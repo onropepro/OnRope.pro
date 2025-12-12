@@ -43,6 +43,7 @@ import { isManagement, hasFinancialAccess, canManageEmployees, canViewPerformanc
 import { DocumentUploader } from "@/components/DocumentUploader";
 import { RefreshButton } from "@/components/RefreshButton";
 import { CSRBadge } from "@/components/CSRBadge";
+import { InstallPWAButton } from "@/components/InstallPWAButton";
 import { formatLocalDate, formatLocalDateLong, formatTimestampDate, formatTimestampDateShort, formatTimestampDateMedium, parseLocalDate, formatLocalDateMedium, formatDurationMs } from "@/lib/dateUtils";
 import { QRCodeSVG } from 'qrcode.react';
 import { trackLogout, trackWorkSessionStart, trackWorkSessionEnd, trackProjectCreated, trackClientAdded, trackBuildingAdded, trackEmployeeAdded } from "@/lib/analytics";
@@ -3178,6 +3179,8 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
+            {/* Install PWA Button */}
+            <InstallPWAButton />
             {/* My Account Button */}
             {currentUser?.role === 'company' && (
               <Button

@@ -21,6 +21,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { isReadOnly } from "@/lib/permissions";
 import { formatTimestampDate } from "@/lib/dateUtils";
+import { InstallPWAButton } from "@/components/InstallPWAButton";
 
 const complaintSchema = z.object({
   residentName: z.string().min(1, "Name is required"),
@@ -317,7 +318,7 @@ export default function ResidentDashboard() {
             </h1>
           </div>
           <div className="flex items-center gap-2">
-
+            <InstallPWAButton />
             <Button variant="ghost" size="icon" onClick={() => setLocation("/profile")} data-testid="button-profile">
               <span className="material-icons">person</span>
             </Button>
@@ -713,6 +714,7 @@ export default function ResidentDashboard() {
                   ? `${projectData.floorCount} Units`
                   : `${projectData.floorCount} Floors`}
               </Badge>
+              <InstallPWAButton />
               <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-profile" onClick={() => setLocation("/profile")}>
                 <span className="material-icons">person</span>
               </Button>
