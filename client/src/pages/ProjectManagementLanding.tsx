@@ -136,7 +136,7 @@ export default function ProjectManagementLanding() {
       </section>
 
       {/* The Pain Section */}
-      <section className="py-12 md:py-20 px-4 md:px-8 max-w-7xl mx-auto">
+      <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto">
         <div className="space-y-6">
           <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950 rounded-2xl shadow-md">
             <CardHeader>
@@ -153,7 +153,7 @@ export default function ProjectManagementLanding() {
       <Separator className="my-8" />
 
       {/* What Changes Section */}
-      <section className="py-12 md:py-20 px-4 md:px-8 max-w-7xl mx-auto space-y-8">
+      <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto space-y-8">
         <div>
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Every Project. Every Elevation. Every Technician. One Screen.</h2>
           <p className="text-muted-foreground leading-relaxed">
@@ -174,7 +174,7 @@ export default function ProjectManagementLanding() {
 
       {/* Software in Action Image */}
       <section className="py-12 md:py-20 px-4 md:px-8">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <div className="relative rounded-xl overflow-hidden shadow-2xl">
             <img 
               src={ropeAccessSoftwareImg} 
@@ -194,7 +194,7 @@ export default function ProjectManagementLanding() {
       <Separator className="my-8" />
 
       {/* Key Features */}
-      <section className="py-12 md:py-20 px-4 md:px-8 max-w-7xl mx-auto space-y-8">
+      <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto space-y-8">
         <div>
           <h2 className="text-2xl md:text-3xl font-bold flex items-center gap-2 mb-6">
             <Sparkles className="w-5 h-5 text-[#0B64A3]" />
@@ -368,7 +368,7 @@ export default function ProjectManagementLanding() {
       <Separator className="my-8" />
 
       {/* Module Integration Points */}
-      <section className="py-12 md:py-20 px-4 md:px-8 max-w-7xl mx-auto space-y-8">
+      <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto space-y-8">
         <div>
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Talks To Everything Else</h2>
           <p className="text-muted-foreground leading-relaxed mb-8">

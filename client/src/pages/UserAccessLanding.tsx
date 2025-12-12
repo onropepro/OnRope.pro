@@ -157,7 +157,7 @@ export default function UserAccessLanding() {
       </section>
 
       {/* Key Features */}
-      <section className="py-16 md:py-20 px-4 max-w-5xl mx-auto space-y-8">
+      <section className="py-16 md:py-20 px-4 max-w-4xl mx-auto space-y-8">
         <div>
           <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-6">
             <Sparkles className="w-5 h-5 text-blue-600 dark:text-blue-400" />
@@ -270,7 +270,7 @@ export default function UserAccessLanding() {
       <Separator className="my-8" />
 
       {/* Module Integration Points */}
-      <section className="py-16 md:py-20 px-4 max-w-5xl mx-auto space-y-8">
+      <section className="py-16 md:py-20 px-4 max-w-4xl mx-auto space-y-8">
         <div>
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Permissions Flow Through Everything</h2>
           <p className="text-muted-foreground leading-relaxed text-base mb-8">

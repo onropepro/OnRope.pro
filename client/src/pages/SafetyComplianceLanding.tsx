@@ -198,7 +198,7 @@ export default function SafetyComplianceLanding() {
 
       {/* Solution Section */}
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
             What This Module Does
           </h2>
@@ -399,7 +399,7 @@ export default function SafetyComplianceLanding() {
       </section>
 
       {/* Key Features */}
-      <section className="py-16 md:py-20 px-4 max-w-5xl mx-auto space-y-8">
+      <section className="py-16 md:py-20 px-4 max-w-4xl mx-auto space-y-8">
         <div>
           <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-6">
             <Sparkles className="w-5 h-5 text-sky-600 dark:text-sky-400" />
@@ -513,7 +513,7 @@ export default function SafetyComplianceLanding() {
 
       {/* Features Grid */}
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
             Everything You Need
           </h2>
@@ -558,7 +558,7 @@ export default function SafetyComplianceLanding() {
 
       {/* Quantified Benefits */}
       <section className="py-16 md:py-20 px-4">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
             Measurable Results
           </h2>
