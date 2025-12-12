@@ -1121,6 +1121,7 @@ export default function TechnicianLogin() {
           </Button>
         </div>
       )}
+      </div>
 
       {/* Login Dialog */}
       <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>

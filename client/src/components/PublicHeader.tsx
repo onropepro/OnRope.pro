@@ -107,7 +107,7 @@ export function PublicHeader({ activeNav = null }: PublicHeaderProps) {
           <Button
             variant={activeNav === 'property-manager' ? 'default' : 'ghost'}
             className="text-sm font-medium"
-            onClick={() => setLocation("#")}
+            onClick={() => setLocation("/changelog/property-manager")}
             data-testid="nav-property-manager"
           >
             Property Manager
@@ -115,7 +115,7 @@ export function PublicHeader({ activeNav = null }: PublicHeaderProps) {
           <Button
             variant={activeNav === 'resident' ? 'default' : 'ghost'}
             className="text-sm font-medium"
-            onClick={() => setLocation("/link")}
+            onClick={() => setLocation("/changelog/resident-portal")}
             data-testid="nav-resident"
           >
             Resident
@@ -137,12 +137,24 @@ export function PublicHeader({ activeNav = null }: PublicHeaderProps) {
             <Button
               variant={activeNav === 'modules' ? 'default' : 'ghost'}
               className="text-sm font-medium"
+              onClick={() => setShowModulesMenu(!showModulesMenu)}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') {
+                  setShowModulesMenu(false);
+                }
+              }}
+              aria-expanded={showModulesMenu}
+              aria-haspopup="menu"
               data-testid="nav-modules"
             >
               Modules
             </Button>
             {showModulesMenu && (
-              <div className="absolute top-full right-0 mt-1 bg-background border rounded-xl shadow-xl p-4 w-[480px] z-50">
+              <div 
+                className="absolute top-full right-0 mt-1 bg-background border rounded-xl shadow-xl p-4 w-[480px] z-50"
+                role="menu"
+                aria-label="Modules menu"
+              >
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
