@@ -214,7 +214,7 @@ export default function EmployeeManagementGuide() {
                   <div>
                     <h3 className="text-xl md:text-2xl font-semibold">Compensation Setup</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Configure hourly rate for payroll calculations. Toggle between hourly and peace work compensation types as needed.
+                      Configure hourly rate for payroll calculations. Toggle between hourly and piece work compensation types as needed.
                     </p>
                   </div>
                 </div>
@@ -342,7 +342,7 @@ export default function EmployeeManagementGuide() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Settings className="w-4 h-4 text-muted-foreground" />
-                  <span>Hourly vs Peace Work</span>
+                  <span>Hourly vs Piece Work</span>
                 </div>
               </CardContent>
             </Card>

@@ -4246,10 +4246,10 @@ export default function Dashboard() {
                             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                               <div className="space-y-0.5">
                                 <FormLabel className="text-base">
-                                  {t('dashboard.projectForm.peaceWork', 'Peace Work')}
+                                  {t('dashboard.projectForm.peaceWork', 'Piece Work')}
                                 </FormLabel>
                                 <FormDescription className="text-xs">
-                                  {t('dashboard.projectForm.peaceWorkDesc', 'Enable peace work mode for this project')}
+                                  {t('dashboard.projectForm.peaceWorkDesc', 'Enable piece work mode for this project')}
                                 </FormDescription>
                               </div>
                               <FormControl>
