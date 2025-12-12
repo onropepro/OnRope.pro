@@ -75,7 +75,6 @@ export default function UserAccessLanding() {
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
       <PublicHeader activeNav="modules" />
-
       {/* Hero Section */}
       <section className="relative text-white pb-[120px]" style={{backgroundImage: 'linear-gradient(135deg, #0B64A3 0%, #0369A1 100%)'}}>
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMtOS45NDEgMC0xOCA4LjA1OS0xOCAxOHM4LjA1OSAxOCAxOCAxOGM5Ljk0MSAwIDE4LTguMDU5IDE4LTE4cy04LjA1OS0xOC0xOC0xOHptMCAzMmMtNy43MzIgMC0xNC02LjI2OC0xNC0xNHM2LjI2OC0xNCAxNC0xNHMxNCA2LjI2OCAxNCAxNC02LjI2OCAxNC0xNCAxNHoiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wMykiLz48L2c+PC9zdmc+')] opacity-30"></div>
@@ -122,7 +121,6 @@ export default function UserAccessLanding() {
           </svg>
         </div>
       </section>
-
       {/* Stats Panel */}
       <section className="relative bg-white dark:bg-slate-950 -mt-px overflow-visible">
         <div className="max-w-3xl mx-auto px-4 pt-4 pb-12">
@@ -155,9 +153,7 @@ export default function UserAccessLanding() {
           </Card>
         </div>
       </section>
-
       <Separator className="my-8" />
-
       {/* Problem Section */}
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
@@ -187,18 +183,14 @@ export default function UserAccessLanding() {
           </Card>
         </div>
       </section>
-
       <Separator className="my-0" />
-
       {/* Features Section */}
       <section id="features" className="pt-8 md:pt-12 pb-16 md:pb-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
             Control What Each Person Can Access
           </h2>
-          <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-            Enterprise-grade permission controls built for small operations.
-          </p>
+          <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">Enterprise-grade permission controls built for rope access operations.</p>
 
           <div className="grid md:grid-cols-3 gap-6">
             {/* Granular Permissions */}
@@ -371,9 +363,7 @@ export default function UserAccessLanding() {
           </div>
         </div>
       </section>
-
       <Separator className="my-8" />
-
       {/* Key Features */}
       <section className="py-16 md:py-20 px-4 max-w-4xl mx-auto space-y-8">
         <div>
@@ -484,9 +474,7 @@ export default function UserAccessLanding() {
           </div>
         </div>
       </section>
-
       <Separator className="my-8" />
-
       {/* Module Integration Points */}
       <section className="py-16 md:py-20 px-4 max-w-4xl mx-auto space-y-8">
         <div>
@@ -548,7 +536,6 @@ export default function UserAccessLanding() {
           </div>
         </div>
       </section>
-
       {/* Problems Solved Section */}
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
@@ -704,7 +691,6 @@ export default function UserAccessLanding() {
           </Accordion>
         </div>
       </section>
-
       {/* Technical Credibility Section */}
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-4xl mx-auto">
@@ -766,7 +752,6 @@ export default function UserAccessLanding() {
           </div>
         </div>
       </section>
-
       {/* Module Integration Section */}
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
@@ -830,7 +815,6 @@ export default function UserAccessLanding() {
           </div>
         </div>
       </section>
-
       {/* CTA Section */}
       <section className="py-16 md:py-20 px-4 text-white" style={{backgroundImage: 'linear-gradient(135deg, #0B64A3 0%, #0369A1 100%)'}}>
         <div className="max-w-3xl mx-auto text-center space-y-6">
@@ -857,7 +841,6 @@ export default function UserAccessLanding() {
           </div>
         </div>
       </section>
-
       {/* Footer */}
       <footer className="py-8 px-4 border-t">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
