@@ -3,10 +3,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
+import { PublicHeader } from "@/components/PublicHeader";
 import ropeAccessSoftwareImg from "@assets/rope-access-software_1765481835892.jpg";
+import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import {
   Briefcase,
   CheckCircle2,
@@ -47,8 +48,6 @@ const ALL_ACCORDION_ITEMS = [
 export default function ProjectManagementLanding() {
   const [expandedProblems, setExpandedProblems] = useState<string[]>([]);
   const [, setLocation] = useLocation();
-  const [showModulesMenu, setShowModulesMenu] = useState(false);
-  const modulesMenuRef = useRef<HTMLDivElement>(null);
   const allExpanded = expandedProblems.length === ALL_ACCORDION_ITEMS.length;
 
   const toggleAll = () => {
@@ -59,120 +58,9 @@ export default function ProjectManagementLanding() {
     }
   };
 
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (modulesMenuRef.current && !modulesMenuRef.current.contains(e.target as Node)) {
-        setShowModulesMenu(false);
-      }
-    };
-    
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
-      {/* Header */}
-      <header className="sticky top-0 z-40 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Link href="/">
-            <img src={onRopeProLogo} alt="OnRopePro" className="h-8 object-contain cursor-pointer" />
-          </Link>
-          
-          <nav className="hidden md:flex items-center gap-1">
-            <Button variant="ghost" className="text-sm font-medium" onClick={() => setLocation("/")} data-testid="nav-employer">Employer</Button>
-            <Button variant="ghost" className="text-sm font-medium" onClick={() => setLocation("/")} data-testid="nav-technician">Technician</Button>
-            <Button variant="ghost" className="text-sm font-medium" onClick={() => setLocation("#")} data-testid="nav-property-manager">Property Manager</Button>
-            <Button variant="ghost" className="text-sm font-medium" onClick={() => setLocation("/link")} data-testid="nav-resident">Resident</Button>
-            <Button variant="ghost" className="text-sm font-medium" onClick={() => setLocation("/building-portal")} data-testid="nav-building-manager">Building Manager</Button>
-            <div 
-              className="relative pb-2" 
-              ref={modulesMenuRef}
-              onMouseEnter={() => setShowModulesMenu(true)}
-              onMouseLeave={() => setShowModulesMenu(false)}
-            >
-              <Button
-                variant="ghost"
-                className="text-sm font-medium"
-                data-testid="nav-modules"
-              >
-                Modules
-              </Button>
-              {showModulesMenu && (
-                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-0 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl p-4 w-[480px] z-50">
-                  <div className="grid grid-cols-2 gap-3">
-                    <button
-                      className="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors text-left group"
-                      onClick={() => {
-                        setLocation("/modules/safety-compliance");
-                        setShowModulesMenu(false);
-                      }}
-                      data-testid="nav-safety-compliance"
-                    >
-                      <div className="w-10 h-10 rounded-lg bg-sky-100 dark:bg-sky-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                        <Shield className="w-5 h-5 text-sky-600" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-sm">Safety & Compliance</div>
-                        <div className="text-xs text-muted-foreground mt-0.5">Harness inspections, toolbox meetings, audit-ready exports</div>
-                      </div>
-                    </button>
-                    <button
-                      className="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors text-left group"
-                      onClick={() => {
-                        setLocation("/modules/user-access-authentication");
-                        setShowModulesMenu(false);
-                      }}
-                      data-testid="nav-user-access"
-                    >
-                      <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                        <Lock className="w-5 h-5 text-blue-600" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-sm">User Access & Authentication</div>
-                        <div className="text-xs text-muted-foreground mt-0.5">Granular permissions, role-based access, audit trails</div>
-                      </div>
-                    </button>
-                    <button
-                      className="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors text-left group col-span-2"
-                      onClick={() => {
-                        setLocation("/modules/project-management");
-                        setShowModulesMenu(false);
-                      }}
-                      data-testid="nav-project-management"
-                    >
-                      <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                        <Briefcase className="w-5 h-5 text-emerald-600" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-sm">Project Management</div>
-                        <div className="text-xs text-muted-foreground mt-0.5">4-elevation tracking, real-time dashboards, crew scheduling</div>
-                      </div>
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </nav>
-          
-          <div className="flex items-center gap-3">
-            <Button 
-              variant="ghost"
-              onClick={() => setLocation("/")}
-              data-testid="button-sign-in-header"
-            >
-              Sign In
-            </Button>
-            <Button 
-              onClick={() => setLocation("/pricing")}
-              className="bg-[#A3320B]"
-              data-testid="button-get-started-header"
-            >
-              Get Started
-            </Button>
-          </div>
-        </div>
-      </header>
+      <PublicHeader activeNav="modules" />
 
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-900 text-white py-24 md:py-32">
