@@ -6172,134 +6172,91 @@ export default function Documents() {
               </CardContent>
             </Card>
 
-            {/* Template Safe Work Practices - Collapsible */}
-            <Collapsible defaultOpen={false} className="group">
-              <Card className="mb-6 overflow-visible">
-                <CollapsibleTrigger className="w-full text-left" data-testid="toggle-safety-practice-templates">
-                  <CardHeader className="bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent pb-4 cursor-pointer hover-elevate rounded-t-lg">
-                    <div className="flex items-start gap-4">
-                      <div className="p-3 bg-amber-500/10 rounded-xl ring-1 ring-amber-500/20">
-                        <BookOpen className="h-6 w-6 text-amber-600 dark:text-amber-400" />
-                      </div>
-                      <div className="flex-1">
-                        <CardTitle className="text-xl mb-1">General Safety Practice Templates</CardTitle>
-                        <p className="text-sm text-muted-foreground">
-                          Pre-built templates covering essential safety topics for rope access operations
-                        </p>
-                      </div>
-                      <ChevronDown className="h-5 w-5 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180 mt-2" />
+            {/* Available Template Safe Work Practices (not yet added) - matching SWP style */}
+            {canUploadDocuments && availablePracticeTemplates.length > 0 && (
+              <Card className="mb-6 overflow-hidden">
+                <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-primary/10 rounded-xl ring-1 ring-primary/20">
+                      <Plus className="h-6 w-6 text-primary" />
                     </div>
-                  </CardHeader>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <CardContent className="pt-6">
-                    <div className="grid gap-4 md:grid-cols-2">
-                      {SAFE_WORK_PRACTICES.map((practice) => (
-                        <Card key={practice.id} className="overflow-hidden">
-                          <CardHeader className="pb-2">
-                            <div className="flex items-start gap-3">
-                              <div className="p-2 bg-amber-500/10 rounded-lg">
-                                <practice.icon className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                    <div className="flex-1">
+                      <CardTitle className="text-xl mb-1">Available Templates</CardTitle>
+                      <p className="text-sm text-muted-foreground">
+                        Add these general safety practice templates. Employees will be automatically enrolled to review and sign them.
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary" className="text-base font-semibold px-3">
+                        {availablePracticeTemplates.length}
+                      </Badge>
+                      <Button
+                        size="sm"
+                        onClick={handleAddAllPracticeTemplates}
+                        disabled={initPracticeTemplatesMutation.isPending}
+                        data-testid="button-add-all-practice-templates"
+                      >
+                        {initPracticeTemplatesMutation.isPending ? (
+                          <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                        ) : (
+                          <Plus className="h-4 w-4 mr-1" />
+                        )}
+                        Add All
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {availablePracticeTemplates.map((practice) => (
+                      <Card key={practice.id} className="overflow-hidden hover-elevate border-dashed">
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-2">
+                                <Shield className="h-4 w-4 text-primary flex-shrink-0" />
+                                <h3 className="font-semibold text-sm truncate">{practice.title}</h3>
                               </div>
-                              <div className="flex-1 min-w-0">
-                                <CardTitle className="text-sm font-medium">{practice.title}</CardTitle>
-                                <CardDescription className="text-xs mt-1 line-clamp-2">
-                                  {practice.description}
-                                </CardDescription>
-                              </div>
-                            </div>
-                          </CardHeader>
-                          <CardContent className="pt-2">
-                            <div className="flex flex-wrap gap-1 mb-3">
-                              {getPracticeTopics(practice).slice(0, 3).map((topic, idx) => (
-                                <Badge key={idx} variant="secondary" className="text-xs">
-                                  {topic}
-                                </Badge>
-                              ))}
-                              {getPracticeTopics(practice).length > 3 && (
+                              <p className="text-xs text-muted-foreground line-clamp-2 mb-3">
+                                {practice.description}
+                              </p>
+                              <div className="flex flex-wrap gap-1.5">
                                 <Badge variant="outline" className="text-xs">
-                                  +{getPracticeTopics(practice).length - 3} more
+                                  {practice.keyPrinciples.length} Principles
                                 </Badge>
-                              )}
+                                <Badge variant="outline" className="text-xs">
+                                  {getPracticeTopics(practice).length} Topics
+                                </Badge>
+                              </div>
                             </div>
                             <div className="flex flex-col gap-2">
-                              <div className="flex gap-2">
-                                <Dialog>
-                                  <DialogTrigger asChild>
-                                    <Button size="sm" variant="outline" className="flex-1" data-testid={`preview-swpractice-${practice.id}`}>
-                                      <Eye className="h-3 w-3 mr-1" />
-                                      Preview
-                                    </Button>
-                                  </DialogTrigger>
-                                  <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-                                    <DialogHeader>
-                                      <DialogTitle className="flex items-center gap-2">
-                                        <practice.icon className="h-5 w-5 text-amber-600" />
-                                        {practice.title}
-                                      </DialogTitle>
-                                      <DialogDescription>{practice.description}</DialogDescription>
-                                    </DialogHeader>
-                                    <div className="space-y-4 mt-4">
-                                      <div>
-                                        <h4 className="font-medium text-sm mb-2">Key Principles</h4>
-                                        <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
-                                          {practice.keyPrinciples.map((principle, idx) => (
-                                            <li key={idx}>{principle}</li>
-                                          ))}
-                                        </ul>
-                                      </div>
-                                      <div>
-                                        <h4 className="font-medium text-sm mb-2">Content</h4>
-                                        <div className="text-sm text-muted-foreground whitespace-pre-wrap bg-muted/30 p-4 rounded-lg">
-                                          {getPracticeContent(practice)}
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <DialogFooter className="mt-4">
-                                      <Button variant="outline" onClick={() => generateSafeWorkPracticePDF(practice, { companyName: currentUser?.companyName, whitelabelBrandingActive: currentUser?.whitelabelBrandingActive })} data-testid={`download-preview-swpractice-${practice.id}`}>
-                                        <Download className="h-4 w-4 mr-2" />
-                                        Download PDF
-                                      </Button>
-                                    </DialogFooter>
-                                  </DialogContent>
-                                </Dialog>
-                                <Button size="sm" variant="outline" onClick={() => generateSafeWorkPracticePDF(practice, { companyName: currentUser?.companyName, whitelabelBrandingActive: currentUser?.whitelabelBrandingActive })} data-testid={`download-swpractice-${practice.id}`}>
-                                  <Download className="h-3 w-3 mr-1" />
-                                  PDF
-                                </Button>
-                              </div>
-                              {canUploadDocuments && (
-                                existingPracticeTemplateIds.has(`swpractice_${practice.id}`) ? (
-                                  <Badge variant="secondary" className="bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-xs justify-center py-1">
-                                    <CheckCircle2 className="h-3 w-3 mr-1" />
-                                    Added to Your Documents
-                                  </Badge>
-                                ) : (
-                                  <Button 
-                                    size="sm" 
-                                    onClick={() => handleAddPracticeTemplate(practice)}
-                                    disabled={initPracticeTemplatesMutation.isPending}
-                                    className="w-full"
-                                    data-testid={`add-swpractice-${practice.id}`}
-                                  >
-                                    {initPracticeTemplatesMutation.isPending ? (
-                                      <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                                    ) : (
-                                      <Plus className="h-3 w-3 mr-1" />
-                                    )}
-                                    Use This Template
-                                  </Button>
-                                )
-                              )}
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => generateSafeWorkPracticePDF(practice, { companyName: currentUser?.companyName, whitelabelBrandingActive: currentUser?.whitelabelBrandingActive })}
+                                data-testid={`preview-swpractice-${practice.id}`}
+                              >
+                                <Eye className="h-4 w-4 mr-1" />
+                                Preview
+                              </Button>
+                              <Button
+                                size="sm"
+                                onClick={() => handleAddPracticeTemplate(practice)}
+                                disabled={initPracticeTemplatesMutation.isPending}
+                                data-testid={`add-swpractice-${practice.id}`}
+                              >
+                                <Plus className="h-4 w-4 mr-1" />
+                                Add
+                              </Button>
                             </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  </CardContent>
-                </CollapsibleContent>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </CardContent>
               </Card>
-            </Collapsible>
+            )}
 
             <div className="p-4 bg-muted/50 rounded-lg">
               <div className="flex items-start gap-3">
