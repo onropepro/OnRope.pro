@@ -37,6 +37,7 @@ import {
   DollarSign
 } from "lucide-react";
 import { TechnicianRegistration } from "@/components/TechnicianRegistration";
+import { InstallPWAButton } from "@/components/InstallPWAButton";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
@@ -448,13 +449,16 @@ export default function TechnicianLogin() {
                 </Button>
               </nav>
             </div>
-            <Button
-              variant="outline"
-              onClick={() => setShowLoginDialog(true)}
-              data-testid="button-sign-in"
-            >
-              Sign In
-            </Button>
+            <div className="flex items-center gap-2">
+              <InstallPWAButton />
+              <Button
+                variant="outline"
+                onClick={() => setShowLoginDialog(true)}
+                data-testid="button-sign-in"
+              >
+                Sign In
+              </Button>
+            </div>
           </div>
         </header>
 
