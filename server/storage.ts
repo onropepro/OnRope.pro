@@ -100,55 +100,6 @@ export class Storage {
     return bcrypt.compare(plainPassword, hashedPassword);
   }
 
-  async getUserByOAuthId(oauthId: string): Promise<User | undefined> {
-    const result = await db.select().from(users).where(eq(users.oauthId, oauthId)).limit(1);
-    return result[0] ? decryptSensitiveFields(result[0]) : undefined;
-  }
-
-  async findOrCreateOAuthUser(params: {
-    oauthId: string;
-    email: string | null;
-    firstName: string | null;
-    lastName: string | null;
-    profileImageUrl: string | null;
-  }): Promise<User> {
-    const { oauthId, email, firstName, lastName, profileImageUrl } = params;
-
-    const existingByOAuth = await this.getUserByOAuthId(oauthId);
-    if (existingByOAuth) {
-      return existingByOAuth;
-    }
-
-    if (email) {
-      const existingByEmail = await this.getUserByEmail(email);
-      if (existingByEmail) {
-        const [updated] = await db.update(users)
-          .set({
-            oauthId,
-            profileImageUrl: profileImageUrl || existingByEmail.profileImageUrl,
-          })
-          .where(eq(users.id, existingByEmail.id))
-          .returning();
-        return decryptSensitiveFields(updated);
-      }
-    }
-
-    const name = [firstName, lastName].filter(Boolean).join(' ') || email || 'OAuth User';
-    const oauthPlaceholderPassword = await bcrypt.hash(`OAUTH_${oauthId}_NO_PASSWORD`, SALT_ROUNDS);
-
-    const [newUser] = await db.insert(users).values({
-      email,
-      name,
-      role: 'rope_access_tech',
-      passwordHash: oauthPlaceholderPassword,
-      oauthId,
-      oauthProvider: 'replit',
-      profileImageUrl,
-    }).returning();
-
-    return decryptSensitiveFields(newUser);
-  }
-
   async getAllEmployees(companyId: string): Promise<(User & { connectionStatus?: string })[]> {
     // Get all employees created by this company (exclude residents and company owner)
     // Include BOTH:
