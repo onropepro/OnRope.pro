@@ -14,7 +14,6 @@ import {
   Users,
   ArrowRight,
   Eye,
-  EyeOff,
   Building2,
   UserCheck,
   Key,
@@ -28,14 +27,18 @@ import {
   BarChart3,
   Calendar,
   DollarSign,
-  UserX,
-  AlertTriangle,
   Database,
   ShieldCheck,
   Sparkles,
   UserCog,
   History,
-  Filter
+  MessageSquare,
+  Clock,
+  Search,
+  UserPlus,
+  TrendingUp,
+  Zap,
+  ChevronRight
 } from "lucide-react";
 
 export default function UserAccessLanding() {
@@ -75,6 +78,7 @@ export default function UserAccessLanding() {
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
       <PublicHeader activeNav="modules" />
+      
       {/* Hero Section */}
       <section className="relative text-white pb-[120px]" style={{backgroundImage: 'linear-gradient(135deg, #0B64A3 0%, #0369A1 100%)'}}>
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMtOS45NDEgMC0xOCA4LjA1OS0xOCAxOHM4LjA1OSAxOCAxOCAxOGM5Ljk0MSAwIDE4LTguMDU5IDE4LTE4cy04LjA1OS0xOC0xOC0xOHptMCAzMmMtNy43MzIgMC0xNC02LjI2OC0xNC0xNHM2LjI2OC0xNCAxNC0xNHMxNCA2LjI2OCAxNCAxNC02LjI2OCAxNC0xNCAxNHoiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wMykiLz48L2c+PC9zdmc+')] opacity-30"></div>
@@ -92,9 +96,8 @@ export default function UserAccessLanding() {
             </h1>
             
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              Grant project creation, employee scheduling, and safety<br />
-              compliance access to the people who need it.<br />
-              <strong>Keep hourly rates, labor costs, and profit margins visible only to you.</strong>
+              Assign project creation, scheduling, and safety compliance to the people who need it. Keep hourly rates, labor costs, and profit margins visible only to you.<br />
+              <strong>One system. Clear boundaries. Zero compromises.</strong>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
@@ -105,7 +108,7 @@ export default function UserAccessLanding() {
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-hero-demo">
-                <Link href="#knowledgebase">
+                <Link href="#faqs">
                   Find Answers
                   <BookOpen className="ml-2 w-5 h-5" />
                 </Link>
@@ -114,13 +117,14 @@ export default function UserAccessLanding() {
           </div>
         </div>
         
-        {/* Wave separator - positioned to overlap with white section below */}
+        {/* Wave separator */}
         <div className="absolute bottom-0 left-0 right-0 z-10">
           <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto block">
             <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" className="fill-white dark:fill-slate-950"/>
           </svg>
         </div>
       </section>
+
       {/* Stats Panel */}
       <section className="relative bg-white dark:bg-slate-950 -mt-px overflow-visible">
         <div className="max-w-3xl mx-auto px-4 pt-4 pb-12">
@@ -153,8 +157,10 @@ export default function UserAccessLanding() {
           </Card>
         </div>
       </section>
+
       <Separator className="my-8" />
-      {/* Problem Section */}
+
+      {/* Problem Statement Section */}
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
@@ -164,198 +170,146 @@ export default function UserAccessLanding() {
           <Card className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
             <CardContent className="p-6 md:p-8 space-y-4 text-muted-foreground">
               <p className="text-lg leading-relaxed font-medium text-foreground">
-                Construction software wasn't built for your business.
+                Construction software wasn't built for rope access.
               </p>
               <p>
-                The moment you add your supervisor to the system, they see everything. Pay rates. Profit margins. Which jobs lose money. Which technicians cost you the most.
+                You add your supervisor to the system. Now they see everything. Pay rates. Profit margins. Which jobs lose money. Which technicians cost the most.
               </p>
               <p>
-                It's not that you don't trust them. It's that some information belongs at the owner level. Period.
+                It's not about trust. Some information belongs at the owner level.
               </p>
               <p>
-                Most systems force a choice: handle everything yourself (and become the bottleneck), or give access and hope nobody looks where they shouldn't.
+                Most systems force a choice: do everything yourself and become the bottleneck, or give access and hope nobody looks where they shouldn't.
+              </p>
+              <p>
+                Meanwhile, building managers drown in resident calls. Technicians text complaints to personal phones. Property managers piece together vendor performance from scattered emails.
+              </p>
+              <p className="font-medium text-foreground">
+                Everyone's frustrated. Nobody has the full picture.
               </p>
               <Separator className="my-6" />
               <p className="font-medium text-foreground text-lg">
-                OnRopePro separates what people can do from what they can see.
+                OnRopePro separates what people can do from what they can see. Five stakeholder types. One unified system. Every person sees exactly what they need. Nothing more.
               </p>
             </CardContent>
           </Card>
         </div>
       </section>
+
       <Separator className="my-0" />
-      {/* Features Section */}
+
+      {/* What This Module Does Section */}
       <section id="features" className="pt-8 md:pt-12 pb-16 md:pb-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Control What Each Person Can Access
+            Complete Access Control That Creates Itself Through Daily Use
           </h2>
-          <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">Customize permissions for each employee. Not role templates. Individual controls.</p>
+          <p className="text-center text-muted-foreground text-lg mb-12 max-w-3xl mx-auto">
+            Every login, every permission, every piece of feedback flows through a single system designed for how rope access actually works.
+          </p>
 
           <div className="grid md:grid-cols-3 gap-6">
-            {/* Granular Permissions */}
+            {/* Card 1: Role-Based Permission Architecture */}
             <Card className="relative overflow-hidden">
               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-cyan-600"></div>
               <CardHeader>
                 <div className="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-3">
                   <Layers className="w-6 h-6 text-blue-600" />
                 </div>
-                <CardTitle className="text-xl">Granular Permission Controls</CardTitle>
+                <CardTitle className="text-xl">Role-Based Permission Architecture</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm text-muted-foreground">
-                <p className="font-medium text-foreground">Your bookkeeper sees aggregate labor costs. Not individual rates.</p>
+                <p className="font-medium text-foreground">Before any employee accesses the system, you define exactly what they see.</p>
+                <p>44+ individual permissions across financial, operational, safety, and inventory categories. Your ops manager creates projects without seeing payroll. Your ground crew logs hours without accessing bids.</p>
+                <p className="font-medium text-foreground mt-4">What gets controlled:</p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Customize exactly what each employee can view and edit</span>
+                    <span>Financial data visibility (rates, costs, margins)</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Supervisors create projects without seeing pay rates</span>
+                    <span>Project creation and modification rights</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Office admin processes invoices without profit margins</span>
+                    <span>Employee management capabilities</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
+                    <span>Safety documentation access</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
+                    <span>Inventory and equipment permissions</span>
                   </li>
                 </ul>
               </CardContent>
             </Card>
 
-            {/* Multi-Tenant Isolation */}
+            {/* Card 2: External Stakeholder Portals */}
             <Card className="relative overflow-hidden">
               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-600"></div>
               <CardHeader>
                 <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center mb-3">
-                  <Database className="w-6 h-6 text-emerald-600" />
+                  <Building2 className="w-6 h-6 text-emerald-600" />
                 </div>
-                <CardTitle className="text-xl">Multi-Tenant Data Isolation</CardTitle>
+                <CardTitle className="text-xl">External Stakeholder Portals</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm text-muted-foreground">
-                <p className="font-medium text-foreground">Your company's data exists in a completely separate partition.</p>
+                <p className="font-medium text-foreground">Three separate portals for three different needs.</p>
+                <p>Residents see their building's progress and submit feedback. Building managers see project details and response metrics. Property managers see portfolio-wide performance. No cross-contamination. No unauthorized access.</p>
+                <p className="font-medium text-foreground mt-4">What each portal provides:</p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Every query filters automatically to your company</span>
+                    <Home className="w-4 h-4 mt-0.5 text-violet-600 shrink-0" />
+                    <span><strong>Resident:</strong> Progress visibility, feedback submission, photo documentation</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Security issues with other accounts can't expose you</span>
+                    <Building2 className="w-4 h-4 mt-0.5 text-sky-600 shrink-0" />
+                    <span><strong>Building Manager:</strong> Full project details, feedback management, work history</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Bank-level protection without an IT department</span>
+                    <Briefcase className="w-4 h-4 mt-0.5 text-blue-600 shrink-0" />
+                    <span><strong>Property Manager:</strong> Multi-building oversight, vendor performance metrics, exportable reports</span>
                   </li>
                 </ul>
               </CardContent>
             </Card>
 
-            {/* irata/SPRAT Tracking */}
+            {/* Card 3: Centralized Feedback System */}
             <Card className="relative overflow-hidden">
               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-orange-600"></div>
               <CardHeader>
                 <div className="w-12 h-12 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center mb-3">
-                  <UserCheck className="w-6 h-6 text-amber-600" />
+                  <MessageSquare className="w-6 h-6 text-amber-600" />
                 </div>
-                <CardTitle className="text-xl">IRATA/SPRAT Level Tracking</CardTitle>
+                <CardTitle className="text-xl">Centralized Feedback System</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm text-muted-foreground">
-                <p className="font-medium text-foreground">Answer client questions in seconds, not minutes.</p>
+                <p className="font-medium text-foreground">Every resident complaint, compliment, and question flows into one dashboard.</p>
+                <p>No more texts to personal phones. No more emails lost in inboxes. No more sticky notes in the lobby. Timestamped. Photographed. Tracked from open to resolved.</p>
+                <p className="font-medium text-foreground mt-4">What gets tracked:</p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Each profile includes certification level</span>
+                    <span>Submission timestamp</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Know instantly which Level 2/3 techs are available</span>
+                    <span>Acknowledgment timestamp</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>No spreadsheets, no digging through files</span>
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            {/* Building Accounts */}
-            <Card className="relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-sky-500 to-blue-600"></div>
-              <CardHeader>
-                <div className="w-12 h-12 rounded-lg bg-sky-100 dark:bg-sky-900 flex items-center justify-center mb-3">
-                  <Building2 className="w-6 h-6 text-sky-600" />
-                </div>
-                <CardTitle className="text-xl">Building-Level Accounts</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm text-muted-foreground">
-                <p className="font-medium text-foreground">New building manager? Change one login, not twelve vendor accounts.</p>
-                <ul className="space-y-2">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Building accounts persist through staff changes</span>
+                    <span>Resolution timestamp</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>No vendor coordination when managers change</span>
+                    <span>Photo documentation</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>No access gaps, no stale credentials</span>
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            {/* Resident Portal */}
-            <Card className="relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 to-purple-600"></div>
-              <CardHeader>
-                <div className="w-12 h-12 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center mb-3">
-                  <Home className="w-6 h-6 text-violet-600" />
-                </div>
-                <CardTitle className="text-xl">Resident Portal Access</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm text-muted-foreground">
-                <p className="font-medium text-foreground">Unit 1847 checks their own progress instead of calling the property manager.</p>
-                <ul className="space-y-2">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Residents see project updates for their building</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Real-time visibility reduces status calls 60-70%</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Know when work reaches your elevation</span>
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            {/* Audit Trail */}
-            <Card className="relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-500 to-pink-600"></div>
-              <CardHeader>
-                <div className="w-12 h-12 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center mb-3">
-                  <FileText className="w-6 h-6 text-rose-600" />
-                </div>
-                <CardTitle className="text-xl">Complete Audit Trail</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm text-muted-foreground">
-                <p className="font-medium text-foreground">Every permission change logged. Every access attempt recorded.</p>
-                <ul className="space-y-2">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>See who changed what, when, and from where</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>When questions arise, answers exist</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Retention policies ensure compliance</span>
+                    <span>Response time metrics</span>
                   </li>
                 </ul>
               </CardContent>
@@ -363,29 +317,187 @@ export default function UserAccessLanding() {
           </div>
         </div>
       </section>
+
       <Separator className="my-8" />
-      {/* Key Features */}
-      <section className="py-16 md:py-20 px-4 max-w-4xl mx-auto space-y-8">
-        <div>
-          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-6">
-            <Sparkles className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+
+      {/* Stakeholder Benefits Section */}
+      <section className="py-16 md:py-20 px-4">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+            Benefits by Stakeholder
+          </h2>
+          <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
+            Five stakeholder types. Five different views. One unified system.
+          </p>
+
+          <div className="space-y-8">
+            {/* For Employers */}
+            <Card className="overflow-hidden">
+              <CardHeader className="bg-blue-50 dark:bg-blue-950 border-b">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                    <Briefcase className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <CardTitle className="text-xl">For Employers (Company Owners)</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6 space-y-4">
+                <div className="grid md:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">Delegate without exposure.</h4>
+                    <p className="text-sm text-muted-foreground">Your supervisor handles North Shore operations. Creates projects. Assigns crews. Manages schedules. Never sees what anyone earns. You focus on growth instead of gatekeeping.</p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">Protect your margins.</h4>
+                    <p className="text-sm text-muted-foreground">Client billing rates, internal costs, project profitability stay visible only to you. Your bookkeeper sees aggregate numbers. Your admin processes invoices. Nobody pieces together your competitive advantage.</p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">Onboard in minutes.</h4>
+                    <p className="text-sm text-muted-foreground">Create an account, assign permissions, done. No IT tickets. No back-and-forth emails. Employee sets their own password on first login.</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* For Technicians */}
+            <Card className="overflow-hidden">
+              <CardHeader className="bg-emerald-50 dark:bg-emerald-950 border-b">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center">
+                    <HardHat className="w-5 h-5 text-emerald-600" />
+                  </div>
+                  <CardTitle className="text-xl">For Technicians</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6 space-y-4">
+                <div className="grid md:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">See your work, not everyone else's.</h4>
+                    <p className="text-sm text-muted-foreground">Your assigned projects. Your logged hours. Your safety inspections. Clean interface showing exactly what you need for today's job.</p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">Submit feedback from the field.</h4>
+                    <p className="text-sm text-muted-foreground">Resident flags an issue while you're on rope? Log it in 30 seconds. Photos attached. Building manager notified. No more remembering to tell someone when you get back to the truck.</p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">Your certifications travel with you.</h4>
+                    <p className="text-sm text-muted-foreground">IRATA level tracked in your profile. When you move companies, your professional identity stays intact.</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* For Building Managers */}
+            <Card className="overflow-hidden">
+              <CardHeader className="bg-sky-50 dark:bg-sky-950 border-b">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-sky-100 dark:bg-sky-900 flex items-center justify-center">
+                    <Building2 className="w-5 h-5 text-sky-600" />
+                  </div>
+                  <CardTitle className="text-xl">For Building Managers</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6 space-y-4">
+                <div className="grid md:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">Stop being the middleman.</h4>
+                    <p className="text-sm text-muted-foreground">Residents submit directly to the vendor. You see everything without handling every back-and-forth. When the strata council asks about responsiveness, you pull the report.</p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">Access survives turnover.</h4>
+                    <p className="text-sm text-muted-foreground">Building accounts, not personal accounts. When you take over from the previous manager, change the password. Instant access. No vendor coordination.</p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">Prove vendor performance.</h4>
+                    <p className="text-sm text-muted-foreground">Response times tracked automatically. Resolution rates calculated. Export professional reports for council presentations in two minutes.</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* For Property Managers */}
+            <Card className="overflow-hidden">
+              <CardHeader className="bg-violet-50 dark:bg-violet-950 border-b">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center">
+                    <Users className="w-5 h-5 text-violet-600" />
+                  </div>
+                  <CardTitle className="text-xl">For Property Managers</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6 space-y-4">
+                <div className="grid md:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">Portfolio-wide visibility.</h4>
+                    <p className="text-sm text-muted-foreground">Every building. Every vendor. Every open issue. One dashboard. Know which properties need attention without calling anyone.</p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">Manager turnover handled.</h4>
+                    <p className="text-sm text-muted-foreground">Your building managers change every 6-12 months. Building accounts mean zero access gaps. Zero former employees with lingering credentials. Zero vendor coordination.</p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">Compliance documentation ready.</h4>
+                    <p className="text-sm text-muted-foreground">When insurance asks about vendor safety programs, you have answers. Digital records. Timestamped inspections. Exportable proof.</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* For Residents */}
+            <Card className="overflow-hidden">
+              <CardHeader className="bg-rose-50 dark:bg-rose-950 border-b">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center">
+                    <Home className="w-5 h-5 text-rose-600" />
+                  </div>
+                  <CardTitle className="text-xl">For Residents</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6 space-y-4">
+                <div className="grid md:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">Know what's happening without calling.</h4>
+                    <p className="text-sm text-muted-foreground">West elevation 80% complete. East starts Wednesday. Move your balcony plants Tuesday night. No phone tag with the building manager.</p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">Submit issues with photos.</h4>
+                    <p className="text-sm text-muted-foreground">Streaky windows? Snap a photo. Submit through the portal. Watch status change from Open to Acknowledged to Resolved. Know someone saw it.</p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">Get answers faster.</h4>
+                    <p className="text-sm text-muted-foreground">Direct to vendor means 24-hour resolution instead of 3-5 days of phone tag through the building manager.</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      <Separator className="my-8" />
+
+      {/* Key Features Grid */}
+      <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 flex items-center justify-center gap-2">
+            <Sparkles className="w-6 h-6 text-blue-600 dark:text-blue-400" />
             Key Features
           </h2>
-          <p className="text-muted-foreground leading-relaxed text-base mb-8">
-            Enterprise-grade permission controls that scale from 5 people to 500. Define who can view, edit, or create any data type. Changes take effect immediately.
+          <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
+            Every feature built for the specific challenges of multi-stakeholder rope access operations.
           </p>
           
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900 flex items-center justify-center shrink-0">
-                    <UserCog className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                  <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0">
+                    <Layers className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Role-Based Access Control</h3>
+                    <h3 className="font-semibold">Granular Permission Controls</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Define custom roles or use built-in templates. Assign permissions for each module: Projects, Payroll, Safety, Time Tracking, and more.
+                      44+ individual permissions across financial, operational, safety, and inventory categories. Assign exactly what each person needs. Change permissions anytime as responsibilities shift.
                     </p>
                   </div>
                 </div>
@@ -396,28 +508,12 @@ export default function UserAccessLanding() {
               <CardContent className="pt-6">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0">
-                    <Filter className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                    <Database className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Data-Level Filtering</h3>
+                    <h3 className="font-semibold">Multi-Tenant Data Isolation</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Supervisors see projects they manage. Technicians see only their own time entries. Data automatically filters based on role and scope.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0">
-                    <DollarSign className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">Financial Visibility Control</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Show labor hours without hourly rates. Display budgets without profit margins. Complete separation of operational and financial visibility.
+                      Your company's data exists in a completely separate partition. Every query, every report, every API call filters to your company only. Bank-level protection without an IT department.
                     </p>
                   </div>
                 </div>
@@ -428,12 +524,12 @@ export default function UserAccessLanding() {
               <CardContent className="pt-6">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-sky-100 dark:bg-sky-900 flex items-center justify-center shrink-0">
-                    <History className="w-5 h-5 text-sky-600 dark:text-sky-400" />
+                    <Building2 className="w-5 h-5 text-sky-600 dark:text-sky-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Audit Logs & History</h3>
+                    <h3 className="font-semibold">Building-Level Accounts</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Every data access recorded with timestamp and user. Modified data shows before/after values. Perfect for compliance and dispute resolution.
+                      Buildings have accounts. Building managers don't. When managers change, the new person changes the password. Access transfers in 30 seconds. No vendor coordination required.
                     </p>
                   </div>
                 </div>
@@ -443,13 +539,29 @@ export default function UserAccessLanding() {
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center shrink-0">
-                    <Layers className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                  <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0">
+                    <UserPlus className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Multi-Tenant Architecture</h3>
+                    <h3 className="font-semibold">Self-Service Onboarding</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Complete data isolation between companies. Each organization sees only their own employees, projects, and financial data.
+                      Building codes on elevator notices. Residents scan, register, access. Technicians share codes on-site. Zero admin overhead for external user setup.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center shrink-0">
+                    <Clock className="w-5 h-5 text-violet-600 dark:text-violet-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Response Time Tracking</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Every feedback submission timestamped automatically. Open to acknowledged. Acknowledged to resolved. Average response time calculated. Exportable for strata councils.
                     </p>
                   </div>
                 </div>
@@ -460,12 +572,12 @@ export default function UserAccessLanding() {
               <CardContent className="pt-6">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
-                    <ShieldCheck className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+                    <History className="w-5 h-5 text-rose-600 dark:text-rose-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Instant Permission Updates</h3>
+                    <h3 className="font-semibold">Complete Audit Trail</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Changes take effect immediately. Revoke access and the user loses visibility on their next page load. No delays.
+                      Every permission change logged. Every sensitive action recorded. Timestamps, user IDs, IP addresses. When questions arise, answers exist.
                     </p>
                   </div>
                 </div>
@@ -474,98 +586,39 @@ export default function UserAccessLanding() {
           </div>
         </div>
       </section>
+
       <Separator className="my-8" />
-      {/* Module Integration Points */}
-      <section className="py-16 md:py-20 px-4 max-w-4xl mx-auto space-y-8">
-        <div>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Permissions Flow Through Everything</h2>
-          <p className="text-muted-foreground leading-relaxed text-base mb-8">
-            User access controls aren't a feature. They're the foundation. When you grant someone project creation rights, they can create projects. When you withhold financial visibility, dashboards, reports, and data exports all respect that decision.
-          </p>
-          
-          <div className="grid md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Employee Directory</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <p><strong className="text-foreground">What Connects:</strong> Only owners create employees and assign roles.</p>
-                <p><strong className="text-foreground">Why It Matters:</strong> Prevents unauthorized hiring. Controls who has system access.</p>
-              </CardContent>
-            </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Payroll & Time Tracking</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <p><strong className="text-foreground">What Connects:</strong> Supervisors see hours worked. Technicians see only their own time. Owners see full payroll cost visibility.</p>
-                <p><strong className="text-foreground">Why It Matters:</strong> 100% confidentiality maintained across all roles.</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Safety & Compliance</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <p><strong className="text-foreground">What Connects:</strong> Technicians submit documents. Safety officers review. Owners see audit trails. Building managers see approval status.</p>
-                <p><strong className="text-foreground">Why It Matters:</strong> Clear responsibility chain with appropriate visibility at each level.</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Scheduling & Projects</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <p><strong className="text-foreground">What Connects:</strong> Owners create and assign. Supervisors manage their projects. Technicians see scheduled work. Residents see progress.</p>
-                <p><strong className="text-foreground">Why It Matters:</strong> Data scope limits automatically by role and assigned resources.</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Analytics & Reporting</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <p><strong className="text-foreground">What Connects:</strong> Owners see full financial and productivity analytics. Building managers see their building's data. Technicians see personal metrics.</p>
-                <p><strong className="text-foreground">Why It Matters:</strong> Reporting respects permission boundaries completely.</p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
       {/* Problems Solved Section */}
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            We Built This for Situations Like Yours
+            Problems Solved
           </h2>
           <p className="text-center text-muted-foreground mb-12">
             Real problems. Real solutions. Organized by who you are.
           </p>
 
           <Accordion type="multiple" className="space-y-4">
-            {/* Company Owners */}
-            <AccordionItem value="owners" className="border rounded-lg px-4">
+            {/* For Employers */}
+            <AccordionItem value="employers" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
                     <Briefcase className="w-5 h-5 text-blue-600" />
                   </div>
-                  <span className="text-lg font-semibold">For Company Owners</span>
+                  <span className="text-lg font-semibold">For Employers</span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="pb-4 space-y-6">
                 <div className="space-y-3">
-                  <p className="font-medium text-foreground">"My supervisor accidentally saw everyone's pay rates."</p>
+                  <p className="font-medium text-foreground">"My supervisor saw everyone's pay rates on day one."</p>
                   <p className="text-muted-foreground text-sm">
-                    You need your ops manager to create projects and check budgets. The moment you grant access, they see what every technician earns. Now your Level 1 knows your Level 3 lead makes $18 more per hour.
+                    You need your ops manager to create projects and check budgets. The moment you grant access, they see what every technician earns. Your Level 1 finds out your Level 3 lead makes $18 more per hour.
                   </p>
                   <div className="bg-emerald-50 dark:bg-emerald-950 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800">
                     <p className="text-sm text-emerald-800 dark:text-emerald-200">
-                      <strong>Solution:</strong> OnRopePro separates operational access from financial visibility. Grant project creation, scheduling, and client communication without exposing rate information.
+                      <strong>Solution:</strong> OnRopePro separates operational access from financial visibility. 44 individual permissions. Grant project creation without exposing compensation data.
                     </p>
                   </div>
                 </div>
@@ -575,11 +628,11 @@ export default function UserAccessLanding() {
                 <div className="space-y-3">
                   <p className="font-medium text-foreground">"A technician changed his own hourly rate from $32 to $42."</p>
                   <p className="text-muted-foreground text-sm">
-                    He also adjusted last week's drop counts. You discovered it during payroll when the numbers didn't add up. Traditional systems let anyone modify data they can see.
+                    He also adjusted last week's drop counts. You discovered it during payroll when the numbers didn't add up.
                   </p>
                   <div className="bg-emerald-50 dark:bg-emerald-950 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800">
                     <p className="text-sm text-emerald-800 dark:text-emerald-200">
-                      <strong>Solution:</strong> Permission controls restrict editing based on assigned capabilities. Technicians log work for assigned projects. Only designated managers modify rates, historical records, and financial data.
+                      <strong>Solution:</strong> Permission controls restrict who can edit what. Technicians log work for assigned projects. Rates stay locked to designated managers.
                     </p>
                   </div>
                 </div>
@@ -587,46 +640,50 @@ export default function UserAccessLanding() {
                 <Separator />
 
                 <div className="space-y-3">
-                  <p className="font-medium text-foreground">"I don't know if I have seats available to hire someone."</p>
+                  <p className="font-medium text-foreground">"I spend hours setting up accounts and chasing passwords."</p>
                   <p className="text-muted-foreground text-sm">
-                    Peak season hit. You needed three temporary techs immediately. But you couldn't remember your plan's limit, and you didn't know how many seats you were using.
+                    Create the account. Set permissions. Done. Employee sets their own password. External users register themselves with building codes. Your admin time approaches zero.
                   </p>
-                  <div className="bg-emerald-50 dark:bg-emerald-950 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800">
-                    <p className="text-sm text-emerald-800 dark:text-emerald-200">
-                      <strong>Solution:</strong> Your dashboard shows "Using 7 of 8 seats" with visual indicators. Make hiring decisions confidently. Avoid surprise overage charges.
-                    </p>
-                  </div>
                 </div>
               </AccordionContent>
             </AccordionItem>
 
-            {/* Operations Managers */}
-            <AccordionItem value="ops" className="border rounded-lg px-4">
+            {/* For Technicians */}
+            <AccordionItem value="technicians" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center">
-                    <Users className="w-5 h-5 text-emerald-600" />
+                    <HardHat className="w-5 h-5 text-emerald-600" />
                   </div>
-                  <span className="text-lg font-semibold">For Operations Managers</span>
+                  <span className="text-lg font-semibold">For Technicians</span>
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="pb-4 space-y-4">
+              <AccordionContent className="pb-4 space-y-6">
                 <div className="space-y-3">
-                  <p className="font-medium text-foreground">"I want my field supervisors to create projects when clients call."</p>
+                  <p className="font-medium text-foreground">"I have to remember 10 different complaints and tell Jeff later."</p>
                   <p className="text-muted-foreground text-sm">
-                    Your most trusted supervisor handles the entire North Shore territory. When clients call, he has to reach you to create the project. You're in meetings. Clients wait hours for setup that takes two minutes.
+                    Resident flags an issue on the ground. You're heading back up the rope. By end of day, you've forgotten half of them. Two weeks later: "Did you go back to 1037?"
                   </p>
                   <div className="bg-emerald-50 dark:bg-emerald-950 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800">
                     <p className="text-sm text-emerald-800 dark:text-emerald-200">
-                      <strong>Solution:</strong> Grant project creation and employee assignment without financial access. Supervisors handle day-to-day operations independently. You focus on strategic work.
+                      <strong>Solution:</strong> Log feedback from your phone in 30 seconds. Photos attached. Automatically routed. Nothing forgotten.
                     </p>
                   </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-3">
+                  <p className="font-medium text-foreground">"I can see way more than I need to and it's overwhelming."</p>
+                  <p className="text-muted-foreground text-sm">
+                    Your dashboard shows your projects. Your hours. Your inspections. Not the entire company's financials. Clean interface for the work that matters.
+                  </p>
                 </div>
               </AccordionContent>
             </AccordionItem>
 
-            {/* Building Managers */}
-            <AccordionItem value="building" className="border rounded-lg px-4">
+            {/* For Building Managers */}
+            <AccordionItem value="building-managers" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-sky-100 dark:bg-sky-900 flex items-center justify-center">
@@ -637,13 +694,13 @@ export default function UserAccessLanding() {
               </AccordionTrigger>
               <AccordionContent className="pb-4 space-y-6">
                 <div className="space-y-3">
-                  <p className="font-medium text-foreground">"I'm the middleman for every issue between residents and vendors."</p>
+                  <p className="font-medium text-foreground">"I'm forwarding emails between residents and vendors all day."</p>
                   <p className="text-muted-foreground text-sm">
-                    Mrs. Chen emails you photos of streaky windows. You forward to the rope access company. Three days pass with no response. Meanwhile, Mrs. Chen files council complaints about management responsiveness.
+                    Mrs. Chen emails you photos of streaky windows. You forward to the rope access company. Three days pass. Mrs. Chen emails again. You call the vendor. Leave a voicemail. Meanwhile, she's filing strata complaints about your responsiveness.
                   </p>
                   <div className="bg-emerald-50 dark:bg-emerald-950 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800">
                     <p className="text-sm text-emerald-800 dark:text-emerald-200">
-                      <strong>Solution:</strong> Centralized feedback with building-level visibility. Residents submit directly. You see all feedback in real-time without being in the communication chain. Average resolution drops from 3-5 days to 24 hours.
+                      <strong>Solution:</strong> Direct resident-to-vendor feedback. You see everything without being in the middle. Average resolution drops from 3-5 days to 24 hours.
                     </p>
                   </div>
                 </div>
@@ -651,38 +708,91 @@ export default function UserAccessLanding() {
                 <Separator />
 
                 <div className="space-y-3">
-                  <p className="font-medium text-foreground">"Building manager turnover every 6-12 months creates access chaos."</p>
+                  <p className="font-medium text-foreground">"The previous manager left and I can't access anything."</p>
                   <p className="text-muted-foreground text-sm">
-                    Sarah managed Tower One for 8 months. Mike takes over. You email 12 vendors requesting account changes. Three weeks later, Sarah still has access and Mike can't log in.
+                    You emailed 12 vendors requesting account changes. Three weeks later, Sarah still has access and you can't log in.
                   </p>
                   <div className="bg-emerald-50 dark:bg-emerald-950 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800">
                     <p className="text-sm text-emerald-800 dark:text-emerald-200">
-                      <strong>Solution:</strong> Building accounts transfer with the role, not the person. Access changes happen in minutes, not weeks.
+                      <strong>Solution:</strong> Change the building password. Instant access. Sarah's locked out. No vendor coordination.
                     </p>
                   </div>
                 </div>
               </AccordionContent>
             </AccordionItem>
 
-            {/* Residents */}
-            <AccordionItem value="residents" className="border rounded-lg px-4">
+            {/* For Property Managers */}
+            <AccordionItem value="property-managers" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center">
-                    <Home className="w-5 h-5 text-violet-600" />
+                    <Users className="w-5 h-5 text-violet-600" />
+                  </div>
+                  <span className="text-lg font-semibold">For Property Managers</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4 space-y-6">
+                <div className="space-y-3">
+                  <p className="font-medium text-foreground">"I manage 40 buildings and building managers turn over constantly."</p>
+                  <p className="text-muted-foreground text-sm">
+                    Every 6-12 months, someone leaves. You send emails to every vendor. Chase down account changes. Former managers retain access for weeks.
+                  </p>
+                  <div className="bg-emerald-50 dark:bg-emerald-950 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                    <p className="text-sm text-emerald-800 dark:text-emerald-200">
+                      <strong>Solution:</strong> Building-level accounts eliminate the problem. Password change transfers access instantly.
+                    </p>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-3">
+                  <p className="font-medium text-foreground">"The strata council asks if our vendors are responsive. I have no data."</p>
+                  <p className="text-muted-foreground text-sm">
+                    You remember several complaints were resolved quickly. But you're scrolling through texts from March trying to prove it.
+                  </p>
+                  <div className="bg-emerald-50 dark:bg-emerald-950 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                    <p className="text-sm text-emerald-800 dark:text-emerald-200">
+                      <strong>Solution:</strong> Pull the report. Average response time: 4.2 hours. Resolution rate: 94%. Data instead of vague assurances.
+                    </p>
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* For Residents */}
+            <AccordionItem value="residents" className="border rounded-lg px-4">
+              <AccordionTrigger className="hover:no-underline py-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center">
+                    <Home className="w-5 h-5 text-rose-600" />
                   </div>
                   <span className="text-lg font-semibold">For Residents</span>
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="pb-4 space-y-4">
+              <AccordionContent className="pb-4 space-y-6">
                 <div className="space-y-3">
-                  <p className="font-medium text-foreground">"I see maintenance equipment on the roof. Nobody tells me what's happening."</p>
+                  <p className="font-medium text-foreground">"I see equipment on the roof. Nobody tells me what's happening."</p>
                   <p className="text-muted-foreground text-sm">
-                    Technicians are on the west side Monday. Are they coming to your side? You need to move balcony plants before cleaning. You call the building manager. They don't know. They contact the vendor.
+                    Technicians on the west side Monday. Are they coming to your side? You need to move balcony plants. You call the building manager. They don't know. They call the vendor.
                   </p>
                   <div className="bg-emerald-50 dark:bg-emerald-950 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800">
                     <p className="text-sm text-emerald-800 dark:text-emerald-200">
-                      <strong>Solution:</strong> The resident portal shows which elevations are complete. The schedule shows east elevation starts Wednesday. You move your plants Tuesday night. No calls necessary.
+                      <strong>Solution:</strong> Check the portal. West 100% complete. East starts Wednesday. Move your plants Tuesday night. No calls.
+                    </p>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-3">
+                  <p className="font-medium text-foreground">"I reported streaky windows three weeks ago. No idea if anyone saw it."</p>
+                  <p className="text-muted-foreground text-sm">
+                    Email to building manager. Forward to vendor. Lost in someone's inbox.
+                  </p>
+                  <div className="bg-emerald-50 dark:bg-emerald-950 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                    <p className="text-sm text-emerald-800 dark:text-emerald-200">
+                      <strong>Solution:</strong> Submit through the portal. Status changes from Open to Acknowledged to Resolved. Photos of corrected work attached. Know exactly where your issue stands.
                     </p>
                   </div>
                 </div>
@@ -691,130 +801,344 @@ export default function UserAccessLanding() {
           </Accordion>
         </div>
       </section>
-      {/* Technical Credibility Section */}
+
+      <Separator className="my-8" />
+
+      {/* Measurable Results Section */}
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Enterprise Security Built for Small Operations
+            Measurable Results
           </h2>
-          <p className="text-center text-muted-foreground mb-12">
-            The security you'd expect from enterprise software, without the enterprise price tag.
+          <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
+            Concrete improvements you'll see from day one.
           </p>
 
           <div className="grid md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-3">
-                  <Lock className="w-5 h-5 text-blue-600" />
-                  <CardTitle className="text-lg">Session Management</CardTitle>
+            <Card className="overflow-hidden">
+              <div className="h-1 bg-gradient-to-r from-blue-500 to-cyan-600"></div>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0">
+                    <Shield className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">Delegation Without Exposure</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Grant project creation, scheduling, and client communication without exposing compensation data. Your supervisors handle operations. Your financials stay private.
+                    </p>
+                  </div>
                 </div>
-              </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">
-                <p>Automatic expiration after 30 days of inactivity. Secure logout clears all session data. Users remain logged in across browser sessions until explicit logout or expiration.</p>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-3">
-                  <Key className="w-5 h-5 text-emerald-600" />
-                  <CardTitle className="text-lg">Password Security</CardTitle>
+            <Card className="overflow-hidden">
+              <div className="h-1 bg-gradient-to-r from-emerald-500 to-teal-600"></div>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0">
+                    <Zap className="w-6 h-6 text-emerald-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">Feedback Resolution: Days to Hours</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Direct resident-to-vendor communication eliminates the building manager middleman. Average resolution time drops from 3-5 days to 24 hours.
+                    </p>
+                  </div>
                 </div>
-              </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">
-                <p>Industry-standard bcrypt hashing with salt rounds. Passwords are never stored in plain text. Not even you can retrieve them. Reset only.</p>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-3">
-                  <Shield className="w-5 h-5 text-amber-600" />
-                  <CardTitle className="text-lg">API Protection</CardTitle>
+            <Card className="overflow-hidden">
+              <div className="h-1 bg-gradient-to-r from-amber-500 to-orange-600"></div>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0">
+                    <Clock className="w-6 h-6 text-amber-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">Manager Turnover: Weeks to Seconds</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Building-level accounts eliminate vendor coordination when managers change. Password change transfers access instantly. Zero access gaps.
+                    </p>
+                  </div>
                 </div>
-              </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">
-                <p>Every endpoint validates authentication, permission, and company scope. Financial data filtered unless user has financial permissions.</p>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-3">
-                  <ShieldCheck className="w-5 h-5 text-rose-600" />
-                  <CardTitle className="text-lg">Request Security</CardTitle>
+            <Card className="overflow-hidden">
+              <div className="h-1 bg-gradient-to-r from-violet-500 to-purple-600"></div>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center shrink-0">
+                    <Search className="w-6 h-6 text-violet-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">Audit Preparation: Scramble to Search</h3>
+                    <p className="text-sm text-muted-foreground">
+                      When insurance asks about vendor performance or strata councils question responsiveness, you search and export. Complete records. Professional PDFs.
+                    </p>
+                  </div>
                 </div>
-              </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">
-                <p>CSRF protection via token-based validation. Rate limiting prevents brute force attacks. SQL injection blocked through parameterized statements. All traffic encrypted via TLS/SSL.</p>
               </CardContent>
             </Card>
           </div>
         </div>
       </section>
+
+      <Separator className="my-8" />
+
       {/* Module Integration Section */}
       <section className="py-16 md:py-20 px-4">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Permissions Flow Through Everything
+            Other Modules This Module Communicates With
           </h2>
-          <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
-            User access controls aren't a feature. They're the foundation. When you grant someone project creation rights, they can create projects. When you withhold financial visibility, dashboards, reports, and data exports all respect that decision.
+          <p className="text-center text-muted-foreground mb-12 max-w-3xl mx-auto">
+            User access controls aren't standalone. They're the foundation every other module builds on. When you grant someone permission, the entire system respects that decision.
           </p>
 
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="flex items-start gap-4 p-4 rounded-lg bg-slate-50 dark:bg-slate-900">
-              <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0">
-                <Users className="w-5 h-5 text-blue-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold mb-1">Employee Directory</h3>
-                <p className="text-sm text-muted-foreground">Only owners create employees and assign roles. Prevents unauthorized hiring.</p>
-              </div>
-            </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0">
+                    <Users className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Employee Management</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Permission controls determine who can create employees, assign roles, and modify profiles. Only owners add team members. No unauthorized hiring.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-            <div className="flex items-start gap-4 p-4 rounded-lg bg-slate-50 dark:bg-slate-900">
-              <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0">
-                <DollarSign className="w-5 h-5 text-emerald-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold mb-1">Payroll & Time Tracking</h3>
-                <p className="text-sm text-muted-foreground">Supervisors see hours worked. Technicians see only their own time. Owners see full payroll cost visibility.</p>
-              </div>
-            </div>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0">
+                    <DollarSign className="w-5 h-5 text-emerald-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Payroll & Time Tracking</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Financial permissions filter what appears in payroll dashboards. Supervisors see hours worked. Technicians see their own time. Owners see full cost visibility.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-            <div className="flex items-start gap-4 p-4 rounded-lg bg-slate-50 dark:bg-slate-900">
-              <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0">
-                <HardHat className="w-5 h-5 text-amber-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold mb-1">Safety & Compliance</h3>
-                <p className="text-sm text-muted-foreground">Technicians submit safety documents. Safety officers review. Owners see audit trails. Clear responsibility chain.</p>
-              </div>
-            </div>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0">
+                    <ClipboardList className="w-5 h-5 text-amber-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Project Management</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Project permissions control who creates, edits, assigns, and views projects. Owners create and assign. Supervisors manage their projects. Technicians see their work.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-            <div className="flex items-start gap-4 p-4 rounded-lg bg-slate-50 dark:bg-slate-900">
-              <div className="w-10 h-10 rounded-lg bg-sky-100 dark:bg-sky-900 flex items-center justify-center shrink-0">
-                <Calendar className="w-5 h-5 text-sky-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold mb-1">Scheduling & Projects</h3>
-                <p className="text-sm text-muted-foreground">Owners create and assign. Supervisors manage their projects. Technicians see their scheduled work.</p>
-              </div>
-            </div>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-sky-100 dark:bg-sky-900 flex items-center justify-center shrink-0">
+                    <ShieldCheck className="w-5 h-5 text-sky-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Safety & Compliance</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Safety permissions determine who submits, reviews, and approves documentation. Clear responsibility chain from technician to safety officer to owner.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-            <div className="flex items-start gap-4 p-4 rounded-lg bg-slate-50 dark:bg-slate-900 md:col-span-2">
-              <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center shrink-0">
-                <BarChart3 className="w-5 h-5 text-violet-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold mb-1">Analytics & Reporting</h3>
-                <p className="text-sm text-muted-foreground">Owners see full financial and productivity analytics. Building managers see their building's data. Technicians see personal metrics. Reporting respects permission boundaries completely.</p>
-              </div>
-            </div>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center shrink-0">
+                    <MessageSquare className="w-5 h-5 text-violet-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Feedback Management</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Access controls route feedback appropriately. Residents submit. Building managers track. Your team resolves. Everyone stays in their lane.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
+                    <BarChart3 className="w-5 h-5 text-rose-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Analytics & Reporting</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Every report filters to the user's permission level. Dashboards show only authorized data. No accidental exposure.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
+
+      <Separator className="my-8" />
+
+      {/* Business Impact Section */}
+      <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
+            Stop Managing Access. Start Managing Growth.
+          </h2>
+          
+          <Card className="border-slate-200 dark:border-slate-800">
+            <CardContent className="p-6 md:p-8 space-y-4 text-muted-foreground">
+              <p>
+                Every hour you spend gatekeeping information is an hour you're not spending on growth.
+              </p>
+              <p>
+                Your supervisor calls because he can't create a project. You stop what you're doing to log in for him. Your building manager forwards another resident email. You relay the response. Your technician texts a complaint from the field. You copy it into a spreadsheet.
+              </p>
+              <p className="font-medium text-foreground">
+                None of this is your job. All of it consumes your day.
+              </p>
+              <Separator className="my-6" />
+              <p>
+                OnRopePro eliminates the gatekeeping. Your supervisor creates projects without seeing payroll. Your building manager tracks feedback without being the middleman. Your technician logs issues without remembering to tell you later.
+              </p>
+              <p>
+                You get visibility without bottlenecks. Control without micromanagement. Protection without paranoia.
+              </p>
+              <p className="font-medium text-foreground text-lg">
+                The information you need to see finds you. The information others need stays with them. And the time you used to spend managing access? That's yours again.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      <Separator className="my-8" />
+
+      {/* FAQs Section */}
+      <section id="faqs" className="py-16 md:py-20 px-4">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+            Frequently Asked Questions
+          </h2>
+          <p className="text-center text-muted-foreground mb-12">
+            Common questions about user access and authentication.
+          </p>
+
+          <Accordion type="single" collapsible className="space-y-4">
+            <AccordionItem value="faq-1" className="border rounded-lg px-4">
+              <AccordionTrigger className="hover:no-underline py-4 text-left">
+                Can I change someone's permissions after I've set them up?
+              </AccordionTrigger>
+              <AccordionContent className="pb-4 text-muted-foreground">
+                Yes. Permissions can be modified anytime from the employee management dashboard. Changes take effect immediately on their next login.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="faq-2" className="border rounded-lg px-4">
+              <AccordionTrigger className="hover:no-underline py-4 text-left">
+                What happens when a building manager leaves?
+              </AccordionTrigger>
+              <AccordionContent className="pb-4 text-muted-foreground">
+                Buildings have accounts, not building managers. The new manager changes the building password. Access transfers instantly. The former manager is locked out. No vendor coordination required.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="faq-3" className="border rounded-lg px-4">
+              <AccordionTrigger className="hover:no-underline py-4 text-left">
+                Can technicians see each other's pay rates?
+              </AccordionTrigger>
+              <AccordionContent className="pb-4 text-muted-foreground">
+                Only if you grant financial permissions, which you control individually per employee. By default, technicians see only their own work records and assigned projects.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="faq-4" className="border rounded-lg px-4">
+              <AccordionTrigger className="hover:no-underline py-4 text-left">
+                How do residents get access to the portal?
+              </AccordionTrigger>
+              <AccordionContent className="pb-4 text-muted-foreground">
+                Building codes. The code appears on elevator notices, gets shared by technicians on-site, or sent by property managers. Resident enters the code, creates an account, instant access to their building's portal.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="faq-5" className="border rounded-lg px-4">
+              <AccordionTrigger className="hover:no-underline py-4 text-left">
+                What if a resident accidentally registers for the wrong unit?
+              </AccordionTrigger>
+              <AccordionContent className="pb-4 text-muted-foreground">
+                The system prompts: "There's already an account for this unit. Are you a new resident?" If they confirm, access transfers. If they realize the mistake, they go back and enter the correct unit.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="faq-6" className="border rounded-lg px-4">
+              <AccordionTrigger className="hover:no-underline py-4 text-left">
+                Can building managers see financial information?
+              </AccordionTrigger>
+              <AccordionContent className="pb-4 text-muted-foreground">
+                No. Building manager accounts have read-only access to project progress, feedback status, and work history. They cannot see rates, costs, or internal financial data.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="faq-7" className="border rounded-lg px-4">
+              <AccordionTrigger className="hover:no-underline py-4 text-left">
+                How does feedback tracking work?
+              </AccordionTrigger>
+              <AccordionContent className="pb-4 text-muted-foreground">
+                Every submission timestamps automatically: when it was opened, when it was acknowledged, when it was resolved. The system calculates average response time and generates exportable reports for strata councils or property managers.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="faq-8" className="border rounded-lg px-4">
+              <AccordionTrigger className="hover:no-underline py-4 text-left">
+                Is my company's data separated from other OnRopePro customers?
+              </AccordionTrigger>
+              <AccordionContent className="pb-4 text-muted-foreground">
+                Completely. Multi-tenant architecture means your data exists in a separate partition. Every query, every API call filters to your company only. A security issue with another account cannot expose your information.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="faq-9" className="border rounded-lg px-4">
+              <AccordionTrigger className="hover:no-underline py-4 text-left">
+                What permissions are available?
+              </AccordionTrigger>
+              <AccordionContent className="pb-4 text-muted-foreground">
+                44+ individual permissions across categories: financial (rates, costs, margins), operational (projects, scheduling), safety (inspections, documentation), inventory (equipment, consumables), and employee management (hiring, roles).
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="faq-10" className="border rounded-lg px-4">
+              <AccordionTrigger className="hover:no-underline py-4 text-left">
+                Can I create custom roles?
+              </AccordionTrigger>
+              <AccordionContent className="pb-4 text-muted-foreground">
+                Yes. While the system includes standard roles (Operations Manager, Supervisor, Technician, etc.), you can create custom positions for unique needs like Inventory Manager or Safety Officer, then assign whatever permissions that role requires.
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-16 md:py-20 px-4 text-white" style={{backgroundImage: 'linear-gradient(135deg, #0B64A3 0%, #0369A1 100%)'}}>
         <div className="max-w-3xl mx-auto text-center space-y-6">
@@ -828,12 +1152,12 @@ export default function UserAccessLanding() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
             <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-cta-trial">
               <Link href="/register">
-                Start Your 90-Day Trial
+                Start Your 60-Day Trial
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>
             <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-cta-guide">
-              <Link href="#knowledgebase">
+              <Link href="#faqs">
                 Find Answers
                 <BookOpen className="ml-2 w-5 h-5" />
               </Link>
@@ -841,6 +1165,7 @@ export default function UserAccessLanding() {
           </div>
         </div>
       </section>
+
       {/* Footer */}
       <footer className="py-8 px-4 border-t">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
@@ -849,9 +1174,12 @@ export default function UserAccessLanding() {
             <span className="text-sm text-muted-foreground">Management Software for Rope Access</span>
           </div>
           <div className="flex items-center gap-6 text-sm text-muted-foreground">
-            <Link href="/pricing" className="hover:text-foreground transition-colors">Pricing</Link>
-            <Link href="/changelog" className="hover:text-foreground transition-colors">Changelog</Link>
-            <Link href="/" className="hover:text-foreground transition-colors">Sign In</Link>
+            <Link href="/privacy" className="hover:text-foreground transition-colors" data-testid="link-footer-privacy">
+              Privacy Policy
+            </Link>
+            <Link href="/terms" className="hover:text-foreground transition-colors" data-testid="link-footer-terms">
+              Terms of Service
+            </Link>
           </div>
         </div>
       </footer>
