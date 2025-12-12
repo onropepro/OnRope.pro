@@ -124,7 +124,7 @@ export default function UserAccessLanding() {
       </section>
 
       {/* Stats Panel */}
-      <section className="relative z-0 bg-white dark:bg-slate-950 -mt-8">
+      <section className="relative z-0 bg-white dark:bg-slate-950 -mt-px">
         <div className="max-w-5xl mx-auto px-4 pt-4 pb-12">
           <Card className="shadow-xl border-0">
             <CardContent className="p-8">
