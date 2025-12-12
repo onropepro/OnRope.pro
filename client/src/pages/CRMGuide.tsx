@@ -579,8 +579,8 @@ export default function CRMGuide() {
           <div className="grid md:grid-cols-2 gap-4">
             <Link href="/clients">
               <Button variant="outline" 
-              className="justify-between h-auto p-4"
-              data-testid="link-clients" className="w-full justify-between h-auto p-4">
+              className="w-full justify-between h-auto p-4"
+              data-testid="link-clients">
 
               <div className="text-left">
                 <div className="font-semibold">Go to Clients</div>
@@ -592,8 +592,8 @@ export default function CRMGuide() {
 
             <Link href="/changelog/resident-portal">
               <Button variant="outline" 
-              className="justify-between h-auto p-4"
-              data-testid="link-resident-portal-guide" className="w-full justify-between h-auto p-4">
+              className="w-full justify-between h-auto p-4"
+              data-testid="link-resident-portal-guide">
 
               <div className="text-left">
                 <div className="font-semibold">Resident Portal Guide</div>

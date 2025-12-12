@@ -602,8 +602,8 @@ export default function BrandingGuide() {
           <div className="grid md:grid-cols-2 gap-4">
             <Link href="/settings">
               <Button variant="outline" 
-              className="justify-between h-auto p-4"
-              data-testid="link-settings" className="w-full justify-between h-auto p-4">
+              className="w-full justify-between h-auto p-4"
+              data-testid="link-settings">
 
               <div className="text-left">
                 <div className="font-semibold">Go to Settings</div>
@@ -615,8 +615,8 @@ export default function BrandingGuide() {
 
             <Link href="/changelog/quoting">
               <Button variant="outline" 
-              className="justify-between h-auto p-4"
-              data-testid="link-quoting-guide" className="w-full justify-between h-auto p-4">
+              className="w-full justify-between h-auto p-4"
+              data-testid="link-quoting-guide">
 
               <div className="text-left">
                 <div className="font-semibold">Quoting Guide</div>

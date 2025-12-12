@@ -438,8 +438,8 @@ export default function LanguageGuide() {
           <div className="grid md:grid-cols-2 gap-4">
             <Link href="/profile">
               <Button variant="outline" 
-              className="justify-between h-auto p-4"
-              data-testid="link-profile" className="w-full justify-between h-auto p-4">
+              className="w-full justify-between h-auto p-4"
+              data-testid="link-profile">
 
               <div className="text-left">
                 <div className="font-semibold">Go to Profile</div>
@@ -451,8 +451,8 @@ export default function LanguageGuide() {
 
             <Link href="/changelog/gps">
               <Button variant="outline" 
-              className="justify-between h-auto p-4"
-              data-testid="link-gps-guide" className="w-full justify-between h-auto p-4">
+              className="w-full justify-between h-auto p-4"
+              data-testid="link-gps-guide">
 
               <div className="text-left">
                 <div className="font-semibold">GPS & Location Guide</div>

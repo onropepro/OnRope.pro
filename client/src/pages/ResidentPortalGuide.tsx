@@ -881,8 +881,8 @@ export default function ResidentPortalGuide() {
           <div className="grid md:grid-cols-2 gap-4">
             <Link href="/residents">
               <Button variant="outline" 
-              className="justify-between h-auto p-4"
-              data-testid="link-residents" className="w-full justify-between h-auto p-4">
+              className="w-full justify-between h-auto p-4"
+              data-testid="link-residents">
 
               <div className="text-left">
                 <div className="font-semibold">Resident Management</div>
@@ -894,8 +894,8 @@ export default function ResidentPortalGuide() {
 
             <Link href="/changelog/branding">
               <Button variant="outline" 
-              className="justify-between h-auto p-4"
-              data-testid="link-branding-guide" className="w-full justify-between h-auto p-4">
+              className="w-full justify-between h-auto p-4"
+              data-testid="link-branding-guide">
 
               <div className="text-left">
                 <div className="font-semibold">Branding Guide</div>

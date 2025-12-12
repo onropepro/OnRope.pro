@@ -485,8 +485,8 @@ export default function AnalyticsGuide() {
           <div className="grid md:grid-cols-2 gap-4">
             <Link href="/dashboard">
               <Button variant="outline" 
-              className="justify-between h-auto p-4"
-              data-testid="link-dashboard" className="w-full justify-between h-auto p-4">
+              className="w-full justify-between h-auto p-4"
+              data-testid="link-dashboard">
 
               <div className="text-left">
                 <div className="font-semibold">Go to Dashboard</div>
@@ -498,8 +498,8 @@ export default function AnalyticsGuide() {
 
             <Link href="/changelog/time-tracking">
               <Button variant="outline" 
-              className="justify-between h-auto p-4"
-              data-testid="link-time-tracking-guide" className="w-full justify-between h-auto p-4">
+              className="w-full justify-between h-auto p-4"
+              data-testid="link-time-tracking-guide">
 
               <div className="text-left">
                 <div className="font-semibold">Time Tracking Guide</div>

@@ -510,8 +510,8 @@ export default function PlatformAdminGuide() {
           <div className="grid md:grid-cols-2 gap-4">
             <Link href="/superuser">
               <Button variant="outline" 
-              className="justify-between h-auto p-4"
-              data-testid="link-superuser" className="w-full justify-between h-auto p-4">
+              className="w-full justify-between h-auto p-4"
+              data-testid="link-superuser">
 
               <div className="text-left">
                 <div className="font-semibold">SuperUser Dashboard</div>
@@ -523,8 +523,8 @@ export default function PlatformAdminGuide() {
 
             <Link href="/changelog/analytics">
               <Button variant="outline" 
-              className="justify-between h-auto p-4"
-              data-testid="link-analytics-guide" className="w-full justify-between h-auto p-4">
+              className="w-full justify-between h-auto p-4"
+              data-testid="link-analytics-guide">
 
               <div className="text-left">
                 <div className="font-semibold">Analytics Guide</div>

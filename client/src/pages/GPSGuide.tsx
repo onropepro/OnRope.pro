@@ -503,8 +503,8 @@ export default function GPSGuide() {
           <div className="grid md:grid-cols-2 gap-4">
             <Link href="/time-tracking">
               <Button variant="outline" 
-              className="justify-between h-auto p-4"
-              data-testid="link-time-tracking" className="w-full justify-between h-auto p-4">
+              className="w-full justify-between h-auto p-4"
+              data-testid="link-time-tracking">
 
               <div className="text-left">
                 <div className="font-semibold">Time Tracking</div>
@@ -516,8 +516,8 @@ export default function GPSGuide() {
 
             <Link href="/changelog/property-manager">
               <Button variant="outline" 
-              className="justify-between h-auto p-4"
-              data-testid="link-property-manager-guide" className="w-full justify-between h-auto p-4">
+              className="w-full justify-between h-auto p-4"
+              data-testid="link-property-manager-guide">
 
               <div className="text-left">
                 <div className="font-semibold">Property Manager Guide</div>

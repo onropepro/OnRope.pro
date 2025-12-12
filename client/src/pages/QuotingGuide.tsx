@@ -673,8 +673,8 @@ export default function QuotingGuide() {
           <div className="grid md:grid-cols-2 gap-4">
             <Link href="/quotes">
               <Button variant="outline" 
-              className="justify-between h-auto p-4"
-              data-testid="link-quotes" className="w-full justify-between h-auto p-4">
+              className="w-full justify-between h-auto p-4"
+              data-testid="link-quotes">
 
               <div className="text-left">
                 <div className="font-semibold">Go to Quotes</div>
@@ -686,8 +686,8 @@ export default function QuotingGuide() {
 
             <Link href="/changelog/crm">
               <Button variant="outline" 
-              className="justify-between h-auto p-4"
-              data-testid="link-crm-guide" className="w-full justify-between h-auto p-4">
+              className="w-full justify-between h-auto p-4"
+              data-testid="link-crm-guide">
 
               <div className="text-left">
                 <div className="font-semibold">CRM Guide</div>

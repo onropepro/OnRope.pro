@@ -888,8 +888,8 @@ export default function InventoryGuide() {
           <div className="grid md:grid-cols-2 gap-4">
             <Link href="/inventory">
               <Button variant="outline" 
-              className="justify-between h-auto p-4"
-              data-testid="link-inventory" className="w-full justify-between h-auto p-4">
+              className="w-full justify-between h-auto p-4"
+              data-testid="link-inventory">
 
               <div className="text-left">
                 <div className="font-semibold">Go to Inventory</div>
@@ -901,8 +901,8 @@ export default function InventoryGuide() {
 
             <Link href="/my-gear">
               <Button variant="outline" 
-              className="justify-between h-auto p-4"
-              data-testid="link-my-gear" className="w-full justify-between h-auto p-4">
+              className="w-full justify-between h-auto p-4"
+              data-testid="link-my-gear">
 
               <div className="text-left">
                 <div className="font-semibold">My Gear</div>
