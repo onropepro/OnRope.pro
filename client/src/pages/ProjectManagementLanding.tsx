@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { PublicHeader } from "@/components/PublicHeader";
 import ropeAccessSoftwareImg from "@assets/rope-access-software_1765481835892.jpg";
+import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import {
   Briefcase,
   CheckCircle2,

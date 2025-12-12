@@ -6,6 +6,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { PublicHeader } from "@/components/PublicHeader";
+import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import {
   Shield,
   CheckCircle2,
