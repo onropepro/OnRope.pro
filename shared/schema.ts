@@ -210,11 +210,6 @@ export const users = pgTable("users", {
   // Language preference (all roles)
   preferredLanguage: varchar("preferred_language").default('en'), // en | fr - user's preferred language
   
-  // OAuth authentication (all roles)
-  oauthId: varchar("oauth_id").unique(), // OAuth provider user ID (e.g., Replit user ID)
-  oauthProvider: varchar("oauth_provider"), // OAuth provider name (e.g., 'replit', 'google', 'apple')
-  profileImageUrl: text("profile_image_url"), // Profile image URL from OAuth provider
-  
   // Activity tracking
   lastActivityAt: timestamp("last_activity_at"), // Last time user made any API request (for activity monitoring)
   

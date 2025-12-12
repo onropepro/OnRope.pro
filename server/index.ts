@@ -1,7 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
-import helmet from "helmet";
 import { pool } from "./db";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
@@ -10,23 +9,6 @@ import { wsHub } from "./websocket-hub";
 import { SESSION_SECRET, SESSION_COOKIE_NAME } from "./session-config";
 
 const app = express();
-
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "blob:", "https:"],
-      connectSrc: ["'self'", "https://replit.com", "wss:", "https:"],
-      frameSrc: ["'self'", "https://replit.com"],
-      formAction: ["'self'", "https://replit.com"],
-    },
-  },
-  crossOriginEmbedderPolicy: false,
-  crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
-}));
 
 // Health check endpoint - responds immediately for deployment health checks
 // This must be before any middleware that requires database connections

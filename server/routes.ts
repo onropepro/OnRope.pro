@@ -52,7 +52,6 @@ const irataVerificationRateLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-
 // SECURITY: Password strength validation
 function validatePasswordStrength(password: string): { valid: boolean; message: string } {
   if (!password || password.length < 8) {
