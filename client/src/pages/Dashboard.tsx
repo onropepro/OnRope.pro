@@ -97,6 +97,8 @@ const projectSchema = z.object({
   floorsPerDay: z.string().optional(),
   totalStalls: z.string().optional(),
   stallsPerDay: z.string().optional(),
+  totalAnchors: z.string().optional(),
+  anchorsPerDay: z.string().optional(),
   assignedEmployees: z.array(z.string()).optional(),
   peaceWork: z.boolean().default(false),
   pricePerDrop: z.string().optional(),
@@ -1715,6 +1717,8 @@ export default function Dashboard() {
           floorsPerDay: data.floorsPerDay ? parseInt(data.floorsPerDay) : undefined,
           totalStalls: data.totalStalls ? parseInt(data.totalStalls) : undefined,
           stallsPerDay: data.stallsPerDay ? parseInt(data.stallsPerDay) : undefined,
+          totalAnchors: data.totalAnchors ? parseInt(data.totalAnchors) : undefined,
+          anchorsPerDay: data.anchorsPerDay ? parseInt(data.anchorsPerDay) : undefined,
           assignedEmployees: data.assignedEmployees || [],
           peaceWork: data.peaceWork || false,
           pricePerDrop: data.pricePerDrop ? parseInt(data.pricePerDrop) : undefined,
@@ -3892,9 +3896,47 @@ export default function Dashboard() {
                           />
                         )}
 
-                        {/* Hide Floor Count for General Pressure Washing, Ground Window, and Rock Scaling (hours-based tracking) */}
+                        {projectForm.watch("jobType") === "anchor_inspection" && (
+                          <>
+                            <FormField
+                              control={projectForm.control}
+                              name="totalAnchors"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>{t('dashboard.projectForm.totalAnchors', 'Total Anchors to Inspect')}</FormLabel>
+                                  <FormControl>
+                                    <Input type="number" min="1" placeholder="e.g., 14" {...field} data-testid="input-total-anchors" className="h-12" />
+                                  </FormControl>
+                                  <FormDescription className="text-xs">
+                                    {t('dashboard.projectForm.totalAnchorsDesc', 'How many anchor points need to be inspected?')}
+                                  </FormDescription>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={projectForm.control}
+                              name="anchorsPerDay"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>{t('dashboard.projectForm.anchorsPerDay', 'Target Anchors per Day')}</FormLabel>
+                                  <FormControl>
+                                    <Input type="number" min="1" placeholder="e.g., 5" {...field} data-testid="input-anchors-per-day" className="h-12" />
+                                  </FormControl>
+                                  <FormDescription className="text-xs">
+                                    {t('dashboard.projectForm.anchorsPerDayDesc', 'Expected number of anchors to inspect per day')}
+                                  </FormDescription>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </>
+                        )}
+
+                        {/* Hide Floor Count for General Pressure Washing, Ground Window, Rock Scaling (hours-based tracking), and Anchor Inspection (anchor-based) */}
                         {projectForm.watch("jobType") !== "general_pressure_washing" && 
                          projectForm.watch("jobType") !== "ground_window_cleaning" && 
+                         projectForm.watch("jobType") !== "anchor_inspection" &&
                          projectForm.watch("jobCategory") !== "rock_scaling" && (
                           <FormField
                             control={projectForm.control}
@@ -4409,6 +4451,7 @@ export default function Dashboard() {
                     filteredProjects.filter((p: Project) => p.status === "active").map((project: Project) => {
                       const isInSuite = project.jobType === "in_suite_dryer_vent_cleaning";
                       const isParkade = project.jobType === "parkade_pressure_cleaning";
+                      const isAnchorInspection = project.jobType === "anchor_inspection";
                       // Use getProgressType to correctly identify hours-based jobs (NDT, Rock Scaling, etc.)
                       const progressType = getProgressType(project.jobType);
                       const isHoursBased = progressType === 'hours';
@@ -4457,6 +4500,15 @@ export default function Dashboard() {
                         total = project.totalStalls || project.floorCount || 0;
                         progressPercent = total > 0 ? (completed / total) * 100 : 0;
                         unitLabel = t('dashboard.projects.stalls', 'stalls');
+                      } else if (isAnchorInspection) {
+                        // Anchor-based tracking (Anchor Inspection)
+                        // completedAnchors comes from summed work session anchorsInspected
+                        const anchorSessions = allWorkSessions.filter((s: any) => s.projectId === project.id && s.endTime);
+                        const totalAnchorsInspected = anchorSessions.reduce((sum: number, s: any) => sum + (s.anchorsInspected || 0), 0);
+                        completed = totalAnchorsInspected;
+                        total = project.totalAnchors || 0;
+                        progressPercent = total > 0 ? (completed / total) * 100 : 0;
+                        unitLabel = t('dashboard.projects.anchors', 'anchors');
                       } else {
                         // Drop-based tracking (Window Cleaning, Building Wash, etc.)
                         completed = project.completedDrops || 0;
@@ -4489,8 +4541,8 @@ export default function Dashboard() {
                                 )}
                               </div>
                               <div className="flex flex-col items-end gap-2">
-                                {/* Hide floor count badge for hours-based projects (NDT, Rock Scaling, General Pressure Washing, Ground Window) */}
-                                {!isHoursBased && !isInSuite && !isParkade && project.floorCount && (
+                                {/* Hide floor count badge for hours-based projects, suite/stall/anchor-based projects */}
+                                {!isHoursBased && !isInSuite && !isParkade && !isAnchorInspection && project.floorCount && (
                                   <Badge variant="secondary" className="text-sm px-3 py-1">
                                     <span className="material-icons text-xs mr-1">layers</span>
                                     {project.floorCount}
