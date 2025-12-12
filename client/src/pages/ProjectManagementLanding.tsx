@@ -79,7 +79,7 @@ export default function ProjectManagementLanding() {
             
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
               Track every building, elevation, and technician from one dashboard.<br />
-              <strong>See exactly where every job stands without a single phone call or site visit.</strong>
+              <strong>See exactly where every job stands<br />without a single phone call or site visit.</strong>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
