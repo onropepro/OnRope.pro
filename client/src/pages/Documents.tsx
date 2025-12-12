@@ -5078,261 +5078,203 @@ export default function Documents() {
     initPracticeTemplatesMutation.mutate(practices);
   };
 
+  // Calculate metrics for simple dashboard cards
+  const hasHealthSafety = healthSafetyDocs.length > 0;
+  const hasPolicy = policyDocs.length > 0;
+  const hasInsurance = insuranceDocs.length > 0;
+  const totalDocsRequired = canUploadDocuments ? 3 : 2;
+  const docsCount = canUploadDocuments 
+    ? (hasHealthSafety ? 1 : 0) + (hasPolicy ? 1 : 0) + (hasInsurance ? 1 : 0)
+    : (hasHealthSafety ? 1 : 0) + (hasPolicy ? 1 : 0);
+  const ratingPercent = totalDocsRequired > 0 ? Math.round((docsCount / totalDocsRequired) * 100) : 0;
+
+  // Calculate compliance metrics
+  const allReviews = allDocumentReviewsData?.reviews || [];
+  const allEmployees = employeesData?.employees || [];
+  const activeEmployees = allEmployees.filter((e: any) => 
+    !e.suspendedAt && e.connectionStatus !== 'suspended' && !e.terminatedDate
+  );
+  const companyOwner = currentUser?.role === 'company' ? currentUser : null;
+  const allStaff = companyOwner 
+    ? [companyOwner, ...activeEmployees.filter((e: any) => e.id !== companyOwner.id)]
+    : activeEmployees;
+  const requiredDocTypes = ['health_safety_manual', 'company_policy', 'safe_work_procedure', 'safe_work_practice'];
+  const requiredDocs = companyDocuments.filter((doc: any) => 
+    requiredDocTypes.includes(doc.documentType)
+  );
+  const totalEmployees = allStaff.length;
+  const totalRequiredSignatures = totalEmployees * requiredDocs.length;
+  const signedReviews = allReviews.filter((r: any) => r.signedAt).length;
+  const compliancePercent = totalRequiredSignatures > 0 
+    ? Math.round((signedReviews / totalRequiredSignatures) * 100) 
+    : 0;
+
   return (
     <div className="min-h-screen bg-background p-4 pb-24">
       <div className="max-w-6xl mx-auto">
+        {/* Clean Header */}
         <div className="mb-6">
           <BackButton to="/dashboard" label={t('dashboard.backToDashboard', 'Back to Dashboard')} />
-          <div className="mb-4">
-            <h1 className="text-xl sm:text-3xl font-bold truncate">{t('documents.pageTitle', 'Documents & Records')}</h1>
-            <p className="text-sm text-muted-foreground hidden sm:block mt-1">{t('documents.pageSubtitle', 'All company documents and safety records')}</p>
+          <div className="space-y-1">
+            <h1 className="text-2xl sm:text-3xl font-bold">{t('documents.pageTitle', 'Documents & Records')}</h1>
+            <p className="text-muted-foreground">{t('documents.pageSubtitle', 'All company documents and safety records')}</p>
           </div>
         </div>
 
-        {/* Documentation Safety Rating */}
-        {(() => {
-          const hasHealthSafety = healthSafetyDocs.length > 0;
-          const hasPolicy = policyDocs.length > 0;
-          const hasInsurance = insuranceDocs.length > 0;
-          
-          // For employees without permission, only count Health & Safety and Company Policy (2 docs max)
-          // For company owners/ops managers, count all 3 documents
-          const totalDocsRequired = canUploadDocuments ? 3 : 2;
-          const docsCount = canUploadDocuments 
-            ? (hasHealthSafety ? 1 : 0) + (hasPolicy ? 1 : 0) + (hasInsurance ? 1 : 0)
-            : (hasHealthSafety ? 1 : 0) + (hasPolicy ? 1 : 0);
-          const ratingPercent = totalDocsRequired > 0 ? Math.round((docsCount / totalDocsRequired) * 100) : 0;
-          
-          return (
-            <Card className="mb-6 overflow-hidden">
-              <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
-                <div className="flex items-start gap-4">
-                  <div className={`p-3 rounded-xl ring-1 ${
-                    ratingPercent === 100 
-                      ? 'bg-emerald-500/10 ring-emerald-500/20' 
-                      : ratingPercent >= 50 
-                        ? 'bg-amber-500/10 ring-amber-500/20'
-                        : 'bg-red-500/10 ring-red-500/20'
-                  }`}>
-                    <Shield className={`h-6 w-6 ${
-                      ratingPercent === 100 
-                        ? 'text-primary' 
-                        : ratingPercent >= 50 
-                          ? 'text-amber-600 dark:text-amber-400'
-                          : 'text-red-600 dark:text-red-400'
-                    }`} />
-                  </div>
-                  <div className="flex-1">
-                    <CardTitle className="text-xl mb-1">{t('documents.safetyRating.title', 'Documentation Safety Rating')}</CardTitle>
-                    <p className="text-sm text-muted-foreground">
-                      {ratingPercent === 100 
-                        ? t('documents.safetyRating.excellent', 'Excellent! All required documents are uploaded')
-                        : ratingPercent >= 50 
-                          ? t('documents.safetyRating.partial', 'Partial compliance - upload missing documents')
-                          : t('documents.safetyRating.none', 'No documents uploaded yet')}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <div className={`text-3xl font-bold ${
-                      ratingPercent === 100 
-                        ? 'text-primary' 
-                        : ratingPercent >= 50 
-                          ? 'text-amber-600 dark:text-amber-400'
-                          : 'text-red-600 dark:text-red-400'
-                    }`}>
-                      {ratingPercent}%
-                    </div>
-                    <div className="text-sm text-muted-foreground">{docsCount}/{totalDocsRequired} {t('documents.safetyRating.documents', 'documents')}</div>
-                  </div>
+        {/* Simple Metric Cards - SuperUser Style */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="p-4 rounded-xl border bg-card">
+            <div className="flex items-center gap-3">
+              <div className={`p-2.5 rounded-lg ${ratingPercent === 100 ? 'bg-emerald-50 dark:bg-emerald-500/10' : ratingPercent >= 50 ? 'bg-amber-50 dark:bg-amber-500/10' : 'bg-red-50 dark:bg-red-500/10'}`}>
+                <Shield className={`h-5 w-5 ${ratingPercent === 100 ? 'text-emerald-500' : ratingPercent >= 50 ? 'text-amber-500' : 'text-red-500'}`} />
+              </div>
+              <div>
+                <p className={`text-2xl font-bold ${ratingPercent === 100 ? 'text-emerald-600 dark:text-emerald-400' : ratingPercent >= 50 ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'}`}>{ratingPercent}%</p>
+                <p className="text-sm text-muted-foreground">{t('documents.safetyRating.title', 'Doc Rating')}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-4 rounded-xl border bg-card">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-lg bg-blue-50 dark:bg-blue-500/10">
+                <FileText className="h-5 w-5 text-blue-500" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{companyDocuments.length}</p>
+                <p className="text-sm text-muted-foreground">{t('documents.totalDocuments', 'Total Docs')}</p>
+              </div>
+            </div>
+          </div>
+
+          {canUploadDocuments && (
+            <div className="p-4 rounded-xl border bg-card">
+              <div className="flex items-center gap-3">
+                <div className={`p-2.5 rounded-lg ${totalRequiredSignatures === 0 ? 'bg-muted' : compliancePercent === 100 ? 'bg-emerald-50 dark:bg-emerald-500/10' : 'bg-amber-50 dark:bg-amber-500/10'}`}>
+                  <Users className={`h-5 w-5 ${totalRequiredSignatures === 0 ? 'text-muted-foreground' : compliancePercent === 100 ? 'text-emerald-500' : 'text-amber-500'}`} />
                 </div>
-              </CardHeader>
-              <CardContent className="pt-4">
-                <div className="flex flex-wrap gap-3 mb-3">
-                  <div className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm ${
-                    hasHealthSafety 
-                      ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300' 
-                      : 'bg-muted text-muted-foreground'
-                  }`}>
-                    {hasHealthSafety ? (
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                    ) : (
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    )}
-                    {t('documents.healthSafety', 'Health & Safety')}
-                  </div>
-                  <div className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm ${
-                    hasPolicy 
-                      ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300' 
-                      : 'bg-muted text-muted-foreground'
-                  }`}>
-                    {hasPolicy ? (
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                    ) : (
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    )}
-                    {t('documents.companyPolicy', 'Company Policy')}
-                  </div>
-                  {canUploadDocuments && (
-                    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm ${
-                      hasInsurance 
-                        ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300' 
-                        : 'bg-muted text-muted-foreground'
-                    }`}>
-                      {hasInsurance ? (
-                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                      ) : (
-                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      )}
-                      {t('documents.certificateOfInsurance', 'Certificate of Insurance')}
-                    </div>
-                  )}
+                <div>
+                  <p className={`text-2xl font-bold ${totalRequiredSignatures === 0 ? 'text-muted-foreground' : compliancePercent === 100 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>{totalRequiredSignatures === 0 ? 'N/A' : `${compliancePercent}%`}</p>
+                  <p className="text-sm text-muted-foreground">{t('documents.teamCompliance', 'Team Compliance')}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="p-4 rounded-xl border bg-card">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-lg bg-purple-50 dark:bg-purple-500/10">
+                <PenLine className="h-5 w-5 text-purple-500" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{signedReviews}/{totalRequiredSignatures || 0}</p>
+                <p className="text-sm text-muted-foreground">{t('documents.signatures', 'Signatures')}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Admin View: Team Compliance - Simplified Collapsible */}
+        {canUploadDocuments && (
+          <Collapsible defaultOpen={false} className="mb-6">
+            <CollapsibleTrigger className="group flex items-center justify-between w-full p-4 rounded-xl border bg-card hover-elevate">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Users className="h-5 w-5 text-primary" />
+                </div>
+                <div className="text-left">
+                  <p className="font-semibold">{t('documents.teamCompliance', 'Team Compliance')}</p>
+                  <p className="text-sm text-muted-foreground">{totalEmployees} {t('documents.employees', 'employees')} | {requiredDocs.length} {t('documents.requiredDocs', 'required docs')}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Badge variant={totalRequiredSignatures === 0 ? "secondary" : compliancePercent === 100 ? "default" : "secondary"} className={totalRequiredSignatures === 0 ? "" : compliancePercent === 100 ? "bg-emerald-500" : "bg-amber-500/20 text-amber-700 dark:text-amber-300"}>
+                  {totalRequiredSignatures === 0 ? t('documents.noDocsYet', 'No docs yet') : `${compliancePercent}% ${t('documents.signed', 'Signed')}`}
+                </Badge>
+                <ChevronRight className="h-5 w-5 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-90" />
+              </div>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mt-4 p-4 rounded-xl border bg-card">
+              {/* Progress Bar */}
+              <div className="mb-4">
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-muted-foreground">{t('documents.signaturesProgress', 'Signatures Progress')}</span>
+                  <span className="font-medium">{signedReviews}/{totalRequiredSignatures}</span>
                 </div>
                 <Progress 
-                  value={ratingPercent} 
+                  value={totalRequiredSignatures > 0 ? compliancePercent : 0} 
                   className={`h-2 ${
-                    ratingPercent === 100 
+                    compliancePercent === 100 
                       ? '[&>div]:bg-emerald-500' 
-                      : ratingPercent >= 50 
+                      : compliancePercent >= 50 
                         ? '[&>div]:bg-amber-500'
                         : '[&>div]:bg-red-500'
                   }`} 
                 />
-              </CardContent>
-            </Card>
-          );
-        })()}
+              </div>
+              
+              {/* Employee List */}
+              {(() => {
+                const employeeReviews = allReviews.reduce((acc: Record<string, any[]>, review: any) => {
+                  const key = review.employeeId;
+                  if (!acc[key]) acc[key] = [];
+                  acc[key].push(review);
+                  return acc;
+                }, {} as Record<string, any[]>);
+                
+                const employeeStats = allStaff.map((employee: any) => {
+                  const reviews = employeeReviews[employee.id] || [];
+                  const signed = reviews.filter((r: any) => r.signedAt);
+                  const signedDocIds = new Set(signed.map((r: any) => r.documentId));
+                  const allRequiredSigned = requiredDocs.every((doc: any) => signedDocIds.has(doc.id));
+                  return {
+                    employeeId: employee.id,
+                    employeeName: employee.name || employee.email || 'Unknown',
+                    signedCount: signed.length,
+                    pendingCount: requiredDocs.length - signed.length,
+                    totalCount: requiredDocs.length,
+                    isComplete: allRequiredSigned && requiredDocs.length > 0,
+                  };
+                }).sort((a, b) => {
+                  if (a.pendingCount > 0 && b.pendingCount === 0) return -1;
+                  if (a.pendingCount === 0 && b.pendingCount > 0) return 1;
+                  return a.employeeName.localeCompare(b.employeeName);
+                });
 
-        {/* Admin View: Employee Document Compliance Status */}
-        {canUploadDocuments && (
-          (() => {
-            const allReviews = allDocumentReviewsData?.reviews || [];
-            const allEmployees = employeesData?.employees || [];
-            
-            // Include company owner in the staff list for compliance tracking
-            // Filter out suspended employees - they should not appear in compliance tracking
-            // Check both primary suspension (suspendedAt) and secondary suspension (connectionStatus)
-            const activeEmployees = allEmployees.filter((e: any) => 
-              !e.suspendedAt && e.connectionStatus !== 'suspended' && !e.terminatedDate
-            );
-            const companyOwner = currentUser?.role === 'company' ? currentUser : null;
-            const allStaff = companyOwner 
-              ? [companyOwner, ...activeEmployees.filter((e: any) => e.id !== companyOwner.id)]
-              : activeEmployees;
-            
-            // Required documents that employees must sign (includes all safe work procedures AND practices)
-            const requiredDocTypes = ['health_safety_manual', 'company_policy', 'safe_work_procedure', 'safe_work_practice'];
-            const requiredDocs = companyDocuments.filter((doc: any) => 
-              requiredDocTypes.includes(doc.documentType)
-            );
-            
-            // Total staff (company owner + employees)
-            const totalEmployees = allStaff.length;
-            
-            // Total required signatures = staff * required documents
-            const totalRequiredSignatures = totalEmployees * requiredDocs.length;
-            
-            // Group reviews by employee
-            const employeeReviews = allReviews.reduce((acc: Record<string, any[]>, review: any) => {
-              const key = review.employeeId;
-              if (!acc[key]) acc[key] = [];
-              acc[key].push(review);
-              return acc;
-            }, {} as Record<string, any[]>);
-            
-            // Calculate stats for each staff member (including company owner and those without any reviews yet)
-            const employeeStats = allStaff.map((employee: any) => {
-              const reviews = employeeReviews[employee.id] || [];
-              const signed = reviews.filter((r: any) => r.signedAt);
-              const pending = reviews.filter((r: any) => !r.signedAt);
-              const viewed = reviews.filter((r: any) => r.viewedAt && !r.signedAt);
-              
-              // Check if all required documents are signed
-              const signedDocIds = new Set(signed.map((r: any) => r.documentId));
-              const allRequiredSigned = requiredDocs.every((doc: any) => signedDocIds.has(doc.id));
-              
-              // Build complete document list with status for ALL required docs (not just ones with reviews)
-              const allDocumentStatuses = requiredDocs.map((doc: any) => {
-                const review = reviews.find((r: any) => r.documentId === doc.id);
-                return {
-                  id: review?.id || `pending-${doc.id}`,
-                  documentId: doc.id,
-                  documentName: doc.fileName || doc.documentType,
-                  documentType: doc.documentType,
-                  viewedAt: review?.viewedAt || null,
-                  signedAt: review?.signedAt || null,
-                  status: review?.signedAt ? 'signed' : (review?.viewedAt ? 'viewed' : 'pending'),
-                };
-              });
-              
-              return {
-                employeeId: employee.id,
-                employeeName: employee.name || employee.email || 'Unknown',
-                reviews: allDocumentStatuses, // Use complete list instead of just existing reviews
-                signedCount: signed.length,
-                pendingCount: requiredDocs.length - signed.length, // Pending = required docs not yet signed
-                viewedCount: viewed.length,
-                totalCount: requiredDocs.length,
-                isComplete: allRequiredSigned && requiredDocs.length > 0,
-              };
-            }).sort((a: any, b: any) => {
-              // Sort: pending first, then by name
-              if (a.pendingCount > 0 && b.pendingCount === 0) return -1;
-              if (a.pendingCount === 0 && b.pendingCount > 0) return 1;
-              return a.employeeName.localeCompare(b.employeeName);
-            });
-            
-            const signedReviews = allReviews.filter((r: any) => r.signedAt).length;
-            const completeEmployees = employeeStats.filter((e: any) => e.isComplete).length;
-            const pendingEmployees = totalEmployees - completeEmployees;
-            
-            // Compliance = signed reviews / total required signatures
-            // If no documents uploaded, show 0% (not 100%) - documents need to be added first
-            const hasNoDocuments = requiredDocs.length === 0;
-            const compliancePercent = totalRequiredSignatures > 0 
-              ? Math.round((signedReviews / totalRequiredSignatures) * 100) 
-              : 0;
-            
-            const formatDocType = (type: string, docName?: string) => {
-              switch (type) {
-                case 'health_safety_manual': return 'Health & Safety Manual';
-                case 'company_policy': return 'Company Policy';
-                case 'method_statement': return 'Method Statement';
-                case 'safe_work_procedure': return docName || 'Safe Work Procedure';
-                default: return type;
-              }
-            };
-            
-            const formatTimestamp = (ts: string | null) => {
-              if (!ts) return null;
-              return formatLocalDateMedium(ts);
-            };
-            
-            return (
-              <Card className="mb-6">
-                <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
-                  <div className="flex items-start gap-4">
-                    <div className="p-3 bg-primary/10 rounded-xl ring-1 ring-primary/20">
-                      <Users className="h-6 w-6 text-primary" />
+                const completeCount = employeeStats.filter(e => e.isComplete).length;
+                const pendingCount = employeeStats.filter(e => !e.isComplete && e.totalCount > 0).length;
+
+                return (
+                  <div className="space-y-3">
+                    {/* Quick Stats */}
+                    <div className="flex gap-4 text-sm mb-3">
+                      <span className="text-emerald-600 dark:text-emerald-400"><CheckCircle2 className="h-4 w-4 inline mr-1" />{completeCount} {t('documents.complete', 'complete')}</span>
+                      <span className="text-amber-600 dark:text-amber-400"><AlertCircle className="h-4 w-4 inline mr-1" />{pendingCount} {t('documents.pending', 'pending')}</span>
                     </div>
-                    <div className="flex-1">
-                      <CardTitle className="text-xl mb-1">{t('documents.employeeDocumentCompliance', 'Employee Document Compliance')}</CardTitle>
-                      <CardDescription>
-                        {t('documents.trackEmployeesReviewed', 'Track which employees have reviewed and signed required documents')}
-                      </CardDescription>
-                    </div>
-                    <div className="flex items-center gap-2">
+                    
+                    {employeeStats.map((employee) => (
+                      <div key={employee.employeeId} className="flex items-center justify-between p-3 rounded-lg border">
+                        <span className="font-medium">{employee.employeeName}</span>
+                        <div className="flex items-center gap-2">
+                          {employee.isComplete ? (
+                            <Badge variant="default" className="bg-emerald-500 text-xs">
+                              <CheckCircle2 className="h-3 w-3 mr-1" />
+                              {t('documents.complete', 'Complete')}
+                            </Badge>
+                          ) : employee.totalCount === 0 ? (
+                            <Badge variant="secondary" className="text-xs">
+                              {t('documents.awaitingDocs', 'Awaiting docs')}
+                            </Badge>
+                          ) : (
+                            <Badge variant="secondary" className="bg-amber-500/20 text-amber-700 dark:text-amber-300 text-xs">
+                              {employee.pendingCount} {t('documents.pending', 'pending')}
+                            </Badge>
+                          )}
+                          <span className="text-sm text-muted-foreground">{employee.signedCount}/{employee.totalCount}</span>
+                        </div>
+                      </div>
+                    ))}
+                    <div className="flex justify-end pt-2 border-t">
                       <Button
                         variant="outline"
                         size="sm"
@@ -5340,185 +5282,15 @@ export default function Documents() {
                         disabled={downloadingComplianceReport}
                         data-testid="button-download-compliance-report"
                       >
-                        {downloadingComplianceReport ? (
-                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        ) : (
-                          <Download className="h-4 w-4 mr-2" />
-                        )}
+                        {downloadingComplianceReport ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Download className="h-4 w-4 mr-2" />}
                         {t('documents.downloadReport', 'Download Report')}
                       </Button>
-                      <div className="flex flex-col items-end gap-1">
-                        <Badge 
-                          variant={compliancePercent === 100 && !hasNoDocuments ? "default" : "secondary"} 
-                          className={`text-base font-semibold px-3 ${
-                            hasNoDocuments 
-                              ? 'bg-amber-500/20 text-amber-700 dark:text-amber-300' 
-                              : compliancePercent === 100 
-                                ? 'bg-emerald-500' 
-                                : ''
-                          }`}
-                        >
-                          {hasNoDocuments 
-                            ? t('documents.noDocuments', 'No Documents') 
-                            : `${compliancePercent}% ${t('documents.signed', 'Signed')}`
-                          }
-                        </Badge>
-                        {!hasNoDocuments && compliancePercent < 100 && (
-                          <span className="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1">
-                            <Shield className="h-3 w-3" />
-                            {Math.round((100 - compliancePercent) * 0.05)}% {t('documents.csrPenalty', 'CSR penalty')}
-                          </span>
-                        )}
-                        {hasNoDocuments && (
-                          <span className="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1">
-                            <AlertCircle className="h-3 w-3" />
-                            {t('documents.uploadDocsFirst', 'Upload documents first')}
-                          </span>
-                        )}
-                      </div>
                     </div>
                   </div>
-                </CardHeader>
-                <CardContent className="pt-6">
-                  {/* Summary Stats */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-                    <div className="p-3 rounded-lg bg-muted/50">
-                      <div className="text-2xl font-bold">{totalEmployees}</div>
-                      <div className="text-sm text-muted-foreground">{t('documents.totalEmployees', 'Total Employees')}</div>
-                    </div>
-                    <div className="p-3 rounded-lg bg-emerald-500/10">
-                      <div className="text-2xl font-bold text-primary">{completeEmployees}</div>
-                      <div className="text-sm text-muted-foreground">{t('documents.fullyCompliant', 'Fully Compliant')}</div>
-                    </div>
-                    <div className="p-3 rounded-lg bg-amber-500/10">
-                      <div className="text-2xl font-bold text-amber-600 dark:text-amber-400">{totalEmployees - completeEmployees}</div>
-                      <div className="text-sm text-muted-foreground">{t('documents.pendingSignatures', 'Pending Signatures')}</div>
-                    </div>
-                    <div className="p-3 rounded-lg bg-primary/10">
-                      <div className="text-2xl font-bold text-primary">{signedReviews}/{totalRequiredSignatures}</div>
-                      <div className="text-sm text-muted-foreground">{t('documents.documentsSigned', 'Documents Signed')}</div>
-                    </div>
-                  </div>
-                  
-                  <Progress 
-                    value={compliancePercent} 
-                    className={`h-2 mb-6 ${
-                      compliancePercent === 100 
-                        ? '[&>div]:bg-emerald-500' 
-                        : compliancePercent >= 50 
-                          ? '[&>div]:bg-amber-500'
-                          : '[&>div]:bg-red-500'
-                    }`} 
-                  />
-                  
-                  {/* Employee List */}
-                  {employeeStats.length > 0 ? (
-                    <div className="space-y-2">
-                      {employeeStats.map((employee) => (
-                        <Collapsible key={employee.employeeId} defaultOpen={false}>
-                          <CollapsibleTrigger 
-                            className="group flex items-center gap-3 w-full p-3 rounded-lg border bg-card hover-elevate"
-                            data-testid={`toggle-employee-docs-${employee.employeeId}`}
-                          >
-                            <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
-                            <div className="flex-1 text-left min-w-0">
-                              <span className="font-medium truncate">{employee.employeeName}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              {hasNoDocuments ? (
-                                <Badge variant="secondary" className="bg-muted text-muted-foreground text-xs">
-                                  <FileText className="h-3 w-3 mr-1" />
-                                  {t('documents.awaitingDocs', 'Awaiting Documents')}
-                                </Badge>
-                              ) : employee.isComplete ? (
-                                <Badge variant="default" className="bg-emerald-500 text-xs">
-                                  <CheckCircle2 className="h-3 w-3 mr-1" />
-                                  {t('documents.complete', 'Complete')}
-                                </Badge>
-                              ) : (
-                                <Badge variant="secondary" className="bg-amber-500/20 text-amber-700 dark:text-amber-300 text-xs">
-                                  <AlertCircle className="h-3 w-3 mr-1" />
-                                  {employee.pendingCount} {t('documents.pending', 'Pending')}
-                                </Badge>
-                              )}
-                              <Badge variant="outline" className="text-xs">
-                                {employee.signedCount}/{employee.totalCount}
-                              </Badge>
-                            </div>
-                          </CollapsibleTrigger>
-                          <CollapsibleContent className="pl-7 mt-2 space-y-2">
-                            {employee.reviews.map((review: any) => (
-                              <div 
-                                key={review.id} 
-                                className={`flex items-center gap-3 p-3 rounded-lg border ${
-                                  review.signedAt 
-                                    ? 'bg-emerald-500/5 border-emerald-500/20' 
-                                    : review.viewedAt 
-                                      ? 'bg-amber-500/5 border-amber-500/20'
-                                      : 'bg-muted/50'
-                                }`}
-                                data-testid={`doc-review-${review.id}`}
-                              >
-                                <div className={`p-2 rounded-lg ${
-                                  review.signedAt 
-                                    ? 'bg-emerald-500/10' 
-                                    : review.viewedAt 
-                                      ? 'bg-amber-500/10'
-                                      : 'bg-muted'
-                                }`}>
-                                  {review.signedAt ? (
-                                    <PenLine className="h-4 w-4 text-primary" />
-                                  ) : review.viewedAt ? (
-                                    <Eye className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-                                  ) : (
-                                    <Clock className="h-4 w-4 text-muted-foreground" />
-                                  )}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="font-medium text-sm truncate">{review.documentName}</div>
-                                  <div className="text-xs text-muted-foreground">{formatDocType(review.documentType)}</div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  {/* Status info - no action buttons in admin view; use Document Reviews section below to sign */}
-                                  <div className="text-right text-xs space-y-1">
-                                    {review.viewedAt && (
-                                      <div className="flex items-center gap-1 text-muted-foreground">
-                                        <Eye className="h-3 w-3" />
-                                        {formatTimestamp(review.viewedAt)}
-                                      </div>
-                                    )}
-                                    {review.signedAt && (
-                                      <div className="flex items-center gap-1 text-primary">
-                                        <PenLine className="h-3 w-3" />
-                                        {formatTimestamp(review.signedAt)}
-                                      </div>
-                                    )}
-                                    {!review.viewedAt && !review.signedAt && (
-                                      <div className="text-muted-foreground">{t('documents.notViewed', 'Not viewed')}</div>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </CollapsibleContent>
-                        </Collapsible>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8">
-                      <div className="inline-flex p-4 bg-primary/5 rounded-full mb-4">
-                        <Users className="h-8 w-8 text-primary/50" />
-                      </div>
-                      <p className="text-muted-foreground font-medium">{t('documents.noDocumentReviewsAssigned', 'No document reviews assigned')}</p>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {t('documents.enrollEmployees', 'Enroll employees in document reviews to track their compliance')}
-                      </p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            );
-          })()
+                );
+              })()}
+            </CollapsibleContent>
+          </Collapsible>
         )}
 
         {/* Document Reviews - for employees to review and sign required documents */}
