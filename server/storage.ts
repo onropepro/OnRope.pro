@@ -80,31 +80,6 @@ export class Storage {
     return result[0] ? decryptSensitiveFields(result[0]) : undefined;
   }
 
-  async getUserByOAuthId(oauthId: string, provider: string): Promise<User | undefined> {
-    const result = await db.select().from(users).where(
-      and(
-        eq(users.oauthId, oauthId),
-        eq(users.oauthProvider, provider)
-      )
-    ).limit(1);
-    return result[0] ? decryptSensitiveFields(result[0]) : undefined;
-  }
-
-  async linkOAuthToUser(userId: string, oauthId: string, provider: string, profileImageUrl?: string): Promise<User | undefined> {
-    const updateData: Partial<User> = {
-      oauthId,
-      oauthProvider: provider,
-    };
-    if (profileImageUrl) {
-      updateData.profileImageUrl = profileImageUrl;
-    }
-    const result = await db.update(users)
-      .set(updateData)
-      .where(eq(users.id, userId))
-      .returning();
-    return result[0] ? decryptSensitiveFields(result[0]) : undefined;
-  }
-
   async createUser(user: InsertUser): Promise<User> {
     // Hash password before storing
     const hashedPassword = await bcrypt.hash(user.passwordHash, SALT_ROUNDS);
