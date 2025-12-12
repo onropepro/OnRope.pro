@@ -401,6 +401,10 @@ export const projects = pgTable("projects", {
   totalStalls: integer("total_stalls"), // For parkade_pressure_cleaning - total parking stalls
   stallsPerDay: integer("stalls_per_day"), // For parkade_pressure_cleaning
   buildingFloors: integer("building_floors"), // For in_suite_dryer_vent_cleaning - total floors in building (separate from unit count)
+  
+  // Anchor inspection fields
+  totalAnchors: integer("total_anchors"), // For anchor_inspection - total anchors to inspect
+  anchorsPerDay: integer("anchors_per_day"), // For anchor_inspection - target anchors per day
   assignedEmployees: text("assigned_employees").array().default(sql`ARRAY[]::text[]`), // Array of employee IDs assigned to this project
   peaceWork: boolean("peace_work").notNull().default(false), // Peace work toggle for project billing/tracking
   pricePerDrop: integer("price_per_drop"), // Price per drop when peace work is enabled
@@ -494,6 +498,9 @@ export const workSessions = pgTable("work_sessions", {
   
   // Manual completion percentage for hours-based job types (General Pressure Washing, Ground Window)
   manualCompletionPercentage: integer("manual_completion_percentage"), // 0-100, null if not applicable
+  
+  // Anchors inspected for anchor_inspection job type
+  anchorsInspected: integer("anchors_inspected").default(0), // Number of anchors inspected this session
   
   // Peace work payment - when project has peaceWork enabled, pay = drops × pricePerDrop
   peaceWorkPay: numeric("peace_work_pay", { precision: 10, scale: 2 }), // Total pay for this session based on drops (null if not peace work)

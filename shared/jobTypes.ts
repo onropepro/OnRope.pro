@@ -9,7 +9,7 @@ export interface JobTypeConfig {
   label: string;
   icon: string;
   elevationRequirement: ElevationRequirement;
-  progressType: 'drops' | 'hours' | 'suites' | 'stalls' | 'floors';
+  progressType: 'drops' | 'hours' | 'suites' | 'stalls' | 'floors' | 'anchors';
 }
 
 export const JOB_CATEGORIES: { value: JobCategory; labelKey: string; label: string; icon: string }[] = [
@@ -36,6 +36,9 @@ export const JOB_TYPES: JobTypeConfig[] = [
   
   // Building Maintenance - Stall-based
   { value: 'parkade_pressure_cleaning', category: 'building_maintenance', labelKey: 'dashboard.jobTypes.parkade_pressure_cleaning', label: 'Parkade Pressure Cleaning', icon: 'local_parking', elevationRequirement: 'never', progressType: 'stalls' },
+  
+  // Building Maintenance - Anchor-based
+  { value: 'anchor_inspection', category: 'building_maintenance', labelKey: 'dashboard.jobTypes.anchor_inspection', label: 'Anchor Inspection', icon: 'anchor', elevationRequirement: 'always', progressType: 'anchors' },
   
   // Building Maintenance - Other
   { value: 'other', category: 'building_maintenance', labelKey: 'dashboard.jobTypes.other', label: 'Other', icon: 'more_horiz', elevationRequirement: 'configurable', progressType: 'hours' },
@@ -67,9 +70,15 @@ export function getCategoryForJobType(jobType: string): JobCategory {
   return config?.category || 'building_maintenance';
 }
 
-export function getProgressType(jobType: string): 'drops' | 'hours' | 'suites' | 'stalls' | 'floors' {
+export function getProgressType(jobType: string): 'drops' | 'hours' | 'suites' | 'stalls' | 'floors' | 'anchors' {
   const config = getJobTypeConfig(jobType);
   return config?.progressType || 'hours';
+}
+
+// Check if a job type uses anchor-based progress tracking
+export function isAnchorBasedJobType(jobType: string): boolean {
+  const config = getJobTypeConfig(jobType);
+  return config?.progressType === 'anchors';
 }
 
 // Get all valid job type values for validation
