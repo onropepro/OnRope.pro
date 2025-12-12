@@ -62,35 +62,40 @@ export default function ProjectManagementLanding() {
     <div className="min-h-screen bg-white dark:bg-slate-950">
       <PublicHeader activeNav="modules" />
 
-      {/* Hero Section - Ocean Blue gradient per design guidelines */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#0B64A3] to-[#0369A1] text-white py-24">
+      {/* Hero Section - Following Module Hero Template from design_guidelines.md */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-sky-600 via-sky-700 to-blue-900 text-white">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMtOS45NDEgMC0xOCA4LjA1OS0xOCAxOHM4LjA1OSAxOCAxOCAxOGM5Ljk0MSAwIDE4LTguMDU5IDE4LTE4cy04LjA1OS0xOC0xOC0xOHptMCAzMmMtNy43MzIgMC0xNC02LjI2OC0xNC0xNHM2LjI2OC0xNCAxNC0xNHMxNCA2LjI2OCAxNCAxNC02LjI2OCAxNC0xNCAxNHoiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wMykiLz48L2c+PC9zdmc+')] opacity-30"></div>
         
-        <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8 text-center space-y-6">
-          <Badge className="bg-white/20 text-white border border-white/40">Project Management Module</Badge>
-          
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight">
-            Stop Managing Projects<br />
-            <span className="text-amber-300">In Your Head</span>
-          </h1>
-          
-          <p className="text-base md:text-lg text-white/80 max-w-3xl mx-auto leading-relaxed">
-            Track every building, elevation, and technician from one dashboard. See exactly where every job stands without a single phone call or site visit.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
-            <Button size="lg" className="h-11 px-6 bg-[#AB4521] text-white border-[#AB4521]" asChild data-testid="button-cta-trial">
-              <Link href="/register">
-                Start Your 90-Day Trial
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Link>
-            </Button>
-            <Button size="lg" variant="outline" className="h-11 px-6 bg-white/10 backdrop-blur-xl border-white/40 text-white" asChild data-testid="button-cta-demo">
-              <Link href="#knowledgebase">
-                Find Answers
-                <BookOpen className="ml-2 w-5 h-5" />
-              </Link>
-            </Button>
+        <div className="relative max-w-6xl mx-auto px-4 py-20 md:py-28">
+          <div className="text-center space-y-6">
+            <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-module-label">
+              Project Management Module
+            </Badge>
+            
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
+              Stop Managing Projects<br />
+              <span className="text-sky-200">In Your Head</span>
+            </h1>
+            
+            <p className="text-xl md:text-2xl text-sky-100 max-w-3xl mx-auto leading-relaxed">
+              Track every building, elevation, and technician from one dashboard.<br />
+              <strong>See exactly where every job stands without a single phone call or site visit.</strong>
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+              <Button size="lg" className="bg-white text-sky-700 hover:bg-sky-50" asChild data-testid="button-cta-trial">
+                <Link href="/register">
+                  Start Your Free Trial
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Link>
+              </Button>
+              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-cta-demo">
+                <Link href="#knowledgebase">
+                  Find Answers
+                  <BookOpen className="ml-2 w-5 h-5" />
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
         
@@ -102,36 +107,26 @@ export default function ProjectManagementLanding() {
         </div>
       </section>
 
-      {/* Stats Section - per design guidelines: rounded-3xl, shadow-xl, -mt-20, p-12, 4-col grid */}
-      <section className="relative z-10 -mt-20 max-w-7xl mx-auto px-4 md:px-8">
-        <Card className="shadow-xl rounded-3xl border border-slate-200 dark:border-slate-800">
-          <CardContent className="p-8 md:p-12">
+      {/* Stats Panel - Following Module Hero Template from design_guidelines.md */}
+      <section className="relative z-10 -mt-8 max-w-5xl mx-auto px-4">
+        <Card className="shadow-xl border-0">
+          <CardContent className="p-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-              <div className="text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0 md:[&:nth-child(4)]:border-r-0">
-                <div className="text-3xl md:text-4xl font-bold text-emerald-600">4</div>
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-bold text-sky-600">4</div>
                 <div className="text-sm text-muted-foreground mt-1">Elevations tracked independently</div>
               </div>
-              <div className="text-center border-r border-slate-200 dark:border-slate-700 md:border-r md:[&:nth-child(4)]:border-r-0">
-                <div className="text-3xl md:text-4xl font-bold text-[#0B64A3]">87-93%</div>
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-bold text-emerald-600">87-93%</div>
                 <div className="text-sm text-muted-foreground mt-1">Payroll errors eliminated</div>
               </div>
-              <div className="text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0 md:[&:nth-child(4)]:border-r-0">
-                <div className="text-3xl md:text-4xl font-bold text-rose-600">60-70%</div>
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-bold text-violet-600">60-70%</div>
                 <div className="text-sm text-muted-foreground mt-1">Fewer resident complaints</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-violet-600">75%</div>
+                <div className="text-3xl md:text-4xl font-bold text-amber-600">75%</div>
                 <div className="text-sm text-muted-foreground mt-1">Faster quote preparation</div>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-6 md:gap-8 mt-6 md:mt-8 pt-6 md:pt-8 border-t border-slate-200 dark:border-slate-700">
-              <div className="text-center border-r border-slate-200 dark:border-slate-700">
-                <div className="text-3xl md:text-4xl font-bold text-amber-600">5-10</div>
-                <div className="text-sm text-muted-foreground mt-1">Hours saved weekly on scheduling</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-emerald-600">20-30%</div>
-                <div className="text-sm text-muted-foreground mt-1">Faster project completion</div>
               </div>
             </div>
           </CardContent>

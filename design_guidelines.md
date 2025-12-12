@@ -106,6 +106,49 @@ Full-width hero (min-h-screen on desktop, 70vh mobile), gradient background (Pri
 **Stats Panel:**  
 White card, shadow-xl, rounded-3xl, -mt-20 overlap, p-12, 4-col grid (2×2 mobile), Display metrics with gradient text, Label captions, Violet accent icons 48px, vertical Mist dividers.
 
+## Module Landing Page Hero Template
+
+**Reference Implementation:** `/modules/safety-compliance` (SafetyComplianceLanding.tsx)
+
+All module landing pages MUST follow this exact hero structure for consistency:
+
+**Container & Background:**
+```
+<section className="relative overflow-hidden bg-gradient-to-br from-sky-600 via-sky-700 to-blue-900 text-white">
+  <div className="relative max-w-6xl mx-auto px-4 py-20 md:py-28">
+```
+
+**Badge (Module Label):**
+```
+<Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1">
+  [Module Name] Module
+</Badge>
+```
+
+**Headline Typography:**
+- Size: `text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight`
+- Main text: White (default)
+- Emphasis phrase: `text-sky-200` (#BAE6FD) - subtle but obvious offset color
+
+**Subtitle:**
+- Size: `text-xl md:text-2xl text-sky-100`
+- Max width: `max-w-3xl mx-auto`
+- Use `<strong>` for key phrases
+
+**CTA Buttons:**
+- Primary: `<Button size="lg" className="bg-white text-sky-700 hover:bg-sky-50">`
+- Secondary: `<Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10">`
+
+**Stats Panel:**
+- Overlap: `-mt-8` (subtle overlap, not dramatic)
+- Container: `max-w-5xl mx-auto`
+- Card: `shadow-xl border-0` (no visible border)
+- Padding: `p-8`
+
+**Hero Emphasis Color Palette:**
+- Primary emphasis: `text-sky-200` (#BAE6FD) - approved for all module hero headlines
+- Secondary text: `text-sky-100` - for subtitles and descriptions
+
 ## Core Components
 
 **Project Cards:**  
