@@ -406,7 +406,7 @@ function StaticCard({ card, colorIndex, brandColors }: { card: any; colorIndex: 
             borderColor: `${iconColor}40` 
           }}
         >
-          <span className="material-icons text-4xl">{card.icon}</span>
+          <span className="material-icons-outlined text-4xl">{card.icon}</span>
           {card.notificationCount > 0 && (
             <Badge 
               variant="destructive" 
@@ -489,7 +489,7 @@ function SortableCard({ card, isRearranging, colorIndex, brandColors }: { card: 
             borderColor: `${iconColor}40` 
           }}
         >
-          <span className="material-icons text-4xl">{card.icon}</span>
+          <span className="material-icons-outlined text-4xl">{card.icon}</span>
           {card.notificationCount > 0 && (
             <Badge 
               variant="destructive" 
