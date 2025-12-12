@@ -108,50 +108,196 @@ White card, shadow-xl, rounded-3xl, -mt-20 overlap, p-12, 4-col grid (2×2 mobil
 
 ## Module Landing Page Hero Template
 
-**Reference Implementation:** `/modules/safety-compliance` (SafetyComplianceLanding.tsx)
+**CANONICAL REFERENCE:** `/modules/user-access-authentication` (UserAccessLanding.tsx)
 
-All module landing pages MUST follow this exact hero structure for consistency:
+All module landing pages MUST follow this exact hero structure. Copy from UserAccessLanding.tsx for consistency.
 
-**Container & Background:**
-```
-<section className="relative overflow-hidden bg-gradient-to-br from-sky-600 via-sky-700 to-blue-900 text-white">
-  <div className="relative max-w-6xl mx-auto px-4 py-20 md:py-28">
-```
+---
 
-**Badge (Module Label):**
+### Hero Section Structure
+
+**Section Container (Hero Background):**
+```tsx
+<section className="relative text-white pb-[120px]" style={{backgroundImage: 'linear-gradient(135deg, #0B64A3 0%, #0369A1 100%)'}}>
+  <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,...')] opacity-30"></div>
 ```
+- `pb-[120px]` - Bottom padding to accommodate wave separator
+- Inline style gradient: `linear-gradient(135deg, #0B64A3 0%, #0369A1 100%)`
+- Overlay pattern with 30% opacity for visual texture
+
+**Content Container:**
+```tsx
+<div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
+  <div className="text-center space-y-6 pt-16">
+```
+- `max-w-6xl` - Maximum width constraint
+- `py-4 md:py-12` - Compact vertical padding (mobile/desktop)
+- `pt-16` - **CRITICAL: 64px top padding above module label badge**
+- `space-y-6` - Consistent vertical spacing between hero elements
+
+---
+
+### Module Label Badge
+
+```tsx
 <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1">
   [Module Name] Module
 </Badge>
 ```
+- Semi-transparent white background with white text
+- Standard format: "[Module Name] Module"
 
-**Headline Typography:**
-- Size: `text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight`
-- Main text: White (default)
-- Emphasis phrase: `text-sky-200` (#BAE6FD) - subtle but obvious offset color
+---
 
-**Subtitle:**
-- Size: `text-xl md:text-2xl text-sky-100`
-- Max width: `max-w-3xl mx-auto`
-- Use `<strong>` for key phrases
+### Headline Typography
 
-**CTA Buttons:**
-- Primary: `<Button size="lg" className="bg-white text-sky-700 hover:bg-sky-50">`
-- Secondary: `<Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10">`
+```tsx
+<h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
+  Main headline text<br />
+  second line<br />
+  <span className="text-blue-100">emphasis phrase.</span>
+</h1>
+```
+- Size: `text-4xl md:text-5xl lg:text-6xl`
+- Weight: `font-bold`
+- Tracking: `tracking-tight`
+- **Emphasis color: `text-blue-100`** - NOT sky-200
 
-**Stats Panel - Unified Floating Design (All Module Pages):**
-- Section: `className="relative bg-white dark:bg-slate-950 -mt-px overflow-visible"`
-- Container: `className="max-w-3xl mx-auto px-4 pt-4 pb-12"`
-- Card: `className="shadow-xl border-0 relative z-20 -mt-20"`
-- CardContent: `className="p-8"`
+---
+
+### Subtitle/Description
+
+```tsx
+<p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
+  Supporting description text.<br />
+  <strong>Bold key phrase for emphasis.</strong>
+</p>
+```
+- Size: `text-xl md:text-2xl`
+- Color: `text-blue-100` (softer than white)
+- Width: `max-w-3xl mx-auto`
+- Line height: `leading-relaxed`
+- Use `<strong>` for key takeaway phrases
+
+---
+
+### CTA Button Container
+
+```tsx
+<div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+```
+- `pt-4` - 16px spacing above buttons
+- `gap-4` - Consistent spacing between buttons
+- Stack vertically on mobile, horizontal on desktop
+
+**Primary CTA Button:**
+```tsx
+<Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild>
+  <Link href="/register">
+    Start Your Free 60-Day Trial
+    <ArrowRight className="ml-2 w-5 h-5" />
+  </Link>
+</Button>
+```
+- White background with Ocean Blue text
+- **Standard text: "Start Your Free 60-Day Trial"**
+- ArrowRight icon (5×5)
+
+**Secondary CTA Button:**
+```tsx
+<Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild>
+  <Link href="#knowledgebase">
+    Find Answers
+    <BookOpen className="ml-2 w-5 h-5" />
+  </Link>
+</Button>
+```
+- Outline variant with semi-transparent border
+- White text with subtle hover
+
+---
+
+### Wave Separator
+
+```tsx
+<div className="absolute bottom-0 left-0 right-0 z-10">
+  <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto block">
+    <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" className="fill-white dark:fill-slate-950"/>
+  </svg>
+</div>
+```
+- Positioned at bottom of hero section
+- z-10 for proper layering
+- Fill matches content section background
+
+---
+
+### Stats Panel (Floating Card)
+
+**Stats Section Container:**
+```tsx
+<section className="relative bg-white dark:bg-slate-950 -mt-px overflow-visible">
+  <div className="max-w-3xl mx-auto px-4 pt-4 pb-12">
+```
+- `-mt-px` - Seamless connection to hero section
+- `overflow-visible` - **CRITICAL: Prevents card clipping**
+- `max-w-3xl` - Narrower than hero for visual focus
+
+**Floating Stats Card:**
+```tsx
+<Card className="shadow-xl border-0 relative z-20 -mt-20">
+  <CardContent className="p-8">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+```
+- `-mt-20` - **CRITICAL: Pulls card 80px into hero, creating float effect**
+- `z-20` - Ensures card renders above wave separator
+- `shadow-xl border-0` - Strong shadow, no border
+- `p-8` - Generous internal padding
 - Grid: 2 columns mobile, 4 columns desktop
-- Spacing: Gap-6 md:gap-8 between stat columns
-- Float Effect: `-mt-20` pulls card 80px into hero area; `overflow-visible` + `z-20` prevents clipping and ensures card floats above all layers
-- Result: Stats card visually floats between blue hero and white content section, creating smooth visual connector
+- `gap-6 md:gap-8` - Spacing between stat columns
 
-**Hero Emphasis Color Palette:**
-- Primary emphasis: `text-sky-200` (#BAE6FD) - approved for all module hero headlines
-- Secondary text: `text-sky-100` - for subtitles and descriptions
+**Individual Stat Items:**
+```tsx
+<div className="text-center">
+  <div className="text-3xl md:text-4xl font-bold text-blue-600">{value}</div>
+  <div className="text-sm text-muted-foreground mt-1">Label text</div>
+</div>
+```
+- Value: `text-3xl md:text-4xl font-bold` + accent color
+- Label: `text-sm text-muted-foreground mt-1`
+- Accent colors vary by stat meaning (blue, rose, amber, emerald)
+
+---
+
+### Module Landing Page Checklist
+
+When creating a new module landing page, verify:
+
+- [ ] Hero section uses `pb-[120px]` bottom padding
+- [ ] Content container uses `py-4 md:py-12` and `pt-16` for badge spacing
+- [ ] Badge uses `bg-white/20 text-white border-white/30` styling
+- [ ] Headline uses `text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight`
+- [ ] Emphasis text uses `text-blue-100` (NOT sky-200)
+- [ ] Subtitle uses `text-xl md:text-2xl text-blue-100`
+- [ ] Primary CTA says "Start Your Free 60-Day Trial" with ArrowRight icon
+- [ ] Button container has `pt-4` spacing above buttons
+- [ ] Wave separator has `z-10` and positioned at `bottom-0`
+- [ ] Stats section has `overflow-visible` on container
+- [ ] Stats card has `-mt-20 shadow-xl border-0 relative z-20`
+- [ ] Stats card uses `max-w-3xl` container width
+
+---
+
+### Color Reference
+
+| Element | Class | Hex Value |
+|---------|-------|-----------|
+| Hero gradient start | - | #0B64A3 |
+| Hero gradient end | - | #0369A1 |
+| Headline emphasis | `text-blue-100` | #DBEAFE |
+| Subtitle text | `text-blue-100` | #DBEAFE |
+| Primary button bg | `bg-white` | #FFFFFF |
+| Primary button text | `text-[#0B64A3]` | #0B64A3 |
 
 ## Core Components
 
