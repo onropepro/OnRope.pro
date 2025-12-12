@@ -188,10 +188,10 @@ export default function UserAccessLanding() {
         </div>
       </section>
 
-      <Separator className="my-8" />
+      <Separator className="my-0" />
 
       {/* Features Section */}
-      <section id="features" className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
+      <section id="features" className="pt-8 md:pt-12 pb-16 md:pb-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
             Control What Each Person Can Access
