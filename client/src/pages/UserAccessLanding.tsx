@@ -156,6 +156,40 @@ export default function UserAccessLanding() {
         </div>
       </section>
 
+      <Separator className="my-8" />
+
+      {/* Problem Section */}
+      <section className="py-16 md:py-20 px-4">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
+            The Access Problem Nobody Talks About
+          </h2>
+          
+          <Card className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+            <CardContent className="p-6 md:p-8 space-y-4 text-muted-foreground">
+              <p className="text-lg leading-relaxed font-medium text-foreground">
+                Construction software wasn't built for your business.
+              </p>
+              <p>
+                The moment you add your supervisor to the system, they see everything. Pay rates. Profit margins. Which jobs lose money. Which technicians cost you the most.
+              </p>
+              <p>
+                It's not that you don't trust them. It's that some information belongs at the owner level. Period.
+              </p>
+              <p>
+                Most systems force a choice: handle everything yourself (and become the bottleneck), or give access and hope nobody looks where they shouldn't.
+              </p>
+              <Separator className="my-6" />
+              <p className="font-medium text-foreground text-lg">
+                OnRopePro separates what people can do from what they can see.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      <Separator className="my-8" />
+
       {/* Key Features */}
       <section className="py-16 md:py-20 px-4 max-w-4xl mx-auto space-y-8">
         <div>
@@ -328,38 +362,6 @@ export default function UserAccessLanding() {
               </CardContent>
             </Card>
           </div>
-        </div>
-      </section>
-
-      <Separator className="my-8" />
-
-      {/* Problem Section */}
-      <section className="py-16 md:py-20 px-4">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
-            The Access Problem Nobody Talks About
-          </h2>
-          
-          <Card className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
-            <CardContent className="p-6 md:p-8 space-y-4 text-muted-foreground">
-              <p className="text-lg leading-relaxed font-medium text-foreground">
-                Construction software wasn't built for your business.
-              </p>
-              <p>
-                The moment you add your supervisor to the system, they see everything. Pay rates. Profit margins. Which jobs lose money. Which technicians cost you the most.
-              </p>
-              <p>
-                It's not that you don't trust them. It's that some information belongs at the owner level. Period.
-              </p>
-              <p>
-                Most systems force a choice: handle everything yourself (and become the bottleneck), or give access and hope nobody looks where they shouldn't.
-              </p>
-              <Separator className="my-6" />
-              <p className="font-medium text-foreground text-lg">
-                OnRopePro separates what people can do from what they can see.
-              </p>
-            </CardContent>
-          </Card>
         </div>
       </section>
 
