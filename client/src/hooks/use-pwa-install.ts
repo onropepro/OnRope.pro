@@ -9,6 +9,7 @@ export function usePWAInstall() {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstalled, setIsInstalled] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -18,14 +19,25 @@ export function usePWAInstall() {
 
     window.addEventListener("beforeinstallprompt", handler);
 
+    // Check if already installed as standalone
     if (window.matchMedia('(display-mode: standalone)').matches) {
+      setIsInstalled(true);
+    }
+    
+    // Also check navigator.standalone for iOS
+    if ((window.navigator as any).standalone === true) {
       setIsInstalled(true);
     }
 
     const userAgent = window.navigator.userAgent.toLowerCase();
-    const isIOSDevice = /iphone|ipad|ipod/.test(userAgent);
-    const isSafari = /safari/.test(userAgent) && !/chrome/.test(userAgent);
-    setIsIOS(isIOSDevice && isSafari);
+    // iOS detection - any iOS device (Safari, Chrome on iOS, etc.)
+    const isIOSDevice = /iphone|ipad|ipod/.test(userAgent) || 
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    setIsIOS(isIOSDevice);
+    
+    // Mobile detection for Android
+    const isMobileDevice = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
+    setIsMobile(isMobileDevice);
 
     window.addEventListener('appinstalled', () => {
       setIsInstalled(true);
@@ -58,6 +70,7 @@ export function usePWAInstall() {
     canInstall: !!installPrompt && !isInstalled,
     isInstalled,
     isIOS,
+    isMobile,
     promptInstall
   };
 }
