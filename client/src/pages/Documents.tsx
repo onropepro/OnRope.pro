@@ -4985,6 +4985,7 @@ export default function Documents() {
         });
         queryClient.invalidateQueries({ queryKey: ["/api/company-documents"] });
         queryClient.invalidateQueries({ queryKey: ["/api/document-reviews"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/document-reviews/my"] });
       }
     },
     onError: (error: Error) => {
@@ -5044,6 +5045,7 @@ export default function Documents() {
         });
         queryClient.invalidateQueries({ queryKey: ["/api/company-documents"] });
         queryClient.invalidateQueries({ queryKey: ["/api/document-reviews"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/document-reviews/my"] });
       }
     },
     onError: (error: Error) => {
@@ -5521,136 +5523,6 @@ export default function Documents() {
 
         {/* Document Reviews - for employees to review and sign required documents */}
         <DocumentReviews companyDocuments={[...healthSafetyDocs, ...policyDocs]} />
-
-        {/* Signed Documents Archive - Shows all signed documents grouped by employee */}
-        {canUploadDocuments && (
-          (() => {
-            const allReviews = allDocumentReviewsData?.reviews || [];
-            const allEmployees = employeesData?.employees || [];
-            
-            const formatDocType = (type: string) => {
-              switch (type) {
-                case 'health_safety_manual': return t('documents.healthSafetyManual', 'Health & Safety Manual');
-                case 'company_policy': return t('documents.companyPolicy', 'Company Policy');
-                case 'safe_work_procedure': return t('documents.safeWorkProcedure', 'Safe Work Procedure');
-                case 'safe_work_practice': return t('documents.safeWorkPractice', 'Safe Work Practice');
-                default: return type;
-              }
-            };
-            
-            const formatTimestamp = (ts: string | null) => {
-              if (!ts) return '';
-              return new Date(ts).toLocaleDateString();
-            };
-            
-            // Filter only signed reviews and exclude suspended employees
-            const signedReviews = allReviews.filter((r: any) => r.signedAt);
-            const activeEmployeeIds = new Set(
-              allEmployees
-                .filter((e: any) => !e.suspendedAt && e.connectionStatus !== 'suspended' && !e.terminatedDate)
-                .map((e: any) => e.id)
-            );
-            
-            // Include company owner
-            const companyOwner = currentUser?.role === 'company' ? currentUser : null;
-            if (companyOwner) {
-              activeEmployeeIds.add(companyOwner.id);
-            }
-            
-            // Group signed reviews by employee
-            const signedByEmployee: Record<string, { name: string; reviews: any[] }> = {};
-            
-            signedReviews.forEach((review: any) => {
-              if (!activeEmployeeIds.has(review.employeeId)) return;
-              
-              if (!signedByEmployee[review.employeeId]) {
-                // Find employee name
-                const employee = allEmployees.find((e: any) => e.id === review.employeeId);
-                const isOwner = companyOwner && review.employeeId === companyOwner.id;
-                signedByEmployee[review.employeeId] = {
-                  name: isOwner ? (companyOwner.name || companyOwner.email || 'Company Owner') : (employee?.name || employee?.email || 'Unknown'),
-                  reviews: [],
-                };
-              }
-              signedByEmployee[review.employeeId].reviews.push(review);
-            });
-            
-            const employeesWithSignedDocs = Object.entries(signedByEmployee)
-              .map(([id, data]) => ({ employeeId: id, ...data }))
-              .sort((a, b) => a.name.localeCompare(b.name));
-            
-            const totalSignedDocs = signedReviews.filter((r: any) => activeEmployeeIds.has(r.employeeId)).length;
-            
-            if (totalSignedDocs === 0) return null;
-            
-            return (
-              <Card className="mb-6 overflow-hidden">
-                <CardHeader className="bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-transparent pb-4">
-                  <div className="flex items-start gap-4">
-                    <div className="p-3 bg-emerald-500/10 rounded-xl ring-1 ring-emerald-500/20">
-                      <FileCheck className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
-                    </div>
-                    <div className="flex-1">
-                      <CardTitle className="text-lg font-semibold mb-1">
-                        {t('documents.signedDocuments', 'Signed Documents')}
-                      </CardTitle>
-                      <CardDescription>
-                        {t('documents.signedDocumentsDescription', 'Archive of all employee-signed documents')}
-                      </CardDescription>
-                    </div>
-                    <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
-                      {totalSignedDocs} {t('documents.signed', 'Signed')}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-6">
-                  <div className="space-y-2">
-                    {employeesWithSignedDocs.map((employee) => (
-                      <Collapsible key={employee.employeeId} defaultOpen={false}>
-                        <CollapsibleTrigger 
-                          className="group flex items-center gap-3 w-full p-3 rounded-lg border bg-card hover-elevate"
-                          data-testid={`toggle-signed-docs-${employee.employeeId}`}
-                        >
-                          <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
-                          <div className="flex-1 text-left min-w-0">
-                            <span className="font-medium truncate">{employee.name}</span>
-                          </div>
-                          <Badge variant="default" className="bg-emerald-500 text-xs">
-                            <FileCheck className="h-3 w-3 mr-1" />
-                            {employee.reviews.length} {t('documents.documents', 'Documents')}
-                          </Badge>
-                        </CollapsibleTrigger>
-                        <CollapsibleContent className="pl-7 mt-2 space-y-2">
-                          {employee.reviews.map((review: any) => (
-                            <div 
-                              key={review.id} 
-                              className="flex items-center gap-3 p-3 rounded-lg border bg-emerald-500/5 border-emerald-500/20"
-                              data-testid={`signed-doc-${review.id}`}
-                            >
-                              <div className="p-2 rounded-lg bg-emerald-500/10">
-                                <PenLine className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="font-medium text-sm truncate">{review.documentName}</div>
-                                <div className="text-xs text-muted-foreground">{formatDocType(review.documentType)}</div>
-                              </div>
-                              <div className="text-right text-xs">
-                                <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
-                                  <PenLine className="h-3 w-3" />
-                                  {formatTimestamp(review.signedAt)}
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </CollapsibleContent>
-                      </Collapsible>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })()
-        )}
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="mb-6">
