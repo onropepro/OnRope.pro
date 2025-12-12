@@ -12,7 +12,6 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { 
   HardHat, 
-  ArrowLeft, 
   Mail, 
   CreditCard, 
   CheckCircle2, 
@@ -37,7 +36,7 @@ import {
   DollarSign
 } from "lucide-react";
 import { TechnicianRegistration } from "@/components/TechnicianRegistration";
-import { InstallPWAButton } from "@/components/InstallPWAButton";
+import { PublicHeader } from "@/components/PublicHeader";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
@@ -379,7 +378,9 @@ export default function TechnicianLogin() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row">
+    <div className="min-h-screen flex flex-col">
+      <PublicHeader activeNav="technician" />
+      
       <style>{`
         @keyframes scroll-left {
           0% { transform: translateX(0); }
@@ -401,68 +402,10 @@ export default function TechnicianLogin() {
         }
       `}</style>
 
-      {/* Left Column - 70% Marketing Content (or 100% when problems column is hidden) */}
-      <div className={`flex-1 ${showProblemsColumn ? 'lg:w-[70%]' : 'lg:w-full'} overflow-y-auto bg-background transition-all duration-300`}>
-        {/* Header */}
-        <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
-          <div className="container mx-auto px-6 py-4 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-3">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setLocation("/")}
-                  data-testid="button-back-home"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                </Button>
-                <img 
-                  src={onRopeProLogo} 
-                  alt="OnRopePro" 
-                  className="h-8 object-contain"
-                />
-              </div>
-              <nav className="hidden md:flex items-center gap-1">
-                <Button
-                  variant="ghost"
-                  className="text-sm font-medium"
-                  onClick={() => setLocation("#")}
-                  data-testid="nav-employer"
-                >
-                  Employer
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="text-sm font-medium"
-                  onClick={() => setLocation("/technician-login")}
-                  data-testid="nav-technician"
-                >
-                  Technician
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="text-sm font-medium"
-                  onClick={() => setLocation("#")}
-                  data-testid="nav-property-manager"
-                >
-                  Property Manager
-                </Button>
-              </nav>
-            </div>
-            <div className="flex items-center gap-2">
-              <InstallPWAButton />
-              <Button
-                variant="outline"
-                onClick={() => setShowLoginDialog(true)}
-                data-testid="button-sign-in"
-              >
-                Sign In
-              </Button>
-            </div>
-          </div>
-        </header>
-
-        {/* Hero Section - Flowbite Style */}
+      <div className="flex-1 flex flex-col lg:flex-row">
+        {/* Left Column - 70% Marketing Content (or 100% when problems column is hidden) */}
+        <div className={`flex-1 ${showProblemsColumn ? 'lg:w-[70%]' : 'lg:w-full'} overflow-y-auto bg-background transition-all duration-300`}>
+          {/* Hero Section - Flowbite Style */}
         <section className="py-20 lg:py-32">
           <div className="container mx-auto px-6 lg:px-8">
             <div className="max-w-4xl mx-auto text-center">

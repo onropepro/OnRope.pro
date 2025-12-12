@@ -4,15 +4,14 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Rocket, Play, Building2, Clock, DollarSign, Users, Shield, MessageSquare, ArrowRight } from "lucide-react";
-import { InstallPWAButton } from "@/components/InstallPWAButton";
+import { PublicHeader } from "@/components/PublicHeader";
 import { Slider } from "@/components/ui/slider";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 export default function Employer() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
-  const [landingLanguage, setLandingLanguage] = useState<'en' | 'fr'>('en');
   const [roiEmployeeCount, setRoiEmployeeCount] = useState(12);
 
   const rotatingWords = [
@@ -29,93 +28,10 @@ export default function Employer() {
     return () => clearInterval(interval);
   }, [rotatingWords.length]);
 
-  const toggleLandingLanguage = () => {
-    const newLang = landingLanguage === 'en' ? 'fr' : 'en';
-    setLandingLanguage(newLang);
-    i18n.changeLanguage(newLang);
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary/5 via-background to-background flex flex-col">
-      {/* Header */}
-      <header className="flex items-center justify-between px-6 md:px-8 py-4 border-b bg-background/80 backdrop-blur-sm sticky top-0 z-50">
-        {/* Logo - Left */}
-        <div className="flex items-center">
-          <img src={onRopeProLogo} alt="OnRopePro" className="h-16 object-contain cursor-pointer" onClick={() => setLocation("/")} />
-        </div>
-        
-        {/* Navigation - Center */}
-        <nav className="hidden lg:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
-          <Button
-            variant="default"
-            className="text-sm font-medium"
-            onClick={() => setLocation("/employer")}
-            data-testid="nav-employer"
-          >
-            Employer
-          </Button>
-          <Button
-            variant="ghost"
-            className="text-sm font-medium"
-            onClick={() => setLocation("/technician-login")}
-            data-testid="nav-technician"
-          >
-            Technician
-          </Button>
-          <Button
-            variant="ghost"
-            className="text-sm font-medium"
-            onClick={() => setLocation("#")}
-            data-testid="nav-property-manager"
-          >
-            Property Manager
-          </Button>
-          <Button
-            variant="ghost"
-            className="text-sm font-medium"
-            onClick={() => setLocation("/link")}
-            data-testid="nav-resident"
-          >
-            Resident
-          </Button>
-          <Button
-            variant="ghost"
-            className="text-sm font-medium"
-            onClick={() => setLocation("/building-portal")}
-            data-testid="nav-building-manager"
-          >
-            Building Manager
-          </Button>
-        </nav>
-        
-        {/* Actions - Right */}
-        <div className="flex items-center gap-3">
-          <InstallPWAButton />
-          <Button 
-            variant="ghost"
-            size="sm"
-            onClick={toggleLandingLanguage}
-            data-testid="button-language-toggle"
-          >
-            {landingLanguage === 'en' ? 'FR' : 'EN'}
-          </Button>
-          <Button 
-            variant="ghost"
-            onClick={() => setLocation("/login")}
-            data-testid="button-sign-in-header"
-          >
-            {t('login.header.signIn', 'Sign In')}
-          </Button>
-          <Button 
-            onClick={() => setLocation("/pricing")}
-            className="bg-action-600 hover:bg-action-500 focus:ring-4 focus:ring-action-500/50"
-            data-testid="button-get-started-header"
-          >
-            {t('login.header.getStarted', 'Get Started')}
-          </Button>
-        </div>
-      </header>
-
+      <PublicHeader activeNav="employer" />
+      
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center text-center px-6 py-16 md:py-24 bg-neutral-100 dark:bg-navy-950">
         <h1 className="text-xs md:text-sm font-semibold tracking-widest text-muted-foreground uppercase mb-1.5">
