@@ -28,8 +28,8 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export default function Login() {
   const { t, i18n } = useTranslation();
   const { toast } = useToast();
-  const [, setLocation] = useLocation();
-  const [showLoginForm, setShowLoginForm] = useState(true);
+  const [location, setLocation] = useLocation();
+  const [showLoginForm, setShowLoginForm] = useState(location === "/login");
   const [showTechnicianRegistration, setShowTechnicianRegistration] = useState(false);
   const [showDevTools, setShowDevTools] = useState(false);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
@@ -49,6 +49,12 @@ export default function Login() {
     t('login.rotatingWords.hourScheduled', 'drop'),
     t('login.rotatingWords.employeePerformance', "employee's performance level")
   ];
+
+  useEffect(() => {
+    if (location === "/login") {
+      setShowLoginForm(true);
+    }
+  }, [location]);
 
   useEffect(() => {
     const interval = setInterval(() => {
