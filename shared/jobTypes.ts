@@ -38,7 +38,7 @@ export const JOB_TYPES: JobTypeConfig[] = [
   { value: 'parkade_pressure_cleaning', category: 'building_maintenance', labelKey: 'dashboard.jobTypes.parkade_pressure_cleaning', label: 'Parkade Pressure Cleaning', icon: 'local_parking', elevationRequirement: 'never', progressType: 'stalls' },
   
   // Building Maintenance - Anchor-based
-  { value: 'anchor_inspection', category: 'building_maintenance', labelKey: 'dashboard.jobTypes.anchor_inspection', label: 'Anchor Inspection', icon: 'anchor', elevationRequirement: 'always', progressType: 'anchors' },
+  { value: 'anchor_inspection', category: 'building_maintenance', labelKey: 'dashboard.jobTypes.anchor_inspection', label: 'Anchor Inspection', icon: 'anchor', elevationRequirement: 'configurable', progressType: 'anchors' },
   
   // Building Maintenance - Other
   { value: 'other', category: 'building_maintenance', labelKey: 'dashboard.jobTypes.other', label: 'Other', icon: 'more_horiz', elevationRequirement: 'configurable', progressType: 'hours' },
