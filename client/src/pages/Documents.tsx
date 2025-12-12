@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BackButton } from "@/components/BackButton";
-import DocumentsLayout from "@/components/DocumentsLayout";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -5111,12 +5110,17 @@ export default function Documents() {
     : 0;
 
   return (
-    <DocumentsLayout 
-      title={t('documents.pageTitle', 'Documents & Records')}
-      activeTab={activeTab}
-      onTabChange={setActiveTab}
-    >
-      <div className="p-6">
+    <div className="min-h-screen bg-background p-4 pb-24">
+      <div className="max-w-6xl mx-auto">
+        {/* Page Header */}
+        <div className="flex items-center gap-3 mb-6">
+          <BackButton />
+          <div>
+            <h1 className="text-2xl font-bold">{t('documents.pageTitle', 'Documents & Records')}</h1>
+            <p className="text-muted-foreground text-sm">{t('documents.subtitle', 'Company documents and safety records')}</p>
+          </div>
+        </div>
+
         {/* SuperUser-Style Metric Cards - Flat, minimal, no card backgrounds */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="flex items-center gap-3">
@@ -5335,6 +5339,34 @@ export default function Documents() {
                     {t('documents.damageReports', 'Damage Reports')}
                   </div>
                 </SelectItem>
+                {canViewSafety && (
+                  <>
+                    <SelectItem value="toolbox-meetings" data-testid="option-toolbox-meetings">
+                      <div className="flex items-center gap-2">
+                        <ClipboardList className="h-4 w-4" />
+                        {t('documents.toolboxMeetingRecords', 'Toolbox Meetings')}
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="flha-records" data-testid="option-flha-records">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4" />
+                        {t('documents.flhaRecords', 'FLHA Records')}
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="incident-reports" data-testid="option-incident-reports">
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4" />
+                        {t('documents.incidentReports', 'Incident Reports')}
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="method-statements" data-testid="option-method-statements">
+                      <div className="flex items-center gap-2">
+                        <FileText className="h-4 w-4" />
+                        {t('documents.methodStatements', 'Method Statements')}
+                      </div>
+                    </SelectItem>
+                  </>
+                )}
               </SelectContent>
             </Select>
           </div>
@@ -6633,8 +6665,8 @@ export default function Documents() {
           </TabsContent>
         </Tabs>
 
-        {/* Rope Access Plans - Only visible if user has safety document permission */}
-        {canViewSafety && (
+        {/* Rope Access Plans - Hidden from main documents page (accessible from projects) */}
+        {false && canViewSafety && (
           <Card className="mb-6 overflow-hidden">
             <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
               <div className="flex items-start gap-4">
@@ -6730,22 +6762,23 @@ export default function Documents() {
           </Card>
         )}
 
-        {/* Toolbox Meetings */}
-        <Card className="mb-6 overflow-hidden">
-          <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
-            <div className="flex items-start gap-4">
-              <div className="p-3 bg-cyan-500/10 rounded-xl ring-1 ring-cyan-500/20">
-                <Calendar className="h-6 w-6 text-primary" />
+        {/* Toolbox Meetings - only shown when selected from dropdown */}
+        {activeTab === "toolbox-meetings" && canViewSafety && (
+          <Card className="mb-6 overflow-hidden">
+            <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-cyan-500/10 rounded-xl ring-1 ring-cyan-500/20">
+                  <Calendar className="h-6 w-6 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <CardTitle className="text-xl mb-1">{t('documents.toolboxMeetingRecords', 'Toolbox Meeting Records')}</CardTitle>
+                  <p className="text-sm text-muted-foreground">{t('documents.toolboxMeetingRecordsDesc', 'Daily safety briefings and discussions')}</p>
+                </div>
+                <Badge variant="secondary" className="text-base font-semibold px-3">
+                  {meetings.length}
+                </Badge>
               </div>
-              <div className="flex-1">
-                <CardTitle className="text-xl mb-1">{t('documents.toolboxMeetingRecords', 'Toolbox Meeting Records')}</CardTitle>
-                <p className="text-sm text-muted-foreground">{t('documents.toolboxMeetingRecordsDesc', 'Daily safety briefings and discussions')}</p>
-              </div>
-              <Badge variant="secondary" className="text-base font-semibold px-3">
-                {meetings.length}
-              </Badge>
-            </div>
-          </CardHeader>
+            </CardHeader>
           <CardContent className="pt-6">
             {meetings.length > 0 && (
               <div className="mb-4">
@@ -6820,10 +6853,11 @@ export default function Documents() {
               </div>
             )}
           </CardContent>
-        </Card>
+          </Card>
+        )}
 
-        {/* FLHA Forms - Only visible to users with safety document permission */}
-        {canViewSafety && (
+        {/* FLHA Forms - only shown when selected from dropdown */}
+        {activeTab === "flha-records" && canViewSafety && (
           <Card className="mb-6 overflow-hidden">
             <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
               <div className="flex items-start gap-4">
@@ -6916,8 +6950,8 @@ export default function Documents() {
           </Card>
         )}
 
-        {/* Incident Reports - Only visible to users with safety document permission */}
-        {canViewSafety && (
+        {/* Incident Reports - only shown when selected from dropdown */}
+        {activeTab === "incident-reports" && canViewSafety && (
           <Card className="mb-6 overflow-hidden">
             <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
               <div className="flex items-start gap-4">
@@ -7028,22 +7062,23 @@ export default function Documents() {
           </Card>
         )}
 
-        {/* Method Statements */}
-        <Card className="mb-6 overflow-hidden">
-          <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
-            <div className="flex items-start gap-4">
-              <div className="p-3 bg-primary/10 rounded-xl ring-1 ring-primary/20">
-                <FileText className="h-6 w-6 text-primary" />
+        {/* Method Statements - only shown when selected from dropdown */}
+        {activeTab === "method-statements" && canViewSafety && (
+          <Card className="mb-6 overflow-hidden">
+            <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-primary/10 rounded-xl ring-1 ring-primary/20">
+                  <FileText className="h-6 w-6 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <CardTitle className="text-xl mb-1">{t('documents.methodStatements', 'Method Statements')}</CardTitle>
+                  <p className="text-sm text-muted-foreground">{t('documents.methodStatementsDesc', 'Work procedures and safety methods')}</p>
+                </div>
+                <Badge variant="secondary" className="text-base font-semibold px-3">
+                  {methodStatements.length + methodStatementDocs.length}
+                </Badge>
               </div>
-              <div className="flex-1">
-                <CardTitle className="text-xl mb-1">{t('documents.methodStatements', 'Method Statements')}</CardTitle>
-                <p className="text-sm text-muted-foreground">{t('documents.methodStatementsDesc', 'Work procedures and safety methods')}</p>
-              </div>
-              <Badge variant="secondary" className="text-base font-semibold px-3">
-                {methodStatements.length + methodStatementDocs.length}
-              </Badge>
-            </div>
-          </CardHeader>
+            </CardHeader>
           <CardContent className="pt-6">
             {/* Upload Method Statement Document */}
             {canUploadDocuments && (
@@ -7191,7 +7226,8 @@ export default function Documents() {
               </div>
             )}
           </CardContent>
-        </Card>
+          </Card>
+        )}
 
       </div>
 
@@ -7503,6 +7539,6 @@ export default function Documents() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </DocumentsLayout>
+    </div>
   );
 }

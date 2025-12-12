@@ -6,9 +6,6 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -16,98 +13,39 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { ChevronDown, ChevronRight, ArrowLeft } from "lucide-react";
-
-type MenuItem = {
-  title: string;
-  icon: string;
-  path: string;
-  exact?: boolean;
-};
-
-type MenuGroup = {
-  label: string;
-  items: MenuItem[];
-};
+import { ArrowLeft, LayoutDashboard, ClipboardList, Shield } from "lucide-react";
 
 interface DocumentsLayoutProps {
   children: React.ReactNode;
   title?: string;
-  activeTab?: string;
-  onTabChange?: (tab: string) => void;
+  activeSection?: string;
+  onSectionChange?: (section: string) => void;
 }
 
-function SidebarContents({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: (tab: string) => void }) {
+function SidebarContents({ activeSection, onSectionChange }: { activeSection?: string; onSectionChange?: (section: string) => void }) {
   const { t } = useTranslation();
-  const [location, setLocation] = useLocation();
-  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
-    DOCUMENTS: true,
-    SAFETY: true,
-  });
 
-  const toggleGroup = (label: string) => {
-    setExpandedGroups((prev) => ({
-      ...prev,
-      [label]: !prev[label],
-    }));
-  };
-
-  const menuGroups: MenuGroup[] = [
+  const menuItems = [
     {
-      label: "DOCUMENTS",
-      items: [
-        {
-          title: t('documents.healthSafetyManual', 'Health & Safety Manual'),
-          icon: "health_and_safety",
-          path: "health-safety",
-        },
-        {
-          title: t('documents.companyPolicies', 'Company Policies'),
-          icon: "menu_book",
-          path: "company-policy",
-        },
-        {
-          title: t('documents.certificateOfInsurance', 'Certificate of Insurance'),
-          icon: "verified_user",
-          path: "insurance",
-        },
-        {
-          title: t('documents.safeWorkProcedures', 'Safe Work Procedures'),
-          icon: "description",
-          path: "swp-templates",
-        },
-        {
-          title: t('documents.safeWorkPractices', 'Safe Work Practices'),
-          icon: "shield",
-          path: "safe-work-practices",
-        },
-      ],
+      id: "overview",
+      title: t('documents.overview', 'Overview'),
+      icon: LayoutDashboard,
     },
     {
-      label: "SAFETY",
-      items: [
-        {
-          title: t('documents.equipmentInspections', 'Equipment Inspections'),
-          icon: "inventory_2",
-          path: "inspections-safety",
-        },
-        {
-          title: t('documents.damageReports', 'Damage Reports'),
-          icon: "warning",
-          path: "damage-reports",
-        },
-      ],
+      id: "operations",
+      title: t('documents.operations', 'Operations'),
+      icon: ClipboardList,
+    },
+    {
+      id: "compliance",
+      title: t('documents.compliance', 'Compliance'),
+      icon: Shield,
     },
   ];
 
-  const handleItemClick = (path: string) => {
-    if (onTabChange) {
-      onTabChange(path);
+  const handleItemClick = (id: string) => {
+    if (onSectionChange) {
+      onSectionChange(id);
     }
   };
 
@@ -124,47 +62,23 @@ function SidebarContents({ activeTab, onTabChange }: { activeTab?: string; onTab
         </div>
       </SidebarHeader>
 
-      <SidebarContent>
-        {menuGroups.map((group) => (
-          <SidebarGroup key={group.label}>
-            <Collapsible
-              open={expandedGroups[group.label]}
-              onOpenChange={() => toggleGroup(group.label)}
-            >
-              <CollapsibleTrigger asChild>
-                <SidebarGroupLabel className="cursor-pointer flex items-center justify-between px-3 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  <span>{group.label}</span>
-                  {expandedGroups[group.label] ? (
-                    <ChevronDown className="h-3 w-3" />
-                  ) : (
-                    <ChevronRight className="h-3 w-3" />
-                  )}
-                </SidebarGroupLabel>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <SidebarGroupContent>
-                  <SidebarMenu>
-                    {group.items.map((item) => (
-                      <SidebarMenuItem key={item.path}>
-                        <SidebarMenuButton
-                          isActive={activeTab === item.path}
-                          tooltip={item.title}
-                          onClick={() => handleItemClick(item.path)}
-                          data-testid={`nav-${item.path}`}
-                        >
-                          <span className="material-icons text-lg text-muted-foreground">
-                            {item.icon}
-                          </span>
-                          <span>{item.title}</span>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    ))}
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </CollapsibleContent>
-            </Collapsible>
-          </SidebarGroup>
-        ))}
+      <SidebarContent className="p-2">
+        <SidebarMenu>
+          {menuItems.map((item) => (
+            <SidebarMenuItem key={item.id}>
+              <SidebarMenuButton
+                isActive={activeSection === item.id}
+                tooltip={item.title}
+                onClick={() => handleItemClick(item.id)}
+                data-testid={`nav-${item.id}`}
+                className="gap-3"
+              >
+                <item.icon className="h-5 w-5" />
+                <span>{item.title}</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
       </SidebarContent>
 
       <SidebarFooter className="p-3 mt-auto border-t">
@@ -175,7 +89,7 @@ function SidebarContents({ activeTab, onTabChange }: { activeTab?: string; onTab
               tooltip="Back to Dashboard"
             >
               <Link href="/dashboard" data-testid="button-back-dashboard">
-                <span className="material-icons text-lg text-muted-foreground">arrow_back</span>
+                <ArrowLeft className="h-5 w-5" />
                 <span>{t('common.backToDashboard', 'Back to Dashboard')}</span>
               </Link>
             </SidebarMenuButton>
@@ -186,13 +100,13 @@ function SidebarContents({ activeTab, onTabChange }: { activeTab?: string; onTab
   );
 }
 
-export default function DocumentsLayout({ children, title, activeTab, onTabChange }: DocumentsLayoutProps) {
+export default function DocumentsLayout({ children, title, activeSection, onSectionChange }: DocumentsLayoutProps) {
   const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
   });
 
   const sidebarStyle = {
-    "--sidebar-width": "16rem",
+    "--sidebar-width": "14rem",
     "--sidebar-width-icon": "3.5rem",
   };
 
@@ -200,7 +114,7 @@ export default function DocumentsLayout({ children, title, activeTab, onTabChang
     <SidebarProvider style={sidebarStyle as React.CSSProperties}>
       <div className="flex h-screen w-full">
         <Sidebar collapsible="icon">
-          <SidebarContents activeTab={activeTab} onTabChange={onTabChange} />
+          <SidebarContents activeSection={activeSection} onSectionChange={onSectionChange} />
         </Sidebar>
         <div className="flex flex-col flex-1 min-w-0">
           <header className="sticky top-0 z-40 flex items-center justify-between gap-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 py-3">
