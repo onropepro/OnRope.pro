@@ -97,19 +97,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
           
           {/* Navigation - Right Aligned */}
           <nav className="hidden lg:flex items-center justify-end gap-1 flex-1">
-            {navItems.map((item) => (
-              <Button
-                key={item.id}
-                variant={activeNav === item.id ? "default" : "ghost"}
-                className="text-sm font-medium"
-                onClick={() => setLocation(item.href)}
-                data-testid={`nav-${item.id}`}
-              >
-                {item.label}
-              </Button>
-            ))}
-            
-            {/* Modules Dropdown - Vertically Centered */}
+            {/* Employer with Modules Dropdown */}
             <div 
               className="relative flex items-center" 
               ref={modulesMenuRef}
@@ -117,15 +105,15 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
               onMouseLeave={() => setShowModulesMenu(false)}
             >
               <Button
-                variant={activeNav === "modules" ? "default" : "ghost"}
+                variant={activeNav === "employer" || activeNav === "modules" ? "default" : "ghost"}
                 className="text-sm font-medium"
-                onClick={() => setShowModulesMenu(!showModulesMenu)}
-                data-testid="nav-modules"
+                onClick={() => setLocation("/employer")}
+                data-testid="nav-employer"
               >
-                Modules
+                Employer
               </Button>
               {showModulesMenu && (
-                <div className="absolute top-full right-0 mt-1 bg-card border border-border rounded-xl shadow-xl p-4 w-[480px] z-50">
+                <div className="absolute top-full left-0 mt-1 bg-card border border-border rounded-xl shadow-xl p-4 w-[480px] z-50">
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
@@ -179,6 +167,19 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                 </div>
               )}
             </div>
+            
+            {/* Other nav items (excluding employer since it's handled above) */}
+            {navItems.filter(item => item.id !== "employer").map((item) => (
+              <Button
+                key={item.id}
+                variant={activeNav === item.id ? "default" : "ghost"}
+                className="text-sm font-medium"
+                onClick={() => setLocation(item.href)}
+                data-testid={`nav-${item.id}`}
+              >
+                {item.label}
+              </Button>
+            ))}
           </nav>
         </div>
       </div>
