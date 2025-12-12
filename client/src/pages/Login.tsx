@@ -661,33 +661,6 @@ export default function Login() {
               </form>
             </Form>
 
-            {/* OAuth Sign In Options */}
-            <div className="space-y-3">
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-card px-2 text-muted-foreground">{t('login.form.orContinueWith', 'Or continue with')}</span>
-                </div>
-              </div>
-              
-              <Button 
-                variant="outline" 
-                className="w-full h-11 text-sm font-medium"
-                onClick={() => {
-                  const returnUrl = new URLSearchParams(window.location.search).get('returnUrl');
-                  window.location.href = `/api/oauth/login${returnUrl ? `?returnUrl=${encodeURIComponent(returnUrl)}` : ''}`;
-                }}
-                data-testid="button-oauth-replit"
-              >
-                <svg viewBox="0 0 24 24" className="w-5 h-5 mr-2" fill="currentColor">
-                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" stroke="currentColor" fill="none"/>
-                </svg>
-                {t('login.form.continueWithReplit', 'Continue with Replit')}
-              </Button>
-            </div>
-
             {/* Portal Access Section */}
             <div className="space-y-3 pt-2">
               <div className="grid grid-cols-2 gap-3">
