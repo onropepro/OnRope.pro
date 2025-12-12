@@ -69,9 +69,9 @@ export default function ProjectManagementLanding() {
         <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8 text-center space-y-6">
           <Badge className="bg-white/20 text-white border border-white/40">Project Management Module</Badge>
           
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight tracking-tight">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight">
             Stop Managing Projects<br />
-            <span className="text-white/90">In Your Head</span>
+            <span className="text-amber-300">In Your Head</span>
           </h1>
           
           <p className="text-base md:text-lg text-white/80 max-w-3xl mx-auto leading-relaxed">
