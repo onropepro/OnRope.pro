@@ -51,7 +51,7 @@ export default function Login() {
   ];
 
   useEffect(() => {
-    if (location === "/login") {
+    if (location.startsWith("/login")) {
       setShowLoginForm(true);
     }
   }, [location]);

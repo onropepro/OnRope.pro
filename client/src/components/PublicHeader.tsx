@@ -60,7 +60,7 @@ export function PublicHeader({ activeNav = null }: PublicHeaderProps) {
           <Button 
             variant="ghost"
             size="sm"
-            onClick={() => setLocation("/login")}
+            onClick={() => setLocation("/login?open=" + Date.now())}
             data-testid="button-sign-in-header"
           >
             {t('login.header.signIn', 'Sign In')}
