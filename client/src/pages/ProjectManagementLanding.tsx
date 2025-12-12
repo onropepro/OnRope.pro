@@ -63,7 +63,7 @@ export default function ProjectManagementLanding() {
       <PublicHeader activeNav="modules" />
 
       {/* Hero Section - Following Module Hero Template from design_guidelines.md */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-sky-600 via-sky-700 to-blue-900 text-white">
+      <section className="relative bg-gradient-to-br from-sky-600 via-sky-700 to-blue-900 text-white pb-[120px]">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMtOS45NDEgMC0xOCA4LjA1OS0xOCAxOHM4LjA1OSAxOCAxOCAxOGM5Ljk0MSAwIDE4LTguMDU5IDE4LTE4cy04LjA1OS0xOC0xOC0xOHptMCAzMmMtNy43MzIgMC0xNC02LjI2OC0xNC0xNHM2LjI2OC0xNCAxNC0xNHMxNCA2LjI2OCAxNCAxNC02LjI2OCAxNC0xNCAxNHoiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wMykiLz48L2c+PC9zdmc+')] opacity-30"></div>
         
         <div className="relative max-w-6xl mx-auto px-4 py-20 md:py-28">
@@ -99,38 +99,40 @@ export default function ProjectManagementLanding() {
           </div>
         </div>
         
-        {/* Wave separator */}
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto">
-            <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" className="fill-background"/>
+        {/* Wave separator - positioned to overlap with white section below */}
+        <div className="absolute bottom-0 left-0 right-0 z-10">
+          <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto block">
+            <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" className="fill-white dark:fill-slate-950"/>
           </svg>
         </div>
       </section>
 
       {/* Stats Panel - Following Module Hero Template from design_guidelines.md */}
-      <section className="relative z-10 -mt-8 max-w-5xl mx-auto px-4">
-        <Card className="shadow-xl border-0">
-          <CardContent className="p-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-sky-600">4</div>
-                <div className="text-sm text-muted-foreground mt-1">Elevations tracked independently</div>
+      <section className="relative z-0 bg-white dark:bg-slate-950 -mt-px">
+        <div className="max-w-5xl mx-auto px-4 pt-4 pb-12">
+          <Card className="shadow-xl border-0">
+            <CardContent className="p-8">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+                <div className="text-center">
+                  <div className="text-3xl md:text-4xl font-bold text-sky-600">4</div>
+                  <div className="text-sm text-muted-foreground mt-1">Elevations tracked independently</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl md:text-4xl font-bold text-emerald-600">87-93%</div>
+                  <div className="text-sm text-muted-foreground mt-1">Payroll errors eliminated</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl md:text-4xl font-bold text-violet-600">60-70%</div>
+                  <div className="text-sm text-muted-foreground mt-1">Fewer resident complaints</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl md:text-4xl font-bold text-amber-600">75%</div>
+                  <div className="text-sm text-muted-foreground mt-1">Faster quote preparation</div>
+                </div>
               </div>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-emerald-600">87-93%</div>
-                <div className="text-sm text-muted-foreground mt-1">Payroll errors eliminated</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-violet-600">60-70%</div>
-                <div className="text-sm text-muted-foreground mt-1">Fewer resident complaints</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-amber-600">75%</div>
-                <div className="text-sm text-muted-foreground mt-1">Faster quote preparation</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </section>
 
       {/* The Pain Section */}
