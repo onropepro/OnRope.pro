@@ -22,6 +22,31 @@ function generateSecureToken(): string {
   return crypto.randomBytes(32).toString('base64url');
 }
 
+function sanitizeReturnUrl(url: string | undefined): string | undefined {
+  if (!url || typeof url !== 'string') {
+    return undefined;
+  }
+  
+  const trimmed = url.trim();
+  
+  if (!trimmed.startsWith('/')) {
+    console.log(`[OAuth] Rejected returnUrl (not relative path): ${trimmed.substring(0, 50)}`);
+    return undefined;
+  }
+  
+  if (trimmed.startsWith('//') || trimmed.includes('://')) {
+    console.log(`[OAuth] Rejected returnUrl (protocol prefix): ${trimmed.substring(0, 50)}`);
+    return undefined;
+  }
+  
+  if (/[<>"'`\x00-\x1f]/.test(trimmed)) {
+    console.log(`[OAuth] Rejected returnUrl (invalid characters): ${trimmed.substring(0, 50)}`);
+    return undefined;
+  }
+  
+  return trimmed;
+}
+
 export async function initializePassport(app: Express): Promise<void> {
   if (!ENABLE_OAUTH) {
     console.log("[OAuth] OAuth is disabled via ENABLE_OAUTH flag");
@@ -58,8 +83,9 @@ export function oauthLoginHandler(): RequestHandler {
       req.session.oauthNonce = nonce;
       req.session.oauthStateCreatedAt = Date.now();
       
-      if (req.query.returnUrl && typeof req.query.returnUrl === 'string') {
-        req.session.returnUrl = req.query.returnUrl;
+      const sanitizedReturnUrl = sanitizeReturnUrl(req.query.returnUrl as string | undefined);
+      if (sanitizedReturnUrl) {
+        req.session.returnUrl = sanitizedReturnUrl;
       }
       
       await new Promise<void>((resolve, reject) => {
@@ -205,7 +231,8 @@ export function oauthCallbackHandler(): RequestHandler {
         });
       });
       
-      const redirectPath = returnUrl || ROLE_REDIRECTS[user.role] || '/dashboard';
+      const safeReturnUrl = sanitizeReturnUrl(returnUrl);
+      const redirectPath = safeReturnUrl || ROLE_REDIRECTS[user.role] || '/dashboard';
       console.log(`[OAuth] User ${user.id} logged in successfully, redirecting to ${redirectPath}`);
       res.redirect(redirectPath);
       
