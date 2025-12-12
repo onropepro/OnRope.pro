@@ -12,8 +12,9 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { trackLogin } from "@/lib/analytics";
-import { Rocket, Play, Building2, Clock, DollarSign, Users, Shield, FileText, Calculator, FileSpreadsheet, Radio, ClipboardCheck, MessageSquare, Home, Award, Calendar, FolderOpen, Globe, TrendingUp, ArrowRight, HardHat, Lock, Briefcase } from "lucide-react";
+import { Rocket, Play, Building2, Clock, DollarSign, Users, Shield, FileText, Calculator, FileSpreadsheet, Radio, ClipboardCheck, MessageSquare, Home, Award, Calendar, FolderOpen, TrendingUp, ArrowRight, HardHat, Lock, Briefcase } from "lucide-react";
 import { TechnicianRegistration } from "@/components/TechnicianRegistration";
+import { InstallPWAButton } from "@/components/InstallPWAButton";
 import { Slider } from "@/components/ui/slider";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
@@ -314,14 +315,13 @@ export default function Login() {
         
         {/* Actions - Right */}
         <div className="flex items-center gap-3">
+          <InstallPWAButton />
           <Button 
             variant="ghost"
             size="sm"
             onClick={toggleLandingLanguage}
-            className="gap-1.5"
             data-testid="button-language-toggle"
           >
-            <Globe className="w-4 h-4" />
             {landingLanguage === 'en' ? 'FR' : 'EN'}
           </Button>
           <Button 

@@ -18,7 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ArrowLeft, Globe, AlertTriangle } from "lucide-react";
+import { ArrowLeft, AlertTriangle } from "lucide-react";
 import { Link } from "wouter";
 
 const residentSchema = z.object({
@@ -313,10 +313,8 @@ export default function Register() {
               variant="ghost"
               size="sm"
               onClick={toggleLandingLanguage}
-              className="gap-1.5"
               data-testid="button-language-toggle"
             >
-              <Globe className="w-4 h-4" />
               {landingLanguage === 'en' ? 'FR' : 'EN'}
             </Button>
           </div>

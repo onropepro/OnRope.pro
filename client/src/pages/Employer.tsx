@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Rocket, Play, Building2, Clock, DollarSign, Users, Shield, MessageSquare, Globe, ArrowRight } from "lucide-react";
+import { Rocket, Play, Building2, Clock, DollarSign, Users, Shield, MessageSquare, ArrowRight } from "lucide-react";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
 import { Slider } from "@/components/ui/slider";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
@@ -95,10 +95,8 @@ export default function Employer() {
             variant="ghost"
             size="sm"
             onClick={toggleLandingLanguage}
-            className="gap-1.5"
             data-testid="button-language-toggle"
           >
-            <Globe className="w-4 h-4" />
             {landingLanguage === 'en' ? 'FR' : 'EN'}
           </Button>
           <Button 
