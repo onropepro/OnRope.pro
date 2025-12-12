@@ -139,11 +139,15 @@ All module landing pages MUST follow this exact hero structure for consistency:
 - Primary: `<Button size="lg" className="bg-white text-sky-700 hover:bg-sky-50">`
 - Secondary: `<Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10">`
 
-**Stats Panel:**
-- Overlap: `-mt-8` (subtle overlap, not dramatic)
-- Container: `max-w-5xl mx-auto`
-- Card: `shadow-xl border-0` (no visible border)
-- Padding: `p-8`
+**Stats Panel - Unified Floating Design (All Module Pages):**
+- Section: `className="relative bg-white dark:bg-slate-950 -mt-px overflow-visible"`
+- Container: `className="max-w-4xl mx-auto px-4 pt-4 pb-12"`
+- Card: `className="shadow-xl border-0 relative z-20 -mt-20"`
+- CardContent: `className="p-8"`
+- Grid: 2 columns mobile, 4 columns desktop
+- Spacing: Gap-6 md:gap-8 between stat columns
+- Float Effect: `-mt-20` pulls card 80px into hero area; `overflow-visible` + `z-20` prevents clipping and ensures card floats above all layers
+- Result: Stats card visually floats between blue hero and white content section, creating smooth visual connector
 
 **Hero Emphasis Color Palette:**
 - Primary emphasis: `text-sky-200` (#BAE6FD) - approved for all module hero headlines

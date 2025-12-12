@@ -108,9 +108,9 @@ export default function ProjectManagementLanding() {
       </section>
 
       {/* Stats Panel - Following Module Hero Template from design_guidelines.md */}
-      <section className="relative z-0 bg-white dark:bg-slate-950 -mt-px">
-        <div className="max-w-5xl mx-auto px-4 pt-4 pb-12">
-          <Card className="shadow-xl border-0">
+      <section className="relative bg-white dark:bg-slate-950 -mt-px overflow-visible">
+        <div className="max-w-4xl mx-auto px-4 pt-4 pb-12">
+          <Card className="shadow-xl border-0 relative z-20 -mt-20">
             <CardContent className="p-8">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                 <div className="text-center">
