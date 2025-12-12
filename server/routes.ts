@@ -14327,11 +14327,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get all employees AND the company owner
       const employees = await storage.getAllEmployees(companyId);
       
+      // Filter out suspended and terminated employees
+      const activeEmployees = employees.filter((e: any) => 
+        !e.suspendedAt && 
+        e.connectionStatus !== 'suspended' && 
+        !e.terminatedDate
+      );
+      
       // Also include the company owner in the compliance tracking
       const companyOwner = await storage.getUserById(companyId);
       const allStaff = companyOwner 
-        ? [companyOwner, ...employees] 
-        : employees;
+        ? [companyOwner, ...activeEmployees] 
+        : activeEmployees;
       
       // Get all company documents
       const companyDocuments = await storage.getCompanyDocuments(companyId);
