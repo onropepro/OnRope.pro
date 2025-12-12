@@ -52,6 +52,15 @@ const irataVerificationRateLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+// SECURITY: Rate limiting for OAuth endpoints
+const oauthRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20, // 20 OAuth attempts per window
+  message: { message: "Too many OAuth attempts. Please try again later." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // SECURITY: Password strength validation
 function validatePasswordStrength(password: string): { valid: boolean; message: string } {
   if (!password || password.length < 8) {
