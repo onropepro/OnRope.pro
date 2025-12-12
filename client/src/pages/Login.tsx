@@ -29,7 +29,7 @@ export default function Login() {
   const { t, i18n } = useTranslation();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
-  const [showLoginForm, setShowLoginForm] = useState(false);
+  const [showLoginForm, setShowLoginForm] = useState(true);
   const [showTechnicianRegistration, setShowTechnicianRegistration] = useState(false);
   const [showDevTools, setShowDevTools] = useState(false);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
