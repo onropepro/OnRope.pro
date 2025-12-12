@@ -36,31 +36,6 @@ export default function Login() {
   const [isAnimating, setIsAnimating] = useState(false);
   const [roiEmployeeCount, setRoiEmployeeCount] = useState(12);
 
-  // Handle OAuth error messages from URL parameters
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const error = params.get('error');
-    if (error) {
-      const errorMessages: Record<string, string> = {
-        oauth_init_failed: t('login.errors.oauthInitFailed', 'Failed to initialize login. Please try again.'),
-        oauth_state_missing: t('login.errors.oauthStateMissing', 'Login session expired. Please try again.'),
-        oauth_state_expired: t('login.errors.oauthStateExpired', 'Login session timed out. Please try again.'),
-        oauth_invalid_token: t('login.errors.oauthInvalidToken', 'Invalid login response. Please try again.'),
-        oauth_superuser_blocked: t('login.errors.oauthSuperuserBlocked', 'This account type cannot use social login.'),
-        oauth_callback_failed: t('login.errors.oauthCallbackFailed', 'Login failed. Please try again.'),
-        account_disabled: t('login.errors.accountDisabled', 'Your account has been disabled. Please contact support.'),
-      };
-      
-      toast({
-        title: t('login.errors.loginFailed', 'Login Failed'),
-        description: errorMessages[error] || t('login.errors.unknownError', 'An error occurred during login.'),
-        variant: 'destructive',
-      });
-      
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-  }, [toast, t]);
-
   const rotatingWords = [
     t('login.rotatingWords.safetyMeeting', 'safety meeting'),
     t('login.rotatingWords.project', 'project'),

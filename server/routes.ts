@@ -16,8 +16,6 @@ import { checkSubscriptionLimits } from "./subscription-middleware";
 import { getTodayString, toLocalDateString, parseLocalDate, getStartOfWeek, getEndOfWeek } from "./dateUtils";
 import { Resend } from "resend";
 import rateLimit from "express-rate-limit";
-import { oauthLoginHandler, oauthCallbackHandler, oauthLogoutHandler, isOAuthEnabled, initializePassport } from "./replit-passport";
-import { ENABLE_OAUTH } from "./oauth-config";
 
 // SECURITY: Rate limiting for login endpoint to prevent brute force attacks
 const loginRateLimiter = rateLimit({
@@ -54,14 +52,6 @@ const irataVerificationRateLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// SECURITY: Rate limiting for OAuth endpoints
-const oauthRateLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 20, // 20 OAuth attempts per window
-  message: { message: "Too many OAuth attempts. Please try again later." },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
 
 // SECURITY: Password strength validation
 function validatePasswordStrength(password: string): { valid: boolean; message: string } {
@@ -444,19 +434,6 @@ async function generateReferralCode(): Promise<string> {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // ==================== OAUTH ROUTES ====================
-  await initializePassport(app);
-  
-  if (ENABLE_OAUTH) {
-    app.get("/api/oauth/login", oauthRateLimiter, oauthLoginHandler());
-    app.get("/api/oauth/callback", oauthRateLimiter, oauthCallbackHandler());
-    app.post("/api/oauth/logout", oauthLogoutHandler());
-    
-    app.get("/api/oauth/status", (_req, res) => {
-      res.json({ enabled: isOAuthEnabled() });
-    });
-  }
-  
   // ==================== ADDRESS AUTOCOMPLETE ====================
   
   // Address autocomplete endpoint using Geoapify API

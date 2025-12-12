@@ -8,7 +8,6 @@ import { setupVite, serveStatic, log } from "./vite";
 import { runMigrations } from "./migrate";
 import { wsHub } from "./websocket-hub";
 import { SESSION_SECRET, SESSION_COOKIE_NAME } from "./session-config";
-import { ENABLE_OAUTH, scrubSensitiveData } from "./oauth-config";
 
 const app = express();
 
@@ -64,17 +63,6 @@ declare module 'express-session' {
     role: string;
     buildingId?: string;
     strataPlanNumber?: string;
-    oauthState?: string;
-    oauthNonce?: string;
-    oauthStateCreatedAt?: number;
-    returnUrl?: string;
-    pendingOAuthRegistration?: {
-      oauthId: string;
-      oauthProvider: string;
-      email?: string;
-      name?: string;
-      profileImageUrl?: string;
-    };
   }
 }
 
@@ -113,7 +101,7 @@ app.use((req, res, next) => {
         logLine = logLine.slice(0, 79) + "…";
       }
 
-      log(scrubSensitiveData(logLine));
+      log(logLine);
     }
   });
 
