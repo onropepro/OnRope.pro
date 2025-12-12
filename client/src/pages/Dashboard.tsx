@@ -379,7 +379,8 @@ function StaticCard({ card, colorIndex, brandColors }: { card: any; colorIndex: 
   let iconColor = card.borderColor;
 
   if (brandingActive && brandColors.length > 0) {
-    const brandColor = brandColors[colorIndex % brandColors.length];
+    // Always use the first brand color for consistent appearance across all cards
+    const brandColor = brandColors[0];
     activeColor = brandColor;
     cardBackground = createTintFromHex(brandColor, 90);
     iconColor = getVisibleIconColor(brandColor);
@@ -446,7 +447,8 @@ function SortableCard({ card, isRearranging, colorIndex, brandColors }: { card: 
   let iconColor = card.borderColor;
 
   if (brandingActive && brandColors.length > 0) {
-    const brandColor = brandColors[colorIndex % brandColors.length];
+    // Always use the first brand color for consistent appearance across all cards
+    const brandColor = brandColors[0];
     activeColor = brandColor;
     cardBackground = createTintFromHex(brandColor, 90);
     iconColor = getVisibleIconColor(brandColor);
