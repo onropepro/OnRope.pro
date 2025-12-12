@@ -101,7 +101,7 @@ export default function UserAccessLanding() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-hero-trial">
                 <Link href="/register">
-                  Start Your 90-Day Trial
+                  Start Your Free 60-Day Trial
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
