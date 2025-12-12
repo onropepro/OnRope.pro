@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { RefreshButton } from "@/components/RefreshButton";
+import { InstallPWAButton } from "@/components/InstallPWAButton";
 import { useLocation } from "wouter";
 import { Badge } from "@/components/ui/badge";
 
@@ -90,6 +91,7 @@ export function BrandedHeader({ title, subtitle, showBackButton, backPath = "/da
         </div>
         <div className="flex items-center gap-3">
           {children}
+          <InstallPWAButton />
           <RefreshButton />
           <div className="relative">
             <Button 
