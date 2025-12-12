@@ -496,7 +496,7 @@ export default function ProjectManagementLanding() {
               <CardContent className="space-y-3 text-sm">
                 <div>
                   <p className="font-medium text-foreground">What Connects:</p>
-                  <p className="text-muted-foreground mt-1">Crew assignments pull directly from your employee directory. System filters by qualification level (IRATA Level 2+). Performance metrics from work sessions feed back into employee records.</p>
+                  <p className="text-muted-foreground mt-1">Crew assignments pull directly from your employee directory. System filters by qualification level (irata Level 2+). Performance metrics from work sessions feed back into employee records.</p>
                 </div>
                 <div>
                   <p className="font-medium text-foreground">Why It Matters:</p>

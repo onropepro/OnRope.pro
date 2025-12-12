@@ -225,7 +225,7 @@ export default function PropertyManagerGuide() {
                 <h4 className="font-semibold">Penalty Categories:</h4>
                 <div className="grid gap-2 text-sm">
                   <div className="flex justify-between items-center p-2 bg-muted rounded">
-                    <span>Expired IRATA Certification</span>
+                    <span>Expired irata Certification</span>
                     <Badge variant="destructive">-15 points</Badge>
                   </div>
                   <div className="flex justify-between items-center p-2 bg-muted rounded">

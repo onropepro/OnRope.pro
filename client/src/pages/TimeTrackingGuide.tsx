@@ -237,9 +237,9 @@ export default function TimeTrackingGuide() {
                   "I forgot to fill out my logbook and now I can't remember what tasks I did"
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground space-y-4 pb-4">
-                  <p><span className="font-medium text-foreground">The Pain:</span> IRATA and SPRAT certifications require detailed task logging. You're supposed to log these daily, but life gets busy. Two months later, you're filling out your logbook from memory.</p>
-                  <p><span className="font-medium text-foreground">Real Example:</span> "Your IRATA recertification is in 3 weeks. You open your logbook, last entry was 6 months ago. You've done hundreds of hours of rope work since then. You guess at task breakdowns and hope the assessor doesn't ask detailed questions."</p>
-                  <p><span className="font-medium text-foreground">Solution:</span> After ending each work session, you're prompted to log your IRATA/SPRAT task hours by category (20+ task types available). This data accumulates in your profile.</p>
+                  <p><span className="font-medium text-foreground">The Pain:</span> irata and SPRAT certifications require detailed task logging. You're supposed to log these daily, but life gets busy. Two months later, you're filling out your logbook from memory.</p>
+                  <p><span className="font-medium text-foreground">Real Example:</span> "Your irata recertification is in 3 weeks. You open your logbook, last entry was 6 months ago. You've done hundreds of hours of rope work since then. You guess at task breakdowns and hope the assessor doesn't ask detailed questions."</p>
+                  <p><span className="font-medium text-foreground">Solution:</span> After ending each work session, you're prompted to log your irata/SPRAT task hours by category (20+ task types available). This data accumulates in your profile.</p>
                   <p><span className="font-medium text-foreground">Benefit:</span> Accurate certification tracking without daily logbook discipline. Recertification prep takes 30 minutes instead of 3 hours of guessing.</p>
                 </AccordionContent>
               </AccordionItem>
@@ -677,7 +677,7 @@ export default function TimeTrackingGuide() {
         <section className="space-y-4">
           <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
             <ClipboardCheck className="w-5 h-5 text-teal-600 dark:text-teal-400" />
-            IRATA Hours Logging
+            irata Hours Logging
           </h2>
 
           <div className="bg-amber-100 dark:bg-amber-900 border-2 border-amber-500 p-4 rounded-lg mb-4">
@@ -686,9 +686,9 @@ export default function TimeTrackingGuide() {
               Important Disclaimer
             </p>
             <p className="mt-2 text-sm text-amber-800 dark:text-amber-200">
-              IRATA/SPRAT hours logged in OnRopePro are <strong>NOT certification-approved</strong>. 
+              irata/SPRAT hours logged in OnRopePro are <strong>NOT certification-approved</strong>. 
               This tool helps technicians track their hours to accurately fill their official logbooks. 
-              It does not replace the official IRATA or SPRAT logging requirements. 
+              It does not replace the official irata or SPRAT logging requirements. 
               Future integration with certification bodies is planned.
             </p>
           </div>
@@ -701,7 +701,7 @@ export default function TimeTrackingGuide() {
               </CardTitle>
             </CardHeader>
             <CardContent className="text-base space-y-4">
-              <p className="text-muted-foreground">After ending a work session, technicians are prompted to log their IRATA task hours for certification progression:</p>
+              <p className="text-muted-foreground">After ending a work session, technicians are prompted to log their irata task hours for certification progression:</p>
               
               <div className="bg-teal-50 dark:bg-teal-950 p-3 rounded space-y-2">
                 <p className="font-semibold text-xs">Task Categories (20 types available):</p>
@@ -725,14 +725,14 @@ export default function TimeTrackingGuide() {
                 <p className="font-semibold text-xs">How It Works:</p>
                 <ol className="list-decimal list-inside space-y-1 text-base mt-2">
                   <li>End work session normally</li>
-                  <li>Prompt appears: "Log your IRATA hours?"</li>
+                  <li>Prompt appears: "Log your irata hours?"</li>
                   <li>Enter hours by task category</li>
                   <li>Hours accumulated in personal profile</li>
                   <li>View total logged hours in "My Logged Hours" page</li>
                 </ol>
               </div>
 
-              <p className="text-xs text-muted-foreground">This data helps technicians track their progression toward IRATA Level 2 or Level 3 certification requirements.</p>
+              <p className="text-xs text-muted-foreground">This data helps technicians track their progression toward irata Level 2 or Level 3 certification requirements.</p>
             </CardContent>
           </Card>
         </section>
@@ -823,7 +823,7 @@ export default function TimeTrackingGuide() {
               <div className="w-12 h-12 rounded-full bg-teal-100 dark:bg-teal-900 flex items-center justify-center mb-2">
                 <ClipboardCheck className="w-6 h-6 text-teal-600" />
               </div>
-              <p className="text-xs font-semibold text-center">Log IRATA</p>
+              <p className="text-xs font-semibold text-center">Log irata</p>
             </div>
             <ArrowRight className="w-5 h-5 text-muted-foreground flex-shrink-0 rotate-90 md:rotate-0" />
             <div className="flex flex-col items-center min-w-[90px]">
@@ -855,7 +855,7 @@ export default function TimeTrackingGuide() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-xs text-muted-foreground">
-                Sessions link to employee profiles for rate lookup, IRATA level tracking, and role-based visibility. Updates to employee hourly rates automatically apply to future sessions.
+                Sessions link to employee profiles for rate lookup, irata level tracking, and role-based visibility. Updates to employee hourly rates automatically apply to future sessions.
               </CardContent>
             </Card>
             <Card className="border">
@@ -906,7 +906,7 @@ export default function TimeTrackingGuide() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm flex items-center gap-2">
                   <ClipboardCheck className="w-4 h-4 text-teal-500" />
-                  IRATA/SPRAT Logging
+                  irata/SPRAT Logging
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-xs text-muted-foreground">

@@ -85,7 +85,7 @@ const SAFE_WORK_PROCEDURES: SafeWorkProcedure[] = [
       'Rescue plan in place with trained rescue team available'
     ],
     ppe: [
-      'Full body harness (IRATA approved, inspected within 12 months)',
+      'Full body harness (irata approved, inspected within 12 months)',
       'Helmet with chin strap (EN 397 rated)',
       'Descender device (certified for rope access)',
       'Back-up device (fall arrester)',
@@ -145,7 +145,7 @@ const SAFE_WORK_PROCEDURES: SafeWorkProcedure[] = [
       'Report all incidents to supervisor and complete incident documentation'
     ],
     competencyRequirements: [
-      'IRATA Level 1 minimum (Level 2+ for complex operations)',
+      'irata Level 1 minimum (Level 2+ for complex operations)',
       'Current first aid certification',
       'Site-specific induction completed',
       'Familiarity with building layout and anchor system',
@@ -178,7 +178,7 @@ const SAFE_WORK_PROCEDURES: SafeWorkProcedure[] = [
       'Proper ventilation assessment before duct entry'
     ],
     ppe: [
-      'Full body harness (IRATA approved)',
+      'Full body harness (irata approved)',
       'Safety helmet with chin strap',
       'Descender and back-up device',
       'Dust mask or respirator (P2 minimum)',
@@ -233,7 +233,7 @@ const SAFE_WORK_PROCEDURES: SafeWorkProcedure[] = [
       'Report all incidents and near-misses'
     ],
     competencyRequirements: [
-      'IRATA Level 1 minimum certification',
+      'irata Level 1 minimum certification',
       'Training in dryer vent cleaning techniques',
       'Understanding of fire hazards related to lint',
       'Current first aid certification',
@@ -268,7 +268,7 @@ const SAFE_WORK_PROCEDURES: SafeWorkProcedure[] = [
       'Weather limits for wind and electrical storms'
     ],
     ppe: [
-      'Full body harness (IRATA approved)',
+      'Full body harness (irata approved)',
       'Safety helmet with face shield option',
       'Descender and back-up device',
       'Waterproof coveralls or rain suit',
@@ -325,7 +325,7 @@ const SAFE_WORK_PROCEDURES: SafeWorkProcedure[] = [
       'Report all incidents to supervisor'
     ],
     competencyRequirements: [
-      'IRATA Level 1 minimum (Level 2 for complex facades)',
+      'irata Level 1 minimum (Level 2 for complex facades)',
       'Pressure washer operation training',
       'Chemical handling certification',
       'Current first aid certification',
@@ -718,7 +718,7 @@ const SAFE_WORK_PROCEDURES: SafeWorkProcedure[] = [
       'Communication with ground support for debris management'
     ],
     ppe: [
-      'Full body harness (IRATA approved)',
+      'Full body harness (irata approved)',
       'Helmet with chin strap and face shield option',
       'Heavy-duty cut-resistant gloves',
       'Respiratory protection (N95 minimum for organic debris)',
@@ -769,7 +769,7 @@ const SAFE_WORK_PROCEDURES: SafeWorkProcedure[] = [
       'Rescue: initiate rescue plan if technician incapacitated on rope'
     ],
     competencyRequirements: [
-      'IRATA Level 1 or equivalent rope access certification',
+      'irata Level 1 or equivalent rope access certification',
       'Current first aid certification',
       'Biological hazard awareness training',
       'Tool handling and attachment procedures',
@@ -802,7 +802,7 @@ const SAFE_WORK_PROCEDURES: SafeWorkProcedure[] = [
       'Cease work during electrical storms or high winds'
     ],
     ppe: [
-      'Full body harness (IRATA approved)',
+      'Full body harness (irata approved)',
       'Helmet with chin strap',
       'Insulated gloves rated for electrical work',
       'Safety glasses or face shield',
@@ -855,7 +855,7 @@ const SAFE_WORK_PROCEDURES: SafeWorkProcedure[] = [
       'Dropped fixture: clear area below, assess for injuries, secure scene'
     ],
     competencyRequirements: [
-      'IRATA Level 1 or equivalent rope access certification',
+      'irata Level 1 or equivalent rope access certification',
       'Electrical safety awareness training',
       'Lock-out/tag-out procedures certification',
       'Current first aid certification',
@@ -888,7 +888,7 @@ const SAFE_WORK_PROCEDURES: SafeWorkProcedure[] = [
       'Eye protection mandatory during all operations'
     ],
     ppe: [
-      'Full body harness (IRATA approved)',
+      'Full body harness (irata approved)',
       'Helmet with chin strap',
       'Chemical-resistant nitrile gloves',
       'Safety glasses or goggles',
@@ -942,7 +942,7 @@ const SAFE_WORK_PROCEDURES: SafeWorkProcedure[] = [
       'Fall or suspension trauma: initiate rescue plan immediately'
     ],
     competencyRequirements: [
-      'IRATA Level 1 or equivalent rope access certification',
+      'irata Level 1 or equivalent rope access certification',
       'Sealant application training and manufacturer certification',
       'Chemical handling and safety awareness',
       'Current first aid certification',
@@ -975,7 +975,7 @@ const SAFE_WORK_PROCEDURES: SafeWorkProcedure[] = [
       'Ground-level exclusion zone for debris and materials'
     ],
     ppe: [
-      'Full body harness (IRATA approved)',
+      'Full body harness (irata approved)',
       'Helmet with chin strap',
       'N95 or P100 respirator (minimum) for contaminated areas',
       'Heavy-duty puncture-resistant gloves',
@@ -1029,7 +1029,7 @@ const SAFE_WORK_PROCEDURES: SafeWorkProcedure[] = [
       'Fall or suspension: initiate rescue plan immediately'
     ],
     competencyRequirements: [
-      'IRATA Level 1 or equivalent rope access certification',
+      'irata Level 1 or equivalent rope access certification',
       'Bird deterrent installation training',
       'Biological hazard awareness and handling',
       'Current first aid certification',
@@ -1062,7 +1062,7 @@ const SAFE_WORK_PROCEDURES: SafeWorkProcedure[] = [
       'Clear communication protocols during testing'
     ],
     ppe: [
-      'Full body harness (IRATA approved)',
+      'Full body harness (irata approved)',
       'Helmet with chin strap',
       'Safety glasses',
       'Work gloves',
@@ -1116,7 +1116,7 @@ const SAFE_WORK_PROCEDURES: SafeWorkProcedure[] = [
       'Weather change: secure equipment, suspend testing until conditions suitable'
     ],
     competencyRequirements: [
-      'IRATA Level 2 or equivalent (Level 3 for supervision)',
+      'irata Level 2 or equivalent (Level 3 for supervision)',
       'Anchor inspection and testing certification',
       'Non-destructive testing qualifications as required',
       'Current first aid certification',
@@ -1219,7 +1219,7 @@ const SAFE_WORK_PRACTICES: SafeWorkPractice[] = [
       'Fall arrest systems must limit fall distance'
     ],
     requirements: [
-      'Minimum IRATA Level 1 certification',
+      'Minimum irata Level 1 certification',
       'Dual rope system with independent anchors',
       'Anchor points rated to minimum 15kN',
       'Fall arrester device properly engaged at all times',
@@ -4576,7 +4576,7 @@ export default function Documents() {
         <div class="footer">
             <p><strong>Professional Rope Access Services</strong></p>
             <p>High-Rise Maintenance & Building Services</p>
-            <p style="margin-top: 15px; font-size: 12px;">This quote is valid for 30 days from the date of issue. All work will be completed in accordance with IRATA standards and local safety regulations.</p>
+            <p style="margin-top: 15px; font-size: 12px;">This quote is valid for 30 days from the date of issue. All work will be completed in accordance with irata standards and local safety regulations.</p>
         </div>
     </div>
 </body>

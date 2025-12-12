@@ -122,7 +122,7 @@ export default function Employer() {
           {t('login.hero.subtitle', 'Building Maintenance Management Software')}
         </h1>
         <p className="text-xs md:text-sm font-semibold tracking-widest text-muted-foreground uppercase mb-16">
-          {t('login.hero.builtBy', 'Built by a Level 3 IRATA Tech & Operations Manager')}
+          {t('login.hero.builtBy', 'Built by a Level 3 irata Tech & Operations Manager')}
         </p>
         
         <p className="text-2xl md:text-4xl font-medium mb-0 text-foreground">

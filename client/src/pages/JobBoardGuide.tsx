@@ -62,7 +62,7 @@ export default function JobBoardGuide() {
                   <div className="bg-muted p-3 rounded">
                     <p className="font-semibold text-sm mb-1">Requirements</p>
                     <ul className="list-disc list-inside text-muted-foreground text-xs space-y-0.5">
-                      <li>Required certifications (IRATA/SPRAT)</li>
+                      <li>Required certifications (irata/SPRAT)</li>
                       <li>Experience level</li>
                       <li>Special skills</li>
                     </ul>
@@ -102,7 +102,7 @@ export default function JobBoardGuide() {
                   <li>View resume/CV documents</li>
                   <li>Safety rating scores</li>
                   <li>Years of experience</li>
-                  <li>IRATA/SPRAT certification details</li>
+                  <li>irata/SPRAT certification details</li>
                   <li>Profile photo and contact info</li>
                   <li>Rope access specialties</li>
                 </ul>
@@ -175,7 +175,7 @@ export default function JobBoardGuide() {
                     <li>Safety rating</li>
                     <li>Name and photo</li>
                     <li>Years of experience</li>
-                    <li>IRATA/SPRAT certification numbers and levels</li>
+                    <li>irata/SPRAT certification numbers and levels</li>
                     <li>Rope access specialties</li>
                   </ul>
                 </div>

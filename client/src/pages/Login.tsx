@@ -346,7 +346,7 @@ export default function Login() {
           {t('login.hero.subtitle', 'Building Maintenance Management Software')}
         </h1>
         <p className="text-xs md:text-sm font-semibold tracking-widest text-muted-foreground uppercase" style={{ marginBottom: '60px' }}>
-          {t('login.hero.builtBy', 'Built by a Level 3 IRATA Tech')}
+          {t('login.hero.builtBy', 'Built by a Level 3 irata Tech')}
         </p>
         
         <p className="text-2xl md:text-4xl font-medium mb-0 text-[#3B3B3B]" style={{ color: '#3B3B3B' }}>

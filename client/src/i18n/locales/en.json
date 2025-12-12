@@ -6,7 +6,7 @@
     },
     "hero": {
       "subtitle": "Building Maintenance Management Software",
-      "builtBy": "Built by a Level 3 IRATA Tech & Operations Manager",
+      "builtBy": "Built by a Level 3 IRATA / SPRAT Tech & Operations Manager",
       "tagline": "Your competitors think they're organized.",
       "taglineBold": "THEY'RE NOT",
       "description": "You track every",
@@ -77,7 +77,7 @@
           "category": "Employees",
           "title": "Team Management & Permissions",
           "tagline": "Supervisors Log Drops. They Don't See Pay Rates.",
-          "description": "Financial data stays private. IRATA levels tracked. 100% payroll accuracy. Hourly rates configured. Zero awkward conversations. Give supervisors job tools, not salary spreadsheets."
+          "description": "Financial data stays private. IRATA / SPRAT levels tracked. 100% payroll accuracy. Hourly rates configured. Zero awkward conversations. Give supervisors job tools, not salary spreadsheets."
         },
         "inventory": {
           "category": "Inventory & Inspections",
@@ -127,7 +127,7 @@
           "description": "240 residents watch progress on their phones. Submit feedback that gets addressed same-day. Tell their council \"these guys are professional.\" Your competitor? Still using paper. Contract renewal rate: 95%. Theirs: 60%. Math is simple."
         },
         "audit": {
-          "category": "IRATA & Insurance Audit Protection",
+          "category": "IRATA / SPRAT & Insurance Audit Protection",
           "title": "\"Show Me Your Inspection Logs\"",
           "description": "Auditor asks for 6 months of harness inspections. You export PDF in 4 minutes. Every tech. Every day. Every piece of equipment. Building manager swoons."
         },
@@ -484,7 +484,7 @@
       },
       "myLoggedHours": {
         "label": "My Logged Hours",
-        "description": "IRATA logbook"
+        "description": "IRATA / SPRAT logbook"
       },
       "pastProjects": {
         "label": "Past Projects",
@@ -814,8 +814,8 @@
       "pendingOnboarding": "Pending Onboarding",
       "pendingOnboardingDesc": "These technicians have accepted your invitation but need salary and permissions set up.",
       "completeOnboarding": "Complete Onboarding",
-      "irataExpired": "IRATA Expired",
-      "irataExpiringSoon": "IRATA Expiring Soon",
+      "irataExpired": "IRATA / SPRAT Expired",
+      "irataExpiringSoon": "IRATA / SPRAT Expiring Soon",
       "started": "Started:",
       "license": "License:",
       "expires": "Expires:",
@@ -863,12 +863,12 @@
       "emergencyContactName": "Emergency Contact Name",
       "emergencyContactPhone": "Emergency Contact Phone",
       "specialMedicalConditions": "Special Medical Conditions",
-      "irataCertification": "IRATA Certification (Optional)",
-      "irataLevel": "IRATA Level",
+      "irataCertification": "IRATA / SPRAT Certification (Optional)",
+      "irataLevel": "IRATA / SPRAT Level",
       "selectLevel": "Select level",
-      "irataLicenseNumber": "IRATA License Number",
-      "irataIssuedDate": "IRATA Issued Date",
-      "irataExpirationDate": "IRATA Expiration Date",
+      "irataLicenseNumber": "IRATA / SPRAT License Number",
+      "irataIssuedDate": "IRATA / SPRAT Issued Date",
+      "irataExpirationDate": "IRATA / SPRAT Expiration Date",
       "continueToPermissions": "Continue to Permissions",
       "back": "Back",
       "accessPermissions": "Access Permissions",
@@ -920,7 +920,7 @@
       "gotIt": "Got It",
       "hourlyRateRequired": "Please enter a valid hourly rate",
       "documentsAndCertifications": "Documents & Certifications",
-      "irataLicense": "IRATA License",
+      "irataLicense": "IRATA / SPRAT License",
       "spratLicense": "SPRAT License",
       "driversLicense": "Driver's License",
       "bankDocuments": "Bank Documents",
@@ -1064,7 +1064,7 @@
       "pricePerDropPlaceholder": "Enter price per drop",
       "pricePerDropHelp": "Amount paid per drop completed",
       "siteMaxHeight": "Site Max Height",
-      "siteHeightExplain": "Site height is required for IRATA logbook entries. Technicians need this to track work at height for certification progression."
+      "siteHeightExplain": "Site height is required for IRATA / SPRAT logbook entries. Technicians need this to track work at height for certification progression."
     },
     "projects": {
       "activeProjects": "Active Projects",
@@ -1117,7 +1117,7 @@
       "hourlyRate": "Hourly Rate",
       "salary": "Annual Salary",
       "startDate": "Start Date",
-      "irataCertification": "IRATA Certification",
+      "irataCertification": "IRATA / SPRAT Certification",
       "level": "Level",
       "levelValue": "Level",
       "licenseNumber": "License Number",
@@ -1297,8 +1297,8 @@
     "status": "Status",
     "hourlyRate": "Hourly Rate",
     "certifications": "Certifications",
-    "irataLevel": "IRATA Level",
-    "irataExpiry": "IRATA Expiry",
+    "irataLevel": "IRATA / SPRAT Level",
+    "irataExpiry": "IRATA / SPRAT Expiry",
     "emergencyContact": "Emergency Contact",
     "emergencyPhone": "Emergency Phone",
     "permissions": "Permissions",
@@ -2343,7 +2343,7 @@
     "hourlyRateSelf": "Hourly Rate (for yourself)",
     "employeeSeats": "Employee Seats",
     "role": "Role",
-    "irataLevel": "IRATA Level",
+    "irataLevel": "IRATA / SPRAT Level",
     "companyLogo": "Company Logo",
     "codes": {
       "residentCode": "Resident Code",
@@ -2578,7 +2578,7 @@
   },
   "loggedHours": {
     "title": "My Logged Hours",
-    "subtitle": "IRATA Logbook",
+    "subtitle": "IRATA / SPRAT Logbook",
     "loading": "Loading your logged hours...",
     "level": "Level",
     "license": "License",
@@ -2595,14 +2595,14 @@
     "taskBreakdown": "Task Breakdown",
     "sessionHistoryByProject": "Session History by Project",
     "noLoggedHoursYet": "No logged hours yet",
-    "noLoggedHoursDesc": "When you end a work session, you'll be prompted to log the IRATA tasks you performed. Your logged hours will appear here for your IRATA certification logbook.",
-    "irataCertInfo": "IRATA Certification Info",
+    "noLoggedHoursDesc": "When you end a work session, you'll be prompted to log the IRATA / SPRAT tasks you performed. Your logged hours will appear here for your IRATA / SPRAT certification logbook.",
+    "irataCertInfo": "IRATA / SPRAT Certification Info",
     "currentLevel": "Current Level",
     "licenseNumber": "License Number",
     "issuedDate": "Issued Date",
     "expires": "Expires",
     "setPriorHoursTitle": "Set Prior Logbook Hours",
-    "setPriorHoursDesc": "Enter the total number of hours you have recorded in your IRATA logbook before using this system. This will be added to your hours logged here to show your complete total.",
+    "setPriorHoursDesc": "Enter the total number of hours you have recorded in your IRATA / SPRAT logbook before using this system. This will be added to your hours logged here to show your complete total.",
     "totalHoursFromLogbook": "Total hours from your existing logbook",
     "hoursPlaceholder": "e.g., 250",
     "hoursAccumulatedNote": "This is the total number of hours you have accumulated before starting to use this system.",
@@ -3315,7 +3315,7 @@
       "description": "Daily harness and PPE safety inspection"
     },
     "irataIcop": {
-      "title": "IRATA ICOP",
+      "title": "IRATA / SPRAT ICOP",
       "description": "International Code of Practice (TC-102ENG)"
     },
     "incidentReport": {
@@ -3328,7 +3328,7 @@
       "form": {
         "pageTitle": "Method Statement / Work Plan",
         "pageSubtitle": "Document safe work procedures and risk controls",
-        "irataCompliant": "IRATA Compliant",
+        "irataCompliant": "IRATA / SPRAT Compliant",
         "basicInfo": {
           "title": "Basic Information",
           "projectOptional": "Project (Optional)",
@@ -3393,8 +3393,8 @@
           "title": "Competency and Communication",
           "requirements": "Competency Requirements",
           "competencyPlaceholder": "Required competency",
-          "irataLevel": "IRATA Level Required",
-          "irataPlaceholder": "Select IRATA level",
+          "irataLevel": "IRATA / SPRAT Level Required",
+          "irataPlaceholder": "Select IRATA / SPRAT level",
           "level1": "Level 1",
           "level2": "Level 2",
           "level3": "Level 3",
@@ -3402,7 +3402,7 @@
           "communicationMethod": "Communication Method",
           "communicationPlaceholder": "e.g. Two-way radio, hand signals",
           "signalProtocol": "Signal Protocol",
-          "signalPlaceholder": "e.g. Standard IRATA signals",
+          "signalPlaceholder": "e.g. Standard IRATA / SPRAT signals",
           "teamMembers": "Team Members",
           "teamMemberPlaceholder": "Team member name"
         },
@@ -3479,7 +3479,7 @@
           "workingHeight": "Working Height",
           "accessMethod": "Access Method",
           "competency": "Competency Requirements",
-          "irataLevel": "IRATA Level",
+          "irataLevel": "IRATA / SPRAT Level",
           "communication": "Communication",
           "signals": "Signal Protocol",
           "teamMembers": "Team Members",
@@ -3751,10 +3751,10 @@
     "flha": {
       "title": "Field Level Hazard Assessment",
       "formTitle": "FLHA Form - Rope Access",
-      "icopTitle": "IRATA International Code of Practice (ICOP)",
-      "icopDescription": "All rope access operations must comply with the IRATA International Code of Practice for Industrial Rope Access (TC-102ENG). This document outlines mandatory safety requirements, technical procedures, and best practices for rope access work.",
+      "icopTitle": "IRATA / SPRAT International Code of Practice (ICOP)",
+      "icopDescription": "All rope access operations must comply with the IRATA / SPRAT International Code of Practice for Industrial Rope Access (TC-102ENG). This document outlines mandatory safety requirements, technical procedures, and best practices for rope access work.",
       "downloadICOP": "Download Official ICOP Document",
-      "viewICOPInfo": "View IRATA ICOP Information",
+      "viewICOPInfo": "View IRATA / SPRAT ICOP Information",
       "project": "Project",
       "selectProject": "Select project",
       "assessmentDate": "Assessment Date",
@@ -3833,10 +3833,10 @@
     },
     "toolbox": {
       "title": "Daily Toolbox Meeting",
-      "icopTitle": "IRATA International Code of Practice (ICOP)",
-      "icopDescription": "All rope access operations must comply with the IRATA International Code of Practice for Industrial Rope Access (TC-102ENG). This document outlines mandatory safety requirements, technical procedures, and best practices for rope access work.",
+      "icopTitle": "IRATA / SPRAT International Code of Practice (ICOP)",
+      "icopDescription": "All rope access operations must comply with the IRATA / SPRAT International Code of Practice for Industrial Rope Access (TC-102ENG). This document outlines mandatory safety requirements, technical procedures, and best practices for rope access work.",
       "downloadICOP": "Download Official ICOP Document",
-      "viewICOPInfo": "View IRATA ICOP Information",
+      "viewICOPInfo": "View IRATA / SPRAT ICOP Information",
       "meetingInformation": "Meeting Information",
       "project": "Project",
       "selectProject": "Select project",
@@ -3989,10 +3989,10 @@
       "failed": "Submission failed"
     },
     "icop": {
-      "title": "IRATA International Code of Practice (ICOP)",
-      "description": "All rope access operations must comply with the IRATA International Code of Practice for Industrial Rope Access (TC-102ENG). This document outlines mandatory safety requirements, technical procedures, and best practices for rope access work.",
+      "title": "IRATA / SPRAT International Code of Practice (ICOP)",
+      "description": "All rope access operations must comply with the IRATA / SPRAT International Code of Practice for Industrial Rope Access (TC-102ENG). This document outlines mandatory safety requirements, technical procedures, and best practices for rope access work.",
       "downloadDocument": "Download Official ICOP Document",
-      "viewInfo": "View IRATA ICOP Information"
+      "viewInfo": "View IRATA / SPRAT ICOP Information"
     }
   },
   "incidentReport": {
@@ -4474,7 +4474,7 @@
       },
       "logHoursPrompt": {
         "title": "Log Your Hours?",
-        "description": "Would you like to log the tasks you performed during this work session? This helps fill your IRATA logbook for certification tracking.",
+        "description": "Would you like to log the tasks you performed during this work session? This helps fill your IRATA / SPRAT logbook for certification tracking.",
         "hoursWorked": "Hours Worked",
         "date": "Date",
         "building": "Building",
@@ -4483,8 +4483,8 @@
         "yesLogHours": "Yes, Log Hours"
       },
       "irataTask": {
-        "title": "Log Your IRATA Tasks",
-        "description": "Select all the rope access tasks you performed during this session at {{buildingName}}. This helps track your IRATA logbook hours for certification progression.",
+        "title": "Log Your IRATA / SPRAT Tasks",
+        "description": "Select all the rope access tasks you performed during this session at {{buildingName}}. This helps track your IRATA / SPRAT logbook hours for certification progression.",
         "thisBuilding": "this building",
         "selectTasks": "Select Tasks Performed (click to select)",
         "tasksSelected": "{{count}} task selected",
@@ -4509,7 +4509,7 @@
       "projectReopened": "Project reopened successfully",
       "projectDeleted": "Project deleted successfully",
       "commentPosted": "Comment posted successfully",
-      "irataTasksLogged": "IRATA tasks logged successfully"
+      "irataTasksLogged": "IRATA / SPRAT tasks logged successfully"
     }
   },
   "propertyManager": {

@@ -706,7 +706,7 @@ export default function CompanyJobBoard() {
                   <p className="text-sm text-muted-foreground line-clamp-2">{job.description}</p>
                   <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground flex-wrap">
                     {job.requiredIrataLevel && (
-                      <span>IRATA: {job.requiredIrataLevel}</span>
+                      <span>irata: {job.requiredIrataLevel}</span>
                     )}
                     {job.requiredSpratLevel && (
                       <span>SPRAT: {job.requiredSpratLevel}</span>
@@ -887,7 +887,7 @@ export default function CompanyJobBoard() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="requiredIrataLevel">{t("jobBoard.form.irataLevel", "Required IRATA Level")}</Label>
+                <Label htmlFor="requiredIrataLevel">{t("jobBoard.form.irataLevel", "Required irata Level")}</Label>
                 <Select value={formData.requiredIrataLevel} onValueChange={(v) => setFormData({ ...formData, requiredIrataLevel: v })}>
                   <SelectTrigger data-testid="select-irata-level">
                     <SelectValue placeholder={t("jobBoard.form.notRequired", "Not Required")} />
@@ -1070,7 +1070,7 @@ export default function CompanyJobBoard() {
                                 <h4 className="font-semibold">{app.technician ? getDisplayName(app.technician) : 'Unknown'}</h4>
                                 {app.technician?.irataLevel && (
                                   <Badge variant="outline" className="text-xs border-amber-500 text-amber-600">
-                                    IRATA {app.technician.irataLevel}
+                                    irata {app.technician.irataLevel}
                                   </Badge>
                                 )}
                                 {app.technician?.spratLevel && (
@@ -1160,7 +1160,7 @@ export default function CompanyJobBoard() {
                                 <h4 className="font-semibold">{app.technician ? getDisplayName(app.technician) : 'Unknown'}</h4>
                                 {app.technician?.irataLevel && (
                                   <Badge variant="outline" className="text-xs border-amber-500 text-amber-600">
-                                    IRATA {app.technician.irataLevel}
+                                    irata {app.technician.irataLevel}
                                   </Badge>
                                 )}
                                 {app.technician?.spratLevel && (
@@ -1290,7 +1290,7 @@ export default function CompanyJobBoard() {
                   {selectedApplication.technician.irataLevel && (
                     <div className="p-3 rounded-lg border">
                       <div className="flex items-center gap-2">
-                        <Badge>IRATA {selectedApplication.technician.irataLevel}</Badge>
+                        <Badge>irata {selectedApplication.technician.irataLevel}</Badge>
                         {isExpired(selectedApplication.technician.irataExpirationDate) && (
                           <Badge variant="destructive">{t("jobBoard.expired", "Expired")}</Badge>
                         )}

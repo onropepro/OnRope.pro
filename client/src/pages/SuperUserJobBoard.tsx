@@ -401,7 +401,7 @@ export default function SuperUserJobBoard() {
                   <p className="text-sm text-muted-foreground line-clamp-2">{job.description}</p>
                   <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
                     {job.requiredIrataLevel && (
-                      <span>IRATA: {job.requiredIrataLevel}</span>
+                      <span>irata: {job.requiredIrataLevel}</span>
                     )}
                     {job.requiredSpratLevel && (
                       <span>SPRAT: {job.requiredSpratLevel}</span>
@@ -566,7 +566,7 @@ export default function SuperUserJobBoard() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="requiredIrataLevel">Required IRATA Level</Label>
+                <Label htmlFor="requiredIrataLevel">Required irata Level</Label>
                 <Select value={formData.requiredIrataLevel} onValueChange={(v) => setFormData({ ...formData, requiredIrataLevel: v })}>
                   <SelectTrigger data-testid="select-irata-level">
                     <SelectValue placeholder="Not Required" />

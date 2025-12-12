@@ -6,7 +6,7 @@
     },
     "hero": {
       "subtitle": "Logiciel de gestion d'entretien de bâtiments",
-      "builtBy": "Créé par un technicien IRATA niveau 3 & Directeur des opérations",
+      "builtBy": "Créé par un technicien IRATA / SPRAT niveau 3 & Directeur des opérations",
       "tagline": "Vos concurrents pensent être organisés.",
       "taglineBold": "ILS NE LE SONT PAS",
       "description": "Vous suivez chaque",
@@ -77,7 +77,7 @@
           "category": "Employés",
           "title": "Gestion d'équipe et permissions",
           "tagline": "Les superviseurs enregistrent les descentes. Ils ne voient pas les taux horaires.",
-          "description": "Les données financières restent privées. Niveaux IRATA suivis. 100% de précision de paie. Taux horaires configurés. Zéro conversation gênante. Donnez aux superviseurs des outils de travail, pas des tableurs de salaires."
+          "description": "Les données financières restent privées. Niveaux IRATA / SPRAT suivis. 100% de précision de paie. Taux horaires configurés. Zéro conversation gênante. Donnez aux superviseurs des outils de travail, pas des tableurs de salaires."
         },
         "inventory": {
           "category": "Inventaire et inspections",
@@ -127,7 +127,7 @@
           "description": "240 résidents suivent la progression sur leur téléphone. Soumettent des commentaires traités le jour même. Disent au conseil « ces gars sont professionnels. » Votre concurrent? Encore sur papier. Taux de renouvellement: 95%. Le leur: 60%. Le calcul est simple."
         },
         "audit": {
-          "category": "Protection audits IRATA et assurance",
+          "category": "Protection audits IRATA / SPRAT et assurance",
           "title": "« Montrez-moi vos registres d'inspection »",
           "description": "L'auditeur demande 6 mois d'inspections de harnais. Vous exportez le PDF en 4 minutes. Chaque technicien. Chaque jour. Chaque équipement. Le gestionnaire d'immeuble est impressionné."
         },
@@ -484,7 +484,7 @@
       },
       "myLoggedHours": {
         "label": "Mes heures enregistrées",
-        "description": "Carnet IRATA"
+        "description": "Carnet IRATA / SPRAT"
       },
       "pastProjects": {
         "label": "Projets passés",
@@ -814,8 +814,8 @@
       "pendingOnboarding": "Intégration en attente",
       "pendingOnboardingDesc": "Ces techniciens ont accepté votre invitation mais ont besoin que leur salaire et autorisations soient configurés.",
       "completeOnboarding": "Compléter l'intégration",
-      "irataExpired": "IRATA expiré",
-      "irataExpiringSoon": "IRATA expire bientôt",
+      "irataExpired": "IRATA / SPRAT expiré",
+      "irataExpiringSoon": "IRATA / SPRAT expire bientôt",
       "started": "Début :",
       "license": "Licence :",
       "expires": "Expire :",
@@ -863,12 +863,12 @@
       "emergencyContactName": "Nom du contact d'urgence",
       "emergencyContactPhone": "Téléphone du contact d'urgence",
       "specialMedicalConditions": "Conditions médicales particulières",
-      "irataCertification": "Certification IRATA (Optionnel)",
-      "irataLevel": "Niveau IRATA",
+      "irataCertification": "Certification IRATA / SPRAT (Optionnel)",
+      "irataLevel": "Niveau IRATA / SPRAT",
       "selectLevel": "Sélectionner le niveau",
-      "irataLicenseNumber": "Numéro de licence IRATA",
-      "irataIssuedDate": "Date d'émission IRATA",
-      "irataExpirationDate": "Date d'expiration IRATA",
+      "irataLicenseNumber": "Numéro de licence IRATA / SPRAT / SPRAT",
+      "irataIssuedDate": "Date d'émission IRATA / SPRAT",
+      "irataExpirationDate": "Date d'expiration IRATA / SPRAT",
       "continueToPermissions": "Continuer vers les autorisations",
       "back": "Retour",
       "accessPermissions": "Autorisations d'accès",
@@ -920,7 +920,7 @@
       "gotIt": "Compris",
       "hourlyRateRequired": "Veuillez entrer un taux horaire valide",
       "documentsAndCertifications": "Documents et certifications",
-      "irataLicense": "Licence IRATA",
+      "irataLicense": "Licence IRATA / SPRAT",
       "spratLicense": "Licence SPRAT",
       "driversLicense": "Permis de conduire",
       "bankDocuments": "Documents bancaires",
@@ -1064,7 +1064,7 @@
       "pricePerDropPlaceholder": "Entrer le prix par descente",
       "pricePerDropHelp": "Montant payé par descente complétée",
       "siteMaxHeight": "Hauteur maximale du site",
-      "siteHeightExplain": "La hauteur du site est requise pour les entrées du carnet IRATA. Les techniciens en ont besoin pour suivre les travaux en hauteur pour la progression de leur certification."
+      "siteHeightExplain": "La hauteur du site est requise pour les entrées du carnet IRATA / SPRAT. Les techniciens en ont besoin pour suivre les travaux en hauteur pour la progression de leur certification."
     },
     "projects": {
       "activeProjects": "Projets actifs",
@@ -1117,7 +1117,7 @@
       "hourlyRate": "Taux horaire",
       "salary": "Salaire annuel",
       "startDate": "Date de début",
-      "irataCertification": "Certification IRATA",
+      "irataCertification": "Certification IRATA / SPRAT",
       "level": "Niveau",
       "levelValue": "Niveau",
       "licenseNumber": "Numéro de licence",
@@ -1297,8 +1297,8 @@
     "status": "Statut",
     "hourlyRate": "Taux horaire",
     "certifications": "Certifications",
-    "irataLevel": "Niveau IRATA",
-    "irataExpiry": "Expiration IRATA",
+    "irataLevel": "Niveau IRATA / SPRAT",
+    "irataExpiry": "Expiration IRATA / SPRAT",
     "emergencyContact": "Contact d'urgence",
     "emergencyPhone": "Téléphone d'urgence",
     "permissions": "Permissions",
@@ -2365,7 +2365,7 @@
     "hourlyRateSelf": "Taux horaire (pour vous-même)",
     "employeeSeats": "Sièges employés",
     "role": "Rôle",
-    "irataLevel": "Niveau IRATA",
+    "irataLevel": "Niveau IRATA / SPRAT",
     "companyLogo": "Logo de l'entreprise",
     "codes": {
       "residentCode": "Code résident",
@@ -2600,7 +2600,7 @@
   },
   "loggedHours": {
     "title": "Mes heures enregistrées",
-    "subtitle": "Carnet de bord IRATA",
+    "subtitle": "Carnet de bord IRATA / SPRAT",
     "loading": "Chargement de vos heures enregistrées...",
     "level": "Niveau",
     "license": "Licence",
@@ -2617,14 +2617,14 @@
     "taskBreakdown": "Répartition des tâches",
     "sessionHistoryByProject": "Historique des sessions par projet",
     "noLoggedHoursYet": "Aucune heure enregistrée pour l'instant",
-    "noLoggedHoursDesc": "Lorsque vous terminez une session de travail, vous serez invité à enregistrer les tâches IRATA que vous avez effectuées. Vos heures enregistrées apparaîtront ici pour votre carnet de certification IRATA.",
-    "irataCertInfo": "Informations de certification IRATA",
+    "noLoggedHoursDesc": "Lorsque vous terminez une session de travail, vous serez invité à enregistrer les tâches IRATA / SPRAT que vous avez effectuées. Vos heures enregistrées apparaîtront ici pour votre carnet de certification IRATA / SPRAT.",
+    "irataCertInfo": "Informations de certification IRATA / SPRAT",
     "currentLevel": "Niveau actuel",
     "licenseNumber": "Numéro de licence",
     "issuedDate": "Date d'émission",
     "expires": "Expire",
     "setPriorHoursTitle": "Définir les heures précédentes du carnet",
-    "setPriorHoursDesc": "Entrez le nombre total d'heures que vous avez enregistrées dans votre carnet IRATA avant d'utiliser ce système. Cela sera ajouté à vos heures enregistrées ici pour montrer votre total complet.",
+    "setPriorHoursDesc": "Entrez le nombre total d'heures que vous avez enregistrées dans votre carnet IRATA / SPRAT avant d'utiliser ce système. Cela sera ajouté à vos heures enregistrées ici pour montrer votre total complet.",
     "totalHoursFromLogbook": "Total des heures de votre carnet existant",
     "hoursPlaceholder": "ex: 250",
     "hoursAccumulatedNote": "C'est le nombre total d'heures que vous avez accumulées avant de commencer à utiliser ce système.",
@@ -3331,10 +3331,10 @@
       "title": "Évaluation des dangers au niveau du terrain",
       "description": "FLHA complet pour les opérations sur corde",
       "formTitle": "Formulaire ELDT - Accès sur corde",
-      "icopTitle": "Code de pratique international IRATA (ICOP)",
-      "icopDescription": "Toutes les opérations d'accès sur corde doivent être conformes au Code de pratique international IRATA pour l'accès industriel sur corde (TC-102ENG). Ce document décrit les exigences de sécurité obligatoires, les procédures techniques et les meilleures pratiques pour les travaux d'accès sur corde.",
+      "icopTitle": "Code de pratique international IRATA / SPRAT (ICOP)",
+      "icopDescription": "Toutes les opérations d'accès sur corde doivent être conformes au Code de pratique international IRATA / SPRAT / SPRAT pour l'accès industriel sur corde (TC-102ENG). Ce document décrit les exigences de sécurité obligatoires, les procédures techniques et les meilleures pratiques pour les travaux d'accès sur corde.",
       "downloadICOP": "Télécharger le document officiel ICOP",
-      "viewICOPInfo": "Voir les informations ICOP IRATA",
+      "viewICOPInfo": "Voir les informations ICOP IRATA / SPRAT",
       "project": "Projet",
       "selectProject": "Sélectionner un projet",
       "assessmentDate": "Date d'évaluation",
@@ -3413,10 +3413,10 @@
     },
     "toolbox": {
       "title": "Réunion de sécurité quotidienne",
-      "icopTitle": "Code de pratique international IRATA (ICOP)",
-      "icopDescription": "Toutes les opérations d'accès sur corde doivent être conformes au Code de pratique international IRATA pour l'accès industriel sur corde (TC-102ENG). Ce document décrit les exigences de sécurité obligatoires, les procédures techniques et les meilleures pratiques pour les travaux d'accès sur corde.",
+      "icopTitle": "Code de pratique international IRATA / SPRAT (ICOP)",
+      "icopDescription": "Toutes les opérations d'accès sur corde doivent être conformes au Code de pratique international IRATA / SPRAT / SPRAT pour l'accès industriel sur corde (TC-102ENG). Ce document décrit les exigences de sécurité obligatoires, les procédures techniques et les meilleures pratiques pour les travaux d'accès sur corde.",
       "downloadICOP": "Télécharger le document officiel ICOP",
-      "viewICOPInfo": "Voir les informations ICOP IRATA",
+      "viewICOPInfo": "Voir les informations ICOP IRATA / SPRAT",
       "meetingInformation": "Informations sur la réunion",
       "project": "Projet",
       "selectProject": "Sélectionner un projet",
@@ -3502,7 +3502,7 @@
       "description": "Inspection quotidienne du harnais et des EPI"
     },
     "irataIcop": {
-      "title": "IRATA ICOP",
+      "title": "IRATA / SPRAT ICOP",
       "description": "Code international de pratique (TC-102ENG)"
     },
     "incidentReport": {
@@ -3515,7 +3515,7 @@
       "form": {
         "pageTitle": "Énoncé de méthode / Plan de travail",
         "pageSubtitle": "Documenter les procédures de travail sécuritaires et les contrôles des risques",
-        "irataCompliant": "Conforme IRATA",
+        "irataCompliant": "Conforme IRATA / SPRAT",
         "basicInfo": {
           "title": "Informations de base",
           "projectOptional": "Projet (Facultatif)",
@@ -3580,8 +3580,8 @@
           "title": "Compétences et communication",
           "requirements": "Exigences de compétence",
           "competencyPlaceholder": "Compétence requise",
-          "irataLevel": "Niveau IRATA requis",
-          "irataPlaceholder": "Sélectionner le niveau IRATA",
+          "irataLevel": "Niveau IRATA / SPRAT requis",
+          "irataPlaceholder": "Sélectionner le niveau IRATA / SPRAT",
           "level1": "Niveau 1",
           "level2": "Niveau 2",
           "level3": "Niveau 3",
@@ -3589,7 +3589,7 @@
           "communicationMethod": "Méthode de communication",
           "communicationPlaceholder": "ex. Radio bidirectionnelle, signaux manuels",
           "signalProtocol": "Protocole de signaux",
-          "signalPlaceholder": "ex. Signaux IRATA standard",
+          "signalPlaceholder": "ex. Signaux IRATA / SPRAT standard",
           "teamMembers": "Membres de l'équipe",
           "teamMemberPlaceholder": "Nom du membre de l'équipe"
         },
@@ -3666,7 +3666,7 @@
           "workingHeight": "Hauteur de travail",
           "accessMethod": "Méthode d'accès",
           "competency": "Exigences de compétence",
-          "irataLevel": "Niveau IRATA",
+          "irataLevel": "Niveau IRATA / SPRAT",
           "communication": "Communication",
           "signals": "Protocole de signaux",
           "teamMembers": "Membres de l'équipe",
@@ -4005,10 +4005,10 @@
       "failed": "Échec de la soumission"
     },
     "icop": {
-      "title": "Code de pratique international IRATA (ICOP)",
-      "description": "Toutes les opérations d'accès sur corde doivent être conformes au Code de pratique international IRATA pour l'accès sur corde industriel (TC-102ENG). Ce document décrit les exigences de sécurité obligatoires, les procédures techniques et les meilleures pratiques pour les travaux d'accès sur corde.",
+      "title": "Code de pratique international IRATA / SPRAT (ICOP)",
+      "description": "Toutes les opérations d'accès sur corde doivent être conformes au Code de pratique international IRATA / SPRAT / SPRAT pour l'accès sur corde industriel (TC-102ENG). Ce document décrit les exigences de sécurité obligatoires, les procédures techniques et les meilleures pratiques pour les travaux d'accès sur corde.",
       "downloadDocument": "Télécharger le document officiel ICOP",
-      "viewInfo": "Voir les informations ICOP IRATA"
+      "viewInfo": "Voir les informations ICOP IRATA / SPRAT"
     }
   },
   "incidentReport": {
@@ -4490,7 +4490,7 @@
       },
       "logHoursPrompt": {
         "title": "Enregistrer vos heures ?",
-        "description": "Souhaitez-vous enregistrer les tâches effectuées pendant cette session de travail ? Cela aide à remplir votre carnet IRATA pour le suivi de certification.",
+        "description": "Souhaitez-vous enregistrer les tâches effectuées pendant cette session de travail ? Cela aide à remplir votre carnet IRATA / SPRAT pour le suivi de certification.",
         "hoursWorked": "Heures travaillées",
         "date": "Date",
         "building": "Bâtiment",
@@ -4499,8 +4499,8 @@
         "yesLogHours": "Oui, enregistrer les heures"
       },
       "irataTask": {
-        "title": "Enregistrer vos tâches IRATA",
-        "description": "Sélectionnez toutes les tâches d'accès sur corde que vous avez effectuées pendant cette session à {{buildingName}}. Cela aide à suivre vos heures de carnet IRATA pour la progression de certification.",
+        "title": "Enregistrer vos tâches IRATA / SPRAT",
+        "description": "Sélectionnez toutes les tâches d'accès sur corde que vous avez effectuées pendant cette session à {{buildingName}}. Cela aide à suivre vos heures de carnet IRATA / SPRAT pour la progression de certification.",
         "thisBuilding": "ce bâtiment",
         "selectTasks": "Sélectionnez les tâches effectuées (cliquez pour sélectionner)",
         "tasksSelected": "{{count}} tâche sélectionnée",
@@ -4525,7 +4525,7 @@
       "projectReopened": "Projet rouvert avec succès",
       "projectDeleted": "Projet supprimé avec succès",
       "commentPosted": "Commentaire publié avec succès",
-      "irataTasksLogged": "Tâches IRATA enregistrées avec succès"
+      "irataTasksLogged": "Tâches IRATA / SPRAT enregistrées avec succès"
     }
   },
   "propertyManager": {

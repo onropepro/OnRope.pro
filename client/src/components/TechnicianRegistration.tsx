@@ -193,7 +193,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
     }
     if (data.certification === "irata" || data.certification === "both") {
       if (!data.irataLevel || !data.irataLicenseNumber.trim()) {
-        setError("IRATA level and license number are required");
+        setError("irata level and license number are required");
         return false;
       }
     }
@@ -349,7 +349,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                   <div className="text-center mb-8">
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
                       <HardHat className="w-4 h-4 text-primary" />
-                      <span className="text-sm font-medium text-primary">For IRATA & SPRAT Technicians</span>
+                      <span className="text-sm font-medium text-primary">For irata & SPRAT Technicians</span>
                     </div>
                     <h1 className="text-3xl font-bold mb-3">Create your free account</h1>
                     <p className="text-muted-foreground">Takes 60 seconds. Free forever.</p>
@@ -594,7 +594,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
 
                   <div className="grid grid-cols-2 gap-3 mb-6">
                     {[
-                      { value: "irata", label: "IRATA" },
+                      { value: "irata", label: "irata" },
                       { value: "sprat", label: "SPRAT" },
                       { value: "both", label: "Both" },
                       { value: "trainee", label: "Trainee" },
@@ -615,12 +615,12 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                     ))}
                   </div>
 
-                  {/* IRATA Fields */}
+                  {/* irata Fields */}
                   {(data.certification === "irata" || data.certification === "both") && (
                     <div className="space-y-4 mb-4 p-4 rounded-lg bg-muted/50">
                       <h4 className="font-medium flex items-center gap-2">
                         <Award className="w-4 h-4 text-[#0369A1]" />
-                        IRATA Details
+                        irata Details
                       </h4>
                       <div className="grid grid-cols-2 gap-3">
                         <div>

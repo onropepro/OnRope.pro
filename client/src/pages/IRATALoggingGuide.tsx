@@ -51,14 +51,14 @@ export default function IRATALoggingGuide() {
 
   return (
     <ChangelogGuideLayout 
-      title="IRATA / SPRAT Task Logging Guide"
+      title="irata / SPRAT Task Logging Guide"
       version="3.0"
       lastUpdated="December 10, 2025"
     >
       <div className="space-y-8">
         <section className="space-y-4">
           <p className="text-muted-foreground leading-relaxed text-base">
-            The IRATA / SPRAT Task Logging System allows rope access technicians to track their work hours against specific task types for certification progression. Hours are automatically captured from work sessions and can be categorized by the type of rope access work performed.
+            The irata / SPRAT Task Logging System allows rope access technicians to track their work hours against specific task types for certification progression. Hours are automatically captured from work sessions and can be categorized by the type of rope access work performed.
           </p>
         </section>
 
@@ -67,7 +67,7 @@ export default function IRATALoggingGuide() {
             <CardHeader className="pb-2">
               <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2 text-amber-900 dark:text-amber-100">
                 <Award className="w-5 h-5" />
-                The Golden Rule: Hours Build Your IRATA / SPRAT Portfolio
+                The Golden Rule: Hours Build Your irata / SPRAT Portfolio
               </CardTitle>
             </CardHeader>
             <CardContent className="text-amber-900 dark:text-amber-100 space-y-4">
@@ -78,7 +78,7 @@ export default function IRATALoggingGuide() {
               </div>
               
               <div className="space-y-2 text-base">
-                <p><strong>Your IRATA / SPRAT hours accumulate automatically.</strong> The system tracks:</p>
+                <p><strong>Your irata / SPRAT hours accumulate automatically.</strong> The system tracks:</p>
                 <ul className="list-disc list-inside space-y-1 ml-2">
                   <li><strong>Baseline Hours</strong>: Pre-existing logbook hours you enter manually</li>
                   <li><strong>Session Hours</strong>: Hours automatically logged from completed work sessions</li>
@@ -88,9 +88,9 @@ export default function IRATALoggingGuide() {
               <div className="bg-amber-100 dark:bg-amber-800 rounded-lg p-3 text-sm">
                 <p className="font-semibold flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4" />
-                  IRATA / SPRAT Technicians Only
+                  irata / SPRAT Technicians Only
                 </p>
-                <p className="mt-1">The task logging prompt only appears for employees with IRATA / SPRAT certification tracking enabled. After ending a work session, you'll be prompted to categorize your hours.</p>
+                <p className="mt-1">The task logging prompt only appears for employees with irata / SPRAT certification tracking enabled. After ending a work session, you'll be prompted to categorize your hours.</p>
               </div>
 
               <div className="grid md:grid-cols-3 gap-3 text-sm">
@@ -127,7 +127,7 @@ export default function IRATALoggingGuide() {
                     Important: This Does NOT Replace Your Physical Logbook
                   </p>
                   <p className="text-red-800 dark:text-red-200 text-sm">
-                    IRATA and SPRAT still require you to maintain a physical logbook. WorkSafeBC and other regulatory bodies may request to see your written logbook on-site. OnRopePro's digital logging is a <strong>supplement</strong> that helps you maintain accurate records, not a replacement for your official certification documentation.
+                    irata and SPRAT still require you to maintain a physical logbook. WorkSafeBC and other regulatory bodies may request to see your written logbook on-site. OnRopePro's digital logging is a <strong>supplement</strong> that helps you maintain accurate records, not a replacement for your official certification documentation.
                   </p>
                   <p className="text-red-800 dark:text-red-200 text-sm">
                     <strong>Note:</strong> If you have no logged rope time for 6 months, your certification may be considered invalid until recertification. Consistent logging protects your credentials.
@@ -189,7 +189,7 @@ export default function IRATALoggingGuide() {
                   <div>
                     <h3 className="font-semibold">20+ Task Categories</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Industry-standard IRATA/SPRAT task types ensure your hours are properly categorized for certification assessments.
+                      Industry-standard irata/SPRAT task types ensure your hours are properly categorized for certification assessments.
                     </p>
                   </div>
                 </div>
@@ -266,7 +266,7 @@ export default function IRATALoggingGuide() {
               </Button>
             </div>
             <p className="text-muted-foreground mt-2">
-              The IRATA/SPRAT Task Logging module solves different problems for different users. Find your role below.
+              The irata/SPRAT Task Logging module solves different problems for different users. Find your role below.
             </p>
           </div>
 
@@ -367,7 +367,7 @@ export default function IRATALoggingGuide() {
                     </p>
                   </div>
                   <p className="text-muted-foreground">
-                    <span className="font-medium text-foreground">Solution:</span> Your IRATA/SPRAT hours belong to YOUR technician profile, not your employer. When you move to a new company, your complete hour history comes with you automatically.
+                    <span className="font-medium text-foreground">Solution:</span> Your irata/SPRAT hours belong to YOUR technician profile, not your employer. When you move to a new company, your complete hour history comes with you automatically.
                   </p>
                   <p className="text-emerald-700 dark:text-emerald-400">
                     <span className="font-medium">Benefit:</span> Portable professional identity. Your career history is yours forever, regardless of which companies you work for.
@@ -474,7 +474,7 @@ export default function IRATALoggingGuide() {
                     <span className="font-medium text-foreground">Solution:</span> When entries are logged same-day and linked to specific projects, you can cross-reference against job records. "This tech logged rope transfers at Building X on Tuesday. I know that building has transfer points on the north elevation. Approve."
                   </p>
                   <p className="text-emerald-700 dark:text-emerald-400">
-                    <span className="font-medium">Benefit:</span> Sign with integrity. Your IRATA/SPRAT number on an approval actually represents verification, not just rubber-stamping.
+                    <span className="font-medium">Benefit:</span> Sign with integrity. Your irata/SPRAT number on an approval actually represents verification, not just rubber-stamping.
                   </p>
                 </AccordionContent>
               </AccordionItem>
@@ -490,7 +490,7 @@ export default function IRATALoggingGuide() {
             Rope Access Task Types
           </h2>
           <p className="text-muted-foreground text-sm">
-            The system includes 20 canonical rope access task types recognized in the industry and defined in the IRATA standards.
+            The system includes 20 canonical rope access task types recognized in the industry and defined in the irata standards.
           </p>
 
           <div className="grid md:grid-cols-2 gap-4">
@@ -652,9 +652,9 @@ export default function IRATALoggingGuide() {
                     2
                   </div>
                   <div>
-                    <h3 className="text-xl md:text-2xl font-semibold">Confirm IRATA / SPRAT Logging</h3>
+                    <h3 className="text-xl md:text-2xl font-semibold">Confirm irata / SPRAT Logging</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      A prompt asks if you want to log these hours to your IRATA / SPRAT portfolio. This only appears for certified technicians.
+                      A prompt asks if you want to log these hours to your irata / SPRAT portfolio. This only appears for certified technicians.
                     </p>
                   </div>
                 </div>
@@ -674,7 +674,7 @@ export default function IRATALoggingGuide() {
                   <div>
                     <h3 className="text-xl md:text-2xl font-semibold">Task Selection Dialog Appears</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      After ending your session, a dialog prompts you to select which rope access tasks you performed. This only appears for IRATA / SPRAT certified technicians.
+                      After ending your session, a dialog prompts you to select which rope access tasks you performed. This only appears for irata / SPRAT certified technicians.
                     </p>
                   </div>
                 </div>
@@ -711,7 +711,7 @@ export default function IRATALoggingGuide() {
                       Important: Task Hours are not the same as Shift Hours
                     </p>
                     <p className="text-sm text-amber-800 dark:text-amber-200">
-                      An 8-hour shift doesn't mean 8 hours of rope access tasks. Deduct lunch breaks, travel time, ground-level prep, and non-rope work. IRATA assessors review your logged tasks carefully, so accuracy matters for your certification progression.
+                      An 8-hour shift doesn't mean 8 hours of rope access tasks. Deduct lunch breaks, travel time, ground-level prep, and non-rope work. irata assessors review your logged tasks carefully, so accuracy matters for your certification progression.
                     </p>
                   </div>
                 </div>
@@ -731,7 +731,7 @@ export default function IRATALoggingGuide() {
                   <div>
                     <h3 className="text-xl md:text-2xl font-semibold">Hours Added to Your Portfolio</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Your logged hours are automatically added to your IRATA / SPRAT portfolio. View your complete history on the "My Logged Hours" page.
+                      Your logged hours are automatically added to your irata / SPRAT portfolio. View your complete history on the "My Logged Hours" page.
                     </p>
                   </div>
                 </div>
@@ -748,7 +748,7 @@ export default function IRATALoggingGuide() {
             My Logged Hours Page
           </h2>
           <p className="text-muted-foreground text-sm">
-            Access your complete IRATA / SPRAT hours history from your Profile page.
+            Access your complete irata / SPRAT hours history from your Profile page.
           </p>
 
           <div className="grid md:grid-cols-2 gap-4">
@@ -808,7 +808,7 @@ export default function IRATALoggingGuide() {
                 <Info className="w-5 h-5 text-action-600 dark:text-action-400 mt-0.5 shrink-0" />
                 <div className="space-y-3 text-sm">
                   <p className="font-semibold text-action-900 dark:text-action-100">
-                    Already Have IRATA / SPRAT Experience?
+                    Already Have irata / SPRAT Experience?
                   </p>
                   <p className="text-action-800 dark:text-action-200">
                     If you have pre-existing hours in your physical logbook from previous employment, you have two options to import them:
@@ -914,9 +914,9 @@ export default function IRATALoggingGuide() {
           <div className="space-y-4">
             <Card>
               <CardContent className="pt-6">
-                <h3 className="font-semibold mb-2">Does this replace my physical IRATA/SPRAT logbook?</h3>
+                <h3 className="font-semibold mb-2">Does this replace my physical irata/SPRAT logbook?</h3>
                 <p className="text-sm text-muted-foreground">
-                  No. IRATA and SPRAT still require physical logbooks, and regulatory bodies like WorkSafeBC may request to see your written records. OnRopePro is a digital supplement that helps you maintain accurate records and never lose your hour history.
+                  No. irata and SPRAT still require physical logbooks, and regulatory bodies like WorkSafeBC may request to see your written records. OnRopePro is a digital supplement that helps you maintain accurate records and never lose your hour history.
                 </p>
               </CardContent>
             </Card>
@@ -925,7 +925,7 @@ export default function IRATALoggingGuide() {
               <CardContent className="pt-6">
                 <h3 className="font-semibold mb-2">What happens to my hours if I change employers?</h3>
                 <p className="text-sm text-muted-foreground">
-                  Your IRATA/SPRAT hours belong to your technician profile, not your employer. When you move to a new company, your complete hour history comes with you, so no re-entry is required.
+                  Your irata/SPRAT hours belong to your technician profile, not your employer. When you move to a new company, your complete hour history comes with you, so no re-entry is required.
                 </p>
               </CardContent>
             </Card>
@@ -943,7 +943,7 @@ export default function IRATALoggingGuide() {
               <CardContent className="pt-6">
                 <h3 className="font-semibold mb-2">How do I log training hours from external courses?</h3>
                 <p className="text-sm text-muted-foreground">
-                  Training at IRATA/SPRAT schools counts as rope time. Use the manual entry feature to add training hours, specifying the training provider and skills practiced.
+                  Training at irata/SPRAT schools counts as rope time. Use the manual entry feature to add training hours, specifying the training provider and skills practiced.
                 </p>
               </CardContent>
             </Card>
@@ -969,14 +969,14 @@ export default function IRATALoggingGuide() {
               Module Integration Points
             </h2>
             <p className="text-muted-foreground leading-relaxed text-base">
-              IRATA/SPRAT task logging connects directly with work sessions, payroll, and career development. Hours logged here flow into multiple systems for accurate tracking and certification progression.
+              irata/SPRAT task logging connects directly with work sessions, payroll, and career development. Hours logged here flow into multiple systems for accurate tracking and certification progression.
             </p>
           </div>
 
           <Card className="bg-violet-50 dark:bg-violet-950 border-violet-200 dark:border-violet-800 mb-4">
             <CardContent className="pt-6">
               <p className="italic">"Your logbook is your professional passport. Every hour logged today is evidence for your next certification level tomorrow."</p>
-              <p className="text-sm font-medium mt-2 text-muted-foreground">, IRATA certification philosophy</p>
+              <p className="text-sm font-medium mt-2 text-muted-foreground">, irata certification philosophy</p>
             </CardContent>
           </Card>
 
@@ -989,7 +989,7 @@ export default function IRATALoggingGuide() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-2">
-                <p className="text-sm text-muted-foreground">Task logging triggers automatically when ending a work session. Hours from the session become the starting point for IRATA hour allocation. Seamless transition from clocking out to logging rope time.</p>
+                <p className="text-sm text-muted-foreground">Task logging triggers automatically when ending a work session. Hours from the session become the starting point for irata hour allocation. Seamless transition from clocking out to logging rope time.</p>
                 <div className="flex items-center gap-2 text-sm">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   <span className="font-medium">Zero duplicate data entry required</span>
@@ -1021,7 +1021,7 @@ export default function IRATALoggingGuide() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-2">
-                <p className="text-sm text-muted-foreground">Harness inspections link to work sessions. IRATA logged hours include safety context. During audits, assessors can see that your logged rope hours occurred with proper safety protocols in place.</p>
+                <p className="text-sm text-muted-foreground">Harness inspections link to work sessions. irata logged hours include safety context. During audits, assessors can see that your logged rope hours occurred with proper safety protocols in place.</p>
                 <div className="flex items-center gap-2 text-sm">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   <span>Complete safety trail for every logged hour</span>
@@ -1053,7 +1053,7 @@ export default function IRATALoggingGuide() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-2">
-                <p className="text-sm text-muted-foreground">IRATA certification level displays on technician profiles. Logged hours accumulate toward next level requirements. Owners see crew qualification levels when assigning teams to projects.</p>
+                <p className="text-sm text-muted-foreground">irata certification level displays on technician profiles. Logged hours accumulate toward next level requirements. Owners see crew qualification levels when assigning teams to projects.</p>
                 <div className="flex items-center gap-2 text-sm">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   <span className="font-medium">Real-time certification level visibility</span>
@@ -1102,7 +1102,7 @@ export default function IRATALoggingGuide() {
                     <tr>
                       <td className="py-2">Task Selection</td>
                       <td className="py-2 text-muted-foreground">Choose task types after ending session</td>
-                      <td className="py-2"><Badge variant="outline">IRATA / SPRAT Techs</Badge></td>
+                      <td className="py-2"><Badge variant="outline">irata / SPRAT Techs</Badge></td>
                     </tr>
                     <tr>
                       <td className="py-2">My Logged Hours</td>

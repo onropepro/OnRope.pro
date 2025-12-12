@@ -159,11 +159,11 @@ const translations = {
     verifyLicenseValidity: "Verify Your License Validity",
     verificationExplanation: "Employers require verified certification status to ensure compliance with safety regulations and insurance requirements. Verifying your license helps your employer confirm you're qualified for rope access work.",
     howItWorks: "How it works:",
-    step1: "Click \"Open IRATA Portal\" to open the verification page",
+    step1: "Click \"Open irata Portal\" to open the verification page",
     step2: "Enter your last name and license number",
     step3: "Take a screenshot of the verification result",
     step4: "Come back here and click \"Upload Screenshot\"",
-    openIrataPortal: "Open IRATA Portal",
+    openIrataPortal: "Open irata Portal",
     uploadVerificationScreenshot: "Upload Verification Screenshot",
     analyzingScreenshot: "Analyzing Screenshot...",
     name: "Name",
@@ -204,9 +204,9 @@ const translations = {
     uploadCertificationCard: "Upload Certification Card",
     replaceCertificationCard: "Replace Card",
     addCertificationCard: "Add Card",
-    uploadIrataCertificationCard: "Upload IRATA Card",
+    uploadIrataCertificationCard: "Upload irata Card",
     uploadSpratCertificationCard: "Upload SPRAT Card",
-    irataCertificationCard: "IRATA Certification Card",
+    irataCertificationCard: "irata Certification Card",
     spratCertificationCard: "SPRAT Certification Card",
     experience: "Experience",
     ropeAccessExperience: "Rope Access Experience",
@@ -242,7 +242,7 @@ const translations = {
     invalidFile: "Invalid file",
     uploadImageFile: "Please upload an image file (screenshot)",
     verificationSuccessful: "Verification Successful",
-    irataVerified: "Your IRATA license has been verified!",
+    irataVerified: "Your irata license has been verified!",
     spratVerified: "Your SPRAT license has been verified!",
     verificationIssue: "Verification Issue",
     couldNotVerify: "Could not verify license from screenshot",
@@ -344,7 +344,7 @@ const translations = {
     confirmDeletePreviousHours: "Are you sure you want to delete this previous hours entry?",
     deleteConfirm: "Delete",
     cancelDelete: "Cancel",
-    logbookDisclaimer: "This is a personal tracking tool only. You must still record all hours in your official IRATA/SPRAT logbook - this digital log does not replace it.",
+    logbookDisclaimer: "This is a personal tracking tool only. You must still record all hours in your official irata/SPRAT logbook - this digital log does not replace it.",
     jobBoard: "Job Board",
     jobBoardDesc: "Browse opportunities and make your profile visible to employers",
     browseJobs: "Browse Jobs",
@@ -506,11 +506,11 @@ const translations = {
     verifyLicenseValidity: "Vérifier la validité de votre licence",
     verificationExplanation: "Les employeurs exigent un statut de certification vérifié pour assurer la conformité aux règlements de sécurité et aux exigences d'assurance. La vérification de votre licence aide votre employeur à confirmer que vous êtes qualifié pour le travail d'accès sur corde.",
     howItWorks: "Comment ça fonctionne:",
-    step1: "Cliquez sur « Ouvrir le portail IRATA » pour ouvrir la page de vérification",
+    step1: "Cliquez sur « Ouvrir le portail irata » pour ouvrir la page de vérification",
     step2: "Entrez votre nom de famille et votre numéro de licence",
     step3: "Prenez une capture d'écran du résultat de la vérification",
     step4: "Revenez ici et cliquez sur « Téléverser la capture d'écran »",
-    openIrataPortal: "Ouvrir le portail IRATA",
+    openIrataPortal: "Ouvrir le portail irata",
     uploadVerificationScreenshot: "Téléverser la capture d'écran",
     analyzingScreenshot: "Analyse en cours...",
     name: "Nom",
@@ -551,9 +551,9 @@ const translations = {
     uploadCertificationCard: "Téléverser la carte de certification",
     replaceCertificationCard: "Remplacer la carte",
     addCertificationCard: "Ajouter une carte",
-    uploadIrataCertificationCard: "Téléverser la carte IRATA",
+    uploadIrataCertificationCard: "Téléverser la carte irata",
     uploadSpratCertificationCard: "Téléverser la carte SPRAT",
-    irataCertificationCard: "Carte de certification IRATA",
+    irataCertificationCard: "Carte de certification irata",
     spratCertificationCard: "Carte de certification SPRAT",
     experience: "Expérience",
     ropeAccessExperience: "Expérience d'accès sur corde",
@@ -589,7 +589,7 @@ const translations = {
     invalidFile: "Fichier invalide",
     uploadImageFile: "Veuillez téléverser un fichier image (capture d'écran)",
     verificationSuccessful: "Vérification réussie",
-    irataVerified: "Votre licence IRATA a été vérifiée!",
+    irataVerified: "Votre licence irata a été vérifiée!",
     spratVerified: "Votre licence SPRAT a été vérifiée!",
     verificationIssue: "Problème de vérification",
     couldNotVerify: "Impossible de vérifier la licence à partir de la capture d'écran",
@@ -691,7 +691,7 @@ const translations = {
     confirmDeletePreviousHours: "Êtes-vous sûr de vouloir supprimer cette entrée d'heures précédentes ?",
     deleteConfirm: "Supprimer",
     cancelDelete: "Annuler",
-    logbookDisclaimer: "Ceci est un outil de suivi personnel uniquement. Vous devez toujours enregistrer toutes vos heures dans votre carnet IRATA/SPRAT officiel - ce journal numérique ne le remplace pas.",
+    logbookDisclaimer: "Ceci est un outil de suivi personnel uniquement. Vous devez toujours enregistrer toutes vos heures dans votre carnet irata/SPRAT officiel - ce journal numérique ne le remplace pas.",
     jobBoard: "Offres d'emploi",
     jobBoardDesc: "Parcourir les opportunites et rendre votre profil visible aux employeurs",
     browseJobs: "Parcourir les offres",
@@ -1219,7 +1219,7 @@ export default function TechnicianPortal() {
       { label: language === 'en' ? 'Full Name' : 'Nom complet', complete: !!user.name },
       { label: language === 'en' ? 'Email' : 'Courriel', complete: !!user.email },
       { label: language === 'en' ? 'Phone Number' : 'Numéro de téléphone', complete: !!user.phone },
-      { label: language === 'en' ? 'IRATA/SPRAT Cert' : 'Certification IRATA/SPRAT', complete: !!user.irataLicenseNumber || !!user.spratLicenseNumber },
+      { label: language === 'en' ? 'irata/SPRAT Cert' : 'Certification irata/SPRAT', complete: !!user.irataLicenseNumber || !!user.spratLicenseNumber },
       // Additional profile fields
       { label: language === 'en' ? 'Emergency Contact' : 'Contact d\'urgence', complete: !!user.emergencyContactName && !!user.emergencyContactPhone },
       { label: language === 'en' ? 'Banking Info' : 'Info bancaire', complete: !!user.bankAccountNumber },
@@ -1816,7 +1816,7 @@ export default function TechnicianPortal() {
           try {
             const irataExpiry = parseLocalDate(user.irataExpirationDate);
             if (irataExpiry >= today && irataExpiry <= thirtyDaysFromNow) {
-              urgentCerts.push({ type: 'IRATA', expiryDate: user.irataExpirationDate });
+              urgentCerts.push({ type: 'irata', expiryDate: user.irataExpirationDate });
             }
           } catch (e) {}
         }
@@ -2196,7 +2196,7 @@ export default function TechnicianPortal() {
                   <div className="flex flex-wrap gap-2">
                     {user.irataLicenseNumber && (
                       <Badge variant="secondary" className="gap-1">
-                        IRATA Level {user.irataLevel || "?"} - {user.irataLicenseNumber}
+                        irata Level {user.irataLevel || "?"} - {user.irataLicenseNumber}
                       </Badge>
                     )}
                     {user.spratLicenseNumber && (
@@ -2967,7 +2967,7 @@ export default function TechnicianPortal() {
                     {user.irataLevel && (
                       <Badge variant="secondary" className="gap-1">
                         <Award className="w-3 h-3" />
-                        IRATA {user.irataLevel}
+                        irata {user.irataLevel}
                       </Badge>
                     )}
                     {user.spratLevel && (
@@ -3324,7 +3324,7 @@ export default function TechnicianPortal() {
                             <Input {...field} type="number" step="0.5" placeholder="e.g., 1500" data-testid="input-baseline-hours" />
                           </FormControl>
                           <p className="text-xs text-muted-foreground">
-                            This is a personal tracking tool only, not an official IRATA/SPRAT record.
+                            This is a personal tracking tool only, not an official irata/SPRAT record.
                           </p>
                           <FormMessage />
                         </FormItem>
@@ -3422,7 +3422,7 @@ export default function TechnicianPortal() {
                         <div className="flex items-center justify-between gap-2 flex-wrap">
                           <div className="flex items-center gap-2">
                             <Award className="w-4 h-4 text-muted-foreground" />
-                            <span className="font-medium">IRATA</span>
+                            <span className="font-medium">irata</span>
                             {user.irataVerifiedAt && (
                               <Badge variant="default" className="bg-green-600 text-xs" data-testid="badge-irata-verified">
                                 <CheckCircle2 className="w-3 h-3 mr-1" />
@@ -3463,7 +3463,7 @@ export default function TechnicianPortal() {
                                   }
                                   return <><span>{formattedDate}</span>{badge}</>;
                                 } catch (e) {
-                                  console.error('Failed to parse IRATA expiration date:', e);
+                                  console.error('Failed to parse irata expiration date:', e);
                                   return <span className="text-muted-foreground italic">{t.notSet}</span>;
                                 }
                               })()
@@ -3619,14 +3619,14 @@ export default function TechnicianPortal() {
                     </div>
                   </div>
                   
-                  {/* IRATA License Verification Section - Available to all technicians */}
+                  {/* irata License Verification Section - Available to all technicians */}
                   <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-lg space-y-4">
                       {/* Show verified status if already verified */}
                       {user.irataVerifiedAt && (
                         <div className="flex items-center gap-3 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
                           <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
                           <div>
-                            <p className="text-sm font-medium text-green-700 dark:text-green-400">IRATA {t.licenseVerified}</p>
+                            <p className="text-sm font-medium text-green-700 dark:text-green-400">irata {t.licenseVerified}</p>
                             <p className="text-xs text-muted-foreground">
                               {t.lastVerified}: {formatDateTime(user.irataVerifiedAt)}
                               {user.irataVerificationStatus && ` (${user.irataVerificationStatus})`}
@@ -3639,7 +3639,7 @@ export default function TechnicianPortal() {
                         <CheckCircle2 className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                         <div className="space-y-2">
                           <h4 className="font-medium text-sm">
-                            {user.irataVerifiedAt ? t.reverifyLicense : t.verifyLicenseValidity} (IRATA)
+                            {user.irataVerifiedAt ? t.reverifyLicense : t.verifyLicenseValidity} (irata)
                           </h4>
                           <p className="text-xs text-muted-foreground leading-relaxed">
                             {t.verificationExplanation}
@@ -3751,11 +3751,11 @@ export default function TechnicianPortal() {
                         </div>
                       )}
                       
-                      {/* IRATA Certification Card Upload - inside verification section */}
+                      {/* irata Certification Card Upload - inside verification section */}
                       <div className="pt-3 border-t border-primary/20 space-y-3">
                         <p className="text-sm font-medium">{t.irataCertificationCard}</p>
                         
-                        {/* Display existing IRATA documents */}
+                        {/* Display existing irata documents */}
                         {user.irataDocuments && user.irataDocuments.filter((u: string) => u && u.trim()).length > 0 && (
                           <div className="space-y-2">
                             {user.irataDocuments.filter((u: string) => u && u.trim()).map((url: string, index: number) => {
@@ -3781,7 +3781,7 @@ export default function TechnicianPortal() {
                                   ) : isImage ? (
                                     <img 
                                       src={url} 
-                                      alt={`IRATA certification ${index + 1}`}
+                                      alt={`irata certification ${index + 1}`}
                                       className="w-full object-contain"
                                       style={{ maxHeight: '200px', minHeight: '80px' }}
                                       onError={(e) => {
@@ -5362,7 +5362,7 @@ export default function TechnicianPortal() {
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                  {language === 'en' ? 'Enhanced IRATA task logging' : 'Journalisation IRATA amelioree'}
+                  {language === 'en' ? 'Enhanced irata task logging' : 'Journalisation irata amelioree'}
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />

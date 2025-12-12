@@ -168,7 +168,7 @@ const defaultPDFTranslations: MethodStatementPDFTranslations = {
   workingHeights: 'Working Heights',
   accessMethod: 'Access Method',
   competencyRequirements: 'Competency Requirements',
-  irataLevelRequired: 'IRATA Level Required',
+  irataLevelRequired: 'irata Level Required',
   communicationMethod: 'Communication Method',
   signalProtocol: 'Signal Protocol',
   teamMembers: 'Team Members',
@@ -863,7 +863,7 @@ export default function MethodStatementForm() {
         </div>
         <Badge variant="outline" className="gap-1">
           <Shield className="h-3 w-3" />
-          {t('safetyForms.methodStatement.form.irataCompliant', 'IRATA Compliant')}
+          {t('safetyForms.methodStatement.form.irataCompliant', 'irata Compliant')}
         </Badge>
       </div>
 
@@ -1221,11 +1221,11 @@ export default function MethodStatementForm() {
                 name="irataLevelRequired"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('safetyForms.methodStatement.form.competency.irataLevel', 'IRATA Level Required')}</FormLabel>
+                    <FormLabel>{t('safetyForms.methodStatement.form.competency.irataLevel', 'irata Level Required')}</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger data-testid="select-irata-level">
-                          <SelectValue placeholder={t('safetyForms.methodStatement.form.competency.irataPlaceholder', 'Select IRATA level')} />
+                          <SelectValue placeholder={t('safetyForms.methodStatement.form.competency.irataPlaceholder', 'Select irata level')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -1262,7 +1262,7 @@ export default function MethodStatementForm() {
                     <FormItem>
                       <FormLabel>{t('safetyForms.methodStatement.form.competency.signalProtocol', 'Signal Protocol')}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder={t('safetyForms.methodStatement.form.competency.signalPlaceholder', 'e.g. Standard IRATA signals')} data-testid="input-signal-protocol" />
+                        <Input {...field} placeholder={t('safetyForms.methodStatement.form.competency.signalPlaceholder', 'e.g. Standard irata signals')} data-testid="input-signal-protocol" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

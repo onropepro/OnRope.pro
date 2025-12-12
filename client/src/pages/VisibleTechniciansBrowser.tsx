@@ -50,7 +50,7 @@ const translations = {
     certificationPlaceholder: "Certification",
     levelPlaceholder: "Level",
     allCerts: "All Certs",
-    irataOnly: "IRATA Only",
+    irataOnly: "irata Only",
     spratOnly: "SPRAT Only",
     bothCerts: "Both",
     allLevels: "All Levels",
@@ -78,7 +78,7 @@ const translations = {
     yrsExp: "yrs exp",
     resume: "Resume",
     unknown: "Unknown",
-    irataLevelLabel: "IRATA Level",
+    irataLevelLabel: "irata Level",
     spratLevelLabel: "SPRAT Level",
     sendJobOffer: "Send Job Offer",
     selectJob: "Select a job to offer",
@@ -103,7 +103,7 @@ const translations = {
     certificationPlaceholder: "Certification",
     levelPlaceholder: "Niveau",
     allCerts: "Toutes les certifications",
-    irataOnly: "IRATA seulement",
+    irataOnly: "irata seulement",
     spratOnly: "SPRAT seulement",
     bothCerts: "Les deux",
     allLevels: "Tous les niveaux",
@@ -131,7 +131,7 @@ const translations = {
     yrsExp: "ans exp",
     resume: "CV",
     unknown: "Inconnu",
-    irataLevelLabel: "IRATA Niveau",
+    irataLevelLabel: "irata Niveau",
     spratLevelLabel: "SPRAT Niveau",
     sendJobOffer: "Envoyer une offre d'emploi",
     selectJob: "Selectionnez un emploi a offrir",
@@ -467,7 +467,7 @@ export default function VisibleTechniciansBrowser() {
                     <div className="mt-3 flex flex-wrap gap-1.5">
                       {tech.irataLevel && (
                         <Badge variant={isExpired(tech.irataExpirationDate) ? "destructive" : isExpiringSoon(tech.irataExpirationDate) ? "secondary" : "default"} className="text-xs">
-                          IRATA L{tech.irataLevel}
+                          irata L{tech.irataLevel}
                         </Badge>
                       )}
                       {tech.spratLevel && (

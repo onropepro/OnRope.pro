@@ -116,10 +116,10 @@ const problemRows = [
   {
     direction: "left" as const,
     problems: [
-      "IRATA expiring next week",
+      "irata expiring next week",
       "Nobody told me",
       "Scrambling for recert",
-      "What do you mean my IRATA license is expired?!?!?!",
+      "What do you mean my irata license is expired?!?!?!",
       "Almost got caught on site with expired SPRAT",
       "Why isn't there a renewal alert?",
       "This could have been prevented",
@@ -272,12 +272,12 @@ export default function TechnicianLogin() {
     {
       icon: FileText,
       title: "Logbook Reference",
-      description: "Every session recorded. Building, tasks, height, hours. Fill out your IRATA logbook from real data, not guesswork two weeks later."
+      description: "Every session recorded. Building, tasks, height, hours. Fill out your irata logbook from real data, not guesswork two weeks later."
     },
     {
       icon: Award,
       title: "Professional Profile",
-      description: "IRATA/SPRAT ID, first aid, driver's abstract - verified and ready for any employer to see."
+      description: "irata/SPRAT ID, first aid, driver's abstract - verified and ready for any employer to see."
     },
     {
       icon: Lock,
@@ -292,7 +292,7 @@ export default function TechnicianLogin() {
     {
       icon: Bell,
       title: "Expiry Alerts (Plus)",
-      description: "30 days before IRATA/SPRAT expires. Your employer sees it too. Zero surprises, zero lapses."
+      description: "30 days before irata/SPRAT expires. Your employer sees it too. Zero surprises, zero lapses."
     },
     {
       icon: Download,
@@ -327,7 +327,7 @@ export default function TechnicianLogin() {
     {
       number: "1",
       title: "Create your free profile",
-      description: "Name, email, IRATA/SPRAT ID. Done in 2 minutes."
+      description: "Name, email, irata/SPRAT ID. Done in 2 minutes."
     },
     {
       number: "2",
@@ -475,7 +475,7 @@ export default function TechnicianLogin() {
                 }}
               >
                 <HardHat className="w-4 h-4" style={{ color: "#79AEA3" }} />
-                <span className="text-sm font-medium" style={{ color: "#79AEA3" }}>For IRATA & SPRAT Technicians</span>
+                <span className="text-sm font-medium" style={{ color: "#79AEA3" }}>For irata & SPRAT Technicians</span>
               </div>
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
@@ -544,7 +544,7 @@ export default function TechnicianLogin() {
                 <div className="space-y-6">
                   <div className="p-6 rounded-lg bg-background border">
                     <p className="text-lg font-semibold text-foreground mb-2">
-                      Eight years on rope. Level 3 IRATA. Hundreds of buildings.
+                      Eight years on rope. Level 3 irata. Hundreds of buildings.
                     </p>
                     <p className="leading-relaxed">
                       And you're still filling out the same forms, still texting timesheets, still guessing at logbook entries like it's your first month.
@@ -880,7 +880,7 @@ export default function TechnicianLogin() {
                   <div className="p-4 text-sm border-l border-border">
                     <div className="flex items-start gap-2">
                       <CheckCircle2 className="w-4 h-4 text-success-600 mt-0.5 flex-shrink-0" />
-                      <span className="text-muted-foreground">You get notified before IRATA/SPRAT lapses.</span>
+                      <span className="text-muted-foreground">You get notified before irata/SPRAT lapses.</span>
                     </div>
                   </div>
                   <div className="p-4 text-sm border-l border-border bg-primary/5">
@@ -1127,7 +1127,7 @@ export default function TechnicianLogin() {
               </span>
               <span className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4" />
-                IRATA/SPRAT verified
+                irata/SPRAT verified
               </span>
             </div>
           </div>
@@ -1188,7 +1188,7 @@ export default function TechnicianLogin() {
               Technician Sign In
             </DialogTitle>
             <DialogDescription>
-              Sign in with your IRATA/SPRAT license number or email
+              Sign in with your irata/SPRAT license number or email
             </DialogDescription>
           </DialogHeader>
           
@@ -1230,7 +1230,7 @@ export default function TechnicianLogin() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>
-                        {loginMethod === "license" ? "IRATA or SPRAT License Number" : "Email Address"}
+                        {loginMethod === "license" ? "irata or SPRAT License Number" : "Email Address"}
                       </FormLabel>
                       <FormControl>
                         <Input

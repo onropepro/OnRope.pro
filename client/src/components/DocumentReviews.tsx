@@ -55,12 +55,12 @@ const SAFE_WORK_PROCEDURES: SafeWorkProcedure[] = [
       'Communication devices (two-way radio) for all rope access personnel',
       'Rescue plan in place with trained rescue team available'
     ],
-    ppe: ['Full body harness (IRATA approved)', 'Safety helmet with chin strap', 'Descender and back-up device', 'Work gloves', 'Safety glasses', 'Safety footwear'],
+    ppe: ['Full body harness (irata approved)', 'Safety helmet with chin strap', 'Descender and back-up device', 'Work gloves', 'Safety glasses', 'Safety footwear'],
     equipment: ['Static kernmantle ropes', 'Anchor straps and connectors', 'Descender and ascender devices', 'Karabiners', 'Window cleaning solution', 'Squeegees and scrubbers'],
     preWorkChecks: ['Verify weather conditions', 'Inspect anchor points', 'Check rope condition', 'Inspect harness', 'Test mechanical devices', 'Confirm exclusion zone'],
     workProcedure: ['Establish ground exclusion zone', 'Access roof/anchor location', 'Rig rope systems', 'Conduct buddy-check', 'Descend in controlled manner', 'Complete cleaning systematically', 'Ascend when complete', 'De-rig equipment'],
     emergencyProcedures: ['Initiate rescue within 10 minutes for suspension trauma', 'Contact emergency services for serious injuries', 'Evacuate if structural concerns arise', 'Immediate ascent in severe weather'],
-    competencyRequirements: ['IRATA Level 1 minimum', 'Current first aid certification', 'Site-specific induction completed']
+    competencyRequirements: ['irata Level 1 minimum', 'Current first aid certification', 'Site-specific induction completed']
   },
   {
     jobType: 'dryer_vent_cleaning',
@@ -74,7 +74,7 @@ const SAFE_WORK_PROCEDURES: SafeWorkProcedure[] = [
     preWorkChecks: ['Review building vent layout', 'Inspect rope access equipment', 'Confirm vacuum operational', 'Verify ground exclusion zone', 'Check weather conditions'],
     workProcedure: ['Set up exclusion zone', 'Rig rope systems', 'Descend to vent location', 'Inspect and document condition', 'Remove vent cover', 'Vacuum and brush clean', 'Reinstall vent cover', 'Document work completed'],
     emergencyProcedures: ['Suspend work if fire detected', 'Use fire extinguisher only if safe', 'Evacuate and alert building management', 'Initiate rescue plan if needed'],
-    competencyRequirements: ['IRATA Level 1 minimum', 'Dryer vent cleaning training', 'Fire hazard awareness', 'First aid certification']
+    competencyRequirements: ['irata Level 1 minimum', 'Dryer vent cleaning training', 'Fire hazard awareness', 'First aid certification']
   },
   {
     jobType: 'building_wash',
@@ -88,7 +88,7 @@ const SAFE_WORK_PROCEDURES: SafeWorkProcedure[] = [
     preWorkChecks: ['Inspect pressure washing equipment', 'Check chemical supplies', 'Identify electrical hazards', 'Establish exclusion zones', 'Confirm weather conditions'],
     workProcedure: ['Establish extended exclusion zone', 'Rig rope systems', 'Connect pressure washing equipment', 'Test on inconspicuous area', 'Work systematically from top down', 'Apply chemicals if required', 'Rinse thoroughly', 'Document completion'],
     emergencyProcedures: ['Stop immediately for pressure injuries', 'Chemical exposure: rinse immediately', 'For electrical concerns: cease all water operations', 'Initiate rescue plan if needed'],
-    competencyRequirements: ['IRATA Level 1 minimum', 'Pressure washing certification', 'Chemical handling training', 'First aid certification']
+    competencyRequirements: ['irata Level 1 minimum', 'Pressure washing certification', 'Chemical handling training', 'First aid certification']
   },
   {
     jobType: 'in_suite_dryer_vent_cleaning',
@@ -158,7 +158,7 @@ const SAFE_WORK_PROCEDURES: SafeWorkProcedure[] = [
     preWorkChecks: ['Assess gutter structural condition', 'Identify electrical hazards', 'Check weather conditions', 'Confirm anchor points', 'Prepare exclusion zone'],
     workProcedure: ['Establish exclusion zone', 'Rig rope systems', 'Visual inspection before loading', 'Remove debris by hand', 'Clear downspout inlets', 'Flush gutter runs', 'Document concerns'],
     emergencyProcedures: ['Structural failure: transfer to backup rope', 'Electrical contact: do not touch victim, call 911', 'Bee/wasp encounter: withdraw slowly', 'Cut injury: apply first aid'],
-    competencyRequirements: ['IRATA Level 1 minimum', 'First aid certification', 'Biological hazard awareness', 'Tool handling procedures']
+    competencyRequirements: ['irata Level 1 minimum', 'First aid certification', 'Biological hazard awareness', 'Tool handling procedures']
   },
   {
     jobType: 'lighting_maintenance',
@@ -172,7 +172,7 @@ const SAFE_WORK_PROCEDURES: SafeWorkProcedure[] = [
     preWorkChecks: ['Confirm LOTO in place', 'Test for absence of voltage', 'Verify anchor points', 'Check weather forecast', 'Inspect tool insulation'],
     workProcedure: ['Implement LOTO', 'Verify no voltage', 'Rig rope systems', 'Allow cooling', 'Perform maintenance', 'Reassemble', 'Test operation', 'Remove LOTO'],
     emergencyProcedures: ['Electrical shock: cut power, call 911', 'Arc flash: evacuate, first aid for burns', 'Fall or suspension: initiate rescue', 'Dropped fixture: clear area'],
-    competencyRequirements: ['IRATA Level 1 minimum', 'Electrical safety training', 'LOTO certification', 'First aid certification']
+    competencyRequirements: ['irata Level 1 minimum', 'Electrical safety training', 'LOTO certification', 'First aid certification']
   },
   {
     jobType: 'caulking_sealing',
@@ -186,7 +186,7 @@ const SAFE_WORK_PROCEDURES: SafeWorkProcedure[] = [
     preWorkChecks: ['Review product SDS', 'Verify temperature/humidity in spec', 'Check weather - no rain during cure', 'Inspect substrate', 'Confirm products'],
     workProcedure: ['Establish exclusion zone', 'Rig rope system', 'Prepare joint', 'Clean surfaces', 'Apply primer', 'Install backer rod', 'Apply sealant', 'Tool to profile', 'Inspect work'],
     emergencyProcedures: ['Eye contact: flush 15 minutes, seek medical', 'Skin reaction: wash, remove clothing', 'Respiratory distress: move to fresh air', 'Cut injury: apply first aid'],
-    competencyRequirements: ['IRATA Level 1 minimum', 'Sealant application training', 'Chemical handling awareness', 'First aid certification']
+    competencyRequirements: ['irata Level 1 minimum', 'Sealant application training', 'Chemical handling awareness', 'First aid certification']
   },
   {
     jobType: 'bird_deterrent',
@@ -200,7 +200,7 @@ const SAFE_WORK_PROCEDURES: SafeWorkProcedure[] = [
     preWorkChecks: ['Survey bird presence and contamination', 'Check for protected species', 'Ensure cleaning supplies ready', 'Confirm deterrent materials', 'Check weather for netting'],
     workProcedure: ['Establish exclusion zone', 'Rig rope systems', 'Document conditions', 'Remove nests if appropriate', 'Clean and disinfect', 'Install deterrent per specs', 'Inspect for gaps'],
     emergencyProcedures: ['Puncture injury: clean immediately, check tetanus', 'Respiratory distress: move to fresh air', 'Netting entanglement: cut free carefully', 'Bird attack: protect face, withdraw'],
-    competencyRequirements: ['IRATA Level 1 minimum', 'Bird deterrent training', 'Biological hazard handling', 'First aid certification']
+    competencyRequirements: ['irata Level 1 minimum', 'Bird deterrent training', 'Biological hazard handling', 'First aid certification']
   },
   {
     jobType: 'anchor_inspection',
@@ -214,7 +214,7 @@ const SAFE_WORK_PROCEDURES: SafeWorkProcedure[] = [
     preWorkChecks: ['Review previous inspection records', 'Identify all anchors for inspection', 'Verify equipment calibration', 'Check weather suitable', 'Confirm access route using verified anchors'],
     workProcedure: ['Access using verified anchors', 'Locate and identify anchors', 'Visual inspection', 'Document concerns', 'Check fastener torque', 'Perform NDT if specified', 'Load test', 'Record results', 'Tag anchor'],
     emergencyProcedures: ['Anchor failure during test: ensure personnel clear', 'Anchor showing failure signs: tag out immediately', 'Fall or suspension: rescue using verified anchors only'],
-    competencyRequirements: ['IRATA Level 2 or higher', 'Anchor inspection certification', 'NDT qualifications as required', 'First aid certification']
+    competencyRequirements: ['irata Level 2 or higher', 'Anchor inspection certification', 'NDT qualifications as required', 'First aid certification']
   }
 ];
 
@@ -253,7 +253,7 @@ const SAFE_WORK_PRACTICES: SafeWorkPractice[] = [
     category: 'Working at Heights',
     icon: AlertTriangle,
     keyPrinciples: ['Falls from height are the leading cause of fatalities', 'Dual rope systems provide redundancy', 'Anchor points must be independently tested', '100% tie-off at all times when at height'],
-    requirements: ['Minimum IRATA Level 1 certification', 'Dual rope system with independent anchors', 'Anchor points rated to minimum 15kN', 'Fall arrester device properly engaged'],
+    requirements: ['Minimum irata Level 1 certification', 'Dual rope system with independent anchors', 'Anchor points rated to minimum 15kN', 'Fall arrester device properly engaged'],
     doList: ['Verify anchor point integrity before use', 'Maintain 100% tie-off at all times', 'Use backup device in addition to descender', 'Communicate clearly with team members'],
     dontList: ['Never work at height alone', 'Never trust unverified anchor points', 'Never remove fall protection while at height', 'Never work in severe weather conditions'],
     emergencyActions: ['In case of fall arrest, immediately call for rescue', 'Suspended worker rescue must occur within 15 minutes', 'Activate emergency services if rescue not possible']

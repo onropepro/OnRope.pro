@@ -532,7 +532,7 @@ export default function ProjectDetail() {
       const endTime = new Date(session.endTime);
       const hoursWorked = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
       
-      // Store session data for IRATA task logging
+      // Store session data for irata task logging
       setEndedSessionData({
         sessionId: session.id,
         hoursWorked: parseFloat(hoursWorked.toFixed(2)),
@@ -558,7 +558,7 @@ export default function ProjectDetail() {
     },
   });
 
-  // IRATA Task Log mutation
+  // irata Task Log mutation
   const saveIrataTaskLogMutation = useMutation({
     mutationFn: async (data: { 
       workSessionId: string; 
@@ -575,14 +575,14 @@ export default function ProjectDetail() {
       setIrataTaskNotes("");
       setRopeAccessTaskHours("");
       setEndedSessionData(null);
-      toast({ title: t('projectDetail.toasts.sessionEnded', 'Work session ended'), description: t('projectDetail.toasts.irataTasksLogged', 'IRATA tasks logged successfully') });
+      toast({ title: t('projectDetail.toasts.sessionEnded', 'Work session ended'), description: t('projectDetail.toasts.irataTasksLogged', 'irata tasks logged successfully') });
     },
     onError: (error: Error) => {
       toast({ title: t('projectDetail.toasts.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
-  // Handle IRATA task log submission
+  // Handle irata task log submission
   const handleSaveIrataTasks = () => {
     if (!endedSessionData || selectedIrataTasks.length === 0) {
       toast({ title: t('projectDetail.toasts.error', 'Error'), description: t('projectDetail.dialogs.irataTask.selectTasks', 'Select Tasks Performed'), variant: "destructive" });
@@ -626,7 +626,7 @@ export default function ProjectDetail() {
     toast({ title: t('projectDetail.toasts.sessionEnded', 'Work session ended'), description: t('projectDetail.toasts.greatWork', 'Great work today!') });
   };
 
-  // Skip IRATA task logging
+  // Skip irata task logging
   const handleSkipIrataTasks = () => {
     setShowIrataTaskDialog(false);
     setSelectedIrataTasks([]);
@@ -636,7 +636,7 @@ export default function ProjectDetail() {
     toast({ title: t('projectDetail.toasts.sessionEnded', 'Work session ended'), description: t('projectDetail.toasts.greatWork', 'Great work today!') });
   };
 
-  // Toggle IRATA task selection
+  // Toggle irata task selection
   const toggleIrataTask = (taskId: string) => {
     setSelectedIrataTasks(prev => 
       prev.includes(taskId) 
@@ -3532,7 +3532,7 @@ export default function ProjectDetail() {
                   <p id="height-conversion" className="text-sm text-muted-foreground font-medium mt-1"></p>
                   <p className="text-xs text-muted-foreground mt-1">
                     <span className="font-medium text-foreground">{t('projectDetail.dialogs.editProject.buildingHeightImportant', 'Important for technicians:')}</span>{' '}
-                    {t('projectDetail.dialogs.editProject.buildingHeightExplain', 'Building height is required for IRATA logbook entries to track work at height for certification.')}
+                    {t('projectDetail.dialogs.editProject.buildingHeightExplain', 'Building height is required for irata logbook entries to track work at height for certification.')}
                   </p>
                   {project.floorCount && project.floorCount > 0 && (
                     <p className="text-xs text-muted-foreground">
@@ -3986,7 +3986,7 @@ export default function ProjectDetail() {
               {t('projectDetail.dialogs.logHoursPrompt.title', 'Log Your Hours?')}
             </DialogTitle>
             <DialogDescription>
-              {t('projectDetail.dialogs.logHoursPrompt.description', 'Would you like to log the tasks you performed during this work session? This helps fill your IRATA logbook for certification tracking.')}
+              {t('projectDetail.dialogs.logHoursPrompt.description', 'Would you like to log the tasks you performed during this work session? This helps fill your irata logbook for certification tracking.')}
             </DialogDescription>
           </DialogHeader>
 
@@ -4035,7 +4035,7 @@ export default function ProjectDetail() {
         </DialogContent>
       </Dialog>
 
-      {/* IRATA Task Selection Dialog */}
+      {/* irata Task Selection Dialog */}
       <Dialog open={showIrataTaskDialog} onOpenChange={(open) => {
         if (!open) handleSkipIrataTasks();
       }}>
@@ -4043,10 +4043,10 @@ export default function ProjectDetail() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <span className="material-icons text-primary">assignment</span>
-              {t('projectDetail.dialogs.irataTask.title', 'Log Your IRATA Tasks')}
+              {t('projectDetail.dialogs.irataTask.title', 'Log Your irata Tasks')}
             </DialogTitle>
             <DialogDescription>
-              {t('projectDetail.dialogs.irataTask.description', 'Select all the rope access tasks you performed during this session at {{buildingName}}. This helps track your IRATA logbook hours for certification progression.', { buildingName: endedSessionData?.buildingName || t('projectDetail.dialogs.irataTask.thisBuilding', 'this building') })}
+              {t('projectDetail.dialogs.irataTask.description', 'Select all the rope access tasks you performed during this session at {{buildingName}}. This helps track your irata logbook hours for certification progression.', { buildingName: endedSessionData?.buildingName || t('projectDetail.dialogs.irataTask.thisBuilding', 'this building') })}
             </DialogDescription>
           </DialogHeader>
 

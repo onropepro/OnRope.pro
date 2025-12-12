@@ -63,7 +63,7 @@ export default function EmployeeManagementGuide() {
               <div className="space-y-2 text-sm">
                 <p><strong>Certification tracking is mandatory for rope access work.</strong> The system monitors:</p>
                 <ul className="list-disc list-inside space-y-1 ml-2">
-                  <li><strong>IRATA Level</strong>: Level 1, 2, or 3 with expiration dates</li>
+                  <li><strong>irata Level</strong>: Level 1, 2, or 3 with expiration dates</li>
                   <li><strong>Driver's License</strong>: Required for company vehicle use</li>
                   <li><strong>Expiration Alerts</strong>: Visual warnings as dates approach</li>
                 </ul>
@@ -113,7 +113,7 @@ export default function EmployeeManagementGuide() {
               <ul className="space-y-2 text-sm">
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span><strong>Expired certification surprises:</strong> Automatic alerts when IRATA certifications approach expiration</span>
+                  <span><strong>Expired certification surprises:</strong> Automatic alerts when irata certifications approach expiration</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
@@ -194,7 +194,7 @@ export default function EmployeeManagementGuide() {
                   <div>
                     <h3 className="text-xl md:text-2xl font-semibold">Certification Details</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Enter IRATA certification level (1, 2, or 3) and expiration date. Optionally add driver's license information for vehicle assignments.
+                      Enter irata certification level (1, 2, or 3) and expiration date. Optionally add driver's license information for vehicle assignments.
                     </p>
                   </div>
                 </div>
@@ -288,11 +288,11 @@ export default function EmployeeManagementGuide() {
               <CardContent className="text-base space-y-2">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <span>IRATA Level (1, 2, or 3)</span>
+                  <span>irata Level (1, 2, or 3)</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-muted-foreground" />
-                  <span>IRATA expiration date</span>
+                  <span>irata expiration date</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Car className="w-4 h-4 text-muted-foreground" />
@@ -388,7 +388,7 @@ export default function EmployeeManagementGuide() {
                   <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 shrink-0">Rope Access Tech</Badge>
                   <div className="text-sm">
                     <p className="font-medium">Field operations</p>
-                    <p className="text-muted-foreground">Clock in/out, safety forms, personal profile, IRATA hours logging, and assigned project access.</p>
+                    <p className="text-muted-foreground">Clock in/out, safety forms, personal profile, irata hours logging, and assigned project access.</p>
                   </div>
                 </div>
               </div>
@@ -498,7 +498,7 @@ export default function EmployeeManagementGuide() {
                       <td className="py-2 text-muted-foreground">Access permissions</td>
                     </tr>
                     <tr>
-                      <td className="py-2">IRATA Level</td>
+                      <td className="py-2">irata Level</td>
                       <td className="py-2"><Badge variant="secondary">Recommended</Badge></td>
                       <td className="py-2 text-muted-foreground">Certification compliance</td>
                     </tr>

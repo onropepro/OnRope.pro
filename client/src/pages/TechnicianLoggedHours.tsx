@@ -110,7 +110,7 @@ const translations = {
     dateRequired: "Please enter start and end dates",
     unknownProject: "Unknown Project",
     importantNotice: "Important Notice",
-    logbookDisclaimer: "This is a personal tracking tool to help you monitor your rope access hours. You must still record all hours in your official IRATA/SPRAT logbook - this digital log does not replace it and is not valid for certification purposes.",
+    logbookDisclaimer: "This is a personal tracking tool to help you monitor your rope access hours. You must still record all hours in your official irata/SPRAT logbook - this digital log does not replace it and is not valid for certification purposes.",
     certificationProgress: "Next Level Progress",
     certificationProgressDesc: "Track your hours and time toward certification upgrade",
     hoursAtLastUpgrade: "Hours at Last Certification",
@@ -123,7 +123,7 @@ const translations = {
     eligibleForUpgrade: "Eligible for upgrade!",
     setBaseline: "Set Baseline",
     updateBaseline: "Update Baseline",
-    irataRequirements: "IRATA requires 1,000 hours and 1 year between levels",
+    irataRequirements: "irata requires 1,000 hours and 1 year between levels",
     spratRequirements: "SPRAT requires 500 hours and 6 months between levels",
     currentLevel: "Current Level",
     nextLevel: "Next Level",
@@ -138,7 +138,7 @@ const translations = {
     scanning: "Analyzing...",
     scanLogbookDesc: "Take a photo of your logbook page to automatically extract entries",
     scanExplanationTitle: "How Logbook Scanning Works",
-    scanExplanationStep1: "Take a clear photo of your IRATA/SPRAT logbook page",
+    scanExplanationStep1: "Take a clear photo of your irata/SPRAT logbook page",
     scanExplanationStep2: "Our AI will analyze the image and extract the entries",
     scanExplanationStep3: "Review and edit the extracted data before saving",
     scanExplanationTip: "For best results, ensure good lighting and that the entire page is visible in the photo.",
@@ -270,7 +270,7 @@ const translations = {
     dateRequired: "Veuillez entrer les dates de début et de fin",
     unknownProject: "Projet inconnu",
     importantNotice: "Avis important",
-    logbookDisclaimer: "Ceci est un outil de suivi personnel pour vous aider à surveiller vos heures d'accès sur corde. Vous devez toujours enregistrer toutes vos heures dans votre carnet IRATA/SPRAT officiel - ce journal numérique ne le remplace pas et n'est pas valide pour les fins de certification.",
+    logbookDisclaimer: "Ceci est un outil de suivi personnel pour vous aider à surveiller vos heures d'accès sur corde. Vous devez toujours enregistrer toutes vos heures dans votre carnet irata/SPRAT officiel - ce journal numérique ne le remplace pas et n'est pas valide pour les fins de certification.",
     certificationProgress: "Progression vers le niveau suivant",
     certificationProgressDesc: "Suivez vos heures et votre temps pour la mise à niveau",
     hoursAtLastUpgrade: "Heures à la dernière certification",
@@ -283,7 +283,7 @@ const translations = {
     eligibleForUpgrade: "Éligible pour la mise à niveau!",
     setBaseline: "Définir la base",
     updateBaseline: "Mettre à jour la base",
-    irataRequirements: "IRATA exige 1 000 heures et 1 an entre les niveaux",
+    irataRequirements: "irata exige 1 000 heures et 1 an entre les niveaux",
     spratRequirements: "SPRAT exige 500 heures et 6 mois entre les niveaux",
     currentLevel: "Niveau actuel",
     nextLevel: "Niveau suivant",
@@ -298,7 +298,7 @@ const translations = {
     scanning: "Analyse...",
     scanLogbookDesc: "Prenez une photo de votre page de carnet pour extraire automatiquement les entrees",
     scanExplanationTitle: "Comment fonctionne la numerisation",
-    scanExplanationStep1: "Prenez une photo claire de votre page de carnet IRATA/SPRAT",
+    scanExplanationStep1: "Prenez une photo claire de votre page de carnet irata/SPRAT",
     scanExplanationStep2: "Notre IA analysera l'image et extraira les entrees",
     scanExplanationStep3: "Verifiez et modifiez les donnees extraites avant de sauvegarder",
     scanExplanationTip: "Pour de meilleurs resultats, assurez-vous d'un bon eclairage et que la page entiere est visible.",
@@ -1332,12 +1332,12 @@ export default function TechnicianLoggedHours() {
               <CardDescription>{t.certificationProgressDesc}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* IRATA Progress */}
+              {/* irata Progress */}
               {irataLevel && !irataProgress.isMaxLevel && !irataProgress.noLevel && (
                 <div className="space-y-3 p-3 rounded-lg bg-muted/30">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="font-semibold">IRATA</Badge>
+                      <Badge variant="outline" className="font-semibold">irata</Badge>
                       <span className="text-sm text-muted-foreground">
                         {t.currentLevel}: {irataLevel} → {t.level1.replace('1', String(irataProgress.nextLevel || 2))}
                       </span>
@@ -1477,7 +1477,7 @@ export default function TechnicianLoggedHours() {
               {/* Show max level message */}
               {irataLevel && irataProgress.isMaxLevel && (
                 <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/30">
-                  <Badge variant="outline" className="font-semibold">IRATA</Badge>
+                  <Badge variant="outline" className="font-semibold">irata</Badge>
                   <span className="text-sm text-muted-foreground">{t.maxLevel}</span>
                 </div>
               )}
@@ -2806,7 +2806,7 @@ export default function TechnicianLoggedHours() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <span className="material-icons text-primary">trending_up</span>
-              {certType === 'irata' ? 'IRATA' : 'SPRAT'} {t.certificationProgress}
+              {certType === 'irata' ? 'irata' : 'SPRAT'} {t.certificationProgress}
             </DialogTitle>
             <DialogDescription>
               {certType === 'irata' ? t.irataRequirements : t.spratRequirements}

@@ -366,7 +366,7 @@ function ProblemsSolvedSection() {
             Important: Safety Compliance Responsibility
           </p>
           <p className="mt-2 text-sm">
-            OnRopePro helps document safety procedures, but <strong>you remain fully responsible for workplace safety and regulatory compliance.</strong> This software does not replace qualified safety professionals, IRATA/SPRAT training, equipment inspections by certified inspectors, or adherence to all applicable OSHA/WorkSafeBC regulations. Consult with qualified safety consultants to ensure your operations meet all legal requirements.
+            OnRopePro helps document safety procedures, but <strong>you remain fully responsible for workplace safety and regulatory compliance.</strong> This software does not replace qualified safety professionals, irata/SPRAT training, equipment inspections by certified inspectors, or adherence to all applicable OSHA/WorkSafeBC regulations. Consult with qualified safety consultants to ensure your operations meet all legal requirements.
           </p>
         </CardContent>
       </Card>
@@ -397,7 +397,7 @@ export default function SafetyGuide() {
       <div className="space-y-8">
         <section className="space-y-4">
           <p className="text-muted-foreground leading-relaxed text-base">
-            The Safety & Compliance system ensures all rope access work is documented, inspected, and compliant with IRATA, OSHA, and industry regulations. It provides <strong>digital capture of safety documentation</strong>, legally-binding digital signatures, professional PDF generation, and feeds into the <strong>Company Safety Rating (CSR)</strong> visible to property managers.
+            The Safety & Compliance system ensures all rope access work is documented, inspected, and compliant with irata, OSHA, and industry regulations. It provides <strong>digital capture of safety documentation</strong>, legally-binding digital signatures, professional PDF generation, and feeds into the <strong>Company Safety Rating (CSR)</strong> visible to property managers.
           </p>
         </section>
 

@@ -66,7 +66,7 @@ const translations = {
     whatEmployersSee: "What employers can see:",
     visibleFields: [
       "Your name and photo",
-      "IRATA/SPRAT certification levels",
+      "irata/SPRAT certification levels",
       "Years of experience",
       "Uploaded resume/CV documents",
       "Your safety rating",
@@ -98,7 +98,7 @@ const translations = {
     weekly: "per week",
     monthly: "per month",
     annually: "per year",
-    irataLevel: "IRATA Level",
+    irataLevel: "irata Level",
     spratLevel: "SPRAT Level",
     close: "Close",
     apply: "Express Interest",
@@ -214,7 +214,7 @@ const translations = {
     whatEmployersSee: "Ce que les employeurs peuvent voir:",
     visibleFields: [
       "Votre nom et photo",
-      "Niveaux de certification IRATA/SPRAT",
+      "Niveaux de certification irata/SPRAT",
       "Annees d'experience",
       "Documents CV/resume telecharges",
       "Votre cote de securite",
@@ -246,7 +246,7 @@ const translations = {
     weekly: "par semaine",
     monthly: "par mois",
     annually: "par an",
-    irataLevel: "Niveau IRATA",
+    irataLevel: "Niveau irata",
     spratLevel: "Niveau SPRAT",
     close: "Fermer",
     apply: "Manifester son interet",
@@ -1133,7 +1133,7 @@ export default function TechnicianJobBoard() {
                             <Award className="w-4 h-4 text-amber-500" />
                             {job.requiredIrataLevel && (
                               <Badge variant="outline" className="border-amber-500 text-amber-600">
-                                IRATA {job.requiredIrataLevel}
+                                irata {job.requiredIrataLevel}
                               </Badge>
                             )}
                             {job.requiredSpratLevel && (
