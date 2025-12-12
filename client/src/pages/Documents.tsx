@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BackButton } from "@/components/BackButton";
+import DocumentsLayout from "@/components/DocumentsLayout";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -5110,66 +5111,53 @@ export default function Documents() {
     : 0;
 
   return (
-    <div className="min-h-screen bg-background p-4 pb-24">
-      <div className="max-w-6xl mx-auto">
-        {/* Clean Header */}
-        <div className="mb-6">
-          <BackButton to="/dashboard" label={t('dashboard.backToDashboard', 'Back to Dashboard')} />
-          <div className="space-y-1">
-            <h1 className="text-2xl sm:text-3xl font-bold">{t('documents.pageTitle', 'Documents & Records')}</h1>
-            <p className="text-muted-foreground">{t('documents.pageSubtitle', 'All company documents and safety records')}</p>
-          </div>
-        </div>
-
-        {/* Simple Metric Cards - SuperUser Style */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div className="p-4 rounded-xl border bg-card">
-            <div className="flex items-center gap-3">
-              <div className={`p-2.5 rounded-lg ${ratingPercent === 100 ? 'bg-emerald-50 dark:bg-emerald-500/10' : ratingPercent >= 50 ? 'bg-amber-50 dark:bg-amber-500/10' : 'bg-red-50 dark:bg-red-500/10'}`}>
-                <Shield className={`h-5 w-5 ${ratingPercent === 100 ? 'text-emerald-500' : ratingPercent >= 50 ? 'text-amber-500' : 'text-red-500'}`} />
-              </div>
-              <div>
-                <p className={`text-2xl font-bold ${ratingPercent === 100 ? 'text-emerald-600 dark:text-emerald-400' : ratingPercent >= 50 ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'}`}>{ratingPercent}%</p>
-                <p className="text-sm text-muted-foreground">{t('documents.safetyRating.title', 'Doc Rating')}</p>
-              </div>
+    <DocumentsLayout 
+      title={t('documents.pageTitle', 'Documents & Records')}
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
+    >
+      <div className="p-6">
+        {/* SuperUser-Style Metric Cards - Flat, minimal, no card backgrounds */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="flex items-center gap-3">
+            <div className={`p-2.5 rounded-lg ${ratingPercent === 100 ? 'bg-emerald-100 dark:bg-emerald-500/20' : ratingPercent >= 50 ? 'bg-amber-100 dark:bg-amber-500/20' : 'bg-red-100 dark:bg-red-500/20'}`}>
+              <Shield className={`h-5 w-5 ${ratingPercent === 100 ? 'text-emerald-600' : ratingPercent >= 50 ? 'text-amber-600' : 'text-red-600'}`} />
+            </div>
+            <div>
+              <p className="text-2xl font-semibold">{ratingPercent}%</p>
+              <p className="text-sm text-muted-foreground">{t('documents.safetyRating.title', 'Doc Rating')}</p>
             </div>
           </div>
 
-          <div className="p-4 rounded-xl border bg-card">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-lg bg-blue-50 dark:bg-blue-500/10">
-                <FileText className="h-5 w-5 text-blue-500" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{companyDocuments.length}</p>
-                <p className="text-sm text-muted-foreground">{t('documents.totalDocuments', 'Total Docs')}</p>
-              </div>
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-lg bg-blue-100 dark:bg-blue-500/20">
+              <FileText className="h-5 w-5 text-blue-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-semibold">{companyDocuments.length}</p>
+              <p className="text-sm text-muted-foreground">{t('documents.totalDocuments', 'Total Docs')}</p>
             </div>
           </div>
 
           {canUploadDocuments && (
-            <div className="p-4 rounded-xl border bg-card">
-              <div className="flex items-center gap-3">
-                <div className={`p-2.5 rounded-lg ${totalRequiredSignatures === 0 ? 'bg-muted' : compliancePercent === 100 ? 'bg-emerald-50 dark:bg-emerald-500/10' : 'bg-amber-50 dark:bg-amber-500/10'}`}>
-                  <Users className={`h-5 w-5 ${totalRequiredSignatures === 0 ? 'text-muted-foreground' : compliancePercent === 100 ? 'text-emerald-500' : 'text-amber-500'}`} />
-                </div>
-                <div>
-                  <p className={`text-2xl font-bold ${totalRequiredSignatures === 0 ? 'text-muted-foreground' : compliancePercent === 100 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>{totalRequiredSignatures === 0 ? 'N/A' : `${compliancePercent}%`}</p>
-                  <p className="text-sm text-muted-foreground">{t('documents.teamCompliance', 'Team Compliance')}</p>
-                </div>
+            <div className="flex items-center gap-3">
+              <div className={`p-2.5 rounded-lg ${totalRequiredSignatures === 0 ? 'bg-muted' : compliancePercent === 100 ? 'bg-emerald-100 dark:bg-emerald-500/20' : 'bg-amber-100 dark:bg-amber-500/20'}`}>
+                <Users className={`h-5 w-5 ${totalRequiredSignatures === 0 ? 'text-muted-foreground' : compliancePercent === 100 ? 'text-emerald-600' : 'text-amber-600'}`} />
+              </div>
+              <div>
+                <p className="text-2xl font-semibold">{totalRequiredSignatures === 0 ? 'N/A' : `${compliancePercent}%`}</p>
+                <p className="text-sm text-muted-foreground">{t('documents.teamCompliance', 'Team Compliance')}</p>
               </div>
             </div>
           )}
 
-          <div className="p-4 rounded-xl border bg-card">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-lg bg-purple-50 dark:bg-purple-500/10">
-                <PenLine className="h-5 w-5 text-purple-500" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{signedReviews}/{totalRequiredSignatures || 0}</p>
-                <p className="text-sm text-muted-foreground">{t('documents.signatures', 'Signatures')}</p>
-              </div>
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-lg bg-purple-100 dark:bg-purple-500/20">
+              <PenLine className="h-5 w-5 text-purple-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-semibold">{signedReviews}/{totalRequiredSignatures || 0}</p>
+              <p className="text-sm text-muted-foreground">{t('documents.signatures', 'Signatures')}</p>
             </div>
           </div>
         </div>
@@ -7515,6 +7503,6 @@ export default function Documents() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </DocumentsLayout>
   );
 }
