@@ -3204,10 +3204,8 @@ export default function Dashboard() {
               variant="ghost"
               size="sm"
               onClick={() => changeLanguage(currentLanguage === 'en' ? 'fr' : 'en')}
-              className="gap-1"
               data-testid="button-language-toggle"
             >
-              <span className="material-icons text-lg">translate</span>
               <span className="text-xs font-medium">{currentLanguage === 'en' ? 'FR' : 'EN'}</span>
             </Button>
             <RefreshButton />
