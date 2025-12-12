@@ -141,7 +141,7 @@ All module landing pages MUST follow this exact hero structure for consistency:
 
 **Stats Panel - Unified Floating Design (All Module Pages):**
 - Section: `className="relative bg-white dark:bg-slate-950 -mt-px overflow-visible"`
-- Container: `className="max-w-4xl mx-auto px-4 pt-4 pb-12"`
+- Container: `className="max-w-3xl mx-auto px-4 pt-4 pb-12"`
 - Card: `className="shadow-xl border-0 relative z-20 -mt-20"`
 - CardContent: `className="p-8"`
 - Grid: 2 columns mobile, 4 columns desktop
