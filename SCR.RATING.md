@@ -1,5 +1,23 @@
 # SCR Rating System
 
+## GOLDEN RULE - MANDATORY FOR ALL DEVELOPMENT
+
+**Every step MUST be tested and working 100% before moving to the next step. No exceptions.**
+
+Before proceeding to the next step of the build, the following must be verified:
+- Backend code reviewed and working
+- Frontend code reviewed and working
+- Database schema correct and all tables created and available
+- Routes tested and functional
+- No LSP errors
+- API wording correct
+- API calls returning correct data
+- Every endpoint tested
+
+This rule applies between EACH step of the build. No exception will be acceptable.
+
+---
+
 ## Harness Inspection Points
 
 1 point will be awarded per project completed for harness inspection completed for every work session.
