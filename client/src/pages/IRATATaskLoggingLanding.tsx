@@ -28,7 +28,8 @@ import {
   RefreshCw,
   Layers,
   Target,
-  TrendingUp
+  TrendingUp,
+  Building2
 } from "lucide-react";
 
 export default function IRATATaskLoggingLanding() {
@@ -470,6 +471,139 @@ export default function IRATATaskLoggingLanding() {
               </CardContent>
             </Card>
           </div>
+        </div>
+      </section>
+
+      {/* Problems Solved Section */}
+      <section className="py-16 md:py-20 px-4">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+            Problems Solved
+          </h2>
+          <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
+            Real frustrations. Real solutions.
+          </p>
+
+          <Accordion type="multiple" className="space-y-4" data-testid="accordion-problems-solved">
+            {/* For Rope Access Technicians */}
+            <AccordionItem value="technicians" className="border rounded-lg overflow-hidden">
+              <AccordionTrigger className="hover:no-underline px-4 py-4 bg-amber-50 dark:bg-amber-950" data-testid="accordion-trigger-technicians">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center">
+                    <HardHat className="w-4 h-4 text-amber-600" />
+                  </div>
+                  <span className="font-semibold text-lg">For Rope Access Technicians</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-6 pt-4 space-y-6">
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-foreground">"I haven't updated my logbook in months."</h4>
+                  <p className="text-muted-foreground text-base">
+                    Opening your physical logbook every day is tedious. You put it off for a week, then two weeks, then months. When you finally try to catch up, you can't remember which buildings you worked at, what tasks you performed, or how many hours you actually spent on rope.
+                  </p>
+                  <p className="text-muted-foreground text-base">
+                    OnRopePro logs your hours the same day, while details are fresh. Building names, task types, duration, all captured when you end your work session. Your career history builds automatically instead of becoming homework you keep avoiding.
+                  </p>
+                </div>
+                <Separator />
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-foreground">"I lost access to my hours when I left my last employer."</h4>
+                  <p className="text-muted-foreground text-base">
+                    Traditional timekeeping systems lock your data inside the company that employs you. When you leave, your documented experience disappears. You're back to paper logbooks and trying to reconstruct years of work history.
+                  </p>
+                  <p className="text-muted-foreground text-base">
+                    Your IRATA/SPRAT hours belong to YOUR technician profile, not your employer. When you move to a new company, your complete hour history comes with you automatically.
+                  </p>
+                </div>
+                <Separator />
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-foreground">"6 months without logged rope time could invalidate my cert."</h4>
+                  <p className="text-muted-foreground text-base">
+                    IRATA requires continuous evidence of rope access work. A six-month gap in your logbook raises questions during assessment. Without documented proof, your certification status becomes uncertain.
+                  </p>
+                  <p className="text-muted-foreground text-base">
+                    OnRopePro tracks every session automatically when connected to an employer. Independent techs log manually. Either way, you never have unexplained gaps that could jeopardize your credentials.
+                  </p>
+                </div>
+                <Separator />
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-foreground">"Nobody actually verifies what I write in my logbook."</h4>
+                  <p className="text-muted-foreground text-base">
+                    You're supposed to get your logbook signed regularly by a Level 3 or supervisor. But realistically, you bring six months of entries to your boss and they just sign everything without looking. There's no actual verification that you did what you claim.
+                  </p>
+                  <p className="text-muted-foreground text-base">
+                    When hours are logged same-day and linked to actual project locations, supervisors can verify entries against known work. "Tommy was at Marina Side today, I know there's rope transfers on that building. Approve." More credible records. More meaningful verification.
+                  </p>
+                </div>
+                <Separator />
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-foreground">"I switch between employers constantly."</h4>
+                  <p className="text-muted-foreground text-base">
+                    Contract rope access work means moving between companies regularly. Each new employer has different systems. Some track hours digitally, some use paper, some track nothing at all. Building a coherent career record across multiple employers is nearly impossible.
+                  </p>
+                  <p className="text-muted-foreground text-base">
+                    One profile. All employers. Every job you work through OnRopePro contributes to the same certification record, regardless of which company employed you that week.
+                  </p>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* For Company Owners */}
+            <AccordionItem value="owners" className="border rounded-lg overflow-hidden">
+              <AccordionTrigger className="hover:no-underline px-4 py-4 bg-blue-50 dark:bg-blue-950" data-testid="accordion-trigger-owners">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                    <Building2 className="w-4 h-4 text-blue-600" />
+                  </div>
+                  <span className="font-semibold text-lg">For Company Owners</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-6 pt-4 space-y-6">
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-foreground">"I don't know if my techs are actually qualified."</h4>
+                  <p className="text-muted-foreground text-base">
+                    You hire a Level 2 tech who claims 2,000 hours of experience. But their logbook is a mess, with gaps everywhere, vague entries, and signatures from months ago. Are they actually experienced, or did they just accumulate time without developing real skills?
+                  </p>
+                  <p className="text-muted-foreground text-base">
+                    When techs use OnRopePro, you can see their verified hour history with task breakdowns. You know exactly how much rigging, rescue, and specialized work they've actually performed. Hire with confidence. Assign techs to jobs that match their actual documented experience level.
+                  </p>
+                </div>
+                <Separator />
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-foreground">"Signing logbooks is a rubber-stamp exercise."</h4>
+                  <p className="text-muted-foreground text-base">
+                    Your Level 3s are supposed to verify and sign tech logbooks. In reality, techs show up with months of backlogged entries and your supervisors just sign everything. There's no meaningful quality control.
+                  </p>
+                  <p className="text-muted-foreground text-base">
+                    Digital approval flow means supervisors can review and approve hours daily or weekly while details are fresh. They can see which projects the tech worked on and verify the task types make sense. Your company's signature on a tech's hours actually means something.
+                  </p>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* For Level 3 Technicians & Supervisors */}
+            <AccordionItem value="supervisors" className="border rounded-lg overflow-hidden">
+              <AccordionTrigger className="hover:no-underline px-4 py-4 bg-sky-50 dark:bg-sky-950" data-testid="accordion-trigger-supervisors">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-sky-100 dark:bg-sky-900 flex items-center justify-center">
+                    <Award className="w-4 h-4 text-sky-600" />
+                  </div>
+                  <span className="font-semibold text-lg">For Level 3 Technicians & Supervisors</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-6 pt-4 space-y-6">
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-foreground">"I'm signing off on hours I can't actually verify."</h4>
+                  <p className="text-muted-foreground text-base">
+                    A tech brings you six months of logbook entries to sign. You weren't on every job with them. You have no idea if they actually did rope transfers on March 15th or if they're padding their book. But you sign anyway because that's how it's always been done.
+                  </p>
+                  <p className="text-muted-foreground text-base">
+                    When entries are logged same-day and linked to specific projects, you can cross-reference against job records. "This tech logged rope transfers at Building X on Tuesday. I know that building has transfer points on the north elevation. Approve." Your IRATA/SPRAT number on an approval actually represents verification, not just rubber-stamping.
+                  </p>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </div>
       </section>
 
