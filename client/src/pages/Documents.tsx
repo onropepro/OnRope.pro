@@ -5713,7 +5713,15 @@ export default function Documents() {
                                         <Badge variant="outline">{dayGroup.items.length}</Badge>
                                       </CollapsibleTrigger>
                                       <CollapsibleContent className="pl-4 space-y-2 mt-1">
-                                        {dayGroup.items.map((doc: any) => (
+                                        {dayGroup.items.map((doc: any) => {
+                                          const expiryDate = doc.insuranceExpiryDate ? new Date(doc.insuranceExpiryDate) : null;
+                                          const now = new Date();
+                                          const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+                                          const isExpired = expiryDate ? expiryDate < now : false;
+                                          const isExpiringSoon = expiryDate ? (expiryDate >= now && expiryDate <= thirtyDaysFromNow) : false;
+                                          const showWarning = isExpired || isExpiringSoon;
+                                          
+                                          return (
                                           <div key={doc.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate active-elevate-2">
                                             <div className="p-2 bg-primary/10 rounded-lg">
                                               <FileCheck className="h-5 w-5 text-primary flex-shrink-0" />
@@ -5723,8 +5731,25 @@ export default function Documents() {
                                               <div className="text-sm text-muted-foreground">
                                                 {t('documents.uploadedBy', 'Uploaded by {{name}}', { name: doc.uploadedByName })}
                                               </div>
+                                              {expiryDate && (
+                                                <div className={`text-sm font-medium mt-1 flex items-center gap-1 ${showWarning ? 'text-red-600 dark:text-red-500' : 'text-muted-foreground'}`}>
+                                                  <Calendar className="h-3.5 w-3.5" />
+                                                  {isExpired ? (
+                                                    <span>{t('documents.expired', 'EXPIRED')} - {formatLocalDateMedium(expiryDate)}</span>
+                                                  ) : isExpiringSoon ? (
+                                                    <span>{t('documents.expiresOn', 'Expires')}: {formatLocalDateMedium(expiryDate)}</span>
+                                                  ) : (
+                                                    <span>{t('documents.expiresOn', 'Expires')}: {formatLocalDateMedium(expiryDate)}</span>
+                                                  )}
+                                                </div>
+                                              )}
                                             </div>
                                             <div className="flex items-center gap-2">
+                                              {showWarning && (
+                                                <Badge variant="destructive" className="mr-2">
+                                                  {isExpired ? t('documents.expired', 'EXPIRED') : t('documents.expiringSoon', 'Expiring Soon')}
+                                                </Badge>
+                                              )}
                                               <Button
                                                 size="sm"
                                                 variant="outline"
@@ -5744,7 +5769,7 @@ export default function Documents() {
                                               </Button>
                                             </div>
                                           </div>
-                                        ))}
+                                        );})}
                                       </CollapsibleContent>
                                     </Collapsible>
                                   ))}
