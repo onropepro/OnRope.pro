@@ -328,6 +328,115 @@ Module pages follow a width hierarchy to create visual focus and readability:
 
 ---
 
+### "Who Benefits From This Module" Section Template
+
+**CANONICAL REFERENCE:** `/modules/user-access-authentication` (UserAccessLanding.tsx) - "Benefits by Stakeholder" section
+
+All module landing pages MUST follow this exact structure for their stakeholder benefits section. This creates visual consistency across all module pages.
+
+---
+
+**Section Container:**
+```tsx
+<section className="py-16 md:py-20 px-4">
+  <div className="max-w-5xl mx-auto">
+```
+- `max-w-5xl` (1024px) - Wider than body text for card layouts
+- `py-16 md:py-20` - Generous vertical padding
+
+**Section Header:**
+```tsx
+<h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+  Who Benefits From This Module
+</h2>
+<p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
+  [Subtitle describing the benefit promise]
+</p>
+```
+
+**Stakeholder Cards Container:**
+```tsx
+<div className="space-y-8">
+```
+- `space-y-8` - Consistent spacing between stakeholder cards
+
+---
+
+**Individual Stakeholder Card Structure:**
+```tsx
+<Card className="overflow-hidden">
+  <CardHeader className="bg-[color]-50 dark:bg-[color]-950 border-b">
+    <div className="flex items-center gap-3">
+      <div className="w-10 h-10 rounded-lg bg-[color]-100 dark:bg-[color]-900 flex items-center justify-center">
+        <[Icon] className="w-5 h-5 text-[color]-600" />
+      </div>
+      <CardTitle className="text-xl">For [Stakeholder Name]</CardTitle>
+    </div>
+  </CardHeader>
+  <CardContent className="p-6 space-y-4">
+    <div className="grid md:grid-cols-[2|3|4] gap-6">
+      {/* Benefit items */}
+    </div>
+  </CardContent>
+</Card>
+```
+
+**Key styling requirements:**
+- Card: `overflow-hidden` (ensures colored header extends to edges)
+- CardHeader: `bg-[color]-50 dark:bg-[color]-950 border-b` (colored background with bottom border)
+- Icon container: `w-10 h-10 rounded-lg bg-[color]-100 dark:bg-[color]-900`
+- Icon: `w-5 h-5 text-[color]-600`
+- CardContent: `p-6 space-y-4`
+- Grid: Use `md:grid-cols-2`, `md:grid-cols-3`, or `md:grid-cols-4` based on number of benefits
+
+---
+
+**Benefit Item Structure (inside grid):**
+```tsx
+<div className="space-y-2">
+  <h4 className="font-semibold text-foreground">[Benefit headline]</h4>
+  <p className="text-sm text-muted-foreground">[Benefit description - 1-2 sentences]</p>
+</div>
+```
+- NO nested Cards - use simple div elements
+- Text: `text-sm text-muted-foreground` (NOT text-base)
+- Headline: `font-semibold text-foreground`
+- Keep descriptions concise (1-2 sentences max)
+
+---
+
+**Stakeholder Color Assignments:**
+
+| Stakeholder | Header BG | Icon BG | Icon | Icon Color |
+|-------------|-----------|---------|------|------------|
+| Employers | `bg-blue-50` | `bg-blue-100` | Briefcase | `text-blue-600` |
+| Technicians | `bg-amber-50` | `bg-amber-100` | Wrench or HardHat | `text-amber-600` |
+| Building Managers | `bg-violet-50` | `bg-violet-100` | Building2 | `text-violet-600` |
+| Property Managers | `bg-emerald-50` | `bg-emerald-100` | Globe or Users | `text-emerald-600` |
+| Residents | `bg-rose-50` | `bg-rose-100` | Home | `text-rose-600` |
+
+**Grid Column Guidelines:**
+- 4 benefits: Use `md:grid-cols-2 lg:grid-cols-4`
+- 3 benefits: Use `md:grid-cols-3`
+- 2 benefits: Use `md:grid-cols-2`
+
+---
+
+**Checklist for "Who Benefits" Section:**
+- [ ] Section uses `max-w-5xl` container width
+- [ ] Section header is centered with `text-center`
+- [ ] Subtitle uses `text-muted-foreground text-lg mb-12 max-w-2xl mx-auto`
+- [ ] Cards container uses `space-y-8`
+- [ ] Each Card has `overflow-hidden` class
+- [ ] CardHeader has colored background with `border-b`
+- [ ] Icon + title are inside CardHeader (not separate)
+- [ ] CardContent uses `p-6 space-y-4`
+- [ ] Grid uses simple divs, NOT nested Card components
+- [ ] Benefit text uses `text-sm` (NOT text-base)
+- [ ] Stakeholder colors follow the assigned palette above
+
+---
+
 ### Color Reference
 
 | Element | Class | Hex Value |
