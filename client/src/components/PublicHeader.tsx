@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
-import { Shield, Lock, Briefcase } from "lucide-react";
+import { Shield, Lock, Briefcase, Gauge } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 interface PublicHeaderProps {
@@ -148,7 +148,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                       </div>
                     </button>
                     <button
-                      className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group col-span-2"
+                      className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
                       onClick={() => {
                         setLocation("/modules/project-management");
                         setShowModulesMenu(false);
@@ -161,6 +161,22 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                       <div>
                         <div className="font-semibold text-sm">Project Management</div>
                         <div className="text-xs text-muted-foreground mt-0.5">4-elevation tracking, real-time dashboards, crew scheduling</div>
+                      </div>
+                    </button>
+                    <button
+                      className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                      onClick={() => {
+                        setLocation("/modules/company-safety-rating");
+                        setShowModulesMenu(false);
+                      }}
+                      data-testid="nav-company-safety-rating"
+                    >
+                      <div className="w-10 h-10 rounded-lg bg-orange-100 dark:bg-orange-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <Gauge className="w-5 h-5 text-orange-600" />
+                      </div>
+                      <div>
+                        <div className="font-semibold text-sm">Company Safety Rating</div>
+                        <div className="text-xs text-muted-foreground mt-0.5">Penalty-based compliance scoring, real-time safety posture</div>
                       </div>
                     </button>
                   </div>

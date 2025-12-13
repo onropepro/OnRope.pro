@@ -77,6 +77,7 @@ import MobileDesignGuide from "@/pages/MobileDesignGuide";
 import SafetyComplianceLanding from "@/pages/SafetyComplianceLanding";
 import UserAccessLanding from "@/pages/UserAccessLanding";
 import ProjectManagementLanding from "@/pages/ProjectManagementLanding";
+import CSRLanding from "@/pages/CSRLanding";
 import JobBoardGuide from "@/pages/JobBoardGuide";
 import Pricing from "@/pages/Pricing";
 import ROICalculator from "@/pages/ROICalculator";
@@ -335,6 +336,7 @@ function Router() {
       <Route path="/modules/safety-compliance" component={SafetyComplianceLanding} />
       <Route path="/modules/user-access-authentication" component={UserAccessLanding} />
       <Route path="/modules/project-management" component={ProjectManagementLanding} />
+      <Route path="/modules/company-safety-rating" component={CSRLanding} />
       <Route path="/changelog/user-access" component={UserAccessGuide} />
       <Route path="/changelog/projects" component={ProjectsGuide} />
       <Route path="/changelog/time-tracking" component={TimeTrackingGuide} />
