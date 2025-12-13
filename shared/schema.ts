@@ -1274,6 +1274,7 @@ export const companyDocuments = pgTable("company_documents", {
   description: text("description"), // Description for safe work procedures
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(), // Track when document was last updated/replaced
+  graceEndsAt: timestamp("grace_ends_at"), // 14-day grace period end date for SCR calculations - employees have until this date to sign new/updated documents
 }, (table) => [
   index("IDX_company_docs_company").on(table.companyId),
   index("IDX_company_docs_type").on(table.companyId, table.documentType),

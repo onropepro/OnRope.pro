@@ -13252,9 +13252,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Document types that require signing
       const requiredDocTypes = ['health_safety_manual', 'company_policy', 'safe_work_procedure', 'safe_work_practice'];
-      const requiredDocs = companyDocuments.filter((doc: any) => 
-        requiredDocTypes.includes(doc.documentType)
-      );
+      const now = new Date();
+      
+      // Filter documents: only include docs where grace period has expired (graceEndsAt <= now) or legacy docs (no graceEndsAt)
+      // Documents within grace period are NOT counted in the denominator per SCR.RATING.md
+      const requiredDocs = companyDocuments.filter((doc: any) => {
+        if (!requiredDocTypes.includes(doc.documentType)) {
+          return false;
+        }
+        // If no graceEndsAt, it's a legacy document - include it
+        if (!doc.graceEndsAt) {
+          return true;
+        }
+        // If grace period has expired (graceEndsAt is in the past), include it
+        const graceEnd = new Date(doc.graceEndsAt);
+        return graceEnd <= now;
+      });
       
       const totalEmployees = totalStaffCount;
       const totalRequiredDocs = requiredDocs.length;
@@ -13738,9 +13751,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Required document types that employees must sign
       const requiredDocTypes = ['health_safety_manual', 'company_policy', 'safe_work_procedure', 'safe_work_practice'];
-      const requiredDocs = companyDocuments.filter((doc: any) => 
-        requiredDocTypes.includes(doc.documentType)
-      );
+      const nowVendor = new Date();
+      
+      // Filter documents: only include docs where grace period has expired (graceEndsAt <= now) or legacy docs (no graceEndsAt)
+      // Documents within grace period are NOT counted in the denominator per SCR.RATING.md
+      const requiredDocs = companyDocuments.filter((doc: any) => {
+        if (!requiredDocTypes.includes(doc.documentType)) {
+          return false;
+        }
+        // If no graceEndsAt, it's a legacy document - include it
+        if (!doc.graceEndsAt) {
+          return true;
+        }
+        // If grace period has expired (graceEndsAt is in the past), include it
+        const graceEnd = new Date(doc.graceEndsAt);
+        return graceEnd <= nowVendor;
+      });
       
       const totalEmployees = totalStaffCount;
       const totalRequiredDocs = requiredDocs.length;
@@ -14942,6 +14968,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       );
 
       // Save new document to database first
+      // Calculate grace period end date: 14 days from now for SCR calculations
+      const graceEndsAt = new Date();
+      graceEndsAt.setDate(graceEndsAt.getDate() + 14);
+      
       const document = await storage.createCompanyDocument({
         companyId,
         documentType,
@@ -14949,6 +14979,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         fileUrl,
         uploadedById: currentUser.id,
         uploadedByName: currentUser.name || currentUser.email || "Unknown User",
+        graceEndsAt,
         ...(documentType === 'method_statement' && { jobType, customJobType }),
       });
 
@@ -15058,6 +15089,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const existing = await storage.getCompanyDocumentByTemplateId(companyId, template.templateId);
         
         if (!existing) {
+          // Calculate grace period end date: 14 days from now for SCR calculations
+          const graceEndsAt = new Date();
+          graceEndsAt.setDate(graceEndsAt.getDate() + 14);
+          
           // Create the template document
           const document = await storage.createCompanyDocument({
             companyId,
@@ -15070,6 +15105,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             templateId: template.templateId,
             description: template.description,
             jobType: template.jobType,
+            graceEndsAt,
           });
 
           createdDocs.push(document);
@@ -15130,6 +15166,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const existing = await storage.getCompanyDocumentByTemplateId(companyId, practice.templateId);
         
         if (!existing) {
+          // Calculate grace period end date: 14 days from now for SCR calculations
+          const graceEndsAt = new Date();
+          graceEndsAt.setDate(graceEndsAt.getDate() + 14);
+          
           // Create the practice template document
           const document = await storage.createCompanyDocument({
             companyId,
@@ -15142,6 +15182,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             templateId: practice.templateId,
             description: practice.description,
             content: practice.content, // Store the practice content
+            graceEndsAt,
           });
 
           createdDocs.push(document);
