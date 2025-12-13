@@ -234,7 +234,7 @@ export default function EmployeeManagementGuide() {
                   <div>
                     <h3 className="text-xl md:text-2xl font-semibold">Employee Created</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      The employee receives login credentials and can access the system based on their assigned role. They'll appear in scheduling and assignment lists.
+                      The employee receives login credentials and can access the system based on their assigned role. They can be scheduled for jobs and assigned gear from inventory.
                     </p>
                   </div>
                 </div>
