@@ -53,7 +53,7 @@ export default function IRATATaskLoggingLanding() {
             
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
               OnRopePro captures your rope access hours the same day you work them. Building names, task types, duration. All logged automatically when you end your shift.<br />
-              <strong>Your paper logbook becomes a backup, not a homework assignment.</strong>
+              <strong>Filling out your paper logbook stops being a homework assignment.</strong>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
