@@ -76,3 +76,38 @@ Example:
 - Company had 2 documents, employee signed both = 1 point (2/2)
 - Company adds a new document (day 1-14): employee still has 1 point (grace period)
 - After 14 days: employee has signed 2 of 3 documents = 0.67 points
+
+---
+
+## Implementation Requirements
+
+### Database Schema Updates
+- Add version tracking to company documents (track when uploaded/updated)
+- Store `graceEndsAt` date (upload date + 14 days) for each document version
+- When a document is updated, old signatures are marked obsolete
+- All timestamps stored in UTC to avoid timezone issues
+
+### Calculation Safeguards
+- Guard against division by zero (0 sessions = 0 points, not an error)
+- Handle floating-point precision to avoid rounding issues
+- Build reusable calculation functions for each category
+
+### Edge Cases to Handle
+- Companies with no projects = 0 points (not an error)
+- Companies with no employees = 0 points
+- Non-elevation projects receiving extra docs = ignored in calculation
+- Terminated employees = excluded from count
+- Documents deleted during grace period = remove from requirements
+
+### Testing Strategy
+- Test each category separately with different scenarios:
+  - Full compliance (100%)
+  - Partial compliance (50%)
+  - Zero data (no projects/employees)
+  - Grace period active vs expired
+  - Multiple document updates
+
+### Grace Period Logic
+- Automatic daily check using current UTC date
+- Documents within 14-day window not counted in denominator
+- After 14 days, included automatically in calculation
