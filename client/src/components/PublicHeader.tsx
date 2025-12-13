@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
-import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText } from "lucide-react";
+import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 interface PublicHeaderProps {
@@ -225,6 +225,22 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                       <div>
                         <div className="font-semibold text-sm">Document Management</div>
                         <div className="text-xs text-muted-foreground mt-0.5">Digital signatures, immutable audit trails, compliance reporting</div>
+                      </div>
+                    </button>
+                    <button
+                      className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                      onClick={() => {
+                        setLocation("/modules/employee-management");
+                        setShowModulesMenu(false);
+                      }}
+                      data-testid="nav-employee-management"
+                    >
+                      <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <Users className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <div className="font-semibold text-sm">Employee Management</div>
+                        <div className="text-xs text-muted-foreground mt-0.5">Portable identities, certification tracking, permissions</div>
                       </div>
                     </button>
                   </div>

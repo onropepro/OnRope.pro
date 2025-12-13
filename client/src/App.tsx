@@ -81,6 +81,7 @@ import CSRLanding from "@/pages/CSRLanding";
 import WorkSessionLanding from "@/pages/WorkSessionLanding";
 import IRATATaskLoggingLanding from "@/pages/IRATATaskLoggingLanding";
 import DocumentManagementLanding from "@/pages/DocumentManagementLanding";
+import EmployeeManagementLanding from "@/pages/EmployeeManagementLanding";
 import JobBoardGuide from "@/pages/JobBoardGuide";
 import Pricing from "@/pages/Pricing";
 import ROICalculator from "@/pages/ROICalculator";
@@ -343,6 +344,7 @@ function Router() {
       <Route path="/modules/company-safety-rating" component={CSRLanding} />
       <Route path="/modules/irata-sprat-task-logging" component={IRATATaskLoggingLanding} />
       <Route path="/modules/document-management" component={DocumentManagementLanding} />
+      <Route path="/modules/employee-management" component={EmployeeManagementLanding} />
       <Route path="/changelog/user-access" component={UserAccessGuide} />
       <Route path="/changelog/projects" component={ProjectsGuide} />
       <Route path="/changelog/time-tracking" component={TimeTrackingGuide} />
