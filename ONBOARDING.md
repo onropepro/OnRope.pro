@@ -123,6 +123,14 @@ For each document:
 - Store completion status per company-technician connection
 - If tech tries to access company portal without completing onboarding, redirect back to onboarding page
 
+### New Document Trigger
+- **When company owner adds a NEW document (safe work practice, procedure, etc.):**
+  - All existing techs must sign the new document before accessing the company work portal
+  - Tech gets redirected to signing page showing only the unsigned document(s)
+  - This applies even if the tech previously completed onboarding
+  - Tech cannot proceed until all new documents are signed
+  - Grace period for CSR calculations still applies (14 days per SCR.RATING.md), but portal access requires immediate signature
+
 ---
 
 ## Edge Cases to Handle
