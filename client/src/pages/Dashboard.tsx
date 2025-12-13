@@ -764,9 +764,8 @@ function NotificationBell() {
 }
 
 // License Expiry Warning Banner Component
-function LicenseExpiryWarningBanner({ employees }: { employees: any[] }) {
+function LicenseExpiryWarningBanner({ employees, onReviewClick }: { employees: any[]; onReviewClick: () => void }) {
   const { t } = useTranslation();
-  const [, setLocation] = useLocation();
   const [isExpanded, setIsExpanded] = useState(false);
   
   // Calculate employees with expiring licenses (within 30 days)
@@ -874,7 +873,7 @@ function LicenseExpiryWarningBanner({ employees }: { employees: any[] }) {
                       : t('dashboard.licenseExpiry.showDetails', 'Details')}
                   </Button>
                   <Button
-                    onClick={() => setLocation("/employee-management")}
+                    onClick={onReviewClick}
                     size="sm"
                     className="bg-red-600 hover:bg-red-700 text-white"
                     data-testid="button-review-licenses"
@@ -3434,7 +3433,7 @@ export default function Dashboard() {
 
       {/* License Expiry Warning Banner - Company owners and managers only */}
       {currentUser && (currentUser.role === 'company' || canManageEmployees(currentUser)) && employees.length > 0 && (
-        <LicenseExpiryWarningBanner employees={employees} />
+        <LicenseExpiryWarningBanner employees={employees} onReviewClick={() => handleTabChange("employees")} />
       )}
 
       <div className="p-6 sm:p-8 max-w-7xl mx-auto">
