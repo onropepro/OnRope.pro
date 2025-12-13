@@ -1045,26 +1045,209 @@ export default function ProjectManagementLanding() {
         </Accordion>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 md:py-20 px-4 text-white" style={{backgroundImage: 'linear-gradient(135deg, #059669 0%, #0d9488 100%)'}}>
+      <Separator className="my-8" />
+
+      {/* Measurable Results Section */}
+      <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto space-y-8">
+        <div className="text-center space-y-4">
+          <h2 className="text-2xl md:text-3xl font-bold">Measurable Results</h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Real numbers from real rope access operations
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
+            <CardHeader className="pb-2">
+              <div className="w-12 h-12 rounded-lg bg-[#0B64A3]/10 dark:bg-[#0B64A3]/20 flex items-center justify-center mb-3">
+                <Clock className="w-6 h-6 text-[#0B64A3]" />
+              </div>
+              <CardTitle className="text-lg">Time Savings</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-muted-foreground">
+              <p>Manual calendar management takes 30-45 minutes per project. Creating the project, blocking calendar dates, texting crew assignments, updating the whiteboard, checking for conflicts.</p>
+              <p>With automatic calendar population, project creation takes 5 minutes. For 20 projects per month, that's 8+ hours saved monthly.</p>
+              <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
+                <p className="font-semibold text-foreground">Annual time savings worth $7,500 at owner rates.</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
+            <CardHeader className="pb-2">
+              <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center mb-3">
+                <DollarSign className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <CardTitle className="text-lg">Payroll Accuracy</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-muted-foreground">
+              <p>Work sessions logged in the field automatically feed payroll calculations. Drop counts, hours, and units convert directly to wages.</p>
+              <p>No transcription from paper timesheets or text messages.</p>
+              <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
+                <p className="font-semibold text-foreground">87-93% reduction in payroll errors. Zero disputes because the system timestamps everything.</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
+            <CardHeader className="pb-2">
+              <div className="w-12 h-12 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center mb-3">
+                <Users className="w-6 h-6 text-violet-600 dark:text-violet-400" />
+              </div>
+              <CardTitle className="text-lg">Communication Efficiency</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-muted-foreground">
+              <p>Residents and building managers check progress themselves instead of calling. Property manager status calls drop 60-70% per active project.</p>
+              <p>For building managers handling 15-30 status calls per week during projects, that's 20+ hours per month reclaimed.</p>
+              <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
+                <p className="font-semibold text-foreground">Your reputation improves because you look organized and transparent.</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
+            <CardHeader className="pb-2">
+              <div className="w-12 h-12 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center mb-3">
+                <Target className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+              </div>
+              <CardTitle className="text-lg">Quote Accuracy</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-muted-foreground">
+              <p>Historical project data shows how long similar buildings actually took. Average drops per day by job type. Labor hours per elevation. Project duration trends.</p>
+              <p>Quote preparation drops from 45 minutes to 10 minutes.</p>
+              <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
+                <p className="font-semibold text-foreground">Pricing accuracy improves 15-20%. Fewer lost contracts from overbidding. Fewer losses from underbidding.</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      <Separator className="my-8" />
+
+      {/* FAQs Section */}
+      <section id="knowledgebase" className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto space-y-8">
+        <div className="text-center space-y-4">
+          <h2 className="text-2xl md:text-3xl font-bold">Frequently Asked Questions</h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Common questions about the Project Management module
+          </p>
+        </div>
+
+        <Accordion type="single" collapsible className="space-y-3">
+          <AccordionItem value="faq-1" className="border rounded-lg px-4">
+            <AccordionTrigger className="hover:no-underline py-4">
+              <span className="text-left font-medium">How does drop-based tracking work?</span>
+            </AccordionTrigger>
+            <AccordionContent className="text-muted-foreground pb-4">
+              Technicians log drops completed per elevation at the end of each work session. The system asks for North, East, South, and West counts separately. Progress calculates automatically based on target drops per direction. Visual progress bars show completion by elevation.
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="faq-2" className="border rounded-lg px-4">
+            <AccordionTrigger className="hover:no-underline py-4">
+              <span className="text-left font-medium">Can building managers see everything we see?</span>
+            </AccordionTrigger>
+            <AccordionContent className="text-muted-foreground pb-4">
+              Building managers see project progress, schedules, photo galleries, and safety documentation. They don't see internal performance metrics, piece work rates, or employee-specific data you'd rather keep private.
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="faq-3" className="border rounded-lg px-4">
+            <AccordionTrigger className="hover:no-underline py-4">
+              <span className="text-left font-medium">What happens if we work on all four elevations simultaneously?</span>
+            </AccordionTrigger>
+            <AccordionContent className="text-muted-foreground pb-4">
+              Each technician logs drops for whichever elevation they worked. If Tommy worked North and Sarah worked East, their sessions record to their respective elevations. Total project progress combines all four automatically.
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="faq-4" className="border rounded-lg px-4">
+            <AccordionTrigger className="hover:no-underline py-4">
+              <span className="text-left font-medium">Can we use our own job types?</span>
+            </AccordionTrigger>
+            <AccordionContent className="text-muted-foreground pb-4">
+              Yes. Create custom job types with your own names and tracking methods. Choose drop-based, hours-based, or unit-based tracking. Custom types save permanently and become available for all future projects.
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="faq-5" className="border rounded-lg px-4">
+            <AccordionTrigger className="hover:no-underline py-4">
+              <span className="text-left font-medium">How does piece work pay calculate?</span>
+            </AccordionTrigger>
+            <AccordionContent className="text-muted-foreground pb-4">
+              Enable piece work mode on drop-based projects. Set the rate per drop. When a technician logs 20 drops at $8 per drop, the system calculates $160 for that session. The payroll module pulls this automatically. Technicians see exactly how their pay was calculated.
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="faq-6" className="border rounded-lg px-4">
+            <AccordionTrigger className="hover:no-underline py-4">
+              <span className="text-left font-medium">What if a project gets delayed by weather?</span>
+            </AccordionTrigger>
+            <AccordionContent className="text-muted-foreground pb-4">
+              Put the project on hold with one click. Calendar entries update automatically. When weather clears, reactivate the project and adjust dates. Building manager portal shows the updated schedule. No need to send multiple update emails.
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="faq-7" className="border rounded-lg px-4">
+            <AccordionTrigger className="hover:no-underline py-4">
+              <span className="text-left font-medium">Can technicians see their performance compared to others?</span>
+            </AccordionTrigger>
+            <AccordionContent className="text-muted-foreground pb-4">
+              Technicians see their own performance metrics and trends. They don't see other technicians' data. Owners and supervisors see company-wide performance comparisons to identify coaching opportunities.
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="faq-8" className="border rounded-lg px-4">
+            <AccordionTrigger className="hover:no-underline py-4">
+              <span className="text-left font-medium">How do I know if a project is falling behind?</span>
+            </AccordionTrigger>
+            <AccordionContent className="text-muted-foreground pb-4">
+              The dashboard shows expected completion versus current pace. If a project is behind target, visual indicators flag it before clients notice. You can adjust crew assignments or extend timelines proactively.
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="faq-9" className="border rounded-lg px-4">
+            <AccordionTrigger className="hover:no-underline py-4">
+              <span className="text-left font-medium">What happens to completed projects?</span>
+            </AccordionTrigger>
+            <AccordionContent className="text-muted-foreground pb-4">
+              Completed projects archive automatically but remain searchable. Historical data powers accurate future quoting. Building managers can still access project records for compliance verification. Nothing gets deleted unless you explicitly choose to.
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="faq-10" className="border rounded-lg px-4">
+            <AccordionTrigger className="hover:no-underline py-4">
+              <span className="text-left font-medium">Does the calendar sync with Google Calendar or Outlook?</span>
+            </AccordionTrigger>
+            <AccordionContent className="text-muted-foreground pb-4">
+              The OnRopePro calendar is the source of truth. We're evaluating external calendar sync for future development. For now, the system ensures all internal stakeholders see the same schedule without needing external tools.
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </section>
+
+      {/* CTA Section - Stop Juggling. Start Managing. */}
+      <section className="py-16 md:py-20 px-4 text-white" style={{backgroundImage: 'linear-gradient(135deg, #0B64A3 0%, #0369A1 100%)'}}>
         <div className="max-w-3xl mx-auto text-center space-y-6">
           <h2 className="text-3xl md:text-4xl font-bold">
-            Stop Managing in Your Head
+            Stop Juggling. Start Managing.
           </h2>
-          <p className="text-lg text-emerald-100">
-            See exactly where every project stands without guessing or phone calls.<br />
-            Full visibility. Real-time data. Simple calendar sync.
-          </p>
+          <div className="text-lg text-blue-100 space-y-4 max-w-2xl mx-auto">
+            <p>Right now you're spending 10-15 hours per week just figuring out what's happening. Driving site to site. Taking notes. Comparing where crews are today versus yesterday. Waking up at 3 AM wondering if you forgot to schedule tomorrow's job.</p>
+            <p>The dashboard shows you everything without leaving your desk. Real-time progress. Per-employee performance. Calendar automatically populated. Conflicts flagged before they become emergencies. Building managers checking progress themselves instead of calling you.</p>
+            <p className="font-medium text-white">Your brain stops being the database. The system carries the cognitive load. Your mental bandwidth goes to growing the business instead of tracking the business.</p>
+          </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Button size="lg" className="bg-white text-emerald-700 hover:bg-emerald-50" asChild data-testid="button-cta-trial">
+            <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-cta-trial-bottom">
               <Link href="/register">
-                Start Your 90-Day Trial
+                Start Your Free 60-Day Trial
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-cta-guide">
-              <Link href="/changelog/projects">
-                Read the Full Guide
+            <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-cta-modules">
+              <Link href="/modules">
+                Explore All Modules
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>
