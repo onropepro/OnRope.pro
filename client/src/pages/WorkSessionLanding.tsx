@@ -789,38 +789,41 @@ export default function WorkSessionLanding() {
         </div>
       </section>
 
-      <Separator className="my-8" />
-
       {/* Footer CTA Section */}
-      <section className="py-16 md:py-24 px-4">
-        <div className="max-w-4xl mx-auto text-center">
+      <section className="relative py-16 md:py-24 px-4 text-white" style={{backgroundImage: 'linear-gradient(135deg, #0B64A3 0%, #0369A1 100%)'}}>
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMtOS45NDEgMC0xOCA4LjA1OS0xOCAxOHM4LjA1OSAxOCAxOCAxOGM5Ljk0MSAwIDE4LTguMDU5IDE4LTE4cy04LjA1OS0xOC0xOC0xOHptMCAzMmMtNy43MzIgMC0xNC02LjI2OC0xNC0xNHM2LjI2OC0xNCAxNC0xNHMxNCA2LjI2OCAxNCAxNC02LjI2OCAxNC0xNCAxNHoiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wMykiLz48L2c+PC9zdmc+')] opacity-30"></div>
+        <div className="relative max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Stop Guessing. Start Knowing.
           </h2>
-          <p className="text-lg text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg text-blue-100 mb-6 max-w-3xl mx-auto leading-relaxed">
             Every payroll cycle, you're reconstructing the past from memory and messages. Every project review, you're piecing together what happened from scattered records. Every client call, you're hoping your crew is actually where they're supposed to be.
           </p>
-          <p className="text-lg text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg text-blue-100 mb-6 max-w-3xl mx-auto leading-relaxed">
             OnRopePro captures the data as it happens. Timestamps. Locations. Output. Shortfall reasons. All of it. Automatically.
           </p>
-          <p className="text-lg font-medium text-foreground mb-8 max-w-3xl mx-auto">
+          <p className="text-lg font-medium text-white mb-8 max-w-3xl mx-auto">
             No more 10 PM spreadsheet sessions. No more "my check is short" phone calls. No more budget surprises at project end.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-[#0B64A3] hover:bg-[#0369A1] text-white" asChild data-testid="button-footer-trial">
+            <Button size="lg" className="bg-white text-[#0B64A3]" asChild data-testid="button-footer-trial">
               <Link href="/register">
                 Start Your Free 60-Day Trial
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" asChild data-testid="button-footer-faq">
+            <Button size="lg" variant="outline" className="border-white/40 text-white" asChild data-testid="button-footer-faq">
               <Link href="#knowledgebase">
                 Find Answers
                 <BookOpen className="ml-2 w-5 h-5" />
               </Link>
             </Button>
           </div>
+          
+          <p className="text-sm text-blue-200 mt-6">
+            Free 60-day trial for Founding Members. No credit card required.
+          </p>
         </div>
       </section>
     </div>
