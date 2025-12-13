@@ -56,8 +56,10 @@ export default function WorkSessionLanding() {
             </h1>
             
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              Monday was windy. Tuesday he left early. Wednesday there was a crane on the roof. Thursday Eddie felt sick. By Friday, you're 20 hours over budget and you have no idea why.<br />
-              <strong>Real answers instead of scattered excuses.</strong>
+              Monday was windy. Tuesday he left early. Wednesday there was a crane on the roof. Thursday Damien felt sick. By Friday, you're 20 hours over budget and you have no idea why.
+            </p>
+            <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
+              OnRopePro's Work Session module captures everything. Clock in, clock out, drops completed, shortfall reasons documented. <strong>Real answers instead of scattered excuses.</strong>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
@@ -128,7 +130,7 @@ export default function WorkSessionLanding() {
                 "I see you logged 45 hours. Last year one guy finished the same building in that time. You're not even halfway done. What happened?"
               </p>
               <p className="italic">
-                "Monday, I think it was windy. And then I had to pull my rope, I think. Or was that Tuesday? Oh yeah, no, Tuesday because Monday I had to leave early because I had dinner with my mom and I told you, remember? Oh yeah, I remember you told me that. Then Tuesday was windy and then Wednesday there was another crane on the roof, so I had to move my rope a bunch of times. And what about Eddie? He was there with you. Oh yeah, but he felt sick. He didn't work so much and he only did one drop on Thursday or Friday. I'm not sure. I was not really paying attention to what he was doing. I was too busy with my stuff."
+                "Monday, I think it was windy. And then I had to pull my rope, I think. Or was that Tuesday? Oh yeah, no, Tuesday because Monday I had to leave early because I had dinner with my mom and I told you, remember? Oh yeah, I remember you told me that. Then Tuesday was windy and then Wednesday there was another crane on the roof, so I had to move my rope a bunch of times. And what about Damien? He was there with you. Oh yeah, but he felt sick. He didn't work so much and he only did one drop on Thursday or Friday. I'm not sure. I was not really paying attention to what he was doing. I was too busy with my stuff."
               </p>
               <p>
                 No clue what's going on. At the end of the building, you're just pissed off because you went 20 hours over budget and you don't really know why. You know it was weather. You know the guy wasn't feeling well some days. You don't really know. Move on. Next building.
