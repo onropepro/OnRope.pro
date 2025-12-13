@@ -115,19 +115,19 @@ export default function ProjectManagementLanding() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-sky-600">4</div>
-                  <div className="text-sm text-muted-foreground mt-1">Elevations tracked independently</div>
+                  <div className="text-base text-muted-foreground mt-1">Elevations tracked independently</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-emerald-600">87-93%</div>
-                  <div className="text-sm text-muted-foreground mt-1">Payroll errors eliminated</div>
+                  <div className="text-base text-muted-foreground mt-1">Payroll errors eliminated</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-violet-600">60-70%</div>
-                  <div className="text-sm text-muted-foreground mt-1">Fewer status calls from clients</div>
+                  <div className="text-base text-muted-foreground mt-1">Fewer status calls from clients</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-amber-600">75%</div>
-                  <div className="text-sm text-muted-foreground mt-1">Faster quote preparation</div>
+                  <div className="text-base text-muted-foreground mt-1">Faster quote preparation</div>
                 </div>
               </div>
             </CardContent>
@@ -315,25 +315,25 @@ export default function ProjectManagementLanding() {
             <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
               <CardContent className="p-5 space-y-2">
                 <h4 className="font-semibold">See all your projects without leaving your desk.</h4>
-                <p className="text-sm text-muted-foreground">The dashboard shows every active job with completion percentage, days remaining, and assigned crew. Filter by status, building, or technician. Updates automatically as work sessions get logged. No more driving site to site taking notes of where crews are compared to yesterday.</p>
+                <p className="text-base text-muted-foreground">The dashboard shows every active job with completion percentage, days remaining, and assigned crew. Filter by status, building, or technician. Updates automatically as work sessions get logged. No more driving site to site taking notes of where crews are compared to yesterday.</p>
               </CardContent>
             </Card>
             <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
               <CardContent className="p-5 space-y-2">
                 <h4 className="font-semibold">Know who's performing and who's coasting.</h4>
-                <p className="text-sm text-muted-foreground">Per-employee performance tracking shows drops completed per session, target achievement rates, and historical trends. You can see that Tommy did five drops every day at this building while another employee only did one. Now you have the data for the conversation you couldn't have before.</p>
+                <p className="text-base text-muted-foreground">Per-employee performance tracking shows drops completed per session, target achievement rates, and historical trends. You can see that Tommy did five drops every day at this building while another employee only did one. Now you have the data for the conversation you couldn't have before.</p>
               </CardContent>
             </Card>
             <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
               <CardContent className="p-5 space-y-2">
                 <h4 className="font-semibold">Quote future jobs with confidence.</h4>
-                <p className="text-sm text-muted-foreground">Historical project data shows how long similar buildings actually took. Search past projects by building type, job type, or date range. "Last time we did a 20-story window wash, it took 14 days with 2 techs averaging 8 drops per day." Stop guessing and overbidding by 50%.</p>
+                <p className="text-base text-muted-foreground">Historical project data shows how long similar buildings actually took. Search past projects by building type, job type, or date range. "Last time we did a 20-story window wash, it took 14 days with 2 techs averaging 8 drops per day." Stop guessing and overbidding by 50%.</p>
               </CardContent>
             </Card>
             <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
               <CardContent className="p-5 space-y-2">
                 <h4 className="font-semibold">Reduce your psychological load.</h4>
-                <p className="text-sm text-muted-foreground">The time you spend looking at projects on one screen, schedule on another, checking if you put Devon somewhere. That mental bandwidth gets freed up. Everything is linked with everything. The system remembers so you don't have to.</p>
+                <p className="text-base text-muted-foreground">The time you spend looking at projects on one screen, schedule on another, checking if you put Devon somewhere. That mental bandwidth gets freed up. Everything is linked with everything. The system remembers so you don't have to.</p>
               </CardContent>
             </Card>
           </div>
@@ -351,19 +351,19 @@ export default function ProjectManagementLanding() {
             <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
               <CardContent className="p-5 space-y-2">
                 <h4 className="font-semibold">Know your target before you start.</h4>
-                <p className="text-sm text-muted-foreground">Your mobile app shows assigned projects with clear daily expectations. Marina Towers, Window Cleaning. Your target: 5 drops per day. Yesterday you completed: 4 drops. No more finding out after the fact that the boss expected something different.</p>
+                <p className="text-base text-muted-foreground">Your mobile app shows assigned projects with clear daily expectations. Marina Towers, Window Cleaning. Your target: 5 drops per day. Yesterday you completed: 4 drops. No more finding out after the fact that the boss expected something different.</p>
               </CardContent>
             </Card>
             <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
               <CardContent className="p-5 space-y-2">
                 <h4 className="font-semibold">See where you're working tomorrow.</h4>
-                <p className="text-sm text-muted-foreground">Your upcoming assignments appear on your phone tonight. Tomorrow: Marina Towers, 8:00 AM. Thursday: Ocean View Apartments, 8:00 AM. Plan your commute the night before instead of waiting for a 6 AM text that sends you to the wrong building.</p>
+                <p className="text-base text-muted-foreground">Your upcoming assignments appear on your phone tonight. Tomorrow: Marina Towers, 8:00 AM. Thursday: Ocean View Apartments, 8:00 AM. Plan your commute the night before instead of waiting for a 6 AM text that sends you to the wrong building.</p>
               </CardContent>
             </Card>
             <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
               <CardContent className="p-5 space-y-2">
                 <h4 className="font-semibold">Track your own improvement.</h4>
-                <p className="text-sm text-muted-foreground">Your performance dashboard shows drops per day average, target achievement rate, and trends over time. This month: 4.8 drops per day, 86% target achievement. Last month: 4.1 drops per day. You're improving, and now you can prove it during your review.</p>
+                <p className="text-base text-muted-foreground">Your performance dashboard shows drops per day average, target achievement rate, and trends over time. This month: 4.8 drops per day, 86% target achievement. Last month: 4.1 drops per day. You're improving, and now you can prove it during your review.</p>
               </CardContent>
             </Card>
           </div>
@@ -381,13 +381,13 @@ export default function ProjectManagementLanding() {
             <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
               <CardContent className="p-5 space-y-2">
                 <h4 className="font-semibold">Stop playing telephone.</h4>
-                <p className="text-sm text-muted-foreground">Log in and see the exact same progress the rope access company sees. Real-time completion percentages by elevation. Before and after photo galleries. Safety documentation. When the building owner asks "How's it going?", answer immediately instead of "I'll call them and find out."</p>
+                <p className="text-base text-muted-foreground">Log in and see the exact same progress the rope access company sees. Real-time completion percentages by elevation. Before and after photo galleries. Safety documentation. When the building owner asks "How's it going?", answer immediately instead of "I'll call them and find out."</p>
               </CardContent>
             </Card>
             <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
               <CardContent className="p-5 space-y-2">
                 <h4 className="font-semibold">Verify contractor performance objectively.</h4>
-                <p className="text-sm text-muted-foreground">The dashboard shows whether work is progressing on schedule. South Elevation: 73% complete. Expected completion: Dec 8. No more relying on verbal updates that might be optimistic. Data you can trust when evaluating vendor performance.</p>
+                <p className="text-base text-muted-foreground">The dashboard shows whether work is progressing on schedule. South Elevation: 73% complete. Expected completion: Dec 8. No more relying on verbal updates that might be optimistic. Data you can trust when evaluating vendor performance.</p>
               </CardContent>
             </Card>
           </div>
@@ -405,13 +405,13 @@ export default function ProjectManagementLanding() {
             <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
               <CardContent className="p-5 space-y-2">
                 <h4 className="font-semibold">Reduce your communication overhead.</h4>
-                <p className="text-sm text-muted-foreground">Residents check progress themselves through their portal. They see which elevation is being worked, when their floor is expected, and the upcoming schedule. Status calls drop 60-70%. Your phone stops ringing with "when will they be done?" questions.</p>
+                <p className="text-base text-muted-foreground">Residents check progress themselves through their portal. They see which elevation is being worked, when their floor is expected, and the upcoming schedule. Status calls drop 60-70%. Your phone stops ringing with "when will they be done?" questions.</p>
               </CardContent>
             </Card>
             <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
               <CardContent className="p-5 space-y-2">
                 <h4 className="font-semibold">Demonstrate professional vendor management.</h4>
-                <p className="text-sm text-muted-foreground">When building owners ask about contractor oversight, show them the portal. Real-time progress tracking. Documented safety compliance. Photo verification. You become known as the property manager who uses technology to ensure accountability.</p>
+                <p className="text-base text-muted-foreground">When building owners ask about contractor oversight, show them the portal. Real-time progress tracking. Documented safety compliance. Photo verification. You become known as the property manager who uses technology to ensure accountability.</p>
               </CardContent>
             </Card>
           </div>
@@ -429,13 +429,13 @@ export default function ProjectManagementLanding() {
             <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
               <CardContent className="p-5 space-y-2">
                 <h4 className="font-semibold">Know when work will reach your window.</h4>
-                <p className="text-sm text-muted-foreground">The resident portal shows progress specific to your elevation. South Elevation: 45% complete. Expected to reach your floor Thursday Dec 12. Entire elevation complete by Dec 15. Plan your life around the work instead of wondering.</p>
+                <p className="text-base text-muted-foreground">The resident portal shows progress specific to your elevation. South Elevation: 45% complete. Expected to reach your floor Thursday Dec 12. Entire elevation complete by Dec 15. Plan your life around the work instead of wondering.</p>
               </CardContent>
             </Card>
             <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
               <CardContent className="p-5 space-y-2">
                 <h4 className="font-semibold">Birthday party on Sunday?</h4>
-                <p className="text-sm text-muted-foreground">Check the schedule. They're not working that day. No need to call the property manager and wait two days for an answer while you worry about strangers outside your window during the party.</p>
+                <p className="text-base text-muted-foreground">Check the schedule. They're not working that day. No need to call the property manager and wait two days for an answer while you worry about strangers outside your window during the party.</p>
               </CardContent>
             </Card>
           </div>
@@ -462,7 +462,7 @@ export default function ProjectManagementLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Directional Drop Tracking</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-base text-muted-foreground mt-1">
                       Track progress on each building elevation independently. North, East, South, and West each show their own drop count, completion percentage, and assigned crew. High-rise window cleaning rarely finishes all sides at once. The system matches your reality.
                     </p>
                   </div>
@@ -478,7 +478,7 @@ export default function ProjectManagementLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Real-Time Progress Dashboard</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-base text-muted-foreground mt-1">
                       See every active project's completion percentage, days remaining, and crew assignment from one screen. Updates automatically as work sessions get logged. Filter by status, building, job type, or technician. Visual progress bars flag when projects fall behind target.
                     </p>
                   </div>
@@ -494,7 +494,7 @@ export default function ProjectManagementLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Flexible Tracking Methods</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-base text-muted-foreground mt-1">
                       Drop-based, hours-based, or unit-based tracking depending on the job type. The form technicians see when ending a work session changes based on what they're working on. Drop-based jobs ask for N/E/S/W counts. Hours-based jobs ask for completion percentage. The system adapts.
                     </p>
                   </div>
@@ -510,7 +510,7 @@ export default function ProjectManagementLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Automatic Calendar Integration</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-base text-muted-foreground mt-1">
                       Creating a project with a date range and assigned employees automatically populates calendar entries. Multi-day project bars. Color coding by job type. Conflict detection when employees are double-booked. No more "Oh shit, I forgot to schedule that" emergencies.
                     </p>
                   </div>
@@ -526,7 +526,7 @@ export default function ProjectManagementLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Custom Job Types</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-base text-muted-foreground mt-1">
                       Create company-specific job types for specialized work. Define the name and tracking method. Choose whether it's elevation-based, time-based, or unit-based. Your weird niche service that no generic software understands? Define it once, use it forever.
                     </p>
                   </div>
@@ -542,7 +542,7 @@ export default function ProjectManagementLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Piece Work Mode</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-base text-muted-foreground mt-1">
                       For drop-based projects, enable piece work compensation instead of hourly. Set rate per drop. System calculates pay automatically. 20 drops at $8 per drop equals $160 for that session. No spreadsheets. No manual calculations. No disputes about how pay was calculated.
                     </p>
                   </div>
