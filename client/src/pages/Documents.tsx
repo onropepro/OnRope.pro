@@ -5293,99 +5293,149 @@ export default function Documents() {
         <DocumentReviews companyDocuments={[...healthSafetyDocs, ...policyDocs]} />
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <Card className="mb-6 p-4 bg-gradient-to-r from-primary/5 to-transparent border-2 border-primary/30">
-            <div className="flex items-center gap-3 mb-3">
+          <div className="mb-6">
+            <div className="flex items-center gap-3 mb-4">
               <div className="p-2 bg-primary/10 rounded-lg">
                 <FolderOpen className="h-5 w-5 text-primary" />
               </div>
               <Label className="text-base font-semibold">{t('documents.selectCategory', 'Select Document Category')}</Label>
             </div>
-            <Select value={activeTab} onValueChange={setActiveTab}>
-              <SelectTrigger className="w-full h-14 text-lg font-semibold bg-background border-2 border-primary/40 hover:border-primary shadow-sm" data-testid="select-document-type">
-                <SelectValue placeholder="Select document type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="health-safety" data-testid="option-health-safety">
-                  <div className="flex items-center gap-2">
-                    <Shield className="h-4 w-4" />
-                    {t('documents.healthSafetyManual', 'Health & Safety Manual')}
-                  </div>
-                </SelectItem>
-                <SelectItem value="company-policy" data-testid="option-company-policy">
-                  <div className="flex items-center gap-2">
-                    <BookOpen className="h-4 w-4" />
-                    {t('documents.companyPolicies', 'Company Policies')}
-                  </div>
-                </SelectItem>
-                {canUploadDocuments && canViewSensitive && (
-                  <SelectItem value="insurance" data-testid="option-insurance">
-                    <div className="flex items-center gap-2">
-                      <FileCheck className="h-4 w-4" />
-                      {t('documents.certificateOfInsurance', 'Certificate of Insurance')}
-                    </div>
-                  </SelectItem>
-                )}
-                <SelectItem value="swp-templates" data-testid="option-swp-templates">
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-4 w-4" />
-                    {t('documents.safeWorkProcedures', 'Safe Work Procedures')}
-                  </div>
-                </SelectItem>
-                <SelectItem value="safe-work-practices" data-testid="option-safe-work-practices">
-                  <div className="flex items-center gap-2">
-                    <Shield className="h-4 w-4" />
-                    {t('documents.safeWorkPractices', 'Safe Work Practices')}
-                  </div>
-                </SelectItem>
-                {canViewSensitive && (
-                  <SelectItem value="inspections-safety" data-testid="option-inspections-safety">
-                    <div className="flex items-center gap-2">
-                      <Package className="h-4 w-4" />
-                      {t('documents.equipmentInspections', 'Equipment Inspections')}
-                    </div>
-                  </SelectItem>
-                )}
-                {canViewSensitive && (
-                  <SelectItem value="damage-reports" data-testid="option-damage-reports">
-                    <div className="flex items-center gap-2">
-                      <AlertTriangle className="h-4 w-4" />
-                      {t('documents.damageReports', 'Damage Reports')}
-                    </div>
-                  </SelectItem>
-                )}
-                {canViewSafety && (
-                  <>
-                    <SelectItem value="toolbox-meetings" data-testid="option-toolbox-meetings">
-                      <div className="flex items-center gap-2">
-                        <ClipboardList className="h-4 w-4" />
-                        {t('documents.toolboxMeetingRecords', 'Toolbox Meetings')}
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="flha-records" data-testid="option-flha-records">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
-                        {t('documents.flhaRecords', 'FLHA Records')}
-                      </div>
-                    </SelectItem>
-                    {canViewSensitive && (
-                      <SelectItem value="incident-reports" data-testid="option-incident-reports">
-                        <div className="flex items-center gap-2">
-                          <AlertTriangle className="h-4 w-4" />
-                          {t('documents.incidentReports', 'Incident Reports')}
-                        </div>
-                      </SelectItem>
-                    )}
-                    <SelectItem value="method-statements" data-testid="option-method-statements">
-                      <div className="flex items-center gap-2">
-                        <FileText className="h-4 w-4" />
-                        {t('documents.methodStatements', 'Method Statements')}
-                      </div>
-                    </SelectItem>
-                  </>
-                )}
-              </SelectContent>
-            </Select>
-          </Card>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+              <button
+                type="button"
+                onClick={() => setActiveTab('health-safety')}
+                className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover-elevate ${activeTab === 'health-safety' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}
+                data-testid="option-health-safety"
+              >
+                <Shield className={`h-6 w-6 ${activeTab === 'health-safety' ? 'text-primary' : 'text-muted-foreground'}`} />
+                <span className={`text-sm font-medium text-center ${activeTab === 'health-safety' ? 'text-primary' : ''}`}>
+                  {t('documents.healthSafetyManual', 'Health & Safety Manual')}
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('company-policy')}
+                className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover-elevate ${activeTab === 'company-policy' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}
+                data-testid="option-company-policy"
+              >
+                <BookOpen className={`h-6 w-6 ${activeTab === 'company-policy' ? 'text-primary' : 'text-muted-foreground'}`} />
+                <span className={`text-sm font-medium text-center ${activeTab === 'company-policy' ? 'text-primary' : ''}`}>
+                  {t('documents.companyPolicies', 'Company Policies')}
+                </span>
+              </button>
+              {canUploadDocuments && canViewSensitive && (
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('insurance')}
+                  className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover-elevate ${activeTab === 'insurance' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}
+                  data-testid="option-insurance"
+                >
+                  <FileCheck className={`h-6 w-6 ${activeTab === 'insurance' ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <span className={`text-sm font-medium text-center ${activeTab === 'insurance' ? 'text-primary' : ''}`}>
+                    {t('documents.certificateOfInsurance', 'Certificate of Insurance')}
+                  </span>
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setActiveTab('swp-templates')}
+                className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover-elevate ${activeTab === 'swp-templates' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}
+                data-testid="option-swp-templates"
+              >
+                <FileText className={`h-6 w-6 ${activeTab === 'swp-templates' ? 'text-primary' : 'text-muted-foreground'}`} />
+                <span className={`text-sm font-medium text-center ${activeTab === 'swp-templates' ? 'text-primary' : ''}`}>
+                  {t('documents.safeWorkProcedures', 'Safe Work Procedures')}
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('safe-work-practices')}
+                className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover-elevate ${activeTab === 'safe-work-practices' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}
+                data-testid="option-safe-work-practices"
+              >
+                <Shield className={`h-6 w-6 ${activeTab === 'safe-work-practices' ? 'text-primary' : 'text-muted-foreground'}`} />
+                <span className={`text-sm font-medium text-center ${activeTab === 'safe-work-practices' ? 'text-primary' : ''}`}>
+                  {t('documents.safeWorkPractices', 'Safe Work Practices')}
+                </span>
+              </button>
+              {canViewSensitive && (
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('inspections-safety')}
+                  className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover-elevate ${activeTab === 'inspections-safety' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}
+                  data-testid="option-inspections-safety"
+                >
+                  <Package className={`h-6 w-6 ${activeTab === 'inspections-safety' ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <span className={`text-sm font-medium text-center ${activeTab === 'inspections-safety' ? 'text-primary' : ''}`}>
+                    {t('documents.equipmentInspections', 'Equipment Inspections')}
+                  </span>
+                </button>
+              )}
+              {canViewSensitive && (
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('damage-reports')}
+                  className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover-elevate ${activeTab === 'damage-reports' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}
+                  data-testid="option-damage-reports"
+                >
+                  <AlertTriangle className={`h-6 w-6 ${activeTab === 'damage-reports' ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <span className={`text-sm font-medium text-center ${activeTab === 'damage-reports' ? 'text-primary' : ''}`}>
+                    {t('documents.damageReports', 'Damage Reports')}
+                  </span>
+                </button>
+              )}
+              {canViewSafety && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('toolbox-meetings')}
+                    className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover-elevate ${activeTab === 'toolbox-meetings' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}
+                    data-testid="option-toolbox-meetings"
+                  >
+                    <ClipboardList className={`h-6 w-6 ${activeTab === 'toolbox-meetings' ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <span className={`text-sm font-medium text-center ${activeTab === 'toolbox-meetings' ? 'text-primary' : ''}`}>
+                      {t('documents.toolboxMeetingRecords', 'Toolbox Meetings')}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('flha-records')}
+                    className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover-elevate ${activeTab === 'flha-records' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}
+                    data-testid="option-flha-records"
+                  >
+                    <Calendar className={`h-6 w-6 ${activeTab === 'flha-records' ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <span className={`text-sm font-medium text-center ${activeTab === 'flha-records' ? 'text-primary' : ''}`}>
+                      {t('documents.flhaRecords', 'FLHA Records')}
+                    </span>
+                  </button>
+                  {canViewSensitive && (
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('incident-reports')}
+                      className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover-elevate ${activeTab === 'incident-reports' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}
+                      data-testid="option-incident-reports"
+                    >
+                      <AlertTriangle className={`h-6 w-6 ${activeTab === 'incident-reports' ? 'text-primary' : 'text-muted-foreground'}`} />
+                      <span className={`text-sm font-medium text-center ${activeTab === 'incident-reports' ? 'text-primary' : ''}`}>
+                        {t('documents.incidentReports', 'Incident Reports')}
+                      </span>
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('method-statements')}
+                    className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover-elevate ${activeTab === 'method-statements' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}
+                    data-testid="option-method-statements"
+                  >
+                    <FileText className={`h-6 w-6 ${activeTab === 'method-statements' ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <span className={`text-sm font-medium text-center ${activeTab === 'method-statements' ? 'text-primary' : ''}`}>
+                      {t('documents.methodStatements', 'Method Statements')}
+                    </span>
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
 
           {/* Health & Safety Manual Tab */}
           <TabsContent value="health-safety">
