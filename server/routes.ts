@@ -13062,13 +13062,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // 1. Documentation Safety Rating (Health & Safety Manual + Company Policy + Certificate of Insurance)
-      // -25% penalty if any required document is missing
+      // Percentage allocation removed - no penalty applied
       const companyDocuments = await storage.getCompanyDocuments(companyId);
       const hasHealthSafety = companyDocuments.some((doc: any) => doc.documentType === 'health_safety_manual');
       const hasCompanyPolicy = companyDocuments.some((doc: any) => doc.documentType === 'company_policy');
       const hasInsurance = companyDocuments.some((doc: any) => doc.documentType === 'certificate_of_insurance');
       const documentationRating = (hasHealthSafety && hasCompanyPolicy && hasInsurance) ? 100 : 0;
-      const documentationPenalty = documentationRating === 100 ? 0 : 25;
+      const documentationPenalty = 0;
       
       // 2. Toolbox Meeting Compliance (with 7-day coverage window)
       // A toolbox meeting covers its project for 7 days forward from the meeting date
@@ -13151,10 +13151,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const toolboxMeetingRating = toolboxTotalDays > 0 
         ? Math.round((toolboxDaysWithMeeting / toolboxTotalDays) * 100) 
         : 100;
-      // Penalty is proportional to missed coverage (max 25%)
-      const toolboxPenalty = toolboxTotalDays > 0 
-        ? Math.round(((toolboxTotalDays - toolboxDaysWithMeeting) / toolboxTotalDays) * 25)
-        : 0;
+      // Percentage allocation removed - no penalty applied
+      const toolboxPenalty = 0;
       
       // 3. Daily Harness Inspection Rating (last 30 days)
       const harnessInspections = await storage.getHarnessInspectionsByCompany(companyId);
@@ -13209,10 +13207,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const harnessInspectionRating = harnessRequiredInspections > 0 
         ? Math.round((harnessCompletedInspections / harnessRequiredInspections) * 100) 
         : 100;
-      // Penalty is proportional to missed inspections (max 25%)
-      const harnessPenalty = harnessRequiredInspections > 0 
-        ? Math.round(((harnessRequiredInspections - harnessCompletedInspections) / harnessRequiredInspections) * 25)
-        : 0;
+      // Percentage allocation removed - no penalty applied
+      const harnessPenalty = 0;
       
       // 4. Document Review Compliance Rating
       // Tracks employee acknowledgment of safety documents (H&S Manual, Company Policy, Safe Work Procedures)
@@ -13300,13 +13296,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const projectDocumentationRating = totalProjectDocsRequired > 0
         ? Math.round((totalProjectDocsPresent / totalProjectDocsRequired) * 100)
         : 100;
-      // Max 20% penalty for missing project documents
-      const projectDocumentationPenalty = totalProjectDocsRequired > 0
-        ? Math.round(((totalProjectDocsRequired - totalProjectDocsPresent) / totalProjectDocsRequired) * 20)
-        : 0;
+      // Percentage allocation removed - no penalty applied
+      const projectDocumentationPenalty = 0;
       
       // Calculate overall CSR: Start at 100%, subtract penalties
-      // Max penalty is 100% (25% docs, 25% toolbox, 25% harness, 5% document reviews, 20% project docs)
+      // Percentage allocations removed for: company uploaded docs, toolbox meetings, harness inspections, FLHA/project docs
+      // Only document review penalty remains active
       const totalPenalty = documentationPenalty + toolboxPenalty + harnessPenalty + documentReviewPenalty + projectDocumentationPenalty;
       const overallCSR = Math.max(0, 100 - totalPenalty);
       
@@ -13500,12 +13495,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const companyId = ownedLink.companyId;
       
       // 1. Documentation Safety Rating (Health & Safety Manual + Company Policy + Certificate of Insurance)
+      // Percentage allocation removed - no penalty applied
       const companyDocuments = await storage.getCompanyDocuments(companyId);
       const hasHealthSafety = companyDocuments.some((doc: any) => doc.documentType === 'health_safety_manual');
       const hasCompanyPolicy = companyDocuments.some((doc: any) => doc.documentType === 'company_policy');
       const hasInsurance = companyDocuments.some((doc: any) => doc.documentType === 'certificate_of_insurance');
       const documentationRating = (hasHealthSafety && hasCompanyPolicy && hasInsurance) ? 100 : 0;
-      const documentationPenalty = documentationRating === 100 ? 0 : 25;
+      const documentationPenalty = 0;
       
       // 2. Toolbox Meeting Compliance (with 7-day coverage window)
       // A toolbox meeting covers its project for 7 days forward from the meeting date
@@ -13585,9 +13581,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const toolboxMeetingRating = toolboxTotalDays > 0 
         ? Math.round((toolboxDaysWithMeeting / toolboxTotalDays) * 100) 
         : 100;
-      const toolboxPenalty = toolboxTotalDays > 0 
-        ? Math.round(((toolboxTotalDays - toolboxDaysWithMeeting) / toolboxTotalDays) * 25)
-        : 0;
+      // Percentage allocation removed - no penalty applied
+      const toolboxPenalty = 0;
       
       // 3. Daily Harness Inspection Rating (last 30 days)
       const harnessInspections = await storage.getHarnessInspectionsByCompany(companyId);
@@ -13638,9 +13633,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const harnessInspectionRating = harnessRequiredInspections > 0 
         ? Math.round((harnessCompletedInspections / harnessRequiredInspections) * 100) 
         : 100;
-      const harnessPenalty = harnessRequiredInspections > 0 
-        ? Math.round(((harnessRequiredInspections - harnessCompletedInspections) / harnessRequiredInspections) * 25)
-        : 0;
+      // Percentage allocation removed - no penalty applied
+      const harnessPenalty = 0;
       
       // 6. Document Review Compliance Rating
       // Calculate based on TOTAL REQUIRED signatures = (employees + owner) × required documents
