@@ -56,7 +56,7 @@ export default function WorkSessionLanding() {
             </h1>
             
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              Monday was windy. Tuesday he left early. Wednesday there was a crane on the roof. Thursday Damien felt sick. By Friday, you're 20 hours over budget and you have no idea why.<br />
+              Monday was windy. Tuesday he left early. Wednesday there was a crane on the roof. Thursday Eddie felt sick. By Friday, you're 20 hours over budget and you have no idea why.<br />
               <strong>Real answers instead of scattered excuses.</strong>
             </p>
             
