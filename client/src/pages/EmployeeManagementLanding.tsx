@@ -54,7 +54,7 @@ export default function EmployeeManagementLanding() {
             </h1>
             
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              Portable technician identities, automated certification alerts, and instant onboarding for the industry with the highest turnover in construction.<br />
+              Portable technician identities that can plug in to your company just by providing an IRATA or SPRAT number, automated certification alerts, and instant onboarding for an industry with a high turnover in construction.<br /><br />
               <strong>Employee management built by rope access professionals<br />who got tired of the same paperwork dance at every new job.</strong>
             </p>
             
