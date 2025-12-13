@@ -836,71 +836,98 @@ function LicenseExpiryWarningBanner({ employees }: { employees: any[] }) {
   const uniqueEmployeeCount = new Set(expiringLicenses.map(l => l.employee.id)).size;
   
   return (
-    <Alert className="mx-4 mt-4 border-red-500/50 bg-red-500/10" data-testid="alert-license-expiry-warning">
-      <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-500" />
-      <div className="flex-1">
-        <AlertTitle className="text-red-700 dark:text-red-400">
-          {t('dashboard.licenseExpiry.title', 'License Expiration Warning')}
-        </AlertTitle>
-        <AlertDescription className="text-red-600 dark:text-red-500 mb-2">
-          {t('dashboard.licenseExpiry.description', '{{count}} employee(s) have licenses expiring within 30 days', { count: uniqueEmployeeCount })}
-        </AlertDescription>
-        
-        {/* Toggle to show details */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 p-0 h-auto mb-2"
-          data-testid="button-toggle-expiry-details"
-        >
-          <span className="material-icons text-sm mr-1">
-            {isExpanded ? 'expand_less' : 'expand_more'}
-          </span>
-          {isExpanded 
-            ? t('dashboard.licenseExpiry.hideDetails', 'Hide details') 
-            : t('dashboard.licenseExpiry.showDetails', 'Show details')}
-        </Button>
-        
-        {isExpanded && (
-          <div className="space-y-2 mt-2 mb-3">
-            {expiringLicenses.map((item, index) => (
-              <div 
-                key={`${item.employee.id}-${item.licenseType}-${index}`}
-                className="flex items-center justify-between bg-red-500/5 rounded-md p-2 text-sm"
-                data-testid={`expiry-item-${item.employee.id}-${index}`}
-              >
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-red-700 dark:text-red-400">{item.employee.name}</span>
-                  <Badge variant="outline" className="border-red-500/50 text-red-600 dark:text-red-400 text-xs">
-                    {item.licenseType}
-                  </Badge>
+    <div className="mx-4 sm:mx-6 mt-4" data-testid="alert-license-expiry-warning">
+      <Card className="border-amber-400/60 dark:border-amber-500/40 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 shadow-sm">
+        <CardContent className="p-4">
+          <div className="flex items-start gap-4">
+            {/* Icon */}
+            <div className="flex-shrink-0 p-2 rounded-full bg-amber-100 dark:bg-amber-900/50">
+              <span className="material-icons text-amber-600 dark:text-amber-400 text-xl">warning</span>
+            </div>
+            
+            {/* Content */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between gap-4 flex-wrap">
+                <div>
+                  <h3 className="font-semibold text-amber-800 dark:text-amber-300 text-base">
+                    {t('dashboard.licenseExpiry.title', 'License Expiration Warning')}
+                  </h3>
+                  <p className="text-amber-700 dark:text-amber-400 text-sm mt-0.5">
+                    {t('dashboard.licenseExpiry.description', '{{count}} employee(s) have licenses expiring within 30 days', { count: uniqueEmployeeCount })}
+                  </p>
                 </div>
+                
+                {/* Action buttons */}
                 <div className="flex items-center gap-2">
-                  <span className="text-red-600 dark:text-red-500 text-xs">
-                    {item.daysRemaining === 0 
-                      ? t('dashboard.licenseExpiry.expiresToday', 'Expires today')
-                      : item.daysRemaining === 1
-                        ? t('dashboard.licenseExpiry.expiresTomorrow', 'Expires tomorrow')
-                        : t('dashboard.licenseExpiry.expiresInDays', 'Expires in {{days}} days', { days: item.daysRemaining })}
-                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    className="border-amber-400 dark:border-amber-600 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/50"
+                    data-testid="button-toggle-expiry-details"
+                  >
+                    <span className="material-icons text-sm mr-1">
+                      {isExpanded ? 'expand_less' : 'expand_more'}
+                    </span>
+                    {isExpanded 
+                      ? t('dashboard.licenseExpiry.hideDetails', 'Hide') 
+                      : t('dashboard.licenseExpiry.showDetails', 'Details')}
+                  </Button>
+                  <Button
+                    onClick={() => setLocation("/employee-management")}
+                    size="sm"
+                    className="bg-amber-600 hover:bg-amber-700 text-white"
+                    data-testid="button-review-licenses"
+                  >
+                    <span className="material-icons text-sm mr-1">people</span>
+                    {t('dashboard.licenseExpiry.reviewLicenses', 'Review')}
+                  </Button>
                 </div>
               </div>
-            ))}
+              
+              {/* Expandable details */}
+              {isExpanded && (
+                <div className="mt-4 space-y-2 border-t border-amber-200 dark:border-amber-800 pt-4">
+                  {expiringLicenses.map((item, index) => (
+                    <div 
+                      key={`${item.employee.id}-${item.licenseType}-${index}`}
+                      className="flex items-center justify-between bg-white/60 dark:bg-black/20 rounded-lg p-3 text-sm border border-amber-200/50 dark:border-amber-700/30"
+                      data-testid={`expiry-item-${item.employee.id}-${index}`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center">
+                          <span className="material-icons text-amber-600 dark:text-amber-400 text-sm">person</span>
+                        </div>
+                        <div>
+                          <span className="font-medium text-foreground">{item.employee.name}</span>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <Badge variant="secondary" className="text-xs px-2 py-0">
+                              {item.licenseType}
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <Badge 
+                          variant={item.daysRemaining <= 7 ? "destructive" : "outline"} 
+                          className={item.daysRemaining <= 7 ? "" : "border-amber-400 text-amber-700 dark:text-amber-400"}
+                        >
+                          {item.daysRemaining === 0 
+                            ? t('dashboard.licenseExpiry.expiresToday', 'Expires today')
+                            : item.daysRemaining === 1
+                              ? t('dashboard.licenseExpiry.expiresTomorrow', 'Tomorrow')
+                              : t('dashboard.licenseExpiry.expiresInDays', '{{days}} days left', { days: item.daysRemaining })}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-        )}
-        
-        <Button
-          onClick={() => setLocation("/employee-management")}
-          className="bg-red-600 hover:bg-red-700 text-white"
-          size="sm"
-          data-testid="button-review-licenses"
-        >
-          <span className="material-icons text-sm mr-1">badge</span>
-          {t('dashboard.licenseExpiry.reviewLicenses', 'Review Employee Licenses')}
-        </Button>
-      </div>
-    </Alert>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 
