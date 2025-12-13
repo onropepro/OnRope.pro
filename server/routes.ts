@@ -15062,20 +15062,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // For Certificate of Insurance, automatically extract expiry date using AI
       let extractedExpiryDate = null;
       if (documentType === 'certificate_of_insurance') {
+        console.log("[COI AI] Starting insurance expiry extraction for document:", document.id);
+        console.log("[COI AI] File URL:", fileUrl);
         try {
           // Fetch the PDF file
           const pdfResponse = await fetch(fileUrl);
+          console.log("[COI AI] PDF fetch status:", pdfResponse.status);
           if (pdfResponse.ok) {
             const pdfBuffer = await pdfResponse.arrayBuffer();
             const pdfBase64 = Buffer.from(pdfBuffer).toString('base64');
+            console.log("[COI AI] PDF size:", pdfBuffer.byteLength, "bytes, base64 length:", pdfBase64.length);
             
             // Initialize Gemini client via AI Integrations
-            const gemini = new OpenAI({
-              apiKey: process.env.AI_INTEGRATIONS_GEMINI_API_KEY,
-              baseURL: process.env.AI_INTEGRATIONS_GEMINI_BASE_URL,
-            });
+            const apiKey = process.env.AI_INTEGRATIONS_GEMINI_API_KEY;
+            const baseURL = process.env.AI_INTEGRATIONS_GEMINI_BASE_URL;
+            console.log("[COI AI] API configured:", apiKey ? "YES" : "NO", "Base URL:", baseURL ? "YES" : "NO");
             
-            const aiResponse = await gemini.chat.completions.create({
+            if (!apiKey || !baseURL) {
+              console.error("[COI AI] Missing API configuration - skipping extraction");
+            } else {
+              const gemini = new OpenAI({
+                apiKey,
+                baseURL,
+              });
+              
+              console.log("[COI AI] Calling Gemini API...");
+              const aiResponse = await gemini.chat.completions.create({
               model: "gemini-2.5-flash",
               messages: [
                 {
@@ -15097,19 +15109,23 @@ Respond with ONLY a JSON object: {"expiryDate": "YYYY-MM-DD"} or {"expiryDate": 
               max_tokens: 100,
             });
             
-            const responseText = aiResponse.choices[0]?.message?.content?.trim() || "";
-            console.log("Insurance expiry AI extraction:", responseText);
-            
-            const parsed = JSON.parse(responseText);
-            if (parsed.expiryDate) {
-              extractedExpiryDate = new Date(parsed.expiryDate);
-              if (!isNaN(extractedExpiryDate.getTime())) {
-                await storage.updateCompanyDocument(document.id, { insuranceExpiryDate: extractedExpiryDate });
-                console.log(`Extracted insurance expiry date: ${extractedExpiryDate.toISOString()}`);
+              const responseText = aiResponse.choices[0]?.message?.content?.trim() || "";
+              console.log("[COI AI] Gemini response:", responseText);
+              
+              const parsed = JSON.parse(responseText);
+              if (parsed.expiryDate) {
+                extractedExpiryDate = new Date(parsed.expiryDate);
+                if (!isNaN(extractedExpiryDate.getTime())) {
+                  await storage.updateCompanyDocument(document.id, { insuranceExpiryDate: extractedExpiryDate });
+                  console.log(`[COI AI] Extracted insurance expiry date: ${extractedExpiryDate.toISOString()}`);
+                }
+              } else {
+                console.log("[COI AI] No expiry date found in document");
               }
             }
           }
-        } catch (aiError) {
+        } catch (aiError: any) {
+          console.error("[COI AI] Extraction error:", aiError?.message || aiError);
           console.error("AI insurance expiry extraction error (non-fatal):", aiError);
           // Continue - document was still uploaded successfully
         }
