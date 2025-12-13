@@ -835,73 +835,70 @@ function LicenseExpiryWarningBanner({ employees, onReviewClick }: { employees: a
   const uniqueEmployeeCount = new Set(expiringLicenses.map(l => l.employee.id)).size;
   
   return (
-    <div className="mx-4 sm:mx-6 mt-3" data-testid="alert-license-expiry-warning">
-      <div className="flex items-center justify-between gap-3 px-3 py-2 rounded-md bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/50">
-        <div className="flex items-center gap-2 min-w-0">
-          <span className="material-icons text-red-500 dark:text-red-400 text-lg flex-shrink-0">warning</span>
-          <span className="text-red-700 dark:text-red-300 text-sm font-medium truncate">
+    <Popover open={isExpanded} onOpenChange={setIsExpanded}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="relative bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-700 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/50 h-8 px-2 gap-1"
+          data-testid="button-license-expiry-warning"
+        >
+          <span className="material-icons text-base">warning</span>
+          <span className="hidden sm:inline text-xs font-medium">{t('dashboard.licenseExpiry.shortTitle', 'Licenses')}</span>
+          <Badge variant="destructive" className="h-4 min-w-[16px] px-1 text-[10px]">
+            {uniqueEmployeeCount}
+          </Badge>
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80 p-0" align="end">
+        <div className="p-3 border-b bg-red-50 dark:bg-red-950/40">
+          <h4 className="font-semibold text-red-700 dark:text-red-300 text-sm flex items-center gap-2">
+            <span className="material-icons text-base">warning</span>
             {t('dashboard.licenseExpiry.title', 'License Expiration Warning')}
-          </span>
-          <span className="text-red-600 dark:text-red-400 text-xs hidden sm:inline">
-            ({uniqueEmployeeCount} {t('dashboard.licenseExpiry.employeeCount', 'employee(s)')})
-          </span>
+          </h4>
+          <p className="text-red-600 dark:text-red-400 text-xs mt-1">
+            {t('dashboard.licenseExpiry.description', '{{count}} employee(s) have licenses expiring within 30 days', { count: uniqueEmployeeCount })}
+          </p>
         </div>
-        
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/50 h-7 px-2"
-            data-testid="button-toggle-expiry-details"
-          >
-            <span className="material-icons text-sm">
-              {isExpanded ? 'expand_less' : 'expand_more'}
-            </span>
-            <span className="text-xs ml-1">{isExpanded ? t('dashboard.licenseExpiry.hideDetails', 'Hide') : t('dashboard.licenseExpiry.showDetails', 'Details')}</span>
-          </Button>
-        </div>
-      </div>
-      
-      {/* Expandable details */}
-      {isExpanded && (
-        <div className="mt-2 mx-1 space-y-2 p-3 rounded-md bg-red-50/50 dark:bg-red-950/20 border border-red-200/50 dark:border-red-800/30">
-          {expiringLicenses.map((item, index) => (
-            <div 
-              key={`${item.employee.id}-${item.licenseType}-${index}`}
-              className="flex items-center justify-between bg-white dark:bg-black/20 rounded-md p-2 text-sm border border-red-100 dark:border-red-900/30"
-              data-testid={`expiry-item-${item.employee.id}-${index}`}
-            >
-              <div className="flex items-center gap-2">
-                <span className="font-medium text-foreground">{item.employee.name}</span>
-                <Badge variant="secondary" className="text-xs px-1.5 py-0">
-                  {item.licenseType}
+        <ScrollArea className="max-h-[250px]">
+          <div className="p-2 space-y-1">
+            {expiringLicenses.map((item, index) => (
+              <div 
+                key={`${item.employee.id}-${item.licenseType}-${index}`}
+                className="flex items-center justify-between rounded-md p-2 text-sm hover:bg-muted/50"
+                data-testid={`expiry-item-${item.employee.id}-${index}`}
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-foreground truncate">{item.employee.name}</div>
+                  <div className="text-xs text-muted-foreground">{item.licenseType}</div>
+                </div>
+                <Badge variant="destructive" className="text-[10px] ml-2 flex-shrink-0">
+                  {item.daysRemaining === 0 
+                    ? t('dashboard.licenseExpiry.expiresToday', 'Today')
+                    : item.daysRemaining === 1
+                      ? t('dashboard.licenseExpiry.expiresTomorrow', '1 day')
+                      : t('dashboard.licenseExpiry.expiresInDays', '{{days}} days', { days: item.daysRemaining })}
                 </Badge>
               </div>
-              <Badge variant="destructive" className="text-xs">
-                {item.daysRemaining === 0 
-                  ? t('dashboard.licenseExpiry.expiresToday', 'Expires today')
-                  : item.daysRemaining === 1
-                    ? t('dashboard.licenseExpiry.expiresTomorrow', 'Tomorrow')
-                    : t('dashboard.licenseExpiry.expiresInDays', '{{days}} days', { days: item.daysRemaining })}
-              </Badge>
-            </div>
-          ))}
-          <div className="pt-2 flex justify-end">
-            <Button
-              onClick={onReviewClick}
-              size="sm"
-              variant="outline"
-              className="border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/50 h-7"
-              data-testid="button-review-licenses"
-            >
-              <span className="material-icons text-sm mr-1">people</span>
-              {t('dashboard.licenseExpiry.reviewLicenses', 'Go to Employees')}
-            </Button>
+            ))}
           </div>
+        </ScrollArea>
+        <div className="p-2 border-t">
+          <Button
+            onClick={() => {
+              setIsExpanded(false);
+              onReviewClick();
+            }}
+            size="sm"
+            className="w-full bg-red-600 hover:bg-red-700 text-white h-8"
+            data-testid="button-review-licenses"
+          >
+            <span className="material-icons text-sm mr-1">people</span>
+            {t('dashboard.licenseExpiry.reviewLicenses', 'Review Employees')}
+          </Button>
         </div>
-      )}
-    </div>
+      </PopoverContent>
+    </Popover>
   );
 }
 
@@ -3348,6 +3345,10 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
+            {/* License Expiry Warning - Inline in header */}
+            {currentUser && (currentUser.role === 'company' || canManageEmployees(currentUser)) && employees.length > 0 && (
+              <LicenseExpiryWarningBanner employees={employees} onReviewClick={() => handleTabChange("employees")} />
+            )}
             {/* Install PWA Button */}
             <InstallPWAButton />
             {/* My Account Button */}
@@ -3407,10 +3408,6 @@ export default function Dashboard() {
         </Alert>
       )}
 
-      {/* License Expiry Warning Banner - Company owners and managers only */}
-      {currentUser && (currentUser.role === 'company' || canManageEmployees(currentUser)) && employees.length > 0 && (
-        <LicenseExpiryWarningBanner employees={employees} onReviewClick={() => handleTabChange("employees")} />
-      )}
 
       <div className="p-6 sm:p-8 max-w-7xl mx-auto">
         {/* Navigation Grid - Permission-filtered dashboard cards */}
