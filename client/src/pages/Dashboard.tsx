@@ -6384,6 +6384,44 @@ export default function Dashboard() {
                         return null;
                       })() : null;
 
+                      // Check SPRAT license expiration status
+                      const spratStatus = employee.spratExpirationDate ? (() => {
+                        const expirationDate = parseLocalDate(employee.spratExpirationDate);
+                        if (!expirationDate) return null;
+                        
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        const thirtyDaysFromNow = new Date();
+                        thirtyDaysFromNow.setHours(0, 0, 0, 0);
+                        thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+                        
+                        if (expirationDate < today) {
+                          return 'expired';
+                        } else if (expirationDate <= thirtyDaysFromNow) {
+                          return 'expiring-soon';
+                        }
+                        return null;
+                      })() : null;
+
+                      // Check Driver's License expiration status
+                      const driversLicenseStatus = employee.driversLicenseExpiry ? (() => {
+                        const expirationDate = parseLocalDate(employee.driversLicenseExpiry);
+                        if (!expirationDate) return null;
+                        
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        const thirtyDaysFromNow = new Date();
+                        thirtyDaysFromNow.setHours(0, 0, 0, 0);
+                        thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+                        
+                        if (expirationDate < today) {
+                          return 'expired';
+                        } else if (expirationDate <= thirtyDaysFromNow) {
+                          return 'expiring-soon';
+                        }
+                        return null;
+                      })() : null;
+
                       return (
                       <Card 
                         key={employee.id} 
@@ -6415,13 +6453,37 @@ export default function Dashboard() {
                                   {irataStatus === 'expired' && (
                                     <Badge variant="destructive" className="text-xs flex items-center gap-1" data-testid={`badge-irata-expired-${employee.id}`}>
                                       <span className="material-icons text-xs">error</span>
-                                      {t('dashboard.employees.irataExpired', 'irata Expired')}
+                                      {t('dashboard.employees.irataExpired', 'IRATA Expired')}
                                     </Badge>
                                   )}
                                   {irataStatus === 'expiring-soon' && (
                                     <Badge variant="outline" className="text-xs flex items-center gap-1 bg-yellow-500/10 border-yellow-500 text-yellow-700 dark:text-yellow-400" data-testid={`badge-irata-warning-${employee.id}`}>
                                       <span className="material-icons text-xs">warning</span>
-                                      {t('dashboard.employees.irataExpiringSoon', 'irata Expiring Soon')}
+                                      {t('dashboard.employees.irataExpiringSoon', 'IRATA Expiring Soon')}
+                                    </Badge>
+                                  )}
+                                  {spratStatus === 'expired' && (
+                                    <Badge variant="destructive" className="text-xs flex items-center gap-1" data-testid={`badge-sprat-expired-${employee.id}`}>
+                                      <span className="material-icons text-xs">error</span>
+                                      {t('dashboard.employees.spratExpired', 'SPRAT Expired')}
+                                    </Badge>
+                                  )}
+                                  {spratStatus === 'expiring-soon' && (
+                                    <Badge variant="outline" className="text-xs flex items-center gap-1 bg-yellow-500/10 border-yellow-500 text-yellow-700 dark:text-yellow-400" data-testid={`badge-sprat-warning-${employee.id}`}>
+                                      <span className="material-icons text-xs">warning</span>
+                                      {t('dashboard.employees.spratExpiringSoon', 'SPRAT Expiring Soon')}
+                                    </Badge>
+                                  )}
+                                  {driversLicenseStatus === 'expired' && (
+                                    <Badge variant="destructive" className="text-xs flex items-center gap-1" data-testid={`badge-license-expired-${employee.id}`}>
+                                      <span className="material-icons text-xs">error</span>
+                                      {t('dashboard.employees.licenseExpired', "Driver's License Expired")}
+                                    </Badge>
+                                  )}
+                                  {driversLicenseStatus === 'expiring-soon' && (
+                                    <Badge variant="outline" className="text-xs flex items-center gap-1 bg-yellow-500/10 border-yellow-500 text-yellow-700 dark:text-yellow-400" data-testid={`badge-license-warning-${employee.id}`}>
+                                      <span className="material-icons text-xs">warning</span>
+                                      {t('dashboard.employees.licenseExpiringSoon', "Driver's License Expiring Soon")}
                                     </Badge>
                                   )}
                                 </div>
