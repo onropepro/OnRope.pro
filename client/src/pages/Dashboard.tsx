@@ -6482,7 +6482,7 @@ export default function Dashboard() {
                                     </Badge>
                                   )}
                                   {irataStatus === 'expiring-soon' && (
-                                    <Badge variant="outline" className="text-xs flex items-center gap-1 bg-yellow-500/10 border-yellow-500 text-yellow-700 dark:text-yellow-400" data-testid={`badge-irata-warning-${employee.id}`}>
+                                    <Badge variant="outline" className="text-xs flex items-center gap-1 bg-red-500/10 border-red-500 text-red-700 dark:text-red-400" data-testid={`badge-irata-warning-${employee.id}`}>
                                       <span className="material-icons text-xs">warning</span>
                                       {t('dashboard.employees.irataExpiringSoon', 'IRATA Expiring Soon')}
                                     </Badge>
@@ -6494,7 +6494,7 @@ export default function Dashboard() {
                                     </Badge>
                                   )}
                                   {spratStatus === 'expiring-soon' && (
-                                    <Badge variant="outline" className="text-xs flex items-center gap-1 bg-yellow-500/10 border-yellow-500 text-yellow-700 dark:text-yellow-400" data-testid={`badge-sprat-warning-${employee.id}`}>
+                                    <Badge variant="outline" className="text-xs flex items-center gap-1 bg-red-500/10 border-red-500 text-red-700 dark:text-red-400" data-testid={`badge-sprat-warning-${employee.id}`}>
                                       <span className="material-icons text-xs">warning</span>
                                       {t('dashboard.employees.spratExpiringSoon', 'SPRAT Expiring Soon')}
                                     </Badge>
@@ -6506,7 +6506,7 @@ export default function Dashboard() {
                                     </Badge>
                                   )}
                                   {driversLicenseStatus === 'expiring-soon' && (
-                                    <Badge variant="outline" className="text-xs flex items-center gap-1 bg-yellow-500/10 border-yellow-500 text-yellow-700 dark:text-yellow-400" data-testid={`badge-license-warning-${employee.id}`}>
+                                    <Badge variant="outline" className="text-xs flex items-center gap-1 bg-red-500/10 border-red-500 text-red-700 dark:text-red-400" data-testid={`badge-license-warning-${employee.id}`}>
                                       <span className="material-icons text-xs">warning</span>
                                       {t('dashboard.employees.licenseExpiringSoon', "Driver's License Expiring Soon")}
                                     </Badge>
