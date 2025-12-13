@@ -117,9 +117,11 @@ For each document:
 3. Company dashboard updates to show new signature
 
 ### Completion Criteria
-- ALL documents for the specific company must be signed
+- **ALL documents for the specific company MUST be signed before granting access to company work portal**
+- Technician cannot bypass this step - they must complete all signatures
 - Technician can have incomplete onboarding for one company while complete for another
 - Store completion status per company-technician connection
+- If tech tries to access company portal without completing onboarding, redirect back to onboarding page
 
 ---
 
