@@ -255,7 +255,7 @@ export function CSRBadge({ user }: CSRBadgeProps) {
                       <span>Documentation</span>
                     </div>
                     <span className={`font-semibold ${getRatingColor(breakdown.documentationRating)}`}>
-                      {breakdown.documentationRating}%
+                      {breakdown.documentationRating} {breakdown.documentationRating === 1 ? 'point' : 'points'}
                     </span>
                   </div>
                   <ColoredProgress value={breakdown.documentationRating} rating={breakdown.documentationRating} />
@@ -275,7 +275,7 @@ export function CSRBadge({ user }: CSRBadgeProps) {
                       <span>Toolbox Meetings</span>
                     </div>
                     <span className={`font-semibold ${getRatingColor(breakdown.toolboxMeetingRating)}`}>
-                      {breakdown.toolboxMeetingRating}%
+                      {breakdown.toolboxMeetingRating} {breakdown.toolboxMeetingRating === 1 ? 'point' : 'points'}
                     </span>
                   </div>
                   <ColoredProgress value={breakdown.toolboxMeetingRating} rating={breakdown.toolboxMeetingRating} />
@@ -291,7 +291,7 @@ export function CSRBadge({ user }: CSRBadgeProps) {
                       <span>Harness Inspections</span>
                     </div>
                     <span className={`font-semibold ${getRatingColor(breakdown.harnessInspectionRating)}`}>
-                      {breakdown.harnessInspectionRating}%
+                      {breakdown.harnessInspectionRating} {breakdown.harnessInspectionRating === 1 ? 'point' : 'points'}
                     </span>
                   </div>
                   <ColoredProgress value={breakdown.harnessInspectionRating} rating={breakdown.harnessInspectionRating} />
@@ -307,7 +307,7 @@ export function CSRBadge({ user }: CSRBadgeProps) {
                       <span>Document Reviews</span>
                     </div>
                     <span className={`font-semibold ${getRatingColor(breakdown.documentReviewRating)}`}>
-                      {breakdown.documentReviewRating}%
+                      {breakdown.documentReviewRating} {breakdown.documentReviewRating === 1 ? 'point' : 'points'}
                     </span>
                   </div>
                   <ColoredProgress value={breakdown.documentReviewRating} rating={breakdown.documentReviewRating} />

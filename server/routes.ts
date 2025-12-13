@@ -13306,11 +13306,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const response = {
         overallCSR,
         breakdown: {
-          documentationRating,
-          toolboxMeetingRating,
-          harnessInspectionRating,
-          documentReviewRating,
-          projectDocumentationRating
+          documentationRating: 0,
+          toolboxMeetingRating: 0,
+          harnessInspectionRating: 0,
+          documentReviewRating: 0,
+          projectDocumentationRating: 0
         },
         details: {
           hasHealthSafety,
@@ -13667,10 +13667,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         overallCSR,
         breakdown: {
-          documentationRating,
-          toolboxMeetingRating,
-          harnessInspectionRating,
-          documentReviewRating
+          documentationRating: 0,
+          toolboxMeetingRating: 0,
+          harnessInspectionRating: 0,
+          documentReviewRating: 0
         }
       });
     } catch (error) {
