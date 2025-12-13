@@ -315,25 +315,29 @@ export default function ProjectManagementLanding() {
             <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
               <CardContent className="p-5 space-y-2">
                 <h4 className="font-semibold">See all your projects without leaving your desk.</h4>
-                <p className="text-base text-muted-foreground">The dashboard shows every active job with completion percentage, days remaining, and assigned crew. Filter by status, building, or technician. Updates automatically as work sessions get logged. No more driving site to site taking notes of where crews are compared to yesterday.</p>
+                <p className="text-base text-muted-foreground">The dashboard shows every active job with completion percentage, days remaining, and assigned crew. Filter by status, building, or technician.</p>
+                <p className="text-base text-muted-foreground">Updates automatically as work sessions get logged. No more driving site to site taking notes of where crews are compared to yesterday.</p>
               </CardContent>
             </Card>
             <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
               <CardContent className="p-5 space-y-2">
                 <h4 className="font-semibold">Know who's performing and who's coasting.</h4>
-                <p className="text-base text-muted-foreground">Per-employee performance tracking shows drops completed per session, target achievement rates, and historical trends. You can see that Tommy did five drops every day at this building while another employee only did one. Now you have the data for the conversation you couldn't have before.</p>
+                <p className="text-base text-muted-foreground">Per-employee performance tracking shows drops completed per session, target achievement rates, and historical trends.</p>
+                <p className="text-base text-muted-foreground">You can see that Tommy did five drops every day at this building while another employee only did one. Now you have the data for the conversation you couldn't have before.</p>
               </CardContent>
             </Card>
             <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
               <CardContent className="p-5 space-y-2">
                 <h4 className="font-semibold">Quote future jobs with confidence.</h4>
-                <p className="text-base text-muted-foreground">Historical project data shows how long similar buildings actually took. Search past projects by building type, job type, or date range. "Last time we did a 20-story window wash, it took 14 days with 2 techs averaging 8 drops per day." Stop guessing and overbidding by 50%.</p>
+                <p className="text-base text-muted-foreground">Historical project data shows how long similar buildings actually took. Search past projects by building type, job type, or date range.</p>
+                <p className="text-base text-muted-foreground">"Last time we did a 20-story window wash, it took 14 days with 2 techs averaging 8 drops per day." Stop guessing and overbidding by 50%.</p>
               </CardContent>
             </Card>
             <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
               <CardContent className="p-5 space-y-2">
                 <h4 className="font-semibold">Reduce your psychological load.</h4>
-                <p className="text-base text-muted-foreground">The time you spend looking at projects on one screen, schedule on another, checking if you put Devon somewhere. That mental bandwidth gets freed up. Everything is linked with everything. The system remembers so you don't have to.</p>
+                <p className="text-base text-muted-foreground">The time you spend looking at projects on one screen, schedule on another, checking if you put Devon somewhere. That mental bandwidth gets freed up.</p>
+                <p className="text-base text-muted-foreground">Everything is linked with everything. The system remembers so you don't have to.</p>
               </CardContent>
             </Card>
           </div>
