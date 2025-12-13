@@ -133,15 +133,15 @@ export default function UserAccessLanding() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-blue-600">{count1}</div>
-                  <div className="text-sm text-muted-foreground mt-1">Exposed pay rates</div>
+                  <div className="text-base text-muted-foreground mt-1">Exposed pay rates</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-rose-600">{count2}</div>
-                  <div className="text-sm text-muted-foreground mt-1">Unauthorized edits</div>
+                  <div className="text-base text-muted-foreground mt-1">Unauthorized edits</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-amber-600">{count3}</div>
-                  <div className="text-sm text-muted-foreground mt-1">Access conflicts</div>
+                  <div className="text-base text-muted-foreground mt-1">Access conflicts</div>
                 </div>
                 <div className="text-center">
                   <div 
@@ -150,7 +150,7 @@ export default function UserAccessLanding() {
                   >
                     {controlPercentage}%
                   </div>
-                  <div className="text-sm text-muted-foreground mt-1">Control maintained</div>
+                  <div className="text-base text-muted-foreground mt-1">Control maintained</div>
                 </div>
               </div>
             </CardContent>
@@ -218,7 +218,7 @@ export default function UserAccessLanding() {
                 </div>
                 <CardTitle className="text-xl">Role-Based Permission Architecture</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm text-muted-foreground">
+              <CardContent className="space-y-3 text-base text-muted-foreground">
                 <p className="font-medium text-foreground">Before any employee accesses the system, you define exactly what they see.</p>
                 <p>44+ individual permissions across financial, operational, safety, and inventory categories. Your ops manager creates projects without seeing payroll. Your ground crew logs hours without accessing bids.</p>
                 <p className="font-medium text-foreground mt-4">What gets controlled:</p>
@@ -256,7 +256,7 @@ export default function UserAccessLanding() {
                 </div>
                 <CardTitle className="text-xl">External Stakeholder Portals</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm text-muted-foreground">
+              <CardContent className="space-y-3 text-base text-muted-foreground">
                 <p className="font-medium text-foreground">Three separate portals for three different needs.</p>
                 <p>Residents see their building's progress and submit feedback. Building managers see project details and response metrics. Property managers see portfolio-wide performance. No cross-contamination. No unauthorized access.</p>
                 <p className="font-medium text-foreground mt-4">What each portal provides:</p>
@@ -286,7 +286,7 @@ export default function UserAccessLanding() {
                 </div>
                 <CardTitle className="text-xl">Centralized Feedback System</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm text-muted-foreground">
+              <CardContent className="space-y-3 text-base text-muted-foreground">
                 <p className="font-medium text-foreground">Every resident complaint, compliment, and question flows into one dashboard.</p>
                 <p>No more texts to personal phones. No more emails lost in inboxes. No more sticky notes in the lobby. Timestamped. Photographed. Tracked from open to resolved.</p>
                 <p className="font-medium text-foreground mt-4">What gets tracked:</p>
@@ -496,7 +496,7 @@ export default function UserAccessLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Granular Permission Controls</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-base text-muted-foreground mt-1">
                       44+ individual permissions across financial, operational, safety, and inventory categories. Assign exactly what each person needs. Change permissions anytime as responsibilities shift.
                     </p>
                   </div>
@@ -512,7 +512,7 @@ export default function UserAccessLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Multi-Tenant Data Isolation</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-base text-muted-foreground mt-1">
                       Your company's data exists in a completely separate partition. Every query, every report, every API call filters to your company only. Bank-level protection without an IT department.
                     </p>
                   </div>
@@ -528,7 +528,7 @@ export default function UserAccessLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Building-Level Accounts</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-base text-muted-foreground mt-1">
                       Buildings have accounts. Building managers don't. When managers change, the new person changes the password. Access transfers in 30 seconds. No vendor coordination required.
                     </p>
                   </div>
@@ -544,7 +544,7 @@ export default function UserAccessLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Self-Service Onboarding</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-base text-muted-foreground mt-1">
                       Building codes on elevator notices. Residents scan, register, access. Technicians share codes on-site. Zero admin overhead for external user setup.
                     </p>
                   </div>
@@ -560,7 +560,7 @@ export default function UserAccessLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Response Time Tracking</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-base text-muted-foreground mt-1">
                       Every feedback submission timestamped automatically. Open to acknowledged. Acknowledged to resolved. Average response time calculated. Exportable for strata councils.
                     </p>
                   </div>
@@ -576,7 +576,7 @@ export default function UserAccessLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Complete Audit Trail</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-base text-muted-foreground mt-1">
                       Every permission change logged. Every sensitive action recorded. Timestamps, user IDs, IP addresses. When questions arise, answers exist.
                     </p>
                   </div>
@@ -613,11 +613,11 @@ export default function UserAccessLanding() {
               <AccordionContent className="pb-4 space-y-6">
                 <div className="space-y-3">
                   <p className="font-medium text-foreground">"My supervisor saw everyone's pay rates on day one."</p>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-muted-foreground text-base">
                     You need your ops manager to create projects and check budgets. The moment you grant access, they see what every technician earns. Your Level 1 finds out your Level 3 lead makes $18 more per hour.
                   </p>
                   <div className="bg-emerald-50 dark:bg-emerald-950 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800">
-                    <p className="text-sm text-emerald-800 dark:text-emerald-200">
+                    <p className="text-base text-emerald-800 dark:text-emerald-200">
                       <strong>Solution:</strong> OnRopePro separates operational access from financial visibility. 44 individual permissions. Grant project creation without exposing compensation data.
                     </p>
                   </div>
@@ -627,11 +627,11 @@ export default function UserAccessLanding() {
 
                 <div className="space-y-3">
                   <p className="font-medium text-foreground">"A technician changed his own hourly rate from $32 to $42."</p>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-muted-foreground text-base">
                     He also adjusted last week's drop counts. You discovered it during payroll when the numbers didn't add up.
                   </p>
                   <div className="bg-emerald-50 dark:bg-emerald-950 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800">
-                    <p className="text-sm text-emerald-800 dark:text-emerald-200">
+                    <p className="text-base text-emerald-800 dark:text-emerald-200">
                       <strong>Solution:</strong> Permission controls restrict who can edit what. Technicians log work for assigned projects. Rates stay locked to designated managers.
                     </p>
                   </div>
@@ -641,7 +641,7 @@ export default function UserAccessLanding() {
 
                 <div className="space-y-3">
                   <p className="font-medium text-foreground">"I spend hours setting up accounts and chasing passwords."</p>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-muted-foreground text-base">
                     Create the account. Set permissions. Done. Employee sets their own password. External users register themselves with building codes. Your admin time approaches zero.
                   </p>
                 </div>
@@ -661,11 +661,11 @@ export default function UserAccessLanding() {
               <AccordionContent className="pb-4 space-y-6">
                 <div className="space-y-3">
                   <p className="font-medium text-foreground">"I have to remember 10 different complaints and tell Jeff later."</p>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-muted-foreground text-base">
                     Resident flags an issue on the ground. You're heading back up the rope. By end of day, you've forgotten half of them. Two weeks later: "Did you go back to 1037?"
                   </p>
                   <div className="bg-emerald-50 dark:bg-emerald-950 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800">
-                    <p className="text-sm text-emerald-800 dark:text-emerald-200">
+                    <p className="text-base text-emerald-800 dark:text-emerald-200">
                       <strong>Solution:</strong> Log feedback from your phone in 30 seconds. Photos attached. Automatically routed. Nothing forgotten.
                     </p>
                   </div>
@@ -675,7 +675,7 @@ export default function UserAccessLanding() {
 
                 <div className="space-y-3">
                   <p className="font-medium text-foreground">"I can see way more than I need to and it's overwhelming."</p>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-muted-foreground text-base">
                     Your dashboard shows your projects. Your hours. Your inspections. Not the entire company's financials. Clean interface for the work that matters.
                   </p>
                 </div>
@@ -695,11 +695,11 @@ export default function UserAccessLanding() {
               <AccordionContent className="pb-4 space-y-6">
                 <div className="space-y-3">
                   <p className="font-medium text-foreground">"I'm forwarding emails between residents and vendors all day."</p>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-muted-foreground text-base">
                     Mrs. Chen emails you photos of streaky windows. You forward to the rope access company. Three days pass. Mrs. Chen emails again. You call the vendor. Leave a voicemail. Meanwhile, she's filing strata complaints about your responsiveness.
                   </p>
                   <div className="bg-emerald-50 dark:bg-emerald-950 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800">
-                    <p className="text-sm text-emerald-800 dark:text-emerald-200">
+                    <p className="text-base text-emerald-800 dark:text-emerald-200">
                       <strong>Solution:</strong> Direct resident-to-vendor feedback. You see everything without being in the middle. Average resolution drops from 3-5 days to 24 hours.
                     </p>
                   </div>
@@ -709,11 +709,11 @@ export default function UserAccessLanding() {
 
                 <div className="space-y-3">
                   <p className="font-medium text-foreground">"The previous manager left and I can't access anything."</p>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-muted-foreground text-base">
                     You emailed 12 vendors requesting account changes. Three weeks later, Sarah still has access and you can't log in.
                   </p>
                   <div className="bg-emerald-50 dark:bg-emerald-950 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800">
-                    <p className="text-sm text-emerald-800 dark:text-emerald-200">
+                    <p className="text-base text-emerald-800 dark:text-emerald-200">
                       <strong>Solution:</strong> Change the building password. Instant access. Sarah's locked out. No vendor coordination.
                     </p>
                   </div>
@@ -734,11 +734,11 @@ export default function UserAccessLanding() {
               <AccordionContent className="pb-4 space-y-6">
                 <div className="space-y-3">
                   <p className="font-medium text-foreground">"I manage 40 buildings and building managers turn over constantly."</p>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-muted-foreground text-base">
                     Every 6-12 months, someone leaves. You send emails to every vendor. Chase down account changes. Former managers retain access for weeks.
                   </p>
                   <div className="bg-emerald-50 dark:bg-emerald-950 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800">
-                    <p className="text-sm text-emerald-800 dark:text-emerald-200">
+                    <p className="text-base text-emerald-800 dark:text-emerald-200">
                       <strong>Solution:</strong> Building-level accounts eliminate the problem. Password change transfers access instantly.
                     </p>
                   </div>
@@ -748,11 +748,11 @@ export default function UserAccessLanding() {
 
                 <div className="space-y-3">
                   <p className="font-medium text-foreground">"The strata council asks if our vendors are responsive. I have no data."</p>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-muted-foreground text-base">
                     You remember several complaints were resolved quickly. But you're scrolling through texts from March trying to prove it.
                   </p>
                   <div className="bg-emerald-50 dark:bg-emerald-950 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800">
-                    <p className="text-sm text-emerald-800 dark:text-emerald-200">
+                    <p className="text-base text-emerald-800 dark:text-emerald-200">
                       <strong>Solution:</strong> Pull the report. Average response time: 4.2 hours. Resolution rate: 94%. Data instead of vague assurances.
                     </p>
                   </div>
@@ -773,11 +773,11 @@ export default function UserAccessLanding() {
               <AccordionContent className="pb-4 space-y-6">
                 <div className="space-y-3">
                   <p className="font-medium text-foreground">"I see equipment on the roof. Nobody tells me what's happening."</p>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-muted-foreground text-base">
                     Technicians on the west side Monday. Are they coming to your side? You need to move balcony plants. You call the building manager. They don't know. They call the vendor.
                   </p>
                   <div className="bg-emerald-50 dark:bg-emerald-950 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800">
-                    <p className="text-sm text-emerald-800 dark:text-emerald-200">
+                    <p className="text-base text-emerald-800 dark:text-emerald-200">
                       <strong>Solution:</strong> Check the portal. West 100% complete. East starts Wednesday. Move your plants Tuesday night. No calls.
                     </p>
                   </div>
@@ -787,11 +787,11 @@ export default function UserAccessLanding() {
 
                 <div className="space-y-3">
                   <p className="font-medium text-foreground">"I reported streaky windows three weeks ago. No idea if anyone saw it."</p>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-muted-foreground text-base">
                     Email to building manager. Forward to vendor. Lost in someone's inbox.
                   </p>
                   <div className="bg-emerald-50 dark:bg-emerald-950 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800">
-                    <p className="text-sm text-emerald-800 dark:text-emerald-200">
+                    <p className="text-base text-emerald-800 dark:text-emerald-200">
                       <strong>Solution:</strong> Submit through the portal. Status changes from Open to Acknowledged to Resolved. Photos of corrected work attached. Know exactly where your issue stands.
                     </p>
                   </div>
@@ -907,7 +907,7 @@ export default function UserAccessLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Employee Management</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-base text-muted-foreground mt-1">
                       Permission controls determine who can create employees, assign roles, and modify profiles. Only owners add team members. No unauthorized hiring.
                     </p>
                   </div>
@@ -923,7 +923,7 @@ export default function UserAccessLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Payroll & Time Tracking</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-base text-muted-foreground mt-1">
                       Financial permissions filter what appears in payroll dashboards. Supervisors see hours worked. Technicians see their own time. Owners see full cost visibility.
                     </p>
                   </div>
@@ -939,7 +939,7 @@ export default function UserAccessLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Project Management</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-base text-muted-foreground mt-1">
                       Project permissions control who creates, edits, assigns, and views projects. Owners create and assign. Supervisors manage their projects. Technicians see their work.
                     </p>
                   </div>
@@ -955,7 +955,7 @@ export default function UserAccessLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Safety & Compliance</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-base text-muted-foreground mt-1">
                       Safety permissions determine who submits, reviews, and approves documentation. Clear responsibility chain from technician to safety officer to owner.
                     </p>
                   </div>
@@ -971,7 +971,7 @@ export default function UserAccessLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Feedback Management</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-base text-muted-foreground mt-1">
                       Access controls route feedback appropriately. Residents submit. Building managers track. Your team resolves. Everyone stays in their lane.
                     </p>
                   </div>
@@ -987,7 +987,7 @@ export default function UserAccessLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Analytics & Reporting</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-base text-muted-foreground mt-1">
                       Every report filters to the user's permission level. Dashboards show only authorized data. No accidental exposure.
                     </p>
                   </div>
