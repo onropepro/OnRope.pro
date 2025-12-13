@@ -156,11 +156,13 @@ export function canViewSafetyDocuments(user: User | null | undefined): boolean {
 /**
  * Check if user can view Company Safety Rating (CSR)
  * - Company owners always have access
+ * - Property managers always have access
  * - All other roles need explicit 'view_csr' permission
  */
 export function canViewCSR(user: User | null | undefined): boolean {
   if (!user) return false;
   if (isCompanyOwner(user)) return true;
+  if (user.role === 'property_manager') return true;
   return checkPermission(user, 'view_csr');
 }
 
