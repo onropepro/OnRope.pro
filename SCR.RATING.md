@@ -44,3 +44,15 @@ Formula: Points = (Uploaded Required Documents / Total Required Documents) per p
 Example: 1 out of 3 docs uploaded = 0.33 points
 
 Formula: Points = (Uploaded Documents / 3)
+
+---
+
+## Employee Document Review Points
+
+1 point will be awarded for each employee that has viewed and signed company documents, safe work procedures, and safe work practices.
+
+The calculation is based on the documents actually uploaded by the company, not a fixed number.
+
+Example: If a company has only 2 out of 3 documents uploaded, and an employee views and signs both documents, that employee has signed 100% of available documents = 1 point for that employee.
+
+Formula: Points per employee = (Documents Signed by Employee / Documents Uploaded by Company)
