@@ -508,7 +508,7 @@ export default function DocumentManagementGuide() {
                     </tr>
                     <tr>
                       <td className="py-2">Safe Work Procedures</td>
-                      <td className="py-2"><Badge variant="secondary">No</Badge></td>
+                      <td className="py-2"><Badge className="bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200">Yes</Badge></td>
                       <td className="py-2"><Badge variant="outline">All Employees</Badge></td>
                     </tr>
                     <tr>
