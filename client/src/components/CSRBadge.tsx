@@ -434,9 +434,9 @@ export function CSRBadge({ user }: CSRBadgeProps) {
                         {getCategoryLabel(entry.category)}
                       </Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground mt-2">
+                    <div className="text-sm text-muted-foreground mt-3 whitespace-pre-line bg-muted/30 p-3 rounded-md">
                       {entry.reason}
-                    </p>
+                    </div>
                     <p className="text-xs text-muted-foreground mt-2">
                       {formatDistanceToNow(new Date(entry.createdAt), { addSuffix: true })}
                     </p>
