@@ -169,6 +169,12 @@ const PERMISSION_CATEGORIES = [
     ],
   },
   {
+    nameKey: "dashboard.permissions.categories.documents",
+    permissions: [
+      { id: "view_sensitive_documents", labelKey: "dashboard.permissions.viewSensitiveDocuments" },
+    ],
+  },
+  {
     nameKey: "dashboard.permissions.categories.inventoryGear",
     permissions: [
       { id: "view_inventory", labelKey: "dashboard.permissions.viewInventory" },
