@@ -31,7 +31,10 @@ import {
   Wrench,
   Building2,
   UserCheck,
-  Zap
+  Zap,
+  Link2,
+  MessagesSquare,
+  HelpCircle
 } from "lucide-react";
 
 export default function CSRLanding() {
@@ -698,6 +701,276 @@ export default function CSRLanding() {
               </CardContent>
             </Card>
           </div>
+        </div>
+      </section>
+
+      <Separator className="my-8" />
+
+      {/* Module Integration Section */}
+      <section className="py-16 md:py-20 px-4">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+            Other Modules This Module Communicates With
+          </h2>
+          <p className="text-center text-muted-foreground text-lg mb-12 max-w-3xl mx-auto">
+            The CSR pulls compliance data from across your OnRopePro system, integrating safety behaviors into a unified score.
+          </p>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0">
+                    <ShieldCheck className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Safety & Compliance</h3>
+                    <p className="text-base text-muted-foreground mt-1">
+                      Core source of documentation status. The CSR reads which company documents are uploaded, current, and signed by employees. Safe Work Procedures and Practices feed directly into score calculations.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0">
+                    <Wrench className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Inventory & Inspections</h3>
+                    <p className="text-base text-muted-foreground mt-1">
+                      Daily harness inspection completion rates from the equipment management system contribute to CSR. Inspection records with pass/fail status, inspector ID, and timestamps all factor into scoring.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0">
+                    <MessagesSquare className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Toolbox Meetings</h3>
+                    <p className="text-base text-muted-foreground mt-1">
+                      Project-level toolbox meeting completion feeds the project documents penalty. The system tracks which projects have associated safety meetings and which are missing required documentation.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center shrink-0">
+                    <Briefcase className="w-5 h-5 text-violet-600 dark:text-violet-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Project Management</h3>
+                    <p className="text-base text-muted-foreground mt-1">
+                      Project creation triggers documentation requirements (Anchor Inspection, Rope Access Plan, Toolbox Meeting, FLHA). The CSR tracks completion status across all active and historical projects.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-sky-100 dark:bg-sky-900 flex items-center justify-center shrink-0">
+                    <Users className="w-5 h-5 text-sky-600 dark:text-sky-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Employee Management</h3>
+                    <p className="text-base text-muted-foreground mt-1">
+                      Employee acknowledgment status on safety documents comes from the employee record system. When new employees join or documents are updated, the CSR reflects pending signatures.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
+                    <Building2 className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Building Manager Portal</h3>
+                    <p className="text-base text-muted-foreground mt-1">
+                      Property managers accessing the vendor dashboard see CSR badges pulled from this module. The integration provides appropriate visibility without exposing detailed operational data.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      <Separator className="my-8" />
+
+      {/* How Will This Improve Your Business Section */}
+      <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
+            Stop Hoping You're Safe. Start Knowing.
+          </h2>
+          
+          <Card className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800">
+            <CardContent className="p-6 md:p-8 space-y-4 text-muted-foreground">
+              <p className="text-base">
+                Right now, you're spending hours every month on safety documentation that may or may not be organized, may or may not be complete, and may or may not survive a WorkSafe inspection. Your crew knows the rules because you've told them, but you can't prove they've read and acknowledged specific policies. Property managers choose between you and competitors based on who has the better sales pitch, not who actually runs safer operations.
+              </p>
+              <p className="text-lg font-medium text-foreground">
+                The CSR changes the foundation of how safety works in your business.
+              </p>
+              <p className="text-base">
+                Every harness inspection, every signed document, every toolbox meeting becomes part of a living compliance score that updates automatically. When a tech forgets to do their morning inspection, you see your score dip and address it immediately instead of discovering the gap during an audit six months later. When you add new safety procedures, the system tracks exactly who has and hasn't reviewed them, so you can follow up with specific people instead of broadcasting reminders to everyone.
+              </p>
+              <p className="text-base">
+                Property managers comparing vendors see your 92% rating next to a competitor's 58%. That's not marketing. That's documented evidence of how you actually run your operation.
+              </p>
+              <p className="text-base">
+                When WorkSafe arrives, you pull up a dashboard instead of rummaging through filing cabinets. Everything is timestamped, signed, and exportable to PDF. The regulator leaves satisfied in minutes instead of camping out for days.
+              </p>
+              <p className="text-lg font-medium text-foreground">
+                Your technicians can evaluate employers before accepting jobs. Your competitors can't hide behind promises anymore. Your safety investment finally translates into business results.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      <Separator className="my-8" />
+
+      {/* FAQs Section */}
+      <section id="faqs-section" className="py-16 md:py-20 px-4">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+            Frequently Asked Questions
+          </h2>
+          <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
+            Everything you need to know about the Company Safety Rating.
+          </p>
+
+          <Accordion type="multiple" className="space-y-3">
+            <AccordionItem value="faq-1" className="border rounded-lg px-4">
+              <AccordionTrigger className="hover:no-underline py-4">
+                <span className="text-left font-medium">How is the starting score calculated?</span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4 text-muted-foreground">
+                New companies start at 75%. Upload your Certificate of Insurance, Health & Safety Manual, and Company Policy to reach 100%. From there, penalties are applied based on ongoing compliance gaps.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="faq-2" className="border rounded-lg px-4">
+              <AccordionTrigger className="hover:no-underline py-4">
+                <span className="text-left font-medium">What if I add Safe Work Procedures and my score drops?</span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4 text-muted-foreground">
+                This is intentional. When you add new safety documents, your score temporarily decreases until employees review and sign them. This ensures documents aren't just uploaded and forgotten. Once all employees acknowledge the new procedures, your score returns to full compliance.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="faq-3" className="border rounded-lg px-4">
+              <AccordionTrigger className="hover:no-underline py-4">
+                <span className="text-left font-medium">How do harness inspection penalties work?</span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4 text-muted-foreground">
+                The penalty is calculated as a percentage of missed inspections against total work sessions. If you have 1,000 work sessions and miss 10 inspections, that's a 1% penalty. If you're just starting and have 10 sessions with 5 missed inspections, that's a 50% penalty in this category. Consistent compliance over time builds a resilient score.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="faq-4" className="border rounded-lg px-4">
+              <AccordionTrigger className="hover:no-underline py-4">
+                <span className="text-left font-medium">Can technicians see my CSR before accepting job offers?</span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4 text-muted-foreground">
+                Yes. Technicians evaluating potential employers can see company CSR ratings. This allows them to make informed decisions about safety before committing to a position.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="faq-5" className="border rounded-lg px-4">
+              <AccordionTrigger className="hover:no-underline py-4">
+                <span className="text-left font-medium">What do property managers see?</span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4 text-muted-foreground">
+                Property managers see your overall CSR percentage and a color-coded badge (green, yellow, orange, or red) through their vendor dashboard. They can also see category breakdowns but not your internal operational details.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="faq-6" className="border rounded-lg px-4">
+              <AccordionTrigger className="hover:no-underline py-4">
+                <span className="text-left font-medium">Who cannot see my CSR?</span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4 text-muted-foreground">
+                Building managers and residents. Building managers handle on-site logistics (keys, water, parking) and don't make vendor selection decisions. Residents seeing safety scores would generate unnecessary concerns without appropriate context.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="faq-7" className="border rounded-lg px-4">
+              <AccordionTrigger className="hover:no-underline py-4">
+                <span className="text-left font-medium">What documents are required for each project?</span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4 text-muted-foreground">
+                Four documents: Anchor Inspection (waived for non-rope jobs like parkade pressure washing), Rope Access Plan, Toolbox Meeting, and FLHA. Missing any of these for a project contributes to your project documents penalty.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="faq-8" className="border rounded-lg px-4">
+              <AccordionTrigger className="hover:no-underline py-4">
+                <span className="text-left font-medium">Can my score ever reach 100% again after adding employees or documents?</span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4 text-muted-foreground">
+                Yes. 100% is achievable when all company documents are current, all projects have complete documentation, all work sessions have associated harness inspections, and all employees have signed all required documents. The system is designed so perfect scores are difficult to maintain long-term, reflecting that nobody is 100% safe forever.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="faq-9" className="border rounded-lg px-4">
+              <AccordionTrigger className="hover:no-underline py-4">
+                <span className="text-left font-medium">How quickly does the score update?</span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4 text-muted-foreground">
+                Real-time. When a technician completes a harness inspection, when an employee signs a document, when a toolbox meeting is logged, the score recalculates immediately.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="faq-10" className="border rounded-lg px-4">
+              <AccordionTrigger className="hover:no-underline py-4">
+                <span className="text-left font-medium">What if a new employee joins and hasn't signed anything yet?</span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4 text-muted-foreground">
+                Your score will decrease proportionally until they complete onboarding documentation. This incentivizes prompt completion of new employee safety training and document acknowledgments.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="faq-11" className="border rounded-lg px-4">
+              <AccordionTrigger className="hover:no-underline py-4">
+                <span className="text-left font-medium">Can I export CSR data for insurance or regulatory purposes?</span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4 text-muted-foreground">
+                Yes. Generate PDF reports showing employee signatures with timestamps for all safety documents, harness inspection completion records, and toolbox meeting logs. These exports satisfy insurance auditors, WorkSafe inspectors, and IRATA/SPRAT compliance requirements.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="faq-12" className="border rounded-lg px-4">
+              <AccordionTrigger className="hover:no-underline py-4">
+                <span className="text-left font-medium">Is the CSR visible to competitors?</span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4 text-muted-foreground">
+                No. Only your own company owners, your technicians (when evaluating job offers), and property managers (when viewing their vendor list) can see your score. Competitors cannot access your CSR.
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </div>
       </section>
 
