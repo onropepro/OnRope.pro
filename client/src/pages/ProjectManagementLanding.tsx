@@ -78,8 +78,8 @@ export default function ProjectManagementLanding() {
             </h1>
             
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              Track every building, elevation, and technician from one dashboard.<br />
-              <strong>See exactly where every job stands<br />without a single phone call or site visit.</strong>
+              Track every building, every elevation, every technician from one screen.<br />
+              <strong>Know exactly where every job stands without driving site to site or relying on yesterday's phone call.</strong>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
@@ -123,7 +123,7 @@ export default function ProjectManagementLanding() {
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-violet-600">60-70%</div>
-                  <div className="text-sm text-muted-foreground mt-1">Fewer resident complaints</div>
+                  <div className="text-sm text-muted-foreground mt-1">Fewer status calls from clients</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-amber-600">75%</div>
@@ -143,8 +143,20 @@ export default function ProjectManagementLanding() {
               <CardTitle className="text-xl md:text-2xl text-amber-900 dark:text-amber-100">The Reality</CardTitle>
             </CardHeader>
             <CardContent className="text-amber-900 dark:text-amber-100 space-y-4">
-              <p>You're juggling window washing at Tower A, caulking at Building B, and anchor inspections at Complex C. A client calls asking for a status update. You're guessing.</p>
-              <p>You think Tommy's finishing the north elevation today. Maybe. Sarah might have capacity next week. Probably. Your brain is your business. And it's exhausted.</p>
+              <p>You're juggling window washing at Tower A, caulking at Building B, anchor inspections at Complex C. A client calls asking for a status update.</p>
+              <p className="font-medium">You're guessing.</p>
+              <p>You think Tommy's finishing the north elevation today. Maybe. Sarah might have capacity next week. Probably. That 15-story quote you just sent? You pulled the timeline from memory because you couldn't find your notes from the similar job six months ago.</p>
+              <p>Many times you've had to go from project to project and look at the guys on the rope and take notes of where they're at compared to where they were yesterday. Ten to fifteen hours a week just figuring out what's happening.</p>
+              <p>Then there's the performance problem nobody talks about. One guy on the cell phone half the day, does one drop. The other guy working his ass off. They were there the same amount of time. You know something's wrong. Without hard data, you can't have the conversation.</p>
+              <p className="font-medium">Your brain is your business. And it's exhausted.</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950 rounded-2xl shadow-md">
+            <CardContent className="pt-6 text-emerald-900 dark:text-emerald-100 space-y-4">
+              <p>OnRopePro changes the equation. Every project visible from one screen. Progress updates automatically as work sessions get logged. Per-employee performance tracked with objective data. The information is at your fingertips instead of scattered across your memory, your whiteboard, and six different text threads.</p>
+              <p>Everything is linked with everything. Create a project and it fills the schedule. Employees log work and it fills payroll. If you do one thing, it does something else for you somewhere else.</p>
+              <p className="font-medium">The system carries the cognitive load. Your mental bandwidth opens up for actually running the business.</p>
             </CardContent>
           </Card>
         </div>
