@@ -174,7 +174,7 @@ export default function EmployeeManagementGuide() {
                   <div>
                     <h3 className="text-xl md:text-2xl font-semibold">Role Assignment</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Select the employee's role: Rope Access Technician, Supervisor, or Operations Manager. This determines their system permissions and dashboard access.
+                      Select from 14 available roles across management and field positions. Roles provide baseline access, with granular permissions configurable per employee.
                     </p>
                   </div>
                 </div>
@@ -357,41 +357,132 @@ export default function EmployeeManagementGuide() {
             Role Hierarchy & Permissions
           </h2>
 
-          <Card>
-            <CardContent className="pt-6">
-              <div className="space-y-4">
-                <div className="flex items-start gap-4 p-3 rounded-lg bg-muted/50">
-                  <Badge className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 shrink-0">Company Owner</Badge>
-                  <div className="text-sm">
-                    <p className="font-medium">Full system access</p>
-                    <p className="text-muted-foreground">All features including billing, employee management, financial data, and company settings.</p>
-                  </div>
-                </div>
+          <p className="text-muted-foreground text-base">
+            The system supports 14 employee roles organized into Management and Worker categories. Each role provides baseline access, with granular permissions configurable per individual.
+          </p>
 
-                <div className="flex items-start gap-4 p-3 rounded-lg bg-muted/50">
+          <div className="grid md:grid-cols-2 gap-4">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
+                  <Users className="w-4 h-4 text-purple-600" />
+                  Management Roles
+                </CardTitle>
+                <CardDescription>8 roles with elevated system access</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div className="flex items-start gap-3 p-2 rounded-lg bg-muted/50">
+                  <Badge className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 shrink-0">Company</Badge>
+                  <p className="text-sm text-muted-foreground">Full system access including billing</p>
+                </div>
+                <div className="flex items-start gap-3 p-2 rounded-lg bg-muted/50">
+                  <Badge className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 shrink-0">Owner/CEO</Badge>
+                  <p className="text-sm text-muted-foreground">Executive-level access</p>
+                </div>
+                <div className="flex items-start gap-3 p-2 rounded-lg bg-muted/50">
                   <Badge className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 shrink-0">Operations Manager</Badge>
-                  <div className="text-sm">
-                    <p className="font-medium">Operational control</p>
-                    <p className="text-muted-foreground">Employee management, scheduling, projects, payroll, and most operational features except billing.</p>
-                  </div>
+                  <p className="text-sm text-muted-foreground">Day-to-day operations control</p>
                 </div>
-
-                <div className="flex items-start gap-4 p-3 rounded-lg bg-muted/50">
-                  <Badge className="bg-action-100 text-action-800 dark:bg-action-900 dark:text-action-200 shrink-0">Supervisor</Badge>
-                  <div className="text-sm">
-                    <p className="font-medium">Team oversight</p>
-                    <p className="text-muted-foreground">Project management, scheduling, safety forms, and team coordination. Limited employee management.</p>
-                  </div>
+                <div className="flex items-start gap-3 p-2 rounded-lg bg-muted/50">
+                  <Badge className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200 shrink-0">Human Resources</Badge>
+                  <p className="text-sm text-muted-foreground">Employee management focus</p>
                 </div>
+                <div className="flex items-start gap-3 p-2 rounded-lg bg-muted/50">
+                  <Badge className="bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200 shrink-0">Accounting</Badge>
+                  <p className="text-sm text-muted-foreground">Financial data access</p>
+                </div>
+                <div className="flex items-start gap-3 p-2 rounded-lg bg-muted/50">
+                  <Badge className="bg-action-100 text-action-800 dark:bg-action-900 dark:text-action-200 shrink-0">General Supervisor</Badge>
+                  <p className="text-sm text-muted-foreground">Multi-team oversight</p>
+                </div>
+                <div className="flex items-start gap-3 p-2 rounded-lg bg-muted/50">
+                  <Badge className="bg-action-100 text-action-800 dark:bg-action-900 dark:text-action-200 shrink-0">Rope Access Supervisor</Badge>
+                  <p className="text-sm text-muted-foreground">Rope team oversight</p>
+                </div>
+                <div className="flex items-start gap-3 p-2 rounded-lg bg-muted/50">
+                  <Badge className="bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-200 shrink-0">Account Manager</Badge>
+                  <p className="text-sm text-muted-foreground">Client relationship focus</p>
+                </div>
+              </CardContent>
+            </Card>
 
-                <div className="flex items-start gap-4 p-3 rounded-lg bg-muted/50">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
+                  <UserCheck className="w-4 h-4 text-green-600" />
+                  Worker Roles
+                </CardTitle>
+                <CardDescription>6 roles for field operations</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div className="flex items-start gap-3 p-2 rounded-lg bg-muted/50">
                   <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 shrink-0">Rope Access Tech</Badge>
-                  <div className="text-sm">
-                    <p className="font-medium">Field operations</p>
-                    <p className="text-muted-foreground">Clock in/out, safety forms, personal profile, irata hours logging, and assigned project access.</p>
-                  </div>
+                  <p className="text-sm text-muted-foreground">Primary field technician role</p>
+                </div>
+                <div className="flex items-start gap-3 p-2 rounded-lg bg-muted/50">
+                  <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 shrink-0">Supervisor</Badge>
+                  <p className="text-sm text-muted-foreground">Generic supervisor role</p>
+                </div>
+                <div className="flex items-start gap-3 p-2 rounded-lg bg-muted/50">
+                  <Badge className="bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-200 shrink-0">Manager</Badge>
+                  <p className="text-sm text-muted-foreground">Site or project manager</p>
+                </div>
+                <div className="flex items-start gap-3 p-2 rounded-lg bg-muted/50">
+                  <Badge className="bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-200 shrink-0">Ground Crew</Badge>
+                  <p className="text-sm text-muted-foreground">Ground-level support</p>
+                </div>
+                <div className="flex items-start gap-3 p-2 rounded-lg bg-muted/50">
+                  <Badge className="bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-200 shrink-0">Ground Crew Supervisor</Badge>
+                  <p className="text-sm text-muted-foreground">Ground team lead</p>
+                </div>
+                <div className="flex items-start gap-3 p-2 rounded-lg bg-muted/50">
+                  <Badge className="bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-200 shrink-0">Labourer</Badge>
+                  <p className="text-sm text-muted-foreground">General labor support</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card className="border-2 border-action-500 bg-action-50 dark:bg-action-950">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-xl md:text-2xl flex items-center gap-2 text-action-900 dark:text-action-100">
+                <Key className="w-5 h-5" />
+                Granular Permission System
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-action-900 dark:text-action-100 space-y-3">
+              <p className="text-base">
+                Beyond base role access, individual permissions can be assigned to each employee. This allows fine-tuned control over who can access specific features.
+              </p>
+              <div className="grid sm:grid-cols-2 gap-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>View Financial Data</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Manage Employees</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>View Performance</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Manage Inventory</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>View Safety Documents</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Access Payroll</span>
                 </div>
               </div>
+              <p className="text-sm text-action-800 dark:text-action-200">
+                Company owners automatically have all permissions. Other roles can be granted specific permissions individually.
+              </p>
             </CardContent>
           </Card>
         </section>
