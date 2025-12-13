@@ -275,6 +275,22 @@ export default function EmployeeManagementGuide() {
                   <Phone className="w-4 h-4 text-muted-foreground" />
                   <span>Phone number</span>
                 </div>
+                <div className="flex items-center gap-2">
+                  <UserCheck className="w-4 h-4 text-muted-foreground" />
+                  <span>Profile photo</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-muted-foreground" />
+                  <span>Birthday</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-muted-foreground" />
+                  <span>Start date</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                  <span>Home address (street, city, province, country, postal code)</span>
+                </div>
               </CardContent>
             </Card>
 
@@ -288,15 +304,35 @@ export default function EmployeeManagementGuide() {
               <CardContent className="text-base space-y-2">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <span>irata Level (1, 2, or 3)</span>
+                  <span>IRATA Level (1, 2, or 3)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Key className="w-4 h-4 text-muted-foreground" />
+                  <span>IRATA license number</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-muted-foreground" />
-                  <span>irata expiration date</span>
+                  <span>IRATA expiration date</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Award className="w-4 h-4 text-muted-foreground" />
+                  <span>SPRAT certification (alternative to IRATA)</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Car className="w-4 h-4 text-muted-foreground" />
-                  <span>Driver's license details</span>
+                  <span>Driver's license (number, province, expiration)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Heart className="w-4 h-4 text-muted-foreground" />
+                  <span>First Aid certification (type, expiration)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-muted-foreground" />
+                  <span>Years of rope access experience</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Settings className="w-4 h-4 text-muted-foreground" />
+                  <span>Rope access specialties</span>
                 </div>
               </CardContent>
             </Card>
@@ -338,12 +374,53 @@ export default function EmployeeManagementGuide() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-muted-foreground" />
-                  <span>Compensation type toggle</span>
+                  <span>Hourly vs Salary toggle</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Settings className="w-4 h-4 text-muted-foreground" />
-                  <span>Hourly vs Piece Work</span>
+                  <DollarSign className="w-4 h-4 text-muted-foreground" />
+                  <span>Annual salary amount</span>
                 </div>
+              </CardContent>
+            </Card>
+
+            <Card className="md:col-span-2">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
+                  <Lock className="w-4 h-4 text-amber-600" />
+                  Sensitive Information
+                  <Badge variant="outline" className="ml-2 text-xs">Encrypted</Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-base">
+                <div className="grid sm:grid-cols-2 gap-2">
+                  <div className="flex items-center gap-2">
+                    <Lock className="w-4 h-4 text-amber-500" />
+                    <span>Social Insurance Number</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Lock className="w-4 h-4 text-amber-500" />
+                    <span>Bank transit number</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Lock className="w-4 h-4 text-amber-500" />
+                    <span>Bank institution number</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Lock className="w-4 h-4 text-amber-500" />
+                    <span>Bank account number</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Lock className="w-4 h-4 text-amber-500" />
+                    <span>Void cheque documents</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Lock className="w-4 h-4 text-amber-500" />
+                    <span>Special medical conditions</span>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground mt-3">
+                  All sensitive data is encrypted at rest using AES-256-GCM encryption.
+                </p>
               </CardContent>
             </Card>
           </div>
