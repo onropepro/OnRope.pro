@@ -13445,55 +13445,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const delta = overallCSR - previousScore;
         
         if (!lastHistory) {
-          // Create detailed initial entry with full breakdown
+          // Create detailed initial entry with point-based breakdown
           const breakdownDetails: string[] = [];
           
-          // Documentation breakdown
-          if (hasHealthSafety && hasCompanyPolicy) {
-            breakdownDetails.push('Documentation: 100% (Health & Safety Manual uploaded, Company Policy uploaded)');
-          } else if (hasHealthSafety) {
-            breakdownDetails.push(`Documentation: ${documentationRating}% (Health & Safety Manual uploaded, Company Policy missing - ${documentationPenalty}% penalty)`);
-          } else if (hasCompanyPolicy) {
-            breakdownDetails.push(`Documentation: ${documentationRating}% (Health & Safety Manual missing, Company Policy uploaded - ${documentationPenalty}% penalty)`);
+          // Company Documentation Points (max 1 pt)
+          const companyDocsCount = (hasHealthSafety ? 1 : 0) + (hasCompanyPolicy ? 1 : 0) + (hasInsurance ? 1 : 0);
+          breakdownDetails.push(`Company Documents: ${companyDocumentationPoints.toFixed(2)} / 1 pts (${companyDocsCount}/3 uploaded)`);
+          
+          // Harness Inspection Points (max = number of active projects)
+          if (projects.filter((p: any) => p.status !== 'deleted').length > 0) {
+            breakdownDetails.push(`Harness Inspections: ${harnessInspectionPoints.toFixed(2)} / ${projects.filter((p: any) => p.status !== 'deleted').length} pts`);
           } else {
-            breakdownDetails.push(`Documentation: ${documentationRating}% (Health & Safety Manual missing, Company Policy missing - ${documentationPenalty}% penalty)`);
+            breakdownDetails.push(`Harness Inspections: 0 / 0 pts (No active projects)`);
           }
           
-          // Toolbox meetings breakdown
-          if (toolboxTotalDays > 0) {
-            breakdownDetails.push(`Toolbox Meetings: ${toolboxMeetingRating}% (${toolboxDaysWithMeeting}/${toolboxTotalDays} work days covered in last 30 days${toolboxPenalty > 0 ? ` - ${toolboxPenalty}% penalty` : ''})`);
-          } else {
-            breakdownDetails.push('Toolbox Meetings: 100% (No work days recorded yet)');
-          }
+          // Employee Document Review Points (max = number of employees + owner)
+          breakdownDetails.push(`Document Reviews: ${employeeDocReviewPoints.toFixed(2)} / ${totalEmployees} pts (${signedReviews}/${totalRequiredSignatures} signatures)`);
           
-          // Harness inspections breakdown
-          if (harnessRequiredInspections > 0) {
-            breakdownDetails.push(`Harness Inspections: ${harnessInspectionRating}% (${harnessCompletedInspections}/${harnessRequiredInspections} required inspections completed${harnessPenalty > 0 ? ` - ${harnessPenalty}% penalty` : ''})`);
-          } else {
-            breakdownDetails.push('Harness Inspections: 100% (No inspections required yet)');
-          }
+          // Project Documentation Points (max = number of active projects)
+          breakdownDetails.push(`Project Docs: ${projectDocumentationPoints.toFixed(2)} / ${activeProjectCount} pts`);
           
-          // Document reviews breakdown
-          if (totalRequiredSignatures > 0) {
-            breakdownDetails.push(`Document Reviews: ${documentReviewRating}% (${signedReviews}/${totalRequiredSignatures} signatures - ${totalEmployees} staff × ${totalRequiredDocs} docs${documentReviewPenalty > 0 ? ` - ${documentReviewPenalty}% penalty` : ''})`);
-          } else {
-            breakdownDetails.push('Document Reviews: 100% (No required documents uploaded yet)');
-          }
-          
-          // Project documentation breakdown
-          if (activeProjectCount > 0) {
-            const projectDetails: string[] = [];
-            if (elevationProjectCount > 0) {
-              projectDetails.push(`${projectsWithAnchorInspection}/${elevationProjectCount} anchor inspections`);
-              projectDetails.push(`${projectsWithRopeAccessPlan}/${elevationProjectCount} rope access plans`);
-            }
-            projectDetails.push(`${projectsWithFLHA}/${activeProjectCount} FLHAs`);
-            breakdownDetails.push(`Project Documentation: ${projectDocumentationRating}% (${projectDetails.join(', ')}${projectDocumentationPenalty > 0 ? ` - ${projectDocumentationPenalty}% penalty` : ''})`);
-          } else {
-            breakdownDetails.push('Project Documentation: 100% (No active projects)');
-          }
-          
-          const fullReason = `Initial safety rating recorded.\n\nBreakdown:\n${breakdownDetails.join('\n')}\n\nTotal Points: ${overallCSR}`;
+          const fullReason = `Initial safety rating recorded.\n\nBreakdown:\n${breakdownDetails.join('\n')}\n\nTotal Points: ${overallCSR.toFixed(2)}`;
           
           await storage.createCsrRatingHistory({
             companyId,
@@ -13504,38 +13476,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
             reason: fullReason
           });
         } else {
-          // Record changes with detailed reasons
+          // Record changes with detailed reasons using point-based system
           const changes: string[] = [];
           
-          // Check each category for changes and build detailed reason
-          if (documentationPenalty > 0) {
-            const docStatus = [];
-            if (!hasHealthSafety) docStatus.push('Health & Safety Manual missing');
-            if (!hasCompanyPolicy) docStatus.push('Company Policy missing');
-            changes.push(`Documentation: ${documentationRating}% (${docStatus.join(', ')} - ${documentationPenalty}% penalty)`);
-          } else if (hasHealthSafety && hasCompanyPolicy) {
-            changes.push('Documentation: 100% (All documents uploaded)');
+          // Company Documentation Points (max 1 pt)
+          const companyDocsCount = (hasHealthSafety ? 1 : 0) + (hasCompanyPolicy ? 1 : 0) + (hasInsurance ? 1 : 0);
+          changes.push(`Company Documents: ${companyDocumentationPoints.toFixed(2)} / 1 pts (${companyDocsCount}/3 uploaded)`);
+          
+          // Harness Inspection Points (max = number of active projects)
+          if (projects.filter((p: any) => p.status !== 'deleted').length > 0) {
+            changes.push(`Harness Inspections: ${harnessInspectionPoints.toFixed(2)} / ${projects.filter((p: any) => p.status !== 'deleted').length} pts`);
+          } else {
+            changes.push(`Harness Inspections: 0 / 0 pts (No active projects)`);
           }
           
-          if (toolboxTotalDays > 0) {
-            changes.push(`Toolbox Meetings: ${toolboxMeetingRating}% (${toolboxDaysWithMeeting}/${toolboxTotalDays} work days covered${toolboxPenalty > 0 ? ` - ${toolboxPenalty}% penalty` : ''})`);
-          }
+          // Employee Document Review Points (max = number of employees + owner)
+          changes.push(`Document Reviews: ${employeeDocReviewPoints.toFixed(2)} / ${totalEmployees} pts (${signedReviews}/${totalRequiredSignatures} signatures)`);
           
-          if (harnessRequiredInspections > 0) {
-            changes.push(`Harness Inspections: ${harnessInspectionRating}% (${harnessCompletedInspections}/${harnessRequiredInspections} completed${harnessPenalty > 0 ? ` - ${harnessPenalty}% penalty` : ''})`);
-          }
-          
-          if (totalRequiredSignatures > 0) {
-            changes.push(`Document Reviews: ${documentReviewRating}% (${signedReviews}/${totalRequiredSignatures} signatures${documentReviewPenalty > 0 ? ` - ${documentReviewPenalty}% penalty` : ''})`);
-          }
-          
-          if (activeProjectCount > 0) {
-            changes.push(`Project Docs: ${projectDocumentationRating}% (${totalProjectDocsPresent}/${totalProjectDocsRequired} present${projectDocumentationPenalty > 0 ? ` - ${projectDocumentationPenalty}% penalty` : ''})`);
-          }
+          // Project Documentation Points (max = number of active projects)
+          changes.push(`Project Docs: ${projectDocumentationPoints.toFixed(2)} / ${activeProjectCount} pts`);
           
           const category = delta > 0 ? 'improvement' : delta < 0 ? 'decline' : 'update';
           const changeType = delta > 0 ? 'improved' : delta < 0 ? 'declined' : 'updated';
-          const reason = `Safety rating ${changeType} from ${previousScore} to ${overallCSR} points.\n\nCurrent Status:\n${changes.join('\n')}`;
+          const reason = `Safety rating ${changeType} from ${previousScore.toFixed(2)} to ${overallCSR.toFixed(2)} points.\n\nCurrent Status:\n${changes.join('\n')}`;
           
           await storage.createCsrRatingHistory({
             companyId,
