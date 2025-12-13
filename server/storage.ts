@@ -171,7 +171,7 @@ export class Storage {
    * Check if an employee belongs to a company (either via companyId or via employer_connections)
    * Returns { belongs: boolean, connectionType: 'primary' | 'secondary' | null, connectionId?: string }
    */
-  async checkEmployeeBelongsToCompany(employeeId: string, companyId: string): Promise<{
+  async checkEmployeeBelongsToCompany(employeeId: string, companyId: string, includeSuspended: boolean = false): Promise<{
     belongs: boolean;
     connectionType: 'primary' | 'secondary' | null;
     connectionId?: string;
@@ -187,11 +187,16 @@ export class Storage {
     }
 
     // Check secondary connection (employer_connections table)
+    // Include suspended connections if requested (for reactivation flow)
+    const statusConditions = includeSuspended 
+      ? or(eq(technicianEmployerConnections.status, "active"), eq(technicianEmployerConnections.status, "suspended"))
+      : eq(technicianEmployerConnections.status, "active");
+    
     const secondaryConnection = await db.select().from(technicianEmployerConnections)
       .where(and(
         eq(technicianEmployerConnections.technicianId, employeeId),
         eq(technicianEmployerConnections.companyId, companyId),
-        eq(technicianEmployerConnections.status, "active")
+        statusConditions
       )).limit(1);
 
     if (secondaryConnection.length > 0) {

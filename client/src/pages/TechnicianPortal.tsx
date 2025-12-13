@@ -3810,37 +3810,51 @@ export default function TechnicianPortal() {
                                             (!isPdf && !lowerUrl.endsWith('.doc') && !lowerUrl.endsWith('.docx'));
                               
                               return (
-                                <a 
-                                  key={index} 
-                                  href={url} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity bg-background"
-                                >
-                                  {isPdf ? (
-                                    <div className="flex flex-col items-center justify-center py-6 bg-muted gap-2">
-                                      <FileText className="w-10 h-10 text-muted-foreground" />
-                                      <span className="text-sm text-muted-foreground font-medium">{t.tapToViewPdf}</span>
-                                    </div>
-                                  ) : isImage ? (
-                                    <img 
-                                      src={url} 
-                                      alt={`irata certification ${index + 1}`}
-                                      className="w-full object-contain"
-                                      style={{ maxHeight: '200px', minHeight: '80px' }}
-                                      onError={(e) => {
-                                        const target = e.target as HTMLImageElement;
-                                        target.onerror = null;
-                                        target.style.display = 'none';
-                                      }}
-                                    />
-                                  ) : (
-                                    <div className="flex flex-col items-center justify-center py-6 bg-muted gap-2">
-                                      <FileText className="w-10 h-10 text-muted-foreground" />
-                                      <span className="text-sm text-muted-foreground font-medium">{t.tapToViewDocument}</span>
-                                    </div>
-                                  )}
-                                </a>
+                                <div key={index} className="relative">
+                                  <a 
+                                    href={url} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity bg-background"
+                                  >
+                                    {isPdf ? (
+                                      <div className="flex flex-col items-center justify-center py-6 bg-muted gap-2">
+                                        <FileText className="w-10 h-10 text-muted-foreground" />
+                                        <span className="text-sm text-muted-foreground font-medium">{t.tapToViewPdf}</span>
+                                      </div>
+                                    ) : isImage ? (
+                                      <img 
+                                        src={url} 
+                                        alt={`irata certification ${index + 1}`}
+                                        className="w-full object-contain"
+                                        style={{ maxHeight: '200px', minHeight: '80px' }}
+                                        onError={(e) => {
+                                          const target = e.target as HTMLImageElement;
+                                          target.onerror = null;
+                                          target.style.display = 'none';
+                                        }}
+                                      />
+                                    ) : (
+                                      <div className="flex flex-col items-center justify-center py-6 bg-muted gap-2">
+                                        <FileText className="w-10 h-10 text-muted-foreground" />
+                                        <span className="text-sm text-muted-foreground font-medium">{t.tapToViewDocument}</span>
+                                      </div>
+                                    )}
+                                  </a>
+                                  <Button
+                                    variant="destructive"
+                                    size="icon"
+                                    className="absolute top-2 right-2 h-7 w-7"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      setDeletingDocument({ type: 'irataDocuments', url });
+                                    }}
+                                    data-testid={`button-delete-irata-doc-${index}`}
+                                  >
+                                    <X className="w-4 h-4" />
+                                  </Button>
+                                </div>
                               );
                             })}
                           </div>
@@ -4005,37 +4019,51 @@ export default function TechnicianPortal() {
                                             (!isPdf && !lowerUrl.endsWith('.doc') && !lowerUrl.endsWith('.docx'));
                               
                               return (
-                                <a 
-                                  key={index} 
-                                  href={url} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity bg-background"
-                                >
-                                  {isPdf ? (
-                                    <div className="flex flex-col items-center justify-center py-6 bg-muted gap-2">
-                                      <FileText className="w-10 h-10 text-muted-foreground" />
-                                      <span className="text-sm text-muted-foreground font-medium">{t.tapToViewPdf}</span>
-                                    </div>
-                                  ) : isImage ? (
-                                    <img 
-                                      src={url} 
-                                      alt={`SPRAT certification ${index + 1}`}
-                                      className="w-full object-contain"
-                                      style={{ maxHeight: '200px', minHeight: '80px' }}
-                                      onError={(e) => {
-                                        const target = e.target as HTMLImageElement;
-                                        target.onerror = null;
-                                        target.style.display = 'none';
-                                      }}
-                                    />
-                                  ) : (
-                                    <div className="flex flex-col items-center justify-center py-6 bg-muted gap-2">
-                                      <FileText className="w-10 h-10 text-muted-foreground" />
-                                      <span className="text-sm text-muted-foreground font-medium">{t.tapToViewDocument}</span>
-                                    </div>
-                                  )}
-                                </a>
+                                <div key={index} className="relative">
+                                  <a 
+                                    href={url} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity bg-background"
+                                  >
+                                    {isPdf ? (
+                                      <div className="flex flex-col items-center justify-center py-6 bg-muted gap-2">
+                                        <FileText className="w-10 h-10 text-muted-foreground" />
+                                        <span className="text-sm text-muted-foreground font-medium">{t.tapToViewPdf}</span>
+                                      </div>
+                                    ) : isImage ? (
+                                      <img 
+                                        src={url} 
+                                        alt={`SPRAT certification ${index + 1}`}
+                                        className="w-full object-contain"
+                                        style={{ maxHeight: '200px', minHeight: '80px' }}
+                                        onError={(e) => {
+                                          const target = e.target as HTMLImageElement;
+                                          target.onerror = null;
+                                          target.style.display = 'none';
+                                        }}
+                                      />
+                                    ) : (
+                                      <div className="flex flex-col items-center justify-center py-6 bg-muted gap-2">
+                                        <FileText className="w-10 h-10 text-muted-foreground" />
+                                        <span className="text-sm text-muted-foreground font-medium">{t.tapToViewDocument}</span>
+                                      </div>
+                                    )}
+                                  </a>
+                                  <Button
+                                    variant="destructive"
+                                    size="icon"
+                                    className="absolute top-2 right-2 h-7 w-7"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      setDeletingDocument({ type: 'spratDocuments', url });
+                                    }}
+                                    data-testid={`button-delete-sprat-doc-${index}`}
+                                  >
+                                    <X className="w-4 h-4" />
+                                  </Button>
+                                </div>
                               );
                             })}
                           </div>
@@ -4136,44 +4164,58 @@ export default function TechnicianPortal() {
                                             (!isPdf && !lowerUrl.endsWith('.doc') && !lowerUrl.endsWith('.docx'));
                               
                               return (
-                                <a 
-                                  key={index} 
-                                  href={url} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity bg-muted/30"
-                                >
-                                  {isPdf ? (
-                                    <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
-                                      <FileText className="w-12 h-12 text-muted-foreground" />
-                                      <span className="text-sm text-muted-foreground font-medium">Tap to view PDF</span>
-                                    </div>
-                                  ) : isImage ? (
-                                    <img 
-                                      src={url} 
-                                      alt={`First aid certificate ${index + 1}`}
-                                      className="w-full object-contain"
-                                      style={{ maxHeight: '300px', minHeight: '100px' }}
-                                      onError={(e) => {
-                                        const target = e.target as HTMLImageElement;
-                                        target.onerror = null;
-                                        target.style.display = 'none';
-                                        const parent = target.parentElement;
-                                        if (parent) {
-                                          const div = document.createElement('div');
-                                          div.className = 'flex flex-col items-center justify-center py-8 gap-2';
-                                          div.innerHTML = '<span class="text-sm text-muted-foreground">Tap to view document</span>';
-                                          parent.appendChild(div);
-                                        }
-                                      }}
-                                    />
-                                  ) : (
-                                    <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
-                                      <FileText className="w-12 h-12 text-muted-foreground" />
-                                      <span className="text-sm text-muted-foreground font-medium">Tap to view document</span>
-                                    </div>
-                                  )}
-                                </a>
+                                <div key={index} className="relative">
+                                  <a 
+                                    href={url} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity bg-muted/30"
+                                  >
+                                    {isPdf ? (
+                                      <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
+                                        <FileText className="w-12 h-12 text-muted-foreground" />
+                                        <span className="text-sm text-muted-foreground font-medium">Tap to view PDF</span>
+                                      </div>
+                                    ) : isImage ? (
+                                      <img 
+                                        src={url} 
+                                        alt={`First aid certificate ${index + 1}`}
+                                        className="w-full object-contain"
+                                        style={{ maxHeight: '300px', minHeight: '100px' }}
+                                        onError={(e) => {
+                                          const target = e.target as HTMLImageElement;
+                                          target.onerror = null;
+                                          target.style.display = 'none';
+                                          const parent = target.parentElement;
+                                          if (parent) {
+                                            const div = document.createElement('div');
+                                            div.className = 'flex flex-col items-center justify-center py-8 gap-2';
+                                            div.innerHTML = '<span class="text-sm text-muted-foreground">Tap to view document</span>';
+                                            parent.appendChild(div);
+                                          }
+                                        }}
+                                      />
+                                    ) : (
+                                      <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
+                                        <FileText className="w-12 h-12 text-muted-foreground" />
+                                        <span className="text-sm text-muted-foreground font-medium">Tap to view document</span>
+                                      </div>
+                                    )}
+                                  </a>
+                                  <Button
+                                    variant="destructive"
+                                    size="icon"
+                                    className="absolute top-2 right-2 h-7 w-7"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      setDeletingDocument({ type: 'firstAidDocuments', url });
+                                    }}
+                                    data-testid={`button-delete-firstaid-doc-${index}`}
+                                  >
+                                    <X className="w-4 h-4" />
+                                  </Button>
+                                </div>
                               );
                             })}
                           </div>
@@ -4305,43 +4347,58 @@ export default function TechnicianPortal() {
                               return (
                                 <div key={index} className="space-y-1">
                                   <p className="text-xs font-medium text-muted-foreground">{documentLabel}</p>
-                                  <a 
-                                    href={url} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity bg-muted/30"
-                                  >
-                                    {isPdf ? (
-                                      <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
-                                        <FileText className="w-12 h-12 text-muted-foreground" />
-                                        <span className="text-sm text-muted-foreground font-medium">Tap to view PDF</span>
-                                      </div>
-                                    ) : isImage ? (
-                                      <img 
-                                        src={url} 
-                                        alt={documentLabel}
-                                        className="w-full object-contain"
-                                        style={{ maxHeight: '300px', minHeight: '100px' }}
-                                        onError={(e) => {
-                                          const target = e.target as HTMLImageElement;
-                                          target.onerror = null;
-                                          target.style.display = 'none';
-                                          const parent = target.parentElement;
-                                          if (parent) {
-                                            const div = document.createElement('div');
-                                            div.className = 'flex flex-col items-center justify-center py-8 gap-2';
-                                            div.innerHTML = '<span class="text-sm text-muted-foreground">Tap to view document</span>';
-                                            parent.appendChild(div);
-                                          }
-                                        }}
-                                      />
-                                    ) : (
-                                      <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
-                                        <FileText className="w-12 h-12 text-muted-foreground" />
-                                        <span className="text-sm text-muted-foreground font-medium">Tap to view document</span>
-                                      </div>
-                                    )}
-                                  </a>
+                                  <div className="relative">
+                                    <a 
+                                      href={url} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity bg-muted/30"
+                                    >
+                                      {isPdf ? (
+                                        <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
+                                          <FileText className="w-12 h-12 text-muted-foreground" />
+                                          <span className="text-sm text-muted-foreground font-medium">Tap to view PDF</span>
+                                        </div>
+                                      ) : isImage ? (
+                                        <img 
+                                          src={url} 
+                                          alt={documentLabel}
+                                          className="w-full object-contain"
+                                          style={{ maxHeight: '300px', minHeight: '100px' }}
+                                          onError={(e) => {
+                                            const target = e.target as HTMLImageElement;
+                                            target.onerror = null;
+                                            target.style.display = 'none';
+                                            const parent = target.parentElement;
+                                            if (parent) {
+                                              const div = document.createElement('div');
+                                              div.className = 'flex flex-col items-center justify-center py-8 gap-2';
+                                              div.innerHTML = '<span class="text-sm text-muted-foreground">Tap to view document</span>';
+                                              parent.appendChild(div);
+                                            }
+                                          }}
+                                        />
+                                      ) : (
+                                        <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
+                                          <FileText className="w-12 h-12 text-muted-foreground" />
+                                          <span className="text-sm text-muted-foreground font-medium">Tap to view document</span>
+                                        </div>
+                                      )}
+                                    </a>
+                                    <Button
+                                      variant="destructive"
+                                      size="icon"
+                                      className="absolute top-2 right-2 h-7 w-7"
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        setDeletingDocument({ type: 'driversLicenseDocuments', url });
+                                      }}
+                                      data-testid={`button-delete-drivers-license-doc-${index}`}
+                                    >
+                                      <X className="w-4 h-4" />
+                                    </Button>
+                                  </div>
                                 </div>
                               );
                             })}
@@ -4413,44 +4470,58 @@ export default function TechnicianPortal() {
                                         (!isPdf && !lowerUrl.endsWith('.doc') && !lowerUrl.endsWith('.docx'));
                           
                           return (
-                            <a 
-                              key={index} 
-                              href={url} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity bg-muted/30"
-                            >
-                              {isPdf ? (
-                                <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
-                                  <FileText className="w-12 h-12 text-muted-foreground" />
-                                  <span className="text-sm text-muted-foreground font-medium">Tap to view PDF</span>
-                                </div>
-                              ) : isImage ? (
-                                <img 
-                                  src={url} 
-                                  alt={`Banking document ${index + 1}`}
-                                  className="w-full object-contain"
-                                  style={{ maxHeight: '300px', minHeight: '100px' }}
-                                  onError={(e) => {
-                                    const target = e.target as HTMLImageElement;
-                                    target.onerror = null;
-                                    target.style.display = 'none';
-                                    const parent = target.parentElement;
-                                    if (parent) {
-                                      const div = document.createElement('div');
-                                      div.className = 'flex flex-col items-center justify-center py-8 gap-2';
-                                      div.innerHTML = '<span class="text-sm text-muted-foreground">Tap to view document</span>';
-                                      parent.appendChild(div);
-                                    }
-                                  }}
-                                />
-                              ) : (
-                                <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
-                                  <FileText className="w-12 h-12 text-muted-foreground" />
-                                  <span className="text-sm text-muted-foreground font-medium">Tap to view document</span>
-                                </div>
-                              )}
-                            </a>
+                            <div key={index} className="relative">
+                              <a 
+                                href={url} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity bg-muted/30"
+                              >
+                                {isPdf ? (
+                                  <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
+                                    <FileText className="w-12 h-12 text-muted-foreground" />
+                                    <span className="text-sm text-muted-foreground font-medium">Tap to view PDF</span>
+                                  </div>
+                                ) : isImage ? (
+                                  <img 
+                                    src={url} 
+                                    alt={`Banking document ${index + 1}`}
+                                    className="w-full object-contain"
+                                    style={{ maxHeight: '300px', minHeight: '100px' }}
+                                    onError={(e) => {
+                                      const target = e.target as HTMLImageElement;
+                                      target.onerror = null;
+                                      target.style.display = 'none';
+                                      const parent = target.parentElement;
+                                      if (parent) {
+                                        const div = document.createElement('div');
+                                        div.className = 'flex flex-col items-center justify-center py-8 gap-2';
+                                        div.innerHTML = '<span class="text-sm text-muted-foreground">Tap to view document</span>';
+                                        parent.appendChild(div);
+                                      }
+                                    }}
+                                  />
+                                ) : (
+                                  <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
+                                    <FileText className="w-12 h-12 text-muted-foreground" />
+                                    <span className="text-sm text-muted-foreground font-medium">Tap to view document</span>
+                                  </div>
+                                )}
+                              </a>
+                              <Button
+                                variant="destructive"
+                                size="icon"
+                                className="absolute top-2 right-2 h-7 w-7"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  setDeletingDocument({ type: 'bankDocuments', url });
+                                }}
+                                data-testid={`button-delete-bank-doc-${index}`}
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            </div>
                           );
                         })}
                       </div>
@@ -4642,33 +4713,47 @@ export default function TechnicianPortal() {
                                           (!isPdf && !lowerUrl.endsWith('.doc') && !lowerUrl.endsWith('.docx'));
                             
                             return (
-                              <a 
-                                key={index} 
-                                href={url} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity bg-muted/30"
-                                data-testid={`link-resume-${index}`}
-                              >
-                                {isPdf ? (
-                                  <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
-                                    <FileText className="w-12 h-12 text-muted-foreground" />
-                                    <span className="text-sm text-muted-foreground font-medium">{t.tapToViewPdf}</span>
-                                  </div>
-                                ) : isImage ? (
-                                  <img 
-                                    src={url} 
-                                    alt={`Resume ${index + 1}`}
-                                    className="w-full h-auto max-h-64 object-contain"
-                                    data-testid={`img-resume-${index}`}
-                                  />
-                                ) : (
-                                  <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
-                                    <FileText className="w-12 h-12 text-muted-foreground" />
-                                    <span className="text-sm text-muted-foreground font-medium">{t.tapToViewDocument}</span>
-                                  </div>
-                                )}
-                              </a>
+                              <div key={index} className="relative">
+                                <a 
+                                  href={url} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity bg-muted/30"
+                                  data-testid={`link-resume-${index}`}
+                                >
+                                  {isPdf ? (
+                                    <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
+                                      <FileText className="w-12 h-12 text-muted-foreground" />
+                                      <span className="text-sm text-muted-foreground font-medium">{t.tapToViewPdf}</span>
+                                    </div>
+                                  ) : isImage ? (
+                                    <img 
+                                      src={url} 
+                                      alt={`Resume ${index + 1}`}
+                                      className="w-full h-auto max-h-64 object-contain"
+                                      data-testid={`img-resume-${index}`}
+                                    />
+                                  ) : (
+                                    <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
+                                      <FileText className="w-12 h-12 text-muted-foreground" />
+                                      <span className="text-sm text-muted-foreground font-medium">{t.tapToViewDocument}</span>
+                                    </div>
+                                  )}
+                                </a>
+                                <Button
+                                  variant="destructive"
+                                  size="icon"
+                                  className="absolute top-2 right-2 h-7 w-7"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setDeletingDocument({ type: 'resumeDocuments', url });
+                                  }}
+                                  data-testid={`button-delete-resume-doc-${index}`}
+                                >
+                                  <X className="w-4 h-4" />
+                                </Button>
+                              </div>
                             );
                           })}
                         </div>
@@ -4711,6 +4796,42 @@ export default function TechnicianPortal() {
           </>
         )}
       </main>
+
+      {/* Document Deletion Confirmation Dialog */}
+      <AlertDialog open={!!deletingDocument} onOpenChange={(open) => !open && setDeletingDocument(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{language === 'en' ? 'Delete Document?' : 'Supprimer le document?'}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {language === 'en' 
+                ? 'This action cannot be undone. The document will be permanently removed.'
+                : 'Cette action est irréversible. Le document sera définitivement supprimé.'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-delete-document">
+              {language === 'en' ? 'Cancel' : 'Annuler'}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (deletingDocument) {
+                  deleteDocumentMutation.mutate({
+                    documentType: deletingDocument.type,
+                    documentUrl: deletingDocument.url
+                  });
+                }
+              }}
+              className="bg-destructive text-destructive-foreground"
+              disabled={deleteDocumentMutation.isPending}
+              data-testid="button-confirm-delete-document"
+            >
+              {deleteDocumentMutation.isPending 
+                ? (language === 'en' ? 'Deleting...' : 'Suppression...')
+                : (language === 'en' ? 'Delete' : 'Supprimer')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Mobile Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-lg border-t z-50 safe-area-inset-bottom">

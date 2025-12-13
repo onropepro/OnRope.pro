@@ -2295,7 +2295,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Check if employee belongs to this company (primary or secondary)
-      const membership = await storage.checkEmployeeBelongsToCompany(id, user.id);
+      // includeSuspended=true to find suspended connections for reactivation
+      const membership = await storage.checkEmployeeBelongsToCompany(id, user.id, true);
       if (!membership.belongs) {
         return res.status(403).json({ message: "Cannot reactivate employees from another company" });
       }
