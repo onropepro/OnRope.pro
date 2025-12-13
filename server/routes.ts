@@ -13310,7 +13310,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const totalPenalty = documentationPenalty + toolboxPenalty + harnessPenalty + documentReviewPenalty + projectDocumentationPenalty;
       const overallCSR = Math.max(0, 100 - totalPenalty);
       
-      res.json({
+      const response = {
         overallCSR,
         breakdown: {
           documentationRating,
@@ -13337,9 +13337,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
           activeProjectCount,
           elevationProjectCount
         }
-      });
+      };
+      
+      // Record CSR history if score has changed
+      const lastHistory = await storage.getLatestCsrRatingHistory(companyId);
+      if (!lastHistory || lastHistory.newScore !== overallCSR) {
+        const previousScore = lastHistory ? lastHistory.newScore : 100;
+        const delta = overallCSR - previousScore;
+        
+        // Determine which category caused the change
+        let category = 'overall';
+        let reason = 'Safety rating updated';
+        
+        if (lastHistory) {
+          // Compare individual breakdowns to find the main driver
+          if (documentationPenalty > 0 && !hasHealthSafety && !hasCompanyPolicy) {
+            category = 'documentation';
+            reason = 'Missing required documentation (Health & Safety Manual and/or Company Policy)';
+          } else if (toolboxPenalty > 0) {
+            category = 'toolbox';
+            reason = `Toolbox meeting coverage: ${toolboxDaysWithMeeting}/${toolboxTotalDays} work days covered`;
+          } else if (harnessPenalty > 0) {
+            category = 'harness';
+            reason = `Harness inspections: ${harnessCompletedInspections}/${harnessRequiredInspections} completed`;
+          } else if (documentReviewPenalty > 0) {
+            category = 'documentReview';
+            reason = `Document reviews: ${signedReviews}/${totalRequiredSignatures} signatures completed`;
+          } else if (projectDocumentationPenalty > 0) {
+            category = 'projectDocumentation';
+            reason = `Project documentation: ${totalProjectDocsPresent}/${totalProjectDocsRequired} documents present`;
+          } else if (delta > 0) {
+            category = 'improvement';
+            reason = 'Safety compliance improved';
+          }
+        } else {
+          category = 'initial';
+          reason = 'Initial safety rating recorded';
+        }
+        
+        await storage.createCsrRatingHistory({
+          companyId,
+          previousScore,
+          newScore: overallCSR,
+          delta,
+          category,
+          reason
+        });
+      }
+      
+      res.json(response);
     } catch (error) {
       console.error("Get company safety rating error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // CSR Rating History endpoint
+  app.get("/api/company-safety-rating/history", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (!canViewCSR(currentUser)) {
+        return res.status(403).json({ message: "Forbidden - Insufficient permissions to view CSR history" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const history = await storage.getCsrRatingHistoryByCompany(companyId);
+      res.json({ history });
+    } catch (error) {
+      console.error("Get CSR history error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
