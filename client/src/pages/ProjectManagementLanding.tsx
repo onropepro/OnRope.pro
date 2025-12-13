@@ -295,159 +295,145 @@ export default function ProjectManagementLanding() {
       <Separator className="my-8" />
 
       {/* Stakeholder Benefits Section */}
-      <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto space-y-12">
-        <div className="text-center space-y-4">
-          <h2 className="text-3xl md:text-4xl font-bold">Who Benefits From This Module</h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+      <section className="py-16 md:py-20 px-4">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+            Who Benefits From This Module
+          </h2>
+          <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
             Every stakeholder gets exactly the visibility they need
           </p>
-        </div>
 
-        {/* For Employers */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-[#0B64A3]/10 dark:bg-[#0B64A3]/20 flex items-center justify-center shrink-0">
-              <Briefcase className="w-5 h-5 text-[#0B64A3]" />
-            </div>
-            <h3 className="text-xl font-semibold">For Employers (Company Owners)</h3>
-          </div>
-          <div className="grid md:grid-cols-2 gap-4 pl-0 md:pl-13">
-            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
-              <CardContent className="p-5 space-y-2">
-                <h4 className="font-semibold">See all your projects without leaving your desk.</h4>
-                <p className="text-base text-muted-foreground">The dashboard shows every active job with completion percentage, days remaining, and assigned crew. Filter by status, building, or technician.</p>
-                <p className="text-base text-muted-foreground">Updates automatically as work sessions get logged. No more driving site to site taking notes of where crews are compared to yesterday.</p>
+          <div className="space-y-8">
+            {/* For Employers */}
+            <Card className="overflow-hidden">
+              <CardHeader className="bg-blue-50 dark:bg-blue-950 border-b">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                    <Briefcase className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <CardTitle className="text-xl">For Employers (Company Owners)</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6 space-y-4">
+                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">See all your projects without leaving your desk.</h4>
+                    <p className="text-sm text-muted-foreground">The dashboard shows every active job with completion percentage, days remaining, and assigned crew. Updates automatically as work sessions get logged.</p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">Know who's performing and who's coasting.</h4>
+                    <p className="text-sm text-muted-foreground">Per-employee performance tracking shows drops completed per session and target achievement rates. Now you have the data for conversations you couldn't have before.</p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">Quote future jobs with confidence.</h4>
+                    <p className="text-sm text-muted-foreground">Historical project data shows how long similar buildings actually took. Stop guessing and overbidding by 50%.</p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">Reduce your psychological load.</h4>
+                    <p className="text-sm text-muted-foreground">Everything is linked with everything. The system remembers so you don't have to. That mental bandwidth gets freed up.</p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
-            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
-              <CardContent className="p-5 space-y-2">
-                <h4 className="font-semibold">Know who's performing and who's coasting.</h4>
-                <p className="text-base text-muted-foreground">Per-employee performance tracking shows drops completed per session, target achievement rates, and historical trends.</p>
-                <p className="text-base text-muted-foreground">You can see that Tommy did five drops every day at this building while another employee only did one. Now you have the data for the conversation you couldn't have before.</p>
-              </CardContent>
-            </Card>
-            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
-              <CardContent className="p-5 space-y-2">
-                <h4 className="font-semibold">Quote future jobs with confidence.</h4>
-                <p className="text-base text-muted-foreground">Historical project data shows how long similar buildings actually took. Search past projects by building type, job type, or date range.</p>
-                <p className="text-base text-muted-foreground">"Last time we did a 20-story window wash, it took 14 days with 2 techs averaging 8 drops per day." Stop guessing and overbidding by 50%.</p>
-              </CardContent>
-            </Card>
-            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
-              <CardContent className="p-5 space-y-2">
-                <h4 className="font-semibold">Reduce your psychological load.</h4>
-                <p className="text-base text-muted-foreground">The time you spend looking at projects on one screen, schedule on another, checking if you put Devon somewhere. That mental bandwidth gets freed up.</p>
-                <p className="text-base text-muted-foreground">Everything is linked with everything. The system remembers so you don't have to.</p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
 
-        {/* For Technicians */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0">
-              <Wrench className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-            </div>
-            <h3 className="text-xl font-semibold">For Technicians</h3>
-          </div>
-          <div className="grid md:grid-cols-3 gap-4 pl-0 md:pl-13">
-            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
-              <CardContent className="p-5 space-y-2">
-                <h4 className="font-semibold">Know your target before you start.</h4>
-                <p className="text-base text-muted-foreground">Your mobile app shows assigned projects with clear daily expectations. Marina Towers, Window Cleaning. Your target: 5 drops per day. Yesterday you completed: 4 drops.</p>
-                <p className="text-base text-muted-foreground">No more finding out after the fact that the boss expected something different.</p>
+            {/* For Technicians */}
+            <Card className="overflow-hidden">
+              <CardHeader className="bg-amber-50 dark:bg-amber-950 border-b">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center">
+                    <Wrench className="w-5 h-5 text-amber-600" />
+                  </div>
+                  <CardTitle className="text-xl">For Technicians</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6 space-y-4">
+                <div className="grid md:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">Know your target before you start.</h4>
+                    <p className="text-sm text-muted-foreground">Your mobile app shows assigned projects with clear daily expectations. No more finding out after the fact that the boss expected something different.</p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">See where you're working tomorrow.</h4>
+                    <p className="text-sm text-muted-foreground">Your upcoming assignments appear on your phone tonight. Plan your commute the night before instead of waiting for a 6 AM text.</p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">Track your own improvement.</h4>
+                    <p className="text-sm text-muted-foreground">Your performance dashboard shows drops per day average, target achievement rate, and trends over time. You're improving, and now you can prove it.</p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
-            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
-              <CardContent className="p-5 space-y-2">
-                <h4 className="font-semibold">See where you're working tomorrow.</h4>
-                <p className="text-base text-muted-foreground">Your upcoming assignments appear on your phone tonight. Tomorrow: Marina Towers, 8:00 AM. Thursday: Ocean View Apartments, 8:00 AM.</p>
-                <p className="text-base text-muted-foreground">Plan your commute the night before instead of waiting for a 6 AM text that sends you to the wrong building.</p>
-              </CardContent>
-            </Card>
-            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
-              <CardContent className="p-5 space-y-2">
-                <h4 className="font-semibold">Track your own improvement.</h4>
-                <p className="text-base text-muted-foreground">Your performance dashboard shows drops per day average, target achievement rate, and trends over time. This month: 4.8 drops per day, 86% target achievement. Last month: 4.1 drops per day.</p>
-                <p className="text-base text-muted-foreground">You're improving, and now you can prove it during your review.</p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
 
-        {/* For Building Managers */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center shrink-0">
-              <Building2 className="w-5 h-5 text-violet-600 dark:text-violet-400" />
-            </div>
-            <h3 className="text-xl font-semibold">For Building Managers</h3>
-          </div>
-          <div className="grid md:grid-cols-2 gap-4 pl-0 md:pl-13">
-            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
-              <CardContent className="p-5 space-y-2">
-                <h4 className="font-semibold">Stop playing telephone.</h4>
-                <p className="text-base text-muted-foreground">Log in and see the exact same progress the rope access company sees. Real-time completion percentages by elevation. Before and after photo galleries. Safety documentation.</p>
-                <p className="text-base text-muted-foreground">When the building owner asks "How's it going?", answer immediately instead of "I'll call them and find out."</p>
+            {/* For Building Managers */}
+            <Card className="overflow-hidden">
+              <CardHeader className="bg-violet-50 dark:bg-violet-950 border-b">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center">
+                    <Building2 className="w-5 h-5 text-violet-600" />
+                  </div>
+                  <CardTitle className="text-xl">For Building Managers</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6 space-y-4">
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">Stop playing telephone.</h4>
+                    <p className="text-sm text-muted-foreground">Log in and see the exact same progress the rope access company sees. Real-time completion percentages by elevation. When the building owner asks "How's it going?", answer immediately.</p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">Verify contractor performance objectively.</h4>
+                    <p className="text-sm text-muted-foreground">The dashboard shows whether work is progressing on schedule. No more relying on verbal updates that might be optimistic. Data you can trust.</p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
-            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
-              <CardContent className="p-5 space-y-2">
-                <h4 className="font-semibold">Verify contractor performance objectively.</h4>
-                <p className="text-base text-muted-foreground">The dashboard shows whether work is progressing on schedule. South Elevation: 73% complete. Expected completion: Dec 8.</p>
-                <p className="text-base text-muted-foreground">No more relying on verbal updates that might be optimistic. Data you can trust when evaluating vendor performance.</p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
 
-        {/* For Property Managers */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0">
-              <Globe className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-            </div>
-            <h3 className="text-xl font-semibold">For Property Managers</h3>
-          </div>
-          <div className="grid md:grid-cols-2 gap-4 pl-0 md:pl-13">
-            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
-              <CardContent className="p-5 space-y-2">
-                <h4 className="font-semibold">Reduce your communication overhead.</h4>
-                <p className="text-base text-muted-foreground">Residents check progress themselves through their portal. They see which elevation is being worked, when their floor is expected, and the upcoming schedule.</p>
-                <p className="text-base text-muted-foreground">Status calls drop 60-70%. Your phone stops ringing with "when will they be done?" questions.</p>
+            {/* For Property Managers */}
+            <Card className="overflow-hidden">
+              <CardHeader className="bg-emerald-50 dark:bg-emerald-950 border-b">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center">
+                    <Globe className="w-5 h-5 text-emerald-600" />
+                  </div>
+                  <CardTitle className="text-xl">For Property Managers</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6 space-y-4">
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">Reduce your communication overhead.</h4>
+                    <p className="text-sm text-muted-foreground">Residents check progress themselves through their portal. Status calls drop 60-70%. Your phone stops ringing with "when will they be done?" questions.</p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">Demonstrate professional vendor management.</h4>
+                    <p className="text-sm text-muted-foreground">When building owners ask about contractor oversight, show them the portal. Real-time progress tracking. Documented safety compliance. Photo verification.</p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
-            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
-              <CardContent className="p-5 space-y-2">
-                <h4 className="font-semibold">Demonstrate professional vendor management.</h4>
-                <p className="text-base text-muted-foreground">When building owners ask about contractor oversight, show them the portal. Real-time progress tracking. Documented safety compliance. Photo verification.</p>
-                <p className="text-base text-muted-foreground">You become known as the property manager who uses technology to ensure accountability.</p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
 
-        {/* For Residents */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
-              <HomeIcon className="w-5 h-5 text-rose-600 dark:text-rose-400" />
-            </div>
-            <h3 className="text-xl font-semibold">For Residents</h3>
-          </div>
-          <div className="grid md:grid-cols-2 gap-4 pl-0 md:pl-13">
-            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
-              <CardContent className="p-5 space-y-2">
-                <h4 className="font-semibold">Know when work will reach your window.</h4>
-                <p className="text-base text-muted-foreground">The resident portal shows progress specific to your elevation. South Elevation: 45% complete. Expected to reach your floor Thursday Dec 12. Entire elevation complete by Dec 15.</p>
-                <p className="text-base text-muted-foreground">Plan your life around the work instead of wondering.</p>
-              </CardContent>
-            </Card>
-            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
-              <CardContent className="p-5 space-y-2">
-                <h4 className="font-semibold">Birthday party on Sunday?</h4>
-                <p className="text-base text-muted-foreground">Check the schedule. They're not working that day. No need to call the property manager and wait two days for an answer while you worry about strangers outside your window during the party.</p>
+            {/* For Residents */}
+            <Card className="overflow-hidden">
+              <CardHeader className="bg-rose-50 dark:bg-rose-950 border-b">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center">
+                    <HomeIcon className="w-5 h-5 text-rose-600" />
+                  </div>
+                  <CardTitle className="text-xl">For Residents</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6 space-y-4">
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">Know when work will reach your window.</h4>
+                    <p className="text-sm text-muted-foreground">The resident portal shows progress specific to your elevation. Plan your life around the work instead of wondering.</p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">Birthday party on Sunday?</h4>
+                    <p className="text-sm text-muted-foreground">Check the schedule. No need to call the property manager and wait two days for an answer while you worry about strangers outside your window.</p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
