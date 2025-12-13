@@ -763,6 +763,147 @@ function NotificationBell() {
   );
 }
 
+// License Expiry Warning Banner Component
+function LicenseExpiryWarningBanner({ employees }: { employees: any[] }) {
+  const { t } = useTranslation();
+  const [, setLocation] = useLocation();
+  const [isExpanded, setIsExpanded] = useState(false);
+  
+  // Calculate employees with expiring licenses (within 30 days)
+  const expiringLicenses = useMemo(() => {
+    // Normalize to start of day for accurate date comparison
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const thirtyDaysFromNow = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+    const results: { employee: any; licenseType: string; expiryDate: string; daysRemaining: number }[] = [];
+    
+    employees.forEach((emp: any) => {
+      // Skip terminated or suspended employees (both primary and secondary suspension)
+      if (emp.terminatedDate || emp.suspendedAt || emp.connectionStatus === 'suspended') return;
+      
+      // Check IRATA expiration
+      if (emp.irataExpirationDate) {
+        const expiryDate = new Date(emp.irataExpirationDate);
+        expiryDate.setHours(0, 0, 0, 0);
+        if (expiryDate <= thirtyDaysFromNow && expiryDate >= today) {
+          const daysRemaining = Math.round((expiryDate.getTime() - today.getTime()) / (24 * 60 * 60 * 1000));
+          results.push({
+            employee: emp,
+            licenseType: 'IRATA Certification',
+            expiryDate: emp.irataExpirationDate,
+            daysRemaining
+          });
+        }
+      }
+      
+      // Check SPRAT expiration
+      if (emp.spratExpirationDate) {
+        const expiryDate = new Date(emp.spratExpirationDate);
+        expiryDate.setHours(0, 0, 0, 0);
+        if (expiryDate <= thirtyDaysFromNow && expiryDate >= today) {
+          const daysRemaining = Math.round((expiryDate.getTime() - today.getTime()) / (24 * 60 * 60 * 1000));
+          results.push({
+            employee: emp,
+            licenseType: 'SPRAT Certification',
+            expiryDate: emp.spratExpirationDate,
+            daysRemaining
+          });
+        }
+      }
+      
+      // Check Driver's License expiration
+      if (emp.driversLicenseExpiry) {
+        const expiryDate = new Date(emp.driversLicenseExpiry);
+        expiryDate.setHours(0, 0, 0, 0);
+        if (expiryDate <= thirtyDaysFromNow && expiryDate >= today) {
+          const daysRemaining = Math.round((expiryDate.getTime() - today.getTime()) / (24 * 60 * 60 * 1000));
+          results.push({
+            employee: emp,
+            licenseType: "Driver's License",
+            expiryDate: emp.driversLicenseExpiry,
+            daysRemaining
+          });
+        }
+      }
+    });
+    
+    // Sort by days remaining (most urgent first)
+    return results.sort((a, b) => a.daysRemaining - b.daysRemaining);
+  }, [employees]);
+  
+  if (expiringLicenses.length === 0) return null;
+  
+  const uniqueEmployeeCount = new Set(expiringLicenses.map(l => l.employee.id)).size;
+  
+  return (
+    <Alert className="mx-4 mt-4 border-red-500/50 bg-red-500/10" data-testid="alert-license-expiry-warning">
+      <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-500" />
+      <div className="flex-1">
+        <AlertTitle className="text-red-700 dark:text-red-400">
+          {t('dashboard.licenseExpiry.title', 'License Expiration Warning')}
+        </AlertTitle>
+        <AlertDescription className="text-red-600 dark:text-red-500 mb-2">
+          {t('dashboard.licenseExpiry.description', '{{count}} employee(s) have licenses expiring within 30 days', { count: uniqueEmployeeCount })}
+        </AlertDescription>
+        
+        {/* Toggle to show details */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 p-0 h-auto mb-2"
+          data-testid="button-toggle-expiry-details"
+        >
+          <span className="material-icons text-sm mr-1">
+            {isExpanded ? 'expand_less' : 'expand_more'}
+          </span>
+          {isExpanded 
+            ? t('dashboard.licenseExpiry.hideDetails', 'Hide details') 
+            : t('dashboard.licenseExpiry.showDetails', 'Show details')}
+        </Button>
+        
+        {isExpanded && (
+          <div className="space-y-2 mt-2 mb-3">
+            {expiringLicenses.map((item, index) => (
+              <div 
+                key={`${item.employee.id}-${item.licenseType}-${index}`}
+                className="flex items-center justify-between bg-red-500/5 rounded-md p-2 text-sm"
+                data-testid={`expiry-item-${item.employee.id}-${index}`}
+              >
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-red-700 dark:text-red-400">{item.employee.name}</span>
+                  <Badge variant="outline" className="border-red-500/50 text-red-600 dark:text-red-400 text-xs">
+                    {item.licenseType}
+                  </Badge>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-red-600 dark:text-red-500 text-xs">
+                    {item.daysRemaining === 0 
+                      ? t('dashboard.licenseExpiry.expiresToday', 'Expires today')
+                      : item.daysRemaining === 1
+                        ? t('dashboard.licenseExpiry.expiresTomorrow', 'Expires tomorrow')
+                        : t('dashboard.licenseExpiry.expiresInDays', 'Expires in {{days}} days', { days: item.daysRemaining })}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        
+        <Button
+          onClick={() => setLocation("/employee-management")}
+          className="bg-red-600 hover:bg-red-700 text-white"
+          size="sm"
+          data-testid="button-review-licenses"
+        >
+          <span className="material-icons text-sm mr-1">badge</span>
+          {t('dashboard.licenseExpiry.reviewLicenses', 'Review Employee Licenses')}
+        </Button>
+      </div>
+    </Alert>
+  );
+}
+
 export default function Dashboard() {
   const { t } = useTranslation();
   const { currentLanguage, changeLanguage } = useLanguage();
@@ -3263,6 +3404,11 @@ export default function Dashboard() {
             </Button>
           </div>
         </Alert>
+      )}
+
+      {/* License Expiry Warning Banner - Company owners and managers only */}
+      {currentUser && (currentUser.role === 'company' || canManageEmployees(currentUser)) && employees.length > 0 && (
+        <LicenseExpiryWarningBanner employees={employees} />
       )}
 
       <div className="p-6 sm:p-8 max-w-7xl mx-auto">
