@@ -169,6 +169,12 @@ const PERMISSION_CATEGORIES = [
     ],
   },
   {
+    nameKey: "dashboard.permissions.categories.documents",
+    permissions: [
+      { id: "view_sensitive_documents", labelKey: "dashboard.permissions.viewSensitiveDocuments" },
+    ],
+  },
+  {
     nameKey: "dashboard.permissions.categories.inventoryGear",
     permissions: [
       { id: "view_inventory", labelKey: "dashboard.permissions.viewInventory" },
@@ -276,6 +282,11 @@ const editEmployeeSchema = z.object({
   irataLicenseNumber: z.string().optional(),
   irataIssuedDate: z.string().optional(),
   irataExpirationDate: z.string().optional(),
+  // sprat fields
+  spratLevel: z.string().optional(),
+  spratLicenseNumber: z.string().optional(),
+  spratIssuedDate: z.string().optional(),
+  spratExpirationDate: z.string().optional(),
   // First Aid fields
   hasFirstAid: z.boolean().default(false),
   firstAidType: z.string().optional(),
@@ -752,6 +763,145 @@ function NotificationBell() {
   );
 }
 
+// License Expiry Warning Banner Component
+function LicenseExpiryWarningBanner({ employees, onReviewClick }: { employees: any[]; onReviewClick: () => void }) {
+  const { t } = useTranslation();
+  const [isExpanded, setIsExpanded] = useState(false);
+  
+  // Calculate employees with expiring licenses (within 30 days)
+  const expiringLicenses = useMemo(() => {
+    // Normalize to start of day for accurate date comparison
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const thirtyDaysFromNow = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+    const results: { employee: any; licenseType: string; expiryDate: string; daysRemaining: number }[] = [];
+    
+    employees.forEach((emp: any) => {
+      // Skip terminated or suspended employees (both primary and secondary suspension)
+      if (emp.terminatedDate || emp.suspendedAt || emp.connectionStatus === 'suspended') return;
+      
+      // Check IRATA expiration
+      if (emp.irataExpirationDate) {
+        const expiryDate = new Date(emp.irataExpirationDate);
+        expiryDate.setHours(0, 0, 0, 0);
+        if (expiryDate <= thirtyDaysFromNow && expiryDate >= today) {
+          const daysRemaining = Math.round((expiryDate.getTime() - today.getTime()) / (24 * 60 * 60 * 1000));
+          results.push({
+            employee: emp,
+            licenseType: 'IRATA Certification',
+            expiryDate: emp.irataExpirationDate,
+            daysRemaining
+          });
+        }
+      }
+      
+      // Check SPRAT expiration
+      if (emp.spratExpirationDate) {
+        const expiryDate = new Date(emp.spratExpirationDate);
+        expiryDate.setHours(0, 0, 0, 0);
+        if (expiryDate <= thirtyDaysFromNow && expiryDate >= today) {
+          const daysRemaining = Math.round((expiryDate.getTime() - today.getTime()) / (24 * 60 * 60 * 1000));
+          results.push({
+            employee: emp,
+            licenseType: 'SPRAT Certification',
+            expiryDate: emp.spratExpirationDate,
+            daysRemaining
+          });
+        }
+      }
+      
+      // Check Driver's License expiration
+      if (emp.driversLicenseExpiry) {
+        const expiryDate = new Date(emp.driversLicenseExpiry);
+        expiryDate.setHours(0, 0, 0, 0);
+        if (expiryDate <= thirtyDaysFromNow && expiryDate >= today) {
+          const daysRemaining = Math.round((expiryDate.getTime() - today.getTime()) / (24 * 60 * 60 * 1000));
+          results.push({
+            employee: emp,
+            licenseType: "Driver's License",
+            expiryDate: emp.driversLicenseExpiry,
+            daysRemaining
+          });
+        }
+      }
+    });
+    
+    // Sort by days remaining (most urgent first)
+    return results.sort((a, b) => a.daysRemaining - b.daysRemaining);
+  }, [employees]);
+  
+  if (expiringLicenses.length === 0) return null;
+  
+  const uniqueEmployeeCount = new Set(expiringLicenses.map(l => l.employee.id)).size;
+  
+  return (
+    <Popover open={isExpanded} onOpenChange={setIsExpanded}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="relative bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-700 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/50 h-8 px-2 gap-1"
+          data-testid="button-license-expiry-warning"
+        >
+          <span className="material-icons text-base">warning</span>
+          <span className="hidden sm:inline text-xs font-medium">{t('dashboard.licenseExpiry.shortTitle', 'Licenses')}</span>
+          <Badge variant="destructive" className="h-4 min-w-[16px] px-1 text-[10px]">
+            {uniqueEmployeeCount}
+          </Badge>
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80 p-0" align="end">
+        <div className="p-3 border-b bg-red-50 dark:bg-red-950/40">
+          <h4 className="font-semibold text-red-700 dark:text-red-300 text-sm flex items-center gap-2">
+            <span className="material-icons text-base">warning</span>
+            {t('dashboard.licenseExpiry.title', 'License Expiration Warning')}
+          </h4>
+          <p className="text-red-600 dark:text-red-400 text-xs mt-1">
+            {t('dashboard.licenseExpiry.description', '{{count}} employee(s) have licenses expiring within 30 days', { count: uniqueEmployeeCount })}
+          </p>
+        </div>
+        <ScrollArea className="max-h-[250px]">
+          <div className="p-2 space-y-1">
+            {expiringLicenses.map((item, index) => (
+              <div 
+                key={`${item.employee.id}-${item.licenseType}-${index}`}
+                className="flex items-center justify-between rounded-md p-2 text-sm hover:bg-muted/50"
+                data-testid={`expiry-item-${item.employee.id}-${index}`}
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-foreground truncate">{item.employee.name}</div>
+                  <div className="text-xs text-muted-foreground">{item.licenseType}</div>
+                </div>
+                <Badge variant="destructive" className="text-[10px] ml-2 flex-shrink-0">
+                  {item.daysRemaining === 0 
+                    ? t('dashboard.licenseExpiry.expiresToday', 'Today')
+                    : item.daysRemaining === 1
+                      ? t('dashboard.licenseExpiry.expiresTomorrow', '1 day')
+                      : t('dashboard.licenseExpiry.expiresInDays', '{{days}} days', { days: item.daysRemaining })}
+                </Badge>
+              </div>
+            ))}
+          </div>
+        </ScrollArea>
+        <div className="p-2 border-t">
+          <Button
+            onClick={() => {
+              setIsExpanded(false);
+              onReviewClick();
+            }}
+            size="sm"
+            className="w-full bg-red-600 hover:bg-red-700 text-white h-8"
+            data-testid="button-review-licenses"
+          >
+            <span className="material-icons text-sm mr-1">people</span>
+            {t('dashboard.licenseExpiry.reviewLicenses', 'Review Employees')}
+          </Button>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 export default function Dashboard() {
   const { t } = useTranslation();
   const { currentLanguage, changeLanguage } = useLanguage();
@@ -1073,6 +1223,7 @@ export default function Dashboard() {
         firstAidDocuments?: string[];
         driversLicenseNumber?: string;
         driversLicenseProvince?: string;
+        driversLicenseIssuedDate?: string;
         driversLicenseExpiry?: string;
         driversLicenseDocuments?: string[];
         bankTransitNumber?: string;
@@ -1133,6 +1284,7 @@ export default function Dashboard() {
         firstAidDocuments?: string[];
         driversLicenseNumber?: string;
         driversLicenseProvince?: string;
+        driversLicenseIssuedDate?: string;
         driversLicenseExpiry?: string;
         driversLicenseDocuments?: string[];
         bankTransitNumber?: string;
@@ -1409,6 +1561,10 @@ export default function Dashboard() {
       irataLicenseNumber: "",
       irataIssuedDate: "",
       irataExpirationDate: "",
+      spratLevel: "",
+      spratLicenseNumber: "",
+      spratIssuedDate: "",
+      spratExpirationDate: "",
       hasFirstAid: false,
       firstAidType: "",
       firstAidExpiry: "",
@@ -2165,6 +2321,10 @@ export default function Dashboard() {
       irataLicenseNumber: employee.irataLicenseNumber ?? "",
       irataIssuedDate: employee.irataIssuedDate ?? "",
       irataExpirationDate: employee.irataExpirationDate ?? "",
+      spratLevel: employee.spratLevel ?? "",
+      spratLicenseNumber: employee.spratLicenseNumber ?? "",
+      spratIssuedDate: employee.spratIssuedDate ?? "",
+      spratExpirationDate: employee.spratExpirationDate ?? "",
       terminatedDate: employee.terminatedDate ?? "",
       terminationReason: employee.terminationReason ?? "",
       terminationNotes: employee.terminationNotes ?? "",
@@ -3185,6 +3345,10 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
+            {/* License Expiry Warning - Inline in header */}
+            {currentUser && (currentUser.role === 'company' || canManageEmployees(currentUser)) && employees.length > 0 && (
+              <LicenseExpiryWarningBanner employees={employees} onReviewClick={() => handleTabChange("employees")} />
+            )}
             {/* Install PWA Button */}
             <InstallPWAButton />
             {/* My Account Button */}
@@ -3243,6 +3407,7 @@ export default function Dashboard() {
           </div>
         </Alert>
       )}
+
 
       <div className="p-6 sm:p-8 max-w-7xl mx-auto">
         {/* Navigation Grid - Permission-filtered dashboard cards */}
@@ -6217,6 +6382,44 @@ export default function Dashboard() {
                         return null;
                       })() : null;
 
+                      // Check SPRAT license expiration status
+                      const spratStatus = employee.spratExpirationDate ? (() => {
+                        const expirationDate = parseLocalDate(employee.spratExpirationDate);
+                        if (!expirationDate) return null;
+                        
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        const thirtyDaysFromNow = new Date();
+                        thirtyDaysFromNow.setHours(0, 0, 0, 0);
+                        thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+                        
+                        if (expirationDate < today) {
+                          return 'expired';
+                        } else if (expirationDate <= thirtyDaysFromNow) {
+                          return 'expiring-soon';
+                        }
+                        return null;
+                      })() : null;
+
+                      // Check Driver's License expiration status
+                      const driversLicenseStatus = employee.driversLicenseExpiry ? (() => {
+                        const expirationDate = parseLocalDate(employee.driversLicenseExpiry);
+                        if (!expirationDate) return null;
+                        
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        const thirtyDaysFromNow = new Date();
+                        thirtyDaysFromNow.setHours(0, 0, 0, 0);
+                        thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+                        
+                        if (expirationDate < today) {
+                          return 'expired';
+                        } else if (expirationDate <= thirtyDaysFromNow) {
+                          return 'expiring-soon';
+                        }
+                        return null;
+                      })() : null;
+
                       return (
                       <Card 
                         key={employee.id} 
@@ -6248,13 +6451,37 @@ export default function Dashboard() {
                                   {irataStatus === 'expired' && (
                                     <Badge variant="destructive" className="text-xs flex items-center gap-1" data-testid={`badge-irata-expired-${employee.id}`}>
                                       <span className="material-icons text-xs">error</span>
-                                      {t('dashboard.employees.irataExpired', 'irata Expired')}
+                                      {t('dashboard.employees.irataExpired', 'IRATA Expired')}
                                     </Badge>
                                   )}
                                   {irataStatus === 'expiring-soon' && (
-                                    <Badge variant="outline" className="text-xs flex items-center gap-1 bg-yellow-500/10 border-yellow-500 text-yellow-700 dark:text-yellow-400" data-testid={`badge-irata-warning-${employee.id}`}>
+                                    <Badge variant="outline" className="text-xs flex items-center gap-1 bg-red-500/10 border-red-500 text-red-700 dark:text-red-400" data-testid={`badge-irata-warning-${employee.id}`}>
                                       <span className="material-icons text-xs">warning</span>
-                                      {t('dashboard.employees.irataExpiringSoon', 'irata Expiring Soon')}
+                                      {t('dashboard.employees.irataExpiringSoon', 'IRATA Expiring Soon')}
+                                    </Badge>
+                                  )}
+                                  {spratStatus === 'expired' && (
+                                    <Badge variant="destructive" className="text-xs flex items-center gap-1" data-testid={`badge-sprat-expired-${employee.id}`}>
+                                      <span className="material-icons text-xs">error</span>
+                                      {t('dashboard.employees.spratExpired', 'SPRAT Expired')}
+                                    </Badge>
+                                  )}
+                                  {spratStatus === 'expiring-soon' && (
+                                    <Badge variant="outline" className="text-xs flex items-center gap-1 bg-red-500/10 border-red-500 text-red-700 dark:text-red-400" data-testid={`badge-sprat-warning-${employee.id}`}>
+                                      <span className="material-icons text-xs">warning</span>
+                                      {t('dashboard.employees.spratExpiringSoon', 'SPRAT Expiring Soon')}
+                                    </Badge>
+                                  )}
+                                  {driversLicenseStatus === 'expired' && (
+                                    <Badge variant="destructive" className="text-xs flex items-center gap-1" data-testid={`badge-license-expired-${employee.id}`}>
+                                      <span className="material-icons text-xs">error</span>
+                                      {t('dashboard.employees.licenseExpired', "Driver's License Expired")}
+                                    </Badge>
+                                  )}
+                                  {driversLicenseStatus === 'expiring-soon' && (
+                                    <Badge variant="outline" className="text-xs flex items-center gap-1 bg-red-500/10 border-red-500 text-red-700 dark:text-red-400" data-testid={`badge-license-warning-${employee.id}`}>
+                                      <span className="material-icons text-xs">warning</span>
+                                      {t('dashboard.employees.licenseExpiringSoon', "Driver's License Expiring Soon")}
                                     </Badge>
                                   )}
                                 </div>
@@ -8067,6 +8294,80 @@ export default function Dashboard() {
                     </div>
 
                     <div className="border-t pt-4 mt-4">
+                      <h4 className="text-sm font-medium mb-4">{t('dashboard.employeeForm.spratCertification', 'SPRAT Certification (Optional)')}</h4>
+                      <div className="space-y-4">
+                        <FormField
+                          control={editEmployeeForm.control}
+                          name="spratLevel"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('dashboard.employeeForm.spratLevel', 'SPRAT Level')}</FormLabel>
+                              <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                  <SelectTrigger className="h-12" data-testid="select-edit-sprat-level">
+                                    <SelectValue placeholder={t('dashboard.employeeForm.selectLevel', 'Select level')} />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="Level 1">Level 1</SelectItem>
+                                  <SelectItem value="Level 2">Level 2</SelectItem>
+                                  <SelectItem value="Level 3">Level 3</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        {editEmployeeForm.watch("spratLevel") && (
+                          <>
+                            <FormField
+                              control={editEmployeeForm.control}
+                              name="spratLicenseNumber"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>{t('dashboard.employeeForm.spratLicenseNumber', 'SPRAT License Number')}</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder="License number" {...field} data-testid="input-edit-sprat-license" className="h-12" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={editEmployeeForm.control}
+                              name="spratIssuedDate"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>{t('dashboard.employeeForm.spratIssuedDate', 'SPRAT Issued Date')}</FormLabel>
+                                  <FormControl>
+                                    <Input type="date" {...field} data-testid="input-edit-sprat-issued" className="h-12" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={editEmployeeForm.control}
+                              name="spratExpirationDate"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>{t('dashboard.employeeForm.spratExpirationDate', 'SPRAT Expiration Date')}</FormLabel>
+                                  <FormControl>
+                                    <Input type="date" {...field} data-testid="input-edit-sprat-expiration" className="h-12" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="border-t pt-4 mt-4">
                       <FormField
                         control={editEmployeeForm.control}
                         name="terminatedDate"
@@ -8369,7 +8670,7 @@ export default function Dashboard() {
                   </Card>
 
                   {/* irata Certification */}
-                  {employeeToView.irataLevel && (
+                  {(employeeToView.irataLevel || employeeToView.irataLicenseNumber || employeeToView.irataExpirationDate || (employeeToView.irataDocuments?.length > 0)) && (
                     <Card>
                       <CardHeader>
                         <CardTitle className="text-base flex items-center gap-2 justify-between">
@@ -8390,10 +8691,12 @@ export default function Dashboard() {
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-3">
+                        {employeeToView.irataLevel && (
                         <div>
                           <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.level', 'Level')}</div>
                           <div className="text-sm font-medium">{employeeToView.irataLevel}</div>
                         </div>
+                        )}
                         {employeeToView.irataLicenseNumber && (
                           <div>
                             <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.licenseNumber', 'License Number')}</div>
@@ -8460,7 +8763,7 @@ export default function Dashboard() {
                   )}
 
                   {/* SPRAT Certification */}
-                  {employeeToView.spratLevel && (
+                  {(employeeToView.spratLevel || employeeToView.spratLicenseNumber || employeeToView.spratExpirationDate || (employeeToView.spratDocuments?.length > 0)) && (
                     <Card>
                       <CardHeader>
                         <CardTitle className="text-base flex items-center gap-2 justify-between">
@@ -8481,10 +8784,12 @@ export default function Dashboard() {
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-3">
+                        {employeeToView.spratLevel && (
                         <div>
                           <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.level', 'Level')}</div>
                           <div className="text-sm font-medium">{employeeToView.spratLevel}</div>
                         </div>
+                        )}
                         {employeeToView.spratLicenseNumber && (
                           <div>
                             <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.licenseNumber', 'License Number')}</div>
@@ -8612,7 +8917,7 @@ export default function Dashboard() {
                   )}
 
                   {/* Driver's License */}
-                  {(employeeToView.driversLicenseNumber || employeeToView.driversLicenseProvince || (employeeToView.driversLicenseDocuments && employeeToView.driversLicenseDocuments.length > 0)) && (
+                  {(employeeToView.driversLicenseNumber || employeeToView.driversLicenseProvince || employeeToView.driversLicenseIssuedDate || employeeToView.driversLicenseExpiry || (employeeToView.driversLicenseDocuments?.length > 0)) && (
                     <Card>
                       <CardHeader>
                         <CardTitle className="text-base flex items-center gap-2">
@@ -8631,6 +8936,12 @@ export default function Dashboard() {
                           <div>
                             <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.provinceState', 'Province/State')}</div>
                             <div className="text-sm font-medium">{employeeToView.driversLicenseProvince}</div>
+                          </div>
+                        )}
+                        {employeeToView.driversLicenseIssuedDate && (
+                          <div>
+                            <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.issuedDate', 'Issued Date')}</div>
+                            <div className="text-sm font-medium">{formatLocalDate(employeeToView.driversLicenseIssuedDate)}</div>
                           </div>
                         )}
                         {employeeToView.driversLicenseExpiry && (

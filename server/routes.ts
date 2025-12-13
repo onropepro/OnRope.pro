@@ -14,6 +14,7 @@ import Stripe from "stripe";
 import { type TierName, type Currency, TIER_CONFIG, ADDON_CONFIG } from "../shared/stripe-config";
 import { checkSubscriptionLimits } from "./subscription-middleware";
 import { getTodayString, toLocalDateString, parseLocalDate, getStartOfWeek, getEndOfWeek } from "./dateUtils";
+import { getDefaultElevation } from "@shared/jobTypes";
 import { Resend } from "resend";
 import rateLimit from "express-rate-limit";
 
@@ -154,6 +155,19 @@ function canViewCSR(user: any): boolean {
   // All other roles need explicit permission
   const permissions = normalizePermissions(user.permissions);
   return permissions.includes('view_csr');
+}
+
+// Helper function to check if user can view sensitive documents
+// (Incident Reports, Damage Reports, COI, Equipment Inspections)
+function canViewSensitiveDocuments(user: any): boolean {
+  if (!user) return false;
+  
+  // Company role always has access
+  if (user.role === 'company') return true;
+  
+  // All other roles need explicit permission
+  const permissions = normalizePermissions(user.permissions);
+  return permissions.includes('view_sensitive_documents');
 }
 
 // ============================================================================
@@ -2281,7 +2295,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Check if employee belongs to this company (primary or secondary)
-      const membership = await storage.checkEmployeeBelongsToCompany(id, user.id);
+      // includeSuspended=true to find suspended connections for reactivation
+      const membership = await storage.checkEmployeeBelongsToCompany(id, user.id, true);
       if (!membership.belongs) {
         return res.status(403).json({ message: "Cannot reactivate employees from another company" });
       }
@@ -3377,6 +3392,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("[Technician] Error uploading document:", error);
       res.status(500).json({ message: error.message || "Failed to upload document" });
+    }
+  });
+
+  // Technician: Delete uploaded document
+  app.delete("/api/technician/document", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const user = await storage.getUserById(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.role !== 'rope_access_tech') {
+        return res.status(403).json({ message: "Only technicians can delete documents through this endpoint" });
+      }
+
+      const { documentType, documentUrl } = req.body;
+      if (!documentType || !documentUrl) {
+        return res.status(400).json({ message: "Document type and URL are required" });
+      }
+
+      const validTypes = ['bankDocuments', 'driversLicenseDocuments', 'firstAidDocuments', 'irataDocuments', 'spratDocuments', 'resumeDocuments'];
+      if (!validTypes.includes(documentType)) {
+        return res.status(400).json({ message: `Invalid document type. Must be one of: ${validTypes.join(', ')}` });
+      }
+
+      // Get the current document array and remove the URL
+      let updateData: any = {};
+      let currentDocs: string[] = [];
+      
+      if (documentType === 'bankDocuments') {
+        currentDocs = user.bankDocuments || [];
+      } else if (documentType === 'driversLicenseDocuments') {
+        currentDocs = user.driversLicenseDocuments || [];
+      } else if (documentType === 'firstAidDocuments') {
+        currentDocs = user.firstAidDocuments || [];
+      } else if (documentType === 'irataDocuments') {
+        currentDocs = user.irataDocuments || [];
+      } else if (documentType === 'spratDocuments') {
+        currentDocs = user.spratDocuments || [];
+      } else if (documentType === 'resumeDocuments') {
+        currentDocs = user.resumeDocuments || [];
+      }
+
+      // Check if the document exists
+      if (!currentDocs.includes(documentUrl)) {
+        return res.status(404).json({ message: "Document not found" });
+      }
+
+      // Remove the document URL from the array
+      const updatedDocs = currentDocs.filter(url => url !== documentUrl);
+      updateData[documentType] = updatedDocs;
+
+      await storage.updateUser(userId, updateData);
+
+      console.log(`[Technician] Deleted ${documentType} document for user ${userId}`);
+
+      res.json({ 
+        message: "Document deleted successfully",
+        documentType
+      });
+    } catch (error: any) {
+      console.error("[Technician] Error deleting document:", error);
+      res.status(500).json({ message: error.message || "Failed to delete document" });
     }
   });
 
@@ -8775,14 +8855,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Job types that don't use drop-based tracking (hours-based or non-elevation jobs)
       const nonDropJobTypes = ['in_suite_dryer_vent_cleaning', 'parkade_pressure_cleaning', 'ground_window_cleaning', 'general_pressure_washing'];
       const isNdtJob = req.body.jobType?.startsWith('ndt_');
-      const isNonDropJob = nonDropJobTypes.includes(req.body.jobType) || isNdtJob || req.body.requiresElevation === false;
+      
+      // Use job type's default elevation requirement if not explicitly provided
+      // This ensures ground-level jobs (ground_window_cleaning, in_suite, parkade) don't require rope access docs
+      const defaultElevation = getDefaultElevation(req.body.jobType);
+      const requiresElevation = req.body.requiresElevation !== undefined ? req.body.requiresElevation : defaultElevation;
+      
+      const isNonDropJob = nonDropJobTypes.includes(req.body.jobType) || isNdtJob || requiresElevation === false;
       
       const projectData = insertProjectSchema.parse({
         ...req.body,
         strataPlanNumber: normalizeStrataPlan(req.body.strataPlanNumber),
         companyId,
         jobCategory: req.body.jobCategory || 'building_maintenance',
-        requiresElevation: req.body.requiresElevation ?? true,
+        requiresElevation,
         targetCompletionDate: req.body.targetCompletionDate || null,
         // Default dailyDropTarget to 0 for non-drop job types
         dailyDropTarget: isNonDropJob ? 0 : req.body.dailyDropTarget,
@@ -12582,6 +12668,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied - Insufficient inventory permissions" });
       }
       
+      // Check sensitive documents permission
+      if (!canViewSensitiveDocuments(currentUser)) {
+        return res.status(403).json({ message: "Forbidden - Insufficient permissions to view sensitive documents" });
+      }
+      
       const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
       
       if (!companyId) {
@@ -12607,6 +12698,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check inventory view permission
       if (!canViewInventory(currentUser)) {
         return res.status(403).json({ message: "Access denied - Insufficient inventory permissions" });
+      }
+      
+      // Check sensitive documents permission
+      if (!canViewSensitiveDocuments(currentUser)) {
+        return res.status(403).json({ message: "Forbidden - Insufficient permissions to view sensitive documents" });
       }
       
       const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
@@ -12776,6 +12872,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!currentUser) {
         return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check sensitive documents permission
+      if (!canViewSensitiveDocuments(currentUser)) {
+        return res.status(403).json({ message: "Forbidden - Insufficient permissions to view sensitive documents" });
       }
       
       const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
@@ -13113,68 +13214,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ? Math.round(((harnessRequiredInspections - harnessCompletedInspections) / harnessRequiredInspections) * 25)
         : 0;
       
-      // 4. Project Completion Rate (average progress of all active/completed projects)
-      // This is a bonus metric - new companies with no projects get 100%
-      let totalProjectProgress = 0;
-      let projectCount = 0;
-      
-      for (const project of projects) {
-        if (project.status === 'deleted') continue;
-        
-        projectCount++;
-        const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id && s.endTime);
-        
-        // If project is marked completed, count as 100%
-        if (project.status === 'completed') {
-          totalProjectProgress += 100;
-          continue;
-        }
-        
-        // Calculate progress based on job type
-        if (project.jobType === 'general_pressure_washing' || project.jobType === 'ground_window_cleaning') {
-          // Hours-based: SUM all manualCompletionPercentage values (each session = contribution %)
-          const sessionsWithPercentage = projectSessions.filter((s: any) => 
-            s.manualCompletionPercentage !== null && s.manualCompletionPercentage !== undefined
-          );
-          if (sessionsWithPercentage.length > 0) {
-            const summedPercentage = sessionsWithPercentage.reduce((sum: number, s: any) => 
-              sum + Number(s.manualCompletionPercentage ?? 0), 0
-            );
-            // Guard against NaN and cap at 100%
-            if (!isNaN(summedPercentage)) {
-              totalProjectProgress += Math.min(100, summedPercentage);
-            }
-          }
-        } else if (project.jobType === 'in_suite_dryer_vent_cleaning') {
-          // Suite-based
-          const completedSuites = projectSessions.reduce((sum: number, s: any) => 
-            sum + (s.suitesCompleted || 0), 0);
-          const totalSuites = (project.floorCount || 1) * (project.suitesPerDay || 1);
-          totalProjectProgress += totalSuites > 0 ? Math.min(100, (completedSuites / totalSuites) * 100) : 0;
-        } else if (project.jobType === 'parkade_pressure_cleaning') {
-          // Stall-based
-          const completedStalls = projectSessions.reduce((sum: number, s: any) => 
-            sum + (s.stallsCompleted || 0), 0);
-          const totalStalls = project.totalStalls || project.floorCount || 1;
-          totalProjectProgress += totalStalls > 0 ? Math.min(100, (completedStalls / totalStalls) * 100) : 0;
-        } else {
-          // Drop-based
-          const totalDrops = (project.totalDropsNorth || 0) + (project.totalDropsEast || 0) + 
-                            (project.totalDropsSouth || 0) + (project.totalDropsWest || 0);
-          const completedDrops = projectSessions.reduce((sum: number, s: any) => 
-            sum + (s.dropsCompletedNorth || 0) + (s.dropsCompletedEast || 0) + 
-                  (s.dropsCompletedSouth || 0) + (s.dropsCompletedWest || 0), 0);
-          totalProjectProgress += totalDrops > 0 ? Math.min(100, (completedDrops / totalDrops) * 100) : 0;
-        }
-      }
-      
-      // Project completion - no penalty for new companies with no projects
-      // For companies with projects, this reflects their overall project health
-      const projectCompletionRating = projectCount > 0 ? Math.round(totalProjectProgress / projectCount) : 100;
-      // No penalty from projects - this is informational only
-      const projectPenalty = 0;
-      
-      // 5. Document Review Compliance Rating
+      // 4. Document Review Compliance Rating
       // Tracks employee acknowledgment of safety documents (H&S Manual, Company Policy, Safe Work Procedures)
       // Calculate based on TOTAL REQUIRED signatures = (employees + company owner) × required documents
       const documentReviews = await storage.getDocumentReviewSignaturesByCompany(companyId);
@@ -13267,19 +13307,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Calculate overall CSR: Start at 100%, subtract penalties
       // Max penalty is 100% (25% docs, 25% toolbox, 25% harness, 5% document reviews, 20% project docs)
-      // Project completion is shown but doesn't penalize
-      const totalPenalty = documentationPenalty + toolboxPenalty + harnessPenalty + documentReviewPenalty + projectDocumentationPenalty + projectPenalty;
+      const totalPenalty = documentationPenalty + toolboxPenalty + harnessPenalty + documentReviewPenalty + projectDocumentationPenalty;
       const overallCSR = Math.max(0, 100 - totalPenalty);
       
-      res.json({
+      const response = {
         overallCSR,
         breakdown: {
           documentationRating,
           toolboxMeetingRating,
           harnessInspectionRating,
           documentReviewRating,
-          projectDocumentationRating,
-          projectCompletionRating
+          projectDocumentationRating
         },
         details: {
           hasHealthSafety,
@@ -13293,17 +13331,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
           documentReviewsTotal: totalRequiredSignatures,
           documentReviewsTotalEmployees: totalEmployees,
           documentReviewsTotalDocs: totalRequiredDocs,
-          projectCount,
-          totalProjectProgress: projectCount > 0 ? Math.round(totalProjectProgress / projectCount) : 100,
           projectsWithAnchorInspection,
           projectsWithRopeAccessPlan,
           projectsWithFLHA,
           activeProjectCount,
           elevationProjectCount
         }
-      });
+      };
+      
+      // Record CSR history if score has changed
+      const lastHistory = await storage.getLatestCsrRatingHistory(companyId);
+      if (!lastHistory || lastHistory.newScore !== overallCSR) {
+        const previousScore = lastHistory ? lastHistory.newScore : 100;
+        const delta = overallCSR - previousScore;
+        
+        // Determine which category caused the change
+        let category = 'overall';
+        let reason = 'Safety rating updated';
+        
+        if (lastHistory) {
+          // Compare individual breakdowns to find the main driver
+          if (documentationPenalty > 0 && !hasHealthSafety && !hasCompanyPolicy) {
+            category = 'documentation';
+            reason = 'Missing required documentation (Health & Safety Manual and/or Company Policy)';
+          } else if (toolboxPenalty > 0) {
+            category = 'toolbox';
+            reason = `Toolbox meeting coverage: ${toolboxDaysWithMeeting}/${toolboxTotalDays} work days covered`;
+          } else if (harnessPenalty > 0) {
+            category = 'harness';
+            reason = `Harness inspections: ${harnessCompletedInspections}/${harnessRequiredInspections} completed`;
+          } else if (documentReviewPenalty > 0) {
+            category = 'documentReview';
+            reason = `Document reviews: ${signedReviews}/${totalRequiredSignatures} signatures completed`;
+          } else if (projectDocumentationPenalty > 0) {
+            category = 'projectDocumentation';
+            reason = `Project documentation: ${totalProjectDocsPresent}/${totalProjectDocsRequired} documents present`;
+          } else if (delta > 0) {
+            category = 'improvement';
+            reason = 'Safety compliance improved';
+          }
+        } else {
+          category = 'initial';
+          reason = 'Initial safety rating recorded';
+        }
+        
+        await storage.createCsrRatingHistory({
+          companyId,
+          previousScore,
+          newScore: overallCSR,
+          delta,
+          category,
+          reason
+        });
+      }
+      
+      res.json(response);
     } catch (error) {
       console.error("Get company safety rating error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // CSR Rating History endpoint
+  app.get("/api/company-safety-rating/history", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (!canViewCSR(currentUser)) {
+        return res.status(403).json({ message: "Forbidden - Insufficient permissions to view CSR history" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const history = await storage.getCsrRatingHistoryByCompany(companyId);
+      res.json({ history });
+    } catch (error) {
+      console.error("Get CSR history error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
@@ -13678,9 +13789,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      // Check if user has permission to view safety documents
-      if (!canViewSafetyDocuments(currentUser)) {
-        return res.status(403).json({ message: "Forbidden - You don't have permission to view incident reports" });
+      // Check if user has permission to view sensitive documents
+      if (!canViewSensitiveDocuments(currentUser)) {
+        return res.status(403).json({ message: "Forbidden - Insufficient permissions to view sensitive documents" });
       }
       
       const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
@@ -13699,11 +13810,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/incident-reports/:id", requireAuth, async (req: Request, res: Response) => {
     try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check sensitive documents permission
+      if (!canViewSensitiveDocuments(currentUser)) {
+        return res.status(403).json({ message: "Forbidden - Insufficient permissions to view sensitive documents" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
       const { id } = req.params;
       const report = await storage.getIncidentReportById(id);
       
       if (!report) {
         return res.status(404).json({ message: "Incident report not found" });
+      }
+      
+      // Verify the incident report belongs to this company
+      if (report.companyId !== companyId) {
+        return res.status(403).json({ message: "Access denied" });
       }
       
       res.json({ report });

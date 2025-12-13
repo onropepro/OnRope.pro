@@ -97,6 +97,7 @@ export const users = pgTable("users", {
   socialInsuranceNumber: varchar("social_insurance_number"), // Social Insurance Number (optional)
   driversLicenseNumber: varchar("drivers_license_number"), // Driver's license number (optional)
   driversLicenseProvince: varchar("drivers_license_province"), // Province where driver's license was issued (optional)
+  driversLicenseIssuedDate: date("drivers_license_issued_date"), // Driver's license issue date (optional)
   driversLicenseExpiry: date("drivers_license_expiry"), // Driver's license expiry date (optional)
   driversLicenseDocuments: text("drivers_license_documents").array().default(sql`ARRAY[]::text[]`), // Array of document URLs (driver's license photos, abstracts, etc.)
   resumeDocuments: text("resume_documents").array().default(sql`ARRAY[]::text[]`), // Array of resume/CV document URLs
@@ -969,6 +970,24 @@ export const toolboxMeetings = pgTable("toolbox_meetings", {
   index("IDX_toolbox_meetings_project").on(table.projectId, table.meetingDate),
   index("IDX_toolbox_meetings_conductor").on(table.conductedBy, table.meetingDate),
 ]);
+
+// CSR Rating History - tracks changes to Company Safety Rating over time
+export const csrRatingHistory = pgTable("csr_rating_history", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  previousScore: integer("previous_score").notNull(),
+  newScore: integer("new_score").notNull(),
+  delta: integer("delta").notNull(), // Positive = improvement, negative = decline
+  category: varchar("category").notNull(), // Which factor caused the change (documentation, toolbox, harness, etc.)
+  reason: text("reason").notNull(), // Human-readable reason for the change
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_csr_rating_history_company").on(table.companyId, table.createdAt),
+]);
+
+export const insertCsrRatingHistorySchema = createInsertSchema(csrRatingHistory).omit({ id: true, createdAt: true });
+export type InsertCsrRatingHistory = z.infer<typeof insertCsrRatingHistorySchema>;
+export type CsrRatingHistory = typeof csrRatingHistory.$inferSelect;
 
 // Field Level Hazard Assessment (FLHA) table - Rope Access specific
 export const flhaForms = pgTable("flha_forms", {

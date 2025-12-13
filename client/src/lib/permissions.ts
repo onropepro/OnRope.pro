@@ -164,6 +164,17 @@ export function canViewCSR(user: User | null | undefined): boolean {
   return checkPermission(user, 'view_csr');
 }
 
+/**
+ * Check if user can view sensitive documents (Incident Reports, Damage Reports, COI, Equipment Inspections)
+ * - Company owners always have access
+ * - All other roles need explicit 'view_sensitive_documents' permission
+ */
+export function canViewSensitiveDocuments(user: User | null | undefined): boolean {
+  if (!user) return false;
+  if (isCompanyOwner(user)) return true;
+  return checkPermission(user, 'view_sensitive_documents');
+}
+
 // ============================================================================
 // INVENTORY PERMISSIONS
 // ============================================================================
@@ -270,6 +281,7 @@ export const permissions = {
   safety: {
     canViewDocuments: canViewSafetyDocuments,
     canViewCSR,
+    canViewSensitiveDocuments,
   },
   inventory: {
     canAccess: canAccessInventory,

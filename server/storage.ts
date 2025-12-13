@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, quoteHistory, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff, documentReviewSignatures, equipmentDamageReports, featureRequests, featureRequestMessages, churnEvents, buildings, buildingInstructions, normalizeStrataPlan, teamInvitations, historicalHours, technicianEmployerConnections } from "@shared/schema";
-import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, QuoteHistory, InsertQuoteHistory, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff, DocumentReviewSignature, InsertDocumentReviewSignature, EquipmentDamageReport, InsertEquipmentDamageReport, FeatureRequest, InsertFeatureRequest, FeatureRequestMessage, InsertFeatureRequestMessage, FeatureRequestWithMessages, ChurnEvent, InsertChurnEvent, Building, InsertBuilding, BuildingInstructions, InsertBuildingInstructions, TeamInvitation, InsertTeamInvitation, HistoricalHours, InsertHistoricalHours } from "@shared/schema";
+import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, quoteHistory, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff, documentReviewSignatures, equipmentDamageReports, featureRequests, featureRequestMessages, churnEvents, buildings, buildingInstructions, normalizeStrataPlan, teamInvitations, historicalHours, technicianEmployerConnections, csrRatingHistory } from "@shared/schema";
+import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, QuoteHistory, InsertQuoteHistory, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff, DocumentReviewSignature, InsertDocumentReviewSignature, EquipmentDamageReport, InsertEquipmentDamageReport, FeatureRequest, InsertFeatureRequest, FeatureRequestMessage, InsertFeatureRequestMessage, FeatureRequestWithMessages, ChurnEvent, InsertChurnEvent, Building, InsertBuilding, BuildingInstructions, InsertBuildingInstructions, TeamInvitation, InsertTeamInvitation, HistoricalHours, InsertHistoricalHours, CsrRatingHistory, InsertCsrRatingHistory } from "@shared/schema";
 import { eq, and, or, desc, sql, isNull, isNotNull, not, gte, lte, between, inArray } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import { encryptSensitiveFields, decryptSensitiveFields } from "./encryption";
@@ -171,7 +171,7 @@ export class Storage {
    * Check if an employee belongs to a company (either via companyId or via employer_connections)
    * Returns { belongs: boolean, connectionType: 'primary' | 'secondary' | null, connectionId?: string }
    */
-  async checkEmployeeBelongsToCompany(employeeId: string, companyId: string): Promise<{
+  async checkEmployeeBelongsToCompany(employeeId: string, companyId: string, includeSuspended: boolean = false): Promise<{
     belongs: boolean;
     connectionType: 'primary' | 'secondary' | null;
     connectionId?: string;
@@ -187,11 +187,16 @@ export class Storage {
     }
 
     // Check secondary connection (employer_connections table)
+    // Include suspended connections if requested (for reactivation flow)
+    const statusConditions = includeSuspended 
+      ? or(eq(technicianEmployerConnections.status, "active"), eq(technicianEmployerConnections.status, "suspended"))
+      : eq(technicianEmployerConnections.status, "active");
+    
     const secondaryConnection = await db.select().from(technicianEmployerConnections)
       .where(and(
         eq(technicianEmployerConnections.technicianId, employeeId),
         eq(technicianEmployerConnections.companyId, companyId),
-        eq(technicianEmployerConnections.status, "active")
+        statusConditions
       )).limit(1);
 
     if (secondaryConnection.length > 0) {
@@ -4165,6 +4170,28 @@ export class Storage {
       .where(eq(historicalHours.id, id))
       .returning();
     return result.length > 0;
+  }
+
+  // CSR Rating History operations
+  async createCsrRatingHistory(data: InsertCsrRatingHistory): Promise<CsrRatingHistory> {
+    const result = await db.insert(csrRatingHistory).values(data).returning();
+    return result[0];
+  }
+
+  async getCsrRatingHistoryByCompany(companyId: string): Promise<CsrRatingHistory[]> {
+    return db.select()
+      .from(csrRatingHistory)
+      .where(eq(csrRatingHistory.companyId, companyId))
+      .orderBy(desc(csrRatingHistory.createdAt));
+  }
+
+  async getLatestCsrRatingHistory(companyId: string): Promise<CsrRatingHistory | undefined> {
+    const result = await db.select()
+      .from(csrRatingHistory)
+      .where(eq(csrRatingHistory.companyId, companyId))
+      .orderBy(desc(csrRatingHistory.createdAt))
+      .limit(1);
+    return result[0];
   }
 }
 
