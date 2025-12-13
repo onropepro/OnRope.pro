@@ -14,6 +14,7 @@ import Stripe from "stripe";
 import { type TierName, type Currency, TIER_CONFIG, ADDON_CONFIG } from "../shared/stripe-config";
 import { checkSubscriptionLimits } from "./subscription-middleware";
 import { getTodayString, toLocalDateString, parseLocalDate, getStartOfWeek, getEndOfWeek } from "./dateUtils";
+import { getDefaultElevation } from "@shared/jobTypes";
 import { Resend } from "resend";
 import rateLimit from "express-rate-limit";
 
@@ -8788,14 +8789,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Job types that don't use drop-based tracking (hours-based or non-elevation jobs)
       const nonDropJobTypes = ['in_suite_dryer_vent_cleaning', 'parkade_pressure_cleaning', 'ground_window_cleaning', 'general_pressure_washing'];
       const isNdtJob = req.body.jobType?.startsWith('ndt_');
-      const isNonDropJob = nonDropJobTypes.includes(req.body.jobType) || isNdtJob || req.body.requiresElevation === false;
+      
+      // Use job type's default elevation requirement if not explicitly provided
+      // This ensures ground-level jobs (ground_window_cleaning, in_suite, parkade) don't require rope access docs
+      const defaultElevation = getDefaultElevation(req.body.jobType);
+      const requiresElevation = req.body.requiresElevation !== undefined ? req.body.requiresElevation : defaultElevation;
+      
+      const isNonDropJob = nonDropJobTypes.includes(req.body.jobType) || isNdtJob || requiresElevation === false;
       
       const projectData = insertProjectSchema.parse({
         ...req.body,
         strataPlanNumber: normalizeStrataPlan(req.body.strataPlanNumber),
         companyId,
         jobCategory: req.body.jobCategory || 'building_maintenance',
-        requiresElevation: req.body.requiresElevation ?? true,
+        requiresElevation,
         targetCompletionDate: req.body.targetCompletionDate || null,
         // Default dailyDropTarget to 0 for non-drop job types
         dailyDropTarget: isNonDropJob ? 0 : req.body.dailyDropTarget,
