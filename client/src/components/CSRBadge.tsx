@@ -206,7 +206,7 @@ export function CSRBadge({ user }: CSRBadgeProps) {
             data-testid="badge-csr"
           >
             <Shield className="w-4 h-4" />
-            <span className="text-sm font-semibold">CSR: {overallCSR}%</span>
+            <span className="text-sm font-semibold">CSR: {overallCSR} {overallCSR === 1 ? 'point' : 'points'}</span>
           </Badge>
         </DialogTrigger>
         <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto" data-testid="dialog-csr-details">
@@ -221,7 +221,7 @@ export function CSRBadge({ user }: CSRBadgeProps) {
             <div className="flex items-center justify-center p-6 rounded-xl bg-muted/50">
               <div className="text-center">
                 <div className={`text-5xl font-bold ${getRatingColor(overallCSR)}`}>
-                  {overallCSR}%
+                  {overallCSR} {overallCSR === 1 ? 'point' : 'points'}
                 </div>
                 <p className="text-sm text-muted-foreground mt-1">Overall Safety Score</p>
               </div>
@@ -255,7 +255,7 @@ export function CSRBadge({ user }: CSRBadgeProps) {
                       <span>Documentation</span>
                     </div>
                     <span className={`font-semibold ${getRatingColor(breakdown.documentationRating)}`}>
-                      {breakdown.documentationRating}%
+                      {breakdown.documentationRating} {breakdown.documentationRating === 1 ? 'point' : 'points'}
                     </span>
                   </div>
                   <ColoredProgress value={breakdown.documentationRating} rating={breakdown.documentationRating} />
@@ -275,7 +275,7 @@ export function CSRBadge({ user }: CSRBadgeProps) {
                       <span>Toolbox Meetings</span>
                     </div>
                     <span className={`font-semibold ${getRatingColor(breakdown.toolboxMeetingRating)}`}>
-                      {breakdown.toolboxMeetingRating}%
+                      {breakdown.toolboxMeetingRating} {breakdown.toolboxMeetingRating === 1 ? 'point' : 'points'}
                     </span>
                   </div>
                   <ColoredProgress value={breakdown.toolboxMeetingRating} rating={breakdown.toolboxMeetingRating} />
@@ -291,7 +291,7 @@ export function CSRBadge({ user }: CSRBadgeProps) {
                       <span>Harness Inspections</span>
                     </div>
                     <span className={`font-semibold ${getRatingColor(breakdown.harnessInspectionRating)}`}>
-                      {breakdown.harnessInspectionRating}%
+                      {breakdown.harnessInspectionRating} {breakdown.harnessInspectionRating === 1 ? 'point' : 'points'}
                     </span>
                   </div>
                   <ColoredProgress value={breakdown.harnessInspectionRating} rating={breakdown.harnessInspectionRating} />
@@ -307,7 +307,7 @@ export function CSRBadge({ user }: CSRBadgeProps) {
                       <span>Document Reviews</span>
                     </div>
                     <span className={`font-semibold ${getRatingColor(breakdown.documentReviewRating)}`}>
-                      {breakdown.documentReviewRating}%
+                      {breakdown.documentReviewRating} {breakdown.documentReviewRating === 1 ? 'point' : 'points'}
                     </span>
                   </div>
                   <ColoredProgress value={breakdown.documentReviewRating} rating={breakdown.documentReviewRating} />
@@ -413,7 +413,7 @@ export function CSRBadge({ user }: CSRBadgeProps) {
                         <div>
                           <div className="flex items-center gap-2">
                             <span className={`text-lg font-bold ${getRatingColor(entry.newScore)}`}>
-                              {entry.newScore}%
+                              {entry.newScore} {entry.newScore === 1 ? 'point' : 'points'}
                             </span>
                             <span className={`text-sm font-medium ${
                               entry.delta > 0 
@@ -422,11 +422,11 @@ export function CSRBadge({ user }: CSRBadgeProps) {
                                   ? 'text-red-600 dark:text-red-400' 
                                   : 'text-muted-foreground'
                             }`}>
-                              {entry.delta > 0 ? '+' : ''}{entry.delta}%
+                              {entry.delta > 0 ? '+' : ''}{entry.delta} {Math.abs(entry.delta) === 1 ? 'point' : 'points'}
                             </span>
                           </div>
                           <p className="text-xs text-muted-foreground">
-                            from {entry.previousScore}%
+                            from {entry.previousScore} {entry.previousScore === 1 ? 'point' : 'points'}
                           </p>
                         </div>
                       </div>
@@ -434,9 +434,9 @@ export function CSRBadge({ user }: CSRBadgeProps) {
                         {getCategoryLabel(entry.category)}
                       </Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground mt-2">
+                    <div className="text-sm text-muted-foreground mt-3 whitespace-pre-line bg-muted/30 p-3 rounded-md">
                       {entry.reason}
-                    </p>
+                    </div>
                     <p className="text-xs text-muted-foreground mt-2">
                       {formatDistanceToNow(new Date(entry.createdAt), { addSuffix: true })}
                     </p>

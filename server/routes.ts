@@ -13062,13 +13062,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // 1. Documentation Safety Rating (Health & Safety Manual + Company Policy + Certificate of Insurance)
-      // -25% penalty if any required document is missing
+      // Percentage allocation removed - no penalty applied
       const companyDocuments = await storage.getCompanyDocuments(companyId);
       const hasHealthSafety = companyDocuments.some((doc: any) => doc.documentType === 'health_safety_manual');
       const hasCompanyPolicy = companyDocuments.some((doc: any) => doc.documentType === 'company_policy');
       const hasInsurance = companyDocuments.some((doc: any) => doc.documentType === 'certificate_of_insurance');
       const documentationRating = (hasHealthSafety && hasCompanyPolicy && hasInsurance) ? 100 : 0;
-      const documentationPenalty = documentationRating === 100 ? 0 : 25;
+      const documentationPenalty = 0;
       
       // 2. Toolbox Meeting Compliance (with 7-day coverage window)
       // A toolbox meeting covers its project for 7 days forward from the meeting date
@@ -13151,10 +13151,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const toolboxMeetingRating = toolboxTotalDays > 0 
         ? Math.round((toolboxDaysWithMeeting / toolboxTotalDays) * 100) 
         : 100;
-      // Penalty is proportional to missed coverage (max 25%)
-      const toolboxPenalty = toolboxTotalDays > 0 
-        ? Math.round(((toolboxTotalDays - toolboxDaysWithMeeting) / toolboxTotalDays) * 25)
-        : 0;
+      // Percentage allocation removed - no penalty applied
+      const toolboxPenalty = 0;
       
       // 3. Daily Harness Inspection Rating (last 30 days)
       const harnessInspections = await storage.getHarnessInspectionsByCompany(companyId);
@@ -13209,10 +13207,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const harnessInspectionRating = harnessRequiredInspections > 0 
         ? Math.round((harnessCompletedInspections / harnessRequiredInspections) * 100) 
         : 100;
-      // Penalty is proportional to missed inspections (max 25%)
-      const harnessPenalty = harnessRequiredInspections > 0 
-        ? Math.round(((harnessRequiredInspections - harnessCompletedInspections) / harnessRequiredInspections) * 25)
-        : 0;
+      // Percentage allocation removed - no penalty applied
+      const harnessPenalty = 0;
       
       // 4. Document Review Compliance Rating
       // Tracks employee acknowledgment of safety documents (H&S Manual, Company Policy, Safe Work Procedures)
@@ -13244,9 +13240,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const documentReviewRating = totalRequiredSignatures > 0 
         ? Math.round((signedReviews / totalRequiredSignatures) * 100) 
         : 100;
-      const documentReviewPenalty = totalRequiredSignatures > 0 
-        ? Math.round(((totalRequiredSignatures - signedReviews) / totalRequiredSignatures) * 5)
-        : 0;
+      // Percentage allocation removed - no penalty applied
+      const documentReviewPenalty = 0;
       
       // 6. Project Safety Documentation Rating
       // Tracks per-project safety documents: Anchor Inspection, Rope Access Plan, FLHA
@@ -13300,24 +13295,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const projectDocumentationRating = totalProjectDocsRequired > 0
         ? Math.round((totalProjectDocsPresent / totalProjectDocsRequired) * 100)
         : 100;
-      // Max 20% penalty for missing project documents
-      const projectDocumentationPenalty = totalProjectDocsRequired > 0
-        ? Math.round(((totalProjectDocsRequired - totalProjectDocsPresent) / totalProjectDocsRequired) * 20)
-        : 0;
+      // Percentage allocation removed - no penalty applied
+      const projectDocumentationPenalty = 0;
       
-      // Calculate overall CSR: Start at 100%, subtract penalties
-      // Max penalty is 100% (25% docs, 25% toolbox, 25% harness, 5% document reviews, 20% project docs)
+      // Calculate overall CSR: Now point-based, starts at 0 until further instructions
+      // All percentage allocations removed
       const totalPenalty = documentationPenalty + toolboxPenalty + harnessPenalty + documentReviewPenalty + projectDocumentationPenalty;
-      const overallCSR = Math.max(0, 100 - totalPenalty);
+      const overallCSR = 0;
       
       const response = {
         overallCSR,
         breakdown: {
-          documentationRating,
-          toolboxMeetingRating,
-          harnessInspectionRating,
-          documentReviewRating,
-          projectDocumentationRating
+          documentationRating: 0,
+          toolboxMeetingRating: 0,
+          harnessInspectionRating: 0,
+          documentReviewRating: 0,
+          projectDocumentationRating: 0
         },
         details: {
           hasHealthSafety,
@@ -13345,44 +13338,108 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const previousScore = lastHistory ? lastHistory.newScore : 100;
         const delta = overallCSR - previousScore;
         
-        // Determine which category caused the change
-        let category = 'overall';
-        let reason = 'Safety rating updated';
-        
-        if (lastHistory) {
-          // Compare individual breakdowns to find the main driver
-          if (documentationPenalty > 0 && !hasHealthSafety && !hasCompanyPolicy) {
-            category = 'documentation';
-            reason = 'Missing required documentation (Health & Safety Manual and/or Company Policy)';
-          } else if (toolboxPenalty > 0) {
-            category = 'toolbox';
-            reason = `Toolbox meeting coverage: ${toolboxDaysWithMeeting}/${toolboxTotalDays} work days covered`;
-          } else if (harnessPenalty > 0) {
-            category = 'harness';
-            reason = `Harness inspections: ${harnessCompletedInspections}/${harnessRequiredInspections} completed`;
-          } else if (documentReviewPenalty > 0) {
-            category = 'documentReview';
-            reason = `Document reviews: ${signedReviews}/${totalRequiredSignatures} signatures completed`;
-          } else if (projectDocumentationPenalty > 0) {
-            category = 'projectDocumentation';
-            reason = `Project documentation: ${totalProjectDocsPresent}/${totalProjectDocsRequired} documents present`;
-          } else if (delta > 0) {
-            category = 'improvement';
-            reason = 'Safety compliance improved';
+        if (!lastHistory) {
+          // Create detailed initial entry with full breakdown
+          const breakdownDetails: string[] = [];
+          
+          // Documentation breakdown
+          if (hasHealthSafety && hasCompanyPolicy) {
+            breakdownDetails.push('Documentation: 100% (Health & Safety Manual uploaded, Company Policy uploaded)');
+          } else if (hasHealthSafety) {
+            breakdownDetails.push(`Documentation: ${documentationRating}% (Health & Safety Manual uploaded, Company Policy missing - ${documentationPenalty}% penalty)`);
+          } else if (hasCompanyPolicy) {
+            breakdownDetails.push(`Documentation: ${documentationRating}% (Health & Safety Manual missing, Company Policy uploaded - ${documentationPenalty}% penalty)`);
+          } else {
+            breakdownDetails.push(`Documentation: ${documentationRating}% (Health & Safety Manual missing, Company Policy missing - ${documentationPenalty}% penalty)`);
           }
+          
+          // Toolbox meetings breakdown
+          if (toolboxTotalDays > 0) {
+            breakdownDetails.push(`Toolbox Meetings: ${toolboxMeetingRating}% (${toolboxDaysWithMeeting}/${toolboxTotalDays} work days covered in last 30 days${toolboxPenalty > 0 ? ` - ${toolboxPenalty}% penalty` : ''})`);
+          } else {
+            breakdownDetails.push('Toolbox Meetings: 100% (No work days recorded yet)');
+          }
+          
+          // Harness inspections breakdown
+          if (harnessRequiredInspections > 0) {
+            breakdownDetails.push(`Harness Inspections: ${harnessInspectionRating}% (${harnessCompletedInspections}/${harnessRequiredInspections} required inspections completed${harnessPenalty > 0 ? ` - ${harnessPenalty}% penalty` : ''})`);
+          } else {
+            breakdownDetails.push('Harness Inspections: 100% (No inspections required yet)');
+          }
+          
+          // Document reviews breakdown
+          if (totalRequiredSignatures > 0) {
+            breakdownDetails.push(`Document Reviews: ${documentReviewRating}% (${signedReviews}/${totalRequiredSignatures} signatures - ${totalEmployees} staff × ${totalRequiredDocs} docs${documentReviewPenalty > 0 ? ` - ${documentReviewPenalty}% penalty` : ''})`);
+          } else {
+            breakdownDetails.push('Document Reviews: 100% (No required documents uploaded yet)');
+          }
+          
+          // Project documentation breakdown
+          if (activeProjectCount > 0) {
+            const projectDetails: string[] = [];
+            if (elevationProjectCount > 0) {
+              projectDetails.push(`${projectsWithAnchorInspection}/${elevationProjectCount} anchor inspections`);
+              projectDetails.push(`${projectsWithRopeAccessPlan}/${elevationProjectCount} rope access plans`);
+            }
+            projectDetails.push(`${projectsWithFLHA}/${activeProjectCount} FLHAs`);
+            breakdownDetails.push(`Project Documentation: ${projectDocumentationRating}% (${projectDetails.join(', ')}${projectDocumentationPenalty > 0 ? ` - ${projectDocumentationPenalty}% penalty` : ''})`);
+          } else {
+            breakdownDetails.push('Project Documentation: 100% (No active projects)');
+          }
+          
+          const fullReason = `Initial safety rating recorded.\n\nBreakdown:\n${breakdownDetails.join('\n')}\n\nTotal Penalty: ${totalPenalty}% = Overall Score: ${overallCSR}%`;
+          
+          await storage.createCsrRatingHistory({
+            companyId,
+            previousScore,
+            newScore: overallCSR,
+            delta,
+            category: 'initial',
+            reason: fullReason
+          });
         } else {
-          category = 'initial';
-          reason = 'Initial safety rating recorded';
+          // Record changes with detailed reasons
+          const changes: string[] = [];
+          
+          // Check each category for changes and build detailed reason
+          if (documentationPenalty > 0) {
+            const docStatus = [];
+            if (!hasHealthSafety) docStatus.push('Health & Safety Manual missing');
+            if (!hasCompanyPolicy) docStatus.push('Company Policy missing');
+            changes.push(`Documentation: ${documentationRating}% (${docStatus.join(', ')} - ${documentationPenalty}% penalty)`);
+          } else if (hasHealthSafety && hasCompanyPolicy) {
+            changes.push('Documentation: 100% (All documents uploaded)');
+          }
+          
+          if (toolboxTotalDays > 0) {
+            changes.push(`Toolbox Meetings: ${toolboxMeetingRating}% (${toolboxDaysWithMeeting}/${toolboxTotalDays} work days covered${toolboxPenalty > 0 ? ` - ${toolboxPenalty}% penalty` : ''})`);
+          }
+          
+          if (harnessRequiredInspections > 0) {
+            changes.push(`Harness Inspections: ${harnessInspectionRating}% (${harnessCompletedInspections}/${harnessRequiredInspections} completed${harnessPenalty > 0 ? ` - ${harnessPenalty}% penalty` : ''})`);
+          }
+          
+          if (totalRequiredSignatures > 0) {
+            changes.push(`Document Reviews: ${documentReviewRating}% (${signedReviews}/${totalRequiredSignatures} signatures${documentReviewPenalty > 0 ? ` - ${documentReviewPenalty}% penalty` : ''})`);
+          }
+          
+          if (activeProjectCount > 0) {
+            changes.push(`Project Docs: ${projectDocumentationRating}% (${totalProjectDocsPresent}/${totalProjectDocsRequired} present${projectDocumentationPenalty > 0 ? ` - ${projectDocumentationPenalty}% penalty` : ''})`);
+          }
+          
+          const category = delta > 0 ? 'improvement' : delta < 0 ? 'decline' : 'update';
+          const changeType = delta > 0 ? 'improved' : delta < 0 ? 'declined' : 'updated';
+          const reason = `Safety rating ${changeType} from ${previousScore}% to ${overallCSR}%.\n\nCurrent Status:\n${changes.join('\n')}\n\nTotal Penalty: ${totalPenalty}%`;
+          
+          await storage.createCsrRatingHistory({
+            companyId,
+            previousScore,
+            newScore: overallCSR,
+            delta,
+            category,
+            reason
+          });
         }
-        
-        await storage.createCsrRatingHistory({
-          companyId,
-          previousScore,
-          newScore: overallCSR,
-          delta,
-          category,
-          reason
-        });
       }
       
       res.json(response);
@@ -13436,12 +13493,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const companyId = ownedLink.companyId;
       
       // 1. Documentation Safety Rating (Health & Safety Manual + Company Policy + Certificate of Insurance)
+      // Percentage allocation removed - no penalty applied
       const companyDocuments = await storage.getCompanyDocuments(companyId);
       const hasHealthSafety = companyDocuments.some((doc: any) => doc.documentType === 'health_safety_manual');
       const hasCompanyPolicy = companyDocuments.some((doc: any) => doc.documentType === 'company_policy');
       const hasInsurance = companyDocuments.some((doc: any) => doc.documentType === 'certificate_of_insurance');
       const documentationRating = (hasHealthSafety && hasCompanyPolicy && hasInsurance) ? 100 : 0;
-      const documentationPenalty = documentationRating === 100 ? 0 : 25;
+      const documentationPenalty = 0;
       
       // 2. Toolbox Meeting Compliance (with 7-day coverage window)
       // A toolbox meeting covers its project for 7 days forward from the meeting date
@@ -13521,9 +13579,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const toolboxMeetingRating = toolboxTotalDays > 0 
         ? Math.round((toolboxDaysWithMeeting / toolboxTotalDays) * 100) 
         : 100;
-      const toolboxPenalty = toolboxTotalDays > 0 
-        ? Math.round(((toolboxTotalDays - toolboxDaysWithMeeting) / toolboxTotalDays) * 25)
-        : 0;
+      // Percentage allocation removed - no penalty applied
+      const toolboxPenalty = 0;
       
       // 3. Daily Harness Inspection Rating (last 30 days)
       const harnessInspections = await storage.getHarnessInspectionsByCompany(companyId);
@@ -13574,9 +13631,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const harnessInspectionRating = harnessRequiredInspections > 0 
         ? Math.round((harnessCompletedInspections / harnessRequiredInspections) * 100) 
         : 100;
-      const harnessPenalty = harnessRequiredInspections > 0 
-        ? Math.round(((harnessRequiredInspections - harnessCompletedInspections) / harnessRequiredInspections) * 25)
-        : 0;
+      // Percentage allocation removed - no penalty applied
+      const harnessPenalty = 0;
       
       // 6. Document Review Compliance Rating
       // Calculate based on TOTAL REQUIRED signatures = (employees + owner) × required documents
@@ -13601,21 +13657,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const documentReviewRating = totalRequiredSignatures > 0 
         ? Math.round((signedReviews / totalRequiredSignatures) * 100) 
         : 100;
-      const documentReviewPenalty = totalRequiredSignatures > 0 
-        ? Math.round(((totalRequiredSignatures - signedReviews) / totalRequiredSignatures) * 5)
-        : 0;
+      // Percentage allocation removed - no penalty applied
+      const documentReviewPenalty = 0;
       
-      // Calculate overall CSR
+      // Calculate overall CSR - now point-based, starts at 0
       const totalPenalty = documentationPenalty + toolboxPenalty + harnessPenalty + documentReviewPenalty;
-      const overallCSR = Math.max(0, 100 - totalPenalty);
+      const overallCSR = 0;
       
       res.json({
         overallCSR,
         breakdown: {
-          documentationRating,
-          toolboxMeetingRating,
-          harnessInspectionRating,
-          documentReviewRating
+          documentationRating: 0,
+          toolboxMeetingRating: 0,
+          harnessInspectionRating: 0,
+          documentReviewRating: 0
         }
       });
     } catch (error) {
