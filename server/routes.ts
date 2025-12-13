@@ -13217,6 +13217,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let projectsWithRopeAccessPlan = 0;
       let projectsWithFLHA = 0;
       let activeProjectCount = 0;
+      let elevationProjectCount = 0; // Projects that require rope access
       
       for (const project of projects) {
         // Skip deleted projects entirely - they should not contribute to any counts
@@ -13225,13 +13226,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Only count active projects
         activeProjectCount++;
         
-        if (project.anchorInspectionCertificateUrl) {
-          projectsWithAnchorInspection++;
+        // Track projects requiring elevation (rope access) - these need anchor inspection and rope access plan
+        const requiresElevation = project.requiresElevation === true;
+        if (requiresElevation) {
+          elevationProjectCount++;
         }
-        if (project.ropeAccessPlanUrl) {
-          projectsWithRopeAccessPlan++;
+        
+        // Anchor inspection and rope access plan only required for elevation projects
+        if (requiresElevation) {
+          if (project.anchorInspectionCertificateUrl) {
+            projectsWithAnchorInspection++;
+          }
+          if (project.ropeAccessPlanUrl) {
+            projectsWithRopeAccessPlan++;
+          }
         }
-        // Check if project has at least one FLHA form
+        
+        // FLHA is required for all projects regardless of elevation
         const projectFLHAs = flhaForms.filter((f: any) => f.projectId === project.id);
         if (projectFLHAs.length > 0) {
           projectsWithFLHA++;
@@ -13239,9 +13250,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Calculate project documentation rating
-      // Each of the 3 document types contributes equally (33.3% each)
-      // Total required = activeProjectCount * 3 (anchor, rope access plan, FLHA)
-      const totalProjectDocsRequired = activeProjectCount * 3;
+      // Anchor inspection and rope access plan only required for elevation projects
+      // FLHA required for all active projects
+      // Total required = elevationProjectCount * 2 (anchor, rope access plan) + activeProjectCount * 1 (FLHA)
+      const totalProjectDocsRequired = (elevationProjectCount * 2) + activeProjectCount;
       const totalProjectDocsPresent = projectsWithAnchorInspection + projectsWithRopeAccessPlan + projectsWithFLHA;
       
       // If no active projects, 100% compliance
@@ -13286,7 +13298,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           projectsWithAnchorInspection,
           projectsWithRopeAccessPlan,
           projectsWithFLHA,
-          activeProjectCount
+          activeProjectCount,
+          elevationProjectCount
         }
       });
     } catch (error) {
@@ -14447,7 +14460,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Job type is required for method statement documents" });
       }
 
-      // Upload file to object storage
+      // For single-document types (health_safety_manual, company_policy), we'll delete old documents
+      // AFTER the new upload succeeds to prevent data loss on upload failure
+      let existingDocsToReplace: any[] = [];
+      if (documentType === 'health_safety_manual' || documentType === 'company_policy') {
+        existingDocsToReplace = await storage.getCompanyDocumentsByType(companyId, documentType);
+      }
+
+      // Upload file to object storage first (before any deletions)
       const objectStorageService = new ObjectStorageService();
       const timestamp = Date.now();
       const filename = `company-documents/${documentType}-${timestamp}-${req.file.originalname}`;
@@ -14457,7 +14477,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         req.file.mimetype
       );
 
-      // Save to database
+      // Save new document to database first
       const document = await storage.createCompanyDocument({
         companyId,
         documentType,
@@ -14467,6 +14487,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         uploadedByName: currentUser.name || currentUser.email || "Unknown User",
         ...(documentType === 'method_statement' && { jobType, customJobType }),
       });
+
+      // Now that new document is saved successfully, delete old documents and their signatures
+      // This invalidates all existing signatures, requiring employees to re-sign the new version
+      for (const oldDoc of existingDocsToReplace) {
+        // Delete all signatures for this document first
+        await storage.deleteDocumentReviewsByDocumentId(oldDoc.id);
+        // Then delete the document
+        await storage.deleteCompanyDocument(oldDoc.id);
+        console.log(`Replaced old ${documentType} (ID: ${oldDoc.id}) with new version (ID: ${document.id})`);
+      }
 
       // Auto-enroll all employees for Health & Safety Manual, Company Policy, Safe Work Procedure, and Safe Work Practice documents
       if (documentType === 'health_safety_manual' || documentType === 'company_policy' || documentType === 'safe_work_procedure' || documentType === 'safe_work_practice') {

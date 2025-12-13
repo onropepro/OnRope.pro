@@ -4553,21 +4553,25 @@ export default function Dashboard() {
                                 
                                 {/* Safety Documents Status - Stacked Vertically */}
                                 <div className="flex flex-col items-end gap-0.5">
-                                  {/* Anchor Inspection Certificate */}
-                                  <div className="flex items-center gap-1.5" title={project.anchorInspectionCertificateUrl ? t('dashboard.projects.anchorInspectionUploaded', 'Anchor inspection uploaded') : t('dashboard.projects.anchorInspectionMissing', 'Anchor inspection missing')}>
-                                    <span className={`material-icons text-lg ${project.anchorInspectionCertificateUrl ? 'text-green-500' : 'text-red-500'}`}>
-                                      {project.anchorInspectionCertificateUrl ? 'check_circle' : 'cancel'}
-                                    </span>
-                                    <span className="text-base text-muted-foreground">{t('dashboard.projects.anchorInspection', 'Anchor Inspection')}</span>
-                                  </div>
+                                  {/* Anchor Inspection Certificate - Only for elevation work */}
+                                  {project.requiresElevation && (
+                                    <div className="flex items-center gap-1.5" title={project.anchorInspectionCertificateUrl ? t('dashboard.projects.anchorInspectionUploaded', 'Anchor inspection uploaded') : t('dashboard.projects.anchorInspectionMissing', 'Anchor inspection missing')}>
+                                      <span className={`material-icons text-lg ${project.anchorInspectionCertificateUrl ? 'text-green-500' : 'text-red-500'}`}>
+                                        {project.anchorInspectionCertificateUrl ? 'check_circle' : 'cancel'}
+                                      </span>
+                                      <span className="text-base text-muted-foreground">{t('dashboard.projects.anchorInspection', 'Anchor Inspection')}</span>
+                                    </div>
+                                  )}
                                   
-                                  {/* Rope Access Plan */}
-                                  <div className="flex items-center gap-1.5" title={project.ropeAccessPlanUrl ? t('dashboard.projects.ropeAccessPlanUploaded', 'Rope access plan uploaded') : t('dashboard.projects.ropeAccessPlanMissing', 'Rope access plan missing')}>
-                                    <span className={`material-icons text-lg ${project.ropeAccessPlanUrl ? 'text-green-500' : 'text-red-500'}`}>
-                                      {project.ropeAccessPlanUrl ? 'check_circle' : 'cancel'}
-                                    </span>
-                                    <span className="text-base text-muted-foreground">{t('dashboard.projects.ropeAccessPlan', 'Rope Access Plan')}</span>
-                                  </div>
+                                  {/* Rope Access Plan - Only for elevation work */}
+                                  {project.requiresElevation && (
+                                    <div className="flex items-center gap-1.5" title={project.ropeAccessPlanUrl ? t('dashboard.projects.ropeAccessPlanUploaded', 'Rope access plan uploaded') : t('dashboard.projects.ropeAccessPlanMissing', 'Rope access plan missing')}>
+                                      <span className={`material-icons text-lg ${project.ropeAccessPlanUrl ? 'text-green-500' : 'text-red-500'}`}>
+                                        {project.ropeAccessPlanUrl ? 'check_circle' : 'cancel'}
+                                      </span>
+                                      <span className="text-base text-muted-foreground">{t('dashboard.projects.ropeAccessPlan', 'Rope Access Plan')}</span>
+                                    </div>
+                                  )}
                                   
                                   {/* Toolbox Meetings */}
                                   {(() => {
