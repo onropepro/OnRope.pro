@@ -2015,6 +2015,20 @@ export class Storage {
     await db.delete(companyDocuments).where(eq(companyDocuments.id, id));
   }
 
+  async updateCompanyDocument(id: string, updates: { insuranceExpiryDate?: Date | null }): Promise<any> {
+    const result = await db.update(companyDocuments)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(companyDocuments.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async getCompanyDocumentById(id: string): Promise<any | undefined> {
+    const result = await db.select().from(companyDocuments)
+      .where(eq(companyDocuments.id, id));
+    return result[0];
+  }
+
   async getCompanyDocumentByTemplateId(companyId: string, templateId: string): Promise<any | undefined> {
     const result = await db.select().from(companyDocuments)
       .where(and(

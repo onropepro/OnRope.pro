@@ -17,6 +17,7 @@ import { getTodayString, toLocalDateString, parseLocalDate, getStartOfWeek, getE
 import { getDefaultElevation } from "@shared/jobTypes";
 import { Resend } from "resend";
 import rateLimit from "express-rate-limit";
+import OpenAI from "openai";
 
 // SECURITY: Rate limiting for login endpoint to prevent brute force attacks
 const loginRateLimiter = rateLimit({
@@ -15058,7 +15059,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      res.json({ document });
+      // For Certificate of Insurance, automatically extract expiry date using AI
+      let extractedExpiryDate = null;
+      if (documentType === 'certificate_of_insurance') {
+        try {
+          // Fetch the PDF file
+          const pdfResponse = await fetch(fileUrl);
+          if (pdfResponse.ok) {
+            const pdfBuffer = await pdfResponse.arrayBuffer();
+            const pdfBase64 = Buffer.from(pdfBuffer).toString('base64');
+            
+            // Initialize Gemini client via AI Integrations
+            const gemini = new OpenAI({
+              apiKey: process.env.AI_INTEGRATIONS_GEMINI_API_KEY,
+              baseURL: process.env.AI_INTEGRATIONS_GEMINI_BASE_URL,
+            });
+            
+            const aiResponse = await gemini.chat.completions.create({
+              model: "gemini-2.5-flash",
+              messages: [
+                {
+                  role: "user",
+                  content: [
+                    {
+                      type: "text",
+                      text: `Analyze this Certificate of Insurance PDF and extract the policy expiry date. 
+Look for fields like "Policy Expiry", "Expiration Date", "Policy Period To", "Coverage Ends", or similar.
+Respond with ONLY a JSON object: {"expiryDate": "YYYY-MM-DD"} or {"expiryDate": null} if not found.`
+                    },
+                    {
+                      type: "image_url",
+                      image_url: { url: `data:application/pdf;base64,${pdfBase64}` }
+                    }
+                  ]
+                }
+              ],
+              max_tokens: 100,
+            });
+            
+            const responseText = aiResponse.choices[0]?.message?.content?.trim() || "";
+            console.log("Insurance expiry AI extraction:", responseText);
+            
+            const parsed = JSON.parse(responseText);
+            if (parsed.expiryDate) {
+              extractedExpiryDate = new Date(parsed.expiryDate);
+              if (!isNaN(extractedExpiryDate.getTime())) {
+                await storage.updateCompanyDocument(document.id, { insuranceExpiryDate: extractedExpiryDate });
+                console.log(`Extracted insurance expiry date: ${extractedExpiryDate.toISOString()}`);
+              }
+            }
+          }
+        } catch (aiError) {
+          console.error("AI insurance expiry extraction error (non-fatal):", aiError);
+          // Continue - document was still uploaded successfully
+        }
+      }
+
+      res.json({ document: { ...document, insuranceExpiryDate: extractedExpiryDate } });
     } catch (error) {
       console.error("Upload company document error:", error);
       res.status(500).json({ message: "Internal server error" });
@@ -15101,6 +15158,116 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Delete company document error:", error);
       res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Extract insurance expiry date from Certificate of Insurance PDF using AI
+  app.post("/api/company-documents/:id/extract-insurance-expiry", requireAuth, requireRole("operations_manager", "company"), async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      // Get the document
+      const document = await storage.getCompanyDocumentById(id);
+      if (!document) {
+        return res.status(404).json({ message: "Document not found" });
+      }
+      
+      if (document.documentType !== 'certificate_of_insurance') {
+        return res.status(400).json({ message: "This endpoint only works for Certificate of Insurance documents" });
+      }
+      
+      // Fetch the PDF file
+      const pdfResponse = await fetch(document.fileUrl);
+      if (!pdfResponse.ok) {
+        return res.status(400).json({ message: "Failed to fetch PDF document" });
+      }
+      
+      const pdfBuffer = await pdfResponse.arrayBuffer();
+      const pdfBase64 = Buffer.from(pdfBuffer).toString('base64');
+      
+      // Initialize Gemini client via AI Integrations
+      const gemini = new OpenAI({
+        apiKey: process.env.AI_INTEGRATIONS_GEMINI_API_KEY,
+        baseURL: process.env.AI_INTEGRATIONS_GEMINI_BASE_URL,
+      });
+      
+      // Use Gemini to extract the expiry date from the PDF
+      const response = await gemini.chat.completions.create({
+        model: "gemini-2.5-flash",
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: `Analyze this Certificate of Insurance PDF and extract the policy expiry date. 
+                
+Look for fields like "Policy Expiry", "Expiration Date", "Policy Period To", "Coverage Ends", or similar.
+
+Respond with ONLY a JSON object in this exact format:
+{"expiryDate": "YYYY-MM-DD", "confidence": "high" | "medium" | "low"}
+
+If you cannot find an expiry date, respond with:
+{"expiryDate": null, "confidence": "none", "reason": "brief explanation"}
+
+Do not include any other text, just the JSON object.`
+              },
+              {
+                type: "image_url",
+                image_url: {
+                  url: `data:application/pdf;base64,${pdfBase64}`
+                }
+              }
+            ]
+          }
+        ],
+        max_tokens: 200,
+      });
+      
+      const aiResponse = response.choices[0]?.message?.content?.trim() || "";
+      console.log("AI extraction response:", aiResponse);
+      
+      // Parse the AI response
+      let extractedData;
+      try {
+        extractedData = JSON.parse(aiResponse);
+      } catch (parseError) {
+        console.error("Failed to parse AI response:", aiResponse);
+        return res.status(500).json({ message: "Failed to parse AI response", rawResponse: aiResponse });
+      }
+      
+      if (!extractedData.expiryDate) {
+        return res.json({ 
+          success: false, 
+          message: extractedData.reason || "Could not extract expiry date from document",
+          confidence: extractedData.confidence
+        });
+      }
+      
+      // Parse and validate the date
+      const expiryDate = new Date(extractedData.expiryDate);
+      if (isNaN(expiryDate.getTime())) {
+        return res.json({ 
+          success: false, 
+          message: "Invalid date format extracted",
+          rawDate: extractedData.expiryDate
+        });
+      }
+      
+      // Update the document with the extracted expiry date
+      const updatedDocument = await storage.updateCompanyDocument(id, {
+        insuranceExpiryDate: expiryDate
+      });
+      
+      res.json({ 
+        success: true, 
+        expiryDate: expiryDate.toISOString(),
+        confidence: extractedData.confidence,
+        document: updatedDocument
+      });
+    } catch (error) {
+      console.error("Extract insurance expiry error:", error);
+      res.status(500).json({ message: "Failed to extract insurance expiry date" });
     }
   });
 
