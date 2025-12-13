@@ -167,7 +167,7 @@ export default function ProjectManagementLanding() {
       {/* What This Module Does Section */}
       <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto space-y-8">
         <div className="text-center space-y-4">
-          <h2 className="text-2xl md:text-3xl font-bold">What This Module Does</h2>
+          <h2 className="text-3xl md:text-4xl font-bold">What This Module Does</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             The operational hub connecting scheduling, safety, and payroll
           </p>
@@ -256,7 +256,7 @@ export default function ProjectManagementLanding() {
       {/* What Changes Section */}
       <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto space-y-8">
         <div>
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">Every Project. Every Elevation. Every Technician. One Screen.</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Every Project. Every Elevation. Every Technician. One Screen.</h2>
           <p className="text-muted-foreground leading-relaxed">
             OnRopePro's Project Management module tracks progress the way rope access actually works. Drop-based tracking for window cleaning and building wash. Hours-based for inspections and repairs. Unit-based for parkade cleaning and in-suite services.
           </p>
@@ -266,7 +266,7 @@ export default function ProjectManagementLanding() {
         </div>
 
         <div>
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">Buildings Have Four Sides. Your Tracking Should Too.</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Buildings Have Four Sides. Your Tracking Should Too.</h2>
           <p className="text-muted-foreground leading-relaxed">
             High-rise window cleaning doesn't happen all at once. The north elevation might be 80% done while the south hasn't started. OnRopePro tracks North, East, South, and West independently. See exactly which directions are complete, in progress, or waiting. Your supervisor knows where to send the crew. Your client sees real progress instead of vague percentages.
           </p>
@@ -297,7 +297,7 @@ export default function ProjectManagementLanding() {
       {/* Stakeholder Benefits Section */}
       <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto space-y-12">
         <div className="text-center space-y-4">
-          <h2 className="text-2xl md:text-3xl font-bold">Who Benefits From This Module</h2>
+          <h2 className="text-3xl md:text-4xl font-bold">Who Benefits From This Module</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Every stakeholder gets exactly the visibility they need
           </p>
@@ -447,7 +447,7 @@ export default function ProjectManagementLanding() {
       {/* Key Features */}
       <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto space-y-8">
         <div>
-          <h2 className="text-2xl md:text-3xl font-bold flex items-center gap-2 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-4">
             <Sparkles className="w-5 h-5 text-[#0B64A3]" />
             Key Features
           </h2>
@@ -558,7 +558,7 @@ export default function ProjectManagementLanding() {
       {/* Module Integration Points */}
       <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto space-y-8">
         <div>
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">Talks To Everything Else</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Talks To Everything Else</h2>
           <p className="text-muted-foreground leading-relaxed mb-8">
             Projects are the operational hub connecting multiple OnRopePro modules. When data enters one place, it flows everywhere it needs to go.
           </p>
@@ -764,7 +764,7 @@ export default function ProjectManagementLanding() {
       {/* Archive & Analytics */}
       <section className="py-12 md:py-20 px-4 md:px-8 max-w-7xl mx-auto space-y-8">
         <div>
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">Historical Data Makes Future Quotes Accurate</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Historical Data Makes Future Quotes Accurate</h2>
           <p className="text-muted-foreground leading-relaxed">
             Completed projects are archived, not deleted. Search by building name, job type, date range, assigned employees, or completion status. Pull up analytics showing average drops per day, labor hours per building type, project duration trends.
           </p>
@@ -780,7 +780,7 @@ export default function ProjectManagementLanding() {
       <section className="py-12 md:py-20 px-4 md:px-8 max-w-7xl mx-auto space-y-8">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold">Problems Solved</h2>
+            <h2 className="text-3xl md:text-4xl font-bold">Problems Solved</h2>
             <p className="text-muted-foreground mt-2">Real problems. Real solutions that teams actually use.</p>
           </div>
           <Button onClick={toggleAll} variant="outline" data-testid="button-toggle-all-accordions">
@@ -1050,7 +1050,7 @@ export default function ProjectManagementLanding() {
       {/* Measurable Results Section */}
       <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto space-y-8">
         <div className="text-center space-y-4">
-          <h2 className="text-2xl md:text-3xl font-bold">Measurable Results</h2>
+          <h2 className="text-3xl md:text-4xl font-bold">Measurable Results</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Real numbers from real rope access operations
           </p>
@@ -1128,7 +1128,7 @@ export default function ProjectManagementLanding() {
       {/* FAQs Section */}
       <section id="knowledgebase" className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto space-y-8">
         <div className="text-center space-y-4">
-          <h2 className="text-2xl md:text-3xl font-bold">Frequently Asked Questions</h2>
+          <h2 className="text-3xl md:text-4xl font-bold">Frequently Asked Questions</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Common questions about the Project Management module
           </p>
