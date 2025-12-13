@@ -106,6 +106,73 @@ Example:
 
 ---
 
+## Display Format (Percentage-Based Rating)
+
+### The Fairness Problem
+Raw point totals are inherently unfair when comparing companies of different sizes:
+- A 100-employee company can accumulate 1000+ points
+- A 3-employee company might only earn ~10 points
+- Raw point comparison would unfairly favor larger companies regardless of actual compliance
+
+### Solution: Percentage-Based Rating
+Display CSR as a **percentage** instead of raw points for BOTH:
+- **Property Managers** - See vendor safety ratings as percentages
+- **Company Owners** - See their own company rating as a percentage
+
+### Calculation Formula
+```
+CSR Rating (%) = (Points Earned / Maximum Possible Points) × 100
+```
+
+### Maximum Possible Points Calculation
+For each company, calculate the theoretical maximum points they could earn:
+
+| Category | Max Points Formula |
+|----------|-------------------|
+| Harness Inspections | 1 point per completed project (assuming 100% inspection compliance) |
+| Project Documentation | 1 point per project (assuming all required docs uploaded) |
+| Company Documentation | 1 point (all 3 docs uploaded) |
+| Employee Document Review | 1 point per employee (assuming all employees signed all docs) |
+
+**Total Max Points = (Completed Projects × 2) + 1 + Employee Count**
+
+### Example Comparison
+| Company | Points Earned | Max Possible | CSR Rating |
+|---------|---------------|--------------|------------|
+| Small Co (3 employees, 2 projects) | 8 | 10 | **80%** |
+| Big Corp (100 employees, 50 projects) | 120 | 201 | **60%** |
+
+Despite Small Co having far fewer raw points, their **higher compliance rate** is correctly reflected in the percentage.
+
+### Display Rules
+- Round to nearest whole percentage (no decimals)
+- Show as "XX%" format
+- Include color coding:
+  - 90-100%: Green (Excellent)
+  - 70-89%: Yellow (Good)
+  - 50-69%: Orange (Needs Improvement)
+  - Below 50%: Red (Poor)
+
+### API Response Format
+Both company owner and property manager endpoints return:
+```json
+{
+  "csrRating": 83,
+  "csrLabel": "Good",
+  "csrColor": "yellow",
+  "breakdown": {
+    "harnessInspection": { "earned": 1.8, "max": 2 },
+    "projectDocumentation": { "earned": 1.5, "max": 2 },
+    "companyDocumentation": { "earned": 1, "max": 1 },
+    "employeeDocumentReview": { "earned": 2.5, "max": 3 }
+  },
+  "totalEarned": 6.8,
+  "totalMax": 8
+}
+```
+
+---
+
 ## Implementation Requirements
 
 ### Database Schema Updates

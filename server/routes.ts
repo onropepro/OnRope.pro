@@ -157,6 +157,20 @@ function canViewCSR(user: any): boolean {
   return permissions.includes('view_csr');
 }
 
+// Helper function to get CSR rating label and color based on percentage
+// Per SCR.RATING.md: 90-100% Green (Excellent), 70-89% Yellow (Good), 50-69% Orange (Needs Improvement), <50% Red (Poor)
+function getCsrRatingInfo(percentage: number): { label: string; color: string } {
+  if (percentage >= 90) {
+    return { label: 'Excellent', color: 'green' };
+  } else if (percentage >= 70) {
+    return { label: 'Good', color: 'yellow' };
+  } else if (percentage >= 50) {
+    return { label: 'Needs Improvement', color: 'orange' };
+  } else {
+    return { label: 'Poor', color: 'red' };
+  }
+}
+
 // Helper function to check if user can view sensitive documents
 // (Incident Reports, Damage Reports, COI, Equipment Inspections)
 function canViewSensitiveDocuments(user: any): boolean {
@@ -13392,16 +13406,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // 2. Project Documentation Points (per project)
       // 3. Company Documentation Points (1 max)
       // 4. Employee Document Review Points (per employee)
-      const overallCSR = Math.round((
+      const totalEarned = Math.round((
         harnessInspectionPoints + 
         projectDocumentationPoints + 
         companyDocumentationPoints + 
         employeeDocReviewPoints
       ) * 100) / 100;
       
+      // Calculate maximum possible points for percentage-based rating
+      // Max is derived from the SAME project/employee sets used for earned calculations
+      // This ensures earned can never exceed max and percentage is always 0-100%
+      // - Harness Inspections: 1 point per project that has work sessions (only those earn points)
+      // - Project Documentation: 1 point per project in projectDocBreakdown (same set as earned)
+      // - Company Documentation: 1 point (all 3 docs uploaded)
+      // - Employee Document Review: 1 point per employee (same count as earned calculation)
+      const maxHarnessPoints = harnessProjectBreakdown.filter((p: any) => p.workSessions > 0).length;
+      const maxProjectDocPoints = projectDocBreakdown.length; // Same projects used for earned calculation
+      const maxCompanyDocPoints = 1; // Always 1 (3 docs required)
+      const maxEmployeeDocPoints = totalEmployees;
+      
+      const totalMax = maxHarnessPoints + maxProjectDocPoints + maxCompanyDocPoints + maxEmployeeDocPoints;
+      
+      // Calculate percentage rating (avoid division by zero)
+      const csrRating = totalMax > 0 ? Math.round((totalEarned / totalMax) * 100) : 100;
+      const { label: csrLabel, color: csrColor } = getCsrRatingInfo(csrRating);
+      
+      // Legacy overallCSR for backward compatibility (raw points)
+      const overallCSR = totalEarned;
+      
       const response = {
+        // NEW: Percentage-based rating (primary display)
+        csrRating,
+        csrLabel,
+        csrColor,
+        // Legacy: Raw point total for backward compatibility
         overallCSR,
         breakdown: {
+          harnessInspection: { earned: harnessInspectionPoints, max: maxHarnessPoints },
+          projectDocumentation: { earned: projectDocumentationPoints, max: maxProjectDocPoints },
+          companyDocumentation: { earned: companyDocumentationPoints, max: maxCompanyDocPoints },
+          employeeDocumentReview: { earned: employeeDocReviewPoints, max: maxEmployeeDocPoints },
+          // Legacy points for backward compatibility
           harnessInspectionPoints,
           projectDocumentationPoints,
           companyDocumentationPoints,
@@ -13413,6 +13458,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           documentReviewRating,
           projectDocumentationRating
         },
+        totalEarned,
+        totalMax,
         details: {
           hasHealthSafety,
           hasCompanyPolicy,
@@ -13894,16 +13941,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Calculate overall CSR: Sum of all 4 point categories
-      const overallCSR = Math.round((
+      const totalEarnedVendor = Math.round((
         harnessInspectionPointsVendor + 
         projectDocumentationPointsVendor + 
         companyDocumentationPoints + 
         employeeDocReviewPointsVendor
       ) * 100) / 100;
       
+      // Calculate maximum possible points for percentage-based rating
+      // Max is derived from the SAME project/employee sets used for earned calculations
+      const maxHarnessPointsVendor = harnessProjectBreakdownVendor.filter((p: any) => p.workSessions > 0).length;
+      const maxProjectDocPointsVendor = projectDocBreakdownVendor.length; // Same projects used for earned
+      const maxCompanyDocPointsVendor = 1;
+      const maxEmployeeDocPointsVendor = totalEmployees;
+      
+      const totalMaxVendor = maxHarnessPointsVendor + maxProjectDocPointsVendor + maxCompanyDocPointsVendor + maxEmployeeDocPointsVendor;
+      
+      // Calculate percentage rating (avoid division by zero)
+      const csrRatingVendor = totalMaxVendor > 0 ? Math.round((totalEarnedVendor / totalMaxVendor) * 100) : 100;
+      const { label: csrLabelVendor, color: csrColorVendor } = getCsrRatingInfo(csrRatingVendor);
+      
+      // Legacy overallCSR for backward compatibility
+      const overallCSR = totalEarnedVendor;
+      
       res.json({
+        // NEW: Percentage-based rating (primary display)
+        csrRating: csrRatingVendor,
+        csrLabel: csrLabelVendor,
+        csrColor: csrColorVendor,
+        // Legacy: Raw point total for backward compatibility
         overallCSR,
         breakdown: {
+          harnessInspection: { earned: harnessInspectionPointsVendor, max: maxHarnessPointsVendor },
+          projectDocumentation: { earned: projectDocumentationPointsVendor, max: maxProjectDocPointsVendor },
+          companyDocumentation: { earned: companyDocumentationPoints, max: maxCompanyDocPointsVendor },
+          employeeDocumentReview: { earned: employeeDocReviewPointsVendor, max: maxEmployeeDocPointsVendor },
+          // Legacy points for backward compatibility
           harnessInspectionPoints: harnessInspectionPointsVendor,
           projectDocumentationPoints: projectDocumentationPointsVendor,
           companyDocumentationPoints,
@@ -13914,6 +13987,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           documentReviewRating,
           projectDocumentationRating: 0
         },
+        totalEarned: totalEarnedVendor,
+        totalMax: totalMaxVendor,
         details: {
           hasHealthSafety,
           hasCompanyPolicy,
