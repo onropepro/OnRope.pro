@@ -185,7 +185,7 @@ export default function ProjectManagementLanding() {
               </div>
               <CardTitle className="text-lg">Progress Tracking by Job Type</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4 text-sm text-muted-foreground">
+            <CardContent className="space-y-4 text-base text-muted-foreground">
               <p>The system adapts to your work, not the other way around.</p>
               <p>Drop-based tracking for window cleaning and building wash counts vertical passes per elevation. North, East, South, West tracked independently. Hours-based tracking for inspections and repairs captures time with manual completion percentage. Unit-based tracking for parkade cleaning and in-suite services counts individual stalls or suites completed.</p>
               <p>The form technicians see when ending a work session changes based on what they're working on. No forcing your operations into someone else's template.</p>
@@ -209,7 +209,7 @@ export default function ProjectManagementLanding() {
               </div>
               <CardTitle className="text-lg">Automatic Calendar Population</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4 text-sm text-muted-foreground">
+            <CardContent className="space-y-4 text-base text-muted-foreground">
               <p>Create a project once. The schedule fills itself.</p>
               <p>When you enter a date range and assign employees, calendar entries appear automatically. No more creating a project, then opening Google Calendar, then texting your supervisor, then updating the whiteboard. Same information, one entry, everywhere it needs to go.</p>
               <p>Building gets pushed by a week? Click the project, change the date. It syncs everywhere. Conflict detection flags when someone is double-booked before it becomes an emergency.</p>
@@ -233,7 +233,7 @@ export default function ProjectManagementLanding() {
               </div>
               <CardTitle className="text-lg">Linked Documentation</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4 text-sm text-muted-foreground">
+            <CardContent className="space-y-4 text-base text-muted-foreground">
               <p>Safety docs live with their projects. Not in email. Not in Google Drive. Not in a folder in the truck.</p>
               <p>Each project connects to its Rope Access Plan, Toolbox Meeting records, and Anchor Inspection Certificates. Property managers access compliance documents through their portal without emailing you. Auditors find everything in one place.</p>
               <p>When the insurance company asks for proof of your safety program, you're not digging. You're clicking.</p>
@@ -568,7 +568,7 @@ export default function ProjectManagementLanding() {
               <CardHeader>
                 <CardTitle className="text-lg">Employee Management</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm">
+              <CardContent className="space-y-3 text-base">
                 <div>
                   <p className="font-medium text-foreground">What Connects:</p>
                   <p className="text-muted-foreground mt-1">Crew assignments pull directly from your employee directory. System filters by qualification level (irata Level 2+). Performance metrics from work sessions feed back into employee records.</p>
@@ -584,7 +584,7 @@ export default function ProjectManagementLanding() {
               <CardHeader>
                 <CardTitle className="text-lg">Work Sessions & Time Tracking</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm">
+              <CardContent className="space-y-3 text-base">
                 <div>
                   <p className="font-medium text-foreground">What Connects:</p>
                   <p className="text-muted-foreground mt-1">When technicians log work sessions on a project, data automatically populates payroll timesheets. Drop counts, hours, or units convert directly to wages. No transcription required.</p>
@@ -600,7 +600,7 @@ export default function ProjectManagementLanding() {
               <CardHeader>
                 <CardTitle className="text-lg">Payroll</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm">
+              <CardContent className="space-y-3 text-base">
                 <div>
                   <p className="font-medium text-foreground">What Connects:</p>
                   <p className="text-muted-foreground mt-1">Project-specific tracking feeds payroll calculations. Drop-based projects calculate piece work pay. Hours-based projects calculate hourly wages. Payroll module pulls all session data without manual entry.</p>
@@ -616,7 +616,7 @@ export default function ProjectManagementLanding() {
               <CardHeader>
                 <CardTitle className="text-lg">Safety & Compliance</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm">
+              <CardContent className="space-y-3 text-base">
                 <div>
                   <p className="font-medium text-foreground">What Connects:</p>
                   <p className="text-muted-foreground mt-1">Each project links to required safety documentation: Rope Access Plans, Job Safety Analyses, Toolbox Meetings, Anchor Inspections. Attach directly to the relevant project.</p>
@@ -632,7 +632,7 @@ export default function ProjectManagementLanding() {
               <CardHeader>
                 <CardTitle className="text-lg">Job Schedule & Calendar</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm">
+              <CardContent className="space-y-3 text-base">
                 <div>
                   <p className="font-medium text-foreground">What Connects:</p>
                   <p className="text-muted-foreground mt-1">Creating a project with date range and assigned employees automatically generates calendar entries. Drag-and-drop rescheduling syncs back to project assignments. Conflict detection flags double-bookings.</p>
@@ -648,7 +648,7 @@ export default function ProjectManagementLanding() {
               <CardHeader>
                 <CardTitle className="text-lg">Buildings Database</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm">
+              <CardContent className="space-y-3 text-base">
                 <div>
                   <p className="font-medium text-foreground">What Connects:</p>
                   <p className="text-muted-foreground mt-1">Projects link to building records containing address, contact info, access instructions, and historical maintenance data. System pulls existing building data automatically for repeat clients.</p>
@@ -664,7 +664,7 @@ export default function ProjectManagementLanding() {
               <CardHeader>
                 <CardTitle className="text-lg">Resident Portal</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm">
+              <CardContent className="space-y-3 text-base">
                 <div>
                   <p className="font-medium text-foreground">What Connects:</p>
                   <p className="text-muted-foreground mt-1">Residents register with building-specific codes. They see progress on projects affecting their building, filtered to show only their elevation. Feedback submissions link directly to the relevant project.</p>
@@ -680,7 +680,7 @@ export default function ProjectManagementLanding() {
               <CardHeader>
                 <CardTitle className="text-lg">Documents Repository</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm">
+              <CardContent className="space-y-3 text-base">
                 <div>
                   <p className="font-medium text-foreground">What Connects:</p>
                   <p className="text-muted-foreground mt-1">Project-specific documents store in centralized repository with project tags. Safety docs, contracts, photos, reports all link back to their project. Search by project name, date, or type.</p>
@@ -696,7 +696,7 @@ export default function ProjectManagementLanding() {
               <CardHeader>
                 <CardTitle className="text-lg">Client & Property Manager Records</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm">
+              <CardContent className="space-y-3 text-base">
                 <div>
                   <p className="font-medium text-foreground">What Connects:</p>
                   <p className="text-muted-foreground mt-1">Projects associate with client records containing contact preferences, billing details, and communication history. Building manager portal access grants visibility into all projects at their properties.</p>
@@ -712,7 +712,7 @@ export default function ProjectManagementLanding() {
               <CardHeader>
                 <CardTitle className="text-lg">Complaints & Feedback Management</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm">
+              <CardContent className="space-y-3 text-base">
                 <div>
                   <p className="font-medium text-foreground">What Connects:</p>
                   <p className="text-muted-foreground mt-1">When residents or building managers submit feedback, it attaches to the specific project. You respond within the system. The full conversation history stays linked to the project record.</p>
@@ -728,7 +728,7 @@ export default function ProjectManagementLanding() {
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">Invoicing <Badge variant="secondary" className="text-xs">Coming Soon</Badge></CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm">
+              <CardContent className="space-y-3 text-base">
                 <div>
                   <p className="font-medium text-foreground">What Connects:</p>
                   <p className="text-muted-foreground mt-1">Project completion will trigger invoice generation. Labor hours and materials will auto-populate billing. Client portal will show project details matching invoice line items.</p>
@@ -744,7 +744,7 @@ export default function ProjectManagementLanding() {
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">Quoting <Badge variant="secondary" className="text-xs">Coming Soon</Badge></CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm">
+              <CardContent className="space-y-3 text-base">
                 <div>
                   <p className="font-medium text-foreground">What Connects:</p>
                   <p className="text-muted-foreground mt-1">Historical project data will feed quote generation. System will suggest pricing based on similar past projects. Accepted quotes will convert directly to projects with one click.</p>
@@ -1064,7 +1064,7 @@ export default function ProjectManagementLanding() {
               </div>
               <CardTitle className="text-lg">Time Savings</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3 text-sm text-muted-foreground">
+            <CardContent className="space-y-3 text-base text-muted-foreground">
               <p>Manual calendar management takes 30-45 minutes per project. Creating the project, blocking calendar dates, texting crew assignments, updating the whiteboard, checking for conflicts.</p>
               <p>With automatic calendar population, project creation takes 5 minutes. For 20 projects per month, that's 8+ hours saved monthly.</p>
               <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
@@ -1080,7 +1080,7 @@ export default function ProjectManagementLanding() {
               </div>
               <CardTitle className="text-lg">Payroll Accuracy</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3 text-sm text-muted-foreground">
+            <CardContent className="space-y-3 text-base text-muted-foreground">
               <p>Work sessions logged in the field automatically feed payroll calculations. Drop counts, hours, and units convert directly to wages.</p>
               <p>No transcription from paper timesheets or text messages.</p>
               <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
@@ -1096,7 +1096,7 @@ export default function ProjectManagementLanding() {
               </div>
               <CardTitle className="text-lg">Communication Efficiency</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3 text-sm text-muted-foreground">
+            <CardContent className="space-y-3 text-base text-muted-foreground">
               <p>Residents and building managers check progress themselves instead of calling. Property manager status calls drop 60-70% per active project.</p>
               <p>For building managers handling 15-30 status calls per week during projects, that's 20+ hours per month reclaimed.</p>
               <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
@@ -1112,7 +1112,7 @@ export default function ProjectManagementLanding() {
               </div>
               <CardTitle className="text-lg">Quote Accuracy</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3 text-sm text-muted-foreground">
+            <CardContent className="space-y-3 text-base text-muted-foreground">
               <p>Historical project data shows how long similar buildings actually took. Average drops per day by job type. Labor hours per elevation. Project duration trends.</p>
               <p>Quote preparation drops from 45 minutes to 10 minutes.</p>
               <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
