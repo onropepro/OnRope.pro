@@ -1341,6 +1341,32 @@ export default function TechnicianPortal() {
     },
   });
 
+  // State for document deletion confirmation
+  const [deletingDocument, setDeletingDocument] = useState<{ type: string; url: string } | null>(null);
+
+  // Mutation to delete uploaded documents
+  const deleteDocumentMutation = useMutation({
+    mutationFn: async ({ documentType, documentUrl }: { documentType: string; documentUrl: string }) => {
+      return apiRequest("DELETE", "/api/technician/document", { documentType, documentUrl });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      toast({
+        title: language === 'en' ? "Document Deleted" : "Document supprimé",
+        description: language === 'en' ? "The document has been removed." : "Le document a été supprimé.",
+      });
+      setDeletingDocument(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: language === 'en' ? "Delete Failed" : "Échec de la suppression",
+        description: error.message || "Failed to delete document",
+        variant: "destructive",
+      });
+      setDeletingDocument(null);
+    },
+  });
+
   // Auto-generate referral code if user doesn't have one
   useEffect(() => {
     if (user && !user.referralCode && !generateReferralCodeMutation.isPending) {
