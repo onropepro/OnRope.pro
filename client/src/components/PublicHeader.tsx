@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
-import { Shield, Lock, Briefcase, Gauge, Clock } from "lucide-react";
+import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 interface PublicHeaderProps {
@@ -193,6 +193,22 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                       <div>
                         <div className="font-semibold text-sm">Work Session & Time Tracking</div>
                         <div className="text-xs text-muted-foreground mt-0.5">GPS clock-in, drop tracking, automatic payroll aggregation</div>
+                      </div>
+                    </button>
+                    <button
+                      className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                      onClick={() => {
+                        setLocation("/modules/irata-sprat-task-logging");
+                        setShowModulesMenu(false);
+                      }}
+                      data-testid="nav-irata-task-logging"
+                    >
+                      <div className="w-10 h-10 rounded-lg bg-cyan-100 dark:bg-cyan-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <ClipboardCheck className="w-5 h-5 text-cyan-600" />
+                      </div>
+                      <div>
+                        <div className="font-semibold text-sm">IRATA/SPRAT Task Logging</div>
+                        <div className="text-xs text-muted-foreground mt-0.5">Same-day hour logging, OCR import, career-portable records</div>
                       </div>
                     </button>
                   </div>
