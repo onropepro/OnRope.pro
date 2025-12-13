@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Shield, FileText, ClipboardCheck, HardHat, TrendingUp, AlertTriangle, CheckCircle2, Lightbulb, FileCheck } from "lucide-react";
+import { Shield, FileText, ClipboardCheck, HardHat, AlertTriangle, CheckCircle2, Lightbulb, FileCheck } from "lucide-react";
 import { canViewCSR, type User } from "@/lib/permissions";
 
 interface CSRBadgeProps {
@@ -119,24 +119,6 @@ function getImprovementTips(csrData: CSRData): { category: string; icon: any; ti
       icon: FileCheck,
       tip: `${details.documentReviewsPending} document signature${details.documentReviewsPending > 1 ? 's are' : ' is'} pending. All staff members (including the company owner) should view and sign required safety documents.`,
       priority: breakdown.documentReviewRating < 80 ? 'medium' : 'low'
-    });
-  }
-
-  if (breakdown.projectCompletionRating < 100 && details.projectCount > 0) {
-    tips.push({
-      category: "Project Progress",
-      icon: TrendingUp,
-      tip: "Update work session progress on your projects. Completing more work sessions improves your project completion score.",
-      priority: breakdown.projectCompletionRating < 50 ? 'high' : 'low'
-    });
-  }
-
-  if (details.projectCount === 0) {
-    tips.push({
-      category: "Project Progress",
-      icon: TrendingUp,
-      tip: "Create and start working on projects to build your project completion score.",
-      priority: 'low'
     });
   }
 
@@ -284,22 +266,6 @@ export function CSRBadge({ user }: CSRBadgeProps) {
                       ({details.documentReviewsTotalEmployees} staff member{details.documentReviewsTotalEmployees !== 1 ? 's' : ''} × {details.documentReviewsTotalDocs} document{details.documentReviewsTotalDocs !== 1 ? 's' : ''})
                     </span>
                   )}
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4 text-muted-foreground" />
-                    <span>Project Progress</span>
-                  </div>
-                  <span className={`font-semibold ${getRatingColor(breakdown.projectCompletionRating)}`}>
-                    {breakdown.projectCompletionRating}%
-                  </span>
-                </div>
-                <ColoredProgress value={breakdown.projectCompletionRating} rating={breakdown.projectCompletionRating} />
-                <p className="text-xs text-muted-foreground">
-                  Average across {details.projectCount} project{details.projectCount !== 1 ? 's' : ''}
                 </p>
               </div>
             </div>
