@@ -37,7 +37,7 @@ const guideLinks: GuideLink[] = [
   { name: "User Access & Authentication", path: "/changelog/user-access", icon: Shield },
   { name: "Project Management", path: "/changelog/projects", icon: FolderOpen },
   { name: "Work Session & Time Tracking", path: "/changelog/time-tracking", icon: Clock },
-  { name: "irata / SPRAT Task Logging", path: "/changelog/irata-logging", icon: ClipboardCheck },
+  { name: "IRATA / SPRAT Task Logging", path: "/changelog/irata-logging", icon: ClipboardCheck },
   { name: "Safety & Compliance", path: "/changelog/safety", icon: Shield },
   { name: "Company Safety Rating (CSR)", path: "/changelog/csr", icon: Star },
   { name: "Document Management", path: "/changelog/documents", icon: FileText },
