@@ -5787,15 +5787,15 @@ export default function Documents() {
                                               <div className="text-sm text-muted-foreground">
                                                 {t('documents.uploadedBy', 'Uploaded by {{name}}', { name: doc.uploadedByName })}
                                               </div>
-                                              {expiryDate && (
+                                              {expiryDate && !isNaN(expiryDate.getTime()) && (
                                                 <div className={`text-sm font-medium mt-1 flex items-center gap-1 ${showWarning ? 'text-red-600 dark:text-red-500' : 'text-muted-foreground'}`}>
                                                   <Calendar className="h-3.5 w-3.5" />
                                                   {isExpired ? (
-                                                    <span>{t('documents.expired', 'EXPIRED')} - {formatLocalDateMedium(expiryDate)}</span>
+                                                    <span>{t('documents.expired', 'EXPIRED')} - {formatLocalDateMedium(doc.insuranceExpiryDate)}</span>
                                                   ) : isExpiringSoon ? (
-                                                    <span>{t('documents.expiresOn', 'Expires')}: {formatLocalDateMedium(expiryDate)}</span>
+                                                    <span>{t('documents.expiresOn', 'Expires')}: {formatLocalDateMedium(doc.insuranceExpiryDate)}</span>
                                                   ) : (
-                                                    <span>{t('documents.expiresOn', 'Expires')}: {formatLocalDateMedium(expiryDate)}</span>
+                                                    <span>{t('documents.expiresOn', 'Expires')}: {formatLocalDateMedium(doc.insuranceExpiryDate)}</span>
                                                   )}
                                                 </div>
                                               )}
