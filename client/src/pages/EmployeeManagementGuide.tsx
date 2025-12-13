@@ -408,7 +408,7 @@ export default function EmployeeManagementGuide() {
                 <p className="mt-1">The rope access industry has exceptionally high turnover, with most technicians changing employers multiple times per season. Traditional onboarding means emailing back and forth, chasing paperwork, manually entering the same information that the tech already gave their last three employers. With OnRopePro, a tech's certifications, emergency contacts, bank information, and work history travel with them. One notification about an expiring certification can pay for the entire annual subscription.</p>
               </div>
 
-              <div className="grid md:grid-cols-3 gap-3 text-sm">
+              <div className="grid md:grid-cols-3 gap-3 text-base">
                 <div className="bg-white dark:bg-amber-900 rounded p-3 text-center">
                   <p className="text-xs text-muted-foreground">Status</p>
                   <p className="font-bold text-green-700 dark:text-green-300">Valid</p>
@@ -888,7 +888,7 @@ export default function EmployeeManagementGuide() {
                     <Badge variant="outline" className="text-xs">Optional</Badge>
                   </div>
                 </div>
-                <p className="text-sm text-muted-foreground mt-3">
+                <p className="text-base text-muted-foreground mt-3">
                   All sensitive data is encrypted at rest using AES-256-GCM encryption.
                 </p>
               </CardContent>
