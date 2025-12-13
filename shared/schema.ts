@@ -12,6 +12,7 @@ import {
   index,
   jsonb,
   numeric,
+  real,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -975,9 +976,9 @@ export const toolboxMeetings = pgTable("toolbox_meetings", {
 export const csrRatingHistory = pgTable("csr_rating_history", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  previousScore: integer("previous_score").notNull(),
-  newScore: integer("new_score").notNull(),
-  delta: integer("delta").notNull(), // Positive = improvement, negative = decline
+  previousScore: real("previous_score").notNull(),
+  newScore: real("new_score").notNull(),
+  delta: real("delta").notNull(), // Positive = improvement, negative = decline
   category: varchar("category").notNull(), // Which factor caused the change (documentation, toolbox, harness, etc.)
   reason: text("reason").notNull(), // Human-readable reason for the change
   createdAt: timestamp("created_at").defaultNow().notNull(),
