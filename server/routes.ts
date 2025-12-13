@@ -13480,7 +13480,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             breakdownDetails.push('Project Documentation: 100% (No active projects)');
           }
           
-          const fullReason = `Initial safety rating recorded.\n\nBreakdown:\n${breakdownDetails.join('\n')}\n\nTotal Penalty: ${totalPenalty}% = Overall Score: ${overallCSR}%`;
+          const fullReason = `Initial safety rating recorded.\n\nBreakdown:\n${breakdownDetails.join('\n')}\n\nTotal Points: ${overallCSR}`;
           
           await storage.createCsrRatingHistory({
             companyId,
@@ -13522,7 +13522,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           const category = delta > 0 ? 'improvement' : delta < 0 ? 'decline' : 'update';
           const changeType = delta > 0 ? 'improved' : delta < 0 ? 'declined' : 'updated';
-          const reason = `Safety rating ${changeType} from ${previousScore}% to ${overallCSR}%.\n\nCurrent Status:\n${changes.join('\n')}\n\nTotal Penalty: ${totalPenalty}%`;
+          const reason = `Safety rating ${changeType} from ${previousScore} to ${overallCSR} points.\n\nCurrent Status:\n${changes.join('\n')}`;
           
           await storage.createCsrRatingHistory({
             companyId,
@@ -13753,17 +13753,200 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Percentage allocation removed - no penalty applied
       const documentReviewPenalty = 0;
       
-      // Calculate overall CSR - now point-based, starts at 0
-      const totalPenalty = documentationPenalty + toolboxPenalty + harnessPenalty + documentReviewPenalty;
-      const overallCSR = 0;
+      // POINT-BASED CSR CALCULATIONS (per SCR.RATING.md)
+      
+      // 1. Company Documentation Points: (Uploaded Docs / 3)
+      const companyDocsUploaded = (hasHealthSafety ? 1 : 0) + (hasCompanyPolicy ? 1 : 0) + (hasInsurance ? 1 : 0);
+      const companyDocumentationPoints = Math.round((companyDocsUploaded / 3) * 100) / 100;
+      
+      // 2. Harness Inspection Points: (Completed Inspections / Total Work Sessions) per project
+      // Get work sessions grouped by project
+      const activeProjects = projects.filter((p: any) => p.status === 'active');
+      const activeProjectCount = activeProjects.length;
+      
+      let harnessInspectionPointsVendor = 0;
+      const harnessProjectBreakdownVendor: any[] = [];
+      
+      for (const project of activeProjects) {
+        const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id);
+        const projectWorkSessions = projectSessions.length;
+        
+        if (projectWorkSessions === 0) {
+          harnessInspectionPointsVendor += 1;
+          harnessProjectBreakdownVendor.push({
+            projectId: project.id,
+            projectName: project.buildingName || project.name,
+            workSessions: 0,
+            completedInspections: 0,
+            points: 1
+          });
+          continue;
+        }
+        
+        let completedInspectionsForProject = 0;
+        for (const session of projectSessions) {
+          const dateStr = session.workDate;
+          const inspection = harnessInspections.find((insp: any) =>
+            insp.workerId === session.employeeId && normalizeDateToString(insp.inspectionDate) === dateStr
+          );
+          if (inspection) {
+            completedInspectionsForProject++;
+          }
+        }
+        
+        const projectPoints = projectWorkSessions > 0 
+          ? completedInspectionsForProject / projectWorkSessions 
+          : 0;
+        harnessInspectionPointsVendor += projectPoints;
+        
+        harnessProjectBreakdownVendor.push({
+          projectId: project.id,
+          projectName: project.buildingName || project.name,
+          workSessions: projectWorkSessions,
+          completedInspections: completedInspectionsForProject,
+          points: Math.round(projectPoints * 100) / 100
+        });
+      }
+      
+      harnessInspectionPointsVendor = Math.round(harnessInspectionPointsVendor * 100) / 100;
+      
+      // 3. Employee Document Review Points: (Docs Signed / Docs Available) per employee
+      let employeeDocReviewPointsVendor = 0;
+      const allStaffIds: string[] = [
+        ...companyEmployees.map((e: any) => e.id),
+        ...(companyOwnerForPM ? [companyOwnerForPM.id] : [])
+      ];
+      
+      for (const staffId of allStaffIds) {
+        if (totalRequiredDocs === 0) {
+          employeeDocReviewPointsVendor += 1;
+        } else {
+          const staffSignatures = documentReviews.filter((r: any) => 
+            r.signedAt && r.employeeId === staffId
+          );
+          const employeePoints = staffSignatures.length / totalRequiredDocs;
+          employeeDocReviewPointsVendor += employeePoints;
+        }
+      }
+      employeeDocReviewPointsVendor = Math.round(employeeDocReviewPointsVendor * 100) / 100;
+      
+      // 4. Project Documentation Points: (Docs Present / Docs Required) per project
+      let projectDocumentationPointsVendor = 0;
+      const elevationProjectCountVendor = activeProjects.filter((p: any) => p.requiresRopeAccess).length;
+      const projectDocBreakdownVendor: any[] = [];
+      
+      for (const project of activeProjects) {
+        const requiresElevation = project.requiresRopeAccess;
+        const docsRequired = requiresElevation ? 4 : 2;
+        
+        let docsPresent = 0;
+        
+        // Check Toolbox Meeting (for all projects)
+        const hasProjectToolbox = meetings.some((m: any) => 
+          m.projectId === project.id.toString() || m.projectId === 'other'
+        );
+        if (hasProjectToolbox) docsPresent++;
+        
+        // Check FLHA (for all projects)
+        const projectFlhas = await storage.getFlhaFormsByProject(project.id);
+        if (projectFlhas && projectFlhas.length > 0) docsPresent++;
+        
+        if (requiresElevation) {
+          // Check Rope Access Plan
+          const hasRopeAccessPlan = companyDocuments.some((doc: any) => 
+            doc.documentType === 'rope_access_plan' && doc.projectId === project.id
+          );
+          if (hasRopeAccessPlan) docsPresent++;
+          
+          // Check Anchor Inspection
+          const anchorInspections = await storage.getAnchorInspectionsByProject(project.id);
+          if (anchorInspections && anchorInspections.length > 0) docsPresent++;
+        }
+        
+        const projectPoints = docsPresent / docsRequired;
+        projectDocumentationPointsVendor += projectPoints;
+        
+        projectDocBreakdownVendor.push({
+          projectId: project.id,
+          projectName: project.buildingName || project.name,
+          isElevation: requiresElevation,
+          docsRequired,
+          docsPresent,
+          points: Math.round(projectPoints * 100) / 100
+        });
+      }
+      
+      projectDocumentationPointsVendor = Math.round(projectDocumentationPointsVendor * 100) / 100;
+      
+      // Count project documentation details
+      let projectsWithAnchorInspection = 0;
+      let projectsWithRopeAccessPlan = 0;
+      let projectsWithFLHA = 0;
+      let projectsWithToolboxMeeting = 0;
+      
+      for (const project of activeProjects) {
+        const hasProjectToolbox = meetings.some((m: any) => 
+          m.projectId === project.id.toString() || m.projectId === 'other'
+        );
+        if (hasProjectToolbox) projectsWithToolboxMeeting++;
+        
+        const projectFlhas = await storage.getFlhaFormsByProject(project.id);
+        if (projectFlhas && projectFlhas.length > 0) projectsWithFLHA++;
+        
+        if (project.requiresRopeAccess) {
+          const hasRopeAccessPlan = companyDocuments.some((doc: any) => 
+            doc.documentType === 'rope_access_plan' && doc.projectId === project.id
+          );
+          if (hasRopeAccessPlan) projectsWithRopeAccessPlan++;
+          
+          const anchorInspections = await storage.getAnchorInspectionsByProject(project.id);
+          if (anchorInspections && anchorInspections.length > 0) projectsWithAnchorInspection++;
+        }
+      }
+      
+      // Calculate overall CSR: Sum of all 4 point categories
+      const overallCSR = Math.round((
+        harnessInspectionPointsVendor + 
+        projectDocumentationPointsVendor + 
+        companyDocumentationPoints + 
+        employeeDocReviewPointsVendor
+      ) * 100) / 100;
       
       res.json({
         overallCSR,
         breakdown: {
-          documentationRating: 0,
-          toolboxMeetingRating: 0,
-          harnessInspectionRating: 0,
-          documentReviewRating: 0
+          harnessInspectionPoints: harnessInspectionPointsVendor,
+          projectDocumentationPoints: projectDocumentationPointsVendor,
+          companyDocumentationPoints,
+          employeeDocReviewPoints: employeeDocReviewPointsVendor,
+          documentationRating,
+          toolboxMeetingRating,
+          harnessInspectionRating,
+          documentReviewRating,
+          projectDocumentationRating: 0
+        },
+        details: {
+          hasHealthSafety,
+          hasCompanyPolicy,
+          hasInsurance,
+          companyDocsUploaded,
+          toolboxDaysWithMeeting,
+          toolboxTotalDays,
+          harnessCompletedInspections,
+          harnessRequiredInspections,
+          harnessProjectBreakdown: harnessProjectBreakdownVendor,
+          documentReviewsSigned: signedReviews,
+          documentReviewsPending: totalRequiredSignatures - signedReviews,
+          documentReviewsTotal: totalRequiredSignatures,
+          documentReviewsTotalEmployees: totalEmployees,
+          documentReviewsTotalDocs: totalRequiredDocs,
+          projectsWithAnchorInspection,
+          projectsWithRopeAccessPlan,
+          projectsWithFLHA,
+          projectsWithToolboxMeeting,
+          activeProjectCount,
+          elevationProjectCount: elevationProjectCountVendor,
+          projectDocBreakdown: projectDocBreakdownVendor
         }
       });
     } catch (error) {

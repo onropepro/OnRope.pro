@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Shield, FileText, ClipboardCheck, HardHat, AlertTriangle, CheckCircle2, Lightbulb, FileCheck, History, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { Shield, FileText, HardHat, AlertTriangle, CheckCircle2, Lightbulb, FileCheck, History, TrendingUp, TrendingDown, Minus, Building2, Users } from "lucide-react";
 import { canViewCSR, type User } from "@/lib/permissions";
 import { formatDistanceToNow } from "date-fns";
 
@@ -11,9 +11,30 @@ interface CSRBadgeProps {
   user?: User | null;
 }
 
+interface HarnessProjectBreakdown {
+  projectId: number;
+  projectName: string;
+  workSessions: number;
+  completedInspections: number;
+  points: number;
+}
+
+interface ProjectDocBreakdown {
+  projectId: number;
+  projectName: string;
+  isElevation: boolean;
+  docsRequired: number;
+  docsPresent: number;
+  points: number;
+}
+
 interface CSRData {
   overallCSR: number;
   breakdown: {
+    harnessInspectionPoints: number;
+    projectDocumentationPoints: number;
+    companyDocumentationPoints: number;
+    employeeDocReviewPoints: number;
     documentationRating: number;
     toolboxMeetingRating: number;
     harnessInspectionRating: number;
@@ -23,10 +44,13 @@ interface CSRData {
   details: {
     hasHealthSafety: boolean;
     hasCompanyPolicy: boolean;
+    hasInsurance?: boolean;
+    companyDocsUploaded?: number;
     toolboxDaysWithMeeting: number;
     toolboxTotalDays: number;
     harnessCompletedInspections: number;
     harnessRequiredInspections: number;
+    harnessProjectBreakdown?: HarnessProjectBreakdown[];
     documentReviewsSigned: number;
     documentReviewsPending: number;
     documentReviewsTotal: number;
@@ -35,8 +59,10 @@ interface CSRData {
     projectsWithAnchorInspection: number;
     projectsWithRopeAccessPlan: number;
     projectsWithFLHA: number;
+    projectsWithToolboxMeeting?: number;
     activeProjectCount: number;
     elevationProjectCount: number;
+    projectDocBreakdown?: ProjectDocBreakdown[];
   };
 }
 
@@ -51,25 +77,37 @@ interface CSRHistoryEntry {
   createdAt: string;
 }
 
-function getRatingColor(rating: number): string {
-  if (rating >= 90) return "text-green-600 dark:text-green-400";
-  if (rating >= 70) return "text-yellow-600 dark:text-yellow-400";
-  if (rating >= 50) return "text-orange-600 dark:text-orange-400";
+function getPointsColor(points: number, maxPoints: number): string {
+  if (maxPoints === 0) return "text-muted-foreground";
+  const ratio = points / maxPoints;
+  if (ratio >= 0.9) return "text-green-600 dark:text-green-400";
+  if (ratio >= 0.7) return "text-yellow-600 dark:text-yellow-400";
+  if (ratio >= 0.5) return "text-orange-600 dark:text-orange-400";
   return "text-red-600 dark:text-red-400";
 }
 
-function getBadgeColors(rating: number): string {
-  if (rating >= 90) return "bg-green-600 dark:bg-green-500 text-white border-green-700 dark:border-green-400";
-  if (rating >= 70) return "bg-yellow-500 dark:bg-yellow-500 text-black dark:text-black border-yellow-600 dark:border-yellow-400";
-  if (rating >= 50) return "bg-orange-500 dark:bg-orange-500 text-white border-orange-600 dark:border-orange-400";
+function getOverallScoreColor(score: number): string {
+  if (score >= 4) return "text-green-600 dark:text-green-400";
+  if (score >= 2) return "text-yellow-600 dark:text-yellow-400";
+  if (score >= 1) return "text-orange-600 dark:text-orange-400";
+  return "text-red-600 dark:text-red-400";
+}
+
+function getBadgeColors(score: number): string {
+  if (score >= 4) return "bg-green-600 dark:bg-green-500 text-white border-green-700 dark:border-green-400";
+  if (score >= 2) return "bg-yellow-500 dark:bg-yellow-500 text-black dark:text-black border-yellow-600 dark:border-yellow-400";
+  if (score >= 1) return "bg-orange-500 dark:bg-orange-500 text-white border-orange-600 dark:border-orange-400";
   return "bg-red-600 dark:bg-red-500 text-white border-red-700 dark:border-red-400";
 }
 
-function ColoredProgress({ value, rating }: { value: number; rating: number }) {
+function PointsProgress({ points, maxPoints }: { points: number; maxPoints: number }) {
+  const percentage = maxPoints > 0 ? (points / maxPoints) * 100 : 0;
+  const ratio = maxPoints > 0 ? points / maxPoints : 0;
+  
   const getBarColor = () => {
-    if (rating >= 90) return "bg-green-500 dark:bg-green-400";
-    if (rating >= 70) return "bg-yellow-500 dark:bg-yellow-400";
-    if (rating >= 50) return "bg-orange-500 dark:bg-orange-400";
+    if (ratio >= 0.9) return "bg-green-500 dark:bg-green-400";
+    if (ratio >= 0.7) return "bg-yellow-500 dark:bg-yellow-400";
+    if (ratio >= 0.5) return "bg-orange-500 dark:bg-orange-400";
     return "bg-red-500 dark:bg-red-400";
   };
 
@@ -77,64 +115,63 @@ function ColoredProgress({ value, rating }: { value: number; rating: number }) {
     <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
       <div 
         className={`h-full rounded-full transition-all ${getBarColor()}`}
-        style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
+        style={{ width: `${Math.min(100, Math.max(0, percentage))}%` }}
       />
     </div>
   );
+}
+
+function formatPoints(points: number): string {
+  return points.toFixed(2).replace(/\.?0+$/, '');
 }
 
 function getImprovementTips(csrData: CSRData): { category: string; icon: any; tip: string; priority: 'high' | 'medium' | 'low' }[] {
   const tips: { category: string; icon: any; tip: string; priority: 'high' | 'medium' | 'low' }[] = [];
   const { breakdown, details } = csrData;
 
-  if (!details.hasHealthSafety) {
+  const companyDocsUploaded = details.companyDocsUploaded ?? 0;
+  if (companyDocsUploaded < 3) {
+    const missing: string[] = [];
+    if (!details.hasHealthSafety) missing.push("Health & Safety Manual");
+    if (!details.hasCompanyPolicy) missing.push("Company Policy");
+    if (!details.hasInsurance) missing.push("Certificate of Insurance");
+    
     tips.push({
-      category: "Documentation",
-      icon: FileText,
-      tip: "Upload your Health & Safety Manual in Documents to add 50% to your documentation score.",
-      priority: breakdown.documentationRating < 50 ? 'high' : 'medium'
+      category: "Company Documents",
+      icon: Building2,
+      tip: `Upload ${missing.join(", ")} to earn up to ${formatPoints(1 - breakdown.companyDocumentationPoints)} more points.`,
+      priority: breakdown.companyDocumentationPoints < 0.5 ? 'high' : 'medium'
     });
   }
 
-  if (!details.hasCompanyPolicy) {
+  if (breakdown.harnessInspectionPoints < details.activeProjectCount && details.activeProjectCount > 0) {
+    const missingPoints = details.activeProjectCount - breakdown.harnessInspectionPoints;
     tips.push({
-      category: "Documentation",
-      icon: FileText,
-      tip: "Upload your Company Policy document to complete your documentation requirements.",
-      priority: breakdown.documentationRating < 50 ? 'high' : 'medium'
+      category: "Harness Inspections",
+      icon: HardHat,
+      tip: `Complete harness inspections for all work sessions on each project to earn up to ${formatPoints(missingPoints)} more points.`,
+      priority: missingPoints > 0.5 ? 'high' : 'medium'
     });
   }
 
-  if (breakdown.toolboxMeetingRating < 100) {
-    const missingDays = details.toolboxTotalDays - details.toolboxDaysWithMeeting;
-    if (missingDays > 0) {
-      tips.push({
-        category: "Toolbox Meetings",
-        icon: ClipboardCheck,
-        tip: `You're missing toolbox meetings for ${missingDays} work day${missingDays > 1 ? 's' : ''} in the last 30 days. Record meetings for each work day to reach 100%.`,
-        priority: breakdown.toolboxMeetingRating < 50 ? 'high' : 'medium'
-      });
-    }
+  if (breakdown.projectDocumentationPoints < details.activeProjectCount && details.activeProjectCount > 0) {
+    const missingPoints = details.activeProjectCount - breakdown.projectDocumentationPoints;
+    tips.push({
+      category: "Project Documentation",
+      icon: FileText,
+      tip: `Upload all required documents for each project to earn up to ${formatPoints(missingPoints)} more points. Elevation projects need: Rope Access Plan, Anchor Inspection, Toolbox Meeting, FLHA. Other projects need: Toolbox Meeting, FLHA.`,
+      priority: missingPoints > 0.5 ? 'high' : 'medium'
+    });
   }
 
-  if (breakdown.harnessInspectionRating < 100) {
-    const missingInspections = details.harnessRequiredInspections - details.harnessCompletedInspections;
-    if (missingInspections > 0) {
-      tips.push({
-        category: "Harness Inspections",
-        icon: HardHat,
-        tip: `${missingInspections} harness inspection${missingInspections > 1 ? 's are' : ' is'} missing. Each employee should complete an inspection before starting work each day.`,
-        priority: breakdown.harnessInspectionRating < 50 ? 'high' : 'medium'
-      });
-    }
-  }
-
-  if (breakdown.documentReviewRating < 100 && details.documentReviewsTotal > 0) {
+  const totalEmployees = details.documentReviewsTotalEmployees ?? 0;
+  if (breakdown.employeeDocReviewPoints < totalEmployees && totalEmployees > 0) {
+    const missingPoints = totalEmployees - breakdown.employeeDocReviewPoints;
     tips.push({
       category: "Document Reviews",
       icon: FileCheck,
-      tip: `${details.documentReviewsPending} document signature${details.documentReviewsPending > 1 ? 's are' : ' is'} pending. All staff members (including the company owner) should view and sign required safety documents.`,
-      priority: breakdown.documentReviewRating < 80 ? 'medium' : 'low'
+      tip: `${details.documentReviewsPending} document signature${details.documentReviewsPending !== 1 ? 's are' : ' is'} pending. Have all staff view and sign company documents to earn up to ${formatPoints(missingPoints)} more points.`,
+      priority: missingPoints > 0.5 ? 'medium' : 'low'
     });
   }
 
@@ -148,11 +185,13 @@ function getImprovementTips(csrData: CSRData): { category: string; icon: any; ti
 
 function getCategoryLabel(category: string): string {
   const labels: Record<string, string> = {
-    documentation: "Documentation",
+    documentation: "Company Documents",
     toolbox: "Toolbox Meetings",
     harness: "Harness Inspections",
     documentReview: "Document Reviews",
     projectDocumentation: "Project Documentation",
+    companyDocumentation: "Company Documents",
+    employeeDocReview: "Document Reviews",
     improvement: "Improvement",
     initial: "Initial Rating",
     overall: "Overall"
@@ -196,6 +235,11 @@ export function CSRBadge({ user }: CSRBadgeProps) {
   const improvementTips = getImprovementTips(csrData);
   const hasImprovements = improvementTips.length > 0;
 
+  const maxHarnessPoints = details.activeProjectCount;
+  const maxProjectDocPoints = details.activeProjectCount;
+  const maxCompanyDocPoints = 1;
+  const maxEmployeeDocPoints = details.documentReviewsTotalEmployees ?? 0;
+
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
@@ -206,7 +250,7 @@ export function CSRBadge({ user }: CSRBadgeProps) {
             data-testid="badge-csr"
           >
             <Shield className="w-4 h-4" />
-            <span className="text-sm font-semibold">CSR: {overallCSR} {overallCSR === 1 ? 'point' : 'points'}</span>
+            <span className="text-sm font-semibold">CSR: {formatPoints(overallCSR)} pts</span>
           </Badge>
         </DialogTrigger>
         <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto" data-testid="dialog-csr-details">
@@ -220,10 +264,10 @@ export function CSRBadge({ user }: CSRBadgeProps) {
           <div className="space-y-6">
             <div className="flex items-center justify-center p-6 rounded-xl bg-muted/50">
               <div className="text-center">
-                <div className={`text-5xl font-bold ${getRatingColor(overallCSR)}`}>
-                  {overallCSR} {overallCSR === 1 ? 'point' : 'points'}
+                <div className={`text-5xl font-bold ${getOverallScoreColor(overallCSR)}`}>
+                  {formatPoints(overallCSR)}
                 </div>
-                <p className="text-sm text-muted-foreground mt-1">Overall Safety Score</p>
+                <p className="text-sm text-muted-foreground mt-1">Total Points</p>
               </div>
             </div>
 
@@ -251,71 +295,76 @@ export function CSRBadge({ user }: CSRBadgeProps) {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-2">
-                      <FileText className="w-4 h-4 text-muted-foreground" />
-                      <span>Documentation</span>
-                    </div>
-                    <span className={`font-semibold ${getRatingColor(breakdown.documentationRating)}`}>
-                      {breakdown.documentationRating} {breakdown.documentationRating === 1 ? 'point' : 'points'}
-                    </span>
-                  </div>
-                  <ColoredProgress value={breakdown.documentationRating} rating={breakdown.documentationRating} />
-                  <p className="text-xs text-muted-foreground">
-                    {details.hasHealthSafety && details.hasCompanyPolicy 
-                      ? "Both manuals uploaded" 
-                      : details.hasHealthSafety || details.hasCompanyPolicy 
-                        ? "1 of 2 manuals uploaded" 
-                        : "No manuals uploaded"}
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2">
-                      <ClipboardCheck className="w-4 h-4 text-muted-foreground" />
-                      <span>Toolbox Meetings</span>
-                    </div>
-                    <span className={`font-semibold ${getRatingColor(breakdown.toolboxMeetingRating)}`}>
-                      {breakdown.toolboxMeetingRating} {breakdown.toolboxMeetingRating === 1 ? 'point' : 'points'}
-                    </span>
-                  </div>
-                  <ColoredProgress value={breakdown.toolboxMeetingRating} rating={breakdown.toolboxMeetingRating} />
-                  <p className="text-xs text-muted-foreground">
-                    {details.toolboxDaysWithMeeting} of {details.toolboxTotalDays} work days covered (last 30 days)
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2">
                       <HardHat className="w-4 h-4 text-muted-foreground" />
                       <span>Harness Inspections</span>
                     </div>
-                    <span className={`font-semibold ${getRatingColor(breakdown.harnessInspectionRating)}`}>
-                      {breakdown.harnessInspectionRating} {breakdown.harnessInspectionRating === 1 ? 'point' : 'points'}
+                    <span className={`font-semibold ${getPointsColor(breakdown.harnessInspectionPoints, maxHarnessPoints)}`}>
+                      {formatPoints(breakdown.harnessInspectionPoints)} / {maxHarnessPoints} pts
                     </span>
                   </div>
-                  <ColoredProgress value={breakdown.harnessInspectionRating} rating={breakdown.harnessInspectionRating} />
+                  <PointsProgress points={breakdown.harnessInspectionPoints} maxPoints={maxHarnessPoints} />
                   <p className="text-xs text-muted-foreground">
-                    {details.harnessCompletedInspections} of {details.harnessRequiredInspections} inspections completed (last 30 days)
+                    {details.activeProjectCount > 0 
+                      ? `1 point per project with all work sessions having harness inspections`
+                      : "No active projects"}
                   </p>
                 </div>
 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-2">
-                      <FileCheck className="w-4 h-4 text-muted-foreground" />
-                      <span>Document Reviews</span>
+                      <FileText className="w-4 h-4 text-muted-foreground" />
+                      <span>Project Documentation</span>
                     </div>
-                    <span className={`font-semibold ${getRatingColor(breakdown.documentReviewRating)}`}>
-                      {breakdown.documentReviewRating} {breakdown.documentReviewRating === 1 ? 'point' : 'points'}
+                    <span className={`font-semibold ${getPointsColor(breakdown.projectDocumentationPoints, maxProjectDocPoints)}`}>
+                      {formatPoints(breakdown.projectDocumentationPoints)} / {maxProjectDocPoints} pts
                     </span>
                   </div>
-                  <ColoredProgress value={breakdown.documentReviewRating} rating={breakdown.documentReviewRating} />
+                  <PointsProgress points={breakdown.projectDocumentationPoints} maxPoints={maxProjectDocPoints} />
                   <p className="text-xs text-muted-foreground">
-                    {details.documentReviewsSigned} of {details.documentReviewsTotal} document signature{details.documentReviewsTotal !== 1 ? 's' : ''} completed
-                    {details.documentReviewsTotalEmployees && details.documentReviewsTotalDocs && (
+                    {details.activeProjectCount > 0 
+                      ? `1 point per project with all required documents uploaded`
+                      : "No active projects"}
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2">
+                      <Building2 className="w-4 h-4 text-muted-foreground" />
+                      <span>Company Documents</span>
+                    </div>
+                    <span className={`font-semibold ${getPointsColor(breakdown.companyDocumentationPoints, maxCompanyDocPoints)}`}>
+                      {formatPoints(breakdown.companyDocumentationPoints)} / {maxCompanyDocPoints} pts
+                    </span>
+                  </div>
+                  <PointsProgress points={breakdown.companyDocumentationPoints} maxPoints={maxCompanyDocPoints} />
+                  <p className="text-xs text-muted-foreground">
+                    {details.companyDocsUploaded ?? 0} of 3 company documents uploaded
+                    <span className="block mt-0.5 text-xs">
+                      (H&S Manual, Company Policy, Certificate of Insurance)
+                    </span>
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2">
+                      <Users className="w-4 h-4 text-muted-foreground" />
+                      <span>Employee Document Reviews</span>
+                    </div>
+                    <span className={`font-semibold ${getPointsColor(breakdown.employeeDocReviewPoints, maxEmployeeDocPoints)}`}>
+                      {formatPoints(breakdown.employeeDocReviewPoints)} / {maxEmployeeDocPoints} pts
+                    </span>
+                  </div>
+                  <PointsProgress points={breakdown.employeeDocReviewPoints} maxPoints={maxEmployeeDocPoints} />
+                  <p className="text-xs text-muted-foreground">
+                    {maxEmployeeDocPoints > 0 
+                      ? `1 point per employee who signs all company documents`
+                      : "No employees or no documents uploaded"}
+                    {details.documentReviewsTotalEmployees && details.documentReviewsTotalDocs && details.documentReviewsTotalEmployees > 0 && (
                       <span className="block mt-0.5">
-                        ({details.documentReviewsTotalEmployees} staff member{details.documentReviewsTotalEmployees !== 1 ? 's' : ''} × {details.documentReviewsTotalDocs} document{details.documentReviewsTotalDocs !== 1 ? 's' : ''})
+                        {details.documentReviewsSigned} of {details.documentReviewsTotal} signature{details.documentReviewsTotal !== 1 ? 's' : ''} completed
                       </span>
                     )}
                   </p>
@@ -412,8 +461,8 @@ export function CSRBadge({ user }: CSRBadgeProps) {
                         )}
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className={`text-lg font-bold ${getRatingColor(entry.newScore)}`}>
-                              {entry.newScore} {entry.newScore === 1 ? 'point' : 'points'}
+                            <span className={`text-lg font-bold ${getOverallScoreColor(entry.newScore)}`}>
+                              {formatPoints(entry.newScore)} pts
                             </span>
                             <span className={`text-sm font-medium ${
                               entry.delta > 0 
@@ -422,11 +471,11 @@ export function CSRBadge({ user }: CSRBadgeProps) {
                                   ? 'text-red-600 dark:text-red-400' 
                                   : 'text-muted-foreground'
                             }`}>
-                              {entry.delta > 0 ? '+' : ''}{entry.delta} {Math.abs(entry.delta) === 1 ? 'point' : 'points'}
+                              {entry.delta > 0 ? '+' : ''}{formatPoints(entry.delta)}
                             </span>
                           </div>
                           <p className="text-xs text-muted-foreground">
-                            from {entry.previousScore} {entry.previousScore === 1 ? 'point' : 'points'}
+                            from {formatPoints(entry.previousScore)} pts
                           </p>
                         </div>
                       </div>
