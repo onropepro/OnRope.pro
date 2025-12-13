@@ -88,20 +88,20 @@ export default function IRATATaskLoggingLanding() {
             <CardContent className="p-8">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-blue-600">Zero</div>
-                  <div className="text-base text-muted-foreground mt-1">Data loss between employers</div>
+                  <div className="text-2xl md:text-3xl font-bold text-foreground">Yours</div>
+                  <div className="text-sm text-muted-foreground mt-1">Hours that don't disappear when you quit</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-emerald-600">Same-Day</div>
-                  <div className="text-base text-muted-foreground mt-1">Logging accuracy</div>
+                  <div className="text-2xl md:text-3xl font-bold text-foreground">Accurate</div>
+                  <div className="text-sm text-muted-foreground mt-1">Logged while you still remember</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-amber-600">20+</div>
-                  <div className="text-base text-muted-foreground mt-1">Task categories</div>
+                  <div className="text-2xl md:text-3xl font-bold text-foreground">Ready</div>
+                  <div className="text-sm text-muted-foreground mt-1">Level 3 proof on demand</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-violet-600">Instant</div>
-                  <div className="text-base text-muted-foreground mt-1">PDF export</div>
+                  <div className="text-2xl md:text-3xl font-bold text-foreground">Portable</div>
+                  <div className="text-sm text-muted-foreground mt-1">One profile, every employer</div>
                 </div>
               </div>
             </CardContent>
