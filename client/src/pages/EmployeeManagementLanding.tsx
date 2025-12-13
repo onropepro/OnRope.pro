@@ -49,7 +49,8 @@ export default function EmployeeManagementLanding() {
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
               Your New Hire Filled Out This Paperwork<br />
-              <span className="text-blue-100">Three Employers Ago. Why Are You Asking Again?</span>
+              Three Employers Ago.<br />
+              <span className="text-blue-100">Why Are You Asking Again?</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
