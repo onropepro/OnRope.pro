@@ -62,4 +62,17 @@ Formula: SCR Points per employee = (Documents Signed by Employee / Documents Upl
 When a company updates or replaces a document:
 - Employees have a **14-day grace period** to re-sign the updated document
 - During the grace period, existing points are preserved
-- After 14 days, if the employee has not signed the updated document, the SCR loses the point for that employee until they sign
+- After 14 days, if the employee has not signed the updated document, the SCR loses the proportional points for that employee until they sign
+
+### New Document Policy
+
+When a company adds a NEW safe work practice or safe work procedure:
+- Employees have a **14-day grace period** to sign the new document
+- During the grace period, existing points are preserved (the new document is not counted in the ratio)
+- After 14 days, the new document is included in the calculation
+- If the employee has not signed the new document, their ratio decreases and the SCR loses proportional points
+
+Example:
+- Company had 2 documents, employee signed both = 1 point (2/2)
+- Company adds a new document (day 1-14): employee still has 1 point (grace period)
+- After 14 days: employee has signed 2 of 3 documents = 0.67 points
