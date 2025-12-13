@@ -12,6 +12,7 @@ import {
   index,
   jsonb,
   numeric,
+  real,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -975,9 +976,9 @@ export const toolboxMeetings = pgTable("toolbox_meetings", {
 export const csrRatingHistory = pgTable("csr_rating_history", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  previousScore: integer("previous_score").notNull(),
-  newScore: integer("new_score").notNull(),
-  delta: integer("delta").notNull(), // Positive = improvement, negative = decline
+  previousScore: real("previous_score").notNull(),
+  newScore: real("new_score").notNull(),
+  delta: real("delta").notNull(), // Positive = improvement, negative = decline
   category: varchar("category").notNull(), // Which factor caused the change (documentation, toolbox, harness, etc.)
   reason: text("reason").notNull(), // Human-readable reason for the change
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -1273,6 +1274,7 @@ export const companyDocuments = pgTable("company_documents", {
   description: text("description"), // Description for safe work procedures
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(), // Track when document was last updated/replaced
+  graceEndsAt: timestamp("grace_ends_at"), // 14-day grace period end date for SCR calculations - employees have until this date to sign new/updated documents
 }, (table) => [
   index("IDX_company_docs_company").on(table.companyId),
   index("IDX_company_docs_type").on(table.companyId, table.documentType),
