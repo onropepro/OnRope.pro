@@ -8377,7 +8377,7 @@ export default function Dashboard() {
                   </Card>
 
                   {/* irata Certification */}
-                  {employeeToView.irataLevel && (
+                  {(employeeToView.irataLevel || employeeToView.irataLicenseNumber || employeeToView.irataExpirationDate || (employeeToView.irataDocuments?.length > 0)) && (
                     <Card>
                       <CardHeader>
                         <CardTitle className="text-base flex items-center gap-2 justify-between">
@@ -8398,10 +8398,12 @@ export default function Dashboard() {
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-3">
+                        {employeeToView.irataLevel && (
                         <div>
                           <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.level', 'Level')}</div>
                           <div className="text-sm font-medium">{employeeToView.irataLevel}</div>
                         </div>
+                        )}
                         {employeeToView.irataLicenseNumber && (
                           <div>
                             <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.licenseNumber', 'License Number')}</div>
@@ -8468,7 +8470,7 @@ export default function Dashboard() {
                   )}
 
                   {/* SPRAT Certification */}
-                  {employeeToView.spratLevel && (
+                  {(employeeToView.spratLevel || employeeToView.spratLicenseNumber || employeeToView.spratExpirationDate || (employeeToView.spratDocuments?.length > 0)) && (
                     <Card>
                       <CardHeader>
                         <CardTitle className="text-base flex items-center gap-2 justify-between">
@@ -8489,10 +8491,12 @@ export default function Dashboard() {
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-3">
+                        {employeeToView.spratLevel && (
                         <div>
                           <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.level', 'Level')}</div>
                           <div className="text-sm font-medium">{employeeToView.spratLevel}</div>
                         </div>
+                        )}
                         {employeeToView.spratLicenseNumber && (
                           <div>
                             <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.licenseNumber', 'License Number')}</div>
@@ -8620,7 +8624,7 @@ export default function Dashboard() {
                   )}
 
                   {/* Driver's License */}
-                  {(employeeToView.driversLicenseNumber || employeeToView.driversLicenseProvince || (employeeToView.driversLicenseDocuments && employeeToView.driversLicenseDocuments.length > 0)) && (
+                  {(employeeToView.driversLicenseNumber || employeeToView.driversLicenseProvince || employeeToView.driversLicenseIssuedDate || employeeToView.driversLicenseExpiry || (employeeToView.driversLicenseDocuments?.length > 0)) && (
                     <Card>
                       <CardHeader>
                         <CardTitle className="text-base flex items-center gap-2">
