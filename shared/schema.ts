@@ -1253,6 +1253,7 @@ export const companyDocuments = pgTable("company_documents", {
   templateId: varchar("template_id"), // Unique identifier for template (e.g., 'swp_window_cleaning')
   description: text("description"), // Description for safe work procedures
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(), // Track when document was last updated/replaced
 }, (table) => [
   index("IDX_company_docs_company").on(table.companyId),
   index("IDX_company_docs_type").on(table.companyId, table.documentType),
