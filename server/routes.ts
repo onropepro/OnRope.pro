@@ -15064,70 +15064,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (documentType === 'certificate_of_insurance') {
         console.log("[COI AI] Starting insurance expiry extraction for document:", document.id);
         try {
-          // Use the uploaded file buffer directly (more reliable than fetching from URL)
+          // Use the uploaded file buffer directly
           const pdfBase64 = req.file.buffer.toString('base64');
-          console.log("[COI AI] PDF size:", req.file.buffer.byteLength, "bytes, base64 length:", pdfBase64.length);
+          console.log("[COI AI] PDF size:", req.file.buffer.byteLength, "bytes");
           
-          // Initialize Gemini client via AI Integrations
-          const apiKey = process.env.AI_INTEGRATIONS_GEMINI_API_KEY;
-          const baseURL = process.env.AI_INTEGRATIONS_GEMINI_BASE_URL;
-          console.log("[COI AI] API configured:", apiKey ? "YES" : "NO", "Base URL:", baseURL ? "YES" : "NO");
+          // Use native Gemini SDK for extraction
+          const { extractInsuranceExpiryDate } = await import("./gemini");
+          const result = await extractInsuranceExpiryDate(pdfBase64);
           
-          if (!apiKey || !baseURL) {
-            console.error("[COI AI] Missing API configuration - skipping extraction");
-          } else {
-            const gemini = new OpenAI({
-              apiKey,
-              baseURL,
-            });
-            
-            console.log("[COI AI] Calling Gemini API...");
-            const aiResponse = await gemini.chat.completions.create({
-              model: "gemini-2.5-flash",
-              messages: [
-                {
-                  role: "user",
-                  content: [
-                    {
-                      type: "text",
-                      text: `Analyze this Certificate of Insurance PDF and extract the policy expiry date. 
-Look for fields like "Policy Expiry", "Expiration Date", "Policy Period To", "Coverage Ends", or similar.
-Respond with ONLY a JSON object: {"expiryDate": "YYYY-MM-DD"} or {"expiryDate": null} if not found.`
-                    },
-                    {
-                      type: "image_url",
-                      image_url: { url: `data:application/pdf;base64,${pdfBase64}` }
-                    }
-                  ]
-                }
-              ],
-              max_tokens: 100,
-            });
-            
-            const responseText = aiResponse.choices[0]?.message?.content?.trim() || "";
-            console.log("[COI AI] Gemini response:", responseText);
-            
-            // Parse response, handle markdown code blocks if present
-            let jsonStr = responseText;
-            if (responseText.includes('```')) {
-              const match = responseText.match(/```(?:json)?\s*([\s\S]*?)```/);
-              if (match) jsonStr = match[1].trim();
+          if (result.expiryDate) {
+            extractedExpiryDate = new Date(result.expiryDate);
+            if (!isNaN(extractedExpiryDate.getTime())) {
+              await storage.updateCompanyDocument(document.id, { insuranceExpiryDate: extractedExpiryDate });
+              console.log(`[COI AI] Extracted insurance expiry date: ${extractedExpiryDate.toISOString()}`);
             }
-            
-            const parsed = JSON.parse(jsonStr);
-            if (parsed.expiryDate) {
-              extractedExpiryDate = new Date(parsed.expiryDate);
-              if (!isNaN(extractedExpiryDate.getTime())) {
-                await storage.updateCompanyDocument(document.id, { insuranceExpiryDate: extractedExpiryDate });
-                console.log(`[COI AI] Extracted insurance expiry date: ${extractedExpiryDate.toISOString()}`);
-              }
-            } else {
-              console.log("[COI AI] No expiry date found in document");
+          } else {
+            console.log("[COI AI] No expiry date found in document");
+            if (result.error) {
+              console.log("[COI AI] Error:", result.error);
             }
           }
         } catch (aiError: any) {
           console.error("[COI AI] Extraction error:", aiError?.message || aiError);
-          console.error("AI insurance expiry extraction error (non-fatal):", aiError);
           // Continue - document was still uploaded successfully
         }
       }

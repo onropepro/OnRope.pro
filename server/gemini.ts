@@ -425,3 +425,75 @@ Respond ONLY with valid JSON matching this structure:
     };
   }
 }
+
+// Extract insurance expiry date from Certificate of Insurance PDF
+export interface InsuranceExpiryResult {
+  expiryDate: string | null;
+  confidence: "high" | "medium" | "low";
+  error: string | null;
+}
+
+export async function extractInsuranceExpiryDate(
+  pdfBase64: string
+): Promise<InsuranceExpiryResult> {
+  try {
+    console.log("[COI AI] Calling Gemini for insurance expiry extraction...");
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: [
+        {
+          role: "user",
+          parts: [
+            {
+              text: `Analyze this Certificate of Insurance PDF and extract the policy expiry date.
+Look for fields like "Policy Expiry", "Expiration Date", "Policy Period To", "Coverage Ends", "Effective To", or similar.
+Extract the date when the insurance policy expires.
+
+Respond ONLY with valid JSON matching this exact structure:
+{
+  "expiryDate": string or null (YYYY-MM-DD format),
+  "confidence": "high" | "medium" | "low",
+  "error": string or null
+}`
+            },
+            {
+              inlineData: {
+                mimeType: "application/pdf",
+                data: pdfBase64
+              }
+            }
+          ]
+        }
+      ],
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            expiryDate: { type: Type.STRING, nullable: true },
+            confidence: { type: Type.STRING },
+            error: { type: Type.STRING, nullable: true }
+          },
+          required: ["confidence"]
+        }
+      }
+    });
+
+    const result = JSON.parse(response.text || "{}") as InsuranceExpiryResult;
+    console.log("[COI AI] Gemini response:", JSON.stringify(result));
+    
+    // Normalize the expiry date if found
+    if (result.expiryDate) {
+      result.expiryDate = normalizeExpiryDate(result.expiryDate);
+    }
+    
+    return result;
+  } catch (error: any) {
+    console.error("[COI AI] Gemini extraction error:", error);
+    return {
+      expiryDate: null,
+      confidence: "low",
+      error: `Extraction failed: ${error.message || "Unknown error"}`
+    };
+  }
+}
