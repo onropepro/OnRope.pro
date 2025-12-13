@@ -164,6 +164,95 @@ export default function ProjectManagementLanding() {
 
       <Separator className="my-8" />
 
+      {/* What This Module Does Section */}
+      <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto space-y-8">
+        <div className="text-center space-y-4">
+          <h2 className="text-2xl md:text-3xl font-bold">What This Module Does</h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            The operational hub connecting scheduling, safety, and payroll
+          </p>
+          <p className="text-muted-foreground max-w-3xl mx-auto">
+            Projects track individual building maintenance jobs with progress measured the way rope access actually works.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-6">
+          {/* Card 1: Progress Tracking by Job Type */}
+          <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
+            <CardHeader className="pb-2">
+              <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center mb-3">
+                <Target className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <CardTitle className="text-lg">Progress Tracking by Job Type</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 text-sm text-muted-foreground">
+              <p>The system adapts to your work, not the other way around.</p>
+              <p>Drop-based tracking for window cleaning and building wash counts vertical passes per elevation. North, East, South, West tracked independently. Hours-based tracking for inspections and repairs captures time with manual completion percentage. Unit-based tracking for parkade cleaning and in-suite services counts individual stalls or suites completed.</p>
+              <p>The form technicians see when ending a work session changes based on what they're working on. No forcing your operations into someone else's template.</p>
+              <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
+                <p className="font-medium text-foreground mb-2">What gets tracked:</p>
+                <ul className="space-y-1">
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />N/E/S/W elevations independently</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />Drops completed per session per direction</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />Hours worked with completion estimates</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />Units or stalls finished</li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Card 2: Automatic Calendar Population */}
+          <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
+            <CardHeader className="pb-2">
+              <div className="w-12 h-12 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center mb-3">
+                <Calendar className="w-6 h-6 text-violet-600 dark:text-violet-400" />
+              </div>
+              <CardTitle className="text-lg">Automatic Calendar Population</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 text-sm text-muted-foreground">
+              <p>Create a project once. The schedule fills itself.</p>
+              <p>When you enter a date range and assign employees, calendar entries appear automatically. No more creating a project, then opening Google Calendar, then texting your supervisor, then updating the whiteboard. Same information, one entry, everywhere it needs to go.</p>
+              <p>Building gets pushed by a week? Click the project, change the date. It syncs everywhere. Conflict detection flags when someone is double-booked before it becomes an emergency.</p>
+              <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
+                <p className="font-medium text-foreground mb-2">What gets automated:</p>
+                <ul className="space-y-1">
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-violet-500 shrink-0" />Multi-day project bars on company calendar</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-violet-500 shrink-0" />Employee assignments visible on their schedules</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-violet-500 shrink-0" />Color coding by job type</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-violet-500 shrink-0" />Conflict detection for double-booking</li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Card 3: Linked Documentation */}
+          <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
+            <CardHeader className="pb-2">
+              <div className="w-12 h-12 rounded-lg bg-[#0B64A3]/10 dark:bg-[#0B64A3]/20 flex items-center justify-center mb-3">
+                <Shield className="w-6 h-6 text-[#0B64A3]" />
+              </div>
+              <CardTitle className="text-lg">Linked Documentation</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 text-sm text-muted-foreground">
+              <p>Safety docs live with their projects. Not in email. Not in Google Drive. Not in a folder in the truck.</p>
+              <p>Each project connects to its Rope Access Plan, Toolbox Meeting records, and Anchor Inspection Certificates. Property managers access compliance documents through their portal without emailing you. Auditors find everything in one place.</p>
+              <p>When the insurance company asks for proof of your safety program, you're not digging. You're clicking.</p>
+              <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
+                <p className="font-medium text-foreground mb-2">What gets linked:</p>
+                <ul className="space-y-1">
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-[#0B64A3] shrink-0" />Rope Access Plans (RAP)</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-[#0B64A3] shrink-0" />Toolbox Meeting records</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-[#0B64A3] shrink-0" />Anchor Inspection Certificates</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-[#0B64A3] shrink-0" />Project photos</li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      <Separator className="my-8" />
+
       {/* What Changes Section */}
       <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto space-y-8">
         <div>
@@ -205,13 +294,164 @@ export default function ProjectManagementLanding() {
 
       <Separator className="my-8" />
 
+      {/* Stakeholder Benefits Section */}
+      <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto space-y-12">
+        <div className="text-center space-y-4">
+          <h2 className="text-2xl md:text-3xl font-bold">Who Benefits From This Module</h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Every stakeholder gets exactly the visibility they need
+          </p>
+        </div>
+
+        {/* For Employers */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-[#0B64A3]/10 dark:bg-[#0B64A3]/20 flex items-center justify-center shrink-0">
+              <Briefcase className="w-5 h-5 text-[#0B64A3]" />
+            </div>
+            <h3 className="text-xl font-semibold">For Employers (Company Owners)</h3>
+          </div>
+          <div className="grid md:grid-cols-2 gap-4 pl-0 md:pl-13">
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
+              <CardContent className="p-5 space-y-2">
+                <h4 className="font-semibold">See all your projects without leaving your desk.</h4>
+                <p className="text-sm text-muted-foreground">The dashboard shows every active job with completion percentage, days remaining, and assigned crew. Filter by status, building, or technician. Updates automatically as work sessions get logged. No more driving site to site taking notes of where crews are compared to yesterday.</p>
+              </CardContent>
+            </Card>
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
+              <CardContent className="p-5 space-y-2">
+                <h4 className="font-semibold">Know who's performing and who's coasting.</h4>
+                <p className="text-sm text-muted-foreground">Per-employee performance tracking shows drops completed per session, target achievement rates, and historical trends. You can see that Tommy did five drops every day at this building while another employee only did one. Now you have the data for the conversation you couldn't have before.</p>
+              </CardContent>
+            </Card>
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
+              <CardContent className="p-5 space-y-2">
+                <h4 className="font-semibold">Quote future jobs with confidence.</h4>
+                <p className="text-sm text-muted-foreground">Historical project data shows how long similar buildings actually took. Search past projects by building type, job type, or date range. "Last time we did a 20-story window wash, it took 14 days with 2 techs averaging 8 drops per day." Stop guessing and overbidding by 50%.</p>
+              </CardContent>
+            </Card>
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
+              <CardContent className="p-5 space-y-2">
+                <h4 className="font-semibold">Reduce your psychological load.</h4>
+                <p className="text-sm text-muted-foreground">The time you spend looking at projects on one screen, schedule on another, checking if you put Devon somewhere. That mental bandwidth gets freed up. Everything is linked with everything. The system remembers so you don't have to.</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* For Technicians */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0">
+              <Wrench className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+            </div>
+            <h3 className="text-xl font-semibold">For Technicians</h3>
+          </div>
+          <div className="grid md:grid-cols-3 gap-4 pl-0 md:pl-13">
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
+              <CardContent className="p-5 space-y-2">
+                <h4 className="font-semibold">Know your target before you start.</h4>
+                <p className="text-sm text-muted-foreground">Your mobile app shows assigned projects with clear daily expectations. Marina Towers, Window Cleaning. Your target: 5 drops per day. Yesterday you completed: 4 drops. No more finding out after the fact that the boss expected something different.</p>
+              </CardContent>
+            </Card>
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
+              <CardContent className="p-5 space-y-2">
+                <h4 className="font-semibold">See where you're working tomorrow.</h4>
+                <p className="text-sm text-muted-foreground">Your upcoming assignments appear on your phone tonight. Tomorrow: Marina Towers, 8:00 AM. Thursday: Ocean View Apartments, 8:00 AM. Plan your commute the night before instead of waiting for a 6 AM text that sends you to the wrong building.</p>
+              </CardContent>
+            </Card>
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
+              <CardContent className="p-5 space-y-2">
+                <h4 className="font-semibold">Track your own improvement.</h4>
+                <p className="text-sm text-muted-foreground">Your performance dashboard shows drops per day average, target achievement rate, and trends over time. This month: 4.8 drops per day, 86% target achievement. Last month: 4.1 drops per day. You're improving, and now you can prove it during your review.</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* For Building Managers */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center shrink-0">
+              <Building2 className="w-5 h-5 text-violet-600 dark:text-violet-400" />
+            </div>
+            <h3 className="text-xl font-semibold">For Building Managers</h3>
+          </div>
+          <div className="grid md:grid-cols-2 gap-4 pl-0 md:pl-13">
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
+              <CardContent className="p-5 space-y-2">
+                <h4 className="font-semibold">Stop playing telephone.</h4>
+                <p className="text-sm text-muted-foreground">Log in and see the exact same progress the rope access company sees. Real-time completion percentages by elevation. Before and after photo galleries. Safety documentation. When the building owner asks "How's it going?", answer immediately instead of "I'll call them and find out."</p>
+              </CardContent>
+            </Card>
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
+              <CardContent className="p-5 space-y-2">
+                <h4 className="font-semibold">Verify contractor performance objectively.</h4>
+                <p className="text-sm text-muted-foreground">The dashboard shows whether work is progressing on schedule. South Elevation: 73% complete. Expected completion: Dec 8. No more relying on verbal updates that might be optimistic. Data you can trust when evaluating vendor performance.</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* For Property Managers */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0">
+              <Globe className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <h3 className="text-xl font-semibold">For Property Managers</h3>
+          </div>
+          <div className="grid md:grid-cols-2 gap-4 pl-0 md:pl-13">
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
+              <CardContent className="p-5 space-y-2">
+                <h4 className="font-semibold">Reduce your communication overhead.</h4>
+                <p className="text-sm text-muted-foreground">Residents check progress themselves through their portal. They see which elevation is being worked, when their floor is expected, and the upcoming schedule. Status calls drop 60-70%. Your phone stops ringing with "when will they be done?" questions.</p>
+              </CardContent>
+            </Card>
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
+              <CardContent className="p-5 space-y-2">
+                <h4 className="font-semibold">Demonstrate professional vendor management.</h4>
+                <p className="text-sm text-muted-foreground">When building owners ask about contractor oversight, show them the portal. Real-time progress tracking. Documented safety compliance. Photo verification. You become known as the property manager who uses technology to ensure accountability.</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* For Residents */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
+              <HomeIcon className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+            </div>
+            <h3 className="text-xl font-semibold">For Residents</h3>
+          </div>
+          <div className="grid md:grid-cols-2 gap-4 pl-0 md:pl-13">
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
+              <CardContent className="p-5 space-y-2">
+                <h4 className="font-semibold">Know when work will reach your window.</h4>
+                <p className="text-sm text-muted-foreground">The resident portal shows progress specific to your elevation. South Elevation: 45% complete. Expected to reach your floor Thursday Dec 12. Entire elevation complete by Dec 15. Plan your life around the work instead of wondering.</p>
+              </CardContent>
+            </Card>
+            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
+              <CardContent className="p-5 space-y-2">
+                <h4 className="font-semibold">Birthday party on Sunday?</h4>
+                <p className="text-sm text-muted-foreground">Check the schedule. They're not working that day. No need to call the property manager and wait two days for an answer while you worry about strangers outside your window during the party.</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      <Separator className="my-8" />
+
       {/* Key Features */}
       <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto space-y-8">
         <div>
-          <h2 className="text-2xl md:text-3xl font-bold flex items-center gap-2 mb-6">
+          <h2 className="text-2xl md:text-3xl font-bold flex items-center gap-2 mb-4">
             <Sparkles className="w-5 h-5 text-[#0B64A3]" />
             Key Features
           </h2>
+          <p className="text-muted-foreground mb-6">Built for how rope access operations actually work. Not retrofitted from generic project management software.</p>
           
           <div className="grid md:grid-cols-2 gap-4">
             <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
@@ -222,8 +462,8 @@ export default function ProjectManagementLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Directional Drop Tracking</h3>
-                    <p className="text-base text-muted-foreground mt-1">
-                      Track progress on each building elevation (N/E/S/W) independently. Perfect for high-rise window cleaning with different access requirements per side.
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Track progress on each building elevation independently. North, East, South, and West each show their own drop count, completion percentage, and assigned crew. High-rise window cleaning rarely finishes all sides at once. The system matches your reality.
                     </p>
                   </div>
                 </div>
@@ -238,8 +478,8 @@ export default function ProjectManagementLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Real-Time Progress Dashboard</h3>
-                    <p className="text-base text-muted-foreground mt-1">
-                      See every project's completion percentage, days remaining, and assigned crew. Updates automatically as work sessions are logged.
+                    <p className="text-sm text-muted-foreground mt-1">
+                      See every active project's completion percentage, days remaining, and crew assignment from one screen. Updates automatically as work sessions get logged. Filter by status, building, job type, or technician. Visual progress bars flag when projects fall behind target.
                     </p>
                   </div>
                 </div>
@@ -254,8 +494,8 @@ export default function ProjectManagementLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Flexible Tracking Methods</h3>
-                    <p className="text-base text-muted-foreground mt-1">
-                      Drop-based for window cleaning, hours-based for repairs, unit-based for suites. The system adapts to each job type.
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Drop-based, hours-based, or unit-based tracking depending on the job type. The form technicians see when ending a work session changes based on what they're working on. Drop-based jobs ask for N/E/S/W counts. Hours-based jobs ask for completion percentage. The system adapts.
                     </p>
                   </div>
                 </div>
@@ -266,28 +506,12 @@ export default function ProjectManagementLanding() {
               <CardContent className="p-6">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0">
-                    <Users className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                    <Calendar className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Crew Assignment & Scheduling</h3>
-                    <p className="text-base text-muted-foreground mt-1">
-                      Assign technicians to specific projects and elevations. Color-coded project bars show scheduling conflicts instantly.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-[#0B64A3]/10 dark:bg-[#0B64A3]/20 flex items-center justify-center shrink-0">
-                    <Eye className="w-5 h-5 text-[#0B64A3]" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">Client & Resident Visibility</h3>
-                    <p className="text-base text-muted-foreground mt-1">
-                      Property managers and residents check progress themselves. Photo galleries and completion status reduce status calls by 60-70%.
+                    <h3 className="font-semibold">Automatic Calendar Integration</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Creating a project with a date range and assigned employees automatically populates calendar entries. Multi-day project bars. Color coding by job type. Conflict detection when employees are double-booked. No more "Oh shit, I forgot to schedule that" emergencies.
                     </p>
                   </div>
                 </div>
@@ -298,12 +522,12 @@ export default function ProjectManagementLanding() {
               <CardContent className="p-6">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
-                    <TrendingUp className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+                    <Wrench className="w-5 h-5 text-rose-600 dark:text-rose-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Performance Analytics</h3>
-                    <p className="text-base text-muted-foreground mt-1">
-                      Track drops or units completed per shift by technician. Identify top performers and coach underperformers with objective data.
+                    <h3 className="font-semibold">Custom Job Types</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Create company-specific job types for specialized work. Define the name and tracking method. Choose whether it's elevation-based, time-based, or unit-based. Your weird niche service that no generic software understands? Define it once, use it forever.
                     </p>
                   </div>
                 </div>
@@ -318,56 +542,8 @@ export default function ProjectManagementLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Piece Work Mode</h3>
-                    <p className="text-base text-muted-foreground mt-1">
-                      Enable piece work compensation for drop-based projects. Set rate per drop, and payroll calculates automatically.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0">
-                    <Search className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">Project Archive & Search</h3>
-                    <p className="text-base text-muted-foreground mt-1">
-                      Completed projects archive automatically but remain searchable. Historical data powers accurate future quoting.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0">
-                    <Camera className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">Photo Documentation</h3>
-                    <p className="text-base text-muted-foreground mt-1">
-                      Attach photos to work sessions showing completed work. Before/after galleries accessible to building managers and residents.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-[#0B64A3]/10 dark:bg-[#0B64A3]/20 flex items-center justify-center shrink-0">
-                    <GitBranch className="w-5 h-5 text-[#0B64A3]" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">Status Workflow</h3>
-                    <p className="text-base text-muted-foreground mt-1">
-                      Projects move through Draft, Active, On Hold, Completed, and Archived stages. Pause projects for weather or client requests.
+                    <p className="text-sm text-muted-foreground mt-1">
+                      For drop-based projects, enable piece work compensation instead of hourly. Set rate per drop. System calculates pay automatically. 20 drops at $8 per drop equals $160 for that session. No spreadsheets. No manual calculations. No disputes about how pay was calculated.
                     </p>
                   </div>
                 </div>
