@@ -13240,9 +13240,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const documentReviewRating = totalRequiredSignatures > 0 
         ? Math.round((signedReviews / totalRequiredSignatures) * 100) 
         : 100;
-      const documentReviewPenalty = totalRequiredSignatures > 0 
-        ? Math.round(((totalRequiredSignatures - signedReviews) / totalRequiredSignatures) * 5)
-        : 0;
+      // Percentage allocation removed - no penalty applied
+      const documentReviewPenalty = 0;
       
       // 6. Project Safety Documentation Rating
       // Tracks per-project safety documents: Anchor Inspection, Rope Access Plan, FLHA
@@ -13299,11 +13298,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Percentage allocation removed - no penalty applied
       const projectDocumentationPenalty = 0;
       
-      // Calculate overall CSR: Start at 100%, subtract penalties
-      // Percentage allocations removed for: company uploaded docs, toolbox meetings, harness inspections, FLHA/project docs
-      // Only document review penalty remains active
+      // Calculate overall CSR: Now point-based, starts at 0 until further instructions
+      // All percentage allocations removed
       const totalPenalty = documentationPenalty + toolboxPenalty + harnessPenalty + documentReviewPenalty + projectDocumentationPenalty;
-      const overallCSR = Math.max(0, 100 - totalPenalty);
+      const overallCSR = 0;
       
       const response = {
         overallCSR,
@@ -13659,13 +13657,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const documentReviewRating = totalRequiredSignatures > 0 
         ? Math.round((signedReviews / totalRequiredSignatures) * 100) 
         : 100;
-      const documentReviewPenalty = totalRequiredSignatures > 0 
-        ? Math.round(((totalRequiredSignatures - signedReviews) / totalRequiredSignatures) * 5)
-        : 0;
+      // Percentage allocation removed - no penalty applied
+      const documentReviewPenalty = 0;
       
-      // Calculate overall CSR
+      // Calculate overall CSR - now point-based, starts at 0
       const totalPenalty = documentationPenalty + toolboxPenalty + harnessPenalty + documentReviewPenalty;
-      const overallCSR = Math.max(0, 100 - totalPenalty);
+      const overallCSR = 0;
       
       res.json({
         overallCSR,
