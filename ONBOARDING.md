@@ -129,6 +129,12 @@ For each document:
 - Technician already signed documents before this feature → Mark as complete if all current docs signed
 - Document is deleted while technician is signing → Handle gracefully, refresh list
 - Technician works for multiple companies → Separate onboarding per company connection
+- **Partial completion (tech closes app mid-signing)** → When technician returns:
+  - Signed documents remain signed (stored in database)
+  - Unsigned documents still show as pending
+  - Progress indicator shows current status (e.g., "3 of 6 documents signed")
+  - Tech can continue signing remaining documents
+  - No need to re-sign previously signed documents
 
 ---
 
