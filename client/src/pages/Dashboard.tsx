@@ -837,22 +837,22 @@ function LicenseExpiryWarningBanner({ employees }: { employees: any[] }) {
   
   return (
     <div className="mx-4 sm:mx-6 mt-4" data-testid="alert-license-expiry-warning">
-      <Card className="border-amber-400/60 dark:border-amber-500/40 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 shadow-sm">
+      <Card className="border-red-400/60 dark:border-red-500/40 bg-gradient-to-r from-red-50 to-rose-50 dark:from-red-950/30 dark:to-rose-950/30 shadow-sm">
         <CardContent className="p-4">
           <div className="flex items-start gap-4">
             {/* Icon */}
-            <div className="flex-shrink-0 p-2 rounded-full bg-amber-100 dark:bg-amber-900/50">
-              <span className="material-icons text-amber-600 dark:text-amber-400 text-xl">warning</span>
+            <div className="flex-shrink-0 p-2 rounded-full bg-red-100 dark:bg-red-900/50">
+              <span className="material-icons text-red-600 dark:text-red-400 text-xl">warning</span>
             </div>
             
             {/* Content */}
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div>
-                  <h3 className="font-semibold text-amber-800 dark:text-amber-300 text-base">
+                  <h3 className="font-semibold text-red-800 dark:text-red-300 text-base">
                     {t('dashboard.licenseExpiry.title', 'License Expiration Warning')}
                   </h3>
-                  <p className="text-amber-700 dark:text-amber-400 text-sm mt-0.5">
+                  <p className="text-red-700 dark:text-red-400 text-sm mt-0.5">
                     {t('dashboard.licenseExpiry.description', '{{count}} employee(s) have licenses expiring within 30 days', { count: uniqueEmployeeCount })}
                   </p>
                 </div>
@@ -863,7 +863,7 @@ function LicenseExpiryWarningBanner({ employees }: { employees: any[] }) {
                     variant="outline"
                     size="sm"
                     onClick={() => setIsExpanded(!isExpanded)}
-                    className="border-amber-400 dark:border-amber-600 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/50"
+                    className="border-red-400 dark:border-red-600 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/50"
                     data-testid="button-toggle-expiry-details"
                   >
                     <span className="material-icons text-sm mr-1">
@@ -876,7 +876,7 @@ function LicenseExpiryWarningBanner({ employees }: { employees: any[] }) {
                   <Button
                     onClick={() => setLocation("/employee-management")}
                     size="sm"
-                    className="bg-amber-600 hover:bg-amber-700 text-white"
+                    className="bg-red-600 hover:bg-red-700 text-white"
                     data-testid="button-review-licenses"
                   >
                     <span className="material-icons text-sm mr-1">people</span>
@@ -887,16 +887,16 @@ function LicenseExpiryWarningBanner({ employees }: { employees: any[] }) {
               
               {/* Expandable details */}
               {isExpanded && (
-                <div className="mt-4 space-y-2 border-t border-amber-200 dark:border-amber-800 pt-4">
+                <div className="mt-4 space-y-2 border-t border-red-200 dark:border-red-800 pt-4">
                   {expiringLicenses.map((item, index) => (
                     <div 
                       key={`${item.employee.id}-${item.licenseType}-${index}`}
-                      className="flex items-center justify-between bg-white/60 dark:bg-black/20 rounded-lg p-3 text-sm border border-amber-200/50 dark:border-amber-700/30"
+                      className="flex items-center justify-between bg-white/60 dark:bg-black/20 rounded-lg p-3 text-sm border border-red-200/50 dark:border-red-700/30"
                       data-testid={`expiry-item-${item.employee.id}-${index}`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center">
-                          <span className="material-icons text-amber-600 dark:text-amber-400 text-sm">person</span>
+                        <div className="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/50 flex items-center justify-center">
+                          <span className="material-icons text-red-600 dark:text-red-400 text-sm">person</span>
                         </div>
                         <div>
                           <span className="font-medium text-foreground">{item.employee.name}</span>
@@ -909,8 +909,7 @@ function LicenseExpiryWarningBanner({ employees }: { employees: any[] }) {
                       </div>
                       <div className="text-right">
                         <Badge 
-                          variant={item.daysRemaining <= 7 ? "destructive" : "outline"} 
-                          className={item.daysRemaining <= 7 ? "" : "border-amber-400 text-amber-700 dark:text-amber-400"}
+                          variant="destructive"
                         >
                           {item.daysRemaining === 0 
                             ? t('dashboard.licenseExpiry.expiresToday', 'Expires today')
