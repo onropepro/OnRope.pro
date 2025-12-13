@@ -344,16 +344,16 @@ export default function UserAccessLanding() {
               <CardContent className="p-6 space-y-4">
                 <div className="grid md:grid-cols-3 gap-6">
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">Delegate without exposure.</h4>
-                    <p className="text-sm text-muted-foreground">Your supervisor handles North Shore operations. Creates projects. Assigns crews. Manages schedules. Never sees what anyone earns. You focus on growth instead of gatekeeping.</p>
+                    <h4 className="text-lg font-semibold text-foreground">Delegate without exposure.</h4>
+                    <p className="text-base text-muted-foreground">Your supervisor handles North Shore operations. Creates projects. Assigns crews. Manages schedules. Never sees what anyone earns. You focus on growth instead of gatekeeping.</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">Protect your margins.</h4>
-                    <p className="text-sm text-muted-foreground">Client billing rates, internal costs, project profitability stay visible only to you. Your bookkeeper sees aggregate numbers. Your admin processes invoices. Nobody pieces together your competitive advantage.</p>
+                    <h4 className="text-lg font-semibold text-foreground">Protect your margins.</h4>
+                    <p className="text-base text-muted-foreground">Client billing rates, internal costs, project profitability stay visible only to you. Your bookkeeper sees aggregate numbers. Your admin processes invoices. Nobody pieces together your competitive advantage.</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">Onboard in minutes.</h4>
-                    <p className="text-sm text-muted-foreground">Create an account, assign permissions, done. No IT tickets. No back-and-forth emails. Employee sets their own password on first login.</p>
+                    <h4 className="text-lg font-semibold text-foreground">Onboard in minutes.</h4>
+                    <p className="text-base text-muted-foreground">Create an account, assign permissions, done. No IT tickets. No back-and-forth emails. Employee sets their own password on first login.</p>
                   </div>
                 </div>
               </CardContent>
@@ -372,16 +372,16 @@ export default function UserAccessLanding() {
               <CardContent className="p-6 space-y-4">
                 <div className="grid md:grid-cols-3 gap-6">
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">See your work, not everyone else's.</h4>
-                    <p className="text-sm text-muted-foreground">Your assigned projects. Your logged hours. Your safety inspections. Clean interface showing exactly what you need for today's job.</p>
+                    <h4 className="text-lg font-semibold text-foreground">See your work, not everyone else's.</h4>
+                    <p className="text-base text-muted-foreground">Your assigned projects. Your logged hours. Your safety inspections. Clean interface showing exactly what you need for today's job.</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">Submit feedback from the field.</h4>
-                    <p className="text-sm text-muted-foreground">Resident flags an issue while you're on rope? Log it in 30 seconds. Photos attached. Building manager notified. No more remembering to tell someone when you get back to the truck.</p>
+                    <h4 className="text-lg font-semibold text-foreground">Submit feedback from the field.</h4>
+                    <p className="text-base text-muted-foreground">Resident flags an issue while you're on rope? Log it in 30 seconds. Photos attached. Building manager notified. No more remembering to tell someone when you get back to the truck.</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">Your certifications travel with you.</h4>
-                    <p className="text-sm text-muted-foreground">IRATA level tracked in your profile. When you move companies, your professional identity stays intact.</p>
+                    <h4 className="text-lg font-semibold text-foreground">Your certifications travel with you.</h4>
+                    <p className="text-base text-muted-foreground">IRATA level tracked in your profile. When you move companies, your professional identity stays intact.</p>
                   </div>
                 </div>
               </CardContent>
@@ -400,16 +400,16 @@ export default function UserAccessLanding() {
               <CardContent className="p-6 space-y-4">
                 <div className="grid md:grid-cols-3 gap-6">
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">Stop being the middleman.</h4>
-                    <p className="text-sm text-muted-foreground">Residents submit directly to the vendor. You see everything without handling every back-and-forth. When the strata council asks about responsiveness, you pull the report.</p>
+                    <h4 className="text-lg font-semibold text-foreground">Stop being the middleman.</h4>
+                    <p className="text-base text-muted-foreground">Residents submit directly to the vendor. You see everything without handling every back-and-forth. When the strata council asks about responsiveness, you pull the report.</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">Access survives turnover.</h4>
-                    <p className="text-sm text-muted-foreground">Building accounts, not personal accounts. When you take over from the previous manager, change the password. Instant access. No vendor coordination.</p>
+                    <h4 className="text-lg font-semibold text-foreground">Access survives turnover.</h4>
+                    <p className="text-base text-muted-foreground">Building accounts, not personal accounts. When you take over from the previous manager, change the password. Instant access. No vendor coordination.</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">Prove vendor performance.</h4>
-                    <p className="text-sm text-muted-foreground">Response times tracked automatically. Resolution rates calculated. Export professional reports for council presentations in two minutes.</p>
+                    <h4 className="text-lg font-semibold text-foreground">Prove vendor performance.</h4>
+                    <p className="text-base text-muted-foreground">Response times tracked automatically. Resolution rates calculated. Export professional reports for council presentations in two minutes.</p>
                   </div>
                 </div>
               </CardContent>
@@ -428,16 +428,16 @@ export default function UserAccessLanding() {
               <CardContent className="p-6 space-y-4">
                 <div className="grid md:grid-cols-3 gap-6">
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">Portfolio-wide visibility.</h4>
-                    <p className="text-sm text-muted-foreground">Every building. Every vendor. Every open issue. One dashboard. Know which properties need attention without calling anyone.</p>
+                    <h4 className="text-lg font-semibold text-foreground">Portfolio-wide visibility.</h4>
+                    <p className="text-base text-muted-foreground">Every building. Every vendor. Every open issue. One dashboard. Know which properties need attention without calling anyone.</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">Manager turnover handled.</h4>
-                    <p className="text-sm text-muted-foreground">Your building managers change every 6-12 months. Building accounts mean zero access gaps. Zero former employees with lingering credentials. Zero vendor coordination.</p>
+                    <h4 className="text-lg font-semibold text-foreground">Manager turnover handled.</h4>
+                    <p className="text-base text-muted-foreground">Your building managers change every 6-12 months. Building accounts mean zero access gaps. Zero former employees with lingering credentials. Zero vendor coordination.</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">Compliance documentation ready.</h4>
-                    <p className="text-sm text-muted-foreground">When insurance asks about vendor safety programs, you have answers. Digital records. Timestamped inspections. Exportable proof.</p>
+                    <h4 className="text-lg font-semibold text-foreground">Compliance documentation ready.</h4>
+                    <p className="text-base text-muted-foreground">When insurance asks about vendor safety programs, you have answers. Digital records. Timestamped inspections. Exportable proof.</p>
                   </div>
                 </div>
               </CardContent>
@@ -456,16 +456,16 @@ export default function UserAccessLanding() {
               <CardContent className="p-6 space-y-4">
                 <div className="grid md:grid-cols-3 gap-6">
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">Know what's happening without calling.</h4>
-                    <p className="text-sm text-muted-foreground">West elevation 80% complete. East starts Wednesday. Move your balcony plants Tuesday night. No phone tag with the building manager.</p>
+                    <h4 className="text-lg font-semibold text-foreground">Know what's happening without calling.</h4>
+                    <p className="text-base text-muted-foreground">West elevation 80% complete. East starts Wednesday. Move your balcony plants Tuesday night. No phone tag with the building manager.</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">Submit issues with photos.</h4>
-                    <p className="text-sm text-muted-foreground">Streaky windows? Snap a photo. Submit through the portal. Watch status change from Open to Acknowledged to Resolved. Know someone saw it.</p>
+                    <h4 className="text-lg font-semibold text-foreground">Submit issues with photos.</h4>
+                    <p className="text-base text-muted-foreground">Streaky windows? Snap a photo. Submit through the portal. Watch status change from Open to Acknowledged to Resolved. Know someone saw it.</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">Get answers faster.</h4>
-                    <p className="text-sm text-muted-foreground">Direct to vendor means 24-hour resolution instead of 3-5 days of phone tag through the building manager.</p>
+                    <h4 className="text-lg font-semibold text-foreground">Get answers faster.</h4>
+                    <p className="text-base text-muted-foreground">Direct to vendor means 24-hour resolution instead of 3-5 days of phone tag through the building manager.</p>
                   </div>
                 </div>
               </CardContent>
@@ -824,7 +824,7 @@ export default function UserAccessLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg mb-2">Delegation Without Exposure</h3>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-base text-muted-foreground">
                       Grant project creation, scheduling, and client communication without exposing compensation data. Your supervisors handle operations. Your financials stay private.
                     </p>
                   </div>
@@ -841,7 +841,7 @@ export default function UserAccessLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg mb-2">Feedback Resolution: Days to Hours</h3>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-base text-muted-foreground">
                       Direct resident-to-vendor communication eliminates the building manager middleman. Average resolution time drops from 3-5 days to 24 hours.
                     </p>
                   </div>
@@ -858,7 +858,7 @@ export default function UserAccessLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg mb-2">Manager Turnover: Weeks to Seconds</h3>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-base text-muted-foreground">
                       Building-level accounts eliminate vendor coordination when managers change. Password change transfers access instantly. Zero access gaps.
                     </p>
                   </div>
@@ -875,7 +875,7 @@ export default function UserAccessLanding() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg mb-2">Audit Preparation: Scramble to Search</h3>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-base text-muted-foreground">
                       When insurance asks about vendor performance or strata councils question responsiveness, you search and export. Complete records. Professional PDFs.
                     </p>
                   </div>

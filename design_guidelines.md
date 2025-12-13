@@ -394,14 +394,17 @@ All module landing pages MUST follow this exact structure for their stakeholder 
 **Benefit Item Structure (inside grid):**
 ```tsx
 <div className="space-y-2">
-  <h4 className="font-semibold text-foreground">[Benefit headline]</h4>
-  <p className="text-sm text-muted-foreground">[Benefit description - 1-2 sentences]</p>
+  <h4 className="text-lg font-semibold text-foreground">[Benefit headline]</h4>
+  <p className="text-base text-muted-foreground">[Benefit description - 1-2 sentences]</p>
 </div>
 ```
 - NO nested Cards - use simple div elements
-- Text: `text-sm text-muted-foreground` (NOT text-base)
-- Headline: `font-semibold text-foreground`
+- Headline: `text-lg font-semibold text-foreground` (18px for visual hierarchy)
+- Description: `text-base text-muted-foreground` (16px minimum for readability)
 - Keep descriptions concise (1-2 sentences max)
+
+**IMPORTANT - Minimum Font Size Rule:**
+Body text on module pages must be at least `text-base` (16px). Never use `text-sm` or smaller for readable paragraph content. The Outfit font family requires larger sizes for comfortable reading.
 
 ---
 
@@ -432,7 +435,8 @@ All module landing pages MUST follow this exact structure for their stakeholder 
 - [ ] Icon + title are inside CardHeader (not separate)
 - [ ] CardContent uses `p-6 space-y-4`
 - [ ] Grid uses simple divs, NOT nested Card components
-- [ ] Benefit text uses `text-sm` (NOT text-base)
+- [ ] Benefit headlines use `text-lg font-semibold` (18px)
+- [ ] Benefit descriptions use `text-base` (16px minimum - never text-sm)
 - [ ] Stakeholder colors follow the assigned palette above
 
 ---

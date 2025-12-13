@@ -318,20 +318,20 @@ export default function ProjectManagementLanding() {
               <CardContent className="p-6 space-y-4">
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">See all your projects without leaving your desk.</h4>
-                    <p className="text-sm text-muted-foreground">The dashboard shows every active job with completion percentage, days remaining, and assigned crew. Updates automatically as work sessions get logged.</p>
+                    <h4 className="text-lg font-semibold text-foreground">See all your projects without leaving your desk.</h4>
+                    <p className="text-base text-muted-foreground">The dashboard shows every active job with completion percentage, days remaining, and assigned crew. Updates automatically as work sessions get logged.</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">Know who's performing and who's coasting.</h4>
-                    <p className="text-sm text-muted-foreground">Per-employee performance tracking shows drops completed per session and target achievement rates. Now you have the data for conversations you couldn't have before.</p>
+                    <h4 className="text-lg font-semibold text-foreground">Know who's performing and who's coasting.</h4>
+                    <p className="text-base text-muted-foreground">Per-employee performance tracking shows drops completed per session and target achievement rates. Now you have the data for conversations you couldn't have before.</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">Quote future jobs with confidence.</h4>
-                    <p className="text-sm text-muted-foreground">Historical project data shows how long similar buildings actually took. Stop guessing and overbidding by 50%.</p>
+                    <h4 className="text-lg font-semibold text-foreground">Quote future jobs with confidence.</h4>
+                    <p className="text-base text-muted-foreground">Historical project data shows how long similar buildings actually took. Stop guessing and overbidding by 50%.</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">Reduce your psychological load.</h4>
-                    <p className="text-sm text-muted-foreground">Everything is linked with everything. The system remembers so you don't have to. That mental bandwidth gets freed up.</p>
+                    <h4 className="text-lg font-semibold text-foreground">Reduce your psychological load.</h4>
+                    <p className="text-base text-muted-foreground">Everything is linked with everything. The system remembers so you don't have to. That mental bandwidth gets freed up.</p>
                   </div>
                 </div>
               </CardContent>
@@ -350,16 +350,16 @@ export default function ProjectManagementLanding() {
               <CardContent className="p-6 space-y-4">
                 <div className="grid md:grid-cols-3 gap-6">
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">Know your target before you start.</h4>
-                    <p className="text-sm text-muted-foreground">Your mobile app shows assigned projects with clear daily expectations. No more finding out after the fact that the boss expected something different.</p>
+                    <h4 className="text-lg font-semibold text-foreground">Know your target before you start.</h4>
+                    <p className="text-base text-muted-foreground">Your mobile app shows assigned projects with clear daily expectations. No more finding out after the fact that the boss expected something different.</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">See where you're working tomorrow.</h4>
-                    <p className="text-sm text-muted-foreground">Your upcoming assignments appear on your phone tonight. Plan your commute the night before instead of waiting for a 6 AM text.</p>
+                    <h4 className="text-lg font-semibold text-foreground">See where you're working tomorrow.</h4>
+                    <p className="text-base text-muted-foreground">Your upcoming assignments appear on your phone tonight. Plan your commute the night before instead of waiting for a 6 AM text.</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">Track your own improvement.</h4>
-                    <p className="text-sm text-muted-foreground">Your performance dashboard shows drops per day average, target achievement rate, and trends over time. You're improving, and now you can prove it.</p>
+                    <h4 className="text-lg font-semibold text-foreground">Track your own improvement.</h4>
+                    <p className="text-base text-muted-foreground">Your performance dashboard shows drops per day average, target achievement rate, and trends over time. You're improving, and now you can prove it.</p>
                   </div>
                 </div>
               </CardContent>
@@ -378,12 +378,12 @@ export default function ProjectManagementLanding() {
               <CardContent className="p-6 space-y-4">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">Stop playing telephone.</h4>
-                    <p className="text-sm text-muted-foreground">Log in and see the exact same progress the rope access company sees. Real-time completion percentages by elevation. When the building owner asks "How's it going?", answer immediately.</p>
+                    <h4 className="text-lg font-semibold text-foreground">Stop playing telephone.</h4>
+                    <p className="text-base text-muted-foreground">Log in and see the exact same progress the rope access company sees. Real-time completion percentages by elevation. When the building owner asks "How's it going?", answer immediately.</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">Verify contractor performance objectively.</h4>
-                    <p className="text-sm text-muted-foreground">The dashboard shows whether work is progressing on schedule. No more relying on verbal updates that might be optimistic. Data you can trust.</p>
+                    <h4 className="text-lg font-semibold text-foreground">Verify contractor performance objectively.</h4>
+                    <p className="text-base text-muted-foreground">The dashboard shows whether work is progressing on schedule. No more relying on verbal updates that might be optimistic. Data you can trust.</p>
                   </div>
                 </div>
               </CardContent>
@@ -402,12 +402,12 @@ export default function ProjectManagementLanding() {
               <CardContent className="p-6 space-y-4">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">Reduce your communication overhead.</h4>
-                    <p className="text-sm text-muted-foreground">Residents check progress themselves through their portal. Status calls drop 60-70%. Your phone stops ringing with "when will they be done?" questions.</p>
+                    <h4 className="text-lg font-semibold text-foreground">Reduce your communication overhead.</h4>
+                    <p className="text-base text-muted-foreground">Residents check progress themselves through their portal. Status calls drop 60-70%. Your phone stops ringing with "when will they be done?" questions.</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">Demonstrate professional vendor management.</h4>
-                    <p className="text-sm text-muted-foreground">When building owners ask about contractor oversight, show them the portal. Real-time progress tracking. Documented safety compliance. Photo verification.</p>
+                    <h4 className="text-lg font-semibold text-foreground">Demonstrate professional vendor management.</h4>
+                    <p className="text-base text-muted-foreground">When building owners ask about contractor oversight, show them the portal. Real-time progress tracking. Documented safety compliance. Photo verification.</p>
                   </div>
                 </div>
               </CardContent>
@@ -426,12 +426,12 @@ export default function ProjectManagementLanding() {
               <CardContent className="p-6 space-y-4">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">Know when work will reach your window.</h4>
-                    <p className="text-sm text-muted-foreground">The resident portal shows progress specific to your elevation. Plan your life around the work instead of wondering.</p>
+                    <h4 className="text-lg font-semibold text-foreground">Know when work will reach your window.</h4>
+                    <p className="text-base text-muted-foreground">The resident portal shows progress specific to your elevation. Plan your life around the work instead of wondering.</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">Birthday party on Sunday?</h4>
-                    <p className="text-sm text-muted-foreground">Check the schedule. No need to call the property manager and wait two days for an answer while you worry about strangers outside your window.</p>
+                    <h4 className="text-lg font-semibold text-foreground">Birthday party on Sunday?</h4>
+                    <p className="text-base text-muted-foreground">Check the schedule. No need to call the property manager and wait two days for an answer while you worry about strangers outside your window.</p>
                   </div>
                 </div>
               </CardContent>
