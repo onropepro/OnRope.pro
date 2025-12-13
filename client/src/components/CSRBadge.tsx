@@ -16,7 +16,7 @@ interface CSRData {
     toolboxMeetingRating: number;
     harnessInspectionRating: number;
     documentReviewRating: number;
-    projectCompletionRating: number;
+    projectDocumentationRating: number;
   };
   details: {
     hasHealthSafety: boolean;
@@ -30,8 +30,11 @@ interface CSRData {
     documentReviewsTotal: number;
     documentReviewsTotalEmployees?: number;
     documentReviewsTotalDocs?: number;
-    projectCount: number;
-    totalProjectProgress: number;
+    projectsWithAnchorInspection: number;
+    projectsWithRopeAccessPlan: number;
+    projectsWithFLHA: number;
+    activeProjectCount: number;
+    elevationProjectCount: number;
   };
 }
 

@@ -13214,68 +13214,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ? Math.round(((harnessRequiredInspections - harnessCompletedInspections) / harnessRequiredInspections) * 25)
         : 0;
       
-      // 4. Project Completion Rate (average progress of all active/completed projects)
-      // This is a bonus metric - new companies with no projects get 100%
-      let totalProjectProgress = 0;
-      let projectCount = 0;
-      
-      for (const project of projects) {
-        if (project.status === 'deleted') continue;
-        
-        projectCount++;
-        const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id && s.endTime);
-        
-        // If project is marked completed, count as 100%
-        if (project.status === 'completed') {
-          totalProjectProgress += 100;
-          continue;
-        }
-        
-        // Calculate progress based on job type
-        if (project.jobType === 'general_pressure_washing' || project.jobType === 'ground_window_cleaning') {
-          // Hours-based: SUM all manualCompletionPercentage values (each session = contribution %)
-          const sessionsWithPercentage = projectSessions.filter((s: any) => 
-            s.manualCompletionPercentage !== null && s.manualCompletionPercentage !== undefined
-          );
-          if (sessionsWithPercentage.length > 0) {
-            const summedPercentage = sessionsWithPercentage.reduce((sum: number, s: any) => 
-              sum + Number(s.manualCompletionPercentage ?? 0), 0
-            );
-            // Guard against NaN and cap at 100%
-            if (!isNaN(summedPercentage)) {
-              totalProjectProgress += Math.min(100, summedPercentage);
-            }
-          }
-        } else if (project.jobType === 'in_suite_dryer_vent_cleaning') {
-          // Suite-based
-          const completedSuites = projectSessions.reduce((sum: number, s: any) => 
-            sum + (s.suitesCompleted || 0), 0);
-          const totalSuites = (project.floorCount || 1) * (project.suitesPerDay || 1);
-          totalProjectProgress += totalSuites > 0 ? Math.min(100, (completedSuites / totalSuites) * 100) : 0;
-        } else if (project.jobType === 'parkade_pressure_cleaning') {
-          // Stall-based
-          const completedStalls = projectSessions.reduce((sum: number, s: any) => 
-            sum + (s.stallsCompleted || 0), 0);
-          const totalStalls = project.totalStalls || project.floorCount || 1;
-          totalProjectProgress += totalStalls > 0 ? Math.min(100, (completedStalls / totalStalls) * 100) : 0;
-        } else {
-          // Drop-based
-          const totalDrops = (project.totalDropsNorth || 0) + (project.totalDropsEast || 0) + 
-                            (project.totalDropsSouth || 0) + (project.totalDropsWest || 0);
-          const completedDrops = projectSessions.reduce((sum: number, s: any) => 
-            sum + (s.dropsCompletedNorth || 0) + (s.dropsCompletedEast || 0) + 
-                  (s.dropsCompletedSouth || 0) + (s.dropsCompletedWest || 0), 0);
-          totalProjectProgress += totalDrops > 0 ? Math.min(100, (completedDrops / totalDrops) * 100) : 0;
-        }
-      }
-      
-      // Project completion - no penalty for new companies with no projects
-      // For companies with projects, this reflects their overall project health
-      const projectCompletionRating = projectCount > 0 ? Math.round(totalProjectProgress / projectCount) : 100;
-      // No penalty from projects - this is informational only
-      const projectPenalty = 0;
-      
-      // 5. Document Review Compliance Rating
+      // 4. Document Review Compliance Rating
       // Tracks employee acknowledgment of safety documents (H&S Manual, Company Policy, Safe Work Procedures)
       // Calculate based on TOTAL REQUIRED signatures = (employees + company owner) × required documents
       const documentReviews = await storage.getDocumentReviewSignaturesByCompany(companyId);
@@ -13368,8 +13307,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Calculate overall CSR: Start at 100%, subtract penalties
       // Max penalty is 100% (25% docs, 25% toolbox, 25% harness, 5% document reviews, 20% project docs)
-      // Project completion is shown but doesn't penalize
-      const totalPenalty = documentationPenalty + toolboxPenalty + harnessPenalty + documentReviewPenalty + projectDocumentationPenalty + projectPenalty;
+      const totalPenalty = documentationPenalty + toolboxPenalty + harnessPenalty + documentReviewPenalty + projectDocumentationPenalty;
       const overallCSR = Math.max(0, 100 - totalPenalty);
       
       res.json({
@@ -13379,8 +13317,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           toolboxMeetingRating,
           harnessInspectionRating,
           documentReviewRating,
-          projectDocumentationRating,
-          projectCompletionRating
+          projectDocumentationRating
         },
         details: {
           hasHealthSafety,
@@ -13394,8 +13331,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           documentReviewsTotal: totalRequiredSignatures,
           documentReviewsTotalEmployees: totalEmployees,
           documentReviewsTotalDocs: totalRequiredDocs,
-          projectCount,
-          totalProjectProgress: projectCount > 0 ? Math.round(totalProjectProgress / projectCount) : 100,
           projectsWithAnchorInspection,
           projectsWithRopeAccessPlan,
           projectsWithFLHA,
