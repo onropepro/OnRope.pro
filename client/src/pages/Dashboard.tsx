@@ -282,6 +282,11 @@ const editEmployeeSchema = z.object({
   irataLicenseNumber: z.string().optional(),
   irataIssuedDate: z.string().optional(),
   irataExpirationDate: z.string().optional(),
+  // sprat fields
+  spratLevel: z.string().optional(),
+  spratLicenseNumber: z.string().optional(),
+  spratIssuedDate: z.string().optional(),
+  spratExpirationDate: z.string().optional(),
   // First Aid fields
   hasFirstAid: z.boolean().default(false),
   firstAidType: z.string().optional(),
@@ -1417,6 +1422,10 @@ export default function Dashboard() {
       irataLicenseNumber: "",
       irataIssuedDate: "",
       irataExpirationDate: "",
+      spratLevel: "",
+      spratLicenseNumber: "",
+      spratIssuedDate: "",
+      spratExpirationDate: "",
       hasFirstAid: false,
       firstAidType: "",
       firstAidExpiry: "",
@@ -2173,6 +2182,10 @@ export default function Dashboard() {
       irataLicenseNumber: employee.irataLicenseNumber ?? "",
       irataIssuedDate: employee.irataIssuedDate ?? "",
       irataExpirationDate: employee.irataExpirationDate ?? "",
+      spratLevel: employee.spratLevel ?? "",
+      spratLicenseNumber: employee.spratLicenseNumber ?? "",
+      spratIssuedDate: employee.spratIssuedDate ?? "",
+      spratExpirationDate: employee.spratExpirationDate ?? "",
       terminatedDate: employee.terminatedDate ?? "",
       terminationReason: employee.terminationReason ?? "",
       terminationNotes: employee.terminationNotes ?? "",
@@ -8064,6 +8077,80 @@ export default function Dashboard() {
                                   <FormLabel>{t('dashboard.employeeForm.irataExpirationDate', 'irata Expiration Date')}</FormLabel>
                                   <FormControl>
                                     <Input type="date" {...field} data-testid="input-edit-irata-expiration" className="h-12" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="border-t pt-4 mt-4">
+                      <h4 className="text-sm font-medium mb-4">{t('dashboard.employeeForm.spratCertification', 'SPRAT Certification (Optional)')}</h4>
+                      <div className="space-y-4">
+                        <FormField
+                          control={editEmployeeForm.control}
+                          name="spratLevel"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('dashboard.employeeForm.spratLevel', 'SPRAT Level')}</FormLabel>
+                              <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                  <SelectTrigger className="h-12" data-testid="select-edit-sprat-level">
+                                    <SelectValue placeholder={t('dashboard.employeeForm.selectLevel', 'Select level')} />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="Level 1">Level 1</SelectItem>
+                                  <SelectItem value="Level 2">Level 2</SelectItem>
+                                  <SelectItem value="Level 3">Level 3</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        {editEmployeeForm.watch("spratLevel") && (
+                          <>
+                            <FormField
+                              control={editEmployeeForm.control}
+                              name="spratLicenseNumber"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>{t('dashboard.employeeForm.spratLicenseNumber', 'SPRAT License Number')}</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder="License number" {...field} data-testid="input-edit-sprat-license" className="h-12" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={editEmployeeForm.control}
+                              name="spratIssuedDate"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>{t('dashboard.employeeForm.spratIssuedDate', 'SPRAT Issued Date')}</FormLabel>
+                                  <FormControl>
+                                    <Input type="date" {...field} data-testid="input-edit-sprat-issued" className="h-12" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={editEmployeeForm.control}
+                              name="spratExpirationDate"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>{t('dashboard.employeeForm.spratExpirationDate', 'SPRAT Expiration Date')}</FormLabel>
+                                  <FormControl>
+                                    <Input type="date" {...field} data-testid="input-edit-sprat-expiration" className="h-12" />
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
