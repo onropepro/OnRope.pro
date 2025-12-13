@@ -741,7 +741,7 @@ export default function IRATATaskLoggingLanding() {
                 Can Level 3s approve hours digitally?
               </AccordionTrigger>
               <AccordionContent className="pb-4 text-muted-foreground text-base">
-                Digital signature and approval flow is planned for future release. Currently, hours log to your profile without supervisor sign-off. Once IRATA formally approves digital logging, the approval workflow will activate.
+                Digital signature and approval flow is planned for future release (pending us contacting IRATA and SPRAT). Currently, hours log to your profile without supervisor sign-off. Once IRATA formally approves digital logging, the approval workflow will activate.
               </AccordionContent>
             </AccordionItem>
 
