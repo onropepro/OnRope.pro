@@ -579,6 +579,259 @@ export default function WorkSessionLanding() {
 
       <Separator className="my-8" />
 
+      {/* Problems Solved Section */}
+      <section className="py-16 md:py-20 px-4">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+            Problems Solved
+          </h2>
+          <p className="text-center text-muted-foreground text-lg mb-12 max-w-3xl mx-auto">
+            Real problems from real rope access operations. Here's how OnRopePro eliminates them.
+          </p>
+
+          <Accordion type="multiple" className="space-y-3">
+            {/* For Employers */}
+            <AccordionItem value="problems-employers" className="border rounded-lg px-4">
+              <AccordionTrigger className="text-left py-4" data-testid="accordion-problems-employers">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0">
+                    <Briefcase className="w-4 h-4 text-blue-600" />
+                  </div>
+                  <span className="font-semibold">For Employers</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4 space-y-6">
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-foreground">"I spend 4 to 8 hours on payroll every two weeks."</h4>
+                  <p className="text-muted-foreground">You're reconciling spreadsheets at 10 PM. Text messages from last Tuesday. A voicemail you half-remember. The scribbled note on your desk that might say "8" or might say "3." By midnight you've reconstructed something that's probably close.</p>
+                  <p className="text-muted-foreground">OnRopePro captures timestamps automatically. Hours aggregate by employee and project. Export your payroll data in 30 seconds. The 7 hours you used to spend? Gone.</p>
+                </div>
+                <Separator />
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-foreground">"My check is $140 short and I want to know why."</h4>
+                  <p className="text-muted-foreground">That phone call from your technician. Your stomach drops. You know he's probably right. You spend an hour digging through records, discover you miscounted his overtime, cut a makeup check, and watch another piece of trust evaporate.</p>
+                  <p className="text-muted-foreground">Both you and your technician see the same data. Same timestamps. Same totals. When the numbers match, disputes don't happen. When someone's wrong, the proof is immediate.</p>
+                </div>
+                <Separator />
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-foreground">"I don't know which projects are profitable until the job is done."</h4>
+                  <p className="text-muted-foreground">You finish a building and realize you're $2,000 over budget. Was it weather? Slow technicians? Equipment problems? By the time you piece it together, you've already underbid three similar projects.</p>
+                  <p className="text-muted-foreground">Labor costs calculate in real-time against your budget. You see cost per drop. Hours per elevation. Performance against daily targets. When a project starts going sideways, you know it on Day 3.</p>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* For Technicians */}
+            <AccordionItem value="problems-technicians" className="border rounded-lg px-4">
+              <AccordionTrigger className="text-left py-4" data-testid="accordion-problems-technicians">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0">
+                    <HardHat className="w-4 h-4 text-amber-600" />
+                  </div>
+                  <span className="font-semibold">For Technicians</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4 space-y-6">
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-foreground">"I fill out the same time info three different ways."</h4>
+                  <p className="text-muted-foreground">Text your hours to the office. Write them in your IRATA logbook. Fill out the company spreadsheet. Three systems that never sync. Three chances for errors. Three things to remember at the end of an exhausting day on rope.</p>
+                  <p className="text-muted-foreground">One tap to clock in. One tap to clock out. That single entry feeds payroll and stores the details you need for your logbook. Done.</p>
+                </div>
+                <Separator />
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-foreground">"I can never remember what I did three weeks ago for my logbook."</h4>
+                  <p className="text-muted-foreground">Your IRATA logbook is supposed to be accurate. But when you're filling it out at the end of the month, you're guessing. Was it rope transfers on Tuesday or Wednesday? How many drops did you complete at the parkade?</p>
+                  <p className="text-muted-foreground">Every work session logs the details: building, tasks performed, hours, drops by elevation. When you update your physical logbook, you're copying verified data, not reconstructing memories.</p>
+                </div>
+                <Separator />
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-foreground">"My supervisor says my performance is inconsistent but has no data to show me."</h4>
+                  <p className="text-muted-foreground">You felt like you worked hard. There's nothing to reference. The review becomes about perception, not performance.</p>
+                  <p className="text-muted-foreground">Your dashboard shows drops per day, target achievement rate, trends over time. "This month: 4.8 drops/day average, 86% target achievement. Last month: 4.1 drops/day, 72% achievement. You're improving."</p>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* For Operations Managers */}
+            <AccordionItem value="problems-ops-managers" className="border rounded-lg px-4">
+              <AccordionTrigger className="text-left py-4" data-testid="accordion-problems-ops-managers">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-cyan-100 dark:bg-cyan-900 flex items-center justify-center shrink-0">
+                    <Users className="w-4 h-4 text-cyan-600" />
+                  </div>
+                  <span className="font-semibold">For Operations Managers</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4 space-y-6">
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-foreground">"I don't know where my crew is or what they're doing."</h4>
+                  <p className="text-muted-foreground">You call Tommy. No answer. You call again. Nothing. Is he on rope? On break? Having an emergency? You have 12 technicians across 4 sites and zero visibility.</p>
+                  <p className="text-muted-foreground">Real-time dashboard shows every clocked-in technician. Which project. How long. Last activity. Answer client calls without making phone calls.</p>
+                </div>
+                <Separator />
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-foreground">"The project went 20 hours over budget and I don't know why."</h4>
+                  <p className="text-muted-foreground">End of project. You're way over. You know it was weather, a sick technician, some equipment issues. But you can't quantify any of it.</p>
+                  <p className="text-muted-foreground">Shortfall reasons are captured when technicians miss daily targets. Every deviation documented. When you review project performance, you see exactly what happened and why.</p>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* For Building Managers */}
+            <AccordionItem value="problems-building-managers" className="border rounded-lg px-4">
+              <AccordionTrigger className="text-left py-4" data-testid="accordion-problems-building-managers">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center shrink-0">
+                    <Building2 className="w-4 h-4 text-violet-600" />
+                  </div>
+                  <span className="font-semibold">For Building Managers</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4 space-y-6">
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-foreground">"I can't verify if the rope access crew was actually on site."</h4>
+                  <p className="text-muted-foreground">You're paying for services. The contractor says their crew was there all week. Your residents say they only saw workers Tuesday and Thursday.</p>
+                  <p className="text-muted-foreground">GPS-verified clock-in and clock-out times visible in your portal. See when crews arrived, when they left, what they accomplished.</p>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* For Property Managers */}
+            <AccordionItem value="problems-property-managers" className="border rounded-lg px-4">
+              <AccordionTrigger className="text-left py-4" data-testid="accordion-problems-property-managers">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0">
+                    <Globe className="w-4 h-4 text-emerald-600" />
+                  </div>
+                  <span className="font-semibold">For Property Managers</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4 space-y-6">
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-foreground">"I need proof of attendance for contractor invoices."</h4>
+                  <p className="text-muted-foreground">Contractor submits an invoice for 40 hours. Were they actually there? Your records are whatever the contractor told you.</p>
+                  <p className="text-muted-foreground">Work session summaries for your buildings available in your portal. Timestamps, locations, work completed. Verify invoices against documented attendance.</p>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
+      </section>
+
+      <Separator className="my-8" />
+
+      {/* Measurable Results Section */}
+      <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+            Measurable Results
+          </h2>
+          <p className="text-center text-muted-foreground text-lg mb-12 max-w-3xl mx-auto">
+            Real numbers from real rope access operations.
+          </p>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Result 1 */}
+            <Card className="relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-cyan-600"></div>
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0">
+                    <Timer className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-foreground mb-2">87-93% Payroll Time Reduction</h3>
+                    <p className="text-base text-muted-foreground">From 4-8 hours per payroll cycle to 30 minutes. That's 7+ hours recovered every two weeks. 182+ hours per year. The equivalent of an extra month of workdays.</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Result 2 */}
+            <Card className="relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-600"></div>
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0">
+                    <CheckCircle2 className="w-6 h-6 text-emerald-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-foreground mb-2">Zero Payroll Disputes</h3>
+                    <p className="text-base text-muted-foreground">Precise timestamps and GPS verification eliminate "he said/she said" conversations. When both parties see the same data, disputes don't happen.</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Result 3 */}
+            <Card className="relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-orange-600"></div>
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0">
+                    <TrendingUp className="w-6 h-6 text-amber-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-foreground mb-2">Real-Time Budget Visibility</h3>
+                    <p className="text-base text-muted-foreground">Labor costs accumulate as work happens, not after the job is done. Catch budget overruns on Day 3, not Day 30. Prevent the surprises that kill profitability.</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Result 4 */}
+            <Card className="relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 to-purple-600"></div>
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center shrink-0">
+                    <Shield className="w-6 h-6 text-violet-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-foreground mb-2">Complete Accountability Trail</h3>
+                    <p className="text-base text-muted-foreground">Every clock-in, clock-out, and edit logged with timestamp. When the labor department asks questions or a client disputes an invoice, you have verifiable records.</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      <Separator className="my-8" />
+
+      {/* How Will This Improve Your Business Section */}
+      <section className="py-16 md:py-20 px-4">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+            Stop Reconstructing. Start Operating.
+          </h2>
+          
+          <Card className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+            <CardContent className="p-6 md:p-8 space-y-4 text-base text-muted-foreground">
+              <p>
+                Right now, you're spending hours every payroll cycle piecing together what happened across your projects. Text messages. Memory. Spreadsheets that don't talk to each other. You're making educated guesses and hoping nobody catches the errors.
+              </p>
+              <p>
+                Your technicians are logging hours in three different places. Texting the office. Writing in their logbooks. Filling out your forms. Same information, multiple systems, zero connection.
+              </p>
+              <p>
+                Your operations managers are calling around to find out where people are. Your clients are asking if the crew showed up. Your projects are going over budget and you only find out when the job is done.
+              </p>
+              <Separator className="my-6" />
+              <p className="font-medium text-foreground text-lg">
+                With OnRopePro, your technicians clock in once. That single action captures their timestamp, verifies their location, confirms their harness inspection, and links their session to the right project. When they clock out, they log their output, document any shortfalls, and the data flows directly into payroll, performance analytics, and project progress.
+              </p>
+              <p className="font-medium text-foreground text-lg">
+                You stop reconstructing the past. You start managing in real-time.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      <Separator className="my-8" />
+
       {/* Module Integration Points Section */}
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-5xl mx-auto">
