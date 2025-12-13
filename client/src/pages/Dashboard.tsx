@@ -1079,6 +1079,7 @@ export default function Dashboard() {
         firstAidDocuments?: string[];
         driversLicenseNumber?: string;
         driversLicenseProvince?: string;
+        driversLicenseIssuedDate?: string;
         driversLicenseExpiry?: string;
         driversLicenseDocuments?: string[];
         bankTransitNumber?: string;
@@ -1139,6 +1140,7 @@ export default function Dashboard() {
         firstAidDocuments?: string[];
         driversLicenseNumber?: string;
         driversLicenseProvince?: string;
+        driversLicenseIssuedDate?: string;
         driversLicenseExpiry?: string;
         driversLicenseDocuments?: string[];
         bankTransitNumber?: string;
@@ -8637,6 +8639,12 @@ export default function Dashboard() {
                           <div>
                             <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.provinceState', 'Province/State')}</div>
                             <div className="text-sm font-medium">{employeeToView.driversLicenseProvince}</div>
+                          </div>
+                        )}
+                        {employeeToView.driversLicenseIssuedDate && (
+                          <div>
+                            <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.issuedDate', 'Issued Date')}</div>
+                            <div className="text-sm font-medium">{formatLocalDate(employeeToView.driversLicenseIssuedDate)}</div>
                           </div>
                         )}
                         {employeeToView.driversLicenseExpiry && (

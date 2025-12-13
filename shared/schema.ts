@@ -97,6 +97,7 @@ export const users = pgTable("users", {
   socialInsuranceNumber: varchar("social_insurance_number"), // Social Insurance Number (optional)
   driversLicenseNumber: varchar("drivers_license_number"), // Driver's license number (optional)
   driversLicenseProvince: varchar("drivers_license_province"), // Province where driver's license was issued (optional)
+  driversLicenseIssuedDate: date("drivers_license_issued_date"), // Driver's license issue date (optional)
   driversLicenseExpiry: date("drivers_license_expiry"), // Driver's license expiry date (optional)
   driversLicenseDocuments: text("drivers_license_documents").array().default(sql`ARRAY[]::text[]`), // Array of document URLs (driver's license photos, abstracts, etc.)
   resumeDocuments: text("resume_documents").array().default(sql`ARRAY[]::text[]`), // Array of resume/CV document URLs

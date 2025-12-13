@@ -143,6 +143,7 @@ const translations = {
     account: "Account",
     driversLicense: "Driver's License",
     licenseNumber: "License #",
+    issuedDate: "Issued Date",
     expiry: "Expiry",
     medicalConditions: "Medical Conditions",
     specialMedicalConditions: "Special Medical Conditions",
@@ -490,6 +491,7 @@ const translations = {
     account: "Compte",
     driversLicense: "Permis de conduire",
     licenseNumber: "Numéro de permis",
+    issuedDate: "Date d'émission",
     expiry: "Expiration",
     medicalConditions: "Conditions médicales",
     specialMedicalConditions: "Conditions médicales spéciales",
@@ -826,6 +828,7 @@ const createProfileSchema = (t: typeof translations['en']) => z.object({
   bankInstitutionNumber: z.string().optional(),
   bankAccountNumber: z.string().optional(),
   driversLicenseNumber: z.string().optional(),
+  driversLicenseIssuedDate: z.string().optional(),
   driversLicenseExpiry: z.string().optional(),
   birthday: z.string().optional(),
   specialMedicalConditions: z.string().optional(),
@@ -911,6 +914,7 @@ export default function TechnicianPortal() {
       bankInstitutionNumber: "",
       bankAccountNumber: "",
       driversLicenseNumber: "",
+      driversLicenseIssuedDate: "",
       driversLicenseExpiry: "",
       birthday: "",
       specialMedicalConditions: "",
@@ -1665,6 +1669,7 @@ export default function TechnicianPortal() {
         bankInstitutionNumber: user.bankInstitutionNumber || "",
         bankAccountNumber: user.bankAccountNumber || "",
         driversLicenseNumber: user.driversLicenseNumber || "",
+        driversLicenseIssuedDate: user.driversLicenseIssuedDate || "",
         driversLicenseExpiry: user.driversLicenseExpiry || "",
         birthday: user.birthday || "",
         specialMedicalConditions: user.specialMedicalConditions || "",
@@ -3293,10 +3298,23 @@ export default function TechnicianPortal() {
                       />
                       <FormField
                         control={form.control}
+                        name="driversLicenseIssuedDate"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t.issuedDate}</FormLabel>
+                            <FormControl>
+                              <Input {...field} type="date" data-testid="input-license-issued-date" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
                         name="driversLicenseExpiry"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Expiry Date</FormLabel>
+                            <FormLabel>{t.expiry}</FormLabel>
                             <FormControl>
                               <Input {...field} type="date" data-testid="input-license-expiry" />
                             </FormControl>
@@ -4223,10 +4241,16 @@ export default function TechnicianPortal() {
                     <CreditCard className="w-4 h-4" />
                     {t.driversLicense}
                   </h3>
-                  {(user.driversLicenseNumber || user.driversLicenseExpiry) && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {(user.driversLicenseNumber || user.driversLicenseIssuedDate || user.driversLicenseExpiry) && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       {user.driversLicenseNumber && (
                         <InfoItem label={t.licenseNumber} value={user.driversLicenseNumber} />
+                      )}
+                      {user.driversLicenseIssuedDate && (
+                        <InfoItem 
+                          label={t.issuedDate}
+                          value={formatLocalDate(user.driversLicenseIssuedDate)} 
+                        />
                       )}
                       {user.driversLicenseExpiry && (
                         <InfoItem 
