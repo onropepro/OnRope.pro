@@ -5294,8 +5294,9 @@ export default function Documents() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="mb-6">
+            <Label className="text-sm font-medium text-muted-foreground mb-2 block">{t('documents.selectCategory', 'Select Document Category')}</Label>
             <Select value={activeTab} onValueChange={setActiveTab}>
-              <SelectTrigger className="w-full max-w-sm" data-testid="select-document-type">
+              <SelectTrigger className="w-full max-w-md h-12 text-base font-medium bg-card border-2 border-primary/20 hover:border-primary/40 transition-colors" data-testid="select-document-type">
                 <SelectValue placeholder="Select document type" />
               </SelectTrigger>
               <SelectContent>
