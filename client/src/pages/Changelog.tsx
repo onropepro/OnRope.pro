@@ -86,6 +86,12 @@ type RecentChange = {
 const recentChangesData: RecentChange[] = [
   {
     date: "December 13, 2025",
+    title: "AI-Powered Insurance Expiry Detection",
+    description: "Certificate of Insurance uploads now feature automatic expiry date extraction using Gemini AI. The system analyzes uploaded PDF documents and extracts policy expiration dates. Expired policies display a red 'EXPIRED' badge, and policies expiring within 30 days show a red 'Expiring Soon' warning. Helps companies maintain valid insurance coverage and avoid compliance gaps",
+    type: "feature"
+  },
+  {
+    date: "December 13, 2025",
     title: "CSR Percentage-Based Rating System",
     description: "Company Safety Rating (CSR) now displays as a percentage (0-100%) instead of raw points, making ratings fair across companies of all sizes. Features color-coded labels: Green (90-100% Excellent), Yellow (70-89% Good), Orange (50-69% Needs Improvement), Red (Below 50% Poor). CSR history now tracks percentage changes with detailed breakdowns. Property managers see consistent percentage ratings for all vendors",
     type: "improvement"
