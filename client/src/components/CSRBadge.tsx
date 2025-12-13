@@ -206,7 +206,7 @@ export function CSRBadge({ user }: CSRBadgeProps) {
             data-testid="badge-csr"
           >
             <Shield className="w-4 h-4" />
-            <span className="text-sm font-semibold">CSR: {overallCSR}%</span>
+            <span className="text-sm font-semibold">CSR: {overallCSR} {overallCSR === 1 ? 'point' : 'points'}</span>
           </Badge>
         </DialogTrigger>
         <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto" data-testid="dialog-csr-details">
@@ -221,7 +221,7 @@ export function CSRBadge({ user }: CSRBadgeProps) {
             <div className="flex items-center justify-center p-6 rounded-xl bg-muted/50">
               <div className="text-center">
                 <div className={`text-5xl font-bold ${getRatingColor(overallCSR)}`}>
-                  {overallCSR}%
+                  {overallCSR} {overallCSR === 1 ? 'point' : 'points'}
                 </div>
                 <p className="text-sm text-muted-foreground mt-1">Overall Safety Score</p>
               </div>
@@ -413,7 +413,7 @@ export function CSRBadge({ user }: CSRBadgeProps) {
                         <div>
                           <div className="flex items-center gap-2">
                             <span className={`text-lg font-bold ${getRatingColor(entry.newScore)}`}>
-                              {entry.newScore}%
+                              {entry.newScore} {entry.newScore === 1 ? 'point' : 'points'}
                             </span>
                             <span className={`text-sm font-medium ${
                               entry.delta > 0 
@@ -422,11 +422,11 @@ export function CSRBadge({ user }: CSRBadgeProps) {
                                   ? 'text-red-600 dark:text-red-400' 
                                   : 'text-muted-foreground'
                             }`}>
-                              {entry.delta > 0 ? '+' : ''}{entry.delta}%
+                              {entry.delta > 0 ? '+' : ''}{entry.delta} {Math.abs(entry.delta) === 1 ? 'point' : 'points'}
                             </span>
                           </div>
                           <p className="text-xs text-muted-foreground">
-                            from {entry.previousScore}%
+                            from {entry.previousScore} {entry.previousScore === 1 ? 'point' : 'points'}
                           </p>
                         </div>
                       </div>
