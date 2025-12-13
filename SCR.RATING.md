@@ -1,7 +1,8 @@
 # SCR Rating System
 
-## GOLDEN RULE - MANDATORY FOR ALL DEVELOPMENT
+## GOLDEN RULES - MANDATORY FOR ALL DEVELOPMENT
 
+### Rule 1: Complete Testing Before Proceeding
 **Every step MUST be tested and working 100% before moving to the next step. No exceptions.**
 
 Before proceeding to the next step of the build, the following must be verified:
@@ -15,6 +16,14 @@ Before proceeding to the next step of the build, the following must be verified:
 - Every endpoint tested
 
 This rule applies between EACH step of the build. No exception will be acceptable.
+
+### Rule 2: Stay Within Scope
+- Do NOT wander away doing things that were not asked
+- Do NOT freelance or add extra features
+- Do NOT assume - ask if unclear
+- Do NOT touch code that does not need to be touched
+- Do NOT add functions that were not asked to be added
+- Do NOT alter any other function or feature of the app unless approved by the user
 
 ---
 
