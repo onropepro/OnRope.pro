@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
-import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck } from "lucide-react";
+import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 interface PublicHeaderProps {
@@ -209,6 +209,22 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                       <div>
                         <div className="font-semibold text-sm">IRATA/SPRAT Task Logging</div>
                         <div className="text-xs text-muted-foreground mt-0.5">Same-day hour logging, OCR import, career-portable records</div>
+                      </div>
+                    </button>
+                    <button
+                      className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                      onClick={() => {
+                        setLocation("/changelog/documents");
+                        setShowModulesMenu(false);
+                      }}
+                      data-testid="nav-document-management"
+                    >
+                      <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <FileText className="w-5 h-5 text-violet-600" />
+                      </div>
+                      <div>
+                        <div className="font-semibold text-sm">Document Management</div>
+                        <div className="text-xs text-muted-foreground mt-0.5">Digital signatures, immutable audit trails, compliance reporting</div>
                       </div>
                     </button>
                   </div>
