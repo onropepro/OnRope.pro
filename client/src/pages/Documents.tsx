@@ -4849,6 +4849,9 @@ export default function Documents() {
       });
 
       queryClient.invalidateQueries({ queryKey: ["/api/company-documents"] });
+      // Invalidate document reviews so new signature requirements show immediately
+      queryClient.invalidateQueries({ queryKey: ["/api/document-reviews/my"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/document-reviews"] });
     } catch (error: any) {
       toast({
         title: "Error",
