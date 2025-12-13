@@ -56,7 +56,7 @@ export default function DocumentManagementLanding() {
             
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
               Every document. Every signature. Every timestamp. Searchable in seconds, not scattered across filing cabinets.<br />
-              <strong>Build compliance records that protect your business when it matters most.</strong>
+              <strong>Build compliance records that protect your business<br />when it matters most.</strong>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
