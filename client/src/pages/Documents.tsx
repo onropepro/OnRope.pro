@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FileText, Download, Calendar, DollarSign, Upload, Trash2, Shield, BookOpen, ArrowLeft, AlertTriangle, Plus, FileCheck, ChevronDown, ChevronRight, FolderOpen, CalendarRange, Package, Loader2, Users, Eye, PenLine, Clock, CheckCircle2, AlertCircle, HardHat, ClipboardList, CheckCircle } from "lucide-react";
 import { CardDescription } from "@/components/ui/card";
-import { hasFinancialAccess, canViewSafetyDocuments } from "@/lib/permissions";
+import { hasFinancialAccess, canViewSafetyDocuments, canViewSensitiveDocuments } from "@/lib/permissions";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { jsPDF } from "jspdf";
@@ -2603,6 +2603,7 @@ export default function Documents() {
   const currentUser = userData?.user;
   const canViewFinancials = hasFinancialAccess(currentUser);
   const canViewSafety = canViewSafetyDocuments(currentUser);
+  const canViewSensitive = canViewSensitiveDocuments(currentUser);
   const canUploadDocuments = currentUser?.role === 'company' || currentUser?.role === 'operations_manager';
   const projects = projectsData?.projects || [];
   const meetings = meetingsData?.meetings || [];
@@ -5310,7 +5311,7 @@ export default function Documents() {
                     {t('documents.companyPolicies', 'Company Policies')}
                   </div>
                 </SelectItem>
-                {canUploadDocuments && (
+                {canUploadDocuments && canViewSensitive && (
                   <SelectItem value="insurance" data-testid="option-insurance">
                     <div className="flex items-center gap-2">
                       <FileCheck className="h-4 w-4" />
@@ -5330,18 +5331,22 @@ export default function Documents() {
                     {t('documents.safeWorkPractices', 'Safe Work Practices')}
                   </div>
                 </SelectItem>
-                <SelectItem value="inspections-safety" data-testid="option-inspections-safety">
-                  <div className="flex items-center gap-2">
-                    <Package className="h-4 w-4" />
-                    {t('documents.equipmentInspections', 'Equipment Inspections')}
-                  </div>
-                </SelectItem>
-                <SelectItem value="damage-reports" data-testid="option-damage-reports">
-                  <div className="flex items-center gap-2">
-                    <AlertTriangle className="h-4 w-4" />
-                    {t('documents.damageReports', 'Damage Reports')}
-                  </div>
-                </SelectItem>
+                {canViewSensitive && (
+                  <SelectItem value="inspections-safety" data-testid="option-inspections-safety">
+                    <div className="flex items-center gap-2">
+                      <Package className="h-4 w-4" />
+                      {t('documents.equipmentInspections', 'Equipment Inspections')}
+                    </div>
+                  </SelectItem>
+                )}
+                {canViewSensitive && (
+                  <SelectItem value="damage-reports" data-testid="option-damage-reports">
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="h-4 w-4" />
+                      {t('documents.damageReports', 'Damage Reports')}
+                    </div>
+                  </SelectItem>
+                )}
                 {canViewSafety && (
                   <>
                     <SelectItem value="toolbox-meetings" data-testid="option-toolbox-meetings">
@@ -5356,12 +5361,14 @@ export default function Documents() {
                         {t('documents.flhaRecords', 'FLHA Records')}
                       </div>
                     </SelectItem>
-                    <SelectItem value="incident-reports" data-testid="option-incident-reports">
-                      <div className="flex items-center gap-2">
-                        <AlertTriangle className="h-4 w-4" />
-                        {t('documents.incidentReports', 'Incident Reports')}
-                      </div>
-                    </SelectItem>
+                    {canViewSensitive && (
+                      <SelectItem value="incident-reports" data-testid="option-incident-reports">
+                        <div className="flex items-center gap-2">
+                          <AlertTriangle className="h-4 w-4" />
+                          {t('documents.incidentReports', 'Incident Reports')}
+                        </div>
+                      </SelectItem>
+                    )}
                     <SelectItem value="method-statements" data-testid="option-method-statements">
                       <div className="flex items-center gap-2">
                         <FileText className="h-4 w-4" />
@@ -5634,8 +5641,8 @@ export default function Documents() {
         </Card>
           </TabsContent>
 
-          {/* Certificate of Insurance Tab - Only visible to company owners and operations managers */}
-          {canUploadDocuments && (
+          {/* Certificate of Insurance Tab - Only visible to company owners and operations managers with sensitive documents permission */}
+          {canUploadDocuments && canViewSensitive && (
             <TabsContent value="insurance">
               <Card className="mb-6 overflow-hidden">
                 <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
@@ -6276,7 +6283,8 @@ export default function Documents() {
             </div>
           </TabsContent>
 
-          {/* Inspections & Safety Tab */}
+          {/* Inspections & Safety Tab - Only visible to users with sensitive documents permission */}
+          {canViewSensitive && (
           <TabsContent value="inspections-safety">
             {/* Toolbox Meeting Safety Rating */}
             <Card className="mb-6 overflow-hidden">
@@ -6530,8 +6538,10 @@ export default function Documents() {
               </CardContent>
             </Card>
           </TabsContent>
+          )}
 
-          {/* Damage Reports Tab */}
+          {/* Damage Reports Tab - Only visible to users with sensitive documents permission */}
+          {canViewSensitive && (
           <TabsContent value="damage-reports">
             <Card className="mb-6 overflow-hidden">
               <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
@@ -6623,6 +6633,7 @@ export default function Documents() {
               </CardContent>
             </Card>
           </TabsContent>
+          )}
         </Tabs>
 
         {/* Rope Access Plans - Hidden from main documents page (accessible from projects) */}
@@ -6911,7 +6922,7 @@ export default function Documents() {
         )}
 
         {/* Incident Reports - only shown when selected from dropdown */}
-        {activeTab === "incident-reports" && canViewSafety && (
+        {activeTab === "incident-reports" && canViewSafety && canViewSensitive && (
           <Card className="mb-6 overflow-hidden">
             <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
               <div className="flex items-start gap-4">

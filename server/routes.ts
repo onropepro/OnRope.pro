@@ -156,6 +156,19 @@ function canViewCSR(user: any): boolean {
   return permissions.includes('view_csr');
 }
 
+// Helper function to check if user can view sensitive documents
+// (Incident Reports, Damage Reports, COI, Equipment Inspections)
+function canViewSensitiveDocuments(user: any): boolean {
+  if (!user) return false;
+  
+  // Company role always has access
+  if (user.role === 'company') return true;
+  
+  // All other roles need explicit permission
+  const permissions = normalizePermissions(user.permissions);
+  return permissions.includes('view_sensitive_documents');
+}
+
 // ============================================================================
 // INVENTORY PERMISSION HELPERS
 // ============================================================================
@@ -12582,6 +12595,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied - Insufficient inventory permissions" });
       }
       
+      // Check sensitive documents permission
+      if (!canViewSensitiveDocuments(currentUser)) {
+        return res.status(403).json({ message: "Forbidden - Insufficient permissions to view sensitive documents" });
+      }
+      
       const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
       
       if (!companyId) {
@@ -12607,6 +12625,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check inventory view permission
       if (!canViewInventory(currentUser)) {
         return res.status(403).json({ message: "Access denied - Insufficient inventory permissions" });
+      }
+      
+      // Check sensitive documents permission
+      if (!canViewSensitiveDocuments(currentUser)) {
+        return res.status(403).json({ message: "Forbidden - Insufficient permissions to view sensitive documents" });
       }
       
       const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
@@ -12776,6 +12799,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!currentUser) {
         return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check sensitive documents permission
+      if (!canViewSensitiveDocuments(currentUser)) {
+        return res.status(403).json({ message: "Forbidden - Insufficient permissions to view sensitive documents" });
       }
       
       const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
@@ -13678,9 +13706,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      // Check if user has permission to view safety documents
-      if (!canViewSafetyDocuments(currentUser)) {
-        return res.status(403).json({ message: "Forbidden - You don't have permission to view incident reports" });
+      // Check if user has permission to view sensitive documents
+      if (!canViewSensitiveDocuments(currentUser)) {
+        return res.status(403).json({ message: "Forbidden - Insufficient permissions to view sensitive documents" });
       }
       
       const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
@@ -13699,11 +13727,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/incident-reports/:id", requireAuth, async (req: Request, res: Response) => {
     try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check sensitive documents permission
+      if (!canViewSensitiveDocuments(currentUser)) {
+        return res.status(403).json({ message: "Forbidden - Insufficient permissions to view sensitive documents" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
       const { id } = req.params;
       const report = await storage.getIncidentReportById(id);
       
       if (!report) {
         return res.status(404).json({ message: "Incident report not found" });
+      }
+      
+      // Verify the incident report belongs to this company
+      if (report.companyId !== companyId) {
+        return res.status(403).json({ message: "Access denied" });
       }
       
       res.json({ report });
