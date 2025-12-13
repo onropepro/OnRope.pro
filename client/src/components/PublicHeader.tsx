@@ -214,7 +214,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                     <button
                       className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
                       onClick={() => {
-                        setLocation("/changelog/documents");
+                        setLocation("/modules/document-management");
                         setShowModulesMenu(false);
                       }}
                       data-testid="nav-document-management"
