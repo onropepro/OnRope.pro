@@ -13485,72 +13485,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       };
       
-      // Record CSR history if score has changed
+      // Record CSR history if percentage rating has changed
       const lastHistory = await storage.getLatestCsrRatingHistory(companyId);
-      if (!lastHistory || lastHistory.newScore !== overallCSR) {
+      if (!lastHistory || lastHistory.newScore !== csrRating) {
         const previousScore = lastHistory ? lastHistory.newScore : 100;
-        const delta = overallCSR - previousScore;
+        const delta = csrRating - previousScore;
         
         if (!lastHistory) {
-          // Create detailed initial entry with point-based breakdown
+          // Create detailed initial entry with percentage and breakdown
           const breakdownDetails: string[] = [];
           
-          // Company Documentation Points (max 1 pt)
+          // Company Documentation (earned/max)
           const companyDocsCount = (hasHealthSafety ? 1 : 0) + (hasCompanyPolicy ? 1 : 0) + (hasInsurance ? 1 : 0);
-          breakdownDetails.push(`Company Documents: ${companyDocumentationPoints.toFixed(2)} / 1 pts (${companyDocsCount}/3 uploaded)`);
+          breakdownDetails.push(`Company Documents: ${companyDocumentationPoints.toFixed(2)} / ${maxCompanyDocPoints} (${companyDocsCount}/3 uploaded)`);
           
-          // Harness Inspection Points (max = number of active projects)
-          if (projects.filter((p: any) => p.status !== 'deleted').length > 0) {
-            breakdownDetails.push(`Harness Inspections: ${harnessInspectionPoints.toFixed(2)} / ${projects.filter((p: any) => p.status !== 'deleted').length} pts`);
-          } else {
-            breakdownDetails.push(`Harness Inspections: 0 / 0 pts (No active projects)`);
-          }
+          // Harness Inspections (earned/max)
+          breakdownDetails.push(`Harness Inspections: ${harnessInspectionPoints.toFixed(2)} / ${maxHarnessPoints} (${harnessCompletedInspections} of ${harnessRequiredInspections} completed)`);
           
-          // Employee Document Review Points (max = number of employees + owner)
-          breakdownDetails.push(`Document Reviews: ${employeeDocReviewPoints.toFixed(2)} / ${totalEmployees} pts (${signedReviews}/${totalRequiredSignatures} signatures)`);
+          // Employee Document Reviews (earned/max)
+          breakdownDetails.push(`Document Reviews: ${employeeDocReviewPoints.toFixed(2)} / ${maxEmployeeDocPoints} (${signedReviews}/${totalRequiredSignatures} signatures)`);
           
-          // Project Documentation Points (max = number of active projects)
-          breakdownDetails.push(`Project Docs: ${projectDocumentationPoints.toFixed(2)} / ${activeProjectCount} pts`);
+          // Project Documentation (earned/max)
+          breakdownDetails.push(`Project Docs: ${projectDocumentationPoints.toFixed(2)} / ${maxProjectDocPoints}`);
           
-          const fullReason = `Initial safety rating recorded.\n\nBreakdown:\n${breakdownDetails.join('\n')}\n\nTotal Points: ${overallCSR.toFixed(2)}`;
+          const fullReason = `Initial safety rating recorded: ${csrRating}% (${csrLabel})\n\nBreakdown (earned/max):\n${breakdownDetails.join('\n')}\n\nTotal: ${totalEarned.toFixed(2)} / ${totalMax}`;
           
           await storage.createCsrRatingHistory({
             companyId,
             previousScore,
-            newScore: overallCSR,
+            newScore: csrRating,
             delta,
             category: 'initial',
             reason: fullReason
           });
         } else {
-          // Record changes with detailed reasons using point-based system
+          // Record changes with percentage-based reasons
           const changes: string[] = [];
           
-          // Company Documentation Points (max 1 pt)
+          // Company Documentation (earned/max)
           const companyDocsCount = (hasHealthSafety ? 1 : 0) + (hasCompanyPolicy ? 1 : 0) + (hasInsurance ? 1 : 0);
-          changes.push(`Company Documents: ${companyDocumentationPoints.toFixed(2)} / 1 pts (${companyDocsCount}/3 uploaded)`);
+          changes.push(`Company Documents: ${companyDocumentationPoints.toFixed(2)} / ${maxCompanyDocPoints} (${companyDocsCount}/3 uploaded)`);
           
-          // Harness Inspection Points (max = number of active projects)
-          if (projects.filter((p: any) => p.status !== 'deleted').length > 0) {
-            changes.push(`Harness Inspections: ${harnessInspectionPoints.toFixed(2)} / ${projects.filter((p: any) => p.status !== 'deleted').length} pts`);
-          } else {
-            changes.push(`Harness Inspections: 0 / 0 pts (No active projects)`);
-          }
+          // Harness Inspections (earned/max)
+          changes.push(`Harness Inspections: ${harnessInspectionPoints.toFixed(2)} / ${maxHarnessPoints} (${harnessCompletedInspections} of ${harnessRequiredInspections} completed)`);
           
-          // Employee Document Review Points (max = number of employees + owner)
-          changes.push(`Document Reviews: ${employeeDocReviewPoints.toFixed(2)} / ${totalEmployees} pts (${signedReviews}/${totalRequiredSignatures} signatures)`);
+          // Employee Document Reviews (earned/max)
+          changes.push(`Document Reviews: ${employeeDocReviewPoints.toFixed(2)} / ${maxEmployeeDocPoints} (${signedReviews}/${totalRequiredSignatures} signatures)`);
           
-          // Project Documentation Points (max = number of active projects)
-          changes.push(`Project Docs: ${projectDocumentationPoints.toFixed(2)} / ${activeProjectCount} pts`);
+          // Project Documentation (earned/max)
+          changes.push(`Project Docs: ${projectDocumentationPoints.toFixed(2)} / ${maxProjectDocPoints}`);
           
           const category = delta > 0 ? 'improvement' : delta < 0 ? 'decline' : 'update';
           const changeType = delta > 0 ? 'improved' : delta < 0 ? 'declined' : 'updated';
-          const reason = `Safety rating ${changeType} from ${previousScore.toFixed(2)} to ${overallCSR.toFixed(2)} points.\n\nCurrent Status:\n${changes.join('\n')}`;
+          const { label: prevLabel } = getCsrRatingInfo(previousScore);
+          const reason = `Safety rating ${changeType} from ${previousScore}% (${prevLabel}) to ${csrRating}% (${csrLabel}).\n\nCurrent Status (earned/max):\n${changes.join('\n')}\n\nTotal: ${totalEarned.toFixed(2)} / ${totalMax}`;
           
           await storage.createCsrRatingHistory({
             companyId,
             previousScore,
-            newScore: overallCSR,
+            newScore: csrRating,
             delta,
             category,
             reason
@@ -13566,6 +13559,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // CSR Rating History endpoint
+  // Returns percentage-based history with label and color for each entry
   app.get("/api/company-safety-rating/history", requireAuth, async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
@@ -13585,7 +13579,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const history = await storage.getCsrRatingHistoryByCompany(companyId);
-      res.json({ history });
+      
+      // Enhance each history entry with label and color based on newScore (percentage)
+      const enhancedHistory = history.map((entry: any) => {
+        const { label, color } = getCsrRatingInfo(entry.newScore);
+        return {
+          ...entry,
+          // newScore is now a percentage (0-100)
+          csrLabel: label,
+          csrColor: color
+        };
+      });
+      
+      res.json({ history: enhancedHistory });
     } catch (error) {
       console.error("Get CSR history error:", error);
       res.status(500).json({ message: "Internal server error" });
