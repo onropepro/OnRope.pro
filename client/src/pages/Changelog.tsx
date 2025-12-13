@@ -85,6 +85,12 @@ type RecentChange = {
 
 const recentChangesData: RecentChange[] = [
   {
+    date: "December 13, 2025",
+    title: "CSR Percentage-Based Rating System",
+    description: "Company Safety Rating (CSR) now displays as a percentage (0-100%) instead of raw points, making ratings fair across companies of all sizes. Features color-coded labels: Green (90-100% Excellent), Yellow (70-89% Good), Orange (50-69% Needs Improvement), Red (Below 50% Poor). CSR history now tracks percentage changes with detailed breakdowns. Property managers see consistent percentage ratings for all vendors",
+    type: "improvement"
+  },
+  {
     date: "December 11, 2025",
     title: "Security: Replaced Vulnerable PDF Library",
     description: "Replaced html-pdf-node with Playwright for PDF generation to address critical CVE in lodash.pick@4.4.0 dependency. Quote PDF export and email functionality now uses a more secure and modern approach",
