@@ -5293,10 +5293,15 @@ export default function Documents() {
         <DocumentReviews companyDocuments={[...healthSafetyDocs, ...policyDocs]} />
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <div className="mb-6">
-            <Label className="text-sm font-medium text-muted-foreground mb-2 block">{t('documents.selectCategory', 'Select Document Category')}</Label>
+          <Card className="mb-6 p-4 bg-gradient-to-r from-primary/5 to-transparent border-2 border-primary/30">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <FolderOpen className="h-5 w-5 text-primary" />
+              </div>
+              <Label className="text-base font-semibold">{t('documents.selectCategory', 'Select Document Category')}</Label>
+            </div>
             <Select value={activeTab} onValueChange={setActiveTab}>
-              <SelectTrigger className="w-full max-w-md h-12 text-base font-medium bg-card border-2 border-primary/20 hover:border-primary/40 transition-colors" data-testid="select-document-type">
+              <SelectTrigger className="w-full h-14 text-lg font-semibold bg-background border-2 border-primary/40 hover:border-primary shadow-sm" data-testid="select-document-type">
                 <SelectValue placeholder="Select document type" />
               </SelectTrigger>
               <SelectContent>
@@ -5380,7 +5385,7 @@ export default function Documents() {
                 )}
               </SelectContent>
             </Select>
-          </div>
+          </Card>
 
           {/* Health & Safety Manual Tab */}
           <TabsContent value="health-safety">
