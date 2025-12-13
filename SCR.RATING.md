@@ -29,3 +29,18 @@ Example: 2 out of 4 docs uploaded = 0.5 points
 Note: Projects that do not require anchor use and rope access work do NOT need Rope Access Plan and Anchor Inspection documents. These projects earn 1 point for having Toolbox Meeting and FLHA completed.
 
 Formula: Points = (Uploaded Required Documents / Total Required Documents) per project
+
+---
+
+## Company Documentation Points
+
+1 point will be awarded if all 3 documents are uploaded.
+
+### Required Documents (3 total)
+- Health and Safety Manual
+- Company Policy
+- Certificate of Insurance
+
+Example: 1 out of 3 docs uploaded = 0.33 points
+
+Formula: Points = (Uploaded Documents / 3)
