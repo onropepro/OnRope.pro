@@ -971,6 +971,24 @@ export const toolboxMeetings = pgTable("toolbox_meetings", {
   index("IDX_toolbox_meetings_conductor").on(table.conductedBy, table.meetingDate),
 ]);
 
+// CSR Rating History - tracks changes to Company Safety Rating over time
+export const csrRatingHistory = pgTable("csr_rating_history", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  previousScore: integer("previous_score").notNull(),
+  newScore: integer("new_score").notNull(),
+  delta: integer("delta").notNull(), // Positive = improvement, negative = decline
+  category: varchar("category").notNull(), // Which factor caused the change (documentation, toolbox, harness, etc.)
+  reason: text("reason").notNull(), // Human-readable reason for the change
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_csr_rating_history_company").on(table.companyId, table.createdAt),
+]);
+
+export const insertCsrRatingHistorySchema = createInsertSchema(csrRatingHistory).omit({ id: true, createdAt: true });
+export type InsertCsrRatingHistory = z.infer<typeof insertCsrRatingHistorySchema>;
+export type CsrRatingHistory = typeof csrRatingHistory.$inferSelect;
+
 // Field Level Hazard Assessment (FLHA) table - Rope Access specific
 export const flhaForms = pgTable("flha_forms", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
