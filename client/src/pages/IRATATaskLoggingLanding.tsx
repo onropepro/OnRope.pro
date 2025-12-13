@@ -48,7 +48,7 @@ export default function IRATATaskLoggingLanding() {
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
               Your Logbook Is Lying<br />
-              <span className="text-blue-100">(Because You Haven't Updated It in Six Months)</span>
+              <span className="text-blue-100">(Because You Haven't Updated It<br />in Six Months)</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
