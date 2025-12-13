@@ -539,6 +539,38 @@ Each problem accordion includes these 4 sections:
 - Secondary text: `text-sm text-muted-foreground` for descriptions, captions
 - Links in text: Ocean Blue, underlined, from wouter `Link` component
 
+**Paragraph Splitting for Readability:**
+Card content with multiple sentences MUST be split into 2 paragraphs for readability:
+- First paragraph: Feature/capability description (what it does, how it works)
+- Second paragraph: Benefit, real example, or outcome (why it matters)
+
+```tsx
+// GOOD: Split for readability
+<CardContent className="p-5 space-y-2">
+  <h4 className="font-semibold">Card Title</h4>
+  <p className="text-base text-muted-foreground">
+    Feature description. Additional context about capability.
+  </p>
+  <p className="text-base text-muted-foreground">
+    Benefit statement or real example with specific outcome.
+  </p>
+</CardContent>
+
+// BAD: Wall of text
+<CardContent className="p-5 space-y-2">
+  <h4 className="font-semibold">Card Title</h4>
+  <p className="text-base text-muted-foreground">
+    Feature description. Additional context. Benefit statement. Real example with outcome. More details.
+  </p>
+</CardContent>
+```
+
+This rule applies to:
+- Stakeholder benefit cards
+- Feature cards
+- Integration cards
+- Any card with more than 2-3 sentences of body text
+
 **Bullet Points & Lists:**
 ```tsx
 <ul className="list-disc list-inside space-y-1 ml-2">
