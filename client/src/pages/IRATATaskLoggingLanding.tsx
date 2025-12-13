@@ -788,7 +788,7 @@ export default function IRATATaskLoggingLanding() {
                 IRATA and SPRAT still require you to maintain a physical logbook. WorkSafeBC and other regulatory bodies may request to see your written logbook on-site. OnRopePro's digital logging is a supplement that helps you maintain accurate records, not a replacement for your official certification documentation.
               </p>
               <p className="text-base font-medium">
-                If you have no logged rope time for 6 months, your certification may be considered invalid until recertification. Consistent logging protects your credentials.
+                If you have no rope access work logged for 6 months, you must complete a refresher before returning to work, though your certification itself isn't considered invalid. Consistent logging ensures you're ready for your next job.
               </p>
             </CardContent>
           </Card>
