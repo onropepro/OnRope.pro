@@ -56,3 +56,10 @@ The calculation is based on the documents actually uploaded by the company.
 Example: If a company has only 2 out of 3 documents uploaded, and an employee views and signs both documents, that employee has signed 100% of available documents. The SCR is awarded 1 point for that employee.
 
 Formula: SCR Points per employee = (Documents Signed by Employee / Documents Uploaded by Company)
+
+### Document Update Policy
+
+When a company updates or replaces a document:
+- Employees have a **14-day grace period** to re-sign the updated document
+- During the grace period, existing points are preserved
+- After 14 days, if the employee has not signed the updated document, the SCR loses the point for that employee until they sign
