@@ -35,8 +35,35 @@ Companies can earn additional CSR points by having employees complete quizzes ba
 
 ## Supported Documents for Quiz Generation
 
+### Company-Specific Quizzes (AI Generated)
 1. **Health & Safety Manual** - When uploaded, AI generates a 20-question quiz
 2. **Company Policy** - When uploaded, AI generates a 20-question quiz
+
+### Pre-Built Certification Quizzes (System Provided)
+Available to all companies. Techs only see quizzes matching their certification level.
+
+**IRATA Quizzes:**
+| Level | Quizzes | Questions | Format |
+|-------|---------|-----------|--------|
+| IRATA Level 1 | 2 quizzes | 20 each | 4 multiple choice |
+| IRATA Level 2 | 2 quizzes | 20 each | 4 multiple choice |
+| IRATA Level 3 | 2 quizzes | 20 each | 4 multiple choice |
+
+**SPRAT Quizzes:**
+| Level | Quizzes | Questions | Format |
+|-------|---------|-----------|--------|
+| SPRAT Level 1 | 2 quizzes | 20 each | 4 multiple choice |
+| SPRAT Level 2 | 2 quizzes | 20 each | 4 multiple choice |
+| SPRAT Level 3 | 2 quizzes | 20 each | 4 multiple choice |
+
+**Total: 12 pre-built quizzes** (6 IRATA + 6 SPRAT)
+
+### Visibility Rules
+- Tech with IRATA Level 1 sees: IRATA L1 quizzes only
+- Tech with IRATA Level 2 sees: IRATA L1 + L2 quizzes
+- Tech with IRATA Level 3 sees: IRATA L1 + L2 + L3 quizzes
+- Same pattern for SPRAT certifications
+- Techs with both IRATA and SPRAT see quizzes for both
 
 ---
 
