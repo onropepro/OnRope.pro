@@ -29,7 +29,7 @@ export default function TechnicianRegistrationGuide() {
       <div className="space-y-8">
         <section className="space-y-4">
           <p className="text-muted-foreground leading-relaxed text-base">
-            The Technician Self-Registration system allows irata and SPRAT technicians to create their own accounts on the platform. The streamlined 4-screen registration process collects essential information while minimizing friction.
+            The Technician Self-Registration system allows IRATA and SPRAT technicians to create their own accounts on the platform. The streamlined 4-screen registration process collects essential information while minimizing friction.
           </p>
           
           <Card className="bg-action-50 dark:bg-action-950 border-action-200 dark:border-action-800">
@@ -88,9 +88,9 @@ export default function TechnicianRegistrationGuide() {
               </CardHeader>
               <CardContent className="text-base space-y-2">
                 <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                  <li>irata certification level (1, 2, or 3)</li>
-                  <li>irata license number</li>
-                  <li>irata expiration date</li>
+                  <li>IRATA certification level (1, 2, or 3)</li>
+                  <li>IRATA license number</li>
+                  <li>IRATA expiration date</li>
                   <li>Optional: SPRAT certification level and details</li>
                 </ul>
               </CardContent>
@@ -207,7 +207,7 @@ export default function TechnicianRegistrationGuide() {
                 <div className="flex items-start gap-3">
                   <FileText className="w-5 h-5 text-amber-600 mt-0.5" />
                   <div>
-                    <p className="font-semibold">Enhanced irata Task Logging</p>
+                    <p className="font-semibold">Enhanced IRATA Task Logging</p>
                     <p className="text-muted-foreground text-sm">Advanced tracking for certification progression</p>
                   </div>
                 </div>
