@@ -19281,13 +19281,13 @@ Do not include any other text, just the JSON object.`
 
       // Get the document file from object storage
       const objectStorage = new ObjectStorageService();
-      const fileData = await objectStorage.getFile(document.filePath);
-      if (!fileData) {
+      const fileBuffer = await objectStorage.downloadPublicFileAsBuffer(document.fileUrl);
+      if (!fileBuffer) {
         return res.status(404).json({ message: "Document file not found in storage" });
       }
 
       // Convert to base64
-      const pdfBase64 = fileData.toString('base64');
+      const pdfBase64 = fileBuffer.toString('base64');
 
       // Generate quiz using AI
       const quizResult = await generateQuizFromDocument(pdfBase64, document.documentType);
