@@ -18,8 +18,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, Download } from "lucide-react";
+import { AlertCircle, Download, Eye } from "lucide-react";
 import { isReadOnly } from "@/lib/permissions";
 import { formatTimestampDate } from "@/lib/dateUtils";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
@@ -40,6 +41,7 @@ export default function ResidentDashboard() {
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const [selectedNotice, setSelectedNotice] = useState<any | null>(null);
   const [lastPhotoViewTime, setLastPhotoViewTime] = useState<number>(() => {
     const stored = localStorage.getItem('lastPhotoViewTime');
     return stored ? parseInt(stored) : 0;
@@ -1447,8 +1449,9 @@ export default function ResidentDashboard() {
                   {workNoticesData.notices.map((notice: any) => (
                     <div 
                       key={notice.id} 
-                      className="bg-background border border-border rounded-xl shadow-lg overflow-hidden"
+                      className="bg-background border border-border rounded-xl shadow-lg overflow-hidden hover-elevate cursor-pointer"
                       data-testid={`work-notice-${notice.id}`}
+                      onClick={() => setSelectedNotice(notice)}
                     >
                       {/* Professional Header with Company Branding */}
                       <div className="bg-gradient-to-r from-slate-800 to-slate-700 dark:from-slate-900 dark:to-slate-800 px-6 py-5 text-white">
@@ -1470,18 +1473,34 @@ export default function ResidentDashboard() {
                             <div className="flex items-center gap-2 mb-1">
                               <span className="text-xs font-medium uppercase tracking-wider text-white/70">Official Notice</span>
                             </div>
-                            <h3 className="text-xl font-bold truncate">{notice.title}</h3>
+                            <h3 className="text-xl font-bold truncate">{notice.title || notice.buildingName}</h3>
                           </div>
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            onClick={() => downloadNoticePdf(notice)}
-                            className="flex-shrink-0"
-                            data-testid={`button-download-notice-${notice.id}`}
-                          >
-                            <Download className="h-4 w-4 mr-1" />
-                            PDF
-                          </Button>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <Button
+                              size="sm"
+                              variant="secondary"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedNotice(notice);
+                              }}
+                              data-testid={`button-view-notice-${notice.id}`}
+                            >
+                              <Eye className="h-4 w-4 mr-1" />
+                              View
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="secondary"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                downloadNoticePdf(notice);
+                              }}
+                              data-testid={`button-download-notice-${notice.id}`}
+                            >
+                              <Download className="h-4 w-4 mr-1" />
+                              PDF
+                            </Button>
+                          </div>
                         </div>
                       </div>
 
@@ -1611,6 +1630,124 @@ export default function ResidentDashboard() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Notice Detail Dialog */}
+      <Dialog open={!!selectedNotice} onOpenChange={(open) => !open && setSelectedNotice(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          {selectedNotice && (
+            <>
+              <DialogHeader className="pb-4">
+                <div className="flex items-center gap-3 mb-2">
+                  {selectedNotice.logoUrl ? (
+                    <div className="flex-shrink-0 bg-muted rounded-lg p-2">
+                      <img 
+                        src={selectedNotice.logoUrl} 
+                        alt="Company logo" 
+                        className="h-10 w-auto object-contain"
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex-shrink-0 bg-muted rounded-lg p-3">
+                      <span className="material-icons text-2xl text-muted-foreground">business</span>
+                    </div>
+                  )}
+                  <div className="flex-1">
+                    <Badge variant="outline" className="mb-1 text-xs">Official Notice</Badge>
+                    <DialogTitle className="text-xl">{selectedNotice.title || selectedNotice.buildingName}</DialogTitle>
+                  </div>
+                </div>
+              </DialogHeader>
+
+              {/* Dates Banner */}
+              <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg px-4 py-3 mb-4">
+                <div className="flex flex-wrap items-center gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <span className="material-icons text-amber-700 dark:text-amber-400">event</span>
+                    <span className="font-medium text-amber-900 dark:text-amber-100">
+                      {selectedNotice.workStartDate && selectedNotice.workEndDate ? (
+                        <>
+                          {new Date(selectedNotice.workStartDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} 
+                          {' - '}
+                          {new Date(selectedNotice.workEndDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+                        </>
+                      ) : selectedNotice.workStartDate ? (
+                        <>Starting {new Date(selectedNotice.workStartDate).toLocaleDateString()}</>
+                      ) : (
+                        'Dates to be announced'
+                      )}
+                    </span>
+                  </div>
+                  {(selectedNotice.workStartTime || selectedNotice.workEndTime) && (
+                    <div className="flex items-center gap-2">
+                      <span className="material-icons text-amber-700 dark:text-amber-400">schedule</span>
+                      <span className="font-medium text-amber-900 dark:text-amber-100">
+                        {selectedNotice.workStartTime || 'TBD'} - {selectedNotice.workEndTime || 'TBD'}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Job Type Badge */}
+              {selectedNotice.jobType && (
+                <div className="mb-4">
+                  <Badge variant="secondary" className="capitalize">
+                    <span className="material-icons text-sm mr-1">construction</span>
+                    {selectedNotice.jobType.replace(/_/g, ' ')}
+                  </Badge>
+                </div>
+              )}
+
+              {/* Notice Content */}
+              <div className="prose prose-sm max-w-none dark:prose-invert mb-6">
+                <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                  {selectedNotice.content}
+                </div>
+              </div>
+
+              {/* Contact Info */}
+              {(selectedNotice.contractors || selectedNotice.contactInfo) && (
+                <div className="border-t pt-4 space-y-3">
+                  {selectedNotice.contractors && (
+                    <div className="flex items-start gap-2 text-sm">
+                      <span className="material-icons text-muted-foreground">engineering</span>
+                      <div>
+                        <p className="text-xs text-muted-foreground uppercase">Service Provider</p>
+                        <p className="font-medium">{selectedNotice.contractors}</p>
+                      </div>
+                    </div>
+                  )}
+                  {selectedNotice.contactInfo && (
+                    <div className="flex items-start gap-2 text-sm">
+                      <span className="material-icons text-muted-foreground">contact_phone</span>
+                      <div>
+                        <p className="text-xs text-muted-foreground uppercase">Contact</p>
+                        <p className="font-medium">{selectedNotice.contactInfo}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Footer */}
+              <div className="mt-4 pt-4 border-t flex items-center justify-between">
+                <div className="text-xs text-muted-foreground flex items-center gap-1">
+                  <span className="material-icons text-sm">apartment</span>
+                  {selectedNotice.buildingName}
+                </div>
+                <Button
+                  size="sm"
+                  onClick={() => downloadNoticePdf(selectedNotice)}
+                  data-testid="button-download-notice-dialog"
+                >
+                  <Download className="h-4 w-4 mr-1" />
+                  Download PDF
+                </Button>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
 
     </div>
   );
