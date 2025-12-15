@@ -1310,102 +1310,147 @@ export default function ResidentDashboard() {
                 <p className="text-muted-foreground">Important notices about upcoming and ongoing work at your building</p>
               </div>
               {!workNoticesData?.notices || workNoticesData.notices.length === 0 ? (
-                <div className="text-center py-8">
-                  <span className="material-icons text-6xl text-muted-foreground mb-3">notifications</span>
-                  <p className="text-muted-foreground">No work notices at this time</p>
+                <div className="text-center py-12">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted/50 mb-4">
+                    <span className="material-icons text-3xl text-muted-foreground">notifications_none</span>
+                  </div>
+                  <p className="text-muted-foreground font-medium">No Active Notices</p>
+                  <p className="text-sm text-muted-foreground mt-1">You will be notified when maintenance work is scheduled</p>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {workNoticesData.notices.map((notice: any) => (
-                    <Card 
+                    <div 
                       key={notice.id} 
-                      className="border shadow-sm"
+                      className="bg-background border border-border rounded-xl shadow-lg overflow-hidden"
                       data-testid={`work-notice-${notice.id}`}
                     >
-                      <CardContent className="p-4 sm:p-6">
-                        {/* Header with logo and title */}
-                        <div className="flex items-start gap-4 mb-4">
-                          {notice.logoUrl && (
-                            <img 
-                              src={notice.logoUrl} 
-                              alt="Company logo" 
-                              className="h-12 w-auto object-contain flex-shrink-0"
-                            />
+                      {/* Professional Header with Company Branding */}
+                      <div className="bg-gradient-to-r from-slate-800 to-slate-700 dark:from-slate-900 dark:to-slate-800 px-6 py-5 text-white">
+                        <div className="flex items-center gap-4">
+                          {notice.logoUrl ? (
+                            <div className="flex-shrink-0 bg-white rounded-lg p-2 shadow-md">
+                              <img 
+                                src={notice.logoUrl} 
+                                alt="Company logo" 
+                                className="h-10 w-auto object-contain"
+                              />
+                            </div>
+                          ) : (
+                            <div className="flex-shrink-0 bg-white/10 rounded-lg p-3">
+                              <span className="material-icons text-2xl">business</span>
+                            </div>
                           )}
                           <div className="flex-1 min-w-0">
-                            <h3 className="text-lg font-semibold">{notice.title}</h3>
-                            <p className="text-sm text-muted-foreground">{notice.buildingName}</p>
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-xs font-medium uppercase tracking-wider text-white/70">Official Notice</span>
+                            </div>
+                            <h3 className="text-xl font-bold truncate">{notice.title}</h3>
                           </div>
                         </div>
+                      </div>
 
-                        {/* Work dates */}
-                        <div className="flex items-center gap-2 mb-4 p-3 rounded-lg bg-muted/50">
-                          <span className="material-icons text-muted-foreground">calendar_today</span>
-                          <div className="text-sm">
-                            <span className="font-medium">Work Period: </span>
-                            {notice.workStartDate && notice.workEndDate ? (
-                              <span>
-                                {new Date(notice.workStartDate).toLocaleDateString()} - {new Date(notice.workEndDate).toLocaleDateString()}
-                              </span>
-                            ) : notice.workStartDate ? (
-                              <span>Starting {new Date(notice.workStartDate).toLocaleDateString()}</span>
-                            ) : (
-                              <span>Dates to be announced</span>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Work hours */}
-                        {(notice.workStartTime || notice.workEndTime) && (
-                          <div className="flex items-center gap-2 mb-4 p-3 rounded-lg bg-muted/50">
-                            <span className="material-icons text-muted-foreground">schedule</span>
-                            <div className="text-sm">
-                              <span className="font-medium">Work Hours: </span>
-                              <span>{notice.workStartTime || 'TBD'} - {notice.workEndTime || 'TBD'}</span>
+                      {/* Important Dates Banner */}
+                      <div className="bg-amber-50 dark:bg-amber-950/30 border-b border-amber-200 dark:border-amber-800 px-6 py-4">
+                        <div className="flex flex-wrap items-center gap-6">
+                          <div className="flex items-center gap-3">
+                            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/50">
+                              <span className="material-icons text-amber-700 dark:text-amber-400">event</span>
+                            </div>
+                            <div>
+                              <p className="text-xs font-medium text-amber-700 dark:text-amber-400 uppercase tracking-wide">Work Period</p>
+                              <p className="font-semibold text-amber-900 dark:text-amber-100">
+                                {notice.workStartDate && notice.workEndDate ? (
+                                  <>
+                                    {new Date(notice.workStartDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} 
+                                    {' - '}
+                                    {new Date(notice.workEndDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+                                  </>
+                                ) : notice.workStartDate ? (
+                                  <>Starting {new Date(notice.workStartDate).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</>
+                                ) : (
+                                  'Dates to be announced'
+                                )}
+                              </p>
                             </div>
                           </div>
-                        )}
+                          
+                          {(notice.workStartTime || notice.workEndTime) && (
+                            <div className="flex items-center gap-3">
+                              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/50">
+                                <span className="material-icons text-amber-700 dark:text-amber-400">schedule</span>
+                              </div>
+                              <div>
+                                <p className="text-xs font-medium text-amber-700 dark:text-amber-400 uppercase tracking-wide">Daily Hours</p>
+                                <p className="font-semibold text-amber-900 dark:text-amber-100">
+                                  {notice.workStartTime || 'TBD'} - {notice.workEndTime || 'TBD'}
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
 
-                        {/* Job type */}
+                      {/* Main Notice Content */}
+                      <div className="px-6 py-6">
+                        {/* Job Type Badge */}
                         {notice.jobType && (
-                          <div className="flex items-center gap-2 mb-4">
-                            <Badge variant="outline" className="capitalize">
+                          <div className="mb-4">
+                            <Badge variant="secondary" className="capitalize text-xs px-3 py-1">
+                              <span className="material-icons text-sm mr-1.5">construction</span>
                               {notice.jobType.replace(/_/g, ' ')}
                             </Badge>
                           </div>
                         )}
 
-                        {/* Notice content */}
+                        {/* Notice Body */}
                         <div className="prose prose-sm max-w-none dark:prose-invert">
-                          <div className="whitespace-pre-wrap text-sm">{notice.content}</div>
+                          <div className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
+                            {notice.content}
+                          </div>
                         </div>
 
-                        {/* Contractors */}
-                        {notice.contractors && (
-                          <div className="mt-4 pt-4 border-t">
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                              <span className="material-icons text-sm">engineering</span>
-                              <span>Contractor: {notice.contractors}</span>
+                        {/* Contact & Contractor Info */}
+                        {(notice.contractors || notice.contactInfo) && (
+                          <div className="mt-6 pt-5 border-t border-border/50">
+                            <div className="grid sm:grid-cols-2 gap-4">
+                              {notice.contractors && (
+                                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                                  <span className="material-icons text-muted-foreground mt-0.5">engineering</span>
+                                  <div>
+                                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">Service Provider</p>
+                                    <p className="text-sm font-medium">{notice.contractors}</p>
+                                  </div>
+                                </div>
+                              )}
+                              {notice.contactInfo && (
+                                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                                  <span className="material-icons text-muted-foreground mt-0.5">contact_phone</span>
+                                  <div>
+                                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">Contact</p>
+                                    <p className="text-sm font-medium">{notice.contactInfo}</p>
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           </div>
                         )}
+                      </div>
 
-                        {/* Contact information */}
-                        {notice.contactInfo && (
-                          <div className="mt-2">
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                              <span className="material-icons text-sm">contact_phone</span>
-                              <span>Contact: {notice.contactInfo}</span>
-                            </div>
+                      {/* Footer with Building & Posted Date */}
+                      <div className="bg-muted/30 px-6 py-3 border-t border-border/50">
+                        <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
+                          <div className="flex items-center gap-1.5">
+                            <span className="material-icons text-sm">apartment</span>
+                            <span>{notice.buildingName}</span>
                           </div>
-                        )}
-
-                        {/* Posted date */}
-                        <div className="mt-4 pt-4 border-t text-xs text-muted-foreground">
-                          Posted: {formatTimestampDate(notice.createdAt)}
+                          <div className="flex items-center gap-1.5">
+                            <span className="material-icons text-sm">history</span>
+                            <span>Posted {formatTimestampDate(notice.createdAt)}</span>
+                          </div>
                         </div>
-                      </CardContent>
-                    </Card>
+                      </div>
+                    </div>
                   ))}
                 </div>
               )}
