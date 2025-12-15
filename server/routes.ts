@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles } from "@shared/schema";
 import { eq, sql, and, or, isNull, gt, desc, asc, inArray } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -7013,6 +7013,322 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('[Referral] Error getting referrals:', error);
       return res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // ==================== DOCUMENT REQUEST ROUTES ====================
+  
+  // Multer config for document request file uploads (any file type allowed)
+  const documentRequestUpload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 25 * 1024 * 1024 }, // 25MB max per file
+  });
+  
+  // Employer creates a document request for a technician
+  app.post("/api/technicians/:techId/document-requests", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { techId } = req.params;
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Only company role can create document requests
+      if (currentUser.role !== 'company') {
+        return res.status(403).json({ message: "Only employers can create document requests" });
+      }
+      
+      const companyId = currentUser.id;
+      
+      // Check if there's an active connection between this company and technician
+      const connections = await db.select().from(technicianEmployerConnections)
+        .where(and(
+          eq(technicianEmployerConnections.technicianId, techId),
+          eq(technicianEmployerConnections.companyId, companyId),
+          eq(technicianEmployerConnections.status, 'active')
+        ));
+      
+      if (connections.length === 0) {
+        return res.status(403).json({ message: "No active connection with this technician" });
+      }
+      
+      const connection = connections[0];
+      
+      // Validate request body
+      const { title, details } = req.body;
+      if (!title || typeof title !== 'string' || title.trim().length === 0) {
+        return res.status(400).json({ message: "Title is required" });
+      }
+      
+      // Create the document request
+      const request = await storage.createDocumentRequest({
+        companyId,
+        technicianId: techId,
+        connectionId: connection.id,
+        requestedById: currentUser.id,
+        title: title.trim(),
+        details: details?.trim() || null,
+        status: 'pending',
+      });
+      
+      // Create notification for the technician
+      await db.insert(notifications).values({
+        userId: techId,
+        type: 'document_request',
+        title: 'New Document Request',
+        message: `${currentUser.companyName || 'An employer'} has requested: ${title.trim()}`,
+        data: JSON.stringify({ requestId: request.id, companyId, title: title.trim() }),
+      });
+      
+      console.log(`[DocRequest] Company ${companyId} created request ${request.id} for technician ${techId}`);
+      
+      res.status(201).json(request);
+    } catch (error) {
+      console.error("Create document request error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Technician gets their document requests (with files)
+  app.get("/api/technicians/me/document-requests", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (user.role !== 'rope_access_tech') {
+        return res.status(403).json({ message: "Only technicians can view their document requests" });
+      }
+      
+      const requests = await storage.getDocumentRequestsByTechnician(user.id);
+      
+      // Fetch files and company info for each request
+      const requestsWithDetails = await Promise.all(requests.map(async (request) => {
+        const files = await storage.getDocumentRequestFiles(request.id);
+        const company = await storage.getUserById(request.companyId);
+        return {
+          ...request,
+          files,
+          company: company ? {
+            id: company.id,
+            name: company.companyName || company.name,
+          } : null,
+        };
+      }));
+      
+      res.json({ requests: requestsWithDetails });
+    } catch (error) {
+      console.error("Get technician document requests error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Employer gets document requests they've sent (by company)
+  app.get("/api/companies/:companyId/document-requests", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { companyId } = req.params;
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Only allow company to view their own requests
+      if (currentUser.role !== 'company' || currentUser.id !== companyId) {
+        return res.status(403).json({ message: "Unauthorized" });
+      }
+      
+      const requests = await storage.getDocumentRequestsByCompany(companyId);
+      
+      // Fetch files and technician info for each request
+      const requestsWithDetails = await Promise.all(requests.map(async (request) => {
+        const files = await storage.getDocumentRequestFiles(request.id);
+        const technician = await storage.getUserById(request.technicianId);
+        return {
+          ...request,
+          files,
+          technician: technician ? {
+            id: technician.id,
+            name: technician.name,
+            email: technician.email,
+          } : null,
+        };
+      }));
+      
+      res.json({ requests: requestsWithDetails });
+    } catch (error) {
+      console.error("Get company document requests error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Technician uploads files to a document request
+  app.post("/api/technicians/document-requests/:id/files", requireAuth, documentRequestUpload.array('files', 10), async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (user.role !== 'rope_access_tech') {
+        return res.status(403).json({ message: "Only technicians can upload files to document requests" });
+      }
+      
+      // Get the request and verify it belongs to this technician
+      const request = await storage.getDocumentRequestById(id);
+      if (!request) {
+        return res.status(404).json({ message: "Document request not found" });
+      }
+      
+      if (request.technicianId !== user.id) {
+        return res.status(403).json({ message: "This request does not belong to you" });
+      }
+      
+      if (request.status !== 'pending') {
+        return res.status(400).json({ message: "This request has already been fulfilled or cancelled" });
+      }
+      
+      const files = req.files as Express.Multer.File[];
+      if (!files || files.length === 0) {
+        return res.status(400).json({ message: "No files uploaded" });
+      }
+      
+      const uploadedFiles = [];
+      for (const file of files) {
+        // Upload to object storage
+        const storageKey = `document-requests/${id}/${Date.now()}-${file.originalname}`;
+        await ObjectStorageService.uploadFile(storageKey, file.buffer);
+        
+        // Create file record
+        const fileRecord = await storage.createDocumentRequestFile({
+          requestId: id,
+          storageKey,
+          fileName: file.originalname,
+          fileSize: file.size,
+          fileType: file.mimetype,
+          uploadedById: user.id,
+        });
+        
+        uploadedFiles.push(fileRecord);
+      }
+      
+      console.log(`[DocRequest] Technician ${user.id} uploaded ${files.length} files to request ${id}`);
+      
+      res.status(201).json({ files: uploadedFiles });
+    } catch (error) {
+      console.error("Upload document request files error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Technician marks a document request as fulfilled
+  app.patch("/api/technicians/document-requests/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { status, responseNote } = req.body;
+      
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (user.role !== 'rope_access_tech') {
+        return res.status(403).json({ message: "Only technicians can update their document requests" });
+      }
+      
+      // Get the request and verify ownership
+      const request = await storage.getDocumentRequestById(id);
+      if (!request) {
+        return res.status(404).json({ message: "Document request not found" });
+      }
+      
+      if (request.technicianId !== user.id) {
+        return res.status(403).json({ message: "This request does not belong to you" });
+      }
+      
+      if (request.status !== 'pending') {
+        return res.status(400).json({ message: "This request has already been fulfilled or cancelled" });
+      }
+      
+      // Validate status
+      if (status !== 'fulfilled') {
+        return res.status(400).json({ message: "Invalid status. Only 'fulfilled' is allowed." });
+      }
+      
+      // Check if at least one file has been uploaded
+      const files = await storage.getDocumentRequestFiles(id);
+      if (files.length === 0) {
+        return res.status(400).json({ message: "You must upload at least one file before marking as fulfilled" });
+      }
+      
+      // Update the request
+      const updated = await storage.updateDocumentRequest(id, {
+        status: 'fulfilled',
+        responseNote: responseNote?.trim() || null,
+        respondedAt: new Date(),
+      });
+      
+      // Create notification for the employer
+      const company = await storage.getUserById(request.companyId);
+      await db.insert(notifications).values({
+        userId: request.companyId,
+        type: 'document_request_fulfilled',
+        title: 'Document Request Fulfilled',
+        message: `${user.name || 'A technician'} has fulfilled your document request: ${request.title}`,
+        data: JSON.stringify({ requestId: id, technicianId: user.id, title: request.title }),
+      });
+      
+      console.log(`[DocRequest] Technician ${user.id} fulfilled request ${id}`);
+      
+      res.json(updated);
+    } catch (error) {
+      console.error("Update document request error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Secure file download endpoint
+  app.get("/api/document-request-files/:id/download", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Get the file record
+      const fileRecord = await storage.getDocumentRequestFileById(id);
+      if (!fileRecord) {
+        return res.status(404).json({ message: "File not found" });
+      }
+      
+      // Get the parent request to check authorization
+      const request = await storage.getDocumentRequestById(fileRecord.requestId);
+      if (!request) {
+        return res.status(404).json({ message: "Document request not found" });
+      }
+      
+      // Only allow the technician or the requesting company to download
+      if (user.id !== request.technicianId && user.id !== request.companyId) {
+        return res.status(403).json({ message: "Unauthorized to download this file" });
+      }
+      
+      // Fetch the file from object storage
+      const fileBuffer = await ObjectStorageService.downloadFile(fileRecord.storageKey);
+      if (!fileBuffer) {
+        return res.status(404).json({ message: "File not found in storage" });
+      }
+      
+      // Set headers for download
+      res.setHeader('Content-Type', fileRecord.fileType || 'application/octet-stream');
+      res.setHeader('Content-Disposition', `attachment; filename="${fileRecord.fileName}"`);
+      res.setHeader('Content-Length', fileRecord.fileSize || fileBuffer.length);
+      
+      res.send(fileBuffer);
+    } catch (error) {
+      console.error("Download document request file error:", error);
+      res.status(500).json({ message: "Internal server error" });
     }
   });
 
