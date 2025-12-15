@@ -7546,10 +7546,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const uploadedFiles = [];
+      const objectStorageService = new ObjectStorageService();
       for (const file of files) {
         // Upload to object storage
         const storageKey = `document-requests/${id}/${Date.now()}-${file.originalname}`;
-        await ObjectStorageService.uploadFile(storageKey, file.buffer);
+        await objectStorageService.uploadPublicFile(storageKey, file.buffer, file.mimetype);
         
         // Create file record
         const fileRecord = await storage.createDocumentRequestFile({
@@ -7670,17 +7671,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Fetch the file from object storage
-      const fileBuffer = await ObjectStorageService.downloadFile(fileRecord.storageKey);
-      if (!fileBuffer) {
+      const objectStorageService = new ObjectStorageService();
+      const file = await objectStorageService.searchPublicObject(fileRecord.storageKey);
+      if (!file) {
         return res.status(404).json({ message: "File not found in storage" });
       }
       
-      // Set headers for download
-      res.setHeader('Content-Type', fileRecord.fileType || 'application/octet-stream');
+      // Set download disposition header
       res.setHeader('Content-Disposition', `attachment; filename="${fileRecord.fileName}"`);
-      res.setHeader('Content-Length', fileRecord.fileSize || fileBuffer.length);
       
-      res.send(fileBuffer);
+      // Stream the file to the response
+      await objectStorageService.downloadObject(file, res);
     } catch (error) {
       console.error("Download document request file error:", error);
       res.status(500).json({ message: "Internal server error" });
