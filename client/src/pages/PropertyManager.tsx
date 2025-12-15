@@ -279,7 +279,9 @@ export default function PropertyManager() {
 
   // Fetch CSR for selected vendor
   const { data: vendorCSRData, isLoading: isLoadingCSR } = useQuery<{
-    overallCSR: number;
+    csrRating: number;
+    csrLabel: string;
+    csrColor: string;
     breakdown: {
       documentationRating: number;
       toolboxMeetingRating: number;
@@ -891,15 +893,15 @@ export default function PropertyManager() {
                       <Badge 
                         variant="outline"
                         className={`gap-1.5 px-3 py-1.5 no-default-hover-elevate no-default-active-elevate ${
-                          vendorCSRData.overallCSR >= 90 ? "bg-green-600 dark:bg-green-500 text-white border-green-700 dark:border-green-400" :
-                          vendorCSRData.overallCSR >= 70 ? "bg-yellow-500 dark:bg-yellow-500 text-black dark:text-black border-yellow-600 dark:border-yellow-400" :
-                          vendorCSRData.overallCSR >= 50 ? "bg-orange-500 dark:bg-orange-500 text-white border-orange-600 dark:border-orange-400" :
+                          vendorCSRData.csrRating >= 90 ? "bg-green-600 dark:bg-green-500 text-white border-green-700 dark:border-green-400" :
+                          vendorCSRData.csrRating >= 70 ? "bg-yellow-500 dark:bg-yellow-500 text-black dark:text-black border-yellow-600 dark:border-yellow-400" :
+                          vendorCSRData.csrRating >= 50 ? "bg-orange-500 dark:bg-orange-500 text-white border-orange-600 dark:border-orange-400" :
                           "bg-red-600 dark:bg-red-500 text-white border-red-700 dark:border-red-400"
                         }`}
                         data-testid="badge-vendor-csr"
                       >
                         <Shield className="w-4 h-4" />
-                        <span className="text-sm font-semibold">CSR: {vendorCSRData.overallCSR}%</span>
+                        <span className="text-sm font-semibold">CSR: {vendorCSRData.csrRating}%</span>
                       </Badge>
                     ) : (
                       <Badge variant="outline" className="gap-1.5 px-3 py-1.5" data-testid="badge-vendor-csr-unavailable">
