@@ -34,6 +34,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recha
 import { parseLocalDate, formatTimestampDate, getTodayString, formatDurationMs } from "@/lib/dateUtils";
 import type { Project, Building, BuildingInstructions } from "@shared/schema";
 import { IRATA_TASK_TYPES, VALID_SHORTFALL_REASONS } from "@shared/schema";
+import { usesPercentageProgress, getProgressType } from "@shared/jobTypes";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { KeyRound, DoorOpen, Phone, User, Wrench, FileText, ChevronDown, ChevronRight, Save } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -489,14 +490,14 @@ export default function ProjectDetail() {
         // Continue without location if unavailable
       }
       
-      // Build payload based on job type
-      const isHoursBased = project.jobType === "general_pressure_washing" || project.jobType === "ground_window_cleaning";
+      // Build payload based on job type - use shared utility for correct determination
+      const isPercentageBasedJob = usesPercentageProgress(project.jobType, project.requiresElevation);
       
       const payload: any = {
         ...locationData,
       };
       
-      if (isHoursBased) {
+      if (isPercentageBasedJob) {
         // For hours-based projects, send manual completion percentage
         payload.manualCompletionPercentage = parseInt(data.manualCompletionPercentage || "0");
       } else {
@@ -870,9 +871,10 @@ export default function ProjectDetail() {
   });
 
   const onEndDaySubmit = (data: EndDayFormData) => {
-    const isHoursBased = project.jobType === "general_pressure_washing" || project.jobType === "ground_window_cleaning";
+    // Use shared utility for correct determination of percentage-based jobs
+    const isPercentageBasedJob = usesPercentageProgress(project.jobType, project.requiresElevation);
     
-    if (isHoursBased) {
+    if (isPercentageBasedJob) {
       // For hours-based projects, validate percentage
       const percentage = parseInt(data.manualCompletionPercentage || "0");
       if (percentage < 0 || percentage > 100) {
@@ -1098,14 +1100,15 @@ export default function ProjectDetail() {
   const completedSessions = workSessions.filter((s: any) => s.endTime !== null);
   
   // Determine tracking type and calculate progress
-  const isHoursBased = project.jobType === "general_pressure_washing" || project.jobType === "ground_window_cleaning";
+  // Use shared utility function that accounts for hours-based jobs AND non-elevation drop-based jobs
+  const isPercentageBased = usesPercentageProgress(project.jobType, project.requiresElevation);
   const isInSuite = project.jobType === "in_suite_dryer_vent_cleaning";
   const isParkade = project.jobType === "parkade_pressure_cleaning";
   
   let totalDrops: number, completedDrops: number, progressPercent: number;
   let completedDropsNorth = 0, completedDropsEast = 0, completedDropsSouth = 0, completedDropsWest = 0;
   
-  if (isHoursBased) {
+  if (isPercentageBased) {
     // Percentage-based tracking (General Pressure Washing, Ground Window)
     // Use the latest manually entered completion percentage from work sessions
     const sessionsWithPercentage = completedSessions.filter((s: any) => 
@@ -1256,7 +1259,7 @@ export default function ProjectDetail() {
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Building Visualization */}
-            {isHoursBased ? (
+            {isPercentageBased ? (
               <div className="space-y-6">
                 {/* Header with progress */}
                 <div className="text-center">
@@ -1429,7 +1432,7 @@ export default function ProjectDetail() {
             )}
 
             {/* Stats - Hide for hours-based projects since they don't have daily targets */}
-            {!isHoursBased && (
+            {!isPercentageBased && (
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center p-4 bg-muted/50 rounded-lg">
                   <div className="text-2xl font-bold">
@@ -2029,7 +2032,7 @@ export default function ProjectDetail() {
                                                       const sessionDrops = (session.dropsCompletedNorth ?? 0) + (session.dropsCompletedEast ?? 0) + 
                                                                            (session.dropsCompletedSouth ?? 0) + (session.dropsCompletedWest ?? 0);
                                                       const metTarget = sessionDrops >= project.dailyDropTarget;
-                                                      const isHoursBasedJob = project.jobType === "general_pressure_washing" || project.jobType === "ground_window_cleaning";
+                                                      const isPercentageBasedSession = usesPercentageProgress(project.jobType, project.requiresElevation);
                                                       const contributionPct = session.manualCompletionPercentage;
                                                       const sessionLaborCost = session.laborCost ? parseFloat(session.laborCost) : null;
                                                       
@@ -2052,9 +2055,9 @@ export default function ProjectDetail() {
                                                                 <MapPin className="h-4 w-4 text-primary" />
                                                               )}
                                                             </div>
-                                                            {isCompleted && (isHoursBasedJob || sessionLaborCost) && (
+                                                            {isCompleted && (isPercentageBasedSession || sessionLaborCost) && (
                                                               <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                                                                {isHoursBasedJob && contributionPct !== null && contributionPct !== undefined && (
+                                                                {isPercentageBasedSession && contributionPct !== null && contributionPct !== undefined && (
                                                                   <span className="flex items-center gap-1">
                                                                     <span className="material-icons text-xs">trending_up</span>
                                                                     +{contributionPct}% {t('projectDetail.progress.contribution', 'contribution')}
@@ -2070,7 +2073,7 @@ export default function ProjectDetail() {
                                                             )}
                                                           </div>
                                                           {isCompleted ? (
-                                                            isHoursBasedJob && contributionPct !== null ? (
+                                                            isPercentageBasedSession && contributionPct !== null ? (
                                                               <Badge variant="default" className="text-xs">
                                                                 +{contributionPct}%
                                                               </Badge>
@@ -3764,7 +3767,7 @@ export default function ProjectDetail() {
           <DialogHeader>
             <DialogTitle>{t('projectDetail.dialogs.endDay.title', 'End Your Work Day')}</DialogTitle>
             <DialogDescription>
-              {isHoursBased
+              {isPercentageBased
                 ? t('projectDetail.dialogs.endDay.descriptionHours', 'Enter how much of the job YOU completed today. This percentage will be added to the total project progress.', { buildingName: project.buildingName })
                 : project.jobType === "in_suite_dryer_vent_cleaning" 
                 ? t('projectDetail.dialogs.endDay.descriptionUnits', 'Enter the number of units you completed today for {{buildingName}}.', { buildingName: project.buildingName })
@@ -3776,7 +3779,7 @@ export default function ProjectDetail() {
 
           <Form {...endDayForm}>
             <form onSubmit={endDayForm.handleSubmit(onEndDaySubmit)} className="space-y-4">
-              {isHoursBased ? (
+              {isPercentageBased ? (
                 <FormField
                   control={endDayForm.control}
                   name="manualCompletionPercentage"
@@ -3946,20 +3949,20 @@ export default function ProjectDetail() {
                 const totalDrops = north + east + south + west;
                 const isInSuite = project.jobType === "in_suite_dryer_vent_cleaning";
                 const isParkade = project.jobType === "parkade_pressure_cleaning";
-                const isHoursBasedLocal = project.jobType === "general_pressure_washing" || project.jobType === "ground_window_cleaning";
+                const isPercentageBasedLocal = usesPercentageProgress(project.jobType, project.requiresElevation);
                 const target = isInSuite || isParkade ? (project.suitesPerDay || project.stallsPerDay || 0) : project.dailyDropTarget;
                 const isBelowTarget = totalDrops < target;
 
                 return (
                   <>
-                    {!isInSuite && !isParkade && !isHoursBasedLocal && (
+                    {!isInSuite && !isParkade && !isPercentageBasedLocal && (
                       <div className="p-3 bg-muted rounded-md">
                         <div className="text-sm text-muted-foreground">{t('projectDetail.progress.totalDrops', 'Total Drops')}</div>
                         <div className="text-2xl font-bold">{totalDrops}</div>
                       </div>
                     )}
 
-                    {isBelowTarget && !isHoursBasedLocal && (
+                    {isBelowTarget && !isPercentageBasedLocal && (
                       <>
                         <FormField
                           control={endDayForm.control}

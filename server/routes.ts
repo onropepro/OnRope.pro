@@ -10414,11 +10414,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Project not found" });
       }
       
-      // Validate manual completion percentage for hours-based job types
-      const isHoursBased = project.jobType === "general_pressure_washing" || project.jobType === "ground_window_cleaning";
+      // Validate manual completion percentage for percentage-based job types
+      // Use shared utility that accounts for hours-based jobs AND non-elevation drop-based jobs
+      const isPercentageBasedJob = usesPercentageProgress(project.jobType, project.requiresElevation);
       let validatedPercentage: number | undefined = undefined;
       
-      if (isHoursBased) {
+      if (isPercentageBasedJob) {
         // Manual completion percentage is REQUIRED for hours-based job types
         if (manualCompletionPercentage === undefined || manualCompletionPercentage === null) {
           return res.status(400).json({ message: "Completion percentage is required for this job type" });
@@ -10462,33 +10463,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
         validatedPercentage = percentageValue;
       }
       
-      // Validate elevation drops (ensure they are numbers and non-negative)
-      const north = typeof dropsCompletedNorth === 'number' ? dropsCompletedNorth : 0;
-      const east = typeof dropsCompletedEast === 'number' ? dropsCompletedEast : 0;
-      const south = typeof dropsCompletedSouth === 'number' ? dropsCompletedSouth : 0;
-      const west = typeof dropsCompletedWest === 'number' ? dropsCompletedWest : 0;
+      // For percentage-based jobs, ignore drop counts entirely - set to 0
+      // For drop-based jobs, validate elevation drops (ensure they are numbers and non-negative)
+      let north = 0, east = 0, south = 0, west = 0;
+      let totalDropsCompleted = 0;
       
-      if (north < 0 || east < 0 || south < 0 || west < 0) {
-        return res.status(400).json({ message: "Invalid drops completed value" });
-      }
-      
-      const totalDropsCompleted = north + east + south + west;
-      
-      // If drops < target, require either a valid reason code OR shortfall explanation (only if dailyDropTarget is set)
-      const approvedCodes = VALID_SHORTFALL_REASONS.map(r => r.code);
-      const isCodeApproved = validShortfallReasonCode && approvedCodes.includes(validShortfallReasonCode);
-      
-      // Reject unknown codes
-      if (validShortfallReasonCode && validShortfallReasonCode !== '' && !isCodeApproved) {
-        return res.status(400).json({ message: "Invalid shortfall reason code" });
-      }
-      
-      const hasValidReasonCode = isCodeApproved && validShortfallReasonCode !== 'other';
-      const hasOtherWithExplanation = validShortfallReasonCode === 'other' && shortfallReason?.trim();
-      const hasShortfallExplanation = shortfallReason?.trim();
-      
-      if (project.dailyDropTarget && totalDropsCompleted < project.dailyDropTarget && !hasValidReasonCode && !hasOtherWithExplanation && !hasShortfallExplanation) {
-        return res.status(400).json({ message: "A reason is required when drops completed is less than the daily target" });
+      if (!isPercentageBasedJob) {
+        north = typeof dropsCompletedNorth === 'number' ? dropsCompletedNorth : 0;
+        east = typeof dropsCompletedEast === 'number' ? dropsCompletedEast : 0;
+        south = typeof dropsCompletedSouth === 'number' ? dropsCompletedSouth : 0;
+        west = typeof dropsCompletedWest === 'number' ? dropsCompletedWest : 0;
+        
+        if (north < 0 || east < 0 || south < 0 || west < 0) {
+          return res.status(400).json({ message: "Invalid drops completed value" });
+        }
+        
+        totalDropsCompleted = north + east + south + west;
+        
+        // If drops < target, require either a valid reason code OR shortfall explanation (only if dailyDropTarget is set)
+        const approvedCodes = VALID_SHORTFALL_REASONS.map(r => r.code);
+        const isCodeApproved = validShortfallReasonCode && approvedCodes.includes(validShortfallReasonCode);
+        
+        // Reject unknown codes
+        if (validShortfallReasonCode && validShortfallReasonCode !== '' && !isCodeApproved) {
+          return res.status(400).json({ message: "Invalid shortfall reason code" });
+        }
+        
+        const hasValidReasonCode = isCodeApproved && validShortfallReasonCode !== 'other';
+        const hasOtherWithExplanation = validShortfallReasonCode === 'other' && shortfallReason?.trim();
+        const hasShortfallExplanation = shortfallReason?.trim();
+        
+        if (project.dailyDropTarget && totalDropsCompleted < project.dailyDropTarget && !hasValidReasonCode && !hasOtherWithExplanation && !hasShortfallExplanation) {
+          return res.status(400).json({ message: "A reason is required when drops completed is less than the daily target" });
+        }
       }
       
       // Calculate overtime breakdown
@@ -10542,7 +10549,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // End the session with elevation-specific drops and overtime hours
-      const shouldRecordReason = project.dailyDropTarget && totalDropsCompleted < project.dailyDropTarget;
+      // For percentage-based jobs, never record shortfall reason (they don't use drop targets)
+      const shouldRecordReason = !isPercentageBasedJob && project.dailyDropTarget && totalDropsCompleted < project.dailyDropTarget;
       const session = await storage.endWorkSession(
         sessionId,
         north,
@@ -10565,7 +10573,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Check if this is a percentage-based job and if this tech is the "last one out" for today
       let requiresProgressPrompt = false;
-      const isPercentageBasedJob = usesPercentageProgress(project.jobType, project.requiresElevation);
+      // isPercentageBasedJob was already computed above for validation
       
       if (isPercentageBasedJob) {
         // Check if there are other sessions that overlap with today's calendar work day
