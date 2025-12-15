@@ -13389,7 +13389,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
         : 100;
       const documentReviewPenalty = 0;
       
-      // 5. Project Documentation Points (NEW SCR SYSTEM)
+      // 5. Quiz Completion Points (NEW)
+      // Formula: 1 point per quiz per employee who passed
+      // Points per employee per quiz = 1 if passed, 0 if not
+      const companyQuizzes = await storage.getQuizzesByCompanyId(companyId);
+      const allQuizAttempts = await storage.getAllQuizAttemptsByCompanyId(companyId);
+      
+      let quizCompletionPoints = 0;
+      const totalQuizzes = companyQuizzes.length;
+      const totalQuizRequirements = totalQuizzes * totalEmployees; // Each employee should pass each quiz
+      
+      // Track which employees have passed which quizzes
+      const passedQuizzes: Map<string, Set<string>> = new Map(); // employeeId -> Set of quizId
+      
+      for (const attempt of allQuizAttempts) {
+        if (attempt.passed && attempt.employeeId && attempt.quizId) {
+          if (!passedQuizzes.has(attempt.employeeId)) {
+            passedQuizzes.set(attempt.employeeId, new Set());
+          }
+          passedQuizzes.get(attempt.employeeId)!.add(attempt.quizId);
+        }
+      }
+      
+      // Calculate points: 1 point per employee per quiz passed
+      for (const staffId of allStaffIds) {
+        const passedByEmployee = passedQuizzes.get(staffId);
+        if (passedByEmployee) {
+          // Count how many of the company's quizzes this employee has passed
+          for (const quiz of companyQuizzes) {
+            if (passedByEmployee.has(quiz.id)) {
+              quizCompletionPoints += 1;
+            }
+          }
+        }
+      }
+      
+      // If no quizzes exist, give full credit (nothing to comply with)
+      // Otherwise calculate based on passed/total
+      const quizCompletionRating = totalQuizRequirements > 0 
+        ? Math.round((quizCompletionPoints / totalQuizRequirements) * 100) 
+        : 100;
+      
+      // Round to 2 decimal places
+      quizCompletionPoints = Math.round(quizCompletionPoints * 100) / 100;
+      
+      // 6. Project Documentation Points (NEW SCR SYSTEM)
       // Formula: 1 point per project with all required docs
       // Elevation projects: 4 docs (Rope Access Plan, Anchor Inspection, Toolbox Meeting, FLHA)
       // Non-elevation projects: 2 docs (Toolbox Meeting, FLHA)
@@ -13475,11 +13519,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // 2. Project Documentation Points (per project)
       // 3. Company Documentation Points (1 max)
       // 4. Employee Document Review Points (per employee)
+      // 5. Quiz Completion Points (per employee per quiz)
       const totalEarned = Math.round((
         harnessInspectionPoints + 
         projectDocumentationPoints + 
         companyDocumentationPoints + 
-        employeeDocReviewPoints
+        employeeDocReviewPoints +
+        quizCompletionPoints
       ) * 100) / 100;
       
       // Calculate maximum possible points for percentage-based rating
@@ -13489,12 +13535,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // - Project Documentation: 1 point per project in projectDocBreakdown (same set as earned)
       // - Company Documentation: 1 point (all 3 docs uploaded)
       // - Employee Document Review: 1 point per employee (same count as earned calculation)
+      // - Quiz Completion: 1 point per quiz per employee (totalQuizzes * totalEmployees)
       const maxHarnessPoints = harnessProjectBreakdown.filter((p: any) => p.workSessions > 0).length;
       const maxProjectDocPoints = projectDocBreakdown.length; // Same projects used for earned calculation
       const maxCompanyDocPoints = 1; // Always 1 (3 docs required)
       const maxEmployeeDocPoints = totalEmployees;
+      const maxQuizPoints = totalQuizRequirements; // totalQuizzes * totalEmployees
       
-      const totalMax = maxHarnessPoints + maxProjectDocPoints + maxCompanyDocPoints + maxEmployeeDocPoints;
+      const totalMax = maxHarnessPoints + maxProjectDocPoints + maxCompanyDocPoints + maxEmployeeDocPoints + maxQuizPoints;
       
       // Calculate percentage rating (avoid division by zero)
       const csrRating = totalMax > 0 ? Math.round((totalEarned / totalMax) * 100) : 100;
@@ -13515,17 +13563,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
           projectDocumentation: { earned: projectDocumentationPoints, max: maxProjectDocPoints },
           companyDocumentation: { earned: companyDocumentationPoints, max: maxCompanyDocPoints },
           employeeDocumentReview: { earned: employeeDocReviewPoints, max: maxEmployeeDocPoints },
+          quizCompletion: { earned: quizCompletionPoints, max: maxQuizPoints },
           // Legacy points for backward compatibility
           harnessInspectionPoints,
           projectDocumentationPoints,
           companyDocumentationPoints,
           employeeDocReviewPoints,
+          quizCompletionPoints,
           // Legacy ratings (percentages) for backward compatibility
           documentationRating,
           toolboxMeetingRating,
           harnessInspectionRating,
           documentReviewRating,
-          projectDocumentationRating
+          projectDocumentationRating,
+          quizCompletionRating
         },
         totalEarned,
         totalMax,
@@ -13550,7 +13601,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           projectsWithToolboxMeeting,
           activeProjectCount,
           elevationProjectCount,
-          projectDocBreakdown
+          projectDocBreakdown,
+          quizCompletionsPassed: quizCompletionPoints,
+          quizCompletionsRequired: totalQuizRequirements,
+          totalQuizzes,
+          totalEmployeesForQuizzes: totalEmployees
         }
       };
       
@@ -13576,6 +13631,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           // Project Documentation (earned/max)
           breakdownDetails.push(`Project Docs: ${projectDocumentationPoints.toFixed(2)} / ${maxProjectDocPoints}`);
+          
+          // Quiz Completion (earned/max)
+          if (totalQuizzes > 0) {
+            breakdownDetails.push(`Quiz Completion: ${quizCompletionPoints.toFixed(2)} / ${maxQuizPoints} (${quizCompletionPoints}/${totalQuizRequirements} passed)`);
+          }
           
           const fullReason = `Initial safety rating recorded: ${csrRating}% (${csrLabel})\n\nBreakdown (earned/max):\n${breakdownDetails.join('\n')}\n\nTotal: ${totalEarned.toFixed(2)} / ${totalMax}`;
           
@@ -13603,6 +13663,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           // Project Documentation (earned/max)
           changes.push(`Project Docs: ${projectDocumentationPoints.toFixed(2)} / ${maxProjectDocPoints}`);
+          
+          // Quiz Completion (earned/max)
+          if (totalQuizzes > 0) {
+            changes.push(`Quiz Completion: ${quizCompletionPoints.toFixed(2)} / ${maxQuizPoints} (${quizCompletionPoints}/${totalQuizRequirements} passed)`);
+          }
           
           const category = delta > 0 ? 'improvement' : delta < 0 ? 'decline' : 'update';
           const changeType = delta > 0 ? 'improved' : delta < 0 ? 'declined' : 'updated';
