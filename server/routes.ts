@@ -10590,6 +10590,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let requiresProgressPrompt = false;
       // isPercentageBasedJob was already computed above for validation
       
+      console.log("[END SESSION] Job type:", project.jobType, "requiresElevation:", project.requiresElevation, "isPercentageBasedJob:", isPercentageBasedJob);
+      
       if (isPercentageBasedJob) {
         // Check if there are other sessions that overlap with today's calendar work day
         // Using project-local timezone for accurate day boundary calculations
@@ -10599,6 +10601,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const company = await storage.getUserById(project.companyId);
         const projectTimezone = getProjectTimezone(project, company || {});
         
+        console.log("[END SESSION] Total project sessions:", allProjectSessions.length, "Timezone:", projectTimezone);
+        
         const otherActiveSessions = allProjectSessions.filter(s => {
           if (s.id === sessionId) return false; // Not the session we just ended
           if (!s.startTime) return false; // Invalid session (no start time)
@@ -10607,14 +10611,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const sessionEnd = s.endTime ? new Date(s.endTime) : null;
           
           // Check if session interval overlaps with today's window in project timezone
-          return sessionOverlapsDay(sessionStart, sessionEnd, projectTimezone);
+          const overlaps = sessionOverlapsDay(sessionStart, sessionEnd, projectTimezone);
+          console.log("[END SESSION] Session", s.id, "overlaps today:", overlaps, "endTime:", s.endTime);
+          return overlaps;
         });
+        
+        console.log("[END SESSION] Other active sessions overlapping today:", otherActiveSessions.length);
         
         // If no other sessions overlap with today, this tech is the "last one out"
         if (otherActiveSessions.length === 0) {
           requiresProgressPrompt = true;
         }
       }
+      
+      console.log("[END SESSION] Returning requiresProgressPrompt:", requiresProgressPrompt);
       
       res.json({ 
         session,
