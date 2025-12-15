@@ -615,3 +615,157 @@ If the document is too short or unclear, generate as many quality questions as p
     };
   }
 }
+
+// Business Card Analysis Result
+export interface BusinessCardAnalysisResult {
+  success: boolean;
+  firstName: string | null;
+  lastName: string | null;
+  company: string | null;
+  jobTitle: string | null;
+  email: string | null;
+  phone: string | null;
+  mobile: string | null;
+  fax: string | null;
+  website: string | null;
+  address: string | null;
+  notes: string | null;
+  confidence: "high" | "medium" | "low";
+  error: string | null;
+}
+
+/**
+ * Analyze business card images (front and optionally back) to extract contact information
+ * @param frontImageBase64 - Base64 encoded front side of business card
+ * @param backImageBase64 - Optional base64 encoded back side of business card
+ * @param frontMimeType - MIME type of front image
+ * @param backMimeType - Optional MIME type of back image
+ */
+export async function analyzeBusinessCard(
+  frontImageBase64: string,
+  backImageBase64?: string,
+  frontMimeType: string = "image/jpeg",
+  backMimeType: string = "image/jpeg"
+): Promise<BusinessCardAnalysisResult> {
+  try {
+    console.log("[Business Card AI] Analyzing business card...");
+    
+    const imageParts: any[] = [
+      {
+        text: `You are an expert at extracting contact information from business cards. Analyze the business card image(s) provided and extract all relevant contact details.
+
+IMPORTANT INSTRUCTIONS:
+1. Extract the person's FIRST NAME and LAST NAME separately
+2. Extract company/organization name
+3. Extract job title/position
+4. Extract ALL phone numbers (main phone, mobile, fax) - label them appropriately
+5. Extract email address(es)
+6. Extract website URL if present
+7. Extract full mailing address if present
+8. Any additional notes or relevant information
+
+If two images are provided, they represent the FRONT and BACK of the same business card. Combine information from both sides.
+
+For phone numbers:
+- If there are multiple numbers, put the main office/landline in "phone" 
+- Put mobile/cell numbers in "mobile"
+- Put fax numbers in "fax"
+
+Respond ONLY with valid JSON matching this exact structure:
+{
+  "success": true,
+  "firstName": string or null,
+  "lastName": string or null,
+  "company": string or null,
+  "jobTitle": string or null,
+  "email": string or null,
+  "phone": string or null,
+  "mobile": string or null,
+  "fax": string or null,
+  "website": string or null,
+  "address": string or null,
+  "notes": string or null (any additional info like social media handles, certifications, etc.),
+  "confidence": "high" | "medium" | "low",
+  "error": null
+}
+
+If the image is not a business card or is unreadable, set success to false and explain in error.`
+      },
+      {
+        inlineData: {
+          mimeType: frontMimeType,
+          data: frontImageBase64
+        }
+      }
+    ];
+    
+    // Add back image if provided
+    if (backImageBase64) {
+      imageParts.push({
+        text: "Back side of the business card:"
+      });
+      imageParts.push({
+        inlineData: {
+          mimeType: backMimeType,
+          data: backImageBase64
+        }
+      });
+    }
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: [
+        {
+          role: "user",
+          parts: imageParts
+        }
+      ],
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            success: { type: Type.BOOLEAN },
+            firstName: { type: Type.STRING, nullable: true },
+            lastName: { type: Type.STRING, nullable: true },
+            company: { type: Type.STRING, nullable: true },
+            jobTitle: { type: Type.STRING, nullable: true },
+            email: { type: Type.STRING, nullable: true },
+            phone: { type: Type.STRING, nullable: true },
+            mobile: { type: Type.STRING, nullable: true },
+            fax: { type: Type.STRING, nullable: true },
+            website: { type: Type.STRING, nullable: true },
+            address: { type: Type.STRING, nullable: true },
+            notes: { type: Type.STRING, nullable: true },
+            confidence: { type: Type.STRING },
+            error: { type: Type.STRING, nullable: true }
+          },
+          required: ["success", "confidence"]
+        }
+      }
+    });
+
+    const result = JSON.parse(response.text || "{}") as BusinessCardAnalysisResult;
+    console.log("[Business Card AI] Analysis result:", JSON.stringify(result));
+    
+    return result;
+  } catch (error: any) {
+    console.error("[Business Card AI] Analysis error:", error);
+    return {
+      success: false,
+      firstName: null,
+      lastName: null,
+      company: null,
+      jobTitle: null,
+      email: null,
+      phone: null,
+      mobile: null,
+      fax: null,
+      website: null,
+      address: null,
+      notes: null,
+      confidence: "low",
+      error: `Analysis failed: ${error.message || "Unknown error"}`
+    };
+  }
+}

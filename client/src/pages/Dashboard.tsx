@@ -65,6 +65,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { ProgressPromptDialog } from "@/components/ProgressPromptDialog";
+import { BusinessCardScanner } from "@/components/BusinessCardScanner";
 
 import { JOB_CATEGORIES, JOB_TYPES, getJobTypesByCategory, getJobTypeConfig, getDefaultElevation, isElevationConfigurable, isDropBasedJobType, getAllJobTypeValues, getProgressType, getCategoryForJobType, type JobCategory } from "@shared/jobTypes";
 
@@ -935,6 +936,7 @@ export default function Dashboard() {
   const [showChangePasswordDialog, setShowChangePasswordDialog] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [showClientDialog, setShowClientDialog] = useState(false);
+  const [showBusinessCardScanner, setShowBusinessCardScanner] = useState(false);
   const [showEditClientDialog, setShowEditClientDialog] = useState(false);
   const [showDeleteClientDialog, setShowDeleteClientDialog] = useState(false);
   const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
@@ -7177,18 +7179,19 @@ export default function Dashboard() {
         {activeTab === "clients" && (
           <div>
             <div className="space-y-4">
-              {/* Add Client Button */}
-              <Dialog open={showClientDialog} onOpenChange={setShowClientDialog}>
-                <DialogTrigger asChild>
-                  <Button 
-                    className="w-full h-12 gap-2" 
-                    data-testid="button-create-client"
-                    disabled={userIsReadOnly || !hasPermission(currentUser, "manage_clients")}
-                  >
-                    <span className="material-icons">business</span>
-                    {t('dashboard.clientDatabase.addNewClient', 'Add New Client')}
-                  </Button>
-                </DialogTrigger>
+              {/* Add Client Buttons */}
+              <div className="flex gap-2">
+                <Dialog open={showClientDialog} onOpenChange={setShowClientDialog}>
+                  <DialogTrigger asChild>
+                    <Button 
+                      className="flex-1 h-12 gap-2" 
+                      data-testid="button-create-client"
+                      disabled={userIsReadOnly || !hasPermission(currentUser, "manage_clients")}
+                    >
+                      <span className="material-icons">business</span>
+                      {t('dashboard.clientDatabase.addNewClient', 'Add New Client')}
+                    </Button>
+                  </DialogTrigger>
                 <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto" data-testid="dialog-add-client">
                   <DialogHeader className="pb-4">
                     <DialogTitle>{t('dashboard.clientDatabase.addNewClient', 'Add New Client')}</DialogTitle>
@@ -7553,7 +7556,41 @@ export default function Dashboard() {
                     </form>
                   </Form>
                 </DialogContent>
-              </Dialog>
+                </Dialog>
+                
+                {/* Scan Business Card Button - Company owners only */}
+                {currentUser?.role === "company" && (
+                  <Button 
+                    variant="outline"
+                    className="h-12 gap-2" 
+                    onClick={() => setShowBusinessCardScanner(true)}
+                    data-testid="button-scan-business-card"
+                    disabled={userIsReadOnly || !hasPermission(currentUser, "manage_clients")}
+                  >
+                    <span className="material-icons">photo_camera</span>
+                    {t('dashboard.clientDatabase.scanCard', 'Scan Card')}
+                  </Button>
+                )}
+              </div>
+
+              {/* Business Card Scanner Dialog */}
+              <BusinessCardScanner 
+                open={showBusinessCardScanner}
+                onOpenChange={setShowBusinessCardScanner}
+                onScanComplete={(data) => {
+                  // Pre-populate the client form with scanned data
+                  clientForm.reset({
+                    firstName: data.firstName || "",
+                    lastName: data.lastName || "",
+                    company: data.company || "",
+                    phoneNumber: data.phone || data.mobile || "",
+                    address: data.address || "",
+                    billingAddress: "",
+                  });
+                  // Open the client dialog with pre-filled data
+                  setShowClientDialog(true);
+                }}
+              />
 
               {/* Clients List */}
               <Card>

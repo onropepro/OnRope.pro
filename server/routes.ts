@@ -9126,6 +9126,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to delete client" });
     }
   });
+
+  // Scan business card with AI to extract contact information
+  app.post("/api/clients/scan-business-card", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+    try {
+      const { frontImage, backImage, frontMimeType, backMimeType } = req.body;
+      
+      if (!frontImage) {
+        return res.status(400).json({ message: "Front image is required" });
+      }
+      
+      // Validate image data
+      const validMimeTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+      if (frontMimeType && !validMimeTypes.includes(frontMimeType)) {
+        return res.status(400).json({ message: "Invalid front image type" });
+      }
+      if (backMimeType && !validMimeTypes.includes(backMimeType)) {
+        return res.status(400).json({ message: "Invalid back image type" });
+      }
+      
+      // Import the business card analyzer
+      const { analyzeBusinessCard } = await import("./gemini");
+      
+      // Analyze the business card
+      const result = await analyzeBusinessCard(
+        frontImage,
+        backImage || undefined,
+        frontMimeType || "image/jpeg",
+        backMimeType || "image/jpeg"
+      );
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Error scanning business card:", error);
+      res.status(500).json({ 
+        success: false,
+        error: "Failed to analyze business card. Please try again."
+      });
+    }
+  });
   
   app.post("/api/upload-rope-access-plan", requireAuth, requireRole("company", "operations_manager", "rope_access_tech"), upload.single('file'), async (req: Request, res: Response) => {
     try {
