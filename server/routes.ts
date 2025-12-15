@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema } from "@shared/schema";
 import { eq, sql, and, or, isNull, gt, desc, asc, inArray } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -10205,6 +10205,202 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ project: restoredProject });
     } catch (error) {
       console.error("Restore project error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // ==================== WORK NOTICES ROUTES ====================
+  
+  // Get work notices for a project
+  app.get("/api/projects/:projectId/work-notices", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Verify project access
+      const hasAccess = await storage.verifyProjectAccess(
+        req.params.projectId,
+        currentUser.id,
+        currentUser.role,
+        currentUser.companyId
+      );
+      
+      if (!hasAccess) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const notices = await db.select().from(workNotices)
+        .where(eq(workNotices.projectId, req.params.projectId))
+        .orderBy(desc(workNotices.createdAt));
+      
+      res.json({ notices });
+    } catch (error) {
+      console.error("Get work notices error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Create work notice for a project
+  app.post("/api/projects/:projectId/work-notices", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Get the project to auto-fill details
+      const project = await storage.getProjectById(req.params.projectId);
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      // Verify project access
+      const hasAccess = await storage.verifyProjectAccess(
+        req.params.projectId,
+        currentUser.id,
+        currentUser.role,
+        currentUser.companyId
+      );
+      
+      if (!hasAccess) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      // Get company info
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const company = await storage.getUserById(companyId);
+      
+      // Validate request body
+      const validatedData = insertWorkNoticeSchema.parse({
+        ...req.body,
+        projectId: req.params.projectId,
+        companyId: companyId,
+        buildingName: project.buildingName,
+        buildingAddress: project.buildingAddress,
+        strataPlanNumber: project.strataPlanNumber,
+        contractorName: company?.companyName || "Contractor",
+        jobType: project.jobType,
+        customJobType: project.customJobType,
+        companyLogoUrl: company?.whitelabelBrandingActive ? company.brandingLogoUrl : null,
+      });
+      
+      const [notice] = await db.insert(workNotices).values(validatedData).returning();
+      
+      res.status(201).json({ notice });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Create work notice error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Update work notice
+  app.patch("/api/work-notices/:id", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Get the notice first
+      const [existingNotice] = await db.select().from(workNotices)
+        .where(eq(workNotices.id, req.params.id));
+      
+      if (!existingNotice) {
+        return res.status(404).json({ message: "Work notice not found" });
+      }
+      
+      // Verify company access
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (existingNotice.companyId !== companyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const { startDate, endDate, noticeTitle, noticeDetails, additionalInstructions, isPublished, propertyManagerName } = req.body;
+      
+      const [updatedNotice] = await db.update(workNotices)
+        .set({
+          startDate: startDate ?? existingNotice.startDate,
+          endDate: endDate ?? existingNotice.endDate,
+          noticeTitle: noticeTitle ?? existingNotice.noticeTitle,
+          noticeDetails: noticeDetails ?? existingNotice.noticeDetails,
+          additionalInstructions: additionalInstructions !== undefined ? additionalInstructions : existingNotice.additionalInstructions,
+          propertyManagerName: propertyManagerName !== undefined ? propertyManagerName : existingNotice.propertyManagerName,
+          isPublished: isPublished !== undefined ? isPublished : existingNotice.isPublished,
+          updatedAt: new Date(),
+        })
+        .where(eq(workNotices.id, req.params.id))
+        .returning();
+      
+      res.json({ notice: updatedNotice });
+    } catch (error) {
+      console.error("Update work notice error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Delete work notice
+  app.delete("/api/work-notices/:id", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Get the notice first
+      const [existingNotice] = await db.select().from(workNotices)
+        .where(eq(workNotices.id, req.params.id));
+      
+      if (!existingNotice) {
+        return res.status(404).json({ message: "Work notice not found" });
+      }
+      
+      // Verify company access
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (existingNotice.companyId !== companyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      await db.delete(workNotices).where(eq(workNotices.id, req.params.id));
+      
+      res.json({ message: "Work notice deleted successfully" });
+    } catch (error) {
+      console.error("Delete work notice error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Get work notices for resident (based on their strata plan number)
+  app.get("/api/resident/work-notices", requireAuth, requireRole("resident"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (!currentUser.strataPlanNumber) {
+        return res.status(400).json({ message: "No building linked to your account" });
+      }
+      
+      // Get published work notices for the resident's building
+      const notices = await db.select().from(workNotices)
+        .where(and(
+          eq(workNotices.strataPlanNumber, currentUser.strataPlanNumber),
+          eq(workNotices.isPublished, true)
+        ))
+        .orderBy(desc(workNotices.createdAt));
+      
+      res.json({ notices });
+    } catch (error) {
+      console.error("Get resident work notices error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
