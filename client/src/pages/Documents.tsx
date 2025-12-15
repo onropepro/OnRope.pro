@@ -7225,6 +7225,68 @@ export default function Documents() {
           </Card>
         )}
 
+        {/* Quizzes - show all company quizzes */}
+        {activeTab === "quizzes" && canUploadDocuments && (
+          <Card className="mb-6 overflow-hidden">
+            <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-primary/10 rounded-xl ring-1 ring-primary/20">
+                  <ClipboardList className="h-6 w-6 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <CardTitle className="text-xl mb-1">{t('documents.quizzes', 'Quizzes')}</CardTitle>
+                  <p className="text-sm text-muted-foreground">{t('documents.quizzesDesc', 'Document comprehension quizzes for employees')}</p>
+                </div>
+                <Badge variant="secondary" className="text-base font-semibold px-3">
+                  {companyQuizzes?.length || 0}
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <div className="mb-4 p-4 rounded-lg bg-muted/50 border">
+                <p className="text-sm text-muted-foreground">
+                  {t('documents.quizInfo', 'Quizzes are automatically generated from Health & Safety Manual and Company Policy documents. Click "Generate Quiz" on any uploaded document to create a quiz for your employees.')}
+                </p>
+              </div>
+              {companyQuizzes && companyQuizzes.length > 0 ? (
+                <div className="space-y-3">
+                  {companyQuizzes.map((quiz: any) => (
+                    <div key={quiz.id} className="flex items-center gap-4 p-4 rounded-lg border bg-card hover-elevate">
+                      <div className="p-2 bg-primary/10 rounded-lg">
+                        <ClipboardList className="h-5 w-5 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium">
+                          {quiz.documentType === 'health_safety_manual' 
+                            ? t('documents.healthSafetyManualQuiz', 'Health & Safety Manual Quiz')
+                            : quiz.documentType === 'company_policy'
+                            ? t('documents.companyPolicyQuiz', 'Company Policy Quiz')
+                            : quiz.documentType}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {Array.isArray(quiz.questions) ? quiz.questions.length : 0} {t('documents.questions', 'questions')} 
+                          {quiz.createdAt && ` • ${t('documents.createdOn', 'Created')} ${formatLocalDateMedium(new Date(quiz.createdAt))}`}
+                        </div>
+                      </div>
+                      <Badge variant="outline">
+                        {t('documents.active', 'Active')}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="inline-flex p-4 bg-primary/5 rounded-full mb-4">
+                    <ClipboardList className="h-8 w-8 text-primary/50" />
+                  </div>
+                  <p className="text-muted-foreground font-medium">{t('documents.noQuizzes', 'No quizzes created yet')}</p>
+                  <p className="text-sm text-muted-foreground mt-1">{t('documents.noQuizzesDesc', 'Generate a quiz from your Health & Safety Manual or Company Policy document')}</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
         {/* Method Statements - only shown when selected from dropdown */}
         {activeTab === "method-statements" && canViewSafety && (
           <Card className="mb-6 overflow-hidden">
