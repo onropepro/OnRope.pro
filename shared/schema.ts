@@ -2765,3 +2765,54 @@ export const insertQuizAttemptSchema = createInsertSchema(quizAttempts).omit({
 
 export type QuizAttempt = typeof quizAttempts.$inferSelect;
 export type InsertQuizAttempt = z.infer<typeof insertQuizAttemptSchema>;
+
+// Technician Document Requests - Employers request documents from technicians
+export const technicianDocumentRequests = pgTable("technician_document_requests", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  technicianId: varchar("technician_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  connectionId: varchar("connection_id").notNull().references(() => technicianEmployerConnections.id, { onDelete: "cascade" }),
+  requestedById: varchar("requested_by_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  title: varchar("title").notNull(),
+  details: text("details"),
+  status: varchar("status").notNull().default("pending"), // pending | fulfilled | cancelled
+  responseNote: text("response_note"),
+  requestedAt: timestamp("requested_at").defaultNow().notNull(),
+  respondedAt: timestamp("responded_at"),
+}, (table) => [
+  index("IDX_tech_doc_requests_company_tech_status").on(table.companyId, table.technicianId, table.status),
+  index("IDX_tech_doc_requests_technician").on(table.technicianId),
+  index("IDX_tech_doc_requests_company").on(table.companyId),
+  index("IDX_tech_doc_requests_connection").on(table.connectionId),
+]);
+
+export const insertTechnicianDocumentRequestSchema = createInsertSchema(technicianDocumentRequests).omit({
+  id: true,
+  requestedAt: true,
+  respondedAt: true,
+});
+
+export type TechnicianDocumentRequest = typeof technicianDocumentRequests.$inferSelect;
+export type InsertTechnicianDocumentRequest = z.infer<typeof insertTechnicianDocumentRequestSchema>;
+
+// Technician Document Request Files - Files uploaded in response to document requests
+export const technicianDocumentRequestFiles = pgTable("technician_document_request_files", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  requestId: varchar("request_id").notNull().references(() => technicianDocumentRequests.id, { onDelete: "cascade" }),
+  storageKey: varchar("storage_key").notNull(),
+  fileName: varchar("file_name").notNull(),
+  fileSize: integer("file_size").notNull(),
+  fileType: varchar("file_type").notNull(),
+  uploadedById: varchar("uploaded_by_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  uploadedAt: timestamp("uploaded_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_tech_doc_request_files_request").on(table.requestId),
+]);
+
+export const insertTechnicianDocumentRequestFileSchema = createInsertSchema(technicianDocumentRequestFiles).omit({
+  id: true,
+  uploadedAt: true,
+});
+
+export type TechnicianDocumentRequestFile = typeof technicianDocumentRequestFiles.$inferSelect;
+export type InsertTechnicianDocumentRequestFile = z.infer<typeof insertTechnicianDocumentRequestFileSchema>;
