@@ -204,12 +204,12 @@ export function QuizSection() {
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-semibold">{getQuizTitle(quiz)}</span>
             {isCertQuiz && quiz.certification && quiz.level && (
-              <Badge className={certBadgeColor} size="sm">
+              <Badge className={certBadgeColor}>
                 {quiz.certification.toUpperCase()} L{quiz.level}
               </Badge>
             )}
             {isSafetyQuiz && quiz.category && (
-              <Badge className={getSafetyBadgeColor(quiz.category)} size="sm">
+              <Badge className={getSafetyBadgeColor(quiz.category)}>
                 {getSafetyCategoryLabel(quiz.category)}
               </Badge>
             )}
@@ -348,7 +348,7 @@ export function QuizSection() {
             <DialogTitle className="flex items-center gap-2">
               {selectedQuiz && getQuizTitle(selectedQuiz)}
               {selectedQuiz?.quizCategory === 'certification' && selectedQuiz.certification && selectedQuiz.level && (
-                <Badge className={selectedQuiz.certification === 'irata' ? 'bg-blue-600 text-white' : 'bg-orange-600 text-white'} size="sm">
+                <Badge className={selectedQuiz.certification === 'irata' ? 'bg-blue-600 text-white' : 'bg-orange-600 text-white'}>
                   {selectedQuiz.certification.toUpperCase()} L{selectedQuiz.level}
                 </Badge>
               )}
