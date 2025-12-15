@@ -17,6 +17,7 @@ import { HighRiseBuilding } from "@/components/HighRiseBuilding";
 import { VerticalBuildingProgress } from "@/components/VerticalBuildingProgress";
 import { ParkadeView } from "@/components/ParkadeView";
 import { SessionDetailsDialog } from "@/components/SessionDetailsDialog";
+import { WorkNoticeList } from "@/components/WorkNoticeForm";
 import { useToast } from "@/hooks/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -2780,6 +2781,15 @@ export default function ProjectDetail() {
               )}
           </CardContent>
         </Card>
+
+        {/* Work Notices - Management Only */}
+        {isManagement && project && (
+          <Card className="glass-card border-0 shadow-premium">
+            <CardContent className="pt-6">
+              <WorkNoticeList projectId={project.id} project={project} />
+            </CardContent>
+          </Card>
+        )}
 
         {/* Residents List - Management Only */}
         {isManagement && (
