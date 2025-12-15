@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, quoteHistory, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff, documentReviewSignatures, equipmentDamageReports, featureRequests, featureRequestMessages, churnEvents, buildings, buildingInstructions, normalizeStrataPlan, teamInvitations, historicalHours, technicianEmployerConnections, csrRatingHistory, documentQuizzes, quizAttempts } from "@shared/schema";
-import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, QuoteHistory, InsertQuoteHistory, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff, DocumentReviewSignature, InsertDocumentReviewSignature, EquipmentDamageReport, InsertEquipmentDamageReport, FeatureRequest, InsertFeatureRequest, FeatureRequestMessage, InsertFeatureRequestMessage, FeatureRequestWithMessages, ChurnEvent, InsertChurnEvent, Building, InsertBuilding, BuildingInstructions, InsertBuildingInstructions, TeamInvitation, InsertTeamInvitation, HistoricalHours, InsertHistoricalHours, CsrRatingHistory, InsertCsrRatingHistory, DocumentQuiz, InsertDocumentQuiz, QuizAttempt, InsertQuizAttempt } from "@shared/schema";
+import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, quoteHistory, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff, documentReviewSignatures, equipmentDamageReports, featureRequests, featureRequestMessages, churnEvents, buildings, buildingInstructions, normalizeStrataPlan, teamInvitations, historicalHours, technicianEmployerConnections, csrRatingHistory, documentQuizzes, quizAttempts, technicianDocumentRequests, technicianDocumentRequestFiles } from "@shared/schema";
+import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, QuoteHistory, InsertQuoteHistory, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff, DocumentReviewSignature, InsertDocumentReviewSignature, EquipmentDamageReport, InsertEquipmentDamageReport, FeatureRequest, InsertFeatureRequest, FeatureRequestMessage, InsertFeatureRequestMessage, FeatureRequestWithMessages, ChurnEvent, InsertChurnEvent, Building, InsertBuilding, BuildingInstructions, InsertBuildingInstructions, TeamInvitation, InsertTeamInvitation, HistoricalHours, InsertHistoricalHours, CsrRatingHistory, InsertCsrRatingHistory, DocumentQuiz, InsertDocumentQuiz, QuizAttempt, InsertQuizAttempt, TechnicianDocumentRequest, InsertTechnicianDocumentRequest, TechnicianDocumentRequestFile, InsertTechnicianDocumentRequestFile } from "@shared/schema";
 import { eq, and, or, desc, sql, isNull, isNotNull, not, gte, lte, between, inArray } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import { encryptSensitiveFields, decryptSensitiveFields } from "./encryption";
@@ -4317,6 +4317,77 @@ export class Storage {
       .from(quizAttempts)
       .where(eq(quizAttempts.companyId, companyId))
       .orderBy(desc(quizAttempts.completedAt));
+  }
+
+  // Technician Document Request operations
+  async createDocumentRequest(data: InsertTechnicianDocumentRequest): Promise<TechnicianDocumentRequest> {
+    const result = await db.insert(technicianDocumentRequests).values(data).returning();
+    return result[0];
+  }
+
+  async getDocumentRequestById(id: string): Promise<TechnicianDocumentRequest | undefined> {
+    const result = await db.select()
+      .from(technicianDocumentRequests)
+      .where(eq(technicianDocumentRequests.id, id))
+      .limit(1);
+    return result[0];
+  }
+
+  async getDocumentRequestsByTechnician(technicianId: string): Promise<TechnicianDocumentRequest[]> {
+    return db.select()
+      .from(technicianDocumentRequests)
+      .where(eq(technicianDocumentRequests.technicianId, technicianId))
+      .orderBy(desc(technicianDocumentRequests.requestedAt));
+  }
+
+  async getDocumentRequestsByCompany(companyId: string): Promise<TechnicianDocumentRequest[]> {
+    return db.select()
+      .from(technicianDocumentRequests)
+      .where(eq(technicianDocumentRequests.companyId, companyId))
+      .orderBy(desc(technicianDocumentRequests.requestedAt));
+  }
+
+  async getDocumentRequestsByConnection(connectionId: string): Promise<TechnicianDocumentRequest[]> {
+    return db.select()
+      .from(technicianDocumentRequests)
+      .where(eq(technicianDocumentRequests.connectionId, connectionId))
+      .orderBy(desc(technicianDocumentRequests.requestedAt));
+  }
+
+  async updateDocumentRequest(id: string, updates: Partial<TechnicianDocumentRequest>): Promise<TechnicianDocumentRequest | undefined> {
+    const result = await db.update(technicianDocumentRequests)
+      .set(updates)
+      .where(eq(technicianDocumentRequests.id, id))
+      .returning();
+    return result[0];
+  }
+
+  // Technician Document Request File operations
+  async createDocumentRequestFile(data: InsertTechnicianDocumentRequestFile): Promise<TechnicianDocumentRequestFile> {
+    const result = await db.insert(technicianDocumentRequestFiles).values(data).returning();
+    return result[0];
+  }
+
+  async getDocumentRequestFiles(requestId: string): Promise<TechnicianDocumentRequestFile[]> {
+    return db.select()
+      .from(technicianDocumentRequestFiles)
+      .where(eq(technicianDocumentRequestFiles.requestId, requestId))
+      .orderBy(desc(technicianDocumentRequestFiles.uploadedAt));
+  }
+
+  async getDocumentRequestFileById(id: string): Promise<TechnicianDocumentRequestFile | undefined> {
+    const result = await db.select()
+      .from(technicianDocumentRequestFiles)
+      .where(eq(technicianDocumentRequestFiles.id, id))
+      .limit(1);
+    return result[0];
+  }
+
+  async deleteDocumentRequestFile(id: string): Promise<boolean> {
+    const result = await db.delete(technicianDocumentRequestFiles)
+      .where(eq(technicianDocumentRequestFiles.id, id))
+      .returning();
+    return result.length > 0;
   }
 }
 
