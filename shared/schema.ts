@@ -2732,9 +2732,10 @@ export type DocumentQuiz = typeof documentQuizzes.$inferSelect;
 export type InsertDocumentQuiz = z.infer<typeof insertDocumentQuizSchema>;
 
 // Quiz Attempts - Tracks employee attempts at completing quizzes
+// Note: quizId can be either a documentQuizzes.id, a certification quiz ID (cert_*), or a safety quiz ID (safety_*)
 export const quizAttempts = pgTable("quiz_attempts", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  quizId: varchar("quiz_id").notNull().references(() => documentQuizzes.id, { onDelete: "cascade" }),
+  quizId: varchar("quiz_id").notNull(), // Removed FK constraint to allow cert/safety quiz IDs
   employeeId: varchar("employee_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   score: real("score").notNull(), // Percentage score (0-100)
