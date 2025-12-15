@@ -15,7 +15,7 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Download, Calendar, DollarSign, Upload, Trash2, Shield, BookOpen, ArrowLeft, AlertTriangle, Plus, FileCheck, ChevronDown, ChevronRight, FolderOpen, CalendarRange, Package, Loader2, Users, Eye, PenLine, Clock, CheckCircle2, AlertCircle, HardHat, ClipboardList, CheckCircle } from "lucide-react";
+import { FileText, Download, Calendar, DollarSign, Upload, Trash2, Shield, BookOpen, ArrowLeft, AlertTriangle, Plus, FileCheck, ChevronDown, ChevronRight, FolderOpen, CalendarRange, Package, Loader2, Users, Eye, PenLine, Clock, CheckCircle2, AlertCircle, HardHat, ClipboardList, CheckCircle, GraduationCap } from "lucide-react";
 import { CardDescription } from "@/components/ui/card";
 import { hasFinancialAccess, canViewSafetyDocuments, canViewSensitiveDocuments } from "@/lib/permissions";
 import { useToast } from "@/hooks/use-toast";
@@ -2513,6 +2513,13 @@ export default function Documents() {
     enabled: userData?.user?.role === 'company' || userData?.user?.role === 'operations_manager',
   });
   const companyQuizzes = quizzesData?.quizzes || [];
+
+  // Fetch certification practice quizzes (IRATA/SPRAT)
+  const { data: certQuizzesData } = useQuery<{ quizzes: any[] }>({
+    queryKey: ["/api/quiz/available"],
+    enabled: userData?.user?.role === 'company' || userData?.user?.role === 'operations_manager',
+  });
+  const certificationQuizzes = (certQuizzesData?.quizzes || []).filter((q: any) => q.quizCategory === 'certification');
 
   // Mutation to generate quiz from document
   const generateQuizMutation = useMutation({
@@ -7228,6 +7235,7 @@ export default function Documents() {
 
         {/* Quizzes - show all company quizzes */}
         {activeTab === "quizzes" && canUploadDocuments && (
+          <>
           <Card className="mb-6 overflow-hidden">
             <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
               <div className="flex items-start gap-4">
@@ -7286,6 +7294,59 @@ export default function Documents() {
               )}
             </CardContent>
           </Card>
+
+          {/* Certification Practice Quizzes */}
+          {certificationQuizzes.length > 0 && (
+            <Card className="mb-6 overflow-hidden">
+              <CardHeader className="bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-transparent pb-4">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-blue-500/10 rounded-xl ring-1 ring-blue-500/20">
+                    <GraduationCap className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <div className="flex-1">
+                    <CardTitle className="text-xl mb-1">{t('documents.certificationQuizzes', 'Certification Practice Quizzes')}</CardTitle>
+                    <p className="text-sm text-muted-foreground">{t('documents.certificationQuizzesDesc', 'IRATA and SPRAT practice quizzes for technician certification prep')}</p>
+                  </div>
+                  <Badge variant="secondary" className="text-base font-semibold px-3">
+                    {certificationQuizzes.length}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <div className="space-y-3">
+                  {certificationQuizzes.map((quiz: any) => {
+                    const certBadgeColor = quiz.certification === 'irata' 
+                      ? 'bg-blue-600 text-white' 
+                      : 'bg-orange-600 text-white';
+                    return (
+                      <div key={quiz.id} className="flex items-center gap-4 p-4 rounded-lg border bg-card hover-elevate" data-testid={`cert-quiz-card-${quiz.id}`}>
+                        <div className={`p-2 rounded-lg ${quiz.certification === 'irata' ? 'bg-blue-500/10' : 'bg-orange-500/10'}`}>
+                          <GraduationCap className={`h-5 w-5 ${quiz.certification === 'irata' ? 'text-blue-600' : 'text-orange-600'}`} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-medium">{quiz.title}</span>
+                            {quiz.certification && quiz.level && (
+                              <Badge className={certBadgeColor} size="sm">
+                                {quiz.certification.toUpperCase()} L{quiz.level}
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {quiz.questionCount} {t('documents.questions', 'questions')}
+                          </div>
+                        </div>
+                        <Badge variant="outline">
+                          {t('documents.available', 'Available')}
+                        </Badge>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </>
         )}
 
         {/* Method Statements - only shown when selected from dropdown */}
