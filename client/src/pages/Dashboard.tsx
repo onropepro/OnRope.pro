@@ -322,6 +322,7 @@ const clientSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   company: z.string().optional(),
+  email: z.string().email("Invalid email address").optional().or(z.literal("")),
   address: z.string().optional(),
   phoneNumber: z.string().optional(),
   lmsNumbers: z.array(z.string()).default([]),
@@ -2570,6 +2571,7 @@ export default function Dashboard() {
       firstName: client.firstName,
       lastName: client.lastName,
       company: client.company || "",
+      email: client.email || "",
       address: client.address || "",
       phoneNumber: client.phoneNumber || "",
       billingAddress: client.billingAddress || "",
@@ -7257,6 +7259,20 @@ export default function Dashboard() {
 
                       <FormField
                         control={clientForm.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t('dashboard.clientForm.emailOptional', 'Email (Optional)')}</FormLabel>
+                            <FormControl>
+                              <Input type="email" placeholder="john@example.com" {...field} className="h-12" data-testid="input-client-email" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={clientForm.control}
                         name="address"
                         render={({ field }) => (
                           <FormItem>
@@ -7583,6 +7599,7 @@ export default function Dashboard() {
                     firstName: data.firstName || "",
                     lastName: data.lastName || "",
                     company: data.company || "",
+                    email: data.email || "",
                     phoneNumber: data.phone || data.mobile || "",
                     address: data.address || "",
                     billingAddress: "",
@@ -7650,6 +7667,11 @@ export default function Dashboard() {
                                 {client.phoneNumber && (
                                   <div className="text-sm text-muted-foreground mb-1">
                                     {client.phoneNumber}
+                                  </div>
+                                )}
+                                {client.email && (
+                                  <div className="text-sm text-muted-foreground mb-1">
+                                    {client.email}
                                   </div>
                                 )}
                                 {client.lmsNumbers && client.lmsNumbers.length > 0 && (
@@ -7762,6 +7784,20 @@ export default function Dashboard() {
                     <FormLabel>{t('dashboard.clientForm.phoneOptional', 'Phone Number (Optional)')}</FormLabel>
                     <FormControl>
                       <Input placeholder="(604) 555-1234" {...field} className="h-12" data-testid="input-edit-client-phone" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={editClientForm.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('dashboard.clientForm.emailOptional', 'Email (Optional)')}</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="john@example.com" {...field} className="h-12" data-testid="input-edit-client-email" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
