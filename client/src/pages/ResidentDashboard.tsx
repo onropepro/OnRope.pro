@@ -108,6 +108,11 @@ export default function ResidentDashboard() {
     queryKey: ["/api/complaints"],
   });
 
+  // Fetch work notices for resident
+  const { data: workNoticesData } = useQuery({
+    queryKey: ["/api/resident/work-notices"],
+  });
+
   // Fetch photos tagged with resident's unit number
   const { data: unitPhotosData } = useQuery({
     queryKey: ["/api/my-unit-photos"],
@@ -782,7 +787,7 @@ export default function ResidentDashboard() {
           }
         }} className="w-full">
           <TabsList 
-            className="grid w-full grid-cols-4 mb-4"
+            className="grid w-full grid-cols-5 mb-4"
             style={hasCustomBranding && primaryColor ? {
               borderColor: `${primaryColor}20`
             } : {}}
@@ -840,6 +845,25 @@ export default function ResidentDashboard() {
                   data-testid="badge-new-responses"
                 >
                   {newResponsesCount}
+                </Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger 
+              value="notices" 
+              data-testid="tab-notices"
+              className="relative"
+              style={hasCustomBranding && primaryColor ? {
+                '--custom-primary': primaryColor
+              } as React.CSSProperties : {}}
+            >
+              Notices
+              {(workNoticesData?.notices?.length || 0) > 0 && (
+                <Badge 
+                  variant="secondary" 
+                  className="absolute -top-1 -right-1 h-4 min-w-[16px] flex items-center justify-center px-1 text-[10px] font-bold"
+                  data-testid="badge-notices-count"
+                >
+                  {workNoticesData?.notices?.length || 0}
                 </Badge>
               )}
             </TabsTrigger>
@@ -1276,6 +1300,115 @@ export default function ResidentDashboard() {
                     })}
                   </div>
                 )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="notices" className="mt-6">
+            <div className="bg-card/60 backdrop-blur-sm rounded-2xl border border-border/50 shadow-xl p-6 sm:p-8">
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold mb-2">Work Notices</h2>
+                <p className="text-muted-foreground">Important notices about upcoming and ongoing work at your building</p>
+              </div>
+              {!workNoticesData?.notices || workNoticesData.notices.length === 0 ? (
+                <div className="text-center py-8">
+                  <span className="material-icons text-6xl text-muted-foreground mb-3">notifications</span>
+                  <p className="text-muted-foreground">No work notices at this time</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {workNoticesData.notices.map((notice: any) => (
+                    <Card 
+                      key={notice.id} 
+                      className="border shadow-sm"
+                      data-testid={`work-notice-${notice.id}`}
+                    >
+                      <CardContent className="p-4 sm:p-6">
+                        {/* Header with logo and title */}
+                        <div className="flex items-start gap-4 mb-4">
+                          {notice.logoUrl && (
+                            <img 
+                              src={notice.logoUrl} 
+                              alt="Company logo" 
+                              className="h-12 w-auto object-contain flex-shrink-0"
+                            />
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-lg font-semibold">{notice.title}</h3>
+                            <p className="text-sm text-muted-foreground">{notice.buildingName}</p>
+                          </div>
+                        </div>
+
+                        {/* Work dates */}
+                        <div className="flex items-center gap-2 mb-4 p-3 rounded-lg bg-muted/50">
+                          <span className="material-icons text-muted-foreground">calendar_today</span>
+                          <div className="text-sm">
+                            <span className="font-medium">Work Period: </span>
+                            {notice.workStartDate && notice.workEndDate ? (
+                              <span>
+                                {new Date(notice.workStartDate).toLocaleDateString()} - {new Date(notice.workEndDate).toLocaleDateString()}
+                              </span>
+                            ) : notice.workStartDate ? (
+                              <span>Starting {new Date(notice.workStartDate).toLocaleDateString()}</span>
+                            ) : (
+                              <span>Dates to be announced</span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Work hours */}
+                        {(notice.workStartTime || notice.workEndTime) && (
+                          <div className="flex items-center gap-2 mb-4 p-3 rounded-lg bg-muted/50">
+                            <span className="material-icons text-muted-foreground">schedule</span>
+                            <div className="text-sm">
+                              <span className="font-medium">Work Hours: </span>
+                              <span>{notice.workStartTime || 'TBD'} - {notice.workEndTime || 'TBD'}</span>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Job type */}
+                        {notice.jobType && (
+                          <div className="flex items-center gap-2 mb-4">
+                            <Badge variant="outline" className="capitalize">
+                              {notice.jobType.replace(/_/g, ' ')}
+                            </Badge>
+                          </div>
+                        )}
+
+                        {/* Notice content */}
+                        <div className="prose prose-sm max-w-none dark:prose-invert">
+                          <div className="whitespace-pre-wrap text-sm">{notice.content}</div>
+                        </div>
+
+                        {/* Contractors */}
+                        {notice.contractors && (
+                          <div className="mt-4 pt-4 border-t">
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <span className="material-icons text-sm">engineering</span>
+                              <span>Contractor: {notice.contractors}</span>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Contact information */}
+                        {notice.contactInfo && (
+                          <div className="mt-2">
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <span className="material-icons text-sm">contact_phone</span>
+                              <span>Contact: {notice.contactInfo}</span>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Posted date */}
+                        <div className="mt-4 pt-4 border-t text-xs text-muted-foreground">
+                          Posted: {formatTimestampDate(notice.createdAt)}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
             </div>
           </TabsContent>
         </Tabs>
