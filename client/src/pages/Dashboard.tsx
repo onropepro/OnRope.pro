@@ -9205,8 +9205,8 @@ export default function Dashboard() {
                     </CardContent>
                   </Card>
 
-                  {/* Document Requests - Only for rope access technicians */}
-                  {employeeToView.role === 'rope_access_tech' && companyIdForData && (
+                  {/* Document Requests - Only for company owners viewing rope access technicians */}
+                  {user?.role === 'company' && employeeToView.role === 'rope_access_tech' && companyIdForData && (
                     <EmployerDocumentRequests
                       technicianId={employeeToView.id}
                       technicianName={employeeToView.name || employeeToView.email}
