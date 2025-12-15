@@ -110,6 +110,7 @@ import {
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import { QuizSection } from "@/components/QuizSection";
+import { TechnicianDocumentRequests } from "@/components/TechnicianDocumentRequests";
 
 type Language = 'en' | 'fr';
 
@@ -2082,6 +2083,11 @@ export default function TechnicianPortal() {
                 <p className="text-xs text-muted-foreground">{t.personalSafetyDocsDesc}</p>
               </button>
             </div>
+
+            {/* Document Requests from Employers */}
+            {user && user.role === 'rope_access_tech' && (
+              <TechnicianDocumentRequests language={language} />
+            )}
 
             {/* Safety Quizzes Section - Show for all technicians (certification/safety quizzes always available) */}
             {user && user.role === 'rope_access_tech' && !user.terminatedDate && (

@@ -7,6 +7,7 @@ import { BrandingContext } from "@/App";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { PurchaseSeatsDialog } from "@/components/PurchaseSeatsDialog";
+import { EmployerDocumentRequests } from "@/components/EmployerDocumentRequests";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -9202,6 +9203,15 @@ export default function Dashboard() {
                       })()}
                     </CardContent>
                   </Card>
+
+                  {/* Document Requests - Only for rope access technicians */}
+                  {employeeToView.role === 'rope_access_tech' && user?.companyId && (
+                    <EmployerDocumentRequests
+                      technicianId={employeeToView.id}
+                      technicianName={employeeToView.name || employeeToView.email}
+                      companyId={user.companyId}
+                    />
+                  )}
                 </div>
               </div>
             </>
