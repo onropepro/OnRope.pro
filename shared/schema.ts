@@ -68,6 +68,7 @@ export const users = pgTable("users", {
   province: varchar("province"), // for company role - province/state
   country: varchar("country"), // for company role - country
   zipCode: varchar("zip_code"), // for company role - postal/zip code
+  timezone: varchar("timezone").default("America/Vancouver"), // IANA timezone for company (e.g., "America/Vancouver", "America/Toronto")
   
   // Shared fields
   name: varchar("name"), // for resident and employee roles
@@ -416,6 +417,7 @@ export const projects = pgTable("projects", {
   overallCompletionPercentage: integer("overall_completion_percentage"), // 0-100
   lastProgressUpdateBy: varchar("last_progress_update_by"), // User ID of last tech to update progress
   lastProgressUpdateAt: timestamp("last_progress_update_at"), // When progress was last updated
+  timezone: varchar("timezone"), // IANA timezone override for project (e.g., "America/Toronto") - falls back to company timezone if null
   
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
