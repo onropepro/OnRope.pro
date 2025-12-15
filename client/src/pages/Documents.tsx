@@ -15,7 +15,8 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Download, Calendar, DollarSign, Upload, Trash2, Shield, BookOpen, ArrowLeft, AlertTriangle, Plus, FileCheck, ChevronDown, ChevronRight, FolderOpen, CalendarRange, Package, Loader2, Users, Eye, PenLine, Clock, CheckCircle2, AlertCircle, HardHat, ClipboardList, CheckCircle, GraduationCap } from "lucide-react";
+import { FileText, Download, Calendar, DollarSign, Upload, Trash2, Shield, BookOpen, ArrowLeft, AlertTriangle, Plus, FileCheck, ChevronDown, ChevronRight, FolderOpen, CalendarRange, Package, Loader2, Users, Eye, PenLine, Clock, CheckCircle2, AlertCircle, HardHat, ClipboardList, CheckCircle, GraduationCap, ArrowRight, ChevronLeft, Trophy, XCircle } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { CardDescription } from "@/components/ui/card";
 import { hasFinancialAccess, canViewSafetyDocuments, canViewSensitiveDocuments } from "@/lib/permissions";
 import { useToast } from "@/hooks/use-toast";
@@ -2560,6 +2561,79 @@ export default function Documents() {
   const swpSignatureRef = useRef<SignatureCanvas>(null);
   const [isSwpSignDialogOpen, setIsSwpSignDialogOpen] = useState(false);
   const [pendingSwpReview, setPendingSwpReview] = useState<any>(null);
+
+  // Quiz taking state
+  const [selectedCertQuiz, setSelectedCertQuiz] = useState<any>(null);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({});
+  const [quizResult, setQuizResult] = useState<any>(null);
+  const [isSubmittingQuiz, setIsSubmittingQuiz] = useState(false);
+
+  // Fetch quiz questions when a certification quiz is selected
+  const { data: quizQuestionsData, isLoading: loadingQuizQuestions } = useQuery<{ quiz: { questions: Array<{ questionNumber: number; question: string; options: { A: string; B: string; C: string; D: string } }> } }>({
+    queryKey: ["/api/quiz", selectedCertQuiz?.id],
+    enabled: !!selectedCertQuiz && !quizResult,
+  });
+
+  const quizQuestions = quizQuestionsData?.quiz?.questions || [];
+  const currentQuestion = quizQuestions[currentQuestionIndex];
+  const answeredCount = Object.keys(quizAnswers).length;
+  const quizProgress = quizQuestions.length > 0 ? (answeredCount / quizQuestions.length) * 100 : 0;
+
+  const handleStartCertQuiz = (quiz: any) => {
+    setSelectedCertQuiz(quiz);
+    setCurrentQuestionIndex(0);
+    setQuizAnswers({});
+    setQuizResult(null);
+  };
+
+  const handleSelectQuizAnswer = (questionNumber: number, answer: string) => {
+    setQuizAnswers(prev => ({ ...prev, [questionNumber]: answer }));
+  };
+
+  const handleNextQuizQuestion = () => {
+    if (currentQuestionIndex < quizQuestions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
+    }
+  };
+
+  const handlePrevQuizQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(prev => prev - 1);
+    }
+  };
+
+  const handleSubmitCertQuiz = async () => {
+    if (!selectedCertQuiz) return;
+
+    const answersArray = quizQuestions.map(q => ({
+      questionNumber: q.questionNumber,
+      selectedAnswer: quizAnswers[q.questionNumber] || '',
+    }));
+
+    setIsSubmittingQuiz(true);
+    try {
+      const response = await apiRequest('POST', `/api/quiz/${selectedCertQuiz.id}/submit`, { answers: answersArray });
+      const result = await response.json();
+      setQuizResult(result);
+      queryClient.invalidateQueries({ queryKey: ['/api/quiz/available'] });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: t('documents.quizError', 'Error'),
+        description: error.message || t('documents.quizSubmitFailed', 'Failed to submit quiz'),
+      });
+    } finally {
+      setIsSubmittingQuiz(false);
+    }
+  };
+
+  const handleCloseCertQuiz = () => {
+    setSelectedCertQuiz(null);
+    setCurrentQuestionIndex(0);
+    setQuizAnswers({});
+    setQuizResult(null);
+  };
 
   // Find if the current SWP has a pending review for the user
   const findMyPendingSwpReview = (swpTitle: string) => {
@@ -7327,7 +7401,7 @@ export default function Documents() {
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="font-medium">{quiz.title}</span>
                             {quiz.certification && quiz.level && (
-                              <Badge className={certBadgeColor} size="sm">
+                              <Badge className={certBadgeColor}>
                                 {quiz.certification.toUpperCase()} L{quiz.level}
                               </Badge>
                             )}
@@ -7336,9 +7410,23 @@ export default function Documents() {
                             {quiz.questionCount} {t('documents.questions', 'questions')}
                           </div>
                         </div>
-                        <Badge variant="outline">
-                          {t('documents.available', 'Available')}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          {quiz.hasPassed ? (
+                            <Badge variant="default" className="bg-green-600 text-white">
+                              <CheckCircle2 className="h-3 w-3 mr-1" />
+                              {t('documents.completed', 'Completed')}
+                            </Badge>
+                          ) : (
+                            <Button
+                              size="sm"
+                              onClick={() => handleStartCertQuiz(quiz)}
+                              data-testid={`start-cert-quiz-${quiz.id}`}
+                            >
+                              {quiz.attemptCount > 0 ? t('documents.retry', 'Retry') : t('documents.startQuiz', 'Start Quiz')}
+                              <ArrowRight className="h-4 w-4 ml-1" />
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     );
                   })}
@@ -7822,6 +7910,171 @@ export default function Documents() {
                   Submit Signature
                 </>
               )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Certification Quiz Taking Dialog */}
+      <Dialog open={!!selectedCertQuiz && !quizResult} onOpenChange={(open) => !open && handleCloseCertQuiz()}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {selectedCertQuiz?.title}
+              {selectedCertQuiz?.certification && selectedCertQuiz?.level && (
+                <Badge className={selectedCertQuiz.certification === 'irata' ? 'bg-blue-600 text-white' : 'bg-orange-600 text-white'}>
+                  {selectedCertQuiz.certification.toUpperCase()} L{selectedCertQuiz.level}
+                </Badge>
+              )}
+            </DialogTitle>
+            <DialogDescription>
+              {t('documents.quizPassRequirement', 'Answer all questions to the best of your ability. You need 80% to pass.')}
+            </DialogDescription>
+          </DialogHeader>
+
+          {loadingQuizQuestions ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : currentQuestion ? (
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">
+                    {t('documents.questionOf', 'Question {{current}} of {{total}}', { current: currentQuestionIndex + 1, total: quizQuestions.length })}
+                  </span>
+                  <span className="text-muted-foreground">
+                    {answeredCount} {t('documents.answered', 'answered')}
+                  </span>
+                </div>
+                <Progress value={quizProgress} className="h-2" />
+              </div>
+
+              <div className="space-y-4">
+                <p className="text-lg font-medium">{currentQuestion.question}</p>
+                <RadioGroup
+                  value={quizAnswers[currentQuestion.questionNumber] || ''}
+                  onValueChange={(value) => handleSelectQuizAnswer(currentQuestion.questionNumber, value)}
+                  className="space-y-3"
+                >
+                  {Object.entries(currentQuestion.options).map(([key, value]) => (
+                    <div key={key} className="flex items-center space-x-3 p-3 rounded-lg border hover-elevate">
+                      <RadioGroupItem value={key} id={`quiz-option-${key}`} data-testid={`quiz-option-${key}`} />
+                      <Label htmlFor={`quiz-option-${key}`} className="flex-1 cursor-pointer">
+                        <span className="font-semibold mr-2">{key}.</span>
+                        {value}
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </div>
+
+              <div className="flex items-center justify-between gap-2">
+                <Button
+                  variant="outline"
+                  onClick={handlePrevQuizQuestion}
+                  disabled={currentQuestionIndex === 0}
+                  data-testid="button-prev-quiz-question"
+                >
+                  <ChevronLeft className="h-4 w-4 mr-1" />
+                  {t('documents.previous', 'Previous')}
+                </Button>
+                <div className="flex gap-2">
+                  {currentQuestionIndex < quizQuestions.length - 1 ? (
+                    <Button
+                      onClick={handleNextQuizQuestion}
+                      data-testid="button-next-quiz-question"
+                    >
+                      {t('documents.next', 'Next')}
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={handleSubmitCertQuiz}
+                      disabled={isSubmittingQuiz || answeredCount < quizQuestions.length}
+                      data-testid="button-submit-cert-quiz"
+                    >
+                      {isSubmittingQuiz ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                          {t('documents.submitting', 'Submitting...')}
+                        </>
+                      ) : (
+                        <>
+                          {t('documents.submitQuiz', 'Submit Quiz')}
+                          <CheckCircle2 className="h-4 w-4 ml-1" />
+                        </>
+                      )}
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              {currentQuestionIndex === quizQuestions.length - 1 && answeredCount < quizQuestions.length && (
+                <div className="flex items-center gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400">
+                  <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                  <span className="text-sm">
+                    {quizQuestions.length - answeredCount} {t('documents.questionsUnanswered', 'question(s) unanswered')}
+                  </span>
+                </div>
+              )}
+            </div>
+          ) : null}
+        </DialogContent>
+      </Dialog>
+
+      {/* Quiz Results Dialog */}
+      <Dialog open={!!quizResult} onOpenChange={(open) => !open && handleCloseCertQuiz()}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {quizResult?.passed ? (
+                <Trophy className="h-6 w-6 text-amber-500" />
+              ) : (
+                <XCircle className="h-6 w-6 text-destructive" />
+              )}
+              {quizResult?.passed ? t('documents.quizPassed', 'Quiz Passed') : t('documents.quizNotPassed', 'Quiz Not Passed')}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-6 py-4">
+            <div className="text-center">
+              <div className={`text-5xl font-bold ${quizResult?.passed ? 'text-green-600' : 'text-destructive'}`}>
+                {quizResult?.score}%
+              </div>
+              <p className="text-muted-foreground mt-2">
+                {quizResult?.correctAnswers} {t('documents.outOf', 'out of')} {quizResult?.totalQuestions} {t('documents.correct', 'correct')}
+              </p>
+            </div>
+
+            <div className={`p-4 rounded-lg ${quizResult?.passed ? 'bg-green-500/10 border border-green-500/20' : 'bg-destructive/10 border border-destructive/20'}`}>
+              {quizResult?.passed ? (
+                <div className="flex items-start gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-green-600 dark:text-green-400">{t('documents.congratulations', 'Congratulations!')}</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {t('documents.quizPassedDesc', 'You have successfully passed this quiz.')}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-start gap-3">
+                  <XCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-destructive">{t('documents.notQuiteYet', 'Not quite there')}</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {t('documents.quizFailedDesc', 'You need 80% to pass. Review the material and try again.')}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button onClick={handleCloseCertQuiz} className="w-full" data-testid="button-close-quiz-results">
+              {quizResult?.passed ? t('documents.done', 'Done') : t('documents.close', 'Close')}
             </Button>
           </DialogFooter>
         </DialogContent>
