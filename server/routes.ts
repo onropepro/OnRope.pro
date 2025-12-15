@@ -19354,31 +19354,58 @@ Do not include any other text, just the JSON object.`
 
       // Employees see quizzes from their company
       const companyId = currentUser.role === 'company' ? currentUser.id : currentUser.companyId;
-      if (!companyId) {
-        return res.status(400).json({ message: "No company associated with this account" });
+      
+      // Get company quizzes if user has a company
+      let companyQuizzesWithStatus: any[] = [];
+      if (companyId) {
+        const quizzes = await storage.getQuizzesByCompanyId(companyId);
+        companyQuizzesWithStatus = await Promise.all(
+          quizzes.map(async (quiz) => {
+            const hasPassed = await storage.hasEmployeePassedQuiz(currentUser.id, quiz.id);
+            const attempts = await storage.getQuizAttemptsByEmployee(currentUser.id, quiz.id);
+            return {
+              id: quiz.id,
+              documentType: quiz.documentType,
+              questionCount: Array.isArray(quiz.questions) ? quiz.questions.length : 0,
+              createdAt: quiz.createdAt,
+              hasPassed,
+              attemptCount: attempts.length,
+              lastAttempt: attempts.length > 0 ? attempts[0].completedAt : null,
+              quizCategory: 'company',
+            };
+          })
+        );
       }
 
-      // Get all quizzes for the company
-      const quizzes = await storage.getQuizzesByCompanyId(companyId);
-
-      // For each quiz, check if the employee has passed it
-      const quizzesWithStatus = await Promise.all(
-        quizzes.map(async (quiz) => {
-          const hasPassed = await storage.hasEmployeePassedQuiz(currentUser.id, quiz.id);
-          const attempts = await storage.getQuizAttemptsByEmployee(currentUser.id, quiz.id);
+      // Get certification quizzes based on user's IRATA/SPRAT level
+      const { getQuizzesForUser } = await import('./certificationQuizzes');
+      const certQuizzes = getQuizzesForUser(currentUser.irataLevel, currentUser.spratLevel);
+      
+      const certQuizzesWithStatus = await Promise.all(
+        certQuizzes.map(async (certQuiz) => {
+          const certQuizId = `cert_${certQuiz.quizType}`;
+          const hasPassed = await storage.hasEmployeePassedQuiz(currentUser.id, certQuizId);
+          const attempts = await storage.getQuizAttemptsByEmployee(currentUser.id, certQuizId);
           return {
-            id: quiz.id,
-            documentType: quiz.documentType,
-            questionCount: Array.isArray(quiz.questions) ? quiz.questions.length : 0,
-            createdAt: quiz.createdAt,
+            id: certQuizId,
+            documentType: certQuiz.quizType,
+            title: certQuiz.title,
+            certification: certQuiz.certification,
+            level: certQuiz.level,
+            questionCount: certQuiz.questions.length,
+            createdAt: null,
             hasPassed,
             attemptCount: attempts.length,
             lastAttempt: attempts.length > 0 ? attempts[0].completedAt : null,
+            quizCategory: 'certification',
           };
         })
       );
 
-      res.json({ quizzes: quizzesWithStatus });
+      // Combine both types of quizzes
+      const allQuizzes = [...companyQuizzesWithStatus, ...certQuizzesWithStatus];
+
+      res.json({ quizzes: allQuizzes });
     } catch (error) {
       console.error("Get available quizzes error:", error);
       res.status(500).json({ message: "Internal server error" });
@@ -19394,6 +19421,44 @@ Do not include any other text, just the JSON object.`
         return res.status(404).json({ message: "User not found" });
       }
 
+      // Handle certification quizzes (IDs start with "cert_")
+      if (quizId.startsWith("cert_")) {
+        const { certificationQuizzes, getQuizzesForUser } = await import('./certificationQuizzes');
+        const quizType = quizId.replace("cert_", "");
+        const certQuiz = certificationQuizzes.find(q => q.quizType === quizType);
+        
+        if (!certQuiz) {
+          return res.status(404).json({ message: "Certification quiz not found" });
+        }
+
+        // Verify user has the required certification level
+        const userQuizzes = getQuizzesForUser(currentUser.irataLevel, currentUser.spratLevel);
+        const hasAccess = userQuizzes.some(q => q.quizType === quizType);
+        if (!hasAccess) {
+          return res.status(403).json({ message: "You do not have access to this certification quiz" });
+        }
+
+        // Return questions WITHOUT correct answers
+        const questionsForTaking = certQuiz.questions.map((q) => ({
+          questionNumber: q.questionNumber,
+          question: q.question,
+          options: q.options,
+        }));
+
+        return res.json({
+          quiz: {
+            id: quizId,
+            documentType: certQuiz.quizType,
+            title: certQuiz.title,
+            certification: certQuiz.certification,
+            level: certQuiz.level,
+            quizCategory: 'certification',
+            questions: questionsForTaking,
+          }
+        });
+      }
+
+      // Handle company quizzes (from database)
       const quiz = await storage.getQuizById(quizId);
       if (!quiz) {
         return res.status(404).json({ message: "Quiz not found" });
@@ -19413,9 +19478,12 @@ Do not include any other text, just the JSON object.`
       }));
 
       res.json({
-        id: quiz.id,
-        documentType: quiz.documentType,
-        questions: questionsForTaking,
+        quiz: {
+          id: quiz.id,
+          documentType: quiz.documentType,
+          quizCategory: 'company',
+          questions: questionsForTaking,
+        }
       });
     } catch (error) {
       console.error("Get quiz error:", error);
@@ -19427,13 +19495,82 @@ Do not include any other text, just the JSON object.`
   app.post("/api/quiz/:quizId/submit", requireAuth, async (req: Request, res: Response) => {
     try {
       const { quizId } = req.params;
-      const { answers } = req.body; // { questionNumber: "A"|"B"|"C"|"D" }
+      const { answers } = req.body; // Array of { questionNumber, selectedAnswer }
 
       const currentUser = await storage.getUserById(req.session.userId!);
       if (!currentUser) {
         return res.status(404).json({ message: "User not found" });
       }
 
+      if (!answers || !Array.isArray(answers)) {
+        return res.status(400).json({ message: "Answers are required as an array" });
+      }
+
+      // Handle certification quizzes (IDs start with "cert_")
+      if (quizId.startsWith("cert_")) {
+        const { certificationQuizzes, getQuizzesForUser } = await import('./certificationQuizzes');
+        const quizType = quizId.replace("cert_", "");
+        const certQuiz = certificationQuizzes.find(q => q.quizType === quizType);
+        
+        if (!certQuiz) {
+          return res.status(404).json({ message: "Certification quiz not found" });
+        }
+        
+        // Verify access based on user's certification level
+        const userQuizzes = getQuizzesForUser(currentUser.irataLevel, currentUser.spratLevel);
+        const hasAccess = userQuizzes.some(q => q.quizType === quizType);
+        if (!hasAccess) {
+          return res.status(403).json({ message: "Access denied - insufficient certification level" });
+        }
+        
+        // Convert answers array to lookup object
+        const answersMap: Record<number, string> = {};
+        for (const ans of answers) {
+          answersMap[ans.questionNumber] = ans.selectedAnswer;
+        }
+        
+        // Grade the quiz
+        const questions = certQuiz.questions;
+        let correctCount = 0;
+        const gradedAnswers: any[] = [];
+
+        for (const question of questions) {
+          const userAnswer = answersMap[question.questionNumber];
+          const isCorrect = userAnswer === question.correctAnswer;
+          if (isCorrect) correctCount++;
+
+          gradedAnswers.push({
+            questionNumber: question.questionNumber,
+            selected: userAnswer || null,
+            correct: question.correctAnswer,
+            isCorrect,
+          });
+        }
+
+        const totalQuestions = questions.length;
+        const score = Math.round((correctCount / totalQuestions) * 100);
+        const passed = score >= 80;
+
+        // Save the attempt (use quizId as the cert_ ID)
+        const attempt = await storage.createQuizAttempt({
+          quizId: quizId,
+          employeeId: currentUser.id,
+          companyId: currentUser.companyId || 'system',
+          score,
+          passed,
+          answers: gradedAnswers,
+        });
+
+        return res.json({
+          score,
+          passed,
+          correctAnswers: correctCount,
+          totalQuestions,
+          answers: gradedAnswers,
+        });
+      }
+
+      // Handle company quizzes (from database)
       const quiz = await storage.getQuizById(quizId);
       if (!quiz) {
         return res.status(404).json({ message: "Quiz not found" });
@@ -19445,8 +19582,10 @@ Do not include any other text, just the JSON object.`
         return res.status(403).json({ message: "Access denied" });
       }
 
-      if (!answers || typeof answers !== 'object') {
-        return res.status(400).json({ message: "Answers are required" });
+      // Convert answers array to lookup object
+      const answersMap: Record<number, string> = {};
+      for (const ans of answers) {
+        answersMap[ans.questionNumber] = ans.selectedAnswer;
       }
 
       // Grade the quiz
@@ -19455,14 +19594,14 @@ Do not include any other text, just the JSON object.`
       const gradedAnswers: any[] = [];
 
       for (const question of questions) {
-        const userAnswer = answers[question.questionNumber];
+        const userAnswer = answersMap[question.questionNumber];
         const isCorrect = userAnswer === question.correctAnswer;
         if (isCorrect) correctCount++;
 
         gradedAnswers.push({
           questionNumber: question.questionNumber,
-          userAnswer: userAnswer || null,
-          correctAnswer: question.correctAnswer,
+          selected: userAnswer || null,
+          correct: question.correctAnswer,
           isCorrect,
         });
       }
@@ -19482,14 +19621,11 @@ Do not include any other text, just the JSON object.`
       });
 
       res.json({
-        attempt,
-        correctCount,
-        totalQuestions,
         score,
         passed,
-        message: passed 
-          ? "Congratulations! You passed the quiz." 
-          : `You scored ${score}%. You need 80% to pass. Please try again.`,
+        correctAnswers: correctCount,
+        totalQuestions,
+        answers: gradedAnswers,
       });
     } catch (error) {
       console.error("Submit quiz error:", error);

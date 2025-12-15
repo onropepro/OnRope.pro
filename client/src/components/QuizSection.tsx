@@ -7,15 +7,19 @@ import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { ClipboardList, CheckCircle2, XCircle, Clock, ArrowRight, Loader2, Trophy, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { ClipboardList, CheckCircle2, XCircle, Clock, ArrowRight, Loader2, Trophy, AlertCircle, ChevronLeft, ChevronRight, Award, GraduationCap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 
 interface Quiz {
-  id: number;
-  documentType: string;
+  id: string | number;
+  documentType?: string;
+  title?: string;
+  certification?: "irata" | "sprat";
+  level?: number;
+  quizCategory: "company" | "certification";
   questionCount: number;
-  createdAt: string;
+  createdAt?: string;
   hasPassed: boolean;
   attemptCount: number;
   lastAttempt: string | null;
@@ -54,7 +58,7 @@ export function QuizSection() {
   });
 
   // Fetch quiz questions when a quiz is selected
-  const { data: questionsData, isLoading: loadingQuestions } = useQuery<{ quiz: { id: number; documentType: string; questions: Question[] } }>({
+  const { data: questionsData, isLoading: loadingQuestions } = useQuery<{ quiz: { id: string | number; documentType?: string; title?: string; certification?: string; level?: number; quizCategory?: string; questions: Question[] } }>({
     queryKey: ["/api/quiz", selectedQuiz?.id],
     enabled: !!selectedQuiz && !quizResult,
   });
@@ -62,6 +66,20 @@ export function QuizSection() {
   const quizzes = quizzesData?.quizzes || [];
   const questions = questionsData?.quiz?.questions || [];
   const currentQuestion = questions[currentQuestionIndex];
+
+  // Separate company quizzes from certification quizzes
+  const companyQuizzes = quizzes.filter(q => q.quizCategory === 'company');
+  const certificationQuizzes = quizzes.filter(q => q.quizCategory === 'certification');
+
+  const getQuizTitle = (quiz: Quiz) => {
+    if (quiz.quizCategory === 'certification' && quiz.title) {
+      return quiz.title;
+    }
+    if (quiz.documentType) {
+      return getDocumentTypeLabel(quiz.documentType);
+    }
+    return 'Quiz';
+  };
 
   const getDocumentTypeLabel = (type: string) => {
     switch (type) {
@@ -133,6 +151,65 @@ export function QuizSection() {
   const answeredCount = Object.keys(answers).length;
   const progress = questions.length > 0 ? (answeredCount / questions.length) * 100 : 0;
 
+  const renderQuizCard = (quiz: Quiz) => {
+    const isCertQuiz = quiz.quizCategory === 'certification';
+    const certBadgeColor = quiz.certification === 'irata' 
+      ? 'bg-blue-600 text-white' 
+      : 'bg-orange-600 text-white';
+
+    return (
+      <div
+        key={quiz.id}
+        className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate"
+        data-testid={`quiz-card-${quiz.id}`}
+      >
+        <div className={`p-3 rounded-xl ${isCertQuiz ? (quiz.certification === 'irata' ? 'bg-blue-500/10' : 'bg-orange-500/10') : 'bg-primary/10'}`}>
+          {isCertQuiz ? (
+            <GraduationCap className={`h-6 w-6 ${quiz.certification === 'irata' ? 'text-blue-600' : 'text-orange-600'}`} />
+          ) : (
+            <ClipboardList className="h-6 w-6 text-primary" />
+          )}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-semibold">{getQuizTitle(quiz)}</span>
+            {isCertQuiz && quiz.certification && quiz.level && (
+              <Badge className={certBadgeColor} size="sm">
+                {quiz.certification.toUpperCase()} L{quiz.level}
+              </Badge>
+            )}
+          </div>
+          <div className="text-sm text-muted-foreground flex items-center gap-2 flex-wrap">
+            <span>{quiz.questionCount} questions</span>
+            {quiz.attemptCount > 0 && (
+              <>
+                <span className="text-muted-foreground/50">|</span>
+                <span>{quiz.attemptCount} attempt{quiz.attemptCount !== 1 ? 's' : ''}</span>
+              </>
+            )}
+          </div>
+        </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          {quiz.hasPassed ? (
+            <Badge variant="default" className="bg-green-600 text-white">
+              <CheckCircle2 className="h-3 w-3 mr-1" />
+              Completed
+            </Badge>
+          ) : (
+            <Button
+              size="sm"
+              onClick={() => handleStartQuiz(quiz)}
+              data-testid={`start-quiz-${quiz.id}`}
+            >
+              {quiz.attemptCount > 0 ? 'Retry' : 'Start Quiz'}
+              <ArrowRight className="h-4 w-4 ml-1" />
+            </Button>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   if (isLoading) {
     return (
       <Card>
@@ -176,66 +253,53 @@ export function QuizSection() {
 
   return (
     <>
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <ClipboardList className="h-5 w-5 text-primary" />
-            Safety Quizzes
-          </CardTitle>
-          <CardDescription>Complete quizzes to demonstrate your knowledge and earn CSR points</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4">
-            {quizzes.map((quiz) => (
-              <div
-                key={quiz.id}
-                className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate"
-                data-testid={`quiz-card-${quiz.id}`}
-              >
-                <div className="p-3 bg-primary/10 rounded-xl">
-                  <ClipboardList className="h-6 w-6 text-primary" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-semibold">{getDocumentTypeLabel(quiz.documentType)}</div>
-                  <div className="text-sm text-muted-foreground flex items-center gap-2 flex-wrap">
-                    <span>{quiz.questionCount} questions</span>
-                    {quiz.attemptCount > 0 && (
-                      <>
-                        <span className="text-muted-foreground/50">|</span>
-                        <span>{quiz.attemptCount} attempt{quiz.attemptCount !== 1 ? 's' : ''}</span>
-                      </>
-                    )}
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  {quiz.hasPassed ? (
-                    <Badge variant="default" className="bg-green-600 text-white">
-                      <CheckCircle2 className="h-3 w-3 mr-1" />
-                      Completed
-                    </Badge>
-                  ) : (
-                    <Button
-                      size="sm"
-                      onClick={() => handleStartQuiz(quiz)}
-                      data-testid={`start-quiz-${quiz.id}`}
-                    >
-                      {quiz.attemptCount > 0 ? 'Retry' : 'Start Quiz'}
-                      <ArrowRight className="h-4 w-4 ml-1" />
-                    </Button>
-                  )}
-                </div>
+      <div className="space-y-6">
+        {certificationQuizzes.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <GraduationCap className="h-5 w-5 text-blue-600" />
+                Certification Practice Quizzes
+              </CardTitle>
+              <CardDescription>Test your IRATA/SPRAT knowledge with practice quizzes</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4">
+                {certificationQuizzes.map(renderQuizCard)}
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        )}
+
+        {companyQuizzes.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ClipboardList className="h-5 w-5 text-primary" />
+                Company Safety Quizzes
+              </CardTitle>
+              <CardDescription>Complete quizzes to demonstrate your knowledge and earn CSR points</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4">
+                {companyQuizzes.map(renderQuizCard)}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
 
       {/* Quiz Taking Dialog */}
       <Dialog open={!!selectedQuiz && !quizResult} onOpenChange={(open) => !open && handleCloseQuiz()}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>
-              {selectedQuiz && getDocumentTypeLabel(selectedQuiz.documentType)} Quiz
+            <DialogTitle className="flex items-center gap-2">
+              {selectedQuiz && getQuizTitle(selectedQuiz)}
+              {selectedQuiz?.quizCategory === 'certification' && selectedQuiz.certification && selectedQuiz.level && (
+                <Badge className={selectedQuiz.certification === 'irata' ? 'bg-blue-600 text-white' : 'bg-orange-600 text-white'} size="sm">
+                  {selectedQuiz.certification.toUpperCase()} L{selectedQuiz.level}
+                </Badge>
+              )}
             </DialogTitle>
             <DialogDescription>
               Answer all questions to the best of your ability. You need 80% ({Math.ceil(selectedQuiz?.questionCount ? selectedQuiz.questionCount * 0.8 : 16)}/{selectedQuiz?.questionCount || 20}) to pass.
@@ -372,9 +436,11 @@ export function QuizSection() {
                     <p className="text-sm text-muted-foreground mt-1">
                       You have successfully passed this quiz.
                     </p>
-                    <p className="text-sm font-medium text-green-600 dark:text-green-400 mt-2">
-                      +1 CSR Point earned for your company!
-                    </p>
+                    {selectedQuiz?.quizCategory === 'company' && (
+                      <p className="text-sm font-medium text-green-600 dark:text-green-400 mt-2">
+                        +1 CSR Point earned for your company!
+                      </p>
+                    )}
                   </div>
                 </div>
               ) : (

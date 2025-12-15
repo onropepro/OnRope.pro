@@ -461,6 +461,7 @@ const translations = {
     sendReply: "Send Reply",
     replyPlaceholder: "Type your reply...",
     newResponse: "New Response",
+    close: "Close",
   },
   fr: {
     technicianPortal: "Portail du technicien",
@@ -809,6 +810,7 @@ const translations = {
     sendReply: "Envoyer la réponse",
     replyPlaceholder: "Tapez votre réponse...",
     newResponse: "Nouvelle réponse",
+    close: "Fermer",
   }
 };
 
