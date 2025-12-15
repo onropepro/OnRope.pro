@@ -392,10 +392,10 @@ export default function TechnicianLogin() {
           100% { transform: translateX(0); }
         }
         .animate-scroll-left {
-          animation: scroll-left 40s linear infinite;
+          animation: scroll-left 60s linear infinite;
         }
         .animate-scroll-right {
-          animation: scroll-right 40s linear infinite;
+          animation: scroll-right 60s linear infinite;
         }
         .animate-scroll-left:hover,
         .animate-scroll-right:hover {
