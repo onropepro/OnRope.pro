@@ -7420,11 +7420,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Create notification for the technician
       await db.insert(notifications).values({
-        userId: techId,
+        companyId: techId,
+        actorId: currentUser.id,
         type: 'document_request',
-        title: 'New Document Request',
-        message: `${currentUser.companyName || 'An employer'} has requested: ${title.trim()}`,
-        data: JSON.stringify({ requestId: request.id, companyId, title: title.trim() }),
+        payload: { 
+          requestId: request.id, 
+          employerId: companyId, 
+          employerName: currentUser.companyName || 'An employer',
+          title: title.trim() 
+        },
       });
       
       console.log(`[DocRequest] Company ${companyId} created request ${request.id} for technician ${techId}`);
