@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
-import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown } from "lucide-react";
+import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown, IdCard } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 interface PublicHeaderProps {
@@ -256,6 +256,22 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                         <div className="text-xs text-muted-foreground mt-0.5">Portable identities, certification tracking, permissions</div>
                       </div>
                     </button>
+                    <button
+                      className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                      onClick={() => {
+                        setLocation("/modules/technician-passport");
+                        setShowModulesMenu(false);
+                      }}
+                      data-testid="nav-technician-passport"
+                    >
+                      <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <IdCard className="w-5 h-5 text-amber-600" />
+                      </div>
+                      <div>
+                        <div className="font-semibold text-sm">Technician Passport</div>
+                        <div className="text-xs text-muted-foreground mt-0.5">Portable work history, certifications, career-long records</div>
+                      </div>
+                    </button>
                   </div>
                 </div>
               )}
@@ -385,6 +401,17 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                   >
                     <Users className="w-5 h-5 text-blue-600" />
                     <span className="text-sm">Employee Management</span>
+                  </button>
+                  <button
+                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
+                    onClick={() => {
+                      setLocation("/modules/technician-passport");
+                      setMobileMenuOpen(false);
+                    }}
+                    data-testid="nav-mobile-technician-passport"
+                  >
+                    <IdCard className="w-5 h-5 text-amber-600" />
+                    <span className="text-sm">Technician Passport</span>
                   </button>
                 </div>
               )}
