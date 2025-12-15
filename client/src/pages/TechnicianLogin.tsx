@@ -413,11 +413,11 @@ export default function TechnicianLogin() {
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
           <div className="text-center space-y-6 pt-16">
             <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-module-label">
-              Technician Passport Module
+              Passport for IRATA & SPRAT Technicians
             </Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              Your Hours. Your Certs. Your Career.<br />
+              Your Logged Hours. Your Certs. Your Career.<br />
               <span className="text-blue-100">Finally in One Place.</span>
             </h1>
             
