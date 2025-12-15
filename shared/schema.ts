@@ -424,6 +424,41 @@ export const projects = pgTable("projects", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Work notices table - resident communication notices for projects
+export const workNotices = pgTable("work_notices", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  
+  // Auto-filled from project (stored for historical reference)
+  buildingName: varchar("building_name"),
+  buildingAddress: text("building_address"),
+  strataPlanNumber: varchar("strata_plan_number"),
+  propertyManagerName: varchar("property_manager_name"),
+  contractorName: varchar("contractor_name"), // Company name doing the work
+  jobType: varchar("job_type").notNull(),
+  customJobType: varchar("custom_job_type"),
+  
+  // User-entered fields
+  startDate: date("start_date").notNull(),
+  endDate: date("end_date").notNull(),
+  noticeTitle: varchar("notice_title").notNull(), // Brief title for the notice
+  noticeDetails: text("notice_details").notNull(), // Full notice text (can include selected template)
+  additionalInstructions: text("additional_instructions"), // Extra instructions from user
+  
+  // White label branding
+  companyLogoUrl: text("company_logo_url"), // Logo URL if white label is enabled
+  
+  // Status
+  isPublished: boolean("is_published").notNull().default(true), // Whether visible to residents
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_work_notices_project").on(table.projectId),
+  index("IDX_work_notices_company").on(table.companyId),
+]);
+
 // Custom job types table - tracks company-specific custom job types for reuse
 export const customJobTypes = pgTable("custom_job_types", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -1727,6 +1762,12 @@ export const insertProjectSchema = createInsertSchema(projects)
     }
   });
 
+export const insertWorkNoticeSchema = createInsertSchema(workNotices).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertCustomJobTypeSchema = createInsertSchema(customJobTypes).omit({
   id: true,
   createdAt: true,
@@ -1991,6 +2032,9 @@ export type UserPublic = Omit<User, "passwordHash" | "licenseKey">;
 
 export type Project = typeof projects.$inferSelect;
 export type InsertProject = z.infer<typeof insertProjectSchema>;
+
+export type WorkNotice = typeof workNotices.$inferSelect;
+export type InsertWorkNotice = z.infer<typeof insertWorkNoticeSchema>;
 
 export type CustomJobType = typeof customJobTypes.$inferSelect;
 export type InsertCustomJobType = z.infer<typeof insertCustomJobTypeSchema>;
