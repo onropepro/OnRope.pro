@@ -7309,8 +7309,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Document request not found" });
       }
       
-      // Only allow the technician or the requesting company to download
-      if (user.id !== request.technicianId && user.id !== request.companyId) {
+      // Only allow the technician or users from the requesting company to download
+      const isTechnician = user.id === request.technicianId;
+      const isCompanyOwner = user.id === request.companyId;
+      const isCompanyEmployee = user.companyId === request.companyId;
+      
+      if (!isTechnician && !isCompanyOwner && !isCompanyEmployee) {
         return res.status(403).json({ message: "Unauthorized to download this file" });
       }
       
