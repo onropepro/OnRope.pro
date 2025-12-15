@@ -1132,7 +1132,7 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
           
           <div className="flex-1 overflow-hidden flex flex-col min-h-0">
             {/* Document Content Area */}
-            <div className="flex-1 min-h-0 mb-4">
+            <div className="flex-1 min-h-0 mb-4 overflow-auto" style={{ maxHeight: 'calc(50vh - 50px)' }}>
               {unifiedDocumentUrl ? (
                 <iframe
                   src={unifiedDocumentUrl}
@@ -1141,7 +1141,7 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
                   title={selectedReview?.documentName || 'Document'}
                 />
               ) : selectedSWP ? (
-                <ScrollArea className="h-full max-h-[calc(50vh-100px)] pr-4">
+                <ScrollArea className="h-full pr-4">
                   <div className="space-y-4">
                     <div>
                       <h4 className="font-semibold text-sm mb-2">{t('documents.scope', 'Scope')}</h4>
@@ -1206,7 +1206,7 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
                   </div>
                 </ScrollArea>
               ) : selectedPractice ? (
-                <ScrollArea className="h-full max-h-[calc(50vh-100px)] pr-4">
+                <ScrollArea className="h-full pr-4">
                   <div className="space-y-4">
                     <div>
                       <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
