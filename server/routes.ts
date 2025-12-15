@@ -18,6 +18,7 @@ import { getDefaultElevation } from "@shared/jobTypes";
 import { Resend } from "resend";
 import rateLimit from "express-rate-limit";
 import OpenAI from "openai";
+import { generateQuizFromDocument } from "./gemini";
 
 // SECURITY: Rate limiting for login endpoint to prevent brute force attacks
 const loginRateLimiter = rateLimit({
@@ -19240,6 +19241,269 @@ Do not include any other text, just the JSON object.`
       res.json({ message: "All notifications marked as read" });
     } catch (error) {
       console.error("Mark all read error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // ==================== QUIZ ROUTES ====================
+
+  // Generate quiz from document (AI) - Company owners only
+  app.post("/api/quiz/generate/:documentId", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+    try {
+      const { documentId } = req.params;
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Get the document
+      const document = await storage.getCompanyDocumentById(documentId);
+      if (!document) {
+        return res.status(404).json({ message: "Document not found" });
+      }
+
+      // Verify ownership
+      if (document.companyId !== currentUser.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      // Check document type is valid for quiz generation
+      const validDocTypes = ['health_safety_manual', 'company_policy'];
+      if (!validDocTypes.includes(document.documentType)) {
+        return res.status(400).json({ message: "Quiz generation is only available for Health & Safety Manual and Company Policy documents" });
+      }
+
+      // Check if quiz already exists for this document
+      const existingQuiz = await storage.getQuizByDocumentId(documentId);
+      if (existingQuiz) {
+        return res.status(400).json({ message: "A quiz already exists for this document. Delete it first to regenerate." });
+      }
+
+      // Get the document file from object storage
+      const objectStorage = new ObjectStorageService();
+      const fileData = await objectStorage.getFile(document.filePath);
+      if (!fileData) {
+        return res.status(404).json({ message: "Document file not found in storage" });
+      }
+
+      // Convert to base64
+      const pdfBase64 = fileData.toString('base64');
+
+      // Generate quiz using AI
+      const quizResult = await generateQuizFromDocument(pdfBase64, document.documentType);
+
+      if (!quizResult.success || quizResult.questions.length < 10) {
+        return res.status(400).json({ 
+          message: quizResult.error || "Failed to generate quiz. Document may be too short or unclear.",
+          questionsGenerated: quizResult.questions.length
+        });
+      }
+
+      // Save quiz to database
+      const quiz = await storage.createDocumentQuiz({
+        companyId: currentUser.id,
+        documentId: documentId,
+        documentType: document.documentType,
+        questions: quizResult.questions,
+      });
+
+      res.json({ 
+        quiz,
+        questionsGenerated: quizResult.questions.length,
+        message: `Quiz generated successfully with ${quizResult.questions.length} questions`
+      });
+    } catch (error) {
+      console.error("Generate quiz error:", error);
+      res.status(500).json({ message: "Failed to generate quiz" });
+    }
+  });
+
+  // Get available quizzes for current employee
+  app.get("/api/quiz/available", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Employees see quizzes from their company
+      const companyId = currentUser.role === 'company' ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "No company associated with this account" });
+      }
+
+      // Get all quizzes for the company
+      const quizzes = await storage.getQuizzesByCompanyId(companyId);
+
+      // For each quiz, check if the employee has passed it
+      const quizzesWithStatus = await Promise.all(
+        quizzes.map(async (quiz) => {
+          const hasPassed = await storage.hasEmployeePassedQuiz(currentUser.id, quiz.id);
+          const attempts = await storage.getQuizAttemptsByEmployee(currentUser.id, quiz.id);
+          return {
+            id: quiz.id,
+            documentType: quiz.documentType,
+            questionCount: Array.isArray(quiz.questions) ? quiz.questions.length : 0,
+            createdAt: quiz.createdAt,
+            hasPassed,
+            attemptCount: attempts.length,
+            lastAttempt: attempts.length > 0 ? attempts[0].completedAt : null,
+          };
+        })
+      );
+
+      res.json({ quizzes: quizzesWithStatus });
+    } catch (error) {
+      console.error("Get available quizzes error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get quiz questions (without correct answers for taking)
+  app.get("/api/quiz/:quizId", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { quizId } = req.params;
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const quiz = await storage.getQuizById(quizId);
+      if (!quiz) {
+        return res.status(404).json({ message: "Quiz not found" });
+      }
+
+      // Verify user belongs to the company
+      const userCompanyId = currentUser.role === 'company' ? currentUser.id : currentUser.companyId;
+      if (quiz.companyId !== userCompanyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      // Return questions WITHOUT correct answers
+      const questionsForTaking = (quiz.questions as any[]).map((q: any) => ({
+        questionNumber: q.questionNumber,
+        question: q.question,
+        options: q.options,
+      }));
+
+      res.json({
+        id: quiz.id,
+        documentType: quiz.documentType,
+        questions: questionsForTaking,
+      });
+    } catch (error) {
+      console.error("Get quiz error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Submit quiz answers and get results
+  app.post("/api/quiz/:quizId/submit", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { quizId } = req.params;
+      const { answers } = req.body; // { questionNumber: "A"|"B"|"C"|"D" }
+
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const quiz = await storage.getQuizById(quizId);
+      if (!quiz) {
+        return res.status(404).json({ message: "Quiz not found" });
+      }
+
+      // Verify user belongs to the company
+      const userCompanyId = currentUser.role === 'company' ? currentUser.id : currentUser.companyId;
+      if (quiz.companyId !== userCompanyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      if (!answers || typeof answers !== 'object') {
+        return res.status(400).json({ message: "Answers are required" });
+      }
+
+      // Grade the quiz
+      const questions = quiz.questions as any[];
+      let correctCount = 0;
+      const gradedAnswers: any[] = [];
+
+      for (const question of questions) {
+        const userAnswer = answers[question.questionNumber];
+        const isCorrect = userAnswer === question.correctAnswer;
+        if (isCorrect) correctCount++;
+
+        gradedAnswers.push({
+          questionNumber: question.questionNumber,
+          userAnswer: userAnswer || null,
+          correctAnswer: question.correctAnswer,
+          isCorrect,
+        });
+      }
+
+      const totalQuestions = questions.length;
+      const score = Math.round((correctCount / totalQuestions) * 100);
+      const passed = score >= 80; // 80% pass rate
+
+      // Save the attempt
+      const attempt = await storage.createQuizAttempt({
+        quizId: quiz.id,
+        employeeId: currentUser.id,
+        companyId: quiz.companyId,
+        score,
+        passed,
+        answers: gradedAnswers,
+      });
+
+      res.json({
+        attempt,
+        correctCount,
+        totalQuestions,
+        score,
+        passed,
+        message: passed 
+          ? "Congratulations! You passed the quiz." 
+          : `You scored ${score}%. You need 80% to pass. Please try again.`,
+      });
+    } catch (error) {
+      console.error("Submit quiz error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get employee's quiz results
+  app.get("/api/quiz/:quizId/results", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { quizId } = req.params;
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const quiz = await storage.getQuizById(quizId);
+      if (!quiz) {
+        return res.status(404).json({ message: "Quiz not found" });
+      }
+
+      // Verify user belongs to the company
+      const userCompanyId = currentUser.role === 'company' ? currentUser.id : currentUser.companyId;
+      if (quiz.companyId !== userCompanyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const attempts = await storage.getQuizAttemptsByEmployee(currentUser.id, quizId);
+      const hasPassed = attempts.some(a => a.passed);
+
+      res.json({
+        quizId,
+        documentType: quiz.documentType,
+        attempts,
+        hasPassed,
+        attemptCount: attempts.length,
+        bestScore: attempts.length > 0 ? Math.max(...attempts.map(a => a.score)) : null,
+      });
+    } catch (error) {
+      console.error("Get quiz results error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

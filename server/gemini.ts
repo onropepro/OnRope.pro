@@ -497,3 +497,121 @@ Respond ONLY with valid JSON matching this exact structure:
     };
   }
 }
+
+// Quiz Question generated from document
+export interface QuizQuestion {
+  questionNumber: number;
+  question: string;
+  options: { A: string; B: string; C: string; D: string };
+  correctAnswer: "A" | "B" | "C" | "D";
+}
+
+export interface QuizGenerationResult {
+  success: boolean;
+  questions: QuizQuestion[];
+  error: string | null;
+}
+
+/**
+ * Generate quiz questions from a PDF document using AI
+ * @param pdfBase64 - Base64 encoded PDF document
+ * @param documentType - Type of document (health_safety_manual, company_policy, etc.)
+ * @returns Array of 20 quiz questions with 4 multiple choice options each
+ */
+export async function generateQuizFromDocument(
+  pdfBase64: string,
+  documentType: string
+): Promise<QuizGenerationResult> {
+  try {
+    console.log(`[Quiz AI] Generating quiz for document type: ${documentType}`);
+    
+    const documentDescription = documentType === 'health_safety_manual' 
+      ? 'Health & Safety Manual' 
+      : documentType === 'company_policy'
+      ? 'Company Policy Document'
+      : documentType;
+    
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: [
+        {
+          role: "user",
+          parts: [
+            {
+              text: `You are an expert at creating educational quizzes based on professional documents. Analyze this ${documentDescription} and generate exactly 20 multiple choice questions that test understanding of the key policies, procedures, and safety requirements.
+
+REQUIREMENTS:
+1. Generate exactly 20 questions
+2. Each question must have exactly 4 options (A, B, C, D)
+3. Questions should test comprehension, not just memorization
+4. Cover the most important topics in the document
+5. Include questions about safety procedures, compliance requirements, and key policies
+6. Make questions clear and unambiguous
+7. Ensure only one answer is clearly correct
+8. Difficulty should be appropriate for employees who have read the document
+
+Respond ONLY with valid JSON matching this exact structure:
+{
+  "success": true,
+  "questions": [
+    {
+      "questionNumber": 1,
+      "question": "What is the primary purpose of...",
+      "options": {
+        "A": "First option",
+        "B": "Second option",
+        "C": "Third option",
+        "D": "Fourth option"
+      },
+      "correctAnswer": "B"
+    }
+  ],
+  "error": null
+}
+
+If the document is too short or unclear, generate as many quality questions as possible (minimum 10) and set success to true. If you cannot generate at least 10 questions, set success to false and explain in error.`
+            },
+            {
+              inlineData: {
+                mimeType: "application/pdf",
+                data: pdfBase64
+              }
+            }
+          ]
+        }
+      ],
+      config: {
+        responseMimeType: "application/json"
+      }
+    });
+
+    const result = JSON.parse(response.text || "{}");
+    console.log(`[Quiz AI] Generated ${result.questions?.length || 0} questions`);
+    
+    // Validate and normalize questions
+    const questions: QuizQuestion[] = (result.questions || []).map((q: any, idx: number) => ({
+      questionNumber: q.questionNumber || idx + 1,
+      question: q.question || "",
+      options: {
+        A: q.options?.A || "",
+        B: q.options?.B || "",
+        C: q.options?.C || "",
+        D: q.options?.D || ""
+      },
+      correctAnswer: ["A", "B", "C", "D"].includes(q.correctAnswer) ? q.correctAnswer : "A"
+    }));
+
+    return {
+      success: result.success ?? (questions.length >= 10),
+      questions,
+      error: result.error || null
+    };
+  } catch (error: any) {
+    console.error("[Quiz AI] Generation error:", error);
+    return {
+      success: false,
+      questions: [],
+      error: `Quiz generation failed: ${error.message || "Unknown error"}`
+    };
+  }
+}
