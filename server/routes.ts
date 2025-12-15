@@ -393,8 +393,8 @@ async function calculateCompanyCSR(companyId: string, storage: any, skipHistoryR
       const hasRopeAccessPlan = companyDocuments.some((doc: any) => doc.documentType === 'rope_access_plan' && doc.projectId === project.id);
       if (hasRopeAccessPlan) { docsPresent++; projectsWithRopeAccessPlan++; }
       
-      const anchorInspections = await storage.getAnchorInspectionsByProject(project.id);
-      if (anchorInspections && anchorInspections.length > 0) { docsPresent++; projectsWithAnchorInspection++; }
+      // Anchor inspection is stored on the project itself as a certificate URL
+      if (project.anchorInspectionCertificateUrl) { docsPresent++; projectsWithAnchorInspection++; }
     }
     
     const projectPoints = docsPresent / docsRequired;
