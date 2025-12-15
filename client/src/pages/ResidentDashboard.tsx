@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { jsPDF } from "jspdf";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation, Link } from "wouter";
@@ -18,10 +19,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Download } from "lucide-react";
 import { isReadOnly } from "@/lib/permissions";
 import { formatTimestampDate } from "@/lib/dateUtils";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
+import { loadLogoAsBase64 } from "@/lib/pdfBranding";
 
 const complaintSchema = z.object({
   residentName: z.string().min(1, "Name is required"),
@@ -112,6 +114,129 @@ export default function ResidentDashboard() {
   const { data: workNoticesData } = useQuery({
     queryKey: ["/api/resident/work-notices"],
   });
+
+  // PDF Download function for work notices
+  const downloadNoticePdf = async (notice: any) => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 20;
+    const contentWidth = pageWidth - margin * 2;
+    let yPos = 25;
+
+    // Header with logo if available
+    if (notice.logoUrl) {
+      try {
+        const logoData = await loadLogoAsBase64(notice.logoUrl);
+        if (logoData) {
+          const logoHeight = 15;
+          const logoWidth = logoHeight * logoData.aspectRatio;
+          doc.addImage(logoData.base64, 'PNG', margin, yPos, logoWidth, logoHeight);
+          yPos += logoHeight + 10;
+        }
+      } catch (e) {
+        console.error('Failed to load logo for PDF:', e);
+      }
+    }
+
+    // Title banner
+    doc.setFillColor(51, 65, 85);
+    doc.rect(margin, yPos, contentWidth, 16, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('OFFICIAL NOTICE', margin + 5, yPos + 11);
+    yPos += 22;
+
+    // Notice title
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    const titleLines = doc.splitTextToSize(notice.title, contentWidth);
+    doc.text(titleLines, margin, yPos);
+    yPos += titleLines.length * 8 + 5;
+
+    // Building name
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(100, 100, 100);
+    doc.text(notice.buildingName || 'Building', margin, yPos);
+    yPos += 10;
+
+    // Dates banner
+    doc.setFillColor(254, 243, 199);
+    doc.rect(margin, yPos, contentWidth, 20, 'F');
+    doc.setDrawColor(217, 119, 6);
+    doc.rect(margin, yPos, contentWidth, 20, 'S');
+    
+    doc.setTextColor(146, 64, 14);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.text('WORK PERIOD:', margin + 5, yPos + 8);
+    doc.setFont('helvetica', 'normal');
+    
+    const startDate = notice.workStartDate ? new Date(notice.workStartDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD';
+    const endDate = notice.workEndDate ? new Date(notice.workEndDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD';
+    doc.text(`${startDate} - ${endDate}`, margin + 35, yPos + 8);
+    
+    // Job type
+    if (notice.jobType) {
+      doc.setFont('helvetica', 'bold');
+      doc.text('SERVICE TYPE:', margin + 5, yPos + 16);
+      doc.setFont('helvetica', 'normal');
+      doc.text(notice.jobType.replace(/_/g, ' ').toUpperCase(), margin + 35, yPos + 16);
+    }
+    yPos += 28;
+
+    // Notice content
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    const contentLines = doc.splitTextToSize(notice.content, contentWidth);
+    
+    const lineHeight = 5;
+    const remainingHeight = doc.internal.pageSize.getHeight() - yPos - 30;
+    const contentHeight = contentLines.length * lineHeight;
+    
+    if (contentHeight > remainingHeight) {
+      let currentLine = 0;
+      while (currentLine < contentLines.length) {
+        const linesPerPage = Math.floor((doc.internal.pageSize.getHeight() - yPos - 30) / lineHeight);
+        const pageLines = contentLines.slice(currentLine, currentLine + linesPerPage);
+        doc.text(pageLines, margin, yPos);
+        currentLine += linesPerPage;
+        
+        if (currentLine < contentLines.length) {
+          doc.addPage();
+          yPos = 25;
+        } else {
+          yPos += pageLines.length * lineHeight + 10;
+        }
+      }
+    } else {
+      doc.text(contentLines, margin, yPos);
+      yPos += contentLines.length * lineHeight + 10;
+    }
+
+    // Footer
+    doc.setDrawColor(200, 200, 200);
+    doc.line(margin, doc.internal.pageSize.getHeight() - 20, pageWidth - margin, doc.internal.pageSize.getHeight() - 20);
+    
+    doc.setFontSize(9);
+    doc.setTextColor(100, 100, 100);
+    if (notice.contractors) {
+      doc.text(`Service Provider: ${notice.contractors}`, margin, doc.internal.pageSize.getHeight() - 14);
+    }
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, pageWidth - margin - 40, doc.internal.pageSize.getHeight() - 14);
+
+    // Download
+    const filename = `Notice-${(notice.title || 'Work-Notice').replace(/[^a-zA-Z0-9]/g, '_').substring(0, 30)}.pdf`;
+    doc.save(filename);
+    
+    toast({
+      title: "PDF Downloaded",
+      description: "Notice has been saved to your device.",
+    });
+  };
 
   // Fetch photos tagged with resident's unit number
   const { data: unitPhotosData } = useQuery({
@@ -1347,6 +1472,16 @@ export default function ResidentDashboard() {
                             </div>
                             <h3 className="text-xl font-bold truncate">{notice.title}</h3>
                           </div>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => downloadNoticePdf(notice)}
+                            className="flex-shrink-0"
+                            data-testid={`button-download-notice-${notice.id}`}
+                          >
+                            <Download className="h-4 w-4 mr-1" />
+                            PDF
+                          </Button>
                         </div>
                       </div>
 

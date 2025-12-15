@@ -6320,9 +6320,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const { passwordHash, ...buildingData } = building;
       
+      // Get work notices for active projects
+      const activeProjects = allProjects.filter(p => p.status === 'active');
+      const workNotices: any[] = [];
+      
+      for (const project of activeProjects) {
+        const notices = await storage.getWorkNoticesByProject(project.id);
+        const company = await storage.getUserById(project.companyId);
+        
+        for (const notice of notices) {
+          if (notice.status === 'published') {
+            workNotices.push({
+              id: notice.id,
+              title: notice.noticeTitle,
+              content: notice.noticeDetails,
+              additionalInstructions: notice.additionalInstructions,
+              workStartDate: notice.startDate,
+              workEndDate: notice.endDate,
+              projectId: project.id,
+              buildingName: project.buildingName,
+              jobType: project.customJobType || project.jobType,
+              companyName: company?.companyName || 'Unknown Company',
+              companyPhone: company?.phone || null,
+              logoUrl: company?.whitelabelBrandingActive ? company?.brandingLogoUrl : null,
+              propertyManagerName: notice.propertyManagerName,
+              createdAt: notice.createdAt,
+            });
+          }
+        }
+      }
+      
       res.json({ 
         building: buildingData,
         projectHistory,
+        workNotices,
         stats: {
           totalProjects: allProjects.length,
           completedProjects: allProjects.filter(p => p.status === 'completed').length,
