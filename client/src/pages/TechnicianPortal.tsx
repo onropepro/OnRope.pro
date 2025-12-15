@@ -2068,8 +2068,8 @@ export default function TechnicianPortal() {
               </button>
             </div>
 
-            {/* Safety Quizzes Section - Only show for technicians with a company */}
-            {user && user.role === 'rope_access_tech' && user.companyId && !user.terminatedDate && (
+            {/* Safety Quizzes Section - Show for all technicians (certification/safety quizzes always available) */}
+            {user && user.role === 'rope_access_tech' && !user.terminatedDate && (
               <QuizSection />
             )}
           </>
