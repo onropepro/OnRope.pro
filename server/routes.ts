@@ -7622,13 +7622,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       // Create notification for the employer
-      const company = await storage.getUserById(request.companyId);
       await db.insert(notifications).values({
-        userId: request.companyId,
+        companyId: request.companyId,
+        actorId: user.id,
         type: 'document_request_fulfilled',
-        title: 'Document Request Fulfilled',
-        message: `${user.name || 'A technician'} has fulfilled your document request: ${request.title}`,
-        data: JSON.stringify({ requestId: id, technicianId: user.id, title: request.title }),
+        payload: { 
+          requestId: id, 
+          technicianId: user.id,
+          technicianName: user.name || 'A technician',
+          title: request.title 
+        },
       });
       
       console.log(`[DocRequest] Technician ${user.id} fulfilled request ${id}`);
