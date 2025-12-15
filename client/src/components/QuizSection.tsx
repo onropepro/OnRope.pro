@@ -238,7 +238,7 @@ export function QuizSection() {
               {selectedQuiz && getDocumentTypeLabel(selectedQuiz.documentType)} Quiz
             </DialogTitle>
             <DialogDescription>
-              Answer all questions to the best of your ability. You need 80% (16/20) to pass.
+              Answer all questions to the best of your ability. You need 80% ({Math.ceil(selectedQuiz?.questionCount ? selectedQuiz.questionCount * 0.8 : 16)}/{selectedQuiz?.questionCount || 20}) to pass.
             </DialogDescription>
           </DialogHeader>
 
@@ -370,7 +370,10 @@ export function QuizSection() {
                   <div>
                     <p className="font-medium text-green-600 dark:text-green-400">Congratulations!</p>
                     <p className="text-sm text-muted-foreground mt-1">
-                      You have successfully passed this quiz. Your company has earned a CSR point.
+                      You have successfully passed this quiz.
+                    </p>
+                    <p className="text-sm font-medium text-green-600 dark:text-green-400 mt-2">
+                      +1 CSR Point earned for your company!
                     </p>
                   </div>
                 </div>
@@ -380,7 +383,7 @@ export function QuizSection() {
                   <div>
                     <p className="font-medium text-destructive">Not quite there</p>
                     <p className="text-sm text-muted-foreground mt-1">
-                      You need 80% (16/20) to pass. Review the material and try again.
+                      You need 80% ({Math.ceil((quizResult?.totalQuestions || 20) * 0.8)}/{quizResult?.totalQuestions || 20}) to pass. Review the material and try again.
                     </p>
                   </div>
                 </div>
