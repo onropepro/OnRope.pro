@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Building2, Plus, Mail, Phone, LogOut, Settings, FileText, Download, AlertCircle, CheckCircle2, Clock, Upload, FileCheck, Trash2, User, Shield, Users } from "lucide-react";
+import { Building2, Plus, Mail, Phone, Settings, FileText, Download, AlertCircle, CheckCircle2, Clock, Upload, FileCheck, Trash2, User, Shield, Users } from "lucide-react";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
 import { formatLocalDate, formatTimestampDate, formatTime, formatDurationMs } from "@/lib/dateUtils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -640,7 +640,7 @@ export default function PropertyManager() {
                 onClick={handleLogout}
                 data-testid="menu-logout"
               >
-                <LogOut className="w-4 h-4 mr-2" />
+                <span className="material-icons text-base mr-2">logout</span>
                 {t('propertyManager.menu.logout', 'Log Out')}
               </DropdownMenuItem>
             </DropdownMenuContent>
