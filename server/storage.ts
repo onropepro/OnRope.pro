@@ -4311,6 +4311,13 @@ export class Storage {
       .where(eq(quizAttempts.employeeId, employeeId))
       .orderBy(desc(quizAttempts.completedAt));
   }
+
+  async getAllQuizAttemptsByCompanyId(companyId: string): Promise<QuizAttempt[]> {
+    return db.select()
+      .from(quizAttempts)
+      .where(eq(quizAttempts.companyId, companyId))
+      .orderBy(desc(quizAttempts.completedAt));
+  }
 }
 
 export const storage = new Storage();
