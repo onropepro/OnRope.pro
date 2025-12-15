@@ -297,10 +297,10 @@ export default function SuperUserTasks() {
     // Hide completed tasks unless explicitly viewing "completed" filter
     if (statusFilter === "all" && task.status === "completed") return false;
     if (statusFilter !== "all" && task.status !== statusFilter) return false;
-    // Filter by assignee dropdown OR by current user (Working as)
+    // Filter by assignee dropdown
     if (assigneeFilter !== "all" && task.assignee !== assigneeFilter) return false;
-    // Also filter by current user - only show tasks assigned to the logged-in user
-    if (task.assignee !== currentUser) return false;
+    // Filter by current user (Working as) - skip if "Everyone" is selected
+    if (currentUser !== "Everyone" && task.assignee !== currentUser) return false;
     return true;
   });
 
@@ -366,10 +366,16 @@ export default function SuperUserTasks() {
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">Working as:</span>
               <Select value={currentUser} onValueChange={setCurrentUser}>
-                <SelectTrigger className="w-[120px]" data-testid="select-current-user">
+                <SelectTrigger className="w-[140px]" data-testid="select-current-user">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="Everyone">
+                    <div className="flex items-center gap-2">
+                      <div className="h-2 w-2 rounded-full bg-gray-400" />
+                      Everyone
+                    </div>
+                  </SelectItem>
                   {ASSIGNEES.map((name) => (
                     <SelectItem key={name} value={name}>
                       <div className="flex items-center gap-2">
