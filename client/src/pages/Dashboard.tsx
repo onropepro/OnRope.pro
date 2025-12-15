@@ -907,6 +907,7 @@ export default function Dashboard() {
   const { t } = useTranslation();
   const { currentLanguage, changeLanguage } = useLanguage();
   const [activeTab, setActiveTab] = useState("");
+  const [projectsSubTab, setProjectsSubTab] = useState<"active" | "past">("active");
   
   const { brandColors: contextBrandColors, brandingActive } = useContext(BrandingContext);
   const defaultCalendarColor = brandingActive && contextBrandColors.length > 0 ? contextBrandColors[0] : "hsl(var(--primary))";
@@ -3030,17 +3031,6 @@ export default function Dashboard() {
       category: "operations",
     },
     {
-      id: "past-projects",
-      label: t('dashboard.cards.pastProjects.label', 'Past Projects'),
-      description: t('dashboard.cards.pastProjects.description', 'Completed work'),
-      icon: "task_alt",
-      onClick: () => handleTabChange("past-projects"),
-      testId: "button-nav-past-projects",
-      isVisible: () => true, // Everyone
-      borderColor: "#60a5fa",
-      category: "operations",
-    },
-    {
       id: "employees",
       label: t('dashboard.cards.employees.label', 'Employees'),
       description: t('dashboard.cards.employees.description', 'Manage team'),
@@ -4635,12 +4625,27 @@ export default function Dashboard() {
                 </Dialog>
               </div>
 
-              {/* Active Projects */}
+              {/* Projects with Active/Past Tabs */}
               <div>
-                <div className="flex items-center gap-2 mb-6 mt-8">
-                  <div className="h-8 w-1 bg-primary rounded-full"></div>
-                  <h2 className="text-xl font-bold">{t('dashboard.projects.activeProjects', 'Active Projects')}</h2>
+                <div className="flex items-center justify-between mb-6 mt-8">
+                  <div className="flex items-center gap-2">
+                    <div className="h-8 w-1 bg-primary rounded-full"></div>
+                    <h2 className="text-xl font-bold">{t('dashboard.projects.title', 'Projects')}</h2>
+                  </div>
+                  <Tabs value={projectsSubTab} onValueChange={(v) => setProjectsSubTab(v as "active" | "past")}>
+                    <TabsList>
+                      <TabsTrigger value="active" data-testid="tab-active-projects">
+                        {t('dashboard.projects.activeProjects', 'Active')}
+                      </TabsTrigger>
+                      <TabsTrigger value="past" data-testid="tab-past-projects">
+                        {t('dashboard.projects.pastProjects', 'Past')}
+                      </TabsTrigger>
+                    </TabsList>
+                  </Tabs>
                 </div>
+
+                {/* Active Projects */}
+                {projectsSubTab === "active" && (
                 <div className="space-y-4">
                   {filteredProjects.filter((p: Project) => p.status === "active").length === 0 ? (
                     <Card>
@@ -4874,11 +4879,105 @@ export default function Dashboard() {
                     })
                   )}
                 </div>
+                )}
+
+                {/* Past Projects */}
+                {projectsSubTab === "past" && (
+                  <Tabs defaultValue="completed" className="space-y-4">
+                    <TabsList className="mb-4">
+                      <TabsTrigger value="completed" data-testid="tab-completed-projects">
+                        <span className="material-icons text-sm mr-1">done_all</span>
+                        {t('dashboard.projects.completed', 'Completed')}
+                      </TabsTrigger>
+                      <TabsTrigger value="deleted" data-testid="tab-deleted-projects">
+                        <span className="material-icons text-sm mr-1">delete</span>
+                        {t('dashboard.projects.deleted', 'Deleted')}
+                      </TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent value="completed" className="space-y-4">
+                      {filteredProjects.filter((p: Project) => p.status === "completed").length === 0 ? (
+                        <Card>
+                          <CardContent className="p-8 text-center text-muted-foreground">
+                            <span className="material-icons text-4xl mb-2 opacity-50">done_all</span>
+                            <div>{t('dashboard.projects.noCompletedProjects', 'No completed projects yet')}</div>
+                          </CardContent>
+                        </Card>
+                      ) : (
+                        <div className="space-y-4">
+                          {filteredProjects.filter((p: Project) => p.status === "completed").map((project: Project) => (
+                            <Card 
+                              key={project.id} 
+                              className="group border-l-4 border-l-success shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer bg-gradient-to-br from-background to-success/5" 
+                              data-testid={`completed-project-${project.id}`}
+                              onClick={() => setLocation(`/projects/${project.id}`)}
+                            >
+                              <CardContent className="p-5">
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1">
+                                    <div className="text-lg font-bold mb-1">{project.buildingName}</div>
+                                    <div className="text-sm font-medium text-muted-foreground mb-1">{project.strataPlanNumber}</div>
+                                    <div className="text-sm text-muted-foreground capitalize flex items-center gap-2">
+                                      <span className="material-icons text-base text-success">check_circle</span>
+                                      {getJobTypeLabel(t, project.jobType)}
+                                    </div>
+                                  </div>
+                                  <Badge variant="outline" className="bg-success/10 text-success border-success/30">
+                                    {t('dashboard.projects.completed', 'Completed')}
+                                  </Badge>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      )}
+                    </TabsContent>
+
+                    <TabsContent value="deleted" className="space-y-4">
+                      {filteredProjects.filter((p: Project) => p.status === "deleted").length === 0 ? (
+                        <Card>
+                          <CardContent className="p-8 text-center text-muted-foreground">
+                            <span className="material-icons text-4xl mb-2 opacity-50">delete_outline</span>
+                            <div>{t('dashboard.projects.noDeletedProjects', 'No deleted projects')}</div>
+                          </CardContent>
+                        </Card>
+                      ) : (
+                        <div className="space-y-4">
+                          {filteredProjects.filter((p: Project) => p.status === "deleted").map((project: Project) => (
+                            <Card 
+                              key={project.id} 
+                              className="group border-l-4 border-l-destructive/50 shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer bg-gradient-to-br from-background to-destructive/5 opacity-75" 
+                              data-testid={`deleted-project-${project.id}`}
+                              onClick={() => setLocation(`/projects/${project.id}`)}
+                            >
+                              <CardContent className="p-5">
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1">
+                                    <div className="text-lg font-bold mb-1">{project.buildingName}</div>
+                                    <div className="text-sm font-medium text-muted-foreground mb-1">{project.strataPlanNumber}</div>
+                                    <div className="text-sm text-muted-foreground capitalize flex items-center gap-2">
+                                      <span className="material-icons text-base text-destructive/70">delete</span>
+                                      {getJobTypeLabel(t, project.jobType)}
+                                    </div>
+                                  </div>
+                                  <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/30">
+                                    {t('dashboard.projects.deleted', 'Deleted')}
+                                  </Badge>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      )}
+                    </TabsContent>
+                  </Tabs>
+                )}
               </div>
             </div>
         )}
 
-        {activeTab === "past-projects" && (
+        {/* Remove old standalone past-projects tab - now integrated into projects tab */}
+        {false && activeTab === "past-projects" && (
           <div>
             <Tabs defaultValue="completed" className="space-y-4">
               <div className="flex items-center justify-between mb-6">
