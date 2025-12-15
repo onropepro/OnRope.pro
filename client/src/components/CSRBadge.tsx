@@ -140,7 +140,7 @@ function getImprovementTips(csrData: CSRData): { category: string; icon: any; ti
     if (!details.hasInsurance) missing.push("Certificate of Insurance");
     
     tips.push({
-      category: "Company Documents",
+      category: "Documents and Training",
       icon: Building2,
       tip: `Upload ${missing.join(", ")} to earn up to ${formatPoints(1 - breakdown.companyDocumentationPoints)} more points.`,
       priority: breakdown.companyDocumentationPoints < 0.5 ? 'high' : 'medium'
@@ -188,12 +188,12 @@ function getImprovementTips(csrData: CSRData): { category: string; icon: any; ti
 
 function getCategoryLabel(category: string): string {
   const labels: Record<string, string> = {
-    documentation: "Company Documents",
+    documentation: "Documents and Training",
     toolbox: "Toolbox Meetings",
     harness: "Harness Inspections",
     documentReview: "Document Reviews",
     projectDocumentation: "Project Documentation",
-    companyDocumentation: "Company Documents",
+    companyDocumentation: "Documents and Training",
     employeeDocReview: "Document Reviews",
     improvement: "Improvement",
     initial: "Initial Rating",
@@ -337,7 +337,7 @@ export function CSRBadge({ user }: CSRBadgeProps) {
                   <div className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-2">
                       <Building2 className="w-4 h-4 text-muted-foreground" />
-                      <span>Company Documents</span>
+                      <span>Documents and Training</span>
                     </div>
                     <span className={`font-semibold ${getPointsColor(breakdown.companyDocumentationPoints, maxCompanyDocPoints)}`}>
                       {formatPoints(breakdown.companyDocumentationPoints)} / {maxCompanyDocPoints} pts
