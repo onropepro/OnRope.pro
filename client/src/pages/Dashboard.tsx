@@ -980,6 +980,7 @@ export default function Dashboard() {
   const [showOtherElevationFields, setShowOtherElevationFields] = useState(false);
   const [invitationToConvert, setInvitationToConvert] = useState<any>(null); // Invitation being converted to employee
   const [showInvitationEmployeeForm, setShowInvitationEmployeeForm] = useState(false); // Show employee form for invitation
+  const [showLeaveCompanyDialog, setShowLeaveCompanyDialog] = useState(false); // For technicians to leave company
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   
@@ -2780,6 +2781,27 @@ export default function Dashboard() {
     },
   });
 
+  const leaveCompanyMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest("POST", "/api/technician/leave-company");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      toast({
+        title: t('dashboard.leaveCompany.success', 'Left Company'),
+        description: t('dashboard.leaveCompany.successDesc', 'You have successfully left the company.'),
+      });
+      setShowLeaveCompanyDialog(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: t('dashboard.leaveCompany.error', 'Error'),
+        description: error.message || "Failed to leave company",
+        variant: "destructive",
+      });
+    },
+  });
+
   const confirmLogout = async () => {
     try {
       // Track logout event before clearing session
@@ -3158,6 +3180,17 @@ export default function Dashboard() {
       testId: "button-my-profile",
       isVisible: (user: any) => user?.role === 'rope_access_tech', // Technicians only
       borderColor: "#f59e0b",
+      category: "team",
+    },
+    {
+      id: "current-employer",
+      label: t('dashboard.cards.currentEmployer.label', 'My Employer'),
+      description: userData?.user?.companyName || t('dashboard.cards.currentEmployer.description', 'Leave company'),
+      icon: "business",
+      onClick: () => setShowLeaveCompanyDialog(true),
+      testId: "button-current-employer",
+      isVisible: (user: any) => user?.role === 'rope_access_tech' && user?.companyId && !user?.terminatedDate,
+      borderColor: "#ef4444",
       category: "team",
     },
   ].filter(card => {
@@ -10956,6 +10989,31 @@ export default function Dashboard() {
           </Form>
         </DialogContent>
       </Dialog>
+
+      {/* Leave Company Dialog for Technicians */}
+      <AlertDialog open={showLeaveCompanyDialog} onOpenChange={setShowLeaveCompanyDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('dashboard.leaveCompany.title', 'Leave')} {userData?.user?.companyName || 'Company'}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('dashboard.leaveCompany.warning', 'This will remove you from their active roster. You can still be invited by other companies.')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-leave-company">{t('common.cancel', 'Cancel')}</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={() => leaveCompanyMutation.mutate()}
+              disabled={leaveCompanyMutation.isPending}
+              className="bg-destructive text-destructive-foreground"
+              data-testid="button-confirm-leave-company"
+            >
+              {leaveCompanyMutation.isPending 
+                ? t('dashboard.leaveCompany.leaving', 'Leaving...') 
+                : t('dashboard.leaveCompany.confirm', 'Yes, Leave Company')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
