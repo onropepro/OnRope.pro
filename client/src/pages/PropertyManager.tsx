@@ -1577,17 +1577,23 @@ export default function PropertyManager() {
                         .filter((s: any) => s.endTime !== null);
                       
                       if (isHoursBased) {
-                        // Hours-based: Show percentage from manualCompletionPercentage
-                        const sessionsWithPercentage = completedSessions.filter((s: any) => 
-                          s.manualCompletionPercentage !== null && s.manualCompletionPercentage !== undefined
-                        );
-                        
+                        // Hours-based: Use project-level overall completion percentage (set by "last one out" technician)
+                        // Fall back to session-based calculation for legacy data
                         let progressPercent = 0;
-                        if (sessionsWithPercentage.length > 0) {
-                          const sortedSessions = [...sessionsWithPercentage].sort((a: any, b: any) => 
-                            new Date(b.endTime).getTime() - new Date(a.endTime).getTime()
+                        if ((projectDetailsData.project as any).overallCompletionPercentage !== null && 
+                            (projectDetailsData.project as any).overallCompletionPercentage !== undefined) {
+                          progressPercent = (projectDetailsData.project as any).overallCompletionPercentage;
+                        } else {
+                          const sessionsWithPercentage = completedSessions.filter((s: any) => 
+                            s.manualCompletionPercentage !== null && s.manualCompletionPercentage !== undefined
                           );
-                          progressPercent = sortedSessions[0].manualCompletionPercentage;
+                          
+                          if (sessionsWithPercentage.length > 0) {
+                            const sortedSessions = [...sessionsWithPercentage].sort((a: any, b: any) => 
+                              new Date(b.endTime).getTime() - new Date(a.endTime).getTime()
+                            );
+                            progressPercent = sortedSessions[0].manualCompletionPercentage;
+                          }
                         }
                         
                         return (

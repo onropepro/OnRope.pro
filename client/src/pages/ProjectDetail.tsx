@@ -1104,20 +1104,26 @@ export default function ProjectDetail() {
   let completedDropsNorth = 0, completedDropsEast = 0, completedDropsSouth = 0, completedDropsWest = 0;
   
   if (isPercentageBased) {
-    // Percentage-based tracking (General Pressure Washing, Ground Window)
-    // Use the latest manually entered completion percentage from work sessions
-    const sessionsWithPercentage = completedSessions.filter((s: any) => 
-      s.manualCompletionPercentage !== null && s.manualCompletionPercentage !== undefined
-    );
-    
-    if (sessionsWithPercentage.length > 0) {
-      // Sort by end time descending and get the most recent percentage
-      const sortedSessions = [...sessionsWithPercentage].sort((a: any, b: any) => 
-        new Date(b.endTime).getTime() - new Date(a.endTime).getTime()
-      );
-      progressPercent = sortedSessions[0].manualCompletionPercentage;
+    // Percentage-based tracking (General Pressure Washing, Ground Window, NDT, Rock Scaling)
+    // Use project-level overall completion percentage (set by "last one out" technician)
+    // Fall back to session-based calculation for legacy data
+    if ((project as any).overallCompletionPercentage !== null && (project as any).overallCompletionPercentage !== undefined) {
+      progressPercent = (project as any).overallCompletionPercentage;
     } else {
-      progressPercent = 0;
+      // Legacy: Use the latest manually entered completion percentage from work sessions
+      const sessionsWithPercentage = completedSessions.filter((s: any) => 
+        s.manualCompletionPercentage !== null && s.manualCompletionPercentage !== undefined
+      );
+      
+      if (sessionsWithPercentage.length > 0) {
+        // Sort by end time descending and get the most recent percentage
+        const sortedSessions = [...sessionsWithPercentage].sort((a: any, b: any) => 
+          new Date(b.endTime).getTime() - new Date(a.endTime).getTime()
+        );
+        progressPercent = sortedSessions[0].manualCompletionPercentage;
+      } else {
+        progressPercent = 0;
+      }
     }
     
     totalDrops = 100;

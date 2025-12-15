@@ -4713,14 +4713,19 @@ export default function Dashboard() {
                           progressPercent = Math.min((totalHoursWorked / project.estimatedHours) * 100, 100);
                           unitLabel = t('dashboard.projects.hours', 'hrs');
                         } else {
-                          // Fall back to completion percentage if no estimated hours
-                          const sessionsWithPercentage = allWorkSessions.filter((s: any) => 
-                            s.projectId === project.id && s.endTime && s.manualCompletionPercentage !== null
-                          );
-                          const latestSession = sessionsWithPercentage.sort((a: any, b: any) => 
-                            new Date(b.endTime).getTime() - new Date(a.endTime).getTime()
-                          )[0];
-                          progressPercent = latestSession?.manualCompletionPercentage || 0;
+                          // Use project-level overall completion percentage (set by "last one out" technician)
+                          // Fall back to session-based calculation for legacy data
+                          if ((project as any).overallCompletionPercentage !== null && (project as any).overallCompletionPercentage !== undefined) {
+                            progressPercent = (project as any).overallCompletionPercentage;
+                          } else {
+                            const sessionsWithPercentage = allWorkSessions.filter((s: any) => 
+                              s.projectId === project.id && s.endTime && s.manualCompletionPercentage !== null
+                            );
+                            const latestSession = sessionsWithPercentage.sort((a: any, b: any) => 
+                              new Date(b.endTime).getTime() - new Date(a.endTime).getTime()
+                            )[0];
+                            progressPercent = latestSession?.manualCompletionPercentage || 0;
+                          }
                           completed = progressPercent;
                           total = 100;
                           unitLabel = "%";
