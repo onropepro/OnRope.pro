@@ -19682,10 +19682,11 @@ Do not include any other text, just the JSON object.`
         const passed = score >= 80;
 
         // Save the attempt (use quizId as the cert_ ID)
+        // Note: companyId can be null for unaffiliated technicians (self-resigned or never linked)
         const attempt = await storage.createQuizAttempt({
           quizId: quizId,
           employeeId: currentUser.id,
-          companyId: currentUser.companyId || 'system',
+          companyId: currentUser.companyId || null,
           score,
           passed,
           answers: gradedAnswers,
@@ -19739,10 +19740,11 @@ Do not include any other text, just the JSON object.`
         const passed = score >= 80;
 
         // Save the attempt (use quizId as the safety_ ID)
+        // Note: companyId can be null for unaffiliated technicians (self-resigned or never linked)
         const attempt = await storage.createQuizAttempt({
           quizId: quizId,
           employeeId: currentUser.id,
-          companyId: currentUser.companyId || 'system',
+          companyId: currentUser.companyId || null,
           score,
           passed,
           answers: gradedAnswers,
