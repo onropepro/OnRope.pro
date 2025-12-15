@@ -985,9 +985,6 @@ export default function Dashboard() {
   const [showInvitationEmployeeForm, setShowInvitationEmployeeForm] = useState(false); // Show employee form for invitation
   const [showLeaveCompanyDialog, setShowLeaveCompanyDialog] = useState(false); // For technicians to leave company
   const [showEmployerInfoDialog, setShowEmployerInfoDialog] = useState(false); // For technicians to view employer info
-  const [showProgressPromptDialog, setShowProgressPromptDialog] = useState(false); // "Last one out" progress prompt
-  const [progressPromptProject, setProgressPromptProject] = useState<{ id: string; currentProgress: number } | null>(null);
-  const [progressPercentageInput, setProgressPercentageInput] = useState("");
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   
@@ -2776,44 +2773,11 @@ export default function Dashboard() {
         employeeId: data?.session?.employeeId,
       });
       
-      // Check if this is the "last one out" and needs to provide overall progress
-      if (data?.requiresProgressPrompt) {
-        setProgressPromptProject({
-          id: data.session?.projectId,
-          currentProgress: data.currentOverallProgress ?? 0
-        });
-        setProgressPercentageInput(String(data.currentOverallProgress ?? 0));
-        setShowProgressPromptDialog(true);
-      } else {
-        toast({ 
-          title: t('dashboard.toast.workSessionEnded', 'Work session ended'), 
-          description: hasLocation 
-            ? t('dashboard.toast.greatWorkLocation', 'Great work today! Location recorded.') 
-            : t('dashboard.toast.greatWorkNoLocation', 'Great work today! (Location not recorded)')
-        });
-      }
-    },
-    onError: (error: Error) => {
-      toast({ title: t('dashboard.toast.error', 'Error'), description: error.message, variant: "destructive" });
-    },
-  });
-
-  // Mutation to update overall project completion percentage (for "last one out" flow)
-  const updateOverallProgressMutation = useMutation({
-    mutationFn: async (data: { projectId: string; completionPercentage?: number; skip?: boolean }) => {
-      return apiRequest("PATCH", `/api/projects/${data.projectId}/overall-progress`, {
-        completionPercentage: data.completionPercentage,
-        skip: data.skip,
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
-      setShowProgressPromptDialog(false);
-      setProgressPromptProject(null);
-      setProgressPercentageInput("");
       toast({ 
-        title: t('dashboard.toast.progressUpdated', 'Progress updated'), 
-        description: t('dashboard.toast.progressUpdatedDesc', 'Project completion percentage has been recorded.')
+        title: t('dashboard.toast.workSessionEnded', 'Work session ended'), 
+        description: hasLocation 
+          ? t('dashboard.toast.greatWorkLocation', 'Great work today! Location recorded.') 
+          : t('dashboard.toast.greatWorkNoLocation', 'Great work today! (Location not recorded)')
       });
     },
     onError: (error: Error) => {
@@ -9849,88 +9813,6 @@ export default function Dashboard() {
               </div>
             </form>
           </Form>
-        </DialogContent>
-      </Dialog>
-
-      {/* "Last One Out" Progress Prompt Dialog */}
-      <Dialog open={showProgressPromptDialog} onOpenChange={(open) => {
-        if (!open && progressPromptProject) {
-          // If closing without submitting, skip the update
-          updateOverallProgressMutation.mutate({ projectId: progressPromptProject.id, skip: true });
-        }
-      }}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <span className="material-icons text-primary">update</span>
-              {t('dashboard.progressPrompt.title', 'Update Project Progress')}
-            </DialogTitle>
-            <DialogDescription>
-              {t('dashboard.progressPrompt.description', "You're the last one leaving the site today. Please enter the overall project completion percentage.")}
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label>{t('dashboard.progressPrompt.currentProgress', 'Current Progress')}: {progressPromptProject?.currentProgress ?? 0}%</Label>
-              <div className="flex items-center gap-2">
-                <Input
-                  type="number"
-                  min="0"
-                  max="100"
-                  step="1"
-                  value={progressPercentageInput}
-                  onChange={(e) => setProgressPercentageInput(e.target.value)}
-                  placeholder="0-100"
-                  className="h-12 text-xl"
-                  data-testid="input-overall-progress"
-                />
-                <span className="text-xl font-bold">%</span>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {t('dashboard.progressPrompt.hint', 'Enter the overall project completion as a percentage (0-100)')}
-              </p>
-            </div>
-          </div>
-          
-          <DialogFooter className="flex gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                if (progressPromptProject) {
-                  updateOverallProgressMutation.mutate({ projectId: progressPromptProject.id, skip: true });
-                }
-              }}
-              disabled={updateOverallProgressMutation.isPending}
-              data-testid="button-skip-progress"
-            >
-              {t('dashboard.progressPrompt.skip', 'Skip')}
-            </Button>
-            <Button
-              type="button"
-              onClick={() => {
-                const value = parseInt(progressPercentageInput);
-                if (isNaN(value) || value < 0 || value > 100) {
-                  toast({ 
-                    title: t('dashboard.toast.error', 'Error'), 
-                    description: t('dashboard.progressPrompt.invalidValue', 'Please enter a valid percentage between 0 and 100'),
-                    variant: "destructive" 
-                  });
-                  return;
-                }
-                if (progressPromptProject) {
-                  updateOverallProgressMutation.mutate({ projectId: progressPromptProject.id, completionPercentage: value });
-                }
-              }}
-              disabled={updateOverallProgressMutation.isPending}
-              data-testid="button-submit-progress"
-            >
-              {updateOverallProgressMutation.isPending 
-                ? t('dashboard.progressPrompt.saving', 'Saving...') 
-                : t('dashboard.progressPrompt.save', 'Save Progress')}
-            </Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
 
