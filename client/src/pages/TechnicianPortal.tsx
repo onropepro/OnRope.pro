@@ -109,6 +109,7 @@ import {
   EyeOff
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
+import { QuizSection } from "@/components/QuizSection";
 
 type Language = 'en' | 'fr';
 
@@ -2064,6 +2065,11 @@ export default function TechnicianPortal() {
                 )}
               </button>
             </div>
+
+            {/* Safety Quizzes Section - Only show for technicians with a company */}
+            {user && user.role === 'rope_access_tech' && user.companyId && !user.terminatedDate && (
+              <QuizSection />
+            )}
           </>
         )}
 
