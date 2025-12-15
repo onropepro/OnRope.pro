@@ -425,3 +425,347 @@ Respond ONLY with valid JSON matching this structure:
     };
   }
 }
+
+// Extract insurance expiry date from Certificate of Insurance PDF
+export interface InsuranceExpiryResult {
+  expiryDate: string | null;
+  confidence: "high" | "medium" | "low";
+  error: string | null;
+}
+
+export async function extractInsuranceExpiryDate(
+  pdfBase64: string
+): Promise<InsuranceExpiryResult> {
+  try {
+    console.log("[COI AI] Calling Gemini for insurance expiry extraction...");
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: [
+        {
+          role: "user",
+          parts: [
+            {
+              text: `Analyze this Certificate of Insurance PDF and extract the policy expiry date.
+Look for fields like "Policy Expiry", "Expiration Date", "Policy Period To", "Coverage Ends", "Effective To", or similar.
+Extract the date when the insurance policy expires.
+
+Respond ONLY with valid JSON matching this exact structure:
+{
+  "expiryDate": string or null (YYYY-MM-DD format),
+  "confidence": "high" | "medium" | "low",
+  "error": string or null
+}`
+            },
+            {
+              inlineData: {
+                mimeType: "application/pdf",
+                data: pdfBase64
+              }
+            }
+          ]
+        }
+      ],
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            expiryDate: { type: Type.STRING, nullable: true },
+            confidence: { type: Type.STRING },
+            error: { type: Type.STRING, nullable: true }
+          },
+          required: ["confidence"]
+        }
+      }
+    });
+
+    const result = JSON.parse(response.text || "{}") as InsuranceExpiryResult;
+    console.log("[COI AI] Gemini response:", JSON.stringify(result));
+    
+    // Normalize the expiry date if found
+    if (result.expiryDate) {
+      result.expiryDate = normalizeExpiryDate(result.expiryDate);
+    }
+    
+    return result;
+  } catch (error: any) {
+    console.error("[COI AI] Gemini extraction error:", error);
+    return {
+      expiryDate: null,
+      confidence: "low",
+      error: `Extraction failed: ${error.message || "Unknown error"}`
+    };
+  }
+}
+
+// Quiz Question generated from document
+export interface QuizQuestion {
+  questionNumber: number;
+  question: string;
+  options: { A: string; B: string; C: string; D: string };
+  correctAnswer: "A" | "B" | "C" | "D";
+}
+
+export interface QuizGenerationResult {
+  success: boolean;
+  questions: QuizQuestion[];
+  error: string | null;
+}
+
+/**
+ * Generate quiz questions from a PDF document using AI
+ * @param pdfBase64 - Base64 encoded PDF document
+ * @param documentType - Type of document (health_safety_manual, company_policy, etc.)
+ * @returns Array of 20 quiz questions with 4 multiple choice options each
+ */
+export async function generateQuizFromDocument(
+  pdfBase64: string,
+  documentType: string
+): Promise<QuizGenerationResult> {
+  try {
+    console.log(`[Quiz AI] Generating quiz for document type: ${documentType}`);
+    
+    const documentDescription = documentType === 'health_safety_manual' 
+      ? 'Health & Safety Manual' 
+      : documentType === 'company_policy'
+      ? 'Company Policy Document'
+      : documentType;
+    
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: [
+        {
+          role: "user",
+          parts: [
+            {
+              text: `You are an expert at creating educational quizzes based on professional documents. Analyze this ${documentDescription} and generate exactly 20 multiple choice questions that test understanding of the key policies, procedures, and safety requirements.
+
+REQUIREMENTS:
+1. Generate exactly 20 questions
+2. Each question must have exactly 4 options (A, B, C, D)
+3. Questions should test comprehension, not just memorization
+4. Cover the most important topics in the document
+5. Include questions about safety procedures, compliance requirements, and key policies
+6. Make questions clear and unambiguous
+7. Ensure only one answer is clearly correct
+8. Difficulty should be appropriate for employees who have read the document
+
+Respond ONLY with valid JSON matching this exact structure:
+{
+  "success": true,
+  "questions": [
+    {
+      "questionNumber": 1,
+      "question": "What is the primary purpose of...",
+      "options": {
+        "A": "First option",
+        "B": "Second option",
+        "C": "Third option",
+        "D": "Fourth option"
+      },
+      "correctAnswer": "B"
+    }
+  ],
+  "error": null
+}
+
+If the document is too short or unclear, generate as many quality questions as possible (minimum 10) and set success to true. If you cannot generate at least 10 questions, set success to false and explain in error.`
+            },
+            {
+              inlineData: {
+                mimeType: "application/pdf",
+                data: pdfBase64
+              }
+            }
+          ]
+        }
+      ],
+      config: {
+        responseMimeType: "application/json"
+      }
+    });
+
+    const result = JSON.parse(response.text || "{}");
+    console.log(`[Quiz AI] Generated ${result.questions?.length || 0} questions`);
+    
+    // Validate and normalize questions
+    const questions: QuizQuestion[] = (result.questions || []).map((q: any, idx: number) => ({
+      questionNumber: q.questionNumber || idx + 1,
+      question: q.question || "",
+      options: {
+        A: q.options?.A || "",
+        B: q.options?.B || "",
+        C: q.options?.C || "",
+        D: q.options?.D || ""
+      },
+      correctAnswer: ["A", "B", "C", "D"].includes(q.correctAnswer) ? q.correctAnswer : "A"
+    }));
+
+    return {
+      success: result.success ?? (questions.length >= 10),
+      questions,
+      error: result.error || null
+    };
+  } catch (error: any) {
+    console.error("[Quiz AI] Generation error:", error);
+    return {
+      success: false,
+      questions: [],
+      error: `Quiz generation failed: ${error.message || "Unknown error"}`
+    };
+  }
+}
+
+// Business Card Analysis Result
+export interface BusinessCardAnalysisResult {
+  success: boolean;
+  firstName: string | null;
+  lastName: string | null;
+  company: string | null;
+  jobTitle: string | null;
+  email: string | null;
+  phone: string | null;
+  mobile: string | null;
+  fax: string | null;
+  website: string | null;
+  address: string | null;
+  notes: string | null;
+  confidence: "high" | "medium" | "low";
+  error: string | null;
+}
+
+/**
+ * Analyze business card images (front and optionally back) to extract contact information
+ * @param frontImageBase64 - Base64 encoded front side of business card
+ * @param backImageBase64 - Optional base64 encoded back side of business card
+ * @param frontMimeType - MIME type of front image
+ * @param backMimeType - Optional MIME type of back image
+ */
+export async function analyzeBusinessCard(
+  frontImageBase64: string,
+  backImageBase64?: string,
+  frontMimeType: string = "image/jpeg",
+  backMimeType: string = "image/jpeg"
+): Promise<BusinessCardAnalysisResult> {
+  try {
+    console.log("[Business Card AI] Analyzing business card...");
+    
+    const imageParts: any[] = [
+      {
+        text: `You are an expert at extracting contact information from business cards. Analyze the business card image(s) provided and extract all relevant contact details.
+
+IMPORTANT INSTRUCTIONS:
+1. Extract the person's FIRST NAME and LAST NAME separately
+2. Extract company/organization name
+3. Extract job title/position
+4. Extract ALL phone numbers (main phone, mobile, fax) - label them appropriately
+5. Extract email address(es)
+6. Extract website URL if present
+7. Extract full mailing address if present
+8. Any additional notes or relevant information
+
+If two images are provided, they represent the FRONT and BACK of the same business card. Combine information from both sides.
+
+For phone numbers:
+- If there are multiple numbers, put the main office/landline in "phone" 
+- Put mobile/cell numbers in "mobile"
+- Put fax numbers in "fax"
+
+Respond ONLY with valid JSON matching this exact structure:
+{
+  "success": true,
+  "firstName": string or null,
+  "lastName": string or null,
+  "company": string or null,
+  "jobTitle": string or null,
+  "email": string or null,
+  "phone": string or null,
+  "mobile": string or null,
+  "fax": string or null,
+  "website": string or null,
+  "address": string or null,
+  "notes": string or null (any additional info like social media handles, certifications, etc.),
+  "confidence": "high" | "medium" | "low",
+  "error": null
+}
+
+If the image is not a business card or is unreadable, set success to false and explain in error.`
+      },
+      {
+        inlineData: {
+          mimeType: frontMimeType,
+          data: frontImageBase64
+        }
+      }
+    ];
+    
+    // Add back image if provided
+    if (backImageBase64) {
+      imageParts.push({
+        text: "Back side of the business card:"
+      });
+      imageParts.push({
+        inlineData: {
+          mimeType: backMimeType,
+          data: backImageBase64
+        }
+      });
+    }
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: [
+        {
+          role: "user",
+          parts: imageParts
+        }
+      ],
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            success: { type: Type.BOOLEAN },
+            firstName: { type: Type.STRING, nullable: true },
+            lastName: { type: Type.STRING, nullable: true },
+            company: { type: Type.STRING, nullable: true },
+            jobTitle: { type: Type.STRING, nullable: true },
+            email: { type: Type.STRING, nullable: true },
+            phone: { type: Type.STRING, nullable: true },
+            mobile: { type: Type.STRING, nullable: true },
+            fax: { type: Type.STRING, nullable: true },
+            website: { type: Type.STRING, nullable: true },
+            address: { type: Type.STRING, nullable: true },
+            notes: { type: Type.STRING, nullable: true },
+            confidence: { type: Type.STRING },
+            error: { type: Type.STRING, nullable: true }
+          },
+          required: ["success", "confidence"]
+        }
+      }
+    });
+
+    const result = JSON.parse(response.text || "{}") as BusinessCardAnalysisResult;
+    console.log("[Business Card AI] Analysis result:", JSON.stringify(result));
+    
+    return result;
+  } catch (error: any) {
+    console.error("[Business Card AI] Analysis error:", error);
+    return {
+      success: false,
+      firstName: null,
+      lastName: null,
+      company: null,
+      jobTitle: null,
+      email: null,
+      phone: null,
+      mobile: null,
+      fax: null,
+      website: null,
+      address: null,
+      notes: null,
+      confidence: "low",
+      error: `Analysis failed: ${error.message || "Unknown error"}`
+    };
+  }
+}

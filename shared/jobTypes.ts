@@ -108,3 +108,44 @@ export function isStallBasedJobType(jobType: string): boolean {
   const config = getJobTypeConfig(jobType);
   return config?.progressType === 'stalls';
 }
+
+// Check if a job type uses hours/percentage-based progress tracking
+export function isHoursBasedJobType(jobType: string): boolean {
+  const config = getJobTypeConfig(jobType);
+  return config?.progressType === 'hours';
+}
+
+/**
+ * Check if a project should use "last one out" progress tracking
+ * This applies when:
+ * - requiresElevation is false (non-elevation job - e.g., boom lift work)
+ * - OR job type is inherently hours-based (General Pressure Washing, Ground Window, etc.)
+ * 
+ * This does NOT apply to suite-based or stall-based jobs (they have their own unit tracking)
+ */
+export function usesPercentageProgress(jobType: string, requiresElevation: boolean): boolean {
+  const config = getJobTypeConfig(jobType);
+  if (!config) return false;
+  
+  // Suite-based and stall-based always use their own unit tracking
+  if (config.progressType === 'suites' || config.progressType === 'stalls') {
+    return false;
+  }
+  
+  // Hours-based jobs always use percentage progress
+  if (config.progressType === 'hours') {
+    return true;
+  }
+  
+  // Drop-based jobs use percentage when elevation is toggled OFF
+  if (config.progressType === 'drops' && !requiresElevation) {
+    return true;
+  }
+  
+  // Anchor-based without elevation uses percentage
+  if (config.progressType === 'anchors' && !requiresElevation) {
+    return true;
+  }
+  
+  return false;
+}

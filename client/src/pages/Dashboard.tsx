@@ -7,6 +7,7 @@ import { BrandingContext } from "@/App";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { PurchaseSeatsDialog } from "@/components/PurchaseSeatsDialog";
+import { EmployerDocumentRequests } from "@/components/EmployerDocumentRequests";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -39,7 +40,7 @@ import { Switch } from "@/components/ui/switch";
 import type { Project, Client, InsertClient } from "@shared/schema";
 import { normalizeStrataPlan } from "@shared/schema";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip as RechartsTooltip } from "recharts";
-import { isManagement, hasFinancialAccess, canManageEmployees, canViewPerformance, hasPermission, isReadOnly, canViewSchedule } from "@/lib/permissions";
+import { isManagement, hasFinancialAccess, canManageEmployees, canViewPerformance, hasPermission, isReadOnly, canViewSchedule, canViewPastProjects } from "@/lib/permissions";
 import { DocumentUploader } from "@/components/DocumentUploader";
 import { RefreshButton } from "@/components/RefreshButton";
 import { CSRBadge } from "@/components/CSRBadge";
@@ -63,6 +64,8 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
+import { ProgressPromptDialog } from "@/components/ProgressPromptDialog";
+import { BusinessCardScanner } from "@/components/BusinessCardScanner";
 
 import { JOB_CATEGORIES, JOB_TYPES, getJobTypesByCategory, getJobTypeConfig, getDefaultElevation, isElevationConfigurable, isDropBasedJobType, getAllJobTypeValues, getProgressType, getCategoryForJobType, type JobCategory } from "@shared/jobTypes";
 
@@ -140,6 +143,7 @@ const PERMISSION_CATEGORIES = [
     nameKey: "dashboard.permissions.categories.projects",
     permissions: [
       { id: "view_projects", labelKey: "dashboard.permissions.viewProjects" },
+      { id: "view_past_projects", labelKey: "dashboard.permissions.viewPastProjects" },
       { id: "create_projects", labelKey: "dashboard.permissions.createProjects" },
       { id: "edit_projects", labelKey: "dashboard.permissions.editProjects" },
       { id: "delete_projects", labelKey: "dashboard.permissions.deleteProjects" },
@@ -318,6 +322,7 @@ const clientSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   company: z.string().optional(),
+  email: z.string().email("Invalid email address").optional().or(z.literal("")),
   address: z.string().optional(),
   phoneNumber: z.string().optional(),
   lmsNumbers: z.array(z.string()).default([]),
@@ -906,6 +911,7 @@ export default function Dashboard() {
   const { t } = useTranslation();
   const { currentLanguage, changeLanguage } = useLanguage();
   const [activeTab, setActiveTab] = useState("");
+  const [projectsSubTab, setProjectsSubTab] = useState<"active" | "past">("active");
   
   const { brandColors: contextBrandColors, brandingActive } = useContext(BrandingContext);
   const defaultCalendarColor = brandingActive && contextBrandColors.length > 0 ? contextBrandColors[0] : "hsl(var(--primary))";
@@ -931,6 +937,7 @@ export default function Dashboard() {
   const [showChangePasswordDialog, setShowChangePasswordDialog] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [showClientDialog, setShowClientDialog] = useState(false);
+  const [showBusinessCardScanner, setShowBusinessCardScanner] = useState(false);
   const [showEditClientDialog, setShowEditClientDialog] = useState(false);
   const [showDeleteClientDialog, setShowDeleteClientDialog] = useState(false);
   const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
@@ -980,6 +987,11 @@ export default function Dashboard() {
   const [showOtherElevationFields, setShowOtherElevationFields] = useState(false);
   const [invitationToConvert, setInvitationToConvert] = useState<any>(null); // Invitation being converted to employee
   const [showInvitationEmployeeForm, setShowInvitationEmployeeForm] = useState(false); // Show employee form for invitation
+  const [showLeaveCompanyDialog, setShowLeaveCompanyDialog] = useState(false); // For technicians to leave company
+  const [showEmployerInfoDialog, setShowEmployerInfoDialog] = useState(false); // For technicians to view employer info
+  const [progressPromptOpen, setProgressPromptOpen] = useState(false);
+  const [progressPromptProjectId, setProgressPromptProjectId] = useState<string | null>(null);
+  const [progressPromptCurrentValue, setProgressPromptCurrentValue] = useState(0);
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   
@@ -2559,6 +2571,7 @@ export default function Dashboard() {
       firstName: client.firstName,
       lastName: client.lastName,
       company: client.company || "",
+      email: client.email || "",
       address: client.address || "",
       phoneNumber: client.phoneNumber || "",
       billingAddress: client.billingAddress || "",
@@ -2754,7 +2767,11 @@ export default function Dashboard() {
         ropeAccessTaskHours: data.ropeAccessTaskHours ? parseFloat(data.ropeAccessTaskHours) : null,
       });
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
+      console.log("[END DAY] Response received:", JSON.stringify(data, null, 2));
+      console.log("[END DAY] requiresProgressPrompt:", data?.requiresProgressPrompt);
+      console.log("[END DAY] session.projectId:", data?.session?.projectId);
+      
       setActiveSession(null);
       setShowEndDayDialog(false);
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
@@ -2768,15 +2785,45 @@ export default function Dashboard() {
         employeeId: data?.session?.employeeId,
       });
       
-      toast({ 
-        title: t('dashboard.toast.workSessionEnded', 'Work session ended'), 
-        description: hasLocation 
-          ? t('dashboard.toast.greatWorkLocation', 'Great work today! Location recorded.') 
-          : t('dashboard.toast.greatWorkNoLocation', 'Great work today! (Location not recorded)')
-      });
+      // Check if this is the "last one out" for a percentage-based job
+      if (data?.requiresProgressPrompt && data?.session?.projectId) {
+        console.log("[END DAY] Showing progress prompt dialog");
+        setProgressPromptProjectId(data.session.projectId);
+        setProgressPromptCurrentValue(data.currentOverallProgress || 0);
+        setProgressPromptOpen(true);
+      } else {
+        console.log("[END DAY] Not showing progress prompt dialog");
+        toast({ 
+          title: t('dashboard.toast.workSessionEnded', 'Work session ended'), 
+          description: hasLocation 
+            ? t('dashboard.toast.greatWorkLocation', 'Great work today! Location recorded.') 
+            : t('dashboard.toast.greatWorkNoLocation', 'Great work today! (Location not recorded)')
+        });
+      }
     },
     onError: (error: Error) => {
       toast({ title: t('dashboard.toast.error', 'Error'), description: error.message, variant: "destructive" });
+    },
+  });
+
+  const leaveCompanyMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest("POST", "/api/technician/leave-company");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      toast({
+        title: t('dashboard.leaveCompany.success', 'Left Company'),
+        description: t('dashboard.leaveCompany.successDesc', 'You have successfully left the company.'),
+      });
+      setShowLeaveCompanyDialog(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: t('dashboard.leaveCompany.error', 'Error'),
+        description: error.message || "Failed to leave company",
+        variant: "destructive",
+      });
     },
   });
 
@@ -3006,17 +3053,6 @@ export default function Dashboard() {
       category: "operations",
     },
     {
-      id: "past-projects",
-      label: t('dashboard.cards.pastProjects.label', 'Past Projects'),
-      description: t('dashboard.cards.pastProjects.description', 'Completed work'),
-      icon: "task_alt",
-      onClick: () => handleTabChange("past-projects"),
-      testId: "button-nav-past-projects",
-      isVisible: () => true, // Everyone
-      borderColor: "#60a5fa",
-      category: "operations",
-    },
-    {
       id: "employees",
       label: t('dashboard.cards.employees.label', 'Employees'),
       description: t('dashboard.cards.employees.description', 'Manage team'),
@@ -3129,7 +3165,7 @@ export default function Dashboard() {
     },
     {
       id: "documents",
-      label: t('dashboard.cards.documents.label', 'Documents'),
+      label: t('dashboard.cards.documents.label', 'Documents and Training'),
       description: t('dashboard.cards.documents.description', 'All company files'),
       icon: "folder_open",
       onClick: () => setLocation("/documents"),
@@ -3158,6 +3194,17 @@ export default function Dashboard() {
       testId: "button-my-profile",
       isVisible: (user: any) => user?.role === 'rope_access_tech', // Technicians only
       borderColor: "#f59e0b",
+      category: "team",
+    },
+    {
+      id: "current-employer",
+      label: t('dashboard.cards.currentEmployer.label', 'My Employer'),
+      description: userData?.user?.companyName || t('dashboard.cards.currentEmployer.description', 'View details'),
+      icon: "business",
+      onClick: () => setShowEmployerInfoDialog(true),
+      testId: "button-current-employer",
+      isVisible: (user: any) => user?.role === 'rope_access_tech' && user?.companyId && !user?.terminatedDate,
+      borderColor: "#0ea5e9",
       category: "team",
     },
   ].filter(card => {
@@ -4600,12 +4647,39 @@ export default function Dashboard() {
                 </Dialog>
               </div>
 
-              {/* Active Projects */}
+              {/* Projects with Active/Past Tabs */}
               <div>
-                <div className="flex items-center gap-2 mb-6 mt-8">
-                  <div className="h-8 w-1 bg-primary rounded-full"></div>
-                  <h2 className="text-xl font-bold">{t('dashboard.projects.activeProjects', 'Active Projects')}</h2>
+                <div className="flex items-center justify-between mb-6 mt-8">
+                  <div className="flex items-center gap-2">
+                    <div className="h-8 w-1 bg-primary rounded-full"></div>
+                    <h2 className="text-xl font-bold">{t('dashboard.projects.title', 'Projects')}</h2>
+                  </div>
+                  {canViewPastProjects(currentUser) && (
+                    <Tabs value={projectsSubTab} onValueChange={(v) => setProjectsSubTab(v as "active" | "past")}>
+                      <TabsList className="bg-muted/80 p-1 h-auto">
+                        <TabsTrigger 
+                          value="active" 
+                          data-testid="tab-active-projects"
+                          className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2 gap-2"
+                        >
+                          <span className="material-icons text-base">play_circle</span>
+                          {t('dashboard.projects.activeProjects', 'Active Projects')}
+                        </TabsTrigger>
+                        <TabsTrigger 
+                          value="past" 
+                          data-testid="tab-past-projects"
+                          className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2 gap-2"
+                        >
+                          <span className="material-icons text-base">history</span>
+                          {t('dashboard.projects.pastProjects', 'Past Projects')}
+                        </TabsTrigger>
+                      </TabsList>
+                    </Tabs>
+                  )}
                 </div>
+
+                {/* Active Projects */}
+                {projectsSubTab === "active" && (
                 <div className="space-y-4">
                   {filteredProjects.filter((p: Project) => p.status === "active").length === 0 ? (
                     <Card>
@@ -4636,14 +4710,21 @@ export default function Dashboard() {
                       
                       if (isHoursBased) {
                         // Hours-based tracking for NDT, Rock Scaling, General Pressure Washing, Ground Window
-                        // Show hours worked vs estimated hours if available, otherwise use completion percentage
-                        if (project.estimatedHours && project.estimatedHours > 0) {
+                        // Priority: overallCompletionPercentage > estimatedHours > session-based percentage
+                        if ((project as any).overallCompletionPercentage !== null && (project as any).overallCompletionPercentage !== undefined) {
+                          // Use project-level overall completion percentage (set by "last one out" technician)
+                          progressPercent = (project as any).overallCompletionPercentage;
+                          completed = progressPercent;
+                          total = 100;
+                          unitLabel = "%";
+                        } else if (project.estimatedHours && project.estimatedHours > 0) {
+                          // Fall back to hours-based progress if no overall percentage set
                           completed = Math.round(totalHoursWorked * 10) / 10;
                           total = project.estimatedHours;
                           progressPercent = Math.min((totalHoursWorked / project.estimatedHours) * 100, 100);
                           unitLabel = t('dashboard.projects.hours', 'hrs');
                         } else {
-                          // Fall back to completion percentage if no estimated hours
+                          // Legacy: Fall back to session-based calculation
                           const sessionsWithPercentage = allWorkSessions.filter((s: any) => 
                             s.projectId === project.id && s.endTime && s.manualCompletionPercentage !== null
                           );
@@ -4839,11 +4920,105 @@ export default function Dashboard() {
                     })
                   )}
                 </div>
+                )}
+
+                {/* Past Projects */}
+                {projectsSubTab === "past" && (
+                  <Tabs defaultValue="completed" className="space-y-4">
+                    <TabsList className="mb-4">
+                      <TabsTrigger value="completed" data-testid="tab-completed-projects">
+                        <span className="material-icons text-sm mr-1">done_all</span>
+                        {t('dashboard.projects.completed', 'Completed')}
+                      </TabsTrigger>
+                      <TabsTrigger value="deleted" data-testid="tab-deleted-projects">
+                        <span className="material-icons text-sm mr-1">delete</span>
+                        {t('dashboard.projects.deleted', 'Deleted')}
+                      </TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent value="completed" className="space-y-4">
+                      {filteredProjects.filter((p: Project) => p.status === "completed").length === 0 ? (
+                        <Card>
+                          <CardContent className="p-8 text-center text-muted-foreground">
+                            <span className="material-icons text-4xl mb-2 opacity-50">done_all</span>
+                            <div>{t('dashboard.projects.noCompletedProjects', 'No completed projects yet')}</div>
+                          </CardContent>
+                        </Card>
+                      ) : (
+                        <div className="space-y-4">
+                          {filteredProjects.filter((p: Project) => p.status === "completed").map((project: Project) => (
+                            <Card 
+                              key={project.id} 
+                              className="group border-l-4 border-l-success shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer bg-gradient-to-br from-background to-success/5" 
+                              data-testid={`completed-project-${project.id}`}
+                              onClick={() => setLocation(`/projects/${project.id}`)}
+                            >
+                              <CardContent className="p-5">
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1">
+                                    <div className="text-lg font-bold mb-1">{project.buildingName}</div>
+                                    <div className="text-sm font-medium text-muted-foreground mb-1">{project.strataPlanNumber}</div>
+                                    <div className="text-sm text-muted-foreground capitalize flex items-center gap-2">
+                                      <span className="material-icons text-base text-success">check_circle</span>
+                                      {getJobTypeLabel(t, project.jobType)}
+                                    </div>
+                                  </div>
+                                  <Badge variant="outline" className="bg-success/10 text-success border-success/30">
+                                    {t('dashboard.projects.completed', 'Completed')}
+                                  </Badge>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      )}
+                    </TabsContent>
+
+                    <TabsContent value="deleted" className="space-y-4">
+                      {filteredProjects.filter((p: Project) => p.status === "deleted").length === 0 ? (
+                        <Card>
+                          <CardContent className="p-8 text-center text-muted-foreground">
+                            <span className="material-icons text-4xl mb-2 opacity-50">delete_outline</span>
+                            <div>{t('dashboard.projects.noDeletedProjects', 'No deleted projects')}</div>
+                          </CardContent>
+                        </Card>
+                      ) : (
+                        <div className="space-y-4">
+                          {filteredProjects.filter((p: Project) => p.status === "deleted").map((project: Project) => (
+                            <Card 
+                              key={project.id} 
+                              className="group border-l-4 border-l-destructive/50 shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer bg-gradient-to-br from-background to-destructive/5 opacity-75" 
+                              data-testid={`deleted-project-${project.id}`}
+                              onClick={() => setLocation(`/projects/${project.id}`)}
+                            >
+                              <CardContent className="p-5">
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1">
+                                    <div className="text-lg font-bold mb-1">{project.buildingName}</div>
+                                    <div className="text-sm font-medium text-muted-foreground mb-1">{project.strataPlanNumber}</div>
+                                    <div className="text-sm text-muted-foreground capitalize flex items-center gap-2">
+                                      <span className="material-icons text-base text-destructive/70">delete</span>
+                                      {getJobTypeLabel(t, project.jobType)}
+                                    </div>
+                                  </div>
+                                  <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/30">
+                                    {t('dashboard.projects.deleted', 'Deleted')}
+                                  </Badge>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      )}
+                    </TabsContent>
+                  </Tabs>
+                )}
               </div>
             </div>
         )}
 
-        {activeTab === "past-projects" && (
+        {/* Remove old standalone past-projects tab - now integrated into projects tab */}
+        {false && activeTab === "past-projects" && (
           <div>
             <Tabs defaultValue="completed" className="space-y-4">
               <div className="flex items-center justify-between mb-6">
@@ -6503,7 +6678,8 @@ export default function Dashboard() {
                                 >
                                   <span className="material-icons text-sm">edit</span>
                                 </Button>
-                                {user?.role === "company" && (
+                                {/* Password change only for company-created employees, NOT rope access technicians who own their own accounts */}
+                                {user?.role === "company" && employee.role !== "rope_access_tech" && (
                                   <Button
                                     variant="ghost"
                                     size="icon"
@@ -6774,27 +6950,32 @@ export default function Dashboard() {
                                     )}
                                   </div>
                                   <div className="flex items-center gap-2">
-                                    <Button
-                                      variant="default"
-                                      size="sm"
-                                      onClick={() => reactivateEmployeeMutation.mutate(employee.id)}
-                                      data-testid={`button-reactivate-employee-${employee.id}`}
-                                      className="h-9"
-                                      disabled={userIsReadOnly}
-                                    >
-                                      <span className="material-icons text-sm mr-1">refresh</span>
-                                      {t('dashboard.employees.reactivate', 'Reactivate')}
-                                    </Button>
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      onClick={() => handleEditEmployee(employee)}
-                                      data-testid={`button-edit-terminated-employee-${employee.id}`}
-                                      className="h-9 w-9"
-                                      disabled={userIsReadOnly}
-                                    >
-                                      <span className="material-icons text-sm">edit</span>
-                                    </Button>
+                                    {/* Hide Reactivate and Edit buttons for self-resigned technicians */}
+                                    {employee.terminationReason !== "Self-resigned" && (
+                                      <>
+                                        <Button
+                                          variant="default"
+                                          size="sm"
+                                          onClick={() => reactivateEmployeeMutation.mutate(employee.id)}
+                                          data-testid={`button-reactivate-employee-${employee.id}`}
+                                          className="h-9"
+                                          disabled={userIsReadOnly}
+                                        >
+                                          <span className="material-icons text-sm mr-1">refresh</span>
+                                          {t('dashboard.employees.reactivate', 'Reactivate')}
+                                        </Button>
+                                        <Button
+                                          variant="ghost"
+                                          size="icon"
+                                          onClick={() => handleEditEmployee(employee)}
+                                          data-testid={`button-edit-terminated-employee-${employee.id}`}
+                                          className="h-9 w-9"
+                                          disabled={userIsReadOnly}
+                                        >
+                                          <span className="material-icons text-sm">edit</span>
+                                        </Button>
+                                      </>
+                                    )}
                                     <Button
                                       variant="ghost"
                                       size="icon"
@@ -7000,18 +7181,19 @@ export default function Dashboard() {
         {activeTab === "clients" && (
           <div>
             <div className="space-y-4">
-              {/* Add Client Button */}
-              <Dialog open={showClientDialog} onOpenChange={setShowClientDialog}>
-                <DialogTrigger asChild>
-                  <Button 
-                    className="w-full h-12 gap-2" 
-                    data-testid="button-create-client"
-                    disabled={userIsReadOnly || !hasPermission(currentUser, "manage_clients")}
-                  >
-                    <span className="material-icons">business</span>
-                    {t('dashboard.clientDatabase.addNewClient', 'Add New Client')}
-                  </Button>
-                </DialogTrigger>
+              {/* Add Client Buttons */}
+              <div className="flex gap-2">
+                <Dialog open={showClientDialog} onOpenChange={setShowClientDialog}>
+                  <DialogTrigger asChild>
+                    <Button 
+                      className="flex-1 h-12 gap-2" 
+                      data-testid="button-create-client"
+                      disabled={userIsReadOnly || !hasPermission(currentUser, "manage_clients")}
+                    >
+                      <span className="material-icons">business</span>
+                      {t('dashboard.clientDatabase.addNewClient', 'Add New Client')}
+                    </Button>
+                  </DialogTrigger>
                 <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto" data-testid="dialog-add-client">
                   <DialogHeader className="pb-4">
                     <DialogTitle>{t('dashboard.clientDatabase.addNewClient', 'Add New Client')}</DialogTitle>
@@ -7069,6 +7251,20 @@ export default function Dashboard() {
                             <FormLabel>{t('dashboard.clientForm.phoneOptional', 'Phone Number (Optional)')}</FormLabel>
                             <FormControl>
                               <Input placeholder="(604) 555-1234" {...field} className="h-12" data-testid="input-client-phone" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={clientForm.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t('dashboard.clientForm.emailOptional', 'Email (Optional)')}</FormLabel>
+                            <FormControl>
+                              <Input type="email" placeholder="john@example.com" {...field} className="h-12" data-testid="input-client-email" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -7376,7 +7572,42 @@ export default function Dashboard() {
                     </form>
                   </Form>
                 </DialogContent>
-              </Dialog>
+                </Dialog>
+                
+                {/* Scan Business Card Button - Company owners only */}
+                {currentUser?.role === "company" && (
+                  <Button 
+                    variant="outline"
+                    className="h-12 gap-2" 
+                    onClick={() => setShowBusinessCardScanner(true)}
+                    data-testid="button-scan-business-card"
+                    disabled={userIsReadOnly || !hasPermission(currentUser, "manage_clients")}
+                  >
+                    <span className="material-icons">photo_camera</span>
+                    {t('dashboard.clientDatabase.scanCard', 'Scan Business Card')}
+                  </Button>
+                )}
+              </div>
+
+              {/* Business Card Scanner Dialog */}
+              <BusinessCardScanner 
+                open={showBusinessCardScanner}
+                onOpenChange={setShowBusinessCardScanner}
+                onScanComplete={(data) => {
+                  // Pre-populate the client form with scanned data
+                  clientForm.reset({
+                    firstName: data.firstName || "",
+                    lastName: data.lastName || "",
+                    company: data.company || "",
+                    email: data.email || "",
+                    phoneNumber: data.phone || data.mobile || "",
+                    address: data.address || "",
+                    billingAddress: "",
+                  });
+                  // Open the client dialog with pre-filled data
+                  setShowClientDialog(true);
+                }}
+              />
 
               {/* Clients List */}
               <Card>
@@ -7436,6 +7667,11 @@ export default function Dashboard() {
                                 {client.phoneNumber && (
                                   <div className="text-sm text-muted-foreground mb-1">
                                     {client.phoneNumber}
+                                  </div>
+                                )}
+                                {client.email && (
+                                  <div className="text-sm text-muted-foreground mb-1">
+                                    {client.email}
                                   </div>
                                 )}
                                 {client.lmsNumbers && client.lmsNumbers.length > 0 && (
@@ -7548,6 +7784,20 @@ export default function Dashboard() {
                     <FormLabel>{t('dashboard.clientForm.phoneOptional', 'Phone Number (Optional)')}</FormLabel>
                     <FormControl>
                       <Input placeholder="(604) 555-1234" {...field} className="h-12" data-testid="input-edit-client-phone" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={editClientForm.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('dashboard.clientForm.emailOptional', 'Email (Optional)')}</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="john@example.com" {...field} className="h-12" data-testid="input-edit-client-email" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -8508,7 +8758,7 @@ export default function Dashboard() {
 
       {/* Employee Detail Dialog */}
       <Dialog open={showEmployeeDetailDialog} onOpenChange={setShowEmployeeDetailDialog}>
-        <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col p-0">
+        <DialogContent className="max-w-5xl max-h-[90vh] flex flex-col p-0">
           {employeeToView && (
             <>
               <DialogHeader className="p-6 border-b flex-shrink-0">
@@ -9163,6 +9413,15 @@ export default function Dashboard() {
                       })()}
                     </CardContent>
                   </Card>
+
+                  {/* Document Requests - Only for company owners viewing rope access technicians */}
+                  {user?.role === 'company' && employeeToView.role === 'rope_access_tech' && companyIdForData && (
+                    <EmployerDocumentRequests
+                      technicianId={employeeToView.id}
+                      technicianName={employeeToView.name || employeeToView.email}
+                      companyId={companyIdForData}
+                    />
+                  )}
                 </div>
               </div>
             </>
@@ -9653,6 +9912,17 @@ export default function Dashboard() {
           </Form>
         </DialogContent>
       </Dialog>
+
+      {/* Last One Out - Progress Prompt Dialog */}
+      <ProgressPromptDialog
+        open={progressPromptOpen}
+        onClose={() => {
+          setProgressPromptOpen(false);
+          setProgressPromptProjectId(null);
+        }}
+        projectId={progressPromptProjectId}
+        currentProgress={progressPromptCurrentValue}
+      />
 
       {/* Harness Inspection Details Dialog */}
       <Dialog open={!!selectedInspection} onOpenChange={() => setSelectedInspection(null)}>
@@ -10956,6 +11226,147 @@ export default function Dashboard() {
           </Form>
         </DialogContent>
       </Dialog>
+
+      {/* Employer Info Dialog for Technicians */}
+      <Dialog open={showEmployerInfoDialog} onOpenChange={setShowEmployerInfoDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <span className="material-icons text-primary">business</span>
+              {t('dashboard.employerInfo.title', 'My Employer')}
+            </DialogTitle>
+            <DialogDescription>
+              {t('dashboard.employerInfo.description', 'Your current employment details')}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {/* Company Name */}
+            <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+              <span className="material-icons text-muted-foreground">apartment</span>
+              <div>
+                <div className="text-xs text-muted-foreground">{t('dashboard.employerInfo.companyName', 'Company')}</div>
+                <div className="font-medium">{userData?.user?.companyName || t('common.unknown', 'Unknown')}</div>
+              </div>
+            </div>
+            
+            {/* Start Date */}
+            {user?.startDate && (
+              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                <span className="material-icons text-muted-foreground">event</span>
+                <div>
+                  <div className="text-xs text-muted-foreground">{t('dashboard.employerInfo.startDate', 'Date of Hire')}</div>
+                  <div className="font-medium">{formatLocalDate(user.startDate)}</div>
+                </div>
+              </div>
+            )}
+            
+            {/* Duration Worked */}
+            {user?.startDate && (
+              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                <span className="material-icons text-muted-foreground">schedule</span>
+                <div>
+                  <div className="text-xs text-muted-foreground">{t('dashboard.employerInfo.duration', 'Time with Company')}</div>
+                  <div className="font-medium">
+                    {(() => {
+                      const start = new Date(user.startDate);
+                      const now = new Date();
+                      const diffMs = now.getTime() - start.getTime();
+                      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                      const years = Math.floor(diffDays / 365);
+                      const months = Math.floor((diffDays % 365) / 30);
+                      const days = diffDays % 30;
+                      
+                      const parts = [];
+                      if (years > 0) parts.push(`${years} ${years === 1 ? t('common.year', 'year') : t('common.years', 'years')}`);
+                      if (months > 0) parts.push(`${months} ${months === 1 ? t('common.month', 'month') : t('common.months', 'months')}`);
+                      if (years === 0 && days > 0) parts.push(`${days} ${days === 1 ? t('common.day', 'day') : t('common.days', 'days')}`);
+                      
+                      return parts.length > 0 ? parts.join(', ') : t('common.today', 'Started today');
+                    })()}
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Hourly Rate or Salary */}
+            {(user?.hourlyRate || user?.salary) && (
+              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                <span className="material-icons text-muted-foreground">payments</span>
+                <div>
+                  <div className="text-xs text-muted-foreground">
+                    {user?.isSalary 
+                      ? t('dashboard.employerInfo.salary', 'Annual Salary') 
+                      : t('dashboard.employerInfo.hourlyRate', 'Hourly Rate')}
+                  </div>
+                  <div className="font-medium">
+                    {user?.isSalary 
+                      ? `$${parseFloat(user.salary || '0').toLocaleString()}/year`
+                      : `$${parseFloat(user.hourlyRate || '0').toFixed(2)}/hr`}
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Role */}
+            <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+              <span className="material-icons text-muted-foreground">badge</span>
+              <div>
+                <div className="text-xs text-muted-foreground">{t('dashboard.employerInfo.role', 'Role')}</div>
+                <div className="font-medium capitalize">{user?.role?.replace(/_/g, ' ') || t('common.technician', 'Technician')}</div>
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter className="flex-col gap-2 sm:flex-row">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowEmployerInfoDialog(false)}
+              className="w-full sm:w-auto"
+              data-testid="button-close-employer-info"
+            >
+              {t('common.close', 'Close')}
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={() => {
+                setShowEmployerInfoDialog(false);
+                setShowLeaveCompanyDialog(true);
+              }}
+              className="w-full sm:w-auto"
+              data-testid="button-leave-company"
+            >
+              <span className="material-icons text-sm mr-1">exit_to_app</span>
+              {t('dashboard.employerInfo.leaveCompany', 'Leave Company')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Leave Company Dialog for Technicians */}
+      <AlertDialog open={showLeaveCompanyDialog} onOpenChange={setShowLeaveCompanyDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('dashboard.leaveCompany.title', 'Leave')} {userData?.user?.companyName || 'Company'}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('dashboard.leaveCompany.warning', 'This will remove you from their active roster. You can still be invited by other companies.')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-leave-company">{t('common.cancel', 'Cancel')}</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={() => leaveCompanyMutation.mutate()}
+              disabled={leaveCompanyMutation.isPending}
+              className="bg-destructive text-destructive-foreground"
+              data-testid="button-confirm-leave-company"
+            >
+              {leaveCompanyMutation.isPending 
+                ? t('dashboard.leaveCompany.leaving', 'Leaving...') 
+                : t('dashboard.leaveCompany.confirm', 'Yes, Leave Company')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

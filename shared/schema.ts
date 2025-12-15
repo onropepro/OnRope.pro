@@ -68,6 +68,7 @@ export const users = pgTable("users", {
   province: varchar("province"), // for company role - province/state
   country: varchar("country"), // for company role - country
   zipCode: varchar("zip_code"), // for company role - postal/zip code
+  timezone: varchar("timezone").default("America/Vancouver"), // IANA timezone for company (e.g., "America/Vancouver", "America/Toronto")
   
   // Shared fields
   name: varchar("name"), // for resident and employee roles
@@ -348,6 +349,7 @@ export const clients = pgTable("clients", {
   firstName: varchar("first_name").notNull(),
   lastName: varchar("last_name").notNull(),
   company: varchar("company"),
+  email: varchar("email"), // Client's email address
   address: text("address"),
   phoneNumber: varchar("phone_number"),
   lmsNumbers: jsonb("lms_numbers").$type<Array<{ number: string; buildingName?: string; address: string; stories?: number; units?: number; parkingStalls?: number; dailyDropTarget?: number; totalDropsNorth?: number; totalDropsEast?: number; totalDropsSouth?: number; totalDropsWest?: number }>>().default(sql`'[]'::jsonb`), // Array of objects with strata number, building name, address, building details, daily drop target, and elevation drops
@@ -410,6 +412,13 @@ export const projects = pgTable("projects", {
   assignedEmployees: text("assigned_employees").array().default(sql`ARRAY[]::text[]`), // Array of employee IDs assigned to this project
   peaceWork: boolean("peace_work").notNull().default(false), // Peace work toggle for project billing/tracking
   pricePerDrop: integer("price_per_drop"), // Price per drop when peace work is enabled
+  
+  // Overall completion percentage for percentage-based jobs (non-elevation or hours-based)
+  // Updated by the "last one out" technician at end of day
+  overallCompletionPercentage: integer("overall_completion_percentage"), // 0-100
+  lastProgressUpdateBy: varchar("last_progress_update_by"), // User ID of last tech to update progress
+  lastProgressUpdateAt: timestamp("last_progress_update_at"), // When progress was last updated
+  timezone: varchar("timezone"), // IANA timezone override for project (e.g., "America/Toronto") - falls back to company timezone if null
   
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -911,12 +920,17 @@ export const harnessInspections = pgTable("harness_inspections", {
   // Reference to the specific gear item from inventory
   gearItemId: varchar("gear_item_id").references(() => gearItems.id, { onDelete: "set null" }),
   
+  // Personal inspection flag - when true, this is a technician's personal inspection
+  // not tied to any company CSR rating (technician created for their own records)
+  isPersonal: boolean("is_personal").notNull().default(false),
+  
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => [
   index("IDX_harness_inspections_company_date").on(table.companyId, table.inspectionDate),
   index("IDX_harness_inspections_worker").on(table.workerId, table.inspectionDate),
   index("IDX_harness_inspections_project").on(table.projectId),
   index("IDX_harness_inspections_kit").on(table.kitInspectionId),
+  index("IDX_harness_inspections_personal").on(table.isPersonal, table.workerId),
 ]);
 
 // Toolbox meetings table
@@ -1275,6 +1289,7 @@ export const companyDocuments = pgTable("company_documents", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(), // Track when document was last updated/replaced
   graceEndsAt: timestamp("grace_ends_at"), // 14-day grace period end date for SCR calculations - employees have until this date to sign new/updated documents
+  insuranceExpiryDate: timestamp("insurance_expiry_date"), // Extracted expiry date from Certificate of Insurance PDF via AI
 }, (table) => [
   index("IDX_company_docs_company").on(table.companyId),
   index("IDX_company_docs_type").on(table.companyId, table.documentType),
@@ -2700,3 +2715,113 @@ export const futureIdeas = pgTable("future_ideas", {
 export const insertFutureIdeaSchema = createInsertSchema(futureIdeas).omit({ id: true, createdAt: true, updatedAt: true });
 export type InsertFutureIdea = z.infer<typeof insertFutureIdeaSchema>;
 export type FutureIdea = typeof futureIdeas.$inferSelect;
+
+// Document Quizzes - AI-generated or pre-built quizzes for employee training
+export const documentQuizzes = pgTable("document_quizzes", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  documentId: varchar("document_id"), // Reference to companyDocuments.id for AI-generated quizzes, null for pre-built
+  documentType: varchar("document_type").notNull(), // health_safety_manual | company_policy | irata_level_1 | irata_level_2 | irata_level_3 | sprat_level_1 | sprat_level_2 | sprat_level_3
+  questions: jsonb("questions").$type<Array<{
+    questionNumber: number;
+    question: string;
+    options: { A: string; B: string; C: string; D: string };
+    correctAnswer: "A" | "B" | "C" | "D";
+  }>>().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_document_quizzes_company").on(table.companyId),
+  index("IDX_document_quizzes_document").on(table.documentId),
+  index("IDX_document_quizzes_type").on(table.documentType),
+]);
+
+export const insertDocumentQuizSchema = createInsertSchema(documentQuizzes).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type DocumentQuiz = typeof documentQuizzes.$inferSelect;
+export type InsertDocumentQuiz = z.infer<typeof insertDocumentQuizSchema>;
+
+// Quiz Attempts - Tracks employee attempts at completing quizzes
+// Note: quizId can be either a documentQuizzes.id, a certification quiz ID (cert_*), or a safety quiz ID (safety_*)
+// Note: companyId can be null for unaffiliated technicians (self-resigned or not yet linked to any company)
+export const quizAttempts = pgTable("quiz_attempts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  quizId: varchar("quiz_id").notNull(), // Removed FK constraint to allow cert/safety quiz IDs
+  employeeId: varchar("employee_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  companyId: varchar("company_id").references(() => users.id, { onDelete: "cascade" }), // Nullable for unaffiliated technicians
+  score: real("score").notNull(), // Percentage score (0-100)
+  passed: boolean("passed").notNull(), // 80% or higher
+  answers: jsonb("answers").$type<Array<{
+    questionNumber: number;
+    selectedAnswer: "A" | "B" | "C" | "D";
+    isCorrect: boolean;
+  }>>().notNull(),
+  completedAt: timestamp("completed_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_quiz_attempts_quiz").on(table.quizId),
+  index("IDX_quiz_attempts_employee").on(table.employeeId),
+  index("IDX_quiz_attempts_company").on(table.companyId),
+])
+
+export const insertQuizAttemptSchema = createInsertSchema(quizAttempts).omit({
+  id: true,
+  completedAt: true,
+});
+
+export type QuizAttempt = typeof quizAttempts.$inferSelect;
+export type InsertQuizAttempt = z.infer<typeof insertQuizAttemptSchema>;
+
+// Technician Document Requests - Employers request documents from technicians
+export const technicianDocumentRequests = pgTable("technician_document_requests", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  technicianId: varchar("technician_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  connectionId: varchar("connection_id").notNull().references(() => technicianEmployerConnections.id, { onDelete: "cascade" }),
+  requestedById: varchar("requested_by_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  title: varchar("title").notNull(),
+  details: text("details"),
+  status: varchar("status").notNull().default("pending"), // pending | fulfilled | cancelled
+  responseNote: text("response_note"),
+  requestedAt: timestamp("requested_at").defaultNow().notNull(),
+  respondedAt: timestamp("responded_at"),
+}, (table) => [
+  index("IDX_tech_doc_requests_company_tech_status").on(table.companyId, table.technicianId, table.status),
+  index("IDX_tech_doc_requests_technician").on(table.technicianId),
+  index("IDX_tech_doc_requests_company").on(table.companyId),
+  index("IDX_tech_doc_requests_connection").on(table.connectionId),
+]);
+
+export const insertTechnicianDocumentRequestSchema = createInsertSchema(technicianDocumentRequests).omit({
+  id: true,
+  requestedAt: true,
+  respondedAt: true,
+});
+
+export type TechnicianDocumentRequest = typeof technicianDocumentRequests.$inferSelect;
+export type InsertTechnicianDocumentRequest = z.infer<typeof insertTechnicianDocumentRequestSchema>;
+
+// Technician Document Request Files - Files uploaded in response to document requests
+export const technicianDocumentRequestFiles = pgTable("technician_document_request_files", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  requestId: varchar("request_id").notNull().references(() => technicianDocumentRequests.id, { onDelete: "cascade" }),
+  storageKey: varchar("storage_key").notNull(),
+  fileName: varchar("file_name").notNull(),
+  fileSize: integer("file_size").notNull(),
+  fileType: varchar("file_type").notNull(),
+  uploadedById: varchar("uploaded_by_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  uploadedAt: timestamp("uploaded_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_tech_doc_request_files_request").on(table.requestId),
+]);
+
+export const insertTechnicianDocumentRequestFileSchema = createInsertSchema(technicianDocumentRequestFiles).omit({
+  id: true,
+  uploadedAt: true,
+});
+
+export type TechnicianDocumentRequestFile = typeof technicianDocumentRequestFiles.$inferSelect;
+export type InsertTechnicianDocumentRequestFile = z.infer<typeof insertTechnicianDocumentRequestFileSchema>;

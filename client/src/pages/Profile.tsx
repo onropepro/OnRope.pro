@@ -21,6 +21,7 @@ import { format } from "date-fns";
 import { QRCodeSVG } from 'qrcode.react';
 import { useTranslation } from "react-i18next";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { COMMON_TIMEZONES } from "@/lib/timezoneUtils";
 
 const profileSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -37,6 +38,7 @@ const profileSchema = z.object({
   country: z.string().optional(),
   zipCode: z.string().optional(),
   employeePhoneNumber: z.string().optional(),
+  timezone: z.string().optional(),
 });
 
 const passwordSchema = z.object({
@@ -960,6 +962,7 @@ export default function Profile() {
       country: user?.country || "",
       zipCode: user?.zipCode || "",
       employeePhoneNumber: user?.employeePhoneNumber || "",
+      timezone: user?.timezone || "America/Vancouver",
     },
   });
 
@@ -1451,6 +1454,31 @@ export default function Profile() {
                                 className="h-12"
                               />
                             </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={profileForm.control}
+                        name="timezone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t('profile.timezone', 'Company Timezone')}</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value || "America/Vancouver"}>
+                              <FormControl>
+                                <SelectTrigger className="h-12" data-testid="select-timezone">
+                                  <SelectValue placeholder="Select timezone" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {COMMON_TIMEZONES.map((tz) => (
+                                  <SelectItem key={tz.value} value={tz.value}>
+                                    {tz.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                             <FormMessage />
                           </FormItem>
                         )}

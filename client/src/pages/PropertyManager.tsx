@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Building2, Plus, Mail, Phone, LogOut, Settings, FileText, Download, AlertCircle, CheckCircle2, Clock, Upload, FileCheck, Trash2, User, Shield, Users } from "lucide-react";
+import { Building2, Plus, Mail, Phone, Settings, FileText, Download, AlertCircle, CheckCircle2, Clock, Upload, FileCheck, Trash2, User, Shield, Users } from "lucide-react";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
 import { formatLocalDate, formatTimestampDate, formatTime, formatDurationMs } from "@/lib/dateUtils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -279,7 +279,9 @@ export default function PropertyManager() {
 
   // Fetch CSR for selected vendor
   const { data: vendorCSRData, isLoading: isLoadingCSR } = useQuery<{
-    overallCSR: number;
+    csrRating: number;
+    csrLabel: string;
+    csrColor: string;
     breakdown: {
       documentationRating: number;
       toolboxMeetingRating: number;
@@ -638,7 +640,7 @@ export default function PropertyManager() {
                 onClick={handleLogout}
                 data-testid="menu-logout"
               >
-                <LogOut className="w-4 h-4 mr-2" />
+                <span className="material-icons text-base mr-2">logout</span>
                 {t('propertyManager.menu.logout', 'Log Out')}
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -891,15 +893,15 @@ export default function PropertyManager() {
                       <Badge 
                         variant="outline"
                         className={`gap-1.5 px-3 py-1.5 no-default-hover-elevate no-default-active-elevate ${
-                          vendorCSRData.overallCSR >= 90 ? "bg-green-600 dark:bg-green-500 text-white border-green-700 dark:border-green-400" :
-                          vendorCSRData.overallCSR >= 70 ? "bg-yellow-500 dark:bg-yellow-500 text-black dark:text-black border-yellow-600 dark:border-yellow-400" :
-                          vendorCSRData.overallCSR >= 50 ? "bg-orange-500 dark:bg-orange-500 text-white border-orange-600 dark:border-orange-400" :
+                          vendorCSRData.csrRating >= 90 ? "bg-green-600 dark:bg-green-500 text-white border-green-700 dark:border-green-400" :
+                          vendorCSRData.csrRating >= 70 ? "bg-yellow-500 dark:bg-yellow-500 text-black dark:text-black border-yellow-600 dark:border-yellow-400" :
+                          vendorCSRData.csrRating >= 50 ? "bg-orange-500 dark:bg-orange-500 text-white border-orange-600 dark:border-orange-400" :
                           "bg-red-600 dark:bg-red-500 text-white border-red-700 dark:border-red-400"
                         }`}
                         data-testid="badge-vendor-csr"
                       >
                         <Shield className="w-4 h-4" />
-                        <span className="text-sm font-semibold">CSR: {vendorCSRData.overallCSR}%</span>
+                        <span className="text-sm font-semibold">CSR: {vendorCSRData.csrRating}%</span>
                       </Badge>
                     ) : (
                       <Badge variant="outline" className="gap-1.5 px-3 py-1.5" data-testid="badge-vendor-csr-unavailable">
@@ -1575,17 +1577,23 @@ export default function PropertyManager() {
                         .filter((s: any) => s.endTime !== null);
                       
                       if (isHoursBased) {
-                        // Hours-based: Show percentage from manualCompletionPercentage
-                        const sessionsWithPercentage = completedSessions.filter((s: any) => 
-                          s.manualCompletionPercentage !== null && s.manualCompletionPercentage !== undefined
-                        );
-                        
+                        // Hours-based: Use project-level overall completion percentage (set by "last one out" technician)
+                        // Fall back to session-based calculation for legacy data
                         let progressPercent = 0;
-                        if (sessionsWithPercentage.length > 0) {
-                          const sortedSessions = [...sessionsWithPercentage].sort((a: any, b: any) => 
-                            new Date(b.endTime).getTime() - new Date(a.endTime).getTime()
+                        if ((projectDetailsData.project as any).overallCompletionPercentage !== null && 
+                            (projectDetailsData.project as any).overallCompletionPercentage !== undefined) {
+                          progressPercent = (projectDetailsData.project as any).overallCompletionPercentage;
+                        } else {
+                          const sessionsWithPercentage = completedSessions.filter((s: any) => 
+                            s.manualCompletionPercentage !== null && s.manualCompletionPercentage !== undefined
                           );
-                          progressPercent = sortedSessions[0].manualCompletionPercentage;
+                          
+                          if (sessionsWithPercentage.length > 0) {
+                            const sortedSessions = [...sessionsWithPercentage].sort((a: any, b: any) => 
+                              new Date(b.endTime).getTime() - new Date(a.endTime).getTime()
+                            );
+                            progressPercent = sortedSessions[0].manualCompletionPercentage;
+                          }
                         }
                         
                         return (

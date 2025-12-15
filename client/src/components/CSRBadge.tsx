@@ -30,6 +30,9 @@ interface ProjectDocBreakdown {
 
 interface CSRData {
   overallCSR: number;
+  csrRating: number;
+  csrLabel: string;
+  csrColor: string;
   breakdown: {
     harnessInspectionPoints: number;
     projectDocumentationPoints: number;
@@ -86,17 +89,17 @@ function getPointsColor(points: number, maxPoints: number): string {
   return "text-red-600 dark:text-red-400";
 }
 
-function getOverallScoreColor(score: number): string {
-  if (score >= 4) return "text-green-600 dark:text-green-400";
-  if (score >= 2) return "text-yellow-600 dark:text-yellow-400";
-  if (score >= 1) return "text-orange-600 dark:text-orange-400";
+function getOverallScoreColor(percentage: number): string {
+  if (percentage >= 90) return "text-green-600 dark:text-green-400";
+  if (percentage >= 70) return "text-yellow-600 dark:text-yellow-400";
+  if (percentage >= 50) return "text-orange-600 dark:text-orange-400";
   return "text-red-600 dark:text-red-400";
 }
 
-function getBadgeColors(score: number): string {
-  if (score >= 4) return "bg-green-600 dark:bg-green-500 text-white border-green-700 dark:border-green-400";
-  if (score >= 2) return "bg-yellow-500 dark:bg-yellow-500 text-black dark:text-black border-yellow-600 dark:border-yellow-400";
-  if (score >= 1) return "bg-orange-500 dark:bg-orange-500 text-white border-orange-600 dark:border-orange-400";
+function getBadgeColors(percentage: number): string {
+  if (percentage >= 90) return "bg-green-600 dark:bg-green-500 text-white border-green-700 dark:border-green-400";
+  if (percentage >= 70) return "bg-yellow-500 dark:bg-yellow-500 text-black dark:text-black border-yellow-600 dark:border-yellow-400";
+  if (percentage >= 50) return "bg-orange-500 dark:bg-orange-500 text-white border-orange-600 dark:border-orange-400";
   return "bg-red-600 dark:bg-red-500 text-white border-red-700 dark:border-red-400";
 }
 
@@ -137,7 +140,7 @@ function getImprovementTips(csrData: CSRData): { category: string; icon: any; ti
     if (!details.hasInsurance) missing.push("Certificate of Insurance");
     
     tips.push({
-      category: "Company Documents",
+      category: "Documents and Training",
       icon: Building2,
       tip: `Upload ${missing.join(", ")} to earn up to ${formatPoints(1 - breakdown.companyDocumentationPoints)} more points.`,
       priority: breakdown.companyDocumentationPoints < 0.5 ? 'high' : 'medium'
@@ -185,12 +188,12 @@ function getImprovementTips(csrData: CSRData): { category: string; icon: any; ti
 
 function getCategoryLabel(category: string): string {
   const labels: Record<string, string> = {
-    documentation: "Company Documents",
+    documentation: "Documents and Training",
     toolbox: "Toolbox Meetings",
     harness: "Harness Inspections",
     documentReview: "Document Reviews",
     projectDocumentation: "Project Documentation",
-    companyDocumentation: "Company Documents",
+    companyDocumentation: "Documents and Training",
     employeeDocReview: "Document Reviews",
     improvement: "Improvement",
     initial: "Initial Rating",
@@ -231,7 +234,9 @@ export function CSRBadge({ user }: CSRBadgeProps) {
     return null;
   }
 
-  const { overallCSR, breakdown, details } = csrData;
+  const { breakdown, details } = csrData;
+  const csrRating = csrData.csrRating ?? 0;
+  const csrLabel = csrData.csrLabel ?? 'N/A';
   const improvementTips = getImprovementTips(csrData);
   const hasImprovements = improvementTips.length > 0;
 
@@ -246,11 +251,11 @@ export function CSRBadge({ user }: CSRBadgeProps) {
         <DialogTrigger asChild>
           <Badge 
             variant="outline" 
-            className={`gap-1.5 px-3 py-1.5 cursor-pointer ${getBadgeColors(overallCSR)}`}
+            className={`gap-1.5 px-3 py-1.5 cursor-pointer ${getBadgeColors(csrRating)}`}
             data-testid="badge-csr"
           >
             <Shield className="w-4 h-4" />
-            <span className="text-sm font-semibold">CSR: {formatPoints(overallCSR)} pts</span>
+            <span className="text-sm font-semibold">CSR: {Math.round(csrRating)}%</span>
           </Badge>
         </DialogTrigger>
         <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto" data-testid="dialog-csr-details">
@@ -264,10 +269,10 @@ export function CSRBadge({ user }: CSRBadgeProps) {
           <div className="space-y-6">
             <div className="flex items-center justify-center p-6 rounded-xl bg-muted/50">
               <div className="text-center">
-                <div className={`text-5xl font-bold ${getOverallScoreColor(overallCSR)}`}>
-                  {formatPoints(overallCSR)}
+                <div className={`text-5xl font-bold ${getOverallScoreColor(csrRating)}`}>
+                  {Math.round(csrRating)}%
                 </div>
-                <p className="text-sm text-muted-foreground mt-1">Total Points</p>
+                <p className="text-sm text-muted-foreground mt-1">{csrLabel}</p>
               </div>
             </div>
 
@@ -332,7 +337,7 @@ export function CSRBadge({ user }: CSRBadgeProps) {
                   <div className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-2">
                       <Building2 className="w-4 h-4 text-muted-foreground" />
-                      <span>Company Documents</span>
+                      <span>Documents and Training</span>
                     </div>
                     <span className={`font-semibold ${getPointsColor(breakdown.companyDocumentationPoints, maxCompanyDocPoints)}`}>
                       {formatPoints(breakdown.companyDocumentationPoints)} / {maxCompanyDocPoints} pts
@@ -462,7 +467,7 @@ export function CSRBadge({ user }: CSRBadgeProps) {
                         <div>
                           <div className="flex items-center gap-2">
                             <span className={`text-lg font-bold ${getOverallScoreColor(entry.newScore)}`}>
-                              {formatPoints(entry.newScore)} pts
+                              {Math.round(entry.newScore)}%
                             </span>
                             <span className={`text-sm font-medium ${
                               entry.delta > 0 
@@ -471,11 +476,11 @@ export function CSRBadge({ user }: CSRBadgeProps) {
                                   ? 'text-red-600 dark:text-red-400' 
                                   : 'text-muted-foreground'
                             }`}>
-                              {entry.delta > 0 ? '+' : ''}{formatPoints(entry.delta)}
+                              {entry.delta > 0 ? '+' : ''}{Math.round(entry.delta)}%
                             </span>
                           </div>
                           <p className="text-xs text-muted-foreground">
-                            from {formatPoints(entry.previousScore)} pts
+                            from {Math.round(entry.previousScore)}%
                           </p>
                         </div>
                       </div>

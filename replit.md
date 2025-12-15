@@ -38,7 +38,7 @@ The platform is built with a React 18 frontend (TypeScript, Wouter for routing),
 *   **IRATA Task Logging System:** Comprehensive work hours logging for IRATA technicians to track tasks for certification progression.
 *   **Client Relationship Management (CRM):** Manages client and building records with autofill intelligence and streamlines client-to-project workflows.
 *   **Scheduling & Resource Allocation:** Dual-calendar system with color-coding, drag-and-drop assignment, and conflict detection.
-*   **Safety & Compliance:** Digitizes harness inspections, toolbox meeting documentation, FLHA forms, incident reports, gear inventory management, digital signatures, and professional PDF export. Includes detailed incident report classification and tracking.
+*   **Safety & Compliance:** Digitizes harness inspections, toolbox meeting documentation, FLHA forms, incident reports, gear inventory management, digital signatures, and professional PDF export. Includes detailed incident report classification and tracking. Certificate of Insurance uploads feature AI-powered expiry date extraction using Gemini, with automatic red badge/text warnings for expired or soon-to-expire (within 30 days) policies.
 *   **Smart Gear Inventory System:** When adding gear to inventory, users can select from a pre-populated list of industry-standard equipment (starting with descenders). Selecting "Other" allows adding custom gear that gets permanently saved to a shared database (`equipment_catalog` table) for all companies to use. Pre-populated descenders include popular models from Petzl (I'D S, I'D L, RIG, Maestro), CMC (Clutch, MPD), Rock Exotica (Totem, Akimbo), Skylotec (Deus, Sirius), ISC, Kong, and more.
 *   **Document Review & Signature System:** Employees review and digitally sign company documents with audit trails.
 *   **Company Safety Rating (CSR):** A penalty-based compliance rating system viewable by property managers.
@@ -58,7 +58,13 @@ The platform is built with a React 18 frontend (TypeScript, Wouter for routing),
 *   **Building Maintenance Focus:** Platform exclusively supports building maintenance services with 10 specialized job types: Window Cleaning, Exterior Dryer Vent Cleaning, Building Wash/Pressure Washing, General Pressure Washing, Gutter Cleaning, In-Suite Dryer Vent Cleaning, Parkade Pressure Cleaning, Ground Window Cleaning, Painting, and Inspection. Each job type has category-specific progress tracking (drops/hours/suites/stalls). Companies can also create custom job types.
 *   **Security Architecture:** Session-based authentication with secure HTTP-only cookies, multi-tenant data isolation, permission-based API response filtering, and robust API security. Sensitive employee data (SIN, bank details, driver's license, medical conditions) is encrypted at rest using AES-256-GCM.
 *   **UI/UX Standards:** Emphasizes obvious, prominent buttons with icons, clear visual feedback, mobile-first design, and accessibility, using `max-w-4xl` for dialogs and `grid-cols-4 sm:grid-cols-6` for options.
-*   **Mandatory Date/Time Handling:** All date/time operations MUST use timezone-safe utilities from `client/src/lib/dateUtils.ts` to prevent off-by-one-day bugs and ensure accuracy for payroll, scheduling, and financial calculations.
+*   **Mandatory Date/Time Handling:** All date/time operations MUST use timezone-safe utilities from `client/src/lib/dateUtils.ts` and `client/src/lib/timezoneUtils.ts` to prevent off-by-one-day bugs and ensure accuracy for payroll, scheduling, and financial calculations.
+*   **Full Timezone Support:** Companies can set their timezone in company profile settings (defaults to America/Vancouver). Projects can optionally override the company timezone. The timezone hierarchy is: Project timezone → Company timezone → Default (America/Vancouver). Uses `date-fns-tz` library with key utilities in `server/timezoneUtils.ts` and `client/src/lib/timezoneUtils.ts`:
+    - `getProjectTimezone()` - Gets effective timezone from project/company/default
+    - `getZonedDayBounds()` - Computes start/end of day in target timezone (returns UTC Date objects)
+    - `sessionOverlapsDay()` - Checks if a work session overlaps a calendar day in the target timezone
+    - `formatInTimezone()` - Formats dates for display in target timezone
+    The "last one out" detection for progress tracking uses project-local timezone to determine when technicians are working on the same calendar day.
 
 ## External Dependencies
 *   **Database:** PostgreSQL

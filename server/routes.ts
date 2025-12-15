@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles } from "@shared/schema";
 import { eq, sql, and, or, isNull, gt, desc, asc, inArray } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -14,9 +14,12 @@ import Stripe from "stripe";
 import { type TierName, type Currency, TIER_CONFIG, ADDON_CONFIG } from "../shared/stripe-config";
 import { checkSubscriptionLimits } from "./subscription-middleware";
 import { getTodayString, toLocalDateString, parseLocalDate, getStartOfWeek, getEndOfWeek } from "./dateUtils";
-import { getDefaultElevation } from "@shared/jobTypes";
+import { getDefaultElevation, usesPercentageProgress } from "@shared/jobTypes";
+import { getProjectTimezone, sessionOverlapsDay } from "./timezoneUtils";
 import { Resend } from "resend";
 import rateLimit from "express-rate-limit";
+import OpenAI from "openai";
+import { generateQuizFromDocument } from "./gemini";
 
 // SECURITY: Rate limiting for login endpoint to prevent brute force attacks
 const loginRateLimiter = rateLimit({
@@ -155,6 +158,361 @@ function canViewCSR(user: any): boolean {
   // All other roles need explicit permission
   const permissions = normalizePermissions(user.permissions);
   return permissions.includes('view_csr');
+}
+
+// Helper function to get CSR rating label and color based on percentage
+// Per SCR.RATING.md: 90-100% Green (Excellent), 70-89% Yellow (Good), 50-69% Orange (Needs Improvement), <50% Red (Poor)
+function getCsrRatingInfo(percentage: number): { label: string; color: string } {
+  if (percentage >= 90) {
+    return { label: 'Excellent', color: 'green' };
+  } else if (percentage >= 70) {
+    return { label: 'Good', color: 'yellow' };
+  } else if (percentage >= 50) {
+    return { label: 'Needs Improvement', color: 'orange' };
+  } else {
+    return { label: 'Poor', color: 'red' };
+  }
+}
+
+// Shared CSR calculation function - used by both company and property manager endpoints
+// This ensures consistent CSR values across all views
+async function calculateCompanyCSR(companyId: string, storage: any, skipHistoryRecording: boolean = false): Promise<any> {
+  // 1. Company Documentation Points
+  const companyDocuments = await storage.getCompanyDocuments(companyId);
+  const hasHealthSafety = companyDocuments.some((doc: any) => doc.documentType === 'health_safety_manual');
+  const hasCompanyPolicy = companyDocuments.some((doc: any) => doc.documentType === 'company_policy');
+  const hasInsurance = companyDocuments.some((doc: any) => doc.documentType === 'certificate_of_insurance');
+  
+  const companyDocsUploaded = (hasHealthSafety ? 1 : 0) + (hasCompanyPolicy ? 1 : 0) + (hasInsurance ? 1 : 0);
+  const companyDocumentationPoints = Math.round((companyDocsUploaded / 3) * 100) / 100;
+  const documentationRating = Math.round((companyDocsUploaded / 3) * 100);
+  
+  // 2. Toolbox Meeting Compliance
+  const TOOLBOX_COVERAGE_DAYS = 7;
+  const projects = await storage.getProjectsByCompany(companyId);
+  const meetings = await storage.getToolboxMeetingsByCompany(companyId);
+  
+  const allWorkSessions: any[] = [];
+  for (const project of projects) {
+    const projectSessions = await storage.getWorkSessionsByProject(project.id, companyId);
+    allWorkSessions.push(...projectSessions);
+  }
+  
+  const projectMeetingDates: Map<string, Date[]> = new Map();
+  const otherMeetingDates: Date[] = [];
+  
+  meetings.forEach((meeting: any) => {
+    if (meeting.meetingDate) {
+      const meetingDate = new Date(meeting.meetingDate);
+      if (meeting.projectId === 'other') {
+        otherMeetingDates.push(meetingDate);
+      } else if (meeting.projectId) {
+        if (!projectMeetingDates.has(meeting.projectId)) {
+          projectMeetingDates.set(meeting.projectId, []);
+        }
+        projectMeetingDates.get(meeting.projectId)!.push(meetingDate);
+      }
+    }
+  });
+  
+  const isDateCovered = (projectId: string, workDateStr: string): boolean => {
+    const workDate = new Date(workDateStr);
+    const projectMeetings = projectMeetingDates.get(projectId) || [];
+    for (const meetingDate of projectMeetings) {
+      const daysDiff = Math.abs(Math.floor((workDate.getTime() - meetingDate.getTime()) / (1000 * 60 * 60 * 24)));
+      if (daysDiff <= TOOLBOX_COVERAGE_DAYS) return true;
+    }
+    for (const meetingDate of otherMeetingDates) {
+      const daysDiff = Math.abs(Math.floor((workDate.getTime() - meetingDate.getTime()) / (1000 * 60 * 60 * 24)));
+      if (daysDiff <= TOOLBOX_COVERAGE_DAYS) return true;
+    }
+    return false;
+  };
+  
+  const workSessionDays = new Set<string>();
+  allWorkSessions.forEach((session: any) => {
+    if (session.projectId && session.workDate) {
+      workSessionDays.add(`${session.projectId}|${session.workDate}`);
+    }
+  });
+  
+  let toolboxDaysWithMeeting = 0;
+  let toolboxTotalDays = 0;
+  workSessionDays.forEach((dayKey) => {
+    toolboxTotalDays++;
+    const [projectId, workDate] = dayKey.split('|');
+    if (isDateCovered(projectId, workDate)) toolboxDaysWithMeeting++;
+  });
+  
+  const toolboxMeetingRating = toolboxTotalDays > 0 ? Math.round((toolboxDaysWithMeeting / toolboxTotalDays) * 100) : 100;
+  
+  // 3. Harness Inspection Points
+  const harnessInspections = await storage.getHarnessInspectionsByCompany(companyId);
+  
+  const normalizeDateToString = (date: any): string => {
+    if (!date) return '';
+    if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) return date;
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return '';
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  };
+  
+  let harnessInspectionPoints = 0;
+  let harnessRequiredInspections = 0;
+  let harnessCompletedInspections = 0;
+  const harnessProjectBreakdown: any[] = [];
+  
+  for (const project of projects) {
+    if (project.status === 'deleted') continue;
+    const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id);
+    const totalWorkSessionsForProject = projectSessions.length;
+    
+    if (totalWorkSessionsForProject === 0) continue;
+    
+    let completedInspectionsForProject = 0;
+    for (const session of projectSessions) {
+      if (!session.employeeId || !session.workDate) continue;
+      const dateStr = normalizeDateToString(session.workDate);
+      const hasInspection = harnessInspections.some((insp: any) =>
+        insp.workerId === session.employeeId && 
+        normalizeDateToString(insp.inspectionDate) === dateStr &&
+        insp.overallStatus !== "not_applicable"
+      );
+      if (hasInspection) completedInspectionsForProject++;
+    }
+    
+    harnessRequiredInspections += totalWorkSessionsForProject;
+    harnessCompletedInspections += completedInspectionsForProject;
+    
+    const projectPoints = totalWorkSessionsForProject > 0 ? completedInspectionsForProject / totalWorkSessionsForProject : 0;
+    harnessInspectionPoints += projectPoints;
+    
+    harnessProjectBreakdown.push({
+      projectId: project.id,
+      projectName: project.name,
+      workSessions: totalWorkSessionsForProject,
+      inspections: completedInspectionsForProject,
+      points: Math.round(projectPoints * 100) / 100
+    });
+  }
+  
+  harnessInspectionPoints = Math.round(harnessInspectionPoints * 100) / 100;
+  const harnessInspectionRating = harnessRequiredInspections > 0 ? Math.round((harnessCompletedInspections / harnessRequiredInspections) * 100) : 100;
+  
+  // 4. Employee Document Review Points
+  const documentReviews = await storage.getDocumentReviewSignaturesByCompany(companyId);
+  const companyEmployees = await storage.getAllEmployees(companyId);
+  const companyOwner = await storage.getUserById(companyId);
+  const totalEmployees = companyOwner ? companyEmployees.length + 1 : companyEmployees.length;
+  
+  const requiredDocTypes = ['health_safety_manual', 'company_policy', 'safe_work_procedure', 'safe_work_practice'];
+  const now = new Date();
+  
+  const requiredDocs = companyDocuments.filter((doc: any) => {
+    if (!requiredDocTypes.includes(doc.documentType)) return false;
+    if (!doc.graceEndsAt) return true;
+    const graceEnd = new Date(doc.graceEndsAt);
+    return graceEnd <= now;
+  });
+  
+  const totalRequiredDocs = requiredDocs.length;
+  const totalRequiredSignatures = totalEmployees * totalRequiredDocs;
+  const signedReviews = documentReviews.filter((r: any) => r.signedAt).length;
+  const pendingReviews = totalRequiredSignatures - signedReviews;
+  const documentReviewRating = totalRequiredSignatures > 0 ? Math.round((signedReviews / totalRequiredSignatures) * 100) : 100;
+  
+  let employeeDocReviewPoints = 0;
+  const allStaffIds = companyOwner ? [companyOwner.id, ...companyEmployees.map((e: any) => e.id)] : companyEmployees.map((e: any) => e.id);
+  
+  for (const staffId of allStaffIds) {
+    if (totalRequiredDocs === 0) {
+      employeeDocReviewPoints += 1;
+      continue;
+    }
+    const signedByEmployee = documentReviews.filter((r: any) => r.employeeId === staffId && r.signedAt).length;
+    const employeePoints = signedByEmployee / totalRequiredDocs;
+    employeeDocReviewPoints += employeePoints;
+  }
+  employeeDocReviewPoints = Math.round(employeeDocReviewPoints * 100) / 100;
+  
+  // 5. Quiz Completion Points
+  const companyQuizzes = await storage.getQuizzesByCompanyId(companyId);
+  const allQuizAttempts = await storage.getAllQuizAttemptsByCompanyId(companyId);
+  
+  let quizCompletionPoints = 0;
+  const totalQuizzes = companyQuizzes.length;
+  const totalQuizRequirements = totalQuizzes * totalEmployees;
+  
+  const passedQuizzes: Map<string, Set<string>> = new Map();
+  for (const attempt of allQuizAttempts) {
+    if (attempt.passed && attempt.employeeId && attempt.quizId) {
+      if (!passedQuizzes.has(attempt.employeeId)) passedQuizzes.set(attempt.employeeId, new Set());
+      passedQuizzes.get(attempt.employeeId)!.add(attempt.quizId);
+    }
+  }
+  
+  for (const staffId of allStaffIds) {
+    const passedByEmployee = passedQuizzes.get(staffId);
+    if (passedByEmployee) {
+      for (const quiz of companyQuizzes) {
+        if (passedByEmployee.has(quiz.id)) quizCompletionPoints += 1;
+      }
+    }
+  }
+  
+  quizCompletionPoints = Math.round(quizCompletionPoints * 100) / 100;
+  const quizCompletionRating = totalQuizRequirements > 0 ? Math.round((quizCompletionPoints / totalQuizRequirements) * 100) : 100;
+  
+  // 6. Project Documentation Points
+  const flhaForms = await storage.getFlhaFormsByCompany(companyId);
+  
+  let projectDocumentationPoints = 0;
+  let projectsWithAnchorInspection = 0;
+  let projectsWithRopeAccessPlan = 0;
+  let projectsWithFLHA = 0;
+  let projectsWithToolboxMeeting = 0;
+  let activeProjectCount = 0;
+  let elevationProjectCount = 0;
+  const projectDocBreakdown: any[] = [];
+  
+  for (const project of projects) {
+    if (project.status === 'deleted') continue;
+    activeProjectCount++;
+    const requiresElevation = project.requiresElevation === true;
+    if (requiresElevation) elevationProjectCount++;
+    
+    let docsPresent = 0;
+    const docsRequired = requiresElevation ? 4 : 2;
+    
+    const hasFlha = flhaForms.some((f: any) => f.projectId === project.id);
+    if (hasFlha) { docsPresent++; projectsWithFLHA++; }
+    
+    const hasToolbox = meetings.some((m: any) => m.projectId === project.id);
+    if (hasToolbox) { docsPresent++; projectsWithToolboxMeeting++; }
+    
+    if (requiresElevation) {
+      const hasRopeAccessPlan = companyDocuments.some((doc: any) => doc.documentType === 'rope_access_plan' && doc.projectId === project.id);
+      if (hasRopeAccessPlan) { docsPresent++; projectsWithRopeAccessPlan++; }
+      
+      // Anchor inspection is stored on the project itself as a certificate URL
+      if (project.anchorInspectionCertificateUrl) { docsPresent++; projectsWithAnchorInspection++; }
+    }
+    
+    const projectPoints = docsPresent / docsRequired;
+    projectDocumentationPoints += projectPoints;
+    
+    projectDocBreakdown.push({
+      projectId: project.id,
+      projectName: project.name,
+      isElevation: requiresElevation,
+      docsRequired,
+      docsPresent,
+      points: Math.round(projectPoints * 100) / 100
+    });
+  }
+  
+  projectDocumentationPoints = Math.round(projectDocumentationPoints * 100) / 100;
+  const totalProjectDocsRequired = (elevationProjectCount * 4) + ((activeProjectCount - elevationProjectCount) * 2);
+  const totalProjectDocsPresent = projectsWithAnchorInspection + projectsWithRopeAccessPlan + projectsWithFLHA + projectsWithToolboxMeeting;
+  const projectDocumentationRating = totalProjectDocsRequired > 0 ? Math.round((totalProjectDocsPresent / totalProjectDocsRequired) * 100) : 100;
+  
+  // Calculate overall CSR
+  const totalEarned = Math.round((harnessInspectionPoints + projectDocumentationPoints + companyDocumentationPoints + employeeDocReviewPoints + quizCompletionPoints) * 100) / 100;
+  
+  const maxHarnessPoints = harnessProjectBreakdown.filter((p: any) => p.workSessions > 0).length;
+  const maxProjectDocPoints = projectDocBreakdown.length;
+  const maxCompanyDocPoints = 1;
+  const maxEmployeeDocPoints = totalEmployees;
+  const maxQuizPoints = totalQuizRequirements;
+  
+  const totalMax = maxHarnessPoints + maxProjectDocPoints + maxCompanyDocPoints + maxEmployeeDocPoints + maxQuizPoints;
+  const csrRating = totalMax > 0 ? Math.round((totalEarned / totalMax) * 100) : 100;
+  const { label: csrLabel, color: csrColor } = getCsrRatingInfo(csrRating);
+  
+  // Record CSR history only for company view (not PM view)
+  if (!skipHistoryRecording) {
+    const lastHistory = await storage.getLatestCsrRatingHistory(companyId);
+    if (!lastHistory || lastHistory.newScore !== csrRating) {
+      const previousScore = lastHistory ? lastHistory.newScore : 100;
+      const delta = csrRating - previousScore;
+      
+      const breakdownDetails: string[] = [];
+      breakdownDetails.push(`Company Documents: ${companyDocumentationPoints.toFixed(2)} / ${maxCompanyDocPoints} (${companyDocsUploaded}/3 uploaded)`);
+      breakdownDetails.push(`Harness Inspections: ${harnessInspectionPoints.toFixed(2)} / ${maxHarnessPoints} (${harnessCompletedInspections} of ${harnessRequiredInspections} completed)`);
+      breakdownDetails.push(`Document Reviews: ${employeeDocReviewPoints.toFixed(2)} / ${maxEmployeeDocPoints} (${signedReviews}/${totalRequiredSignatures} signatures)`);
+      breakdownDetails.push(`Project Docs: ${projectDocumentationPoints.toFixed(2)} / ${maxProjectDocPoints}`);
+      if (totalQuizzes > 0) {
+        breakdownDetails.push(`Quiz Completion: ${quizCompletionPoints.toFixed(2)} / ${maxQuizPoints} (${quizCompletionPoints}/${totalQuizRequirements} passed)`);
+      }
+      
+      const reason = !lastHistory 
+        ? `Initial safety rating recorded: ${csrRating}% (${csrLabel})\n\nBreakdown (earned/max):\n${breakdownDetails.join('\n')}\n\nTotal: ${totalEarned.toFixed(2)} / ${totalMax}`
+        : `CSR updated: ${previousScore}% -> ${csrRating}%\n\nBreakdown:\n${breakdownDetails.join('\n')}`;
+      
+      await storage.createCsrRatingHistory({
+        companyId,
+        previousScore,
+        newScore: csrRating,
+        delta,
+        category: !lastHistory ? 'initial' : 'update',
+        reason
+      });
+    }
+  }
+  
+  return {
+    csrRating,
+    csrLabel,
+    csrColor,
+    overallCSR: totalEarned,
+    breakdown: {
+      harnessInspection: { earned: harnessInspectionPoints, max: maxHarnessPoints },
+      projectDocumentation: { earned: projectDocumentationPoints, max: maxProjectDocPoints },
+      companyDocumentation: { earned: companyDocumentationPoints, max: maxCompanyDocPoints },
+      employeeDocumentReview: { earned: employeeDocReviewPoints, max: maxEmployeeDocPoints },
+      quizCompletion: { earned: quizCompletionPoints, max: maxQuizPoints },
+      harnessInspectionPoints,
+      projectDocumentationPoints,
+      companyDocumentationPoints,
+      employeeDocReviewPoints,
+      quizCompletionPoints,
+      documentationRating,
+      toolboxMeetingRating,
+      harnessInspectionRating,
+      documentReviewRating,
+      projectDocumentationRating,
+      quizCompletionRating
+    },
+    totalEarned,
+    totalMax,
+    details: {
+      hasHealthSafety,
+      hasCompanyPolicy,
+      hasInsurance,
+      companyDocsUploaded,
+      toolboxDaysWithMeeting,
+      toolboxTotalDays,
+      harnessCompletedInspections,
+      harnessRequiredInspections,
+      harnessProjectBreakdown,
+      documentReviewsSigned: signedReviews,
+      documentReviewsPending: pendingReviews,
+      documentReviewsTotal: totalRequiredSignatures,
+      documentReviewsTotalEmployees: totalEmployees,
+      documentReviewsTotalDocs: totalRequiredDocs,
+      projectsWithAnchorInspection,
+      projectsWithRopeAccessPlan,
+      projectsWithFLHA,
+      projectsWithToolboxMeeting,
+      activeProjectCount,
+      elevationProjectCount,
+      projectDocBreakdown,
+      quizCompletionsPassed: quizCompletionPoints,
+      quizCompletionsRequired: totalQuizRequirements,
+      totalQuizzes,
+      totalEmployeesForQuizzes: totalEmployees
+    }
+  };
 }
 
 // Helper function to check if user can view sensitive documents
@@ -1203,9 +1561,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Check if user has been terminated (only applies to non-technicians)
       // Technicians can still access their portal even if terminated from a company
-      const isTechnician = !!(user.ropeAccessLicenseNumber || user.irataCertNumber || user.spratCertNumber);
+      // Self-resigned users (technicians who voluntarily left) are ALWAYS allowed to log in
+      const isTechnician = user.role === 'rope_access_tech' || !!(user.ropeAccessLicenseNumber || user.irataCertNumber || user.spratCertNumber);
+      const isSelfResigned = user.terminationReason === "Self-resigned";
       
-      if (user.terminatedDate && !isTechnician) {
+      if (user.terminatedDate && !isTechnician && !isSelfResigned) {
         return res.status(403).json({ message: "Your employment has been terminated. Please contact your administrator for more information." });
       }
       
@@ -6106,6 +6466,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Convert empty string to null, otherwise parse as number
           updates.hourlyRate = req.body.hourlyRate === '' ? null : req.body.hourlyRate;
         }
+        if (req.body.timezone !== undefined) {
+          updates.timezone = req.body.timezone || "America/Vancouver";
+        }
       }
       
       await storage.updateUser(user.id, updates);
@@ -6489,6 +6852,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Prevent changing other company owners' passwords
       if (employee.role === "company" && employee.id !== currentUser.id) {
         return res.status(403).json({ message: "Cannot change another company owner's password" });
+      }
+      
+      // SECURITY: Prevent employers from changing rope access technician passwords
+      // Technicians own their own accounts through the Technician Portal
+      if (employee.role === "rope_access_tech") {
+        return res.status(403).json({ message: "Cannot change password for rope access technicians. They manage their own accounts." });
       }
       
       const { newPassword } = req.body;
@@ -6995,6 +7364,334 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('[Referral] Error getting referrals:', error);
       return res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // ==================== DOCUMENT REQUEST ROUTES ====================
+  
+  // Multer config for document request file uploads (any file type allowed)
+  const documentRequestUpload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 25 * 1024 * 1024 }, // 25MB max per file
+  });
+  
+  // Employer creates a document request for a technician
+  app.post("/api/technicians/:techId/document-requests", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { techId } = req.params;
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Only company role can create document requests
+      if (currentUser.role !== 'company') {
+        return res.status(403).json({ message: "Only employers can create document requests" });
+      }
+      
+      const companyId = currentUser.id;
+      
+      // Check if there's an active connection between this company and technician
+      const connections = await db.select().from(technicianEmployerConnections)
+        .where(and(
+          eq(technicianEmployerConnections.technicianId, techId),
+          eq(technicianEmployerConnections.companyId, companyId),
+          eq(technicianEmployerConnections.status, 'active')
+        ));
+      
+      if (connections.length === 0) {
+        return res.status(403).json({ message: "No active connection with this technician" });
+      }
+      
+      const connection = connections[0];
+      
+      // Validate request body
+      const { title, details } = req.body;
+      if (!title || typeof title !== 'string' || title.trim().length === 0) {
+        return res.status(400).json({ message: "Title is required" });
+      }
+      
+      // Create the document request
+      const request = await storage.createDocumentRequest({
+        companyId,
+        technicianId: techId,
+        connectionId: connection.id,
+        requestedById: currentUser.id,
+        title: title.trim(),
+        details: details?.trim() || null,
+        status: 'pending',
+      });
+      
+      // Create notification for the technician
+      await db.insert(notifications).values({
+        companyId: techId,
+        actorId: currentUser.id,
+        type: 'document_request',
+        payload: { 
+          requestId: request.id, 
+          employerId: companyId, 
+          employerName: currentUser.companyName || 'An employer',
+          title: title.trim() 
+        },
+      });
+      
+      console.log(`[DocRequest] Company ${companyId} created request ${request.id} for technician ${techId}`);
+      
+      res.status(201).json(request);
+    } catch (error) {
+      console.error("Create document request error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Technician gets their document requests (with files)
+  app.get("/api/technicians/me/document-requests", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (user.role !== 'rope_access_tech') {
+        return res.status(403).json({ message: "Only technicians can view their document requests" });
+      }
+      
+      const requests = await storage.getDocumentRequestsByTechnician(user.id);
+      
+      // Fetch files and company info for each request
+      const requestsWithDetails = await Promise.all(requests.map(async (request) => {
+        const files = await storage.getDocumentRequestFiles(request.id);
+        const company = await storage.getUserById(request.companyId);
+        return {
+          ...request,
+          files,
+          company: company ? {
+            id: company.id,
+            name: company.companyName || company.name,
+          } : null,
+        };
+      }));
+      
+      res.json({ requests: requestsWithDetails });
+    } catch (error) {
+      console.error("Get technician document requests error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Employer gets document requests they've sent (by company)
+  app.get("/api/companies/:companyId/document-requests", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { companyId } = req.params;
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Only allow company to view their own requests
+      if (currentUser.role !== 'company' || currentUser.id !== companyId) {
+        return res.status(403).json({ message: "Unauthorized" });
+      }
+      
+      const requests = await storage.getDocumentRequestsByCompany(companyId);
+      
+      // Fetch files and technician info for each request
+      const requestsWithDetails = await Promise.all(requests.map(async (request) => {
+        const files = await storage.getDocumentRequestFiles(request.id);
+        const technician = await storage.getUserById(request.technicianId);
+        return {
+          ...request,
+          files,
+          technician: technician ? {
+            id: technician.id,
+            name: technician.name,
+            email: technician.email,
+          } : null,
+        };
+      }));
+      
+      res.json({ requests: requestsWithDetails });
+    } catch (error) {
+      console.error("Get company document requests error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Technician uploads files to a document request
+  app.post("/api/technicians/document-requests/:id/files", requireAuth, documentRequestUpload.array('files', 10), async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (user.role !== 'rope_access_tech') {
+        return res.status(403).json({ message: "Only technicians can upload files to document requests" });
+      }
+      
+      // Get the request and verify it belongs to this technician
+      const request = await storage.getDocumentRequestById(id);
+      if (!request) {
+        return res.status(404).json({ message: "Document request not found" });
+      }
+      
+      if (request.technicianId !== user.id) {
+        return res.status(403).json({ message: "This request does not belong to you" });
+      }
+      
+      if (request.status !== 'pending') {
+        return res.status(400).json({ message: "This request has already been fulfilled or cancelled" });
+      }
+      
+      const files = req.files as Express.Multer.File[];
+      if (!files || files.length === 0) {
+        return res.status(400).json({ message: "No files uploaded" });
+      }
+      
+      const uploadedFiles = [];
+      const objectStorageService = new ObjectStorageService();
+      for (const file of files) {
+        // Upload to object storage
+        const storageKey = `document-requests/${id}/${Date.now()}-${file.originalname}`;
+        await objectStorageService.uploadPublicFile(storageKey, file.buffer, file.mimetype);
+        
+        // Create file record
+        const fileRecord = await storage.createDocumentRequestFile({
+          requestId: id,
+          storageKey,
+          fileName: file.originalname,
+          fileSize: file.size,
+          fileType: file.mimetype,
+          uploadedById: user.id,
+        });
+        
+        uploadedFiles.push(fileRecord);
+      }
+      
+      console.log(`[DocRequest] Technician ${user.id} uploaded ${files.length} files to request ${id}`);
+      
+      res.status(201).json({ files: uploadedFiles });
+    } catch (error) {
+      console.error("Upload document request files error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Technician marks a document request as fulfilled
+  app.patch("/api/technicians/document-requests/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { status, responseNote } = req.body;
+      
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (user.role !== 'rope_access_tech') {
+        return res.status(403).json({ message: "Only technicians can update their document requests" });
+      }
+      
+      // Get the request and verify ownership
+      const request = await storage.getDocumentRequestById(id);
+      if (!request) {
+        return res.status(404).json({ message: "Document request not found" });
+      }
+      
+      if (request.technicianId !== user.id) {
+        return res.status(403).json({ message: "This request does not belong to you" });
+      }
+      
+      if (request.status !== 'pending') {
+        return res.status(400).json({ message: "This request has already been fulfilled or cancelled" });
+      }
+      
+      // Validate status
+      if (status !== 'fulfilled') {
+        return res.status(400).json({ message: "Invalid status. Only 'fulfilled' is allowed." });
+      }
+      
+      // Check if at least one file has been uploaded
+      const files = await storage.getDocumentRequestFiles(id);
+      if (files.length === 0) {
+        return res.status(400).json({ message: "You must upload at least one file before marking as fulfilled" });
+      }
+      
+      // Update the request
+      const updated = await storage.updateDocumentRequest(id, {
+        status: 'fulfilled',
+        responseNote: responseNote?.trim() || null,
+        respondedAt: new Date(),
+      });
+      
+      // Create notification for the employer
+      await db.insert(notifications).values({
+        companyId: request.companyId,
+        actorId: user.id,
+        type: 'document_request_fulfilled',
+        payload: { 
+          requestId: id, 
+          technicianId: user.id,
+          technicianName: user.name || 'A technician',
+          title: request.title 
+        },
+      });
+      
+      console.log(`[DocRequest] Technician ${user.id} fulfilled request ${id}`);
+      
+      res.json(updated);
+    } catch (error) {
+      console.error("Update document request error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Secure file download endpoint
+  app.get("/api/document-request-files/:id/download", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Get the file record
+      const fileRecord = await storage.getDocumentRequestFileById(id);
+      if (!fileRecord) {
+        return res.status(404).json({ message: "File not found" });
+      }
+      
+      // Get the parent request to check authorization
+      const request = await storage.getDocumentRequestById(fileRecord.requestId);
+      if (!request) {
+        return res.status(404).json({ message: "Document request not found" });
+      }
+      
+      // Only allow the technician or users from the requesting company to download
+      const isTechnician = user.id === request.technicianId;
+      const isCompanyOwner = user.id === request.companyId;
+      const isCompanyEmployee = user.companyId === request.companyId;
+      
+      if (!isTechnician && !isCompanyOwner && !isCompanyEmployee) {
+        return res.status(403).json({ message: "Unauthorized to download this file" });
+      }
+      
+      // Fetch the file from object storage
+      const objectStorageService = new ObjectStorageService();
+      const file = await objectStorageService.searchPublicObject(fileRecord.storageKey);
+      if (!file) {
+        return res.status(404).json({ message: "File not found in storage" });
+      }
+      
+      // Set download disposition header
+      res.setHeader('Content-Disposition', `attachment; filename="${fileRecord.fileName}"`);
+      
+      // Stream the file to the response
+      await objectStorageService.downloadObject(file, res);
+    } catch (error) {
+      console.error("Download document request file error:", error);
+      res.status(500).json({ message: "Internal server error" });
     }
   });
 
@@ -8429,6 +9126,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to delete client" });
     }
   });
+
+  // Scan business card with AI to extract contact information
+  app.post("/api/clients/scan-business-card", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+    try {
+      const { frontImage, backImage, frontMimeType, backMimeType } = req.body;
+      
+      if (!frontImage) {
+        return res.status(400).json({ message: "Front image is required" });
+      }
+      
+      // Validate image data
+      const validMimeTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+      if (frontMimeType && !validMimeTypes.includes(frontMimeType)) {
+        return res.status(400).json({ message: "Invalid front image type" });
+      }
+      if (backMimeType && !validMimeTypes.includes(backMimeType)) {
+        return res.status(400).json({ message: "Invalid back image type" });
+      }
+      
+      // Import the business card analyzer
+      const { analyzeBusinessCard } = await import("./gemini");
+      
+      // Analyze the business card
+      const result = await analyzeBusinessCard(
+        frontImage,
+        backImage || undefined,
+        frontMimeType || "image/jpeg",
+        backMimeType || "image/jpeg"
+      );
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Error scanning business card:", error);
+      res.status(500).json({ 
+        success: false,
+        error: "Failed to analyze business card. Please try again."
+      });
+    }
+  });
   
   app.post("/api/upload-rope-access-plan", requireAuth, requireRole("company", "operations_manager", "rope_access_tech"), upload.single('file'), async (req: Request, res: Response) => {
     try {
@@ -9034,7 +9770,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (currentUser.role === "company") {
         // Return only THIS company's projects, filtered by status (all if not specified)
         projects = await storage.getProjectsByCompany(currentUser.id, statusFilter);
-      } else if (currentUser.role === "operations_manager" || currentUser.role === "supervisor" || currentUser.role === "general_supervisor" || currentUser.role === "rope_access_supervisor" || currentUser.role === "rope_access_tech") {
+      } else if (EMPLOYEE_ROLES.includes(currentUser.role)) {
         // Return projects for their company, filtered by status (all if not specified)
         const companyId = currentUser.companyId;
         if (companyId) {
@@ -9072,6 +9808,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         projects = [];
       }
       
+      // Filter out completed/deleted projects for users without view_past_projects permission
+      // Company owners, property managers, and management roles have access by default
+      const MANAGEMENT_ROLES_BACKEND = [
+        'company', 'owner_ceo', 'human_resources', 'accounting', 
+        'operations_manager', 'general_supervisor', 'rope_access_supervisor', 'account_manager'
+      ];
+      const hasViewPastProjectsPermission = 
+        currentUser.role === 'company' ||
+        currentUser.role === 'property_manager' ||
+        MANAGEMENT_ROLES_BACKEND.includes(currentUser.role) ||
+        (currentUser.permissions?.includes('view_past_projects') ?? false);
+      
+      if (!hasViewPastProjectsPermission) {
+        // Filter to only active projects
+        projects = projects.filter(p => p.status === 'active');
+      }
+      
       // Add completedDrops, totalDrops, and totalHoursWorked to each project
       const projectsWithProgress = await Promise.all(
         projects.map(async (project) => {
@@ -9092,15 +9845,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
             return sum;
           }, 0);
           
-          // Sum all manual completion percentages for hours-based projects (each session tracks contribution %)
-          const sessionsWithPercentage = completedSessions.filter(s => s.manualCompletionPercentage !== null && s.manualCompletionPercentage !== undefined);
-          const cumulativeCompletionPercentage = sessionsWithPercentage.length > 0
-            ? sessionsWithPercentage.reduce((sum: number, s) => sum + Number(s.manualCompletionPercentage ?? 0), 0)
-            : null;
-          // Cap at 100% and guard against NaN
-          const latestCompletionPercentage = cumulativeCompletionPercentage !== null && !isNaN(cumulativeCompletionPercentage)
-            ? Math.min(100, cumulativeCompletionPercentage) 
-            : null;
+          // For percentage-based jobs, use the overallCompletionPercentage field (set by "last one out" technician)
+          // Fall back to summing session percentages for backward compatibility with existing data
+          let latestCompletionPercentage: number | null = null;
+          
+          if (project.overallCompletionPercentage !== null && project.overallCompletionPercentage !== undefined) {
+            // Use the new "last one out" progress tracking system
+            latestCompletionPercentage = project.overallCompletionPercentage;
+          } else {
+            // Fall back to legacy cumulative session percentage calculation
+            const sessionsWithPercentage = completedSessions.filter(s => s.manualCompletionPercentage !== null && s.manualCompletionPercentage !== undefined);
+            const cumulativeCompletionPercentage = sessionsWithPercentage.length > 0
+              ? sessionsWithPercentage.reduce((sum: number, s) => sum + Number(s.manualCompletionPercentage ?? 0), 0)
+              : null;
+            // Cap at 100% and guard against NaN
+            latestCompletionPercentage = cumulativeCompletionPercentage !== null && !isNaN(cumulativeCompletionPercentage)
+              ? Math.min(100, cumulativeCompletionPercentage) 
+              : null;
+          }
           
           // Get assigned technicians from scheduled jobs and active workers
           const technicianMap = new Map<string, { id: string; name: string; photoUrl?: string | null; isActive: boolean }>();
@@ -9484,12 +10246,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const isInSuite = project.jobType === 'in_suite_dryer_vent_cleaning';
       const isParkade = project.jobType === 'parkade_pressure_cleaning';
       
+      // Check if this job uses percentage-based progress (hours-based or non-elevation jobs)
+      const usesPercentage = usesPercentageProgress(project.jobType, project.requiresElevation ?? true);
+      
       const totalUnits = isInSuite 
         ? (project.floorCount ?? 0) 
         : isParkade 
         ? (project.floorCount ?? 0)  // For parkade, floorCount stores total stalls
         : totalDrops;
-      const progressPercentage = totalUnits > 0 ? (total / totalUnits) * 100 : 0;
+      
+      // For percentage-based jobs, use overallCompletionPercentage from the project
+      // For unit-based jobs, calculate from completed units
+      let progressPercentage: number;
+      if (usesPercentage) {
+        progressPercentage = project.overallCompletionPercentage ?? 0;
+      } else {
+        progressPercentage = totalUnits > 0 ? (total / totalUnits) * 100 : 0;
+      }
       
       res.json({
         completedDrops: total,
@@ -9505,6 +10278,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         totalStalls: isParkade ? (project.floorCount ?? 0) : undefined,
         completedStalls: isParkade ? total : undefined,
         progressPercentage: Math.round(progressPercentage),
+        usesPercentageProgress: usesPercentage,
+        overallCompletionPercentage: project.overallCompletionPercentage,
       });
     } catch (error) {
       console.error("Get project progress error:", error);
@@ -9708,16 +10483,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Project not found" });
       }
       
-      // Validate manual completion percentage for hours-based job types
-      const isHoursBased = project.jobType === "general_pressure_washing" || project.jobType === "ground_window_cleaning";
+      // Validate manual completion percentage for percentage-based job types
+      // Use shared utility that accounts for hours-based jobs AND non-elevation drop-based jobs
+      const isPercentageBasedJob = usesPercentageProgress(project.jobType, project.requiresElevation);
       let validatedPercentage: number | undefined = undefined;
       
-      if (isHoursBased) {
-        // Manual completion percentage is REQUIRED for hours-based job types
-        if (manualCompletionPercentage === undefined || manualCompletionPercentage === null) {
-          return res.status(400).json({ message: "Completion percentage is required for this job type" });
-        }
-        
+      // For percentage-based jobs, the completion percentage is NOT required upfront
+      // Only the "last one out" will be prompted to update overall project progress AFTER session ends
+      // If a percentage is provided (optional), validate it
+      if (isPercentageBasedJob && manualCompletionPercentage !== undefined && manualCompletionPercentage !== null) {
         // Only accept string or number types
         if (typeof manualCompletionPercentage !== 'string' && typeof manualCompletionPercentage !== 'number') {
           return res.status(400).json({ message: "Completion percentage must be a number" });
@@ -9756,33 +10530,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
         validatedPercentage = percentageValue;
       }
       
-      // Validate elevation drops (ensure they are numbers and non-negative)
-      const north = typeof dropsCompletedNorth === 'number' ? dropsCompletedNorth : 0;
-      const east = typeof dropsCompletedEast === 'number' ? dropsCompletedEast : 0;
-      const south = typeof dropsCompletedSouth === 'number' ? dropsCompletedSouth : 0;
-      const west = typeof dropsCompletedWest === 'number' ? dropsCompletedWest : 0;
+      // For percentage-based jobs, ignore drop counts entirely - set to 0
+      // For drop-based jobs, validate elevation drops (ensure they are numbers and non-negative)
+      let north = 0, east = 0, south = 0, west = 0;
+      let totalDropsCompleted = 0;
       
-      if (north < 0 || east < 0 || south < 0 || west < 0) {
-        return res.status(400).json({ message: "Invalid drops completed value" });
-      }
-      
-      const totalDropsCompleted = north + east + south + west;
-      
-      // If drops < target, require either a valid reason code OR shortfall explanation (only if dailyDropTarget is set)
-      const approvedCodes = VALID_SHORTFALL_REASONS.map(r => r.code);
-      const isCodeApproved = validShortfallReasonCode && approvedCodes.includes(validShortfallReasonCode);
-      
-      // Reject unknown codes
-      if (validShortfallReasonCode && validShortfallReasonCode !== '' && !isCodeApproved) {
-        return res.status(400).json({ message: "Invalid shortfall reason code" });
-      }
-      
-      const hasValidReasonCode = isCodeApproved && validShortfallReasonCode !== 'other';
-      const hasOtherWithExplanation = validShortfallReasonCode === 'other' && shortfallReason?.trim();
-      const hasShortfallExplanation = shortfallReason?.trim();
-      
-      if (project.dailyDropTarget && totalDropsCompleted < project.dailyDropTarget && !hasValidReasonCode && !hasOtherWithExplanation && !hasShortfallExplanation) {
-        return res.status(400).json({ message: "A reason is required when drops completed is less than the daily target" });
+      if (!isPercentageBasedJob) {
+        north = typeof dropsCompletedNorth === 'number' ? dropsCompletedNorth : 0;
+        east = typeof dropsCompletedEast === 'number' ? dropsCompletedEast : 0;
+        south = typeof dropsCompletedSouth === 'number' ? dropsCompletedSouth : 0;
+        west = typeof dropsCompletedWest === 'number' ? dropsCompletedWest : 0;
+        
+        if (north < 0 || east < 0 || south < 0 || west < 0) {
+          return res.status(400).json({ message: "Invalid drops completed value" });
+        }
+        
+        totalDropsCompleted = north + east + south + west;
+        
+        // If drops < target, require either a valid reason code OR shortfall explanation (only if dailyDropTarget is set)
+        const approvedCodes = VALID_SHORTFALL_REASONS.map(r => r.code);
+        const isCodeApproved = validShortfallReasonCode && approvedCodes.includes(validShortfallReasonCode);
+        
+        // Reject unknown codes
+        if (validShortfallReasonCode && validShortfallReasonCode !== '' && !isCodeApproved) {
+          return res.status(400).json({ message: "Invalid shortfall reason code" });
+        }
+        
+        const hasValidReasonCode = isCodeApproved && validShortfallReasonCode !== 'other';
+        const hasOtherWithExplanation = validShortfallReasonCode === 'other' && shortfallReason?.trim();
+        const hasShortfallExplanation = shortfallReason?.trim();
+        
+        if (project.dailyDropTarget && totalDropsCompleted < project.dailyDropTarget && !hasValidReasonCode && !hasOtherWithExplanation && !hasShortfallExplanation) {
+          return res.status(400).json({ message: "A reason is required when drops completed is less than the daily target" });
+        }
       }
       
       // Calculate overtime breakdown
@@ -9836,7 +10616,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // End the session with elevation-specific drops and overtime hours
-      const shouldRecordReason = project.dailyDropTarget && totalDropsCompleted < project.dailyDropTarget;
+      // For percentage-based jobs, never record shortfall reason (they don't use drop targets)
+      const shouldRecordReason = !isPercentageBasedJob && project.dailyDropTarget && totalDropsCompleted < project.dailyDropTarget;
       const session = await storage.endWorkSession(
         sessionId,
         north,
@@ -9857,9 +10638,129 @@ export async function registerRoutes(app: Express): Promise<Server> {
         validatedRopeAccessHours
       );
       
-      res.json({ session });
+      // Check if this is a percentage-based job and if this tech is the "last one out" for today
+      let requiresProgressPrompt = false;
+      // isPercentageBasedJob was already computed above for validation
+      
+      console.log("[END SESSION] Job type:", project.jobType, "requiresElevation:", project.requiresElevation, "isPercentageBasedJob:", isPercentageBasedJob);
+      
+      if (isPercentageBasedJob) {
+        // Check if there are other sessions that overlap with today's calendar work day
+        // Using project-local timezone for accurate day boundary calculations
+        const allProjectSessions = await storage.getWorkSessionsByProject(project.id, project.companyId);
+        
+        // Get company to determine timezone (project timezone overrides company default)
+        const company = await storage.getUserById(project.companyId);
+        const projectTimezone = getProjectTimezone(project, company || {});
+        
+        console.log("[END SESSION] Total project sessions:", allProjectSessions.length, "Timezone:", projectTimezone);
+        
+        const otherActiveSessions = allProjectSessions.filter(s => {
+          if (s.id === sessionId) return false; // Not the session we just ended
+          if (!s.startTime) return false; // Invalid session (no start time)
+          if (s.endTime) return false; // Session already ended - not active
+          
+          const sessionStart = new Date(s.startTime);
+          
+          // Check if this still-active session overlaps with today's window in project timezone
+          const overlaps = sessionOverlapsDay(sessionStart, null, projectTimezone);
+          console.log("[END SESSION] Active session", s.id, "overlaps today:", overlaps);
+          return overlaps;
+        });
+        
+        console.log("[END SESSION] Other active sessions overlapping today:", otherActiveSessions.length);
+        
+        // If no other sessions overlap with today, this tech is the "last one out"
+        if (otherActiveSessions.length === 0) {
+          requiresProgressPrompt = true;
+        }
+      }
+      
+      console.log("[END SESSION] Returning requiresProgressPrompt:", requiresProgressPrompt);
+      
+      res.json({ 
+        session,
+        requiresProgressPrompt,
+        currentOverallProgress: isPercentageBasedJob ? (project.overallCompletionPercentage ?? 0) : undefined
+      });
     } catch (error) {
       console.error("End work session error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Update project overall completion percentage (called by "last one out" technician)
+  app.patch("/api/projects/:projectId/overall-progress", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const { projectId } = req.params;
+      const { completionPercentage, skip } = req.body;
+      
+      // Get project
+      const project = await storage.getProjectById(projectId);
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      // Verify the user belongs to this company
+      const userCompanyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (project.companyId !== userCompanyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      // Check if this is a percentage-based job
+      const isPercentageBasedJob = usesPercentageProgress(project.jobType, project.requiresElevation);
+      if (!isPercentageBasedJob) {
+        return res.status(400).json({ message: "This project does not use percentage-based progress tracking" });
+      }
+      
+      // If skip is true, just return success without updating
+      if (skip === true) {
+        return res.json({ 
+          message: "Progress update skipped",
+          project: { 
+            id: project.id, 
+            overallCompletionPercentage: project.overallCompletionPercentage 
+          } 
+        });
+      }
+      
+      // Validate completion percentage
+      if (completionPercentage === undefined || completionPercentage === null) {
+        return res.status(400).json({ message: "Completion percentage is required" });
+      }
+      
+      const percentage = typeof completionPercentage === 'string' 
+        ? parseInt(completionPercentage, 10) 
+        : completionPercentage;
+      
+      if (isNaN(percentage) || percentage < 0 || percentage > 100) {
+        return res.status(400).json({ message: "Completion percentage must be between 0 and 100" });
+      }
+      
+      // Update the project with the new overall completion percentage
+      const updatedProject = await storage.updateProject(projectId, {
+        overallCompletionPercentage: percentage,
+        lastProgressUpdateBy: currentUser.id,
+        lastProgressUpdateAt: new Date(),
+      });
+      
+      console.log(`[PROGRESS UPDATE] Project ${projectId}: Updated to ${percentage}% by ${currentUser.fullName || currentUser.email}`);
+      
+      res.json({ 
+        message: "Progress updated successfully",
+        project: { 
+          id: updatedProject.id, 
+          overallCompletionPercentage: updatedProject.overallCompletionPercentage 
+        } 
+      });
+    } catch (error) {
+      console.error("Update project progress error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
@@ -12938,6 +13839,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Personal harness inspection routes (for technicians' personal safety documents)
+  app.post("/api/personal-harness-inspections", requireAuth, requireRole("rope_access_tech"), async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      
+      // Convert empty strings to undefined for optional fields
+      const cleanedBody = {
+        ...req.body,
+        dateInService: req.body.dateInService || undefined,
+        projectId: undefined, // Personal inspections don't have projects
+      };
+      
+      // For personal inspections, set companyId and workerId to the technician's own ID
+      // and mark as personal
+      const inspectionData = insertHarnessInspectionSchema.parse({
+        ...cleanedBody,
+        companyId: userId,
+        workerId: userId,
+        isPersonal: true,
+      });
+      
+      const inspection = await storage.createHarnessInspection(inspectionData);
+      res.json({ inspection });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Create personal harness inspection error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/personal-harness-inspections", requireAuth, requireRole("rope_access_tech"), async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const inspections = await storage.getPersonalHarnessInspections(userId);
+      res.json({ inspections });
+    } catch (error) {
+      console.error("Get personal harness inspections error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/personal-harness-inspections/:id", requireAuth, requireRole("rope_access_tech"), async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const userId = req.session.userId!;
+      
+      // Verify the inspection belongs to this user and is personal
+      const inspection = await storage.getHarnessInspectionById(id);
+      if (!inspection) {
+        return res.status(404).json({ message: "Inspection not found" });
+      }
+      if (inspection.workerId !== userId || !inspection.isPersonal) {
+        return res.status(403).json({ message: "Not authorized to delete this inspection" });
+      }
+      
+      await storage.deleteHarnessInspection(id);
+      res.json({ message: "Personal harness inspection deleted successfully" });
+    } catch (error) {
+      console.error("Delete personal harness inspection error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Toolbox meeting routes
   app.post("/api/toolbox-meetings", requireAuth, requireRole("rope_access_tech", "general_supervisor", "rope_access_supervisor", "supervisor", "operations_manager", "company"), async (req: Request, res: Response) => {
     try {
@@ -13306,7 +14272,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
         : 100;
       const documentReviewPenalty = 0;
       
-      // 5. Project Documentation Points (NEW SCR SYSTEM)
+      // 5. Quiz Completion Points (NEW)
+      // Formula: 1 point per quiz per employee who passed
+      // Points per employee per quiz = 1 if passed, 0 if not
+      const companyQuizzes = await storage.getQuizzesByCompanyId(companyId);
+      const allQuizAttempts = await storage.getAllQuizAttemptsByCompanyId(companyId);
+      
+      let quizCompletionPoints = 0;
+      const totalQuizzes = companyQuizzes.length;
+      const totalQuizRequirements = totalQuizzes * totalEmployees; // Each employee should pass each quiz
+      
+      // Track which employees have passed which quizzes
+      const passedQuizzes: Map<string, Set<string>> = new Map(); // employeeId -> Set of quizId
+      
+      for (const attempt of allQuizAttempts) {
+        if (attempt.passed && attempt.employeeId && attempt.quizId) {
+          if (!passedQuizzes.has(attempt.employeeId)) {
+            passedQuizzes.set(attempt.employeeId, new Set());
+          }
+          passedQuizzes.get(attempt.employeeId)!.add(attempt.quizId);
+        }
+      }
+      
+      // Calculate points: 1 point per employee per quiz passed
+      for (const staffId of allStaffIds) {
+        const passedByEmployee = passedQuizzes.get(staffId);
+        if (passedByEmployee) {
+          // Count how many of the company's quizzes this employee has passed
+          for (const quiz of companyQuizzes) {
+            if (passedByEmployee.has(quiz.id)) {
+              quizCompletionPoints += 1;
+            }
+          }
+        }
+      }
+      
+      // If no quizzes exist, give full credit (nothing to comply with)
+      // Otherwise calculate based on passed/total
+      const quizCompletionRating = totalQuizRequirements > 0 
+        ? Math.round((quizCompletionPoints / totalQuizRequirements) * 100) 
+        : 100;
+      
+      // Round to 2 decimal places
+      quizCompletionPoints = Math.round(quizCompletionPoints * 100) / 100;
+      
+      // 6. Project Documentation Points (NEW SCR SYSTEM)
       // Formula: 1 point per project with all required docs
       // Elevation projects: 4 docs (Rope Access Plan, Anchor Inspection, Toolbox Meeting, FLHA)
       // Non-elevation projects: 2 docs (Toolbox Meeting, FLHA)
@@ -13392,27 +14402,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // 2. Project Documentation Points (per project)
       // 3. Company Documentation Points (1 max)
       // 4. Employee Document Review Points (per employee)
-      const overallCSR = Math.round((
+      // 5. Quiz Completion Points (per employee per quiz)
+      const totalEarned = Math.round((
         harnessInspectionPoints + 
         projectDocumentationPoints + 
         companyDocumentationPoints + 
-        employeeDocReviewPoints
+        employeeDocReviewPoints +
+        quizCompletionPoints
       ) * 100) / 100;
       
+      // Calculate maximum possible points for percentage-based rating
+      // Max is derived from the SAME project/employee sets used for earned calculations
+      // This ensures earned can never exceed max and percentage is always 0-100%
+      // - Harness Inspections: 1 point per project that has work sessions (only those earn points)
+      // - Project Documentation: 1 point per project in projectDocBreakdown (same set as earned)
+      // - Company Documentation: 1 point (all 3 docs uploaded)
+      // - Employee Document Review: 1 point per employee (same count as earned calculation)
+      // - Quiz Completion: 1 point per quiz per employee (totalQuizzes * totalEmployees)
+      const maxHarnessPoints = harnessProjectBreakdown.filter((p: any) => p.workSessions > 0).length;
+      const maxProjectDocPoints = projectDocBreakdown.length; // Same projects used for earned calculation
+      const maxCompanyDocPoints = 1; // Always 1 (3 docs required)
+      const maxEmployeeDocPoints = totalEmployees;
+      const maxQuizPoints = totalQuizRequirements; // totalQuizzes * totalEmployees
+      
+      const totalMax = maxHarnessPoints + maxProjectDocPoints + maxCompanyDocPoints + maxEmployeeDocPoints + maxQuizPoints;
+      
+      // Calculate percentage rating (avoid division by zero)
+      const csrRating = totalMax > 0 ? Math.round((totalEarned / totalMax) * 100) : 100;
+      const { label: csrLabel, color: csrColor } = getCsrRatingInfo(csrRating);
+      
+      // Legacy overallCSR for backward compatibility (raw points)
+      const overallCSR = totalEarned;
+      
       const response = {
+        // NEW: Percentage-based rating (primary display)
+        csrRating,
+        csrLabel,
+        csrColor,
+        // Legacy: Raw point total for backward compatibility
         overallCSR,
         breakdown: {
+          harnessInspection: { earned: harnessInspectionPoints, max: maxHarnessPoints },
+          projectDocumentation: { earned: projectDocumentationPoints, max: maxProjectDocPoints },
+          companyDocumentation: { earned: companyDocumentationPoints, max: maxCompanyDocPoints },
+          employeeDocumentReview: { earned: employeeDocReviewPoints, max: maxEmployeeDocPoints },
+          quizCompletion: { earned: quizCompletionPoints, max: maxQuizPoints },
+          // Legacy points for backward compatibility
           harnessInspectionPoints,
           projectDocumentationPoints,
           companyDocumentationPoints,
           employeeDocReviewPoints,
+          quizCompletionPoints,
           // Legacy ratings (percentages) for backward compatibility
           documentationRating,
           toolboxMeetingRating,
           harnessInspectionRating,
           documentReviewRating,
-          projectDocumentationRating
+          projectDocumentationRating,
+          quizCompletionRating
         },
+        totalEarned,
+        totalMax,
         details: {
           hasHealthSafety,
           hasCompanyPolicy,
@@ -13434,113 +14484,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
           projectsWithToolboxMeeting,
           activeProjectCount,
           elevationProjectCount,
-          projectDocBreakdown
+          projectDocBreakdown,
+          quizCompletionsPassed: quizCompletionPoints,
+          quizCompletionsRequired: totalQuizRequirements,
+          totalQuizzes,
+          totalEmployeesForQuizzes: totalEmployees
         }
       };
       
-      // Record CSR history if score has changed
+      // Record CSR history if percentage rating has changed
       const lastHistory = await storage.getLatestCsrRatingHistory(companyId);
-      if (!lastHistory || lastHistory.newScore !== overallCSR) {
+      if (!lastHistory || lastHistory.newScore !== csrRating) {
         const previousScore = lastHistory ? lastHistory.newScore : 100;
-        const delta = overallCSR - previousScore;
+        const delta = csrRating - previousScore;
         
         if (!lastHistory) {
-          // Create detailed initial entry with full breakdown
+          // Create detailed initial entry with percentage and breakdown
           const breakdownDetails: string[] = [];
           
-          // Documentation breakdown
-          if (hasHealthSafety && hasCompanyPolicy) {
-            breakdownDetails.push('Documentation: 100% (Health & Safety Manual uploaded, Company Policy uploaded)');
-          } else if (hasHealthSafety) {
-            breakdownDetails.push(`Documentation: ${documentationRating}% (Health & Safety Manual uploaded, Company Policy missing - ${documentationPenalty}% penalty)`);
-          } else if (hasCompanyPolicy) {
-            breakdownDetails.push(`Documentation: ${documentationRating}% (Health & Safety Manual missing, Company Policy uploaded - ${documentationPenalty}% penalty)`);
-          } else {
-            breakdownDetails.push(`Documentation: ${documentationRating}% (Health & Safety Manual missing, Company Policy missing - ${documentationPenalty}% penalty)`);
+          // Company Documentation (earned/max)
+          const companyDocsCount = (hasHealthSafety ? 1 : 0) + (hasCompanyPolicy ? 1 : 0) + (hasInsurance ? 1 : 0);
+          breakdownDetails.push(`Company Documents: ${companyDocumentationPoints.toFixed(2)} / ${maxCompanyDocPoints} (${companyDocsCount}/3 uploaded)`);
+          
+          // Harness Inspections (earned/max)
+          breakdownDetails.push(`Harness Inspections: ${harnessInspectionPoints.toFixed(2)} / ${maxHarnessPoints} (${harnessCompletedInspections} of ${harnessRequiredInspections} completed)`);
+          
+          // Employee Document Reviews (earned/max)
+          breakdownDetails.push(`Document Reviews: ${employeeDocReviewPoints.toFixed(2)} / ${maxEmployeeDocPoints} (${signedReviews}/${totalRequiredSignatures} signatures)`);
+          
+          // Project Documentation (earned/max)
+          breakdownDetails.push(`Project Docs: ${projectDocumentationPoints.toFixed(2)} / ${maxProjectDocPoints}`);
+          
+          // Quiz Completion (earned/max)
+          if (totalQuizzes > 0) {
+            breakdownDetails.push(`Quiz Completion: ${quizCompletionPoints.toFixed(2)} / ${maxQuizPoints} (${quizCompletionPoints}/${totalQuizRequirements} passed)`);
           }
           
-          // Toolbox meetings breakdown
-          if (toolboxTotalDays > 0) {
-            breakdownDetails.push(`Toolbox Meetings: ${toolboxMeetingRating}% (${toolboxDaysWithMeeting}/${toolboxTotalDays} work days covered in last 30 days${toolboxPenalty > 0 ? ` - ${toolboxPenalty}% penalty` : ''})`);
-          } else {
-            breakdownDetails.push('Toolbox Meetings: 100% (No work days recorded yet)');
-          }
-          
-          // Harness inspections breakdown
-          if (harnessRequiredInspections > 0) {
-            breakdownDetails.push(`Harness Inspections: ${harnessInspectionRating}% (${harnessCompletedInspections}/${harnessRequiredInspections} required inspections completed${harnessPenalty > 0 ? ` - ${harnessPenalty}% penalty` : ''})`);
-          } else {
-            breakdownDetails.push('Harness Inspections: 100% (No inspections required yet)');
-          }
-          
-          // Document reviews breakdown
-          if (totalRequiredSignatures > 0) {
-            breakdownDetails.push(`Document Reviews: ${documentReviewRating}% (${signedReviews}/${totalRequiredSignatures} signatures - ${totalEmployees} staff × ${totalRequiredDocs} docs${documentReviewPenalty > 0 ? ` - ${documentReviewPenalty}% penalty` : ''})`);
-          } else {
-            breakdownDetails.push('Document Reviews: 100% (No required documents uploaded yet)');
-          }
-          
-          // Project documentation breakdown
-          if (activeProjectCount > 0) {
-            const projectDetails: string[] = [];
-            if (elevationProjectCount > 0) {
-              projectDetails.push(`${projectsWithAnchorInspection}/${elevationProjectCount} anchor inspections`);
-              projectDetails.push(`${projectsWithRopeAccessPlan}/${elevationProjectCount} rope access plans`);
-            }
-            projectDetails.push(`${projectsWithFLHA}/${activeProjectCount} FLHAs`);
-            breakdownDetails.push(`Project Documentation: ${projectDocumentationRating}% (${projectDetails.join(', ')}${projectDocumentationPenalty > 0 ? ` - ${projectDocumentationPenalty}% penalty` : ''})`);
-          } else {
-            breakdownDetails.push('Project Documentation: 100% (No active projects)');
-          }
-          
-          const fullReason = `Initial safety rating recorded.\n\nBreakdown:\n${breakdownDetails.join('\n')}\n\nTotal Points: ${overallCSR}`;
+          const fullReason = `Initial safety rating recorded: ${csrRating}% (${csrLabel})\n\nBreakdown (earned/max):\n${breakdownDetails.join('\n')}\n\nTotal: ${totalEarned.toFixed(2)} / ${totalMax}`;
           
           await storage.createCsrRatingHistory({
             companyId,
             previousScore,
-            newScore: overallCSR,
+            newScore: csrRating,
             delta,
             category: 'initial',
             reason: fullReason
           });
         } else {
-          // Record changes with detailed reasons
+          // Record changes with percentage-based reasons
           const changes: string[] = [];
           
-          // Check each category for changes and build detailed reason
-          if (documentationPenalty > 0) {
-            const docStatus = [];
-            if (!hasHealthSafety) docStatus.push('Health & Safety Manual missing');
-            if (!hasCompanyPolicy) docStatus.push('Company Policy missing');
-            changes.push(`Documentation: ${documentationRating}% (${docStatus.join(', ')} - ${documentationPenalty}% penalty)`);
-          } else if (hasHealthSafety && hasCompanyPolicy) {
-            changes.push('Documentation: 100% (All documents uploaded)');
-          }
+          // Company Documentation (earned/max)
+          const companyDocsCount = (hasHealthSafety ? 1 : 0) + (hasCompanyPolicy ? 1 : 0) + (hasInsurance ? 1 : 0);
+          changes.push(`Company Documents: ${companyDocumentationPoints.toFixed(2)} / ${maxCompanyDocPoints} (${companyDocsCount}/3 uploaded)`);
           
-          if (toolboxTotalDays > 0) {
-            changes.push(`Toolbox Meetings: ${toolboxMeetingRating}% (${toolboxDaysWithMeeting}/${toolboxTotalDays} work days covered${toolboxPenalty > 0 ? ` - ${toolboxPenalty}% penalty` : ''})`);
-          }
+          // Harness Inspections (earned/max)
+          changes.push(`Harness Inspections: ${harnessInspectionPoints.toFixed(2)} / ${maxHarnessPoints} (${harnessCompletedInspections} of ${harnessRequiredInspections} completed)`);
           
-          if (harnessRequiredInspections > 0) {
-            changes.push(`Harness Inspections: ${harnessInspectionRating}% (${harnessCompletedInspections}/${harnessRequiredInspections} completed${harnessPenalty > 0 ? ` - ${harnessPenalty}% penalty` : ''})`);
-          }
+          // Employee Document Reviews (earned/max)
+          changes.push(`Document Reviews: ${employeeDocReviewPoints.toFixed(2)} / ${maxEmployeeDocPoints} (${signedReviews}/${totalRequiredSignatures} signatures)`);
           
-          if (totalRequiredSignatures > 0) {
-            changes.push(`Document Reviews: ${documentReviewRating}% (${signedReviews}/${totalRequiredSignatures} signatures${documentReviewPenalty > 0 ? ` - ${documentReviewPenalty}% penalty` : ''})`);
-          }
+          // Project Documentation (earned/max)
+          changes.push(`Project Docs: ${projectDocumentationPoints.toFixed(2)} / ${maxProjectDocPoints}`);
           
-          if (activeProjectCount > 0) {
-            changes.push(`Project Docs: ${projectDocumentationRating}% (${totalProjectDocsPresent}/${totalProjectDocsRequired} present${projectDocumentationPenalty > 0 ? ` - ${projectDocumentationPenalty}% penalty` : ''})`);
+          // Quiz Completion (earned/max)
+          if (totalQuizzes > 0) {
+            changes.push(`Quiz Completion: ${quizCompletionPoints.toFixed(2)} / ${maxQuizPoints} (${quizCompletionPoints}/${totalQuizRequirements} passed)`);
           }
           
           const category = delta > 0 ? 'improvement' : delta < 0 ? 'decline' : 'update';
           const changeType = delta > 0 ? 'improved' : delta < 0 ? 'declined' : 'updated';
-          const reason = `Safety rating ${changeType} from ${previousScore} to ${overallCSR} points.\n\nCurrent Status:\n${changes.join('\n')}`;
+          const { label: prevLabel } = getCsrRatingInfo(previousScore);
+          const reason = `Safety rating ${changeType} from ${previousScore}% (${prevLabel}) to ${csrRating}% (${csrLabel}).\n\nCurrent Status (earned/max):\n${changes.join('\n')}\n\nTotal: ${totalEarned.toFixed(2)} / ${totalMax}`;
           
           await storage.createCsrRatingHistory({
             companyId,
             previousScore,
-            newScore: overallCSR,
+            newScore: csrRating,
             delta,
             category,
             reason
@@ -13556,6 +14576,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // CSR Rating History endpoint
+  // Returns percentage-based history with label and color for each entry
   app.get("/api/company-safety-rating/history", requireAuth, async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
@@ -13575,7 +14596,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const history = await storage.getCsrRatingHistoryByCompany(companyId);
-      res.json({ history });
+      
+      // Enhance each history entry with label and color based on newScore (percentage)
+      const enhancedHistory = history.map((entry: any) => {
+        const { label, color } = getCsrRatingInfo(entry.newScore);
+        return {
+          ...entry,
+          // newScore is now a percentage (0-100)
+          csrLabel: label,
+          csrColor: color
+        };
+      });
+      
+      res.json({ history: enhancedHistory });
     } catch (error) {
       console.error("Get CSR history error:", error);
       res.status(500).json({ message: "Internal server error" });
@@ -13583,6 +14616,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Property Manager: Get CSR for a linked vendor company
+  // SIMPLIFIED: Uses the same calculation as company CSR endpoint to ensure consistency
   app.get("/api/property-managers/vendors/:linkId/csr", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
     try {
       const { linkId } = req.params;
@@ -13598,388 +14632,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const companyId = ownedLink.companyId;
       
-      // 1. Documentation Safety Rating (Health & Safety Manual + Company Policy + Certificate of Insurance)
-      // Percentage allocation removed - no penalty applied
-      const companyDocuments = await storage.getCompanyDocuments(companyId);
-      const hasHealthSafety = companyDocuments.some((doc: any) => doc.documentType === 'health_safety_manual');
-      const hasCompanyPolicy = companyDocuments.some((doc: any) => doc.documentType === 'company_policy');
-      const hasInsurance = companyDocuments.some((doc: any) => doc.documentType === 'certificate_of_insurance');
-      const documentationRating = (hasHealthSafety && hasCompanyPolicy && hasInsurance) ? 100 : 0;
-      const documentationPenalty = 0;
-      
-      // 2. Toolbox Meeting Compliance (with 7-day coverage window)
-      // A toolbox meeting covers its project for 7 days forward from the meeting date
-      // Meetings can occur outside of work sessions and still provide coverage
-      const TOOLBOX_COVERAGE_DAYS = 7;
-      
-      const projects = await storage.getProjectsByCompany(companyId);
-      const meetings = await storage.getToolboxMeetingsByCompany(companyId);
-      
-      const allWorkSessions: any[] = [];
-      for (const project of projects) {
-        const projectSessions = await storage.getWorkSessionsByProject(project.id, companyId);
-        allWorkSessions.push(...projectSessions);
-      }
-      
-      // Build meeting coverage map: for each project, store meeting dates
-      const projectMeetingDates: Map<string, Date[]> = new Map();
-      const otherMeetingDates: Date[] = [];
-      
-      meetings.forEach((meeting: any) => {
-        if (meeting.meetingDate) {
-          const meetingDate = new Date(meeting.meetingDate);
-          if (meeting.projectId === 'other') {
-            otherMeetingDates.push(meetingDate);
-          } else if (meeting.projectId) {
-            if (!projectMeetingDates.has(meeting.projectId)) {
-              projectMeetingDates.set(meeting.projectId, []);
-            }
-            projectMeetingDates.get(meeting.projectId)!.push(meetingDate);
-          }
-        }
-      });
-      
-      // Helper function to check if a work date is covered by a meeting within the coverage window
-      const isDateCovered = (projectId: string, workDateStr: string): boolean => {
-        const workDate = new Date(workDateStr);
-        
-        // Check project-specific meetings
-        const projectMeetings = projectMeetingDates.get(projectId) || [];
-        for (const meetingDate of projectMeetings) {
-          const daysDiff = Math.abs(Math.floor((workDate.getTime() - meetingDate.getTime()) / (1000 * 60 * 60 * 24)));
-          // Meeting covers work if within 7 days in either direction
-          if (daysDiff <= TOOLBOX_COVERAGE_DAYS) {
-            return true;
-          }
-        }
-        
-        // Check "other" meetings (cover all projects)
-        for (const meetingDate of otherMeetingDates) {
-          const daysDiff = Math.abs(Math.floor((workDate.getTime() - meetingDate.getTime()) / (1000 * 60 * 60 * 24)));
-          if (daysDiff <= TOOLBOX_COVERAGE_DAYS) {
-            return true;
-          }
-        }
-        
-        return false;
-      };
-      
-      // Calculate toolbox meeting compliance using coverage window
-      const workSessionDays = new Set<string>();
-      allWorkSessions.forEach((session: any) => {
-        if (session.projectId && session.workDate) {
-          workSessionDays.add(`${session.projectId}|${session.workDate}`);
-        }
-      });
-      
-      let toolboxDaysWithMeeting = 0;
-      let toolboxTotalDays = 0;
-      workSessionDays.forEach((dayKey) => {
-        toolboxTotalDays++;
-        const [projectId, workDate] = dayKey.split('|');
-        if (isDateCovered(projectId, workDate)) {
-          toolboxDaysWithMeeting++;
-        }
-      });
-      
-      const toolboxMeetingRating = toolboxTotalDays > 0 
-        ? Math.round((toolboxDaysWithMeeting / toolboxTotalDays) * 100) 
-        : 100;
-      // Percentage allocation removed - no penalty applied
-      const toolboxPenalty = 0;
-      
-      // 3. Daily Harness Inspection Rating (last 30 days)
-      const harnessInspections = await storage.getHarnessInspectionsByCompany(companyId);
-      const today = new Date();
-      
-      // Helper function to normalize date to YYYY-MM-DD string format
-      const normalizeDateToString = (date: any): string => {
-        if (!date) return '';
-        // If it's already a string in YYYY-MM-DD format, return it
-        if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
-          return date;
-        }
-        // If it's a Date object or string that needs conversion
-        const d = new Date(date);
-        if (isNaN(d.getTime())) return '';
-        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-      };
-      
-      let harnessRequiredInspections = 0;
-      let harnessCompletedInspections = 0;
-      
-      for (let i = 0; i < 30; i++) {
-        const checkDate = new Date(today);
-        checkDate.setDate(checkDate.getDate() - i);
-        const dateStr = `${checkDate.getFullYear()}-${String(checkDate.getMonth() + 1).padStart(2, '0')}-${String(checkDate.getDate()).padStart(2, '0')}`;
-        
-        const workersWithSessions = new Set<string>();
-        allWorkSessions.forEach((session: any) => {
-          if (session.employeeId && session.workDate === dateStr) {
-            workersWithSessions.add(session.employeeId);
-          }
-        });
-        
-        workersWithSessions.forEach((workerId) => {
-          const inspection = harnessInspections.find((insp: any) =>
-            insp.workerId === workerId && normalizeDateToString(insp.inspectionDate) === dateStr
-          );
-          
-          if (!inspection || inspection.overallStatus !== "not_applicable") {
-            harnessRequiredInspections++;
-            if (inspection && inspection.overallStatus !== "not_applicable") {
-              harnessCompletedInspections++;
-            }
-          }
-        });
-      }
-      
-      const harnessInspectionRating = harnessRequiredInspections > 0 
-        ? Math.round((harnessCompletedInspections / harnessRequiredInspections) * 100) 
-        : 100;
-      // Percentage allocation removed - no penalty applied
-      const harnessPenalty = 0;
-      
-      // 6. Document Review Compliance Rating
-      // Calculate based on TOTAL REQUIRED signatures = (employees + owner) × required documents
-      const documentReviews = await storage.getDocumentReviewSignaturesByCompany(companyId);
-      const companyEmployees = await storage.getAllEmployees(companyId);
-      
-      // Include company owner in the count
-      const companyOwnerForPM = await storage.getUserById(companyId);
-      const totalStaffCount = companyOwnerForPM ? companyEmployees.length + 1 : companyEmployees.length;
-      
-      // Required document types that employees must sign
-      const requiredDocTypes = ['health_safety_manual', 'company_policy', 'safe_work_procedure', 'safe_work_practice'];
-      const nowVendor = new Date();
-      
-      // Filter documents: only include docs where grace period has expired (graceEndsAt <= now) or legacy docs (no graceEndsAt)
-      // Documents within grace period are NOT counted in the denominator per SCR.RATING.md
-      const requiredDocs = companyDocuments.filter((doc: any) => {
-        if (!requiredDocTypes.includes(doc.documentType)) {
-          return false;
-        }
-        // If no graceEndsAt, it's a legacy document - include it
-        if (!doc.graceEndsAt) {
-          return true;
-        }
-        // If grace period has expired (graceEndsAt is in the past), include it
-        const graceEnd = new Date(doc.graceEndsAt);
-        return graceEnd <= nowVendor;
-      });
-      
-      const totalEmployees = totalStaffCount;
-      const totalRequiredDocs = requiredDocs.length;
-      const totalRequiredSignatures = totalEmployees * totalRequiredDocs;
-      const signedReviews = documentReviews.filter((r: any) => r.signedAt).length;
-      
-      const documentReviewRating = totalRequiredSignatures > 0 
-        ? Math.round((signedReviews / totalRequiredSignatures) * 100) 
-        : 100;
-      // Percentage allocation removed - no penalty applied
-      const documentReviewPenalty = 0;
-      
-      // POINT-BASED CSR CALCULATIONS (per SCR.RATING.md)
-      
-      // 1. Company Documentation Points: (Uploaded Docs / 3)
-      const companyDocsUploaded = (hasHealthSafety ? 1 : 0) + (hasCompanyPolicy ? 1 : 0) + (hasInsurance ? 1 : 0);
-      const companyDocumentationPoints = Math.round((companyDocsUploaded / 3) * 100) / 100;
-      
-      // 2. Harness Inspection Points: (Completed Inspections / Total Work Sessions) per project
-      // Get work sessions grouped by project
-      const activeProjects = projects.filter((p: any) => p.status === 'active');
-      const activeProjectCount = activeProjects.length;
-      
-      let harnessInspectionPointsVendor = 0;
-      const harnessProjectBreakdownVendor: any[] = [];
-      
-      for (const project of activeProjects) {
-        const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id);
-        const projectWorkSessions = projectSessions.length;
-        
-        if (projectWorkSessions === 0) {
-          harnessInspectionPointsVendor += 1;
-          harnessProjectBreakdownVendor.push({
-            projectId: project.id,
-            projectName: project.buildingName || project.name,
-            workSessions: 0,
-            completedInspections: 0,
-            points: 1
-          });
-          continue;
-        }
-        
-        let completedInspectionsForProject = 0;
-        for (const session of projectSessions) {
-          const dateStr = session.workDate;
-          const inspection = harnessInspections.find((insp: any) =>
-            insp.workerId === session.employeeId && normalizeDateToString(insp.inspectionDate) === dateStr
-          );
-          if (inspection) {
-            completedInspectionsForProject++;
-          }
-        }
-        
-        const projectPoints = projectWorkSessions > 0 
-          ? completedInspectionsForProject / projectWorkSessions 
-          : 0;
-        harnessInspectionPointsVendor += projectPoints;
-        
-        harnessProjectBreakdownVendor.push({
-          projectId: project.id,
-          projectName: project.buildingName || project.name,
-          workSessions: projectWorkSessions,
-          completedInspections: completedInspectionsForProject,
-          points: Math.round(projectPoints * 100) / 100
-        });
-      }
-      
-      harnessInspectionPointsVendor = Math.round(harnessInspectionPointsVendor * 100) / 100;
-      
-      // 3. Employee Document Review Points: (Docs Signed / Docs Available) per employee
-      let employeeDocReviewPointsVendor = 0;
-      const allStaffIds: string[] = [
-        ...companyEmployees.map((e: any) => e.id),
-        ...(companyOwnerForPM ? [companyOwnerForPM.id] : [])
-      ];
-      
-      for (const staffId of allStaffIds) {
-        if (totalRequiredDocs === 0) {
-          employeeDocReviewPointsVendor += 1;
-        } else {
-          const staffSignatures = documentReviews.filter((r: any) => 
-            r.signedAt && r.employeeId === staffId
-          );
-          const employeePoints = staffSignatures.length / totalRequiredDocs;
-          employeeDocReviewPointsVendor += employeePoints;
-        }
-      }
-      employeeDocReviewPointsVendor = Math.round(employeeDocReviewPointsVendor * 100) / 100;
-      
-      // 4. Project Documentation Points: (Docs Present / Docs Required) per project
-      let projectDocumentationPointsVendor = 0;
-      const elevationProjectCountVendor = activeProjects.filter((p: any) => p.requiresRopeAccess).length;
-      const projectDocBreakdownVendor: any[] = [];
-      
-      for (const project of activeProjects) {
-        const requiresElevation = project.requiresRopeAccess;
-        const docsRequired = requiresElevation ? 4 : 2;
-        
-        let docsPresent = 0;
-        
-        // Check Toolbox Meeting (for all projects)
-        const hasProjectToolbox = meetings.some((m: any) => 
-          m.projectId === project.id.toString() || m.projectId === 'other'
-        );
-        if (hasProjectToolbox) docsPresent++;
-        
-        // Check FLHA (for all projects)
-        const projectFlhas = await storage.getFlhaFormsByProject(project.id);
-        if (projectFlhas && projectFlhas.length > 0) docsPresent++;
-        
-        if (requiresElevation) {
-          // Check Rope Access Plan
-          const hasRopeAccessPlan = companyDocuments.some((doc: any) => 
-            doc.documentType === 'rope_access_plan' && doc.projectId === project.id
-          );
-          if (hasRopeAccessPlan) docsPresent++;
-          
-          // Check Anchor Inspection
-          const anchorInspections = await storage.getAnchorInspectionsByProject(project.id);
-          if (anchorInspections && anchorInspections.length > 0) docsPresent++;
-        }
-        
-        const projectPoints = docsPresent / docsRequired;
-        projectDocumentationPointsVendor += projectPoints;
-        
-        projectDocBreakdownVendor.push({
-          projectId: project.id,
-          projectName: project.buildingName || project.name,
-          isElevation: requiresElevation,
-          docsRequired,
-          docsPresent,
-          points: Math.round(projectPoints * 100) / 100
-        });
-      }
-      
-      projectDocumentationPointsVendor = Math.round(projectDocumentationPointsVendor * 100) / 100;
-      
-      // Count project documentation details
-      let projectsWithAnchorInspection = 0;
-      let projectsWithRopeAccessPlan = 0;
-      let projectsWithFLHA = 0;
-      let projectsWithToolboxMeeting = 0;
-      
-      for (const project of activeProjects) {
-        const hasProjectToolbox = meetings.some((m: any) => 
-          m.projectId === project.id.toString() || m.projectId === 'other'
-        );
-        if (hasProjectToolbox) projectsWithToolboxMeeting++;
-        
-        const projectFlhas = await storage.getFlhaFormsByProject(project.id);
-        if (projectFlhas && projectFlhas.length > 0) projectsWithFLHA++;
-        
-        if (project.requiresRopeAccess) {
-          const hasRopeAccessPlan = companyDocuments.some((doc: any) => 
-            doc.documentType === 'rope_access_plan' && doc.projectId === project.id
-          );
-          if (hasRopeAccessPlan) projectsWithRopeAccessPlan++;
-          
-          const anchorInspections = await storage.getAnchorInspectionsByProject(project.id);
-          if (anchorInspections && anchorInspections.length > 0) projectsWithAnchorInspection++;
-        }
-      }
-      
-      // Calculate overall CSR: Sum of all 4 point categories
-      const overallCSR = Math.round((
-        harnessInspectionPointsVendor + 
-        projectDocumentationPointsVendor + 
-        companyDocumentationPoints + 
-        employeeDocReviewPointsVendor
-      ) * 100) / 100;
-      
-      res.json({
-        overallCSR,
-        breakdown: {
-          harnessInspectionPoints: harnessInspectionPointsVendor,
-          projectDocumentationPoints: projectDocumentationPointsVendor,
-          companyDocumentationPoints,
-          employeeDocReviewPoints: employeeDocReviewPointsVendor,
-          documentationRating,
-          toolboxMeetingRating,
-          harnessInspectionRating,
-          documentReviewRating,
-          projectDocumentationRating: 0
-        },
-        details: {
-          hasHealthSafety,
-          hasCompanyPolicy,
-          hasInsurance,
-          companyDocsUploaded,
-          toolboxDaysWithMeeting,
-          toolboxTotalDays,
-          harnessCompletedInspections,
-          harnessRequiredInspections,
-          harnessProjectBreakdown: harnessProjectBreakdownVendor,
-          documentReviewsSigned: signedReviews,
-          documentReviewsPending: totalRequiredSignatures - signedReviews,
-          documentReviewsTotal: totalRequiredSignatures,
-          documentReviewsTotalEmployees: totalEmployees,
-          documentReviewsTotalDocs: totalRequiredDocs,
-          projectsWithAnchorInspection,
-          projectsWithRopeAccessPlan,
-          projectsWithFLHA,
-          projectsWithToolboxMeeting,
-          activeProjectCount,
-          elevationProjectCount: elevationProjectCountVendor,
-          projectDocBreakdown: projectDocBreakdownVendor
-        }
-      });
+      // Use the shared CSR calculation function (skip history recording for PM views)
+      const csrData = await calculateCompanyCSR(companyId, storage, true);
+      res.json(csrData);
     } catch (error) {
       console.error("Get vendor CSR error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
+
 
   // Property Manager: Get vendor company documents (for viewing Certificate of Insurance, etc.)
   app.get("/api/property-managers/vendors/:linkId/documents", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
@@ -15014,7 +15675,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      res.json({ document });
+      // For Certificate of Insurance, automatically extract expiry date using AI
+      let extractedExpiryDate = null;
+      if (documentType === 'certificate_of_insurance') {
+        console.log("[COI AI] Starting insurance expiry extraction for document:", document.id);
+        try {
+          // Use the uploaded file buffer directly
+          const pdfBase64 = req.file.buffer.toString('base64');
+          console.log("[COI AI] PDF size:", req.file.buffer.byteLength, "bytes");
+          
+          // Use native Gemini SDK for extraction
+          const { extractInsuranceExpiryDate } = await import("./gemini");
+          const result = await extractInsuranceExpiryDate(pdfBase64);
+          
+          if (result.expiryDate) {
+            extractedExpiryDate = new Date(result.expiryDate);
+            if (!isNaN(extractedExpiryDate.getTime())) {
+              await storage.updateCompanyDocument(document.id, { insuranceExpiryDate: extractedExpiryDate });
+              console.log(`[COI AI] Extracted insurance expiry date: ${extractedExpiryDate.toISOString()}`);
+            }
+          } else {
+            console.log("[COI AI] No expiry date found in document");
+            if (result.error) {
+              console.log("[COI AI] Error:", result.error);
+            }
+          }
+        } catch (aiError: any) {
+          console.error("[COI AI] Extraction error:", aiError?.message || aiError);
+          // Continue - document was still uploaded successfully
+        }
+      }
+
+      res.json({ document: { ...document, insuranceExpiryDate: extractedExpiryDate } });
     } catch (error) {
       console.error("Upload company document error:", error);
       res.status(500).json({ message: "Internal server error" });
@@ -15057,6 +15749,116 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Delete company document error:", error);
       res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Extract insurance expiry date from Certificate of Insurance PDF using AI
+  app.post("/api/company-documents/:id/extract-insurance-expiry", requireAuth, requireRole("operations_manager", "company"), async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      // Get the document
+      const document = await storage.getCompanyDocumentById(id);
+      if (!document) {
+        return res.status(404).json({ message: "Document not found" });
+      }
+      
+      if (document.documentType !== 'certificate_of_insurance') {
+        return res.status(400).json({ message: "This endpoint only works for Certificate of Insurance documents" });
+      }
+      
+      // Fetch the PDF file
+      const pdfResponse = await fetch(document.fileUrl);
+      if (!pdfResponse.ok) {
+        return res.status(400).json({ message: "Failed to fetch PDF document" });
+      }
+      
+      const pdfBuffer = await pdfResponse.arrayBuffer();
+      const pdfBase64 = Buffer.from(pdfBuffer).toString('base64');
+      
+      // Initialize Gemini client via AI Integrations
+      const gemini = new OpenAI({
+        apiKey: process.env.AI_INTEGRATIONS_GEMINI_API_KEY,
+        baseURL: process.env.AI_INTEGRATIONS_GEMINI_BASE_URL,
+      });
+      
+      // Use Gemini to extract the expiry date from the PDF
+      const response = await gemini.chat.completions.create({
+        model: "gemini-2.5-flash",
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: `Analyze this Certificate of Insurance PDF and extract the policy expiry date. 
+                
+Look for fields like "Policy Expiry", "Expiration Date", "Policy Period To", "Coverage Ends", or similar.
+
+Respond with ONLY a JSON object in this exact format:
+{"expiryDate": "YYYY-MM-DD", "confidence": "high" | "medium" | "low"}
+
+If you cannot find an expiry date, respond with:
+{"expiryDate": null, "confidence": "none", "reason": "brief explanation"}
+
+Do not include any other text, just the JSON object.`
+              },
+              {
+                type: "image_url",
+                image_url: {
+                  url: `data:application/pdf;base64,${pdfBase64}`
+                }
+              }
+            ]
+          }
+        ],
+        max_tokens: 200,
+      });
+      
+      const aiResponse = response.choices[0]?.message?.content?.trim() || "";
+      console.log("AI extraction response:", aiResponse);
+      
+      // Parse the AI response
+      let extractedData;
+      try {
+        extractedData = JSON.parse(aiResponse);
+      } catch (parseError) {
+        console.error("Failed to parse AI response:", aiResponse);
+        return res.status(500).json({ message: "Failed to parse AI response", rawResponse: aiResponse });
+      }
+      
+      if (!extractedData.expiryDate) {
+        return res.json({ 
+          success: false, 
+          message: extractedData.reason || "Could not extract expiry date from document",
+          confidence: extractedData.confidence
+        });
+      }
+      
+      // Parse and validate the date
+      const expiryDate = new Date(extractedData.expiryDate);
+      if (isNaN(expiryDate.getTime())) {
+        return res.json({ 
+          success: false, 
+          message: "Invalid date format extracted",
+          rawDate: extractedData.expiryDate
+        });
+      }
+      
+      // Update the document with the extracted expiry date
+      const updatedDocument = await storage.updateCompanyDocument(id, {
+        insuranceExpiryDate: expiryDate
+      });
+      
+      res.json({ 
+        success: true, 
+        expiryDate: expiryDate.toISOString(),
+        confidence: extractedData.confidence,
+        document: updatedDocument
+      });
+    } catch (error) {
+      console.error("Extract insurance expiry error:", error);
+      res.status(500).json({ message: "Failed to extract insurance expiry date" });
     }
   });
 
@@ -19054,6 +19856,553 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "All notifications marked as read" });
     } catch (error) {
       console.error("Mark all read error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // ==================== QUIZ ROUTES ====================
+
+  // Generate quiz from document (AI) - Company owners only
+  app.post("/api/quiz/generate/:documentId", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+    try {
+      const { documentId } = req.params;
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Get the document
+      const document = await storage.getCompanyDocumentById(documentId);
+      if (!document) {
+        return res.status(404).json({ message: "Document not found" });
+      }
+
+      // Verify ownership
+      if (document.companyId !== currentUser.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      // Check document type is valid for quiz generation
+      const validDocTypes = ['health_safety_manual', 'company_policy'];
+      if (!validDocTypes.includes(document.documentType)) {
+        return res.status(400).json({ message: "Quiz generation is only available for Health & Safety Manual and Company Policy documents" });
+      }
+
+      // Check if quiz already exists for this document
+      const existingQuiz = await storage.getQuizByDocumentId(documentId);
+      if (existingQuiz) {
+        return res.status(400).json({ message: "A quiz already exists for this document. Delete it first to regenerate." });
+      }
+
+      // Get the document file from object storage
+      const objectStorage = new ObjectStorageService();
+      const fileBuffer = await objectStorage.downloadPublicFileAsBuffer(document.fileUrl);
+      if (!fileBuffer) {
+        return res.status(404).json({ message: "Document file not found in storage" });
+      }
+
+      // Convert to base64
+      const pdfBase64 = fileBuffer.toString('base64');
+
+      // Generate quiz using AI
+      const quizResult = await generateQuizFromDocument(pdfBase64, document.documentType);
+
+      if (!quizResult.success || quizResult.questions.length < 10) {
+        return res.status(400).json({ 
+          message: quizResult.error || "Failed to generate quiz. Document may be too short or unclear.",
+          questionsGenerated: quizResult.questions.length
+        });
+      }
+
+      // Save quiz to database
+      const quiz = await storage.createDocumentQuiz({
+        companyId: currentUser.id,
+        documentId: documentId,
+        documentType: document.documentType,
+        questions: quizResult.questions,
+      });
+
+      res.json({ 
+        quiz,
+        questionsGenerated: quizResult.questions.length,
+        message: `Quiz generated successfully with ${quizResult.questions.length} questions`
+      });
+    } catch (error) {
+      console.error("Generate quiz error:", error);
+      res.status(500).json({ message: "Failed to generate quiz" });
+    }
+  });
+
+  // Get all quizzes for company (company owners/operations managers only)
+  app.get("/api/quiz/company", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Only company owners and operations managers can access this
+      if (currentUser.role !== 'company' && currentUser.role !== 'operations_manager') {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const companyId = currentUser.role === 'company' ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "No company associated with this account" });
+      }
+
+      const quizzes = await storage.getQuizzesByCompanyId(companyId);
+      res.json({ quizzes });
+    } catch (error) {
+      console.error("Get company quizzes error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get available quizzes for current employee
+  app.get("/api/quiz/available", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Employees see quizzes from their company
+      const companyId = currentUser.role === 'company' ? currentUser.id : currentUser.companyId;
+      
+      // Get company quizzes if user has a company
+      let companyQuizzesWithStatus: any[] = [];
+      if (companyId) {
+        const quizzes = await storage.getQuizzesByCompanyId(companyId);
+        companyQuizzesWithStatus = await Promise.all(
+          quizzes.map(async (quiz) => {
+            const hasPassed = await storage.hasEmployeePassedQuiz(currentUser.id, quiz.id);
+            const attempts = await storage.getQuizAttemptsByEmployee(currentUser.id, quiz.id);
+            return {
+              id: quiz.id,
+              documentType: quiz.documentType,
+              questionCount: Array.isArray(quiz.questions) ? quiz.questions.length : 0,
+              createdAt: quiz.createdAt,
+              hasPassed,
+              attemptCount: attempts.length,
+              lastAttempt: attempts.length > 0 ? attempts[0].completedAt : null,
+              quizCategory: 'company',
+            };
+          })
+        );
+      }
+
+      // Get certification quizzes based on user's IRATA/SPRAT level
+      // Company owners see ALL certification quizzes so they can test the system
+      const { certificationQuizzes, getQuizzesForUser } = await import('./certificationQuizzes');
+      const certQuizzes = currentUser.role === 'company' 
+        ? certificationQuizzes 
+        : getQuizzesForUser(currentUser.irataLevel, currentUser.spratLevel);
+      
+      const certQuizzesWithStatus = await Promise.all(
+        certQuizzes.map(async (certQuiz) => {
+          const certQuizId = `cert_${certQuiz.quizType}`;
+          const hasPassed = await storage.hasEmployeePassedQuiz(currentUser.id, certQuizId);
+          const attempts = await storage.getQuizAttemptsByEmployee(currentUser.id, certQuizId);
+          return {
+            id: certQuizId,
+            documentType: certQuiz.quizType,
+            title: certQuiz.title,
+            certification: certQuiz.certification,
+            level: certQuiz.level,
+            questionCount: certQuiz.questions.length,
+            createdAt: null,
+            hasPassed,
+            attemptCount: attempts.length,
+            lastAttempt: attempts.length > 0 ? attempts[0].completedAt : null,
+            quizCategory: 'certification',
+          };
+        })
+      );
+
+      // Get safety practice quizzes (SWP, FLHA, Harness Inspection)
+      // All users can access safety quizzes
+      const { safetyQuizzes } = await import('./safetyQuizzes');
+      const safetyQuizzesWithStatus = await Promise.all(
+        safetyQuizzes.map(async (safetyQuiz) => {
+          const safetyQuizId = `safety_${safetyQuiz.quizType}`;
+          const hasPassed = await storage.hasEmployeePassedQuiz(currentUser.id, safetyQuizId);
+          const attempts = await storage.getQuizAttemptsByEmployee(currentUser.id, safetyQuizId);
+          return {
+            id: safetyQuizId,
+            documentType: safetyQuiz.quizType,
+            title: safetyQuiz.title,
+            category: safetyQuiz.category,
+            jobType: safetyQuiz.jobType,
+            questionCount: safetyQuiz.questions.length,
+            createdAt: null,
+            hasPassed,
+            attemptCount: attempts.length,
+            lastAttempt: attempts.length > 0 ? attempts[0].completedAt : null,
+            quizCategory: 'safety',
+          };
+        })
+      );
+
+      // Combine all types of quizzes
+      const allQuizzes = [...companyQuizzesWithStatus, ...certQuizzesWithStatus, ...safetyQuizzesWithStatus];
+
+      res.json({ quizzes: allQuizzes });
+    } catch (error) {
+      console.error("Get available quizzes error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get quiz questions (without correct answers for taking)
+  app.get("/api/quiz/:quizId", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { quizId } = req.params;
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Handle certification quizzes (IDs start with "cert_")
+      if (quizId.startsWith("cert_")) {
+        const { certificationQuizzes, getQuizzesForUser } = await import('./certificationQuizzes');
+        const quizType = quizId.replace("cert_", "");
+        const certQuiz = certificationQuizzes.find(q => q.quizType === quizType);
+        
+        if (!certQuiz) {
+          return res.status(404).json({ message: "Certification quiz not found" });
+        }
+
+        // Verify user has the required certification level (company owners can access all)
+        const isCompanyOwner = currentUser.role === 'company';
+        if (!isCompanyOwner) {
+          const userQuizzes = getQuizzesForUser(currentUser.irataLevel, currentUser.spratLevel);
+          const hasAccess = userQuizzes.some(q => q.quizType === quizType);
+          if (!hasAccess) {
+            return res.status(403).json({ message: "You do not have access to this certification quiz" });
+          }
+        }
+
+        // Return questions WITHOUT correct answers
+        const questionsForTaking = certQuiz.questions.map((q) => ({
+          questionNumber: q.questionNumber,
+          question: q.question,
+          options: q.options,
+        }));
+
+        return res.json({
+          quiz: {
+            id: quizId,
+            documentType: certQuiz.quizType,
+            title: certQuiz.title,
+            certification: certQuiz.certification,
+            level: certQuiz.level,
+            quizCategory: 'certification',
+            questions: questionsForTaking,
+          }
+        });
+      }
+
+      // Handle safety quizzes (IDs start with "safety_")
+      if (quizId.startsWith("safety_")) {
+        const { safetyQuizzes } = await import('./safetyQuizzes');
+        const quizType = quizId.replace("safety_", "");
+        const safetyQuiz = safetyQuizzes.find(q => q.quizType === quizType);
+        
+        if (!safetyQuiz) {
+          return res.status(404).json({ message: "Safety quiz not found" });
+        }
+
+        // Return questions WITHOUT correct answers
+        const questionsForTaking = safetyQuiz.questions.map((q) => ({
+          questionNumber: q.questionNumber,
+          question: q.question,
+          options: q.options,
+        }));
+
+        return res.json({
+          quiz: {
+            id: quizId,
+            documentType: safetyQuiz.quizType,
+            title: safetyQuiz.title,
+            category: safetyQuiz.category,
+            jobType: safetyQuiz.jobType,
+            quizCategory: 'safety',
+            questions: questionsForTaking,
+          }
+        });
+      }
+
+      // Handle company quizzes (from database)
+      const quiz = await storage.getQuizById(quizId);
+      if (!quiz) {
+        return res.status(404).json({ message: "Quiz not found" });
+      }
+
+      // Verify user belongs to the company
+      const userCompanyId = currentUser.role === 'company' ? currentUser.id : currentUser.companyId;
+      if (quiz.companyId !== userCompanyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      // Return questions WITHOUT correct answers
+      const questionsForTaking = (quiz.questions as any[]).map((q: any) => ({
+        questionNumber: q.questionNumber,
+        question: q.question,
+        options: q.options,
+      }));
+
+      res.json({
+        quiz: {
+          id: quiz.id,
+          documentType: quiz.documentType,
+          quizCategory: 'company',
+          questions: questionsForTaking,
+        }
+      });
+    } catch (error) {
+      console.error("Get quiz error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Submit quiz answers and get results
+  app.post("/api/quiz/:quizId/submit", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { quizId } = req.params;
+      const { answers } = req.body; // Array of { questionNumber, selectedAnswer }
+
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (!answers || !Array.isArray(answers)) {
+        return res.status(400).json({ message: "Answers are required as an array" });
+      }
+
+      // Handle certification quizzes (IDs start with "cert_")
+      if (quizId.startsWith("cert_")) {
+        const { certificationQuizzes, getQuizzesForUser } = await import('./certificationQuizzes');
+        const quizType = quizId.replace("cert_", "");
+        const certQuiz = certificationQuizzes.find(q => q.quizType === quizType);
+        
+        if (!certQuiz) {
+          return res.status(404).json({ message: "Certification quiz not found" });
+        }
+        
+        // Verify access based on user's certification level (company owners can access all)
+        const isCompanyOwner = currentUser.role === 'company';
+        if (!isCompanyOwner) {
+          const userQuizzes = getQuizzesForUser(currentUser.irataLevel, currentUser.spratLevel);
+          const hasAccess = userQuizzes.some(q => q.quizType === quizType);
+          if (!hasAccess) {
+            return res.status(403).json({ message: "Access denied - insufficient certification level" });
+          }
+        }
+        
+        // Convert answers array to lookup object
+        const answersMap: Record<number, string> = {};
+        for (const ans of answers) {
+          answersMap[ans.questionNumber] = ans.selectedAnswer;
+        }
+        
+        // Grade the quiz
+        const questions = certQuiz.questions;
+        let correctCount = 0;
+        const gradedAnswers: any[] = [];
+
+        for (const question of questions) {
+          const userAnswer = answersMap[question.questionNumber];
+          const isCorrect = userAnswer === question.correctAnswer;
+          if (isCorrect) correctCount++;
+
+          gradedAnswers.push({
+            questionNumber: question.questionNumber,
+            selected: userAnswer || null,
+            correct: question.correctAnswer,
+            isCorrect,
+          });
+        }
+
+        const totalQuestions = questions.length;
+        const score = Math.round((correctCount / totalQuestions) * 100);
+        const passed = score >= 80;
+
+        // Save the attempt (use quizId as the cert_ ID)
+        // Note: companyId can be null for unaffiliated technicians (self-resigned or never linked)
+        const attempt = await storage.createQuizAttempt({
+          quizId: quizId,
+          employeeId: currentUser.id,
+          companyId: currentUser.companyId || null,
+          score,
+          passed,
+          answers: gradedAnswers,
+        });
+
+        return res.json({
+          score,
+          passed,
+          correctAnswers: correctCount,
+          totalQuestions,
+          answers: gradedAnswers,
+        });
+      }
+
+      // Handle safety practice quizzes (IDs start with "safety_")
+      if (quizId.startsWith("safety_")) {
+        const { safetyQuizzes } = await import('./safetyQuizzes');
+        const quizType = quizId.replace("safety_", "");
+        const safetyQuiz = safetyQuizzes.find(q => q.quizType === quizType);
+        
+        if (!safetyQuiz) {
+          return res.status(404).json({ message: "Safety quiz not found" });
+        }
+        
+        // Convert answers array to lookup object
+        const answersMap: Record<number, string> = {};
+        for (const ans of answers) {
+          answersMap[ans.questionNumber] = ans.selectedAnswer;
+        }
+        
+        // Grade the quiz
+        const questions = safetyQuiz.questions;
+        let correctCount = 0;
+        const gradedAnswers: any[] = [];
+
+        for (const question of questions) {
+          const userAnswer = answersMap[question.questionNumber];
+          const isCorrect = userAnswer === question.correctAnswer;
+          if (isCorrect) correctCount++;
+
+          gradedAnswers.push({
+            questionNumber: question.questionNumber,
+            selected: userAnswer || null,
+            correct: question.correctAnswer,
+            isCorrect,
+          });
+        }
+
+        const totalQuestions = questions.length;
+        const score = Math.round((correctCount / totalQuestions) * 100);
+        const passed = score >= 80;
+
+        // Save the attempt (use quizId as the safety_ ID)
+        // Note: companyId can be null for unaffiliated technicians (self-resigned or never linked)
+        const attempt = await storage.createQuizAttempt({
+          quizId: quizId,
+          employeeId: currentUser.id,
+          companyId: currentUser.companyId || null,
+          score,
+          passed,
+          answers: gradedAnswers,
+        });
+
+        return res.json({
+          score,
+          passed,
+          correctAnswers: correctCount,
+          totalQuestions,
+          answers: gradedAnswers,
+        });
+      }
+
+      // Handle company quizzes (from database)
+      const quiz = await storage.getQuizById(quizId);
+      if (!quiz) {
+        return res.status(404).json({ message: "Quiz not found" });
+      }
+
+      // Verify user belongs to the company
+      const userCompanyId = currentUser.role === 'company' ? currentUser.id : currentUser.companyId;
+      if (quiz.companyId !== userCompanyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      // Convert answers array to lookup object
+      const answersMap: Record<number, string> = {};
+      for (const ans of answers) {
+        answersMap[ans.questionNumber] = ans.selectedAnswer;
+      }
+
+      // Grade the quiz
+      const questions = quiz.questions as any[];
+      let correctCount = 0;
+      const gradedAnswers: any[] = [];
+
+      for (const question of questions) {
+        const userAnswer = answersMap[question.questionNumber];
+        const isCorrect = userAnswer === question.correctAnswer;
+        if (isCorrect) correctCount++;
+
+        gradedAnswers.push({
+          questionNumber: question.questionNumber,
+          selected: userAnswer || null,
+          correct: question.correctAnswer,
+          isCorrect,
+        });
+      }
+
+      const totalQuestions = questions.length;
+      const score = Math.round((correctCount / totalQuestions) * 100);
+      const passed = score >= 80; // 80% pass rate
+
+      // Save the attempt
+      const attempt = await storage.createQuizAttempt({
+        quizId: quiz.id,
+        employeeId: currentUser.id,
+        companyId: quiz.companyId,
+        score,
+        passed,
+        answers: gradedAnswers,
+      });
+
+      res.json({
+        score,
+        passed,
+        correctAnswers: correctCount,
+        totalQuestions,
+        answers: gradedAnswers,
+      });
+    } catch (error) {
+      console.error("Submit quiz error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get employee's quiz results
+  app.get("/api/quiz/:quizId/results", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { quizId } = req.params;
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const quiz = await storage.getQuizById(quizId);
+      if (!quiz) {
+        return res.status(404).json({ message: "Quiz not found" });
+      }
+
+      // Verify user belongs to the company
+      const userCompanyId = currentUser.role === 'company' ? currentUser.id : currentUser.companyId;
+      if (quiz.companyId !== userCompanyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const attempts = await storage.getQuizAttemptsByEmployee(currentUser.id, quizId);
+      const hasPassed = attempts.some(a => a.passed);
+
+      res.json({
+        quizId,
+        documentType: quiz.documentType,
+        attempts,
+        hasPassed,
+        attemptCount: attempts.length,
+        bestScore: attempts.length > 0 ? Math.max(...attempts.map(a => a.score)) : null,
+      });
+    } catch (error) {
+      console.error("Get quiz results error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

@@ -190,6 +190,50 @@ export class ObjectStorageService {
 
     return file;
   }
+
+  // Download a public file as a Buffer (for processing like AI quiz generation)
+  async downloadPublicFileAsBuffer(fileUrl: string): Promise<Buffer | null> {
+    // fileUrl can be:
+    // - Relative: "/public-objects/company-documents/..."
+    // - Absolute: "https://domain.com/public-objects/company-documents/..."
+    const prefix = "/public-objects/";
+    
+    let filePath: string;
+    
+    // Handle absolute URLs by extracting path after /public-objects/
+    if (fileUrl.startsWith("http://") || fileUrl.startsWith("https://")) {
+      try {
+        const url = new URL(fileUrl);
+        const pathname = url.pathname;
+        if (!pathname.includes(prefix)) {
+          console.error("Invalid absolute URL format - missing /public-objects/:", fileUrl);
+          return null;
+        }
+        const prefixIndex = pathname.indexOf(prefix);
+        filePath = pathname.substring(prefixIndex + prefix.length);
+      } catch (e) {
+        console.error("Failed to parse absolute URL:", fileUrl, e);
+        return null;
+      }
+    } else if (fileUrl.startsWith(prefix)) {
+      // Handle relative URLs
+      filePath = fileUrl.substring(prefix.length);
+    } else {
+      console.error("Invalid file URL format:", fileUrl);
+      return null;
+    }
+    
+    const file = await this.searchPublicObject(filePath);
+    
+    if (!file) {
+      console.error("File not found in object storage:", filePath);
+      return null;
+    }
+    
+    // Download file content as buffer
+    const [buffer] = await file.download();
+    return buffer;
+  }
 }
 
 function parseObjectPath(path: string): {

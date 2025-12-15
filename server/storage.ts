@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, quoteHistory, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff, documentReviewSignatures, equipmentDamageReports, featureRequests, featureRequestMessages, churnEvents, buildings, buildingInstructions, normalizeStrataPlan, teamInvitations, historicalHours, technicianEmployerConnections, csrRatingHistory } from "@shared/schema";
-import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, QuoteHistory, InsertQuoteHistory, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff, DocumentReviewSignature, InsertDocumentReviewSignature, EquipmentDamageReport, InsertEquipmentDamageReport, FeatureRequest, InsertFeatureRequest, FeatureRequestMessage, InsertFeatureRequestMessage, FeatureRequestWithMessages, ChurnEvent, InsertChurnEvent, Building, InsertBuilding, BuildingInstructions, InsertBuildingInstructions, TeamInvitation, InsertTeamInvitation, HistoricalHours, InsertHistoricalHours, CsrRatingHistory, InsertCsrRatingHistory } from "@shared/schema";
+import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, quoteHistory, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff, documentReviewSignatures, equipmentDamageReports, featureRequests, featureRequestMessages, churnEvents, buildings, buildingInstructions, normalizeStrataPlan, teamInvitations, historicalHours, technicianEmployerConnections, csrRatingHistory, documentQuizzes, quizAttempts, technicianDocumentRequests, technicianDocumentRequestFiles } from "@shared/schema";
+import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, QuoteHistory, InsertQuoteHistory, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff, DocumentReviewSignature, InsertDocumentReviewSignature, EquipmentDamageReport, InsertEquipmentDamageReport, FeatureRequest, InsertFeatureRequest, FeatureRequestMessage, InsertFeatureRequestMessage, FeatureRequestWithMessages, ChurnEvent, InsertChurnEvent, Building, InsertBuilding, BuildingInstructions, InsertBuildingInstructions, TeamInvitation, InsertTeamInvitation, HistoricalHours, InsertHistoricalHours, CsrRatingHistory, InsertCsrRatingHistory, DocumentQuiz, InsertDocumentQuiz, QuizAttempt, InsertQuizAttempt, TechnicianDocumentRequest, InsertTechnicianDocumentRequest, TechnicianDocumentRequestFile, InsertTechnicianDocumentRequestFile } from "@shared/schema";
 import { eq, and, or, desc, sql, isNull, isNotNull, not, gte, lte, between, inArray } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import { encryptSensitiveFields, decryptSensitiveFields } from "./encryption";
@@ -1436,6 +1436,21 @@ export class Storage {
       .orderBy(desc(harnessInspections.inspectionDate));
   }
 
+  async getPersonalHarnessInspections(userId: string): Promise<HarnessInspection[]> {
+    return db.select().from(harnessInspections)
+      .where(and(
+        eq(harnessInspections.workerId, userId),
+        eq(harnessInspections.isPersonal, true)
+      ))
+      .orderBy(desc(harnessInspections.inspectionDate));
+  }
+
+  async getHarnessInspectionById(id: string): Promise<HarnessInspection | undefined> {
+    const [inspection] = await db.select().from(harnessInspections)
+      .where(eq(harnessInspections.id, id));
+    return inspection;
+  }
+
   // Gear items operations
   async createGearItem(item: InsertGearItem, serialEntries?: Array<{serialNumber: string, dateOfManufacture?: string, dateInService?: string}>): Promise<GearItem & { serialEntries: GearSerialNumber[] }> {
     const result = await db.insert(gearItems).values(item).returning();
@@ -2013,6 +2028,20 @@ export class Storage {
 
   async deleteCompanyDocument(id: string): Promise<void> {
     await db.delete(companyDocuments).where(eq(companyDocuments.id, id));
+  }
+
+  async updateCompanyDocument(id: string, updates: { insuranceExpiryDate?: Date | null }): Promise<any> {
+    const result = await db.update(companyDocuments)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(companyDocuments.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async getCompanyDocumentById(id: string): Promise<any | undefined> {
+    const result = await db.select().from(companyDocuments)
+      .where(eq(companyDocuments.id, id));
+    return result[0];
   }
 
   async getCompanyDocumentByTemplateId(companyId: string, templateId: string): Promise<any | undefined> {
@@ -4192,6 +4221,173 @@ export class Storage {
       .orderBy(desc(csrRatingHistory.createdAt))
       .limit(1);
     return result[0];
+  }
+
+  // Document Quiz operations
+  async createDocumentQuiz(quiz: InsertDocumentQuiz): Promise<DocumentQuiz> {
+    const result = await db.insert(documentQuizzes).values(quiz).returning();
+    return result[0];
+  }
+
+  async getQuizById(id: string): Promise<DocumentQuiz | undefined> {
+    const result = await db.select()
+      .from(documentQuizzes)
+      .where(eq(documentQuizzes.id, id))
+      .limit(1);
+    return result[0];
+  }
+
+  async getQuizzesByCompanyId(companyId: string): Promise<DocumentQuiz[]> {
+    return db.select()
+      .from(documentQuizzes)
+      .where(eq(documentQuizzes.companyId, companyId))
+      .orderBy(desc(documentQuizzes.createdAt));
+  }
+
+  async getQuizByDocumentId(documentId: string): Promise<DocumentQuiz | undefined> {
+    const result = await db.select()
+      .from(documentQuizzes)
+      .where(eq(documentQuizzes.documentId, documentId))
+      .limit(1);
+    return result[0];
+  }
+
+  async updateDocumentQuiz(id: string, updates: Partial<InsertDocumentQuiz>): Promise<DocumentQuiz | undefined> {
+    const result = await db.update(documentQuizzes)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(documentQuizzes.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteDocumentQuiz(id: string): Promise<boolean> {
+    const result = await db.delete(documentQuizzes)
+      .where(eq(documentQuizzes.id, id))
+      .returning();
+    return result.length > 0;
+  }
+
+  // Quiz Attempt operations
+  async createQuizAttempt(attempt: InsertQuizAttempt): Promise<QuizAttempt> {
+    const result = await db.insert(quizAttempts).values(attempt).returning();
+    return result[0];
+  }
+
+  async getQuizAttemptsByEmployee(employeeId: string, quizId: string): Promise<QuizAttempt[]> {
+    return db.select()
+      .from(quizAttempts)
+      .where(and(
+        eq(quizAttempts.employeeId, employeeId),
+        eq(quizAttempts.quizId, quizId)
+      ))
+      .orderBy(desc(quizAttempts.completedAt));
+  }
+
+  async getQuizAttemptsByCompany(companyId: string, quizId: string): Promise<QuizAttempt[]> {
+    return db.select()
+      .from(quizAttempts)
+      .where(and(
+        eq(quizAttempts.companyId, companyId),
+        eq(quizAttempts.quizId, quizId)
+      ))
+      .orderBy(desc(quizAttempts.completedAt));
+  }
+
+  async hasEmployeePassedQuiz(employeeId: string, quizId: string): Promise<boolean> {
+    const result = await db.select()
+      .from(quizAttempts)
+      .where(and(
+        eq(quizAttempts.employeeId, employeeId),
+        eq(quizAttempts.quizId, quizId),
+        eq(quizAttempts.passed, true)
+      ))
+      .limit(1);
+    return result.length > 0;
+  }
+
+  async getAllQuizAttemptsByEmployee(employeeId: string): Promise<QuizAttempt[]> {
+    return db.select()
+      .from(quizAttempts)
+      .where(eq(quizAttempts.employeeId, employeeId))
+      .orderBy(desc(quizAttempts.completedAt));
+  }
+
+  async getAllQuizAttemptsByCompanyId(companyId: string): Promise<QuizAttempt[]> {
+    return db.select()
+      .from(quizAttempts)
+      .where(eq(quizAttempts.companyId, companyId))
+      .orderBy(desc(quizAttempts.completedAt));
+  }
+
+  // Technician Document Request operations
+  async createDocumentRequest(data: InsertTechnicianDocumentRequest): Promise<TechnicianDocumentRequest> {
+    const result = await db.insert(technicianDocumentRequests).values(data).returning();
+    return result[0];
+  }
+
+  async getDocumentRequestById(id: string): Promise<TechnicianDocumentRequest | undefined> {
+    const result = await db.select()
+      .from(technicianDocumentRequests)
+      .where(eq(technicianDocumentRequests.id, id))
+      .limit(1);
+    return result[0];
+  }
+
+  async getDocumentRequestsByTechnician(technicianId: string): Promise<TechnicianDocumentRequest[]> {
+    return db.select()
+      .from(technicianDocumentRequests)
+      .where(eq(technicianDocumentRequests.technicianId, technicianId))
+      .orderBy(desc(technicianDocumentRequests.requestedAt));
+  }
+
+  async getDocumentRequestsByCompany(companyId: string): Promise<TechnicianDocumentRequest[]> {
+    return db.select()
+      .from(technicianDocumentRequests)
+      .where(eq(technicianDocumentRequests.companyId, companyId))
+      .orderBy(desc(technicianDocumentRequests.requestedAt));
+  }
+
+  async getDocumentRequestsByConnection(connectionId: string): Promise<TechnicianDocumentRequest[]> {
+    return db.select()
+      .from(technicianDocumentRequests)
+      .where(eq(technicianDocumentRequests.connectionId, connectionId))
+      .orderBy(desc(technicianDocumentRequests.requestedAt));
+  }
+
+  async updateDocumentRequest(id: string, updates: Partial<TechnicianDocumentRequest>): Promise<TechnicianDocumentRequest | undefined> {
+    const result = await db.update(technicianDocumentRequests)
+      .set(updates)
+      .where(eq(technicianDocumentRequests.id, id))
+      .returning();
+    return result[0];
+  }
+
+  // Technician Document Request File operations
+  async createDocumentRequestFile(data: InsertTechnicianDocumentRequestFile): Promise<TechnicianDocumentRequestFile> {
+    const result = await db.insert(technicianDocumentRequestFiles).values(data).returning();
+    return result[0];
+  }
+
+  async getDocumentRequestFiles(requestId: string): Promise<TechnicianDocumentRequestFile[]> {
+    return db.select()
+      .from(technicianDocumentRequestFiles)
+      .where(eq(technicianDocumentRequestFiles.requestId, requestId))
+      .orderBy(desc(technicianDocumentRequestFiles.uploadedAt));
+  }
+
+  async getDocumentRequestFileById(id: string): Promise<TechnicianDocumentRequestFile | undefined> {
+    const result = await db.select()
+      .from(technicianDocumentRequestFiles)
+      .where(eq(technicianDocumentRequestFiles.id, id))
+      .limit(1);
+    return result[0];
+  }
+
+  async deleteDocumentRequestFile(id: string): Promise<boolean> {
+    const result = await db.delete(technicianDocumentRequestFiles)
+      .where(eq(technicianDocumentRequestFiles.id, id))
+      .returning();
+    return result.length > 0;
   }
 }
 

@@ -27,7 +27,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Separator } from "@/components/ui/separator";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, RefreshCw } from "lucide-react";
 
 type SubMenuItem = {
   title: string;
@@ -400,12 +400,23 @@ export default function SuperUserLayout({ children, title }: SuperUserLayoutProp
                 <h1 className="text-lg font-semibold truncate">{title}</h1>
               )}
             </div>
-            {userData?.user && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <span className="material-icons text-base">person</span>
-                <span className="hidden sm:inline">{userData.user.email}</span>
-              </div>
-            )}
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => window.location.reload()}
+                data-testid="button-refresh-page"
+                title="Refresh page"
+              >
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+              {userData?.user && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <span className="material-icons text-base">person</span>
+                  <span className="hidden sm:inline">{userData.user.email}</span>
+                </div>
+              )}
+            </div>
           </header>
           <main className="flex-1 overflow-y-auto">
             {children}

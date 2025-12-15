@@ -124,6 +124,15 @@ export function canManageEmployees(user: User | null | undefined): boolean {
   return checkPermission(user, 'view_employees');
 }
 
+/** Check if user can view past (completed/deleted) projects */
+export function canViewPastProjects(user: User | null | undefined): boolean {
+  if (!user) return false;
+  if (isCompanyOwner(user)) return true;
+  // Management roles get access by default
+  if (isManagement(user)) return true;
+  return checkPermission(user, 'view_past_projects');
+}
+
 /** Check if user can view performance analytics */
 export function canViewPerformance(user: User | null | undefined): boolean {
   if (!user) return false;

@@ -109,6 +109,8 @@ import {
   EyeOff
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
+import { QuizSection } from "@/components/QuizSection";
+import { TechnicianDocumentRequests } from "@/components/TechnicianDocumentRequests";
 
 type Language = 'en' | 'fr';
 
@@ -405,6 +407,8 @@ const translations = {
     improveHarness: "Complete harness inspection before clocking in",
     improveDocs: "Sign all assigned safety documents",
     // Feedback
+    personalSafetyDocs: "Personal Safety Docs",
+    personalSafetyDocsDesc: "Track your own equipment inspections",
     feedback: "Feedback",
     feedbackDesc: "Share suggestions or report issues with the OnRopePro team",
     sendFeedback: "Send Feedback",
@@ -460,6 +464,7 @@ const translations = {
     sendReply: "Send Reply",
     replyPlaceholder: "Type your reply...",
     newResponse: "New Response",
+    close: "Close",
   },
   fr: {
     technicianPortal: "Portail du technicien",
@@ -753,6 +758,8 @@ const translations = {
     improveHarness: "Effectuer l'inspection du harnais avant de pointer",
     improveDocs: "Signer tous les documents de sécurité assignés",
     // Feedback
+    personalSafetyDocs: "Documents de securite",
+    personalSafetyDocsDesc: "Suivez vos inspections d'equipement",
     feedback: "Commentaires",
     feedbackDesc: "Partagez vos suggestions ou signalez des problèmes à l'équipe OnRopePro",
     sendFeedback: "Envoyer des commentaires",
@@ -808,6 +815,7 @@ const translations = {
     sendReply: "Envoyer la réponse",
     replyPlaceholder: "Tapez votre réponse...",
     newResponse: "Nouvelle réponse",
+    close: "Fermer",
   }
 };
 
@@ -2063,7 +2071,28 @@ export default function TechnicianPortal() {
                   </p>
                 )}
               </button>
+              
+              {/* Personal Safety Documents */}
+              <button
+                onClick={() => setLocation("/personal-safety-documents")}
+                className="p-4 rounded-lg border bg-gradient-to-br from-green-500/5 to-green-500/10 hover-elevate text-left"
+                data-testid="quick-action-personal-safety"
+              >
+                <Shield className="w-8 h-8 text-green-600 mb-2" />
+                <p className="font-medium text-sm">{t.personalSafetyDocs}</p>
+                <p className="text-xs text-muted-foreground">{t.personalSafetyDocsDesc}</p>
+              </button>
             </div>
+
+            {/* Document Requests from Employers */}
+            {user && user.role === 'rope_access_tech' && (
+              <TechnicianDocumentRequests language={language} />
+            )}
+
+            {/* Safety Quizzes Section - Show for all technicians (certification/safety quizzes always available) */}
+            {user && user.role === 'rope_access_tech' && !user.terminatedDate && (
+              <QuizSection />
+            )}
           </>
         )}
 
@@ -4871,11 +4900,6 @@ export default function TechnicianPortal() {
           >
             <Eye className="w-5 h-5" />
             <span className="text-[10px] font-medium leading-tight text-center">{language === 'en' ? 'Employer' : 'Employeur'}</span>
-            {!(user?.ropeAccessSpecialties && user.ropeAccessSpecialties.length > 0) && (
-              <span className="absolute -top-1 -right-1 bg-amber-500 text-white text-[8px] rounded-full w-3 h-3 flex items-center justify-center">
-                !
-              </span>
-            )}
           </button>
           <button
             onClick={() => setActiveTab('work')}

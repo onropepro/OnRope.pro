@@ -15,7 +15,8 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Download, Calendar, DollarSign, Upload, Trash2, Shield, BookOpen, ArrowLeft, AlertTriangle, Plus, FileCheck, ChevronDown, ChevronRight, FolderOpen, CalendarRange, Package, Loader2, Users, Eye, PenLine, Clock, CheckCircle2, AlertCircle, HardHat, ClipboardList, CheckCircle } from "lucide-react";
+import { FileText, Download, Calendar, DollarSign, Upload, Trash2, Shield, BookOpen, ArrowLeft, AlertTriangle, Plus, FileCheck, ChevronDown, ChevronRight, FolderOpen, CalendarRange, Package, Loader2, Users, Eye, PenLine, Clock, CheckCircle2, AlertCircle, HardHat, ClipboardList, CheckCircle, GraduationCap, ArrowRight, ChevronLeft, Trophy, XCircle } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { CardDescription } from "@/components/ui/card";
 import { hasFinancialAccess, canViewSafetyDocuments, canViewSensitiveDocuments } from "@/lib/permissions";
 import { useToast } from "@/hooks/use-toast";
@@ -27,6 +28,7 @@ import { downloadMethodStatement } from "@/pages/MethodStatementForm";
 import { formatLocalDate, formatLocalDateLong, formatLocalDateMedium, parseLocalDate, formatTimestampDate, formatLocalDateShort } from "@/lib/dateUtils";
 import { format } from "date-fns";
 import { DocumentReviews } from "@/components/DocumentReviews";
+import { QuizSection } from "@/components/QuizSection";
 import SignatureCanvas from 'react-signature-canvas';
 import { ROPE_ACCESS_EQUIPMENT_CATEGORIES, ROPE_ACCESS_INSPECTION_ITEMS, type RopeAccessEquipmentCategory } from "@shared/schema";
 
@@ -2450,6 +2452,7 @@ export default function Documents() {
   const [downloadingComplianceReport, setDownloadingComplianceReport] = useState(false);
   const [viewingSWPProcedure, setViewingSWPProcedure] = useState<typeof SAFE_WORK_PROCEDURES[0] | null>(null);
   const [isViewSWPDialogOpen, setIsViewSWPDialogOpen] = useState(false);
+  const [generatingQuizDocId, setGeneratingQuizDocId] = useState<number | null>(null);
 
   const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
@@ -2506,10 +2509,132 @@ export default function Documents() {
     queryKey: ["/api/document-reviews/my"],
   });
 
+  // Fetch document quizzes for the company
+  const { data: quizzesData } = useQuery<{ quizzes: any[] }>({
+    queryKey: ["/api/quiz/company"],
+    enabled: userData?.user?.role === 'company' || userData?.user?.role === 'operations_manager',
+  });
+  const companyQuizzes = quizzesData?.quizzes || [];
+
+  // Fetch certification practice quizzes (IRATA/SPRAT)
+  const { data: certQuizzesData } = useQuery<{ quizzes: any[] }>({
+    queryKey: ["/api/quiz/available"],
+    enabled: userData?.user?.role === 'company' || userData?.user?.role === 'operations_manager',
+  });
+  const certificationQuizzes = (certQuizzesData?.quizzes || []).filter((q: any) => q.quizCategory === 'certification');
+
+  // Mutation to generate quiz from document
+  const generateQuizMutation = useMutation({
+    mutationFn: async (documentId: number) => {
+      return apiRequest('POST', `/api/quiz/generate/${documentId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/quiz/company'] });
+      setGeneratingQuizDocId(null);
+      toast({
+        title: t('documents.quizGenerated', 'Quiz Generated'),
+        description: t('documents.quizGeneratedDesc', 'The quiz has been created and is now available for employees.'),
+      });
+    },
+    onError: (error: any) => {
+      setGeneratingQuizDocId(null);
+      toast({
+        variant: "destructive",
+        title: t('documents.quizError', 'Error'),
+        description: error.message || t('documents.quizGenerationFailed', 'Failed to generate quiz'),
+      });
+    },
+  });
+
+  // Helper to check if a document has a quiz
+  const documentHasQuiz = (documentId: number) => {
+    const quizzes = quizzesData?.quizzes || [];
+    return quizzes.some((q: any) => q.documentId === documentId);
+  };
+
+  // Handle generate quiz button click
+  const handleGenerateQuiz = (documentId: number) => {
+    setGeneratingQuizDocId(documentId);
+    generateQuizMutation.mutate(documentId);
+  };
+
   // Signature canvas ref and state for SWP signing
   const swpSignatureRef = useRef<SignatureCanvas>(null);
   const [isSwpSignDialogOpen, setIsSwpSignDialogOpen] = useState(false);
   const [pendingSwpReview, setPendingSwpReview] = useState<any>(null);
+
+  // Quiz taking state
+  const [selectedCertQuiz, setSelectedCertQuiz] = useState<any>(null);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({});
+  const [quizResult, setQuizResult] = useState<any>(null);
+  const [isSubmittingQuiz, setIsSubmittingQuiz] = useState(false);
+
+  // Fetch quiz questions when a certification quiz is selected
+  const { data: quizQuestionsData, isLoading: loadingQuizQuestions } = useQuery<{ quiz: { questions: Array<{ questionNumber: number; question: string; options: { A: string; B: string; C: string; D: string } }> } }>({
+    queryKey: ["/api/quiz", selectedCertQuiz?.id],
+    enabled: !!selectedCertQuiz && !quizResult,
+  });
+
+  const quizQuestions = quizQuestionsData?.quiz?.questions || [];
+  const currentQuestion = quizQuestions[currentQuestionIndex];
+  const answeredCount = Object.keys(quizAnswers).length;
+  const quizProgress = quizQuestions.length > 0 ? (answeredCount / quizQuestions.length) * 100 : 0;
+
+  const handleStartCertQuiz = (quiz: any) => {
+    setSelectedCertQuiz(quiz);
+    setCurrentQuestionIndex(0);
+    setQuizAnswers({});
+    setQuizResult(null);
+  };
+
+  const handleSelectQuizAnswer = (questionNumber: number, answer: string) => {
+    setQuizAnswers(prev => ({ ...prev, [questionNumber]: answer }));
+  };
+
+  const handleNextQuizQuestion = () => {
+    if (currentQuestionIndex < quizQuestions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
+    }
+  };
+
+  const handlePrevQuizQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(prev => prev - 1);
+    }
+  };
+
+  const handleSubmitCertQuiz = async () => {
+    if (!selectedCertQuiz) return;
+
+    const answersArray = quizQuestions.map(q => ({
+      questionNumber: q.questionNumber,
+      selectedAnswer: quizAnswers[q.questionNumber] || '',
+    }));
+
+    setIsSubmittingQuiz(true);
+    try {
+      const response = await apiRequest('POST', `/api/quiz/${selectedCertQuiz.id}/submit`, { answers: answersArray });
+      const result = await response.json();
+      setQuizResult(result);
+      queryClient.invalidateQueries({ queryKey: ['/api/quiz/available'] });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: t('documents.quizError', 'Error'),
+        description: error.message || t('documents.quizSubmitFailed', 'Failed to submit quiz'),
+      });
+    } finally {
+      setIsSubmittingQuiz(false);
+    }
+  };
+
+  const handleCloseCertQuiz = () => {
+    setSelectedCertQuiz(null);
+    setCurrentQuestionIndex(0);
+    setQuizAnswers({});
+    setQuizResult(null);
+  };
 
   // Find if the current SWP has a pending review for the user
   const findMyPendingSwpReview = (swpTitle: string) => {
@@ -5294,91 +5419,158 @@ export default function Documents() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="mb-6">
-            <Select value={activeTab} onValueChange={setActiveTab}>
-              <SelectTrigger className="w-full max-w-sm" data-testid="select-document-type">
-                <SelectValue placeholder="Select document type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="health-safety" data-testid="option-health-safety">
-                  <div className="flex items-center gap-2">
-                    <Shield className="h-4 w-4" />
-                    {t('documents.healthSafetyManual', 'Health & Safety Manual')}
-                  </div>
-                </SelectItem>
-                <SelectItem value="company-policy" data-testid="option-company-policy">
-                  <div className="flex items-center gap-2">
-                    <BookOpen className="h-4 w-4" />
-                    {t('documents.companyPolicies', 'Company Policies')}
-                  </div>
-                </SelectItem>
-                {canUploadDocuments && canViewSensitive && (
-                  <SelectItem value="insurance" data-testid="option-insurance">
-                    <div className="flex items-center gap-2">
-                      <FileCheck className="h-4 w-4" />
-                      {t('documents.certificateOfInsurance', 'Certificate of Insurance')}
-                    </div>
-                  </SelectItem>
-                )}
-                <SelectItem value="swp-templates" data-testid="option-swp-templates">
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-4 w-4" />
-                    {t('documents.safeWorkProcedures', 'Safe Work Procedures')}
-                  </div>
-                </SelectItem>
-                <SelectItem value="safe-work-practices" data-testid="option-safe-work-practices">
-                  <div className="flex items-center gap-2">
-                    <Shield className="h-4 w-4" />
-                    {t('documents.safeWorkPractices', 'Safe Work Practices')}
-                  </div>
-                </SelectItem>
-                {canViewSensitive && (
-                  <SelectItem value="inspections-safety" data-testid="option-inspections-safety">
-                    <div className="flex items-center gap-2">
-                      <Package className="h-4 w-4" />
-                      {t('documents.equipmentInspections', 'Equipment Inspections')}
-                    </div>
-                  </SelectItem>
-                )}
-                {canViewSensitive && (
-                  <SelectItem value="damage-reports" data-testid="option-damage-reports">
-                    <div className="flex items-center gap-2">
-                      <AlertTriangle className="h-4 w-4" />
-                      {t('documents.damageReports', 'Damage Reports')}
-                    </div>
-                  </SelectItem>
-                )}
-                {canViewSafety && (
-                  <>
-                    <SelectItem value="toolbox-meetings" data-testid="option-toolbox-meetings">
-                      <div className="flex items-center gap-2">
-                        <ClipboardList className="h-4 w-4" />
-                        {t('documents.toolboxMeetingRecords', 'Toolbox Meetings')}
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="flha-records" data-testid="option-flha-records">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
-                        {t('documents.flhaRecords', 'FLHA Records')}
-                      </div>
-                    </SelectItem>
-                    {canViewSensitive && (
-                      <SelectItem value="incident-reports" data-testid="option-incident-reports">
-                        <div className="flex items-center gap-2">
-                          <AlertTriangle className="h-4 w-4" />
-                          {t('documents.incidentReports', 'Incident Reports')}
-                        </div>
-                      </SelectItem>
-                    )}
-                    <SelectItem value="method-statements" data-testid="option-method-statements">
-                      <div className="flex items-center gap-2">
-                        <FileText className="h-4 w-4" />
-                        {t('documents.methodStatements', 'Method Statements')}
-                      </div>
-                    </SelectItem>
-                  </>
-                )}
-              </SelectContent>
-            </Select>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <FolderOpen className="h-5 w-5 text-primary" />
+              </div>
+              <Label className="text-base font-semibold">{t('documents.selectCategory', 'Select Document Category')}</Label>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+              <button
+                type="button"
+                onClick={() => setActiveTab('health-safety')}
+                className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover-elevate ${activeTab === 'health-safety' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}
+                data-testid="option-health-safety"
+              >
+                <Shield className={`h-6 w-6 ${activeTab === 'health-safety' ? 'text-primary' : 'text-muted-foreground'}`} />
+                <span className={`text-sm font-medium text-center ${activeTab === 'health-safety' ? 'text-primary' : ''}`}>
+                  {t('documents.healthSafetyManual', 'Health & Safety Manual')}
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('company-policy')}
+                className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover-elevate ${activeTab === 'company-policy' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}
+                data-testid="option-company-policy"
+              >
+                <BookOpen className={`h-6 w-6 ${activeTab === 'company-policy' ? 'text-primary' : 'text-muted-foreground'}`} />
+                <span className={`text-sm font-medium text-center ${activeTab === 'company-policy' ? 'text-primary' : ''}`}>
+                  {t('documents.companyPolicies', 'Company Policies')}
+                </span>
+              </button>
+              {canUploadDocuments && canViewSensitive && (
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('insurance')}
+                  className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover-elevate ${activeTab === 'insurance' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}
+                  data-testid="option-insurance"
+                >
+                  <FileCheck className={`h-6 w-6 ${activeTab === 'insurance' ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <span className={`text-sm font-medium text-center ${activeTab === 'insurance' ? 'text-primary' : ''}`}>
+                    {t('documents.certificateOfInsurance', 'Certificate of Insurance')}
+                  </span>
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setActiveTab('swp-templates')}
+                className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover-elevate ${activeTab === 'swp-templates' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}
+                data-testid="option-swp-templates"
+              >
+                <FileText className={`h-6 w-6 ${activeTab === 'swp-templates' ? 'text-primary' : 'text-muted-foreground'}`} />
+                <span className={`text-sm font-medium text-center ${activeTab === 'swp-templates' ? 'text-primary' : ''}`}>
+                  {t('documents.safeWorkProcedures', 'Safe Work Procedures')}
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('safe-work-practices')}
+                className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover-elevate ${activeTab === 'safe-work-practices' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}
+                data-testid="option-safe-work-practices"
+              >
+                <Shield className={`h-6 w-6 ${activeTab === 'safe-work-practices' ? 'text-primary' : 'text-muted-foreground'}`} />
+                <span className={`text-sm font-medium text-center ${activeTab === 'safe-work-practices' ? 'text-primary' : ''}`}>
+                  {t('documents.safeWorkPractices', 'Safe Work Practices')}
+                </span>
+              </button>
+              {canViewSensitive && (
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('inspections-safety')}
+                  className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover-elevate ${activeTab === 'inspections-safety' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}
+                  data-testid="option-inspections-safety"
+                >
+                  <Package className={`h-6 w-6 ${activeTab === 'inspections-safety' ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <span className={`text-sm font-medium text-center ${activeTab === 'inspections-safety' ? 'text-primary' : ''}`}>
+                    {t('documents.equipmentInspections', 'Equipment Inspections')}
+                  </span>
+                </button>
+              )}
+              {canViewSensitive && (
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('damage-reports')}
+                  className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover-elevate ${activeTab === 'damage-reports' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}
+                  data-testid="option-damage-reports"
+                >
+                  <AlertTriangle className={`h-6 w-6 ${activeTab === 'damage-reports' ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <span className={`text-sm font-medium text-center ${activeTab === 'damage-reports' ? 'text-primary' : ''}`}>
+                    {t('documents.damageReports', 'Damage Reports')}
+                  </span>
+                </button>
+              )}
+              {canViewSafety && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('toolbox-meetings')}
+                    className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover-elevate ${activeTab === 'toolbox-meetings' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}
+                    data-testid="option-toolbox-meetings"
+                  >
+                    <ClipboardList className={`h-6 w-6 ${activeTab === 'toolbox-meetings' ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <span className={`text-sm font-medium text-center ${activeTab === 'toolbox-meetings' ? 'text-primary' : ''}`}>
+                      {t('documents.toolboxMeetingRecords', 'Toolbox Meetings')}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('flha-records')}
+                    className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover-elevate ${activeTab === 'flha-records' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}
+                    data-testid="option-flha-records"
+                  >
+                    <Calendar className={`h-6 w-6 ${activeTab === 'flha-records' ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <span className={`text-sm font-medium text-center ${activeTab === 'flha-records' ? 'text-primary' : ''}`}>
+                      {t('documents.flhaRecords', 'FLHA Records')}
+                    </span>
+                  </button>
+                  {canViewSensitive && (
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('incident-reports')}
+                      className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover-elevate ${activeTab === 'incident-reports' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}
+                      data-testid="option-incident-reports"
+                    >
+                      <AlertTriangle className={`h-6 w-6 ${activeTab === 'incident-reports' ? 'text-primary' : 'text-muted-foreground'}`} />
+                      <span className={`text-sm font-medium text-center ${activeTab === 'incident-reports' ? 'text-primary' : ''}`}>
+                        {t('documents.incidentReports', 'Incident Reports')}
+                      </span>
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('method-statements')}
+                    className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover-elevate ${activeTab === 'method-statements' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}
+                    data-testid="option-method-statements"
+                  >
+                    <FileText className={`h-6 w-6 ${activeTab === 'method-statements' ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <span className={`text-sm font-medium text-center ${activeTab === 'method-statements' ? 'text-primary' : ''}`}>
+                      {t('documents.methodStatements', 'Method Statements')}
+                    </span>
+                  </button>
+                </>
+              )}
+              <button
+                type="button"
+                onClick={() => setActiveTab('quizzes')}
+                className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover-elevate ${activeTab === 'quizzes' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}
+                data-testid="option-quizzes"
+              >
+                <ClipboardList className={`h-6 w-6 ${activeTab === 'quizzes' ? 'text-primary' : 'text-muted-foreground'}`} />
+                <span className={`text-sm font-medium text-center ${activeTab === 'quizzes' ? 'text-primary' : ''}`}>
+                  {t('documents.quizzes', 'Quizzes')}
+                </span>
+              </button>
+            </div>
           </div>
 
           {/* Health & Safety Manual Tab */}
@@ -5475,6 +5667,34 @@ export default function Documents() {
                                           <Download className="h-4 w-4 mr-1" />
                                           {t('documents.view', 'View')}
                                         </Button>
+                                        {canUploadDocuments && (
+                                          documentHasQuiz(doc.id) ? (
+                                            <Badge variant="secondary" className="text-xs">
+                                              <CheckCircle className="h-3 w-3 mr-1" />
+                                              {t('documents.quizReady', 'Quiz Ready')}
+                                            </Badge>
+                                          ) : (
+                                            <Button
+                                              size="sm"
+                                              variant="outline"
+                                              onClick={() => handleGenerateQuiz(doc.id)}
+                                              disabled={generatingQuizDocId === doc.id}
+                                              data-testid={`generate-quiz-health-safety-${doc.id}`}
+                                            >
+                                              {generatingQuizDocId === doc.id ? (
+                                                <>
+                                                  <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                                                  {t('documents.generating', 'Generating...')}
+                                                </>
+                                              ) : (
+                                                <>
+                                                  <ClipboardList className="h-4 w-4 mr-1" />
+                                                  {t('documents.generateQuiz', 'Generate Quiz')}
+                                                </>
+                                              )}
+                                            </Button>
+                                          )
+                                        )}
                                         {canUploadDocuments && (
                                           <Button
                                             size="sm"
@@ -5606,6 +5826,34 @@ export default function Documents() {
                                           {t('documents.view', 'View')}
                                         </Button>
                                         {canUploadDocuments && (
+                                          documentHasQuiz(doc.id) ? (
+                                            <Badge variant="secondary" className="text-xs">
+                                              <CheckCircle className="h-3 w-3 mr-1" />
+                                              {t('documents.quizReady', 'Quiz Ready')}
+                                            </Badge>
+                                          ) : (
+                                            <Button
+                                              size="sm"
+                                              variant="outline"
+                                              onClick={() => handleGenerateQuiz(doc.id)}
+                                              disabled={generatingQuizDocId === doc.id}
+                                              data-testid={`generate-quiz-policy-${doc.id}`}
+                                            >
+                                              {generatingQuizDocId === doc.id ? (
+                                                <>
+                                                  <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                                                  {t('documents.generating', 'Generating...')}
+                                                </>
+                                              ) : (
+                                                <>
+                                                  <ClipboardList className="h-4 w-4 mr-1" />
+                                                  {t('documents.generateQuiz', 'Generate Quiz')}
+                                                </>
+                                              )}
+                                            </Button>
+                                          )
+                                        )}
+                                        {canUploadDocuments && (
                                           <Button
                                             size="sm"
                                             variant="ghost"
@@ -5713,7 +5961,15 @@ export default function Documents() {
                                         <Badge variant="outline">{dayGroup.items.length}</Badge>
                                       </CollapsibleTrigger>
                                       <CollapsibleContent className="pl-4 space-y-2 mt-1">
-                                        {dayGroup.items.map((doc: any) => (
+                                        {dayGroup.items.map((doc: any) => {
+                                          const expiryDate = doc.insuranceExpiryDate ? new Date(doc.insuranceExpiryDate) : null;
+                                          const now = new Date();
+                                          const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+                                          const isExpired = expiryDate ? expiryDate < now : false;
+                                          const isExpiringSoon = expiryDate ? (expiryDate >= now && expiryDate <= thirtyDaysFromNow) : false;
+                                          const showWarning = isExpired || isExpiringSoon;
+                                          
+                                          return (
                                           <div key={doc.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate active-elevate-2">
                                             <div className="p-2 bg-primary/10 rounded-lg">
                                               <FileCheck className="h-5 w-5 text-primary flex-shrink-0" />
@@ -5723,8 +5979,25 @@ export default function Documents() {
                                               <div className="text-sm text-muted-foreground">
                                                 {t('documents.uploadedBy', 'Uploaded by {{name}}', { name: doc.uploadedByName })}
                                               </div>
+                                              {expiryDate && !isNaN(expiryDate.getTime()) && (
+                                                <div className={`text-sm font-medium mt-1 flex items-center gap-1 ${showWarning ? 'text-red-600 dark:text-red-500' : 'text-muted-foreground'}`}>
+                                                  <Calendar className="h-3.5 w-3.5" />
+                                                  {isExpired ? (
+                                                    <span>{t('documents.expired', 'EXPIRED')} - {formatLocalDateMedium(doc.insuranceExpiryDate)}</span>
+                                                  ) : isExpiringSoon ? (
+                                                    <span>{t('documents.expiresOn', 'Expires')}: {formatLocalDateMedium(doc.insuranceExpiryDate)}</span>
+                                                  ) : (
+                                                    <span>{t('documents.expiresOn', 'Expires')}: {formatLocalDateMedium(doc.insuranceExpiryDate)}</span>
+                                                  )}
+                                                </div>
+                                              )}
                                             </div>
                                             <div className="flex items-center gap-2">
+                                              {showWarning && (
+                                                <Badge variant="destructive" className="mr-2">
+                                                  {isExpired ? t('documents.expired', 'EXPIRED') : t('documents.expiringSoon', 'Expiring Soon')}
+                                                </Badge>
+                                              )}
                                               <Button
                                                 size="sm"
                                                 variant="outline"
@@ -5744,7 +6017,7 @@ export default function Documents() {
                                               </Button>
                                             </div>
                                           </div>
-                                        ))}
+                                        );})}
                                       </CollapsibleContent>
                                     </Collapsible>
                                   ))}
@@ -7033,6 +7306,76 @@ export default function Documents() {
           </Card>
         )}
 
+        {/* Quizzes - show all quizzes */}
+        {activeTab === "quizzes" && (
+          <>
+          {/* Company Quizzes - managers see management view, techs see available quizzes */}
+          {canUploadDocuments ? (
+            <Card className="mb-6 overflow-hidden">
+              <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-primary/10 rounded-xl ring-1 ring-primary/20">
+                    <ClipboardList className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <CardTitle className="text-xl mb-1">{t('documents.quizzes', 'Quizzes')}</CardTitle>
+                    <p className="text-sm text-muted-foreground">{t('documents.quizzesDesc', 'Document comprehension quizzes for employees')}</p>
+                  </div>
+                  <Badge variant="secondary" className="text-base font-semibold px-3">
+                    {companyQuizzes?.length || 0}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <div className="mb-4 p-4 rounded-lg bg-muted/50 border">
+                  <p className="text-sm text-muted-foreground">
+                    {t('documents.quizInfo', 'Quizzes are automatically generated from Health & Safety Manual and Company Policy documents. Click "Generate Quiz" on any uploaded document to create a quiz for your employees.')}
+                  </p>
+                </div>
+                {companyQuizzes && companyQuizzes.length > 0 ? (
+                  <div className="space-y-3">
+                    {companyQuizzes.map((quiz: any) => (
+                      <div key={quiz.id} className="flex items-center gap-4 p-4 rounded-lg border bg-card hover-elevate">
+                        <div className="p-2 bg-primary/10 rounded-lg">
+                          <ClipboardList className="h-5 w-5 text-primary" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium">
+                            {quiz.documentType === 'health_safety_manual' 
+                              ? t('documents.healthSafetyManualQuiz', 'Health & Safety Manual Quiz')
+                              : quiz.documentType === 'company_policy'
+                              ? t('documents.companyPolicyQuiz', 'Company Policy Quiz')
+                              : quiz.documentType}
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {Array.isArray(quiz.questions) ? quiz.questions.length : 0} {t('documents.questions', 'questions')} 
+                            {quiz.createdAt && ` • ${t('documents.createdOn', 'Created')} ${formatLocalDateMedium(quiz.createdAt)}`}
+                          </div>
+                        </div>
+                        <Badge variant="outline">
+                          {t('documents.active', 'Active')}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="inline-flex p-4 bg-primary/5 rounded-full mb-4">
+                      <ClipboardList className="h-8 w-8 text-primary/50" />
+                    </div>
+                    <p className="text-muted-foreground font-medium">{t('documents.noQuizzes', 'No quizzes created yet')}</p>
+                    <p className="text-sm text-muted-foreground mt-1">{t('documents.noQuizzesDesc', 'Generate a quiz from your Health & Safety Manual or Company Policy document')}</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          ) : null}
+
+          {/* QuizSection - All users can take quizzes (certification, safety, and company quizzes) */}
+          <QuizSection />
+        </>
+        )}
+
         {/* Method Statements - only shown when selected from dropdown */}
         {activeTab === "method-statements" && canViewSafety && (
           <Card className="mb-6 overflow-hidden">
@@ -7506,6 +7849,171 @@ export default function Documents() {
                   Submit Signature
                 </>
               )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Certification Quiz Taking Dialog */}
+      <Dialog open={!!selectedCertQuiz && !quizResult} onOpenChange={(open) => !open && handleCloseCertQuiz()}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {selectedCertQuiz?.title}
+              {selectedCertQuiz?.certification && selectedCertQuiz?.level && (
+                <Badge className={selectedCertQuiz.certification === 'irata' ? 'bg-blue-600 text-white' : 'bg-orange-600 text-white'}>
+                  {selectedCertQuiz.certification.toUpperCase()} L{selectedCertQuiz.level}
+                </Badge>
+              )}
+            </DialogTitle>
+            <DialogDescription>
+              {t('documents.quizPassRequirement', 'Answer all questions to the best of your ability. You need 80% to pass.')}
+            </DialogDescription>
+          </DialogHeader>
+
+          {loadingQuizQuestions ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : currentQuestion ? (
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">
+                    {t('documents.questionOf', 'Question {{current}} of {{total}}', { current: currentQuestionIndex + 1, total: quizQuestions.length })}
+                  </span>
+                  <span className="text-muted-foreground">
+                    {answeredCount} {t('documents.answered', 'answered')}
+                  </span>
+                </div>
+                <Progress value={quizProgress} className="h-2" />
+              </div>
+
+              <div className="space-y-4">
+                <p className="text-lg font-medium">{currentQuestion.question}</p>
+                <RadioGroup
+                  value={quizAnswers[currentQuestion.questionNumber] || ''}
+                  onValueChange={(value) => handleSelectQuizAnswer(currentQuestion.questionNumber, value)}
+                  className="space-y-3"
+                >
+                  {Object.entries(currentQuestion.options).map(([key, value]) => (
+                    <div key={key} className="flex items-center space-x-3 p-3 rounded-lg border hover-elevate">
+                      <RadioGroupItem value={key} id={`quiz-option-${key}`} data-testid={`quiz-option-${key}`} />
+                      <Label htmlFor={`quiz-option-${key}`} className="flex-1 cursor-pointer">
+                        <span className="font-semibold mr-2">{key}.</span>
+                        {value}
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </div>
+
+              <div className="flex items-center justify-between gap-2">
+                <Button
+                  variant="outline"
+                  onClick={handlePrevQuizQuestion}
+                  disabled={currentQuestionIndex === 0}
+                  data-testid="button-prev-quiz-question"
+                >
+                  <ChevronLeft className="h-4 w-4 mr-1" />
+                  {t('documents.previous', 'Previous')}
+                </Button>
+                <div className="flex gap-2">
+                  {currentQuestionIndex < quizQuestions.length - 1 ? (
+                    <Button
+                      onClick={handleNextQuizQuestion}
+                      data-testid="button-next-quiz-question"
+                    >
+                      {t('documents.next', 'Next')}
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={handleSubmitCertQuiz}
+                      disabled={isSubmittingQuiz || answeredCount < quizQuestions.length}
+                      data-testid="button-submit-cert-quiz"
+                    >
+                      {isSubmittingQuiz ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                          {t('documents.submitting', 'Submitting...')}
+                        </>
+                      ) : (
+                        <>
+                          {t('documents.submitQuiz', 'Submit Quiz')}
+                          <CheckCircle2 className="h-4 w-4 ml-1" />
+                        </>
+                      )}
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              {currentQuestionIndex === quizQuestions.length - 1 && answeredCount < quizQuestions.length && (
+                <div className="flex items-center gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400">
+                  <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                  <span className="text-sm">
+                    {quizQuestions.length - answeredCount} {t('documents.questionsUnanswered', 'question(s) unanswered')}
+                  </span>
+                </div>
+              )}
+            </div>
+          ) : null}
+        </DialogContent>
+      </Dialog>
+
+      {/* Quiz Results Dialog */}
+      <Dialog open={!!quizResult} onOpenChange={(open) => !open && handleCloseCertQuiz()}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {quizResult?.passed ? (
+                <Trophy className="h-6 w-6 text-amber-500" />
+              ) : (
+                <XCircle className="h-6 w-6 text-destructive" />
+              )}
+              {quizResult?.passed ? t('documents.quizPassed', 'Quiz Passed') : t('documents.quizNotPassed', 'Quiz Not Passed')}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-6 py-4">
+            <div className="text-center">
+              <div className={`text-5xl font-bold ${quizResult?.passed ? 'text-green-600' : 'text-destructive'}`}>
+                {quizResult?.score}%
+              </div>
+              <p className="text-muted-foreground mt-2">
+                {quizResult?.correctAnswers} {t('documents.outOf', 'out of')} {quizResult?.totalQuestions} {t('documents.correct', 'correct')}
+              </p>
+            </div>
+
+            <div className={`p-4 rounded-lg ${quizResult?.passed ? 'bg-green-500/10 border border-green-500/20' : 'bg-destructive/10 border border-destructive/20'}`}>
+              {quizResult?.passed ? (
+                <div className="flex items-start gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-green-600 dark:text-green-400">{t('documents.congratulations', 'Congratulations!')}</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {t('documents.quizPassedDesc', 'You have successfully passed this quiz.')}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-start gap-3">
+                  <XCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-destructive">{t('documents.notQuiteYet', 'Not quite there')}</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {t('documents.quizFailedDesc', 'You need 80% to pass. Review the material and try again.')}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button onClick={handleCloseCertQuiz} className="w-full" data-testid="button-close-quiz-results">
+              {quizResult?.passed ? t('documents.done', 'Done') : t('documents.close', 'Close')}
             </Button>
           </DialogFooter>
         </DialogContent>

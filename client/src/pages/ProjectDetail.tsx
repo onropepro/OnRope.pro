@@ -34,6 +34,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recha
 import { parseLocalDate, formatTimestampDate, getTodayString, formatDurationMs } from "@/lib/dateUtils";
 import type { Project, Building, BuildingInstructions } from "@shared/schema";
 import { IRATA_TASK_TYPES, VALID_SHORTFALL_REASONS } from "@shared/schema";
+import { usesPercentageProgress, getProgressType } from "@shared/jobTypes";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { KeyRound, DoorOpen, Phone, User, Wrench, FileText, ChevronDown, ChevronRight, Save } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -130,6 +131,10 @@ export default function ProjectDetail() {
   const [selectedIrataTasks, setSelectedIrataTasks] = useState<string[]>([]);
   const [irataTaskNotes, setIrataTaskNotes] = useState("");
   const [ropeAccessTaskHours, setRopeAccessTaskHours] = useState("");
+  // "Last one out" progress prompt state
+  const [showProgressPrompt, setShowProgressPrompt] = useState(false);
+  const [currentOverallProgress, setCurrentOverallProgress] = useState<number>(0);
+  const [newProgressValue, setNewProgressValue] = useState<string>("");
   const [endedSessionData, setEndedSessionData] = useState<{
     sessionId: string;
     hoursWorked: number;
@@ -485,16 +490,16 @@ export default function ProjectDetail() {
         // Continue without location if unavailable
       }
       
-      // Build payload based on job type
-      const isHoursBased = project.jobType === "general_pressure_washing" || project.jobType === "ground_window_cleaning";
+      // Build payload based on job type - use shared utility for correct determination
+      const isPercentageBasedJob = usesPercentageProgress(project.jobType, project.requiresElevation);
       
       const payload: any = {
         ...locationData,
       };
       
-      if (isHoursBased) {
-        // For hours-based projects, send manual completion percentage
-        payload.manualCompletionPercentage = parseInt(data.manualCompletionPercentage || "0");
+      if (isPercentageBasedJob) {
+        // For percentage-based jobs, no upfront percentage is sent
+        // Only the "last one out" will be prompted to update overall progress after session ends
       } else {
         // For drop-based projects, send drop counts
         payload.dropsCompletedNorth = parseInt(data.dropsCompletedNorth || "0");
@@ -550,8 +555,15 @@ export default function ProjectDetail() {
       queryClient.invalidateQueries({ queryKey: ["/api/my-drops-today"] });
       endDayForm.reset();
       
-      // Show log hours prompt for all users to log their rope access hours if applicable
-      setShowLogHoursPrompt(true);
+      // Check if this is a "last one out" situation for percentage-based jobs
+      if (data.requiresProgressPrompt) {
+        setCurrentOverallProgress(data.currentOverallProgress ?? 0);
+        setNewProgressValue(String(data.currentOverallProgress ?? 0));
+        setShowProgressPrompt(true);
+      } else {
+        // Show log hours prompt for all users to log their rope access hours if applicable
+        setShowLogHoursPrompt(true);
+      }
     },
     onError: (error: Error) => {
       toast({ title: t('projectDetail.toasts.error', 'Error'), description: error.message, variant: "destructive" });
@@ -634,6 +646,68 @@ export default function ProjectDetail() {
     setRopeAccessTaskHours("");
     setEndedSessionData(null);
     toast({ title: t('projectDetail.toasts.sessionEnded', 'Work session ended'), description: t('projectDetail.toasts.greatWork', 'Great work today!') });
+  };
+
+  // Update project overall progress mutation (for "last one out" scenario)
+  const updateProgressMutation = useMutation({
+    mutationFn: async (data: { completionPercentage?: number; skip?: boolean }) => {
+      const response = await fetch(`/api/projects/${id}/overall-progress`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to update progress");
+      }
+
+      return response.json();
+    },
+    onSuccess: (data, variables) => {
+      setShowProgressPrompt(false);
+      setNewProgressValue("");
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects", id] });
+      
+      if (variables.skip) {
+        toast({ 
+          title: t('projectDetail.toasts.sessionEnded', 'Work session ended'), 
+          description: t('projectDetail.toasts.progressSkipped', 'Progress update skipped') 
+        });
+      } else {
+        toast({ 
+          title: t('projectDetail.toasts.progressUpdated', 'Progress Updated'), 
+          description: `Project is now ${variables.completionPercentage}% complete` 
+        });
+      }
+      
+      // Continue to log hours prompt
+      setShowLogHoursPrompt(true);
+    },
+    onError: (error: Error) => {
+      toast({ title: t('projectDetail.toasts.error', 'Error'), description: error.message, variant: "destructive" });
+    },
+  });
+
+  // Handle progress update submission
+  const handleProgressSubmit = () => {
+    const percentage = parseInt(newProgressValue, 10);
+    if (isNaN(percentage) || percentage < 0 || percentage > 100) {
+      toast({ 
+        title: t('projectDetail.toasts.error', 'Error'), 
+        description: "Please enter a valid percentage between 0 and 100", 
+        variant: "destructive" 
+      });
+      return;
+    }
+    updateProgressMutation.mutate({ completionPercentage: percentage });
+  };
+
+  // Handle skip progress update
+  const handleProgressSkip = () => {
+    updateProgressMutation.mutate({ skip: true });
   };
 
   // Toggle irata task selection
@@ -797,17 +871,13 @@ export default function ProjectDetail() {
   });
 
   const onEndDaySubmit = (data: EndDayFormData) => {
-    const isHoursBased = project.jobType === "general_pressure_washing" || project.jobType === "ground_window_cleaning";
+    // Use shared utility for correct determination of percentage-based jobs
+    const isPercentageBasedJob = usesPercentageProgress(project.jobType, project.requiresElevation);
     
-    if (isHoursBased) {
-      // For hours-based projects, validate percentage
-      const percentage = parseInt(data.manualCompletionPercentage || "0");
-      if (percentage < 0 || percentage > 100) {
-        endDayForm.setError("manualCompletionPercentage", {
-          message: "Percentage must be between 0 and 100"
-        });
-        return;
-      }
+    if (isPercentageBasedJob) {
+      // For percentage-based jobs, no upfront input needed
+      // Only the "last one out" will be prompted for overall progress after the session ends
+      // Just proceed with ending the session
     } else {
       // For drop-based projects, validate drops and daily target
       const north = parseInt(data.dropsCompletedNorth || "0");
@@ -1025,28 +1095,35 @@ export default function ProjectDetail() {
   const completedSessions = workSessions.filter((s: any) => s.endTime !== null);
   
   // Determine tracking type and calculate progress
-  const isHoursBased = project.jobType === "general_pressure_washing" || project.jobType === "ground_window_cleaning";
+  // Use shared utility function that accounts for hours-based jobs AND non-elevation drop-based jobs
+  const isPercentageBased = usesPercentageProgress(project.jobType, project.requiresElevation);
   const isInSuite = project.jobType === "in_suite_dryer_vent_cleaning";
   const isParkade = project.jobType === "parkade_pressure_cleaning";
   
   let totalDrops: number, completedDrops: number, progressPercent: number;
   let completedDropsNorth = 0, completedDropsEast = 0, completedDropsSouth = 0, completedDropsWest = 0;
   
-  if (isHoursBased) {
-    // Percentage-based tracking (General Pressure Washing, Ground Window)
-    // Use the latest manually entered completion percentage from work sessions
-    const sessionsWithPercentage = completedSessions.filter((s: any) => 
-      s.manualCompletionPercentage !== null && s.manualCompletionPercentage !== undefined
-    );
-    
-    if (sessionsWithPercentage.length > 0) {
-      // Sort by end time descending and get the most recent percentage
-      const sortedSessions = [...sessionsWithPercentage].sort((a: any, b: any) => 
-        new Date(b.endTime).getTime() - new Date(a.endTime).getTime()
-      );
-      progressPercent = sortedSessions[0].manualCompletionPercentage;
+  if (isPercentageBased) {
+    // Percentage-based tracking (General Pressure Washing, Ground Window, NDT, Rock Scaling)
+    // Use project-level overall completion percentage (set by "last one out" technician)
+    // Fall back to session-based calculation for legacy data
+    if ((project as any).overallCompletionPercentage !== null && (project as any).overallCompletionPercentage !== undefined) {
+      progressPercent = (project as any).overallCompletionPercentage;
     } else {
-      progressPercent = 0;
+      // Legacy: Use the latest manually entered completion percentage from work sessions
+      const sessionsWithPercentage = completedSessions.filter((s: any) => 
+        s.manualCompletionPercentage !== null && s.manualCompletionPercentage !== undefined
+      );
+      
+      if (sessionsWithPercentage.length > 0) {
+        // Sort by end time descending and get the most recent percentage
+        const sortedSessions = [...sessionsWithPercentage].sort((a: any, b: any) => 
+          new Date(b.endTime).getTime() - new Date(a.endTime).getTime()
+        );
+        progressPercent = sortedSessions[0].manualCompletionPercentage;
+      } else {
+        progressPercent = 0;
+      }
     }
     
     totalDrops = 100;
@@ -1183,7 +1260,7 @@ export default function ProjectDetail() {
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Building Visualization */}
-            {isHoursBased ? (
+            {isPercentageBased ? (
               <div className="space-y-6">
                 {/* Header with progress */}
                 <div className="text-center">
@@ -1356,7 +1433,7 @@ export default function ProjectDetail() {
             )}
 
             {/* Stats - Hide for hours-based projects since they don't have daily targets */}
-            {!isHoursBased && (
+            {!isPercentageBased && (
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center p-4 bg-muted/50 rounded-lg">
                   <div className="text-2xl font-bold">
@@ -1956,7 +2033,7 @@ export default function ProjectDetail() {
                                                       const sessionDrops = (session.dropsCompletedNorth ?? 0) + (session.dropsCompletedEast ?? 0) + 
                                                                            (session.dropsCompletedSouth ?? 0) + (session.dropsCompletedWest ?? 0);
                                                       const metTarget = sessionDrops >= project.dailyDropTarget;
-                                                      const isHoursBasedJob = project.jobType === "general_pressure_washing" || project.jobType === "ground_window_cleaning";
+                                                      const isPercentageBasedSession = usesPercentageProgress(project.jobType, project.requiresElevation);
                                                       const contributionPct = session.manualCompletionPercentage;
                                                       const sessionLaborCost = session.laborCost ? parseFloat(session.laborCost) : null;
                                                       
@@ -1979,9 +2056,9 @@ export default function ProjectDetail() {
                                                                 <MapPin className="h-4 w-4 text-primary" />
                                                               )}
                                                             </div>
-                                                            {isCompleted && (isHoursBasedJob || sessionLaborCost) && (
+                                                            {isCompleted && (isPercentageBasedSession || sessionLaborCost) && (
                                                               <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                                                                {isHoursBasedJob && contributionPct !== null && contributionPct !== undefined && (
+                                                                {isPercentageBasedSession && contributionPct !== null && contributionPct !== undefined && (
                                                                   <span className="flex items-center gap-1">
                                                                     <span className="material-icons text-xs">trending_up</span>
                                                                     +{contributionPct}% {t('projectDetail.progress.contribution', 'contribution')}
@@ -1997,7 +2074,7 @@ export default function ProjectDetail() {
                                                             )}
                                                           </div>
                                                           {isCompleted ? (
-                                                            isHoursBasedJob && contributionPct !== null ? (
+                                                            isPercentageBasedSession && contributionPct !== null ? (
                                                               <Badge variant="default" className="text-xs">
                                                                 +{contributionPct}%
                                                               </Badge>
@@ -3691,8 +3768,8 @@ export default function ProjectDetail() {
           <DialogHeader>
             <DialogTitle>{t('projectDetail.dialogs.endDay.title', 'End Your Work Day')}</DialogTitle>
             <DialogDescription>
-              {isHoursBased
-                ? t('projectDetail.dialogs.endDay.descriptionHours', 'Enter how much of the job YOU completed today. This percentage will be added to the total project progress.', { buildingName: project.buildingName })
+              {isPercentageBased
+                ? t('projectDetail.dialogs.endDay.descriptionPercentage', 'End your work session for {{buildingName}}. If you are the last one to clock out today, you will be asked to update the overall project progress.', { buildingName: project.buildingName })
                 : project.jobType === "in_suite_dryer_vent_cleaning" 
                 ? t('projectDetail.dialogs.endDay.descriptionUnits', 'Enter the number of units you completed today for {{buildingName}}.', { buildingName: project.buildingName })
                 : project.jobType === "parkade_pressure_cleaning"
@@ -3703,32 +3780,13 @@ export default function ProjectDetail() {
 
           <Form {...endDayForm}>
             <form onSubmit={endDayForm.handleSubmit(onEndDaySubmit)} className="space-y-4">
-              {isHoursBased ? (
-                <FormField
-                  control={endDayForm.control}
-                  name="manualCompletionPercentage"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('projectDetail.dialogs.endDay.completionPercentage', 'Your Contribution Today (%)')}</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          min="0"
-                          max="100"
-                          placeholder="0"
-                          {...field}
-                          data-testid="input-completion-percentage"
-                          className="h-16 text-3xl font-bold text-center"
-                          autoComplete="off"
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        {t('projectDetail.dialogs.endDay.completionPercentageHelp', 'How much of the job did YOU complete today? This adds to the total progress.')}
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              {isPercentageBased ? (
+                /* For percentage-based jobs, no input needed upfront - only the "last one out" will be prompted for overall progress after session ends */
+                <div className="p-4 bg-muted rounded-md">
+                  <p className="text-sm text-muted-foreground">
+                    {t('projectDetail.dialogs.endDay.percentageNote', 'Your work session will be recorded. Only the last person to clock out will update the project progress.')}
+                  </p>
+                </div>
               ) : project.jobType === "in_suite_dryer_vent_cleaning" ? (
                 <FormField
                   control={endDayForm.control}
@@ -3873,20 +3931,20 @@ export default function ProjectDetail() {
                 const totalDrops = north + east + south + west;
                 const isInSuite = project.jobType === "in_suite_dryer_vent_cleaning";
                 const isParkade = project.jobType === "parkade_pressure_cleaning";
-                const isHoursBasedLocal = project.jobType === "general_pressure_washing" || project.jobType === "ground_window_cleaning";
+                const isPercentageBasedLocal = usesPercentageProgress(project.jobType, project.requiresElevation);
                 const target = isInSuite || isParkade ? (project.suitesPerDay || project.stallsPerDay || 0) : project.dailyDropTarget;
                 const isBelowTarget = totalDrops < target;
 
                 return (
                   <>
-                    {!isInSuite && !isParkade && !isHoursBasedLocal && (
+                    {!isInSuite && !isParkade && !isPercentageBasedLocal && (
                       <div className="p-3 bg-muted rounded-md">
                         <div className="text-sm text-muted-foreground">{t('projectDetail.progress.totalDrops', 'Total Drops')}</div>
                         <div className="text-2xl font-bold">{totalDrops}</div>
                       </div>
                     )}
 
-                    {isBelowTarget && !isHoursBasedLocal && (
+                    {isBelowTarget && !isPercentageBasedLocal && (
                       <>
                         <FormField
                           control={endDayForm.control}
@@ -3974,6 +4032,85 @@ export default function ProjectDetail() {
               </div>
             </form>
           </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* "Last One Out" Progress Prompt Dialog */}
+      <Dialog open={showProgressPrompt} onOpenChange={setShowProgressPrompt}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <span className="material-icons text-primary">trending_up</span>
+              {t('projectDetail.dialogs.progressPrompt.title', 'Update Project Progress')}
+            </DialogTitle>
+            <DialogDescription>
+              {t('projectDetail.dialogs.progressPrompt.description', "You're the last one clocking out today. Please update the overall project completion.")}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="py-4 space-y-4">
+            {/* Current Progress */}
+            <div className="p-4 bg-muted rounded-md">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-muted-foreground">{t('projectDetail.dialogs.progressPrompt.currentProgress', 'Current Progress')}</span>
+                <span className="text-lg font-semibold">{currentOverallProgress}%</span>
+              </div>
+              <div className="w-full bg-background rounded-full h-2">
+                <div 
+                  className="bg-primary h-2 rounded-full transition-all"
+                  style={{ width: `${currentOverallProgress}%` }}
+                />
+              </div>
+            </div>
+
+            {/* New Progress Input */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                {t('projectDetail.dialogs.progressPrompt.newProgress', 'New Overall Completion (%)')}
+              </label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={newProgressValue}
+                  onChange={(e) => setNewProgressValue(e.target.value)}
+                  placeholder="0-100"
+                  className="flex-1"
+                  data-testid="input-new-progress"
+                />
+                <span className="text-lg font-semibold">%</span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {t('projectDetail.dialogs.progressPrompt.hint', 'Enter the overall project completion percentage (not just your contribution)')}
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter className="flex gap-2 sm:gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleProgressSkip}
+              disabled={updateProgressMutation.isPending}
+              data-testid="button-skip-progress"
+            >
+              {t('projectDetail.dialogs.progressPrompt.skip', "Skip - I'm Not The Last One")}
+            </Button>
+            <Button
+              type="button"
+              onClick={handleProgressSubmit}
+              disabled={updateProgressMutation.isPending || !newProgressValue}
+              data-testid="button-submit-progress"
+            >
+              {updateProgressMutation.isPending ? (
+                <span className="material-icons animate-spin mr-2 text-sm">refresh</span>
+              ) : (
+                <span className="material-icons mr-2 text-sm">check</span>
+              )}
+              {t('projectDetail.dialogs.progressPrompt.update', 'Update Progress')}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 

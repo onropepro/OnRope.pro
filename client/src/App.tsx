@@ -90,6 +90,7 @@ import TechnicianLogin from "@/pages/TechnicianLogin";
 import TechnicianPortal from "@/pages/TechnicianPortal";
 import Employer from "@/pages/Employer";
 import TechnicianLoggedHours from "@/pages/TechnicianLoggedHours";
+import PersonalSafetyDocuments from "@/pages/PersonalSafetyDocuments";
 import TechnicianJobBoard from "@/pages/TechnicianJobBoard";
 import CompanyJobBoard from "@/pages/CompanyJobBoard";
 import VisibleTechniciansBrowser from "@/pages/VisibleTechniciansBrowser";
@@ -196,6 +197,11 @@ function Router() {
       <Route path="/technician-job-board">
         <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
           <TechnicianJobBoard />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/personal-safety-documents">
+        <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
+          <PersonalSafetyDocuments />
         </ProtectedRoute>
       </Route>
       <Route path="/resident">
