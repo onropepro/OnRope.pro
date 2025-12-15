@@ -19318,6 +19318,32 @@ Do not include any other text, just the JSON object.`
     }
   });
 
+  // Get all quizzes for company (company owners/operations managers only)
+  app.get("/api/quiz/company", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Only company owners and operations managers can access this
+      if (currentUser.role !== 'company' && currentUser.role !== 'operations_manager') {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const companyId = currentUser.role === 'company' ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "No company associated with this account" });
+      }
+
+      const quizzes = await storage.getQuizzesByCompanyId(companyId);
+      res.json({ quizzes });
+    } catch (error) {
+      console.error("Get company quizzes error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Get available quizzes for current employee
   app.get("/api/quiz/available", requireAuth, async (req: Request, res: Response) => {
     try {

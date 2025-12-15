@@ -2450,6 +2450,7 @@ export default function Documents() {
   const [downloadingComplianceReport, setDownloadingComplianceReport] = useState(false);
   const [viewingSWPProcedure, setViewingSWPProcedure] = useState<typeof SAFE_WORK_PROCEDURES[0] | null>(null);
   const [isViewSWPDialogOpen, setIsViewSWPDialogOpen] = useState(false);
+  const [generatingQuizDocId, setGeneratingQuizDocId] = useState<number | null>(null);
 
   const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
@@ -2505,6 +2506,47 @@ export default function Documents() {
   const { data: myDocumentReviewsData } = useQuery<{ reviews: any[] }>({
     queryKey: ["/api/document-reviews/my"],
   });
+
+  // Fetch document quizzes for the company
+  const { data: quizzesData } = useQuery<{ quizzes: any[] }>({
+    queryKey: ["/api/quiz/company"],
+    enabled: userData?.user?.role === 'company' || userData?.user?.role === 'operations_manager',
+  });
+
+  // Mutation to generate quiz from document
+  const generateQuizMutation = useMutation({
+    mutationFn: async (documentId: number) => {
+      return apiRequest('POST', `/api/quiz/generate/${documentId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/quiz/company'] });
+      setGeneratingQuizDocId(null);
+      toast({
+        title: t('documents.quizGenerated', 'Quiz Generated'),
+        description: t('documents.quizGeneratedDesc', 'The quiz has been created and is now available for employees.'),
+      });
+    },
+    onError: (error: any) => {
+      setGeneratingQuizDocId(null);
+      toast({
+        variant: "destructive",
+        title: t('documents.quizError', 'Error'),
+        description: error.message || t('documents.quizGenerationFailed', 'Failed to generate quiz'),
+      });
+    },
+  });
+
+  // Helper to check if a document has a quiz
+  const documentHasQuiz = (documentId: number) => {
+    const quizzes = quizzesData?.quizzes || [];
+    return quizzes.some((q: any) => q.documentId === documentId);
+  };
+
+  // Handle generate quiz button click
+  const handleGenerateQuiz = (documentId: number) => {
+    setGeneratingQuizDocId(documentId);
+    generateQuizMutation.mutate(documentId);
+  };
 
   // Signature canvas ref and state for SWP signing
   const swpSignatureRef = useRef<SignatureCanvas>(null);
@@ -5532,6 +5574,34 @@ export default function Documents() {
                                           {t('documents.view', 'View')}
                                         </Button>
                                         {canUploadDocuments && (
+                                          documentHasQuiz(doc.id) ? (
+                                            <Badge variant="secondary" className="text-xs">
+                                              <CheckCircle className="h-3 w-3 mr-1" />
+                                              {t('documents.quizReady', 'Quiz Ready')}
+                                            </Badge>
+                                          ) : (
+                                            <Button
+                                              size="sm"
+                                              variant="outline"
+                                              onClick={() => handleGenerateQuiz(doc.id)}
+                                              disabled={generatingQuizDocId === doc.id}
+                                              data-testid={`generate-quiz-health-safety-${doc.id}`}
+                                            >
+                                              {generatingQuizDocId === doc.id ? (
+                                                <>
+                                                  <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                                                  {t('documents.generating', 'Generating...')}
+                                                </>
+                                              ) : (
+                                                <>
+                                                  <ClipboardList className="h-4 w-4 mr-1" />
+                                                  {t('documents.generateQuiz', 'Generate Quiz')}
+                                                </>
+                                              )}
+                                            </Button>
+                                          )
+                                        )}
+                                        {canUploadDocuments && (
                                           <Button
                                             size="sm"
                                             variant="ghost"
@@ -5661,6 +5731,34 @@ export default function Documents() {
                                           <Download className="h-4 w-4 mr-1" />
                                           {t('documents.view', 'View')}
                                         </Button>
+                                        {canUploadDocuments && (
+                                          documentHasQuiz(doc.id) ? (
+                                            <Badge variant="secondary" className="text-xs">
+                                              <CheckCircle className="h-3 w-3 mr-1" />
+                                              {t('documents.quizReady', 'Quiz Ready')}
+                                            </Badge>
+                                          ) : (
+                                            <Button
+                                              size="sm"
+                                              variant="outline"
+                                              onClick={() => handleGenerateQuiz(doc.id)}
+                                              disabled={generatingQuizDocId === doc.id}
+                                              data-testid={`generate-quiz-policy-${doc.id}`}
+                                            >
+                                              {generatingQuizDocId === doc.id ? (
+                                                <>
+                                                  <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                                                  {t('documents.generating', 'Generating...')}
+                                                </>
+                                              ) : (
+                                                <>
+                                                  <ClipboardList className="h-4 w-4 mr-1" />
+                                                  {t('documents.generateQuiz', 'Generate Quiz')}
+                                                </>
+                                              )}
+                                            </Button>
+                                          )
+                                        )}
                                         {canUploadDocuments && (
                                           <Button
                                             size="sm"
