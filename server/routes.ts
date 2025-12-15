@@ -10606,13 +10606,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const otherActiveSessions = allProjectSessions.filter(s => {
           if (s.id === sessionId) return false; // Not the session we just ended
           if (!s.startTime) return false; // Invalid session (no start time)
+          if (s.endTime) return false; // Session already ended - not active
           
           const sessionStart = new Date(s.startTime);
-          const sessionEnd = s.endTime ? new Date(s.endTime) : null;
           
-          // Check if session interval overlaps with today's window in project timezone
-          const overlaps = sessionOverlapsDay(sessionStart, sessionEnd, projectTimezone);
-          console.log("[END SESSION] Session", s.id, "overlaps today:", overlaps, "endTime:", s.endTime);
+          // Check if this still-active session overlaps with today's window in project timezone
+          const overlaps = sessionOverlapsDay(sessionStart, null, projectTimezone);
+          console.log("[END SESSION] Active session", s.id, "overlaps today:", overlaps);
           return overlaps;
         });
         
