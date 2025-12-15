@@ -6807,27 +6807,32 @@ export default function Dashboard() {
                                     )}
                                   </div>
                                   <div className="flex items-center gap-2">
-                                    <Button
-                                      variant="default"
-                                      size="sm"
-                                      onClick={() => reactivateEmployeeMutation.mutate(employee.id)}
-                                      data-testid={`button-reactivate-employee-${employee.id}`}
-                                      className="h-9"
-                                      disabled={userIsReadOnly}
-                                    >
-                                      <span className="material-icons text-sm mr-1">refresh</span>
-                                      {t('dashboard.employees.reactivate', 'Reactivate')}
-                                    </Button>
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      onClick={() => handleEditEmployee(employee)}
-                                      data-testid={`button-edit-terminated-employee-${employee.id}`}
-                                      className="h-9 w-9"
-                                      disabled={userIsReadOnly}
-                                    >
-                                      <span className="material-icons text-sm">edit</span>
-                                    </Button>
+                                    {/* Hide Reactivate and Edit buttons for self-resigned technicians */}
+                                    {employee.terminationReason !== "Self-resigned" && (
+                                      <>
+                                        <Button
+                                          variant="default"
+                                          size="sm"
+                                          onClick={() => reactivateEmployeeMutation.mutate(employee.id)}
+                                          data-testid={`button-reactivate-employee-${employee.id}`}
+                                          className="h-9"
+                                          disabled={userIsReadOnly}
+                                        >
+                                          <span className="material-icons text-sm mr-1">refresh</span>
+                                          {t('dashboard.employees.reactivate', 'Reactivate')}
+                                        </Button>
+                                        <Button
+                                          variant="ghost"
+                                          size="icon"
+                                          onClick={() => handleEditEmployee(employee)}
+                                          data-testid={`button-edit-terminated-employee-${employee.id}`}
+                                          className="h-9 w-9"
+                                          disabled={userIsReadOnly}
+                                        >
+                                          <span className="material-icons text-sm">edit</span>
+                                        </Button>
+                                      </>
+                                    )}
                                     <Button
                                       variant="ghost"
                                       size="icon"
