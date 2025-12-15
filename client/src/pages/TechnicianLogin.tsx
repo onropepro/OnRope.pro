@@ -488,6 +488,24 @@ export default function TechnicianLogin() {
       {/* Main Content */}
       <div className="bg-white dark:bg-slate-950">
 
+        {/* Scrolling Problems Marquee */}
+        <div className="bg-neutral-100 dark:bg-navy-950 py-4 overflow-hidden border-b border-neutral-200 dark:border-navy-800" data-testid="marquee-problems">
+          <div 
+            className="flex gap-8 whitespace-nowrap animate-scroll-left"
+            style={{ width: "max-content" }}
+          >
+            {[...problemRows.flatMap(row => row.problems), ...problemRows.flatMap(row => row.problems), ...problemRows.flatMap(row => row.problems)].map((problem, index) => (
+              <span 
+                key={index} 
+                className="text-base text-muted-foreground/70 flex items-center gap-8"
+              >
+                {problem}
+                <span className="text-muted-foreground/30">•</span>
+              </span>
+            ))}
+          </div>
+        </div>
+
         {/* Problem Section - Flowbite Style */}
         <section className="py-20 lg:py-28 bg-neutral-100 dark:bg-navy-950">
           <div className="container mx-auto px-6 lg:px-8">
