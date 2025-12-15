@@ -19405,8 +19405,32 @@ Do not include any other text, just the JSON object.`
         })
       );
 
-      // Combine both types of quizzes
-      const allQuizzes = [...companyQuizzesWithStatus, ...certQuizzesWithStatus];
+      // Get safety practice quizzes (SWP, FLHA, Harness Inspection)
+      // All users can access safety quizzes
+      const { safetyQuizzes } = await import('./safetyQuizzes');
+      const safetyQuizzesWithStatus = await Promise.all(
+        safetyQuizzes.map(async (safetyQuiz) => {
+          const safetyQuizId = `safety_${safetyQuiz.quizType}`;
+          const hasPassed = await storage.hasEmployeePassedQuiz(currentUser.id, safetyQuizId);
+          const attempts = await storage.getQuizAttemptsByEmployee(currentUser.id, safetyQuizId);
+          return {
+            id: safetyQuizId,
+            documentType: safetyQuiz.quizType,
+            title: safetyQuiz.title,
+            category: safetyQuiz.category,
+            jobType: safetyQuiz.jobType,
+            questionCount: safetyQuiz.questions.length,
+            createdAt: null,
+            hasPassed,
+            attemptCount: attempts.length,
+            lastAttempt: attempts.length > 0 ? attempts[0].completedAt : null,
+            quizCategory: 'safety',
+          };
+        })
+      );
+
+      // Combine all types of quizzes
+      const allQuizzes = [...companyQuizzesWithStatus, ...certQuizzesWithStatus, ...safetyQuizzesWithStatus];
 
       res.json({ quizzes: allQuizzes });
     } catch (error) {
@@ -19459,6 +19483,36 @@ Do not include any other text, just the JSON object.`
             certification: certQuiz.certification,
             level: certQuiz.level,
             quizCategory: 'certification',
+            questions: questionsForTaking,
+          }
+        });
+      }
+
+      // Handle safety quizzes (IDs start with "safety_")
+      if (quizId.startsWith("safety_")) {
+        const { safetyQuizzes } = await import('./safetyQuizzes');
+        const quizType = quizId.replace("safety_", "");
+        const safetyQuiz = safetyQuizzes.find(q => q.quizType === quizType);
+        
+        if (!safetyQuiz) {
+          return res.status(404).json({ message: "Safety quiz not found" });
+        }
+
+        // Return questions WITHOUT correct answers
+        const questionsForTaking = safetyQuiz.questions.map((q) => ({
+          questionNumber: q.questionNumber,
+          question: q.question,
+          options: q.options,
+        }));
+
+        return res.json({
+          quiz: {
+            id: quizId,
+            documentType: safetyQuiz.quizType,
+            title: safetyQuiz.title,
+            category: safetyQuiz.category,
+            jobType: safetyQuiz.jobType,
+            quizCategory: 'safety',
             questions: questionsForTaking,
           }
         });
@@ -19561,6 +19615,63 @@ Do not include any other text, just the JSON object.`
         const passed = score >= 80;
 
         // Save the attempt (use quizId as the cert_ ID)
+        const attempt = await storage.createQuizAttempt({
+          quizId: quizId,
+          employeeId: currentUser.id,
+          companyId: currentUser.companyId || 'system',
+          score,
+          passed,
+          answers: gradedAnswers,
+        });
+
+        return res.json({
+          score,
+          passed,
+          correctAnswers: correctCount,
+          totalQuestions,
+          answers: gradedAnswers,
+        });
+      }
+
+      // Handle safety practice quizzes (IDs start with "safety_")
+      if (quizId.startsWith("safety_")) {
+        const { safetyQuizzes } = await import('./safetyQuizzes');
+        const quizType = quizId.replace("safety_", "");
+        const safetyQuiz = safetyQuizzes.find(q => q.quizType === quizType);
+        
+        if (!safetyQuiz) {
+          return res.status(404).json({ message: "Safety quiz not found" });
+        }
+        
+        // Convert answers array to lookup object
+        const answersMap: Record<number, string> = {};
+        for (const ans of answers) {
+          answersMap[ans.questionNumber] = ans.selectedAnswer;
+        }
+        
+        // Grade the quiz
+        const questions = safetyQuiz.questions;
+        let correctCount = 0;
+        const gradedAnswers: any[] = [];
+
+        for (const question of questions) {
+          const userAnswer = answersMap[question.questionNumber];
+          const isCorrect = userAnswer === question.correctAnswer;
+          if (isCorrect) correctCount++;
+
+          gradedAnswers.push({
+            questionNumber: question.questionNumber,
+            selected: userAnswer || null,
+            correct: question.correctAnswer,
+            isCorrect,
+          });
+        }
+
+        const totalQuestions = questions.length;
+        const score = Math.round((correctCount / totalQuestions) * 100);
+        const passed = score >= 80;
+
+        // Save the attempt (use quizId as the safety_ ID)
         const attempt = await storage.createQuizAttempt({
           quizId: quizId,
           employeeId: currentUser.id,
