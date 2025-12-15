@@ -4633,12 +4633,22 @@ export default function Dashboard() {
                     <h2 className="text-xl font-bold">{t('dashboard.projects.title', 'Projects')}</h2>
                   </div>
                   <Tabs value={projectsSubTab} onValueChange={(v) => setProjectsSubTab(v as "active" | "past")}>
-                    <TabsList>
-                      <TabsTrigger value="active" data-testid="tab-active-projects">
-                        {t('dashboard.projects.activeProjects', 'Active')}
+                    <TabsList className="bg-muted/80 p-1 h-auto">
+                      <TabsTrigger 
+                        value="active" 
+                        data-testid="tab-active-projects"
+                        className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2 gap-2"
+                      >
+                        <span className="material-icons text-base">play_circle</span>
+                        {t('dashboard.projects.activeProjects', 'Active Projects')}
                       </TabsTrigger>
-                      <TabsTrigger value="past" data-testid="tab-past-projects">
-                        {t('dashboard.projects.pastProjects', 'Past')}
+                      <TabsTrigger 
+                        value="past" 
+                        data-testid="tab-past-projects"
+                        className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2 gap-2"
+                      >
+                        <span className="material-icons text-base">history</span>
+                        {t('dashboard.projects.pastProjects', 'Past Projects')}
                       </TabsTrigger>
                     </TabsList>
                   </Tabs>
