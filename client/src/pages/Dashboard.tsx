@@ -3152,7 +3152,7 @@ export default function Dashboard() {
     },
     {
       id: "documents",
-      label: t('dashboard.cards.documents.label', 'Documents'),
+      label: t('dashboard.cards.documents.label', 'Documents and Training'),
       description: t('dashboard.cards.documents.description', 'All company files'),
       icon: "folder_open",
       onClick: () => setLocation("/documents"),
