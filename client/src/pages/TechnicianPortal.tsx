@@ -4879,11 +4879,6 @@ export default function TechnicianPortal() {
           >
             <Eye className="w-5 h-5" />
             <span className="text-[10px] font-medium leading-tight text-center">{language === 'en' ? 'Employer' : 'Employeur'}</span>
-            {!(user?.ropeAccessSpecialties && user.ropeAccessSpecialties.length > 0) && (
-              <span className="absolute -top-1 -right-1 bg-amber-500 text-white text-[8px] rounded-full w-3 h-3 flex items-center justify-center">
-                !
-              </span>
-            )}
           </button>
           <button
             onClick={() => setActiveTab('work')}

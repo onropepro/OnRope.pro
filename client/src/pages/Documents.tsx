@@ -28,6 +28,7 @@ import { downloadMethodStatement } from "@/pages/MethodStatementForm";
 import { formatLocalDate, formatLocalDateLong, formatLocalDateMedium, parseLocalDate, formatTimestampDate, formatLocalDateShort } from "@/lib/dateUtils";
 import { format } from "date-fns";
 import { DocumentReviews } from "@/components/DocumentReviews";
+import { QuizSection } from "@/components/QuizSection";
 import SignatureCanvas from 'react-signature-canvas';
 import { ROPE_ACCESS_EQUIPMENT_CATEGORIES, ROPE_ACCESS_INSPECTION_ITEMS, type RopeAccessEquipmentCategory } from "@shared/schema";
 
@@ -5558,19 +5559,17 @@ export default function Documents() {
                   </button>
                 </>
               )}
-              {canUploadDocuments && (
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('quizzes')}
-                  className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover-elevate ${activeTab === 'quizzes' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}
-                  data-testid="option-quizzes"
-                >
-                  <ClipboardList className={`h-6 w-6 ${activeTab === 'quizzes' ? 'text-primary' : 'text-muted-foreground'}`} />
-                  <span className={`text-sm font-medium text-center ${activeTab === 'quizzes' ? 'text-primary' : ''}`}>
-                    {t('documents.quizzes', 'Quizzes')}
-                  </span>
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => setActiveTab('quizzes')}
+                className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover-elevate ${activeTab === 'quizzes' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}
+                data-testid="option-quizzes"
+              >
+                <ClipboardList className={`h-6 w-6 ${activeTab === 'quizzes' ? 'text-primary' : 'text-muted-foreground'}`} />
+                <span className={`text-sm font-medium text-center ${activeTab === 'quizzes' ? 'text-primary' : ''}`}>
+                  {t('documents.quizzes', 'Quizzes')}
+                </span>
+              </button>
             </div>
           </div>
 
@@ -7307,133 +7306,73 @@ export default function Documents() {
           </Card>
         )}
 
-        {/* Quizzes - show all company quizzes */}
-        {activeTab === "quizzes" && canUploadDocuments && (
+        {/* Quizzes - show all quizzes */}
+        {activeTab === "quizzes" && (
           <>
-          <Card className="mb-6 overflow-hidden">
-            <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
-              <div className="flex items-start gap-4">
-                <div className="p-3 bg-primary/10 rounded-xl ring-1 ring-primary/20">
-                  <ClipboardList className="h-6 w-6 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <CardTitle className="text-xl mb-1">{t('documents.quizzes', 'Quizzes')}</CardTitle>
-                  <p className="text-sm text-muted-foreground">{t('documents.quizzesDesc', 'Document comprehension quizzes for employees')}</p>
-                </div>
-                <Badge variant="secondary" className="text-base font-semibold px-3">
-                  {companyQuizzes?.length || 0}
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <div className="mb-4 p-4 rounded-lg bg-muted/50 border">
-                <p className="text-sm text-muted-foreground">
-                  {t('documents.quizInfo', 'Quizzes are automatically generated from Health & Safety Manual and Company Policy documents. Click "Generate Quiz" on any uploaded document to create a quiz for your employees.')}
-                </p>
-              </div>
-              {companyQuizzes && companyQuizzes.length > 0 ? (
-                <div className="space-y-3">
-                  {companyQuizzes.map((quiz: any) => (
-                    <div key={quiz.id} className="flex items-center gap-4 p-4 rounded-lg border bg-card hover-elevate">
-                      <div className="p-2 bg-primary/10 rounded-lg">
-                        <ClipboardList className="h-5 w-5 text-primary" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium">
-                          {quiz.documentType === 'health_safety_manual' 
-                            ? t('documents.healthSafetyManualQuiz', 'Health & Safety Manual Quiz')
-                            : quiz.documentType === 'company_policy'
-                            ? t('documents.companyPolicyQuiz', 'Company Policy Quiz')
-                            : quiz.documentType}
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          {Array.isArray(quiz.questions) ? quiz.questions.length : 0} {t('documents.questions', 'questions')} 
-                          {quiz.createdAt && ` • ${t('documents.createdOn', 'Created')} ${formatLocalDateMedium(quiz.createdAt)}`}
-                        </div>
-                      </div>
-                      <Badge variant="outline">
-                        {t('documents.active', 'Active')}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <div className="inline-flex p-4 bg-primary/5 rounded-full mb-4">
-                    <ClipboardList className="h-8 w-8 text-primary/50" />
-                  </div>
-                  <p className="text-muted-foreground font-medium">{t('documents.noQuizzes', 'No quizzes created yet')}</p>
-                  <p className="text-sm text-muted-foreground mt-1">{t('documents.noQuizzesDesc', 'Generate a quiz from your Health & Safety Manual or Company Policy document')}</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Certification Practice Quizzes */}
-          {certificationQuizzes.length > 0 && (
+          {/* Company Quizzes - managers see management view, techs see available quizzes */}
+          {canUploadDocuments ? (
             <Card className="mb-6 overflow-hidden">
-              <CardHeader className="bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-transparent pb-4">
+              <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
                 <div className="flex items-start gap-4">
-                  <div className="p-3 bg-blue-500/10 rounded-xl ring-1 ring-blue-500/20">
-                    <GraduationCap className="h-6 w-6 text-blue-600" />
+                  <div className="p-3 bg-primary/10 rounded-xl ring-1 ring-primary/20">
+                    <ClipboardList className="h-6 w-6 text-primary" />
                   </div>
                   <div className="flex-1">
-                    <CardTitle className="text-xl mb-1">{t('documents.certificationQuizzes', 'Certification Practice Quizzes')}</CardTitle>
-                    <p className="text-sm text-muted-foreground">{t('documents.certificationQuizzesDesc', 'IRATA and SPRAT practice quizzes for technician certification prep')}</p>
+                    <CardTitle className="text-xl mb-1">{t('documents.quizzes', 'Quizzes')}</CardTitle>
+                    <p className="text-sm text-muted-foreground">{t('documents.quizzesDesc', 'Document comprehension quizzes for employees')}</p>
                   </div>
                   <Badge variant="secondary" className="text-base font-semibold px-3">
-                    {certificationQuizzes.length}
+                    {companyQuizzes?.length || 0}
                   </Badge>
                 </div>
               </CardHeader>
               <CardContent className="pt-6">
-                <div className="space-y-3">
-                  {certificationQuizzes.map((quiz: any) => {
-                    const certBadgeColor = quiz.certification === 'irata' 
-                      ? 'bg-blue-600 text-white' 
-                      : 'bg-orange-600 text-white';
-                    return (
-                      <div key={quiz.id} className="flex items-center gap-4 p-4 rounded-lg border bg-card hover-elevate" data-testid={`cert-quiz-card-${quiz.id}`}>
-                        <div className={`p-2 rounded-lg ${quiz.certification === 'irata' ? 'bg-blue-500/10' : 'bg-orange-500/10'}`}>
-                          <GraduationCap className={`h-5 w-5 ${quiz.certification === 'irata' ? 'text-blue-600' : 'text-orange-600'}`} />
+                <div className="mb-4 p-4 rounded-lg bg-muted/50 border">
+                  <p className="text-sm text-muted-foreground">
+                    {t('documents.quizInfo', 'Quizzes are automatically generated from Health & Safety Manual and Company Policy documents. Click "Generate Quiz" on any uploaded document to create a quiz for your employees.')}
+                  </p>
+                </div>
+                {companyQuizzes && companyQuizzes.length > 0 ? (
+                  <div className="space-y-3">
+                    {companyQuizzes.map((quiz: any) => (
+                      <div key={quiz.id} className="flex items-center gap-4 p-4 rounded-lg border bg-card hover-elevate">
+                        <div className="p-2 bg-primary/10 rounded-lg">
+                          <ClipboardList className="h-5 w-5 text-primary" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-medium">{quiz.title}</span>
-                            {quiz.certification && quiz.level && (
-                              <Badge className={certBadgeColor}>
-                                {quiz.certification.toUpperCase()} L{quiz.level}
-                              </Badge>
-                            )}
+                          <div className="font-medium">
+                            {quiz.documentType === 'health_safety_manual' 
+                              ? t('documents.healthSafetyManualQuiz', 'Health & Safety Manual Quiz')
+                              : quiz.documentType === 'company_policy'
+                              ? t('documents.companyPolicyQuiz', 'Company Policy Quiz')
+                              : quiz.documentType}
                           </div>
                           <div className="text-sm text-muted-foreground">
-                            {quiz.questionCount} {t('documents.questions', 'questions')}
+                            {Array.isArray(quiz.questions) ? quiz.questions.length : 0} {t('documents.questions', 'questions')} 
+                            {quiz.createdAt && ` • ${t('documents.createdOn', 'Created')} ${formatLocalDateMedium(quiz.createdAt)}`}
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          {quiz.hasPassed ? (
-                            <Badge variant="default" className="bg-green-600 text-white">
-                              <CheckCircle2 className="h-3 w-3 mr-1" />
-                              {t('documents.completed', 'Completed')}
-                            </Badge>
-                          ) : (
-                            <Button
-                              size="sm"
-                              onClick={() => handleStartCertQuiz(quiz)}
-                              data-testid={`start-cert-quiz-${quiz.id}`}
-                            >
-                              {quiz.attemptCount > 0 ? t('documents.retry', 'Retry') : t('documents.startQuiz', 'Start Quiz')}
-                              <ArrowRight className="h-4 w-4 ml-1" />
-                            </Button>
-                          )}
-                        </div>
+                        <Badge variant="outline">
+                          {t('documents.active', 'Active')}
+                        </Badge>
                       </div>
-                    );
-                  })}
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="inline-flex p-4 bg-primary/5 rounded-full mb-4">
+                      <ClipboardList className="h-8 w-8 text-primary/50" />
+                    </div>
+                    <p className="text-muted-foreground font-medium">{t('documents.noQuizzes', 'No quizzes created yet')}</p>
+                    <p className="text-sm text-muted-foreground mt-1">{t('documents.noQuizzesDesc', 'Generate a quiz from your Health & Safety Manual or Company Policy document')}</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
-          )}
+          ) : null}
+
+          {/* QuizSection - All users can take quizzes (certification, safety, and company quizzes) */}
+          <QuizSection />
         </>
         )}
 
