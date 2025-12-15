@@ -17,7 +17,7 @@ import { HighRiseBuilding } from "@/components/HighRiseBuilding";
 import { VerticalBuildingProgress } from "@/components/VerticalBuildingProgress";
 import { ParkadeView } from "@/components/ParkadeView";
 import { SessionDetailsDialog } from "@/components/SessionDetailsDialog";
-import { WorkNoticeList } from "@/components/WorkNoticeForm";
+import { WorkNoticeList, WorkNoticeForm } from "@/components/WorkNoticeForm";
 import { useToast } from "@/hooks/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -148,6 +148,9 @@ export default function ProjectDetail() {
   // Building instructions state
   const [buildingInstructionsOpen, setBuildingInstructionsOpen] = useState(true);
   const [showEditInstructionsDialog, setShowEditInstructionsDialog] = useState(false);
+  
+  // Work notice quick action state
+  const [showQuickNoticeForm, setShowQuickNoticeForm] = useState(false);
   const [instructionsForm, setInstructionsForm] = useState({
     buildingAccess: "",
     keysAndFob: "",
@@ -1763,6 +1766,17 @@ export default function ProjectDetail() {
                 <span className="material-icons text-2xl text-red-600">report_problem</span>
                 <span className="text-xs font-medium text-center">{t('projectDetail.quickActions.incidentReport', 'Incident Report')}</span>
               </Button>
+              {isManagement && (
+                <Button
+                  variant="outline"
+                  className="h-auto py-4 flex flex-col items-center gap-2"
+                  onClick={() => setShowQuickNoticeForm(true)}
+                  data-testid="button-create-notice"
+                >
+                  <span className="material-icons text-2xl text-purple-600">campaign</span>
+                  <span className="text-xs font-medium text-center">{t('projectDetail.quickActions.createNotice', 'Create Notice')}</span>
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -3011,6 +3025,22 @@ export default function ProjectDetail() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Quick Create Work Notice Dialog */}
+      {project && (
+        <Dialog open={showQuickNoticeForm} onOpenChange={setShowQuickNoticeForm}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <WorkNoticeForm
+              project={project}
+              onClose={() => setShowQuickNoticeForm(false)}
+              onSuccess={() => {
+                setShowQuickNoticeForm(false);
+                queryClient.invalidateQueries({ queryKey: ["/api/projects", project.id, "work-notices"] });
+              }}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* Photo Upload Dialog */}
       <Dialog open={showPhotoDialog} onOpenChange={(open) => !open && handlePhotoDialogCancel()}>
