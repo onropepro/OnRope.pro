@@ -7568,7 +7568,7 @@ export default function Dashboard() {
                     disabled={userIsReadOnly || !hasPermission(currentUser, "manage_clients")}
                   >
                     <span className="material-icons">photo_camera</span>
-                    {t('dashboard.clientDatabase.scanCard', 'Scan Card')}
+                    {t('dashboard.clientDatabase.scanCard', 'Scan Business Card')}
                   </Button>
                 )}
               </div>
