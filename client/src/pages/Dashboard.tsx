@@ -981,6 +981,7 @@ export default function Dashboard() {
   const [invitationToConvert, setInvitationToConvert] = useState<any>(null); // Invitation being converted to employee
   const [showInvitationEmployeeForm, setShowInvitationEmployeeForm] = useState(false); // Show employee form for invitation
   const [showLeaveCompanyDialog, setShowLeaveCompanyDialog] = useState(false); // For technicians to leave company
+  const [showEmployerInfoDialog, setShowEmployerInfoDialog] = useState(false); // For technicians to view employer info
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   
@@ -3185,12 +3186,12 @@ export default function Dashboard() {
     {
       id: "current-employer",
       label: t('dashboard.cards.currentEmployer.label', 'My Employer'),
-      description: userData?.user?.companyName || t('dashboard.cards.currentEmployer.description', 'Leave company'),
+      description: userData?.user?.companyName || t('dashboard.cards.currentEmployer.description', 'View details'),
       icon: "business",
-      onClick: () => setShowLeaveCompanyDialog(true),
+      onClick: () => setShowEmployerInfoDialog(true),
       testId: "button-current-employer",
       isVisible: (user: any) => user?.role === 'rope_access_tech' && user?.companyId && !user?.terminatedDate,
-      borderColor: "#ef4444",
+      borderColor: "#0ea5e9",
       category: "team",
     },
   ].filter(card => {
@@ -10992,6 +10993,122 @@ export default function Dashboard() {
               )}
             </form>
           </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Employer Info Dialog for Technicians */}
+      <Dialog open={showEmployerInfoDialog} onOpenChange={setShowEmployerInfoDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <span className="material-icons text-primary">business</span>
+              {t('dashboard.employerInfo.title', 'My Employer')}
+            </DialogTitle>
+            <DialogDescription>
+              {t('dashboard.employerInfo.description', 'Your current employment details')}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {/* Company Name */}
+            <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+              <span className="material-icons text-muted-foreground">apartment</span>
+              <div>
+                <div className="text-xs text-muted-foreground">{t('dashboard.employerInfo.companyName', 'Company')}</div>
+                <div className="font-medium">{userData?.user?.companyName || t('common.unknown', 'Unknown')}</div>
+              </div>
+            </div>
+            
+            {/* Start Date */}
+            {user?.startDate && (
+              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                <span className="material-icons text-muted-foreground">event</span>
+                <div>
+                  <div className="text-xs text-muted-foreground">{t('dashboard.employerInfo.startDate', 'Date of Hire')}</div>
+                  <div className="font-medium">{formatLocalDate(user.startDate)}</div>
+                </div>
+              </div>
+            )}
+            
+            {/* Duration Worked */}
+            {user?.startDate && (
+              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                <span className="material-icons text-muted-foreground">schedule</span>
+                <div>
+                  <div className="text-xs text-muted-foreground">{t('dashboard.employerInfo.duration', 'Time with Company')}</div>
+                  <div className="font-medium">
+                    {(() => {
+                      const start = new Date(user.startDate);
+                      const now = new Date();
+                      const diffMs = now.getTime() - start.getTime();
+                      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                      const years = Math.floor(diffDays / 365);
+                      const months = Math.floor((diffDays % 365) / 30);
+                      const days = diffDays % 30;
+                      
+                      const parts = [];
+                      if (years > 0) parts.push(`${years} ${years === 1 ? t('common.year', 'year') : t('common.years', 'years')}`);
+                      if (months > 0) parts.push(`${months} ${months === 1 ? t('common.month', 'month') : t('common.months', 'months')}`);
+                      if (years === 0 && days > 0) parts.push(`${days} ${days === 1 ? t('common.day', 'day') : t('common.days', 'days')}`);
+                      
+                      return parts.length > 0 ? parts.join(', ') : t('common.today', 'Started today');
+                    })()}
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Hourly Rate or Salary */}
+            {(user?.hourlyRate || user?.salary) && (
+              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                <span className="material-icons text-muted-foreground">payments</span>
+                <div>
+                  <div className="text-xs text-muted-foreground">
+                    {user?.isSalary 
+                      ? t('dashboard.employerInfo.salary', 'Annual Salary') 
+                      : t('dashboard.employerInfo.hourlyRate', 'Hourly Rate')}
+                  </div>
+                  <div className="font-medium">
+                    {user?.isSalary 
+                      ? `$${parseFloat(user.salary || '0').toLocaleString()}/year`
+                      : `$${parseFloat(user.hourlyRate || '0').toFixed(2)}/hr`}
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Role */}
+            <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+              <span className="material-icons text-muted-foreground">badge</span>
+              <div>
+                <div className="text-xs text-muted-foreground">{t('dashboard.employerInfo.role', 'Role')}</div>
+                <div className="font-medium capitalize">{user?.role?.replace(/_/g, ' ') || t('common.technician', 'Technician')}</div>
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter className="flex-col gap-2 sm:flex-row">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowEmployerInfoDialog(false)}
+              className="w-full sm:w-auto"
+              data-testid="button-close-employer-info"
+            >
+              {t('common.close', 'Close')}
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={() => {
+                setShowEmployerInfoDialog(false);
+                setShowLeaveCompanyDialog(true);
+              }}
+              className="w-full sm:w-auto"
+              data-testid="button-leave-company"
+            >
+              <span className="material-icons text-sm mr-1">exit_to_app</span>
+              {t('dashboard.employerInfo.leaveCompany', 'Leave Company')}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
