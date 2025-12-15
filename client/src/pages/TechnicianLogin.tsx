@@ -38,8 +38,20 @@ import {
   Briefcase,
   BookOpen,
   Zap,
-  DollarSign
+  DollarSign,
+  Link2,
+  TrendingUp,
+  ChevronsUpDown,
+  ClipboardList,
+  Globe,
+  Building2,
+  Home,
+  Crown,
+  XCircle,
+  Search
 } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Link } from "wouter";
 import { TechnicianRegistration } from "@/components/TechnicianRegistration";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
@@ -52,128 +64,43 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
-const problemRows = [
-  {
-    direction: "left" as const,
-    problems: [
-      "New job, same paperwork again",
-      "Filling out banking forms for the 4th time",
-      "\"Bring a void cheque\"",
-      "Emergency contact form again",
-      "Half-day orientation",
-      "Changed employer, job history gone",
-    ]
-  },
-  {
-    direction: "right" as const,
-    problems: [
-      "Texting hours to the office",
-      "Timesheet every Friday",
-      "\"Did you log yesterday?\"",
-      "Forgot to submit my time",
-      "Hope they entered it right",
-      "My word against their spreadsheet",
-    ]
-  },
-  {
-    direction: "left" as const,
-    problems: [
-      "Filling out my logbook two weeks late",
-      "What building was I at?",
-      "Making stuff up because I can't remember",
-      "Staring at my phone trying to recall",
-      "10 pages of guesswork",
-      "This can't be right",
-    ]
-  },
-  {
-    direction: "right" as const,
-    problems: [
-      "$63 missing from my check",
-      "Supervisor logged wrong hours",
-      "Payroll disputes every month",
-      "\"I swear I worked 9 hours\"",
-      "Can't prove anything",
-      "Who's actually tracking this?",
-    ]
-  },
-  {
-    direction: "left" as const,
-    problems: [
-      "8 years experience, zero proof",
-      "\"I've done hundreds of rope transfers\"",
-      "No data for raise negotiations",
-      "Gut feel isn't leverage",
-      "How do I prove what I've done?",
-    ]
-  },
-  {
-    direction: "right" as const,
-    problems: [
-      "My Indeed account is mostly SPAM",
-      "Endless search, zero results",
-      "Where are the real postings?",
-      "Are jobs listed on job boards even real?",
-      "Industry jobs are invisible",
-    ]
-  },
-  {
-    direction: "left" as const,
-    problems: [
-      "irata expiring next week",
-      "Nobody told me",
-      "Scrambling for recert",
-      "What do you mean my irata license is expired?!?!?!",
-      "Almost got caught on site with expired SPRAT",
-      "Why isn't there a renewal alert?",
-      "This could have been prevented",
-    ]
-  },
-  {
-    direction: "right" as const,
-    problems: [
-      "Moonlighting is a nightmare",
-      "Can't work two companies easily",
-      "Weekend jobs with no system",
-      "Building my own clients with paper",
-      "One profile should handle this",
-    ]
-  },
-];
-
-function ScrollingProblems({ problems, direction }: { problems: string[], direction: "left" | "right" }) {
-  const duplicatedProblems = [...problems, ...problems, ...problems];
-  
-  return (
-    <div className="overflow-hidden py-2">
-      <div 
-        className={`flex gap-10 whitespace-nowrap ${
-          direction === "left" ? "animate-scroll-left" : "animate-scroll-right"
-        }`}
-        style={{
-          width: "max-content",
-        }}
-      >
-        {duplicatedProblems.map((problem, index) => (
-          <span 
-            key={index} 
-            className="text-2xl text-muted-foreground/80 flex items-center gap-4"
-          >
-            {problem}
-            <span className="text-muted-foreground/40">•</span>
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export default function TechnicianLogin() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [loginMethod, setLoginMethod] = useState<"license" | "email">("license");
   const [showRegistration, setShowRegistration] = useState(false);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
+  const [expandedTechProblems, setExpandedTechProblems] = useState<string[]>([]);
+  const [expandedEmployerProblems, setExpandedEmployerProblems] = useState<string[]>([]);
+  const [expandedFaqs, setExpandedFaqs] = useState<string[]>([]);
+
+  const allTechProblemIds = ["tech-1", "tech-2", "tech-3", "tech-4", "tech-5", "tech-6"];
+  const allEmployerProblemIds = ["employer-1", "employer-2", "employer-3", "pm-1"];
+  const allFaqIds = ["faq-1", "faq-2", "faq-3", "faq-4", "faq-5", "faq-6", "faq-7", "faq-8", "faq-9", "faq-10"];
+
+  const toggleAllTechProblems = () => {
+    if (expandedTechProblems.length === allTechProblemIds.length) {
+      setExpandedTechProblems([]);
+    } else {
+      setExpandedTechProblems(allTechProblemIds);
+    }
+  };
+
+  const toggleAllEmployerProblems = () => {
+    if (expandedEmployerProblems.length === allEmployerProblemIds.length) {
+      setExpandedEmployerProblems([]);
+    } else {
+      setExpandedEmployerProblems(allEmployerProblemIds);
+    }
+  };
+
+  const toggleAllFaqs = () => {
+    if (expandedFaqs.length === allFaqIds.length) {
+      setExpandedFaqs([]);
+    } else {
+      setExpandedFaqs(allFaqIds);
+    }
+  };
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -488,24 +415,6 @@ export default function TechnicianLogin() {
 
       {/* Main Content */}
       <div className="bg-white dark:bg-slate-950">
-
-        {/* Scrolling Problems Marquee */}
-        <div className="bg-neutral-100 dark:bg-navy-950 py-4 overflow-hidden border-b border-neutral-200 dark:border-navy-800" data-testid="marquee-problems">
-          <div 
-            className="flex gap-8 whitespace-nowrap animate-scroll-left"
-            style={{ width: "max-content" }}
-          >
-            {[...problemRows.flatMap(row => row.problems), ...problemRows.flatMap(row => row.problems), ...problemRows.flatMap(row => row.problems)].map((problem, index) => (
-              <span 
-                key={index} 
-                className="text-base text-muted-foreground/70 flex items-center gap-8"
-              >
-                {problem}
-                <span className="text-muted-foreground/30">•</span>
-              </span>
-            ))}
-          </div>
-        </div>
 
         {/* Problem Section - Flowbite Style */}
         <section className="py-20 lg:py-28 bg-neutral-100 dark:bg-navy-950">
@@ -1213,73 +1122,961 @@ export default function TechnicianLogin() {
           </div>
         </section>
 
-        {/* Final CTA - Flowbite Style */}
-        <section className="py-20 lg:py-28 bg-action-500/10 dark:bg-navy-900">
-          <div className="container mx-auto px-6 lg:px-8 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Set up once. That's it.
+        <Separator className="my-0" />
+
+        {/* Who Benefits Section */}
+        <section className="py-16 md:py-20 px-4">
+          <div className="max-w-5xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+              Who Benefits From This Module
             </h2>
-            <p className="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
-              Your certs. Your banking info. Your hours. Your logbook reference. Enter them once. Plug into any employer. Automatic from there.
+            <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
+              Every stakeholder in the rope access ecosystem gains from technician portability and verified credentials.
             </p>
-            
-            <div className="flex flex-col items-center gap-6">
-              <Button 
-                size="lg" 
-                className="gap-2 rounded-full bg-action-500 hover:bg-action-600 shadow-lg shadow-action-500/25 focus:ring-4 focus:ring-action-500/50"
-                onClick={() => setShowRegistration(true)}
-                data-testid="button-final-cta"
-              >
-                Create Your Free Profile
-                <ChevronRight className="w-5 h-5" />
-              </Button>
-              
-              <button 
-                onClick={() => setShowLoginDialog(true)}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                data-testid="link-sign-in"
-              >
-                Already have an account? Sign In
-              </button>
+
+            <div className="space-y-8">
+              {/* For Technicians */}
+              <Card className="overflow-hidden">
+                <CardHeader className="bg-amber-50 dark:bg-amber-950 border-b">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center">
+                      <HardHat className="w-5 h-5 text-amber-600" />
+                    </div>
+                    <CardTitle className="text-xl">For Technicians</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-6 space-y-4">
+                  <div className="grid md:grid-cols-3 gap-6">
+                    <div className="space-y-2">
+                      <h4 className="text-lg font-semibold text-foreground">Your work history belongs to you</h4>
+                      <p className="text-base text-muted-foreground">When you leave a company, everything goes with you: hours, certifications, safety record. Your next employer sees your complete professional identity in seconds.</p>
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="text-lg font-semibold text-foreground">Never miss a certification deadline</h4>
+                      <p className="text-base text-muted-foreground">PLUS accounts show exactly how close you are to your next level and alert you 60 days before your certification expires.</p>
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="text-lg font-semibold text-foreground">Work for multiple companies</h4>
+                      <p className="text-base text-muted-foreground">PLUS accounts connect to unlimited employers simultaneously. One login. Separate hour tracking per company. Maximize your earning potential.</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* For Employers */}
+              <Card className="overflow-hidden">
+                <CardHeader className="bg-blue-50 dark:bg-blue-950 border-b">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                      <Briefcase className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <CardTitle className="text-xl">For Employers</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-6 space-y-4">
+                  <div className="grid md:grid-cols-3 gap-6">
+                    <div className="space-y-2">
+                      <h4 className="text-lg font-semibold text-foreground">Onboard in 10 seconds, not 60 minutes</h4>
+                      <p className="text-base text-muted-foreground">When a tech connects to your company, you receive their complete profile instantly: certifications, banking details, emergency contacts, work history.</p>
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="text-lg font-semibold text-foreground">Verify qualifications before you hire</h4>
+                      <p className="text-base text-muted-foreground">Search any IRATA license number and see: name, level, First Aid status, location. The tech approves the connection before you access their full profile.</p>
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="text-lg font-semibold text-foreground">Safety documentation completes itself</h4>
+                      <p className="text-base text-muted-foreground">When techs accept your invitation, they must read and sign all safety procedures before accessing the Work Dashboard. 100% compliance. Zero chasing.</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* For Property Managers */}
+              <Card className="overflow-hidden">
+                <CardHeader className="bg-emerald-50 dark:bg-emerald-950 border-b">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center">
+                      <Globe className="w-5 h-5 text-emerald-600" />
+                    </div>
+                    <CardTitle className="text-xl">For Property Managers</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-6 space-y-4">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <h4 className="text-lg font-semibold text-foreground">Verify contractor qualifications instantly</h4>
+                      <p className="text-base text-muted-foreground">Through the Building Manager Portal, view technician certification levels, expiry dates, and safety ratings for any contractor working on your property.</p>
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="text-lg font-semibold text-foreground">Document everything for strata councils</h4>
+                      <p className="text-base text-muted-foreground">When residents ask who was working outside their window, you have instant access to verified technician credentials. Professional documentation on demand.</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* For Building Managers */}
+              <Card className="overflow-hidden">
+                <CardHeader className="bg-violet-50 dark:bg-violet-950 border-b">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center">
+                      <Building2 className="w-5 h-5 text-violet-600" />
+                    </div>
+                    <CardTitle className="text-xl">For Building Managers</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-6 space-y-4">
+                  <div className="space-y-2">
+                    <h4 className="text-lg font-semibold text-foreground">Know exactly who accesses your building</h4>
+                    <p className="text-base text-muted-foreground">See verified credentials for every technician working on your property. Certification levels. Expiry dates. Safety compliance. Protect your liability with verified vendor qualifications.</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* For Residents */}
+              <Card className="overflow-hidden">
+                <CardHeader className="bg-rose-50 dark:bg-rose-950 border-b">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center">
+                      <Home className="w-5 h-5 text-rose-600" />
+                    </div>
+                    <CardTitle className="text-xl">For Residents</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-6 space-y-4">
+                  <div className="space-y-2">
+                    <h4 className="text-lg font-semibold text-foreground">See who's working on your building</h4>
+                    <p className="text-base text-muted-foreground">Through the Resident Portal, view technician profiles for workers on your property. Know that qualified professionals are handling your building's maintenance.</p>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-            
-            <p className="text-sm text-muted-foreground mt-8">
-              Free forever. Join rope access professionals who set up once and never looked back.
-            </p>
           </div>
         </section>
 
-        {/* Footer Trust Elements */}
-        <footer className="border-t py-8">
-          <div className="container mx-auto px-6">
-            <div className="flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
-              <span className="flex items-center gap-2">
-                <Lock className="w-4 h-4" />
-                Bank-level encryption
-              </span>
-              <span className="flex items-center gap-2">
-                <Smartphone className="w-4 h-4" />
-                Works on any device
-              </span>
-              <span className="flex items-center gap-2">
-                <MapPin className="w-4 h-4" />
-                Canadian company, Canadian data storage
-              </span>
-              <span className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4" />
-                irata/SPRAT verified
-              </span>
+        <Separator className="my-0" />
+
+        {/* Key Features Section */}
+        <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
+          <div className="max-w-5xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+              Key Features
+            </h2>
+            <p className="text-center text-muted-foreground text-lg mb-12 max-w-3xl mx-auto">
+              Every feature exists to solve a real problem technicians face every day.
+            </p>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0">
+                      <Link2 className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold">Portable Professional Identity</h3>
+                      <p className="text-base text-muted-foreground mt-1">
+                        Your IRATA or SPRAT license number becomes your permanent identifier. Change employers, and your complete work history transfers in seconds.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0">
+                      <Clock className="w-5 h-5 text-emerald-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold">Automatic Hour Tracking</h3>
+                      <p className="text-base text-muted-foreground mt-1">
+                        Every work session logs automatically: building address, height, tasks performed, duration. Wait a year to fill your logbook if you want. Every detail is recorded.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0">
+                      <TrendingUp className="w-5 h-5 text-amber-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold">Level Progression Display</h3>
+                      <p className="text-base text-muted-foreground mt-1">
+                        See exactly where you stand: "847 of 1,000 hours toward Level 2. 153 hours remaining." Updates in real-time as sessions log.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
+                      <Bell className="w-5 h-5 text-rose-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold flex items-center gap-2">
+                        Certification Expiry Alerts
+                        <Badge variant="outline" className="text-xs bg-amber-100 text-amber-700 border-amber-300">PLUS</Badge>
+                      </h3>
+                      <p className="text-base text-muted-foreground mt-1">
+                        60-day yellow badge. 30-day red badge. Banner warnings you can't miss. Never let a certification lapse because you forgot to check.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center shrink-0">
+                      <Users className="w-5 h-5 text-violet-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold flex items-center gap-2">
+                        Multi-Employer Connections
+                        <Badge variant="outline" className="text-xs bg-amber-100 text-amber-700 border-amber-300">PLUS</Badge>
+                      </h3>
+                      <p className="text-base text-muted-foreground mt-1">
+                        Connect to unlimited employers simultaneously. Switch between Work Dashboards instantly. Hours log separately per company.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-sky-100 dark:bg-sky-900 flex items-center justify-center shrink-0">
+                      <Search className="w-5 h-5 text-sky-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold flex items-center gap-2">
+                        Job Board Access
+                        <Badge variant="outline" className="text-xs bg-amber-100 text-amber-700 border-amber-300">PLUS</Badge>
+                      </h3>
+                      <p className="text-base text-muted-foreground mt-1">
+                        See employment opportunities from employers in your region. Apply with one click. Your complete profile sends automatically.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        <Separator className="my-0" />
+
+        {/* Problems Solved Section - Technicians */}
+        <section className="py-16 md:py-20 px-4">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+              Problems Solved
+            </h2>
+            <p className="text-center text-muted-foreground text-lg mb-12 max-w-3xl mx-auto">
+              Real problems from real technicians and employers. Real solutions.
+            </p>
+
+            {/* Technician Problems */}
+            <div className="mb-12">
+              <div className="flex items-center justify-between gap-2 flex-wrap mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center">
+                    <HardHat className="w-5 h-5 text-amber-600" />
+                  </div>
+                  <h3 className="text-xl font-semibold">For Technicians</h3>
+                </div>
+                <button
+                  onClick={toggleAllTechProblems}
+                  className="flex items-center gap-1 text-sm text-muted-foreground hover-elevate rounded-md px-2 py-1"
+                  data-testid="button-toggle-tech-problems"
+                >
+                  <ChevronsUpDown className="w-4 h-4" />
+                  {expandedTechProblems.length === allTechProblemIds.length ? "Collapse All" : "Expand All"}
+                </button>
+              </div>
+
+              <Accordion 
+                type="multiple" 
+                value={expandedTechProblems}
+                onValueChange={setExpandedTechProblems}
+                className="space-y-3"
+              >
+                <AccordionItem value="tech-1" className="border rounded-lg px-4">
+                  <AccordionTrigger className="text-left" data-testid="accordion-tech-problem-1">
+                    <span className="font-medium">"I can't remember what I did 3 months ago when filling my logbook."</span>
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-4 text-muted-foreground">
+                    <p>
+                      <span className="font-medium text-foreground">The Pain:</span> IRATA certification requires detailed logbooks with dates, heights, tasks, and locations. Filling these retrospectively means guessing at details, potentially understating hours, and risking questions during audits.
+                    </p>
+                    <div className="bg-emerald-50 dark:bg-emerald-950 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                      <p className="text-base text-emerald-800 dark:text-emerald-200">
+                        <strong>Solution:</strong> OnRopePro automatically logs every work session with exact dates, building addresses, heights, tasks performed, and duration. Sessions group by project. One export covers months of detailed activity.
+                      </p>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="tech-2" className="border rounded-lg px-4">
+                  <AccordionTrigger className="text-left" data-testid="accordion-tech-problem-2">
+                    <span className="font-medium">"Every new job means re-entering all my information."</span>
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-4 text-muted-foreground">
+                    <p>
+                      <span className="font-medium text-foreground">The Pain:</span> Switch employers and you're starting from scratch: new forms, new banking details, new certification copies, new emergency contacts. The rope access industry averages 2-3 employer changes per year. That's 45+ forms annually.
+                    </p>
+                    <div className="bg-emerald-50 dark:bg-emerald-950 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                      <p className="text-base text-emerald-800 dark:text-emerald-200">
+                        <strong>Solution:</strong> Your Technician Passport stores everything once. When you accept an employer invitation, they receive your complete profile instantly. Update your address once, and every connected employer sees the change.
+                      </p>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="tech-3" className="border rounded-lg px-4">
+                  <AccordionTrigger className="text-left" data-testid="accordion-tech-problem-3">
+                    <span className="font-medium">"My IRATA certification expired and I didn't notice."</span>
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-4 text-muted-foreground">
+                    <p>
+                      <span className="font-medium text-foreground">The Pain:</span> IRATA certifications expire after 3 years. Miss the renewal window and you can't work legally. Assessment slots fill up during busy season. Employers discover expired certs at job sites.
+                    </p>
+                    <div className="bg-emerald-50 dark:bg-emerald-950 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                      <p className="text-base text-emerald-800 dark:text-emerald-200">
+                        <strong>Solution:</strong> PLUS accounts provide automated alerts at 60 days and 30 days before expiration. Plan assessments during slow season. Book early when slots are available.
+                      </p>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="tech-4" className="border rounded-lg px-4">
+                  <AccordionTrigger className="text-left" data-testid="accordion-tech-problem-4">
+                    <span className="font-medium">"I want to work for multiple companies but it's a paperwork nightmare."</span>
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-4 text-muted-foreground">
+                    <p>
+                      <span className="font-medium text-foreground">The Pain:</span> Managing separate paperwork, banking info, and certifications for each employer means administrative chaos. Some techs give up on side work because the hassle isn't worth it.
+                    </p>
+                    <div className="bg-emerald-50 dark:bg-emerald-950 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                      <p className="text-base text-emerald-800 dark:text-emerald-200">
+                        <strong>Solution:</strong> PLUS accounts allow unlimited employer connections. Accept invitations from multiple companies. Each receives your standardized profile. Hours log separately per employer.
+                      </p>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="tech-5" className="border rounded-lg px-4">
+                  <AccordionTrigger className="text-left" data-testid="accordion-tech-problem-5">
+                    <span className="font-medium">"I don't know how close I am to my next certification level."</span>
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-4 text-muted-foreground">
+                    <p>
+                      <span className="font-medium text-foreground">The Pain:</span> IRATA level progression requires specific hour thresholds. Techs track this manually, not knowing if they're 100 hours or 500 hours away. Some discover at assessment they don't qualify.
+                    </p>
+                    <div className="bg-emerald-50 dark:bg-emerald-950 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                      <p className="text-base text-emerald-800 dark:text-emerald-200">
+                        <strong>Solution:</strong> PLUS accounts display real-time level progression: your total hours, hours required for next level, hours remaining. Updates automatically as work sessions log.
+                      </p>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="tech-6" className="border rounded-lg px-4">
+                  <AccordionTrigger className="text-left" data-testid="accordion-tech-problem-6">
+                    <span className="font-medium">"I can't find job opportunities in my area."</span>
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-4 text-muted-foreground">
+                    <p>
+                      <span className="font-medium text-foreground">The Pain:</span> Rope access jobs aren't posted on Indeed or LinkedIn. Finding work means knowing people, random phone calls, or word-of-mouth. New technicians have no systematic way to discover opportunities.
+                    </p>
+                    <div className="bg-emerald-50 dark:bg-emerald-950 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                      <p className="text-base text-emerald-800 dark:text-emerald-200">
+                        <strong>Solution:</strong> PLUS accounts access the OnRopePro Job Board showing employment opportunities from employers in your region. Apply with one click. Your complete profile sends automatically.
+                      </p>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </div>
+
+            {/* Employer Problems */}
+            <div>
+              <div className="flex items-center justify-between gap-2 flex-wrap mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                    <Briefcase className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <h3 className="text-xl font-semibold">For Employers & Property Managers</h3>
+                </div>
+                <button
+                  onClick={toggleAllEmployerProblems}
+                  className="flex items-center gap-1 text-sm text-muted-foreground hover-elevate rounded-md px-2 py-1"
+                  data-testid="button-toggle-employer-problems"
+                >
+                  <ChevronsUpDown className="w-4 h-4" />
+                  {expandedEmployerProblems.length === allEmployerProblemIds.length ? "Collapse All" : "Expand All"}
+                </button>
+              </div>
+
+              <Accordion 
+                type="multiple" 
+                value={expandedEmployerProblems}
+                onValueChange={setExpandedEmployerProblems}
+                className="space-y-3"
+              >
+                <AccordionItem value="employer-1" className="border rounded-lg px-4">
+                  <AccordionTrigger className="text-left" data-testid="accordion-employer-problem-1">
+                    <span className="font-medium">"Onboarding paperwork gets lost in email chaos."</span>
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-4 text-muted-foreground">
+                    <p>
+                      <span className="font-medium text-foreground">The Pain:</span> New hire accepts job. You email safety documentation. They read it (maybe). They sign it (eventually). Six months later, an auditor asks for proof of acknowledgment.
+                    </p>
+                    <div className="bg-emerald-50 dark:bg-emerald-950 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                      <p className="text-base text-emerald-800 dark:text-emerald-200">
+                        <strong>Solution:</strong> When a tech accepts your invitation, they must read and sign all safety documentation before accessing the Work Dashboard. Documents stored permanently with audit timestamps.
+                      </p>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="employer-2" className="border rounded-lg px-4">
+                  <AccordionTrigger className="text-left" data-testid="accordion-employer-problem-2">
+                    <span className="font-medium">"I can't verify a tech's qualifications quickly."</span>
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-4 text-muted-foreground">
+                    <p>
+                      <span className="font-medium text-foreground">The Pain:</span> Applicant claims Level 2 with First Aid. You ask for copies. They send blurry photos. You verify with IRATA manually. Days pass. You need bodies on site tomorrow.
+                    </p>
+                    <div className="bg-emerald-50 dark:bg-emerald-950 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                      <p className="text-base text-emerald-800 dark:text-emerald-200">
+                        <strong>Solution:</strong> Search any IRATA license number and instantly see: name, certification level, First Aid status, location. The tech approves the connection before you receive full profile access.
+                      </p>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="employer-3" className="border rounded-lg px-4">
+                  <AccordionTrigger className="text-left" data-testid="accordion-employer-problem-3">
+                    <span className="font-medium">"An employee claimed hours that didn't match the project timeline."</span>
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-4 text-muted-foreground">
+                    <p>
+                      <span className="font-medium text-foreground">The Pain:</span> Paper timesheets show 8 hours. No detail on which building, which elevation, what tasks. Disputes arise. Payroll errors follow.
+                    </p>
+                    <div className="bg-emerald-50 dark:bg-emerald-950 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                      <p className="text-base text-emerald-800 dark:text-emerald-200">
+                        <strong>Solution:</strong> When techs connect to your company, every work session logs automatically: building address, heights, specific tasks, duration. Complete, undisputable work records.
+                      </p>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="pm-1" className="border rounded-lg px-4">
+                  <AccordionTrigger className="text-left" data-testid="accordion-pm-problem-1">
+                    <div className="flex items-center gap-2">
+                      <Globe className="w-4 h-4 text-emerald-500" />
+                      <span className="font-medium">"I can't verify contractor technician qualifications." (Property Managers)</span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-4 text-muted-foreground">
+                    <p>
+                      <span className="font-medium text-foreground">The Pain:</span> You hire a rope access company, but how do you know their technicians are actually certified? You request documentation. It takes days. Certifications might be expired.
+                    </p>
+                    <div className="bg-emerald-50 dark:bg-emerald-950 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                      <p className="text-base text-emerald-800 dark:text-emerald-200">
+                        <strong>Solution:</strong> Through the Building Manager Portal, view technician profiles for contractors working on your property: certification levels, expiry dates, safety ratings. Real-time verification.
+                      </p>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </div>
+          </div>
+        </section>
+
+        <Separator className="my-0" />
+
+        {/* Measurable Results Section */}
+        <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+              Measurable Results
+            </h2>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <Card className="border-2 border-blue-200 dark:border-blue-800">
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0">
+                      <Zap className="w-6 h-6 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold mb-2">Time Savings</h3>
+                      <p className="text-3xl font-bold text-blue-600 mb-2">60+ min to 10 sec</p>
+                      <p className="text-base text-muted-foreground">That's the difference between traditional onboarding paperwork and connecting to a tech who already has a Passport.</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2 border-emerald-200 dark:border-emerald-800">
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0">
+                      <CheckCircle2 className="w-6 h-6 text-emerald-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold mb-2">Error Elimination</h3>
+                      <p className="text-3xl font-bold text-emerald-600 mb-2">Zero guesswork</p>
+                      <p className="text-base text-muted-foreground">Every session tracks automatically with building address, heights, tasks, and duration. No more reconstructing from memory.</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2 border-amber-200 dark:border-amber-800">
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0">
+                      <Shield className="w-6 h-6 text-amber-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold mb-2">Compliance Certainty</h3>
+                      <p className="text-3xl font-bold text-amber-600 mb-2">100% rate</p>
+                      <p className="text-base text-muted-foreground">Techs cannot access the Work Dashboard until they've read and signed all safety procedures. Audit-ready always.</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2 border-violet-200 dark:border-violet-800">
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-full bg-violet-100 dark:bg-violet-900 flex items-center justify-center shrink-0">
+                      <Lock className="w-6 h-6 text-violet-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold mb-2">Career Protection</h3>
+                      <p className="text-3xl font-bold text-violet-600 mb-2">Forever yours</p>
+                      <p className="text-base text-muted-foreground">When you leave an employer, every logged hour, every inspection, every acknowledgment travels with you permanently.</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        <Separator className="my-0" />
+
+        {/* Connected Modules Section */}
+        <section className="py-16 md:py-20 px-4">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+              Connected Modules
+            </h2>
+            <p className="text-center text-muted-foreground text-lg mb-12 max-w-3xl mx-auto">
+              Your Technician Passport integrates with every OnRopePro module your employers use.
+            </p>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0">
+                      <ClipboardList className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold">Project Management</h3>
+                      <p className="text-base text-muted-foreground mt-1">
+                        Your work sessions automatically tie to specific projects, buildings, and elevations. Project assignments flow to your Work Dashboard. Completed drops log to your Passport.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0">
+                      <Shield className="w-5 h-5 text-emerald-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold">Safety & Compliance</h3>
+                      <p className="text-base text-muted-foreground mt-1">
+                        Harness inspections, safety document acknowledgments, and compliance completions sync to your personal safety rating. Your rating follows you across all employers.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0">
+                      <DollarSign className="w-5 h-5 text-amber-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold">Payroll Processing</h3>
+                      <p className="text-base text-muted-foreground mt-1">
+                        Logged hours feed directly into employer payroll calculations. Banking details stored in your Passport eliminate re-entry for every new job.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center shrink-0">
+                      <Clock className="w-5 h-5 text-violet-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold">Time Tracking</h3>
+                      <p className="text-base text-muted-foreground mt-1">
+                        Clock-in, clock-out, break tracking. All time entries sync to your Passport's work history. Every minute documented.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="md:col-span-2">
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-sky-100 dark:bg-sky-900 flex items-center justify-center shrink-0">
+                      <Search className="w-5 h-5 text-sky-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold">Job Board</h3>
+                      <p className="text-base text-muted-foreground mt-1">
+                        PLUS account profiles appear to employers posting positions. Apply with one click. Your complete Passport sends automatically.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        <Separator className="my-0" />
+
+        {/* Account Tiers Section */}
+        <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+              Account Tiers
+            </h2>
+            <p className="text-center text-muted-foreground text-lg mb-12 max-w-3xl mx-auto">
+              Start free. Unlock PLUS with one referral.
+            </p>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Standard Tier */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-xl flex items-center gap-2">
+                    <HardHat className="w-5 h-5 text-slate-600" />
+                    Standard
+                    <Badge variant="secondary">Free Forever</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <ul className="space-y-3">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-1 shrink-0" />
+                      <span>Portable professional identity</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-1 shrink-0" />
+                      <span>Certification storage (IRATA/SPRAT)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-1 shrink-0" />
+                      <span>Work history tracking (with employer)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-1 shrink-0" />
+                      <span>Personal safety rating</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-1 shrink-0" />
+                      <span>Resume/CV upload</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-1 shrink-0" />
+                      <span>Single employer connection</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-1 shrink-0" />
+                      <span>Unique referral code</span>
+                    </li>
+                  </ul>
+                  <Separator />
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-muted-foreground">Limitations:</p>
+                    <ul className="space-y-2 text-sm text-muted-foreground">
+                      <li className="flex items-start gap-2">
+                        <XCircle className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" />
+                        <span>No certification expiry alerts</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <XCircle className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" />
+                        <span>One employer connection at a time</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <XCircle className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" />
+                        <span>No Job Board access</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <XCircle className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" />
+                        <span>No level progression tracking</span>
+                      </li>
+                    </ul>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* PLUS Tier */}
+              <Card className="border-2 border-amber-400 dark:border-amber-600">
+                <CardHeader className="bg-amber-50 dark:bg-amber-950 rounded-t-lg">
+                  <CardTitle className="text-xl flex items-center gap-2">
+                    <Crown className="w-5 h-5 text-amber-600" />
+                    PLUS
+                    <Badge className="bg-amber-500 text-white">Free with 1 Referral</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4 pt-6">
+                  <p className="text-sm text-muted-foreground mb-4">Everything in Standard, plus:</p>
+                  <ul className="space-y-3">
+                    <li className="flex items-start gap-2">
+                      <Star className="w-4 h-4 text-amber-500 mt-1 shrink-0" />
+                      <span className="font-medium">Certification expiry alerts (60-day yellow, 30-day red)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Star className="w-4 h-4 text-amber-500 mt-1 shrink-0" />
+                      <span className="font-medium">Unlimited employer connections</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Star className="w-4 h-4 text-amber-500 mt-1 shrink-0" />
+                      <span className="font-medium">Job Board access</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Star className="w-4 h-4 text-amber-500 mt-1 shrink-0" />
+                      <span className="font-medium">Enhanced profile visibility to employers</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Star className="w-4 h-4 text-amber-500 mt-1 shrink-0" />
+                      <span className="font-medium">Level progression tracking</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Star className="w-4 h-4 text-amber-500 mt-1 shrink-0" />
+                      <span className="font-medium">Gold "PLUS" badge on profile</span>
+                    </li>
+                  </ul>
+                  <Separator />
+                  <div className="bg-amber-50 dark:bg-amber-950 p-4 rounded-lg">
+                    <p className="text-base text-amber-800 dark:text-amber-200 font-medium">
+                      How to unlock: Refer one technician who creates a Passport.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        <Separator className="my-0" />
+
+        {/* FAQs Section */}
+        <section id="faqs" className="py-16 md:py-20 px-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex items-center justify-between gap-2 flex-wrap mb-8">
+              <h2 className="text-3xl md:text-4xl font-bold">
+                Frequently Asked Questions
+              </h2>
+              <button
+                onClick={toggleAllFaqs}
+                className="flex items-center gap-1 text-sm text-muted-foreground hover-elevate rounded-md px-2 py-1"
+                data-testid="button-toggle-faqs"
+              >
+                <ChevronsUpDown className="w-4 h-4" />
+                {expandedFaqs.length === allFaqIds.length ? "Collapse All" : "Expand All"}
+              </button>
+            </div>
+
+            <Accordion 
+              type="multiple" 
+              value={expandedFaqs}
+              onValueChange={setExpandedFaqs}
+              className="space-y-3"
+            >
+              <AccordionItem value="faq-1" className="border rounded-lg px-4">
+                <AccordionTrigger className="text-left" data-testid="accordion-faq-1">
+                  <span className="font-medium">"Do I need to pay for a Technician Passport?"</span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  <p>No. Technician accounts are free forever. PLUS accounts are also free. Unlock PLUS by referring one other technician who creates an account.</p>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="faq-2" className="border rounded-lg px-4">
+                <AccordionTrigger className="text-left" data-testid="accordion-faq-2">
+                  <span className="font-medium">"What happens to my data if I leave a company?"</span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  <p>Your Passport (certifications, work history, safety rating) stays with you permanently. Company-specific data (assigned gear, company documents) stays with that employer.</p>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="faq-3" className="border rounded-lg px-4">
+                <AccordionTrigger className="text-left" data-testid="accordion-faq-3">
+                  <span className="font-medium">"Can I use OnRopePro without connecting to an employer?"</span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  <p>Yes. Create an account, store certifications, upload your resume, access the Job Board (PLUS). Automatic hour tracking activates when connected to an employer using OnRopePro.</p>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="faq-4" className="border rounded-lg px-4">
+                <AccordionTrigger className="text-left" data-testid="accordion-faq-4">
+                  <span className="font-medium">"Is my Social Insurance Number required?"</span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  <p>No. SIN is completely optional. Refusing will not deny you service or limit your account. The SIN field streamlines payroll when you connect with employers, but you can provide it directly to your employer instead.</p>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="faq-5" className="border rounded-lg px-4">
+                <AccordionTrigger className="text-left" data-testid="accordion-faq-5">
+                  <span className="font-medium">"How do employers find me?"</span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  <p>Employers search by IRATA license number. They see limited info (name, level, location) until you approve their connection request. Full profile access requires your consent.</p>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="faq-6" className="border rounded-lg px-4">
+                <AccordionTrigger className="text-left" data-testid="accordion-faq-6">
+                  <span className="font-medium">"What if I'm a company owner who also works as a technician?"</span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  <p>When you create an employer account, you automatically receive a linked technician account. No separate registration needed. Your hours log alongside your employees.</p>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="faq-7" className="border rounded-lg px-4">
+                <AccordionTrigger className="text-left" data-testid="accordion-faq-7">
+                  <span className="font-medium">"Does this replace my IRATA logbook?"</span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  <p>No. OnRopePro's automatic tracking assists your record-keeping but does not replace your official IRATA/SPRAT logbook. You remain responsible for maintaining your physical logbook per certification body requirements.</p>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="faq-8" className="border rounded-lg px-4">
+                <AccordionTrigger className="text-left" data-testid="accordion-faq-8">
+                  <span className="font-medium">"How secure is my information?"</span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  <p>All financial data (banking, SIN) is encrypted using AES-256-GCM and stored on SOC2 Type II compliant infrastructure. OnRopePro operates in compliance with PIPEDA (Canada) and applicable provincial privacy legislation.</p>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="faq-9" className="border rounded-lg px-4">
+                <AccordionTrigger className="text-left" data-testid="accordion-faq-9">
+                  <span className="font-medium">"How do I get a PLUS account?"</span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  <p>Refer one other technician who creates a Passport. Use your unique referral code. When they sign up, you unlock PLUS automatically.</p>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="faq-10" className="border rounded-lg px-4">
+                <AccordionTrigger className="text-left" data-testid="accordion-faq-10">
+                  <span className="font-medium">"What if I work in the US, not Canada?"</span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  <p>SPRAT certification works the same as IRATA. US market launch is planned for Year 3, starting with West Coast markets. Sign up now to be notified when US features are available.</p>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
+        </section>
+
+        {/* Final CTA Section */}
+        <section className="py-16 md:py-20 px-4 text-white" style={{backgroundImage: 'linear-gradient(135deg, #0B64A3 0%, #0369A1 100%)'}}>
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Your Career Deserves Better Than Scattered Paper
+            </h2>
+            <p className="text-xl text-blue-100 mb-4 max-w-2xl mx-auto leading-relaxed">
+              You've spent years earning every hour. Every drop. Every re-anchor. Every assessment passed.
+            </p>
+            <p className="text-lg text-blue-100 mb-8 max-w-2xl mx-auto">
+              Those hours prove your career. They shouldn't disappear every time you change jobs. Create your Passport in 3 minutes. Your work history finally has a permanent home.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button 
+                size="lg" 
+                className="bg-white text-[#0B64A3] hover:bg-blue-50" 
+                onClick={() => setShowRegistration(true)}
+                data-testid="button-cta-passport"
+              >
+                Create Your Free Passport
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="border-white/40 text-white hover:bg-white/10"
+                onClick={() => {
+                  const element = document.getElementById('faqs');
+                  element?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                data-testid="button-cta-faqs"
+              >
+                Find Answers
+                <BookOpen className="ml-2 w-5 h-5" />
+              </Button>
+            </div>
+            <p className="text-sm text-blue-200 mt-6">Free forever. PLUS unlocks with 1 referral.</p>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="py-8 px-4 border-t">
+          <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <img src={onRopeProLogo} alt="OnRopePro" className="h-8 object-contain" />
+              <span className="text-sm text-muted-foreground">Management Software for Rope Access</span>
+            </div>
+            <div className="flex items-center gap-6 text-sm text-muted-foreground">
+              <Link href="/privacy" className="hover:text-foreground transition-colors" data-testid="link-footer-privacy">
+                Privacy Policy
+              </Link>
+              <Link href="/terms" className="hover:text-foreground transition-colors" data-testid="link-footer-terms">
+                Terms of Service
+              </Link>
             </div>
           </div>
         </footer>
-
-        {/* Scrolling problems at bottom */}
-        <div className="bg-muted/50 py-8 overflow-hidden">
-          <p className="text-sm font-medium text-muted-foreground text-center mb-4">Sound familiar?</p>
-          {problemRows.map((row, index) => (
-            <ScrollingProblems key={index} problems={row.problems} direction={row.direction} />
-          ))}
-        </div>
       </div>
 
       {/* Login Dialog */}
