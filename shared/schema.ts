@@ -2701,3 +2701,60 @@ export const futureIdeas = pgTable("future_ideas", {
 export const insertFutureIdeaSchema = createInsertSchema(futureIdeas).omit({ id: true, createdAt: true, updatedAt: true });
 export type InsertFutureIdea = z.infer<typeof insertFutureIdeaSchema>;
 export type FutureIdea = typeof futureIdeas.$inferSelect;
+
+// Document Quizzes - AI-generated or pre-built quizzes for employee training
+export const documentQuizzes = pgTable("document_quizzes", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  documentId: varchar("document_id"), // Reference to companyDocuments.id for AI-generated quizzes, null for pre-built
+  documentType: varchar("document_type").notNull(), // health_safety_manual | company_policy | irata_level_1 | irata_level_2 | irata_level_3 | sprat_level_1 | sprat_level_2 | sprat_level_3
+  questions: jsonb("questions").$type<Array<{
+    questionNumber: number;
+    question: string;
+    options: { A: string; B: string; C: string; D: string };
+    correctAnswer: "A" | "B" | "C" | "D";
+  }>>().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_document_quizzes_company").on(table.companyId),
+  index("IDX_document_quizzes_document").on(table.documentId),
+  index("IDX_document_quizzes_type").on(table.documentType),
+]);
+
+export const insertDocumentQuizSchema = createInsertSchema(documentQuizzes).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type DocumentQuiz = typeof documentQuizzes.$inferSelect;
+export type InsertDocumentQuiz = z.infer<typeof insertDocumentQuizSchema>;
+
+// Quiz Attempts - Tracks employee attempts at completing quizzes
+export const quizAttempts = pgTable("quiz_attempts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  quizId: varchar("quiz_id").notNull().references(() => documentQuizzes.id, { onDelete: "cascade" }),
+  employeeId: varchar("employee_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  score: real("score").notNull(), // Percentage score (0-100)
+  passed: boolean("passed").notNull(), // 80% or higher
+  answers: jsonb("answers").$type<Array<{
+    questionNumber: number;
+    selectedAnswer: "A" | "B" | "C" | "D";
+    isCorrect: boolean;
+  }>>().notNull(),
+  completedAt: timestamp("completed_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_quiz_attempts_quiz").on(table.quizId),
+  index("IDX_quiz_attempts_employee").on(table.employeeId),
+  index("IDX_quiz_attempts_company").on(table.companyId),
+])
+
+export const insertQuizAttemptSchema = createInsertSchema(quizAttempts).omit({
+  id: true,
+  completedAt: true,
+});
+
+export type QuizAttempt = typeof quizAttempts.$inferSelect;
+export type InsertQuizAttempt = z.infer<typeof insertQuizAttemptSchema>;
