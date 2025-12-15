@@ -2764,6 +2764,10 @@ export default function Dashboard() {
       });
     },
     onSuccess: (data: any) => {
+      console.log("[END DAY] Response received:", JSON.stringify(data, null, 2));
+      console.log("[END DAY] requiresProgressPrompt:", data?.requiresProgressPrompt);
+      console.log("[END DAY] session.projectId:", data?.session?.projectId);
+      
       setActiveSession(null);
       setShowEndDayDialog(false);
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
@@ -2779,10 +2783,12 @@ export default function Dashboard() {
       
       // Check if this is the "last one out" for a percentage-based job
       if (data?.requiresProgressPrompt && data?.session?.projectId) {
+        console.log("[END DAY] Showing progress prompt dialog");
         setProgressPromptProjectId(data.session.projectId);
         setProgressPromptCurrentValue(data.currentOverallProgress || 0);
         setProgressPromptOpen(true);
       } else {
+        console.log("[END DAY] Not showing progress prompt dialog");
         toast({ 
           title: t('dashboard.toast.workSessionEnded', 'Work session ended'), 
           description: hasLocation 
