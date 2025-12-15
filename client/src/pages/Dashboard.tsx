@@ -64,6 +64,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
+import { ProgressPromptDialog } from "@/components/ProgressPromptDialog";
 
 import { JOB_CATEGORIES, JOB_TYPES, getJobTypesByCategory, getJobTypeConfig, getDefaultElevation, isElevationConfigurable, isDropBasedJobType, getAllJobTypeValues, getProgressType, getCategoryForJobType, type JobCategory } from "@shared/jobTypes";
 
@@ -985,6 +986,9 @@ export default function Dashboard() {
   const [showInvitationEmployeeForm, setShowInvitationEmployeeForm] = useState(false); // Show employee form for invitation
   const [showLeaveCompanyDialog, setShowLeaveCompanyDialog] = useState(false); // For technicians to leave company
   const [showEmployerInfoDialog, setShowEmployerInfoDialog] = useState(false); // For technicians to view employer info
+  const [progressPromptOpen, setProgressPromptOpen] = useState(false);
+  const [progressPromptProjectId, setProgressPromptProjectId] = useState<string | null>(null);
+  const [progressPromptCurrentValue, setProgressPromptCurrentValue] = useState(0);
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   
@@ -2773,12 +2777,19 @@ export default function Dashboard() {
         employeeId: data?.session?.employeeId,
       });
       
-      toast({ 
-        title: t('dashboard.toast.workSessionEnded', 'Work session ended'), 
-        description: hasLocation 
-          ? t('dashboard.toast.greatWorkLocation', 'Great work today! Location recorded.') 
-          : t('dashboard.toast.greatWorkNoLocation', 'Great work today! (Location not recorded)')
-      });
+      // Check if this is the "last one out" for a percentage-based job
+      if (data?.requiresProgressPrompt && data?.session?.projectId) {
+        setProgressPromptProjectId(data.session.projectId);
+        setProgressPromptCurrentValue(data.currentOverallProgress || 0);
+        setProgressPromptOpen(true);
+      } else {
+        toast({ 
+          title: t('dashboard.toast.workSessionEnded', 'Work session ended'), 
+          description: hasLocation 
+            ? t('dashboard.toast.greatWorkLocation', 'Great work today! Location recorded.') 
+            : t('dashboard.toast.greatWorkNoLocation', 'Great work today! (Location not recorded)')
+        });
+      }
     },
     onError: (error: Error) => {
       toast({ title: t('dashboard.toast.error', 'Error'), description: error.message, variant: "destructive" });
@@ -9815,6 +9826,17 @@ export default function Dashboard() {
           </Form>
         </DialogContent>
       </Dialog>
+
+      {/* Last One Out - Progress Prompt Dialog */}
+      <ProgressPromptDialog
+        open={progressPromptOpen}
+        onClose={() => {
+          setProgressPromptOpen(false);
+          setProgressPromptProjectId(null);
+        }}
+        projectId={progressPromptProjectId}
+        currentProgress={progressPromptCurrentValue}
+      />
 
       {/* Harness Inspection Details Dialog */}
       <Dialog open={!!selectedInspection} onOpenChange={() => setSelectedInspection(null)}>
