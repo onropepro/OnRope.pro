@@ -406,6 +406,8 @@ const translations = {
     improveHarness: "Complete harness inspection before clocking in",
     improveDocs: "Sign all assigned safety documents",
     // Feedback
+    personalSafetyDocs: "Personal Safety Docs",
+    personalSafetyDocsDesc: "Track your own equipment inspections",
     feedback: "Feedback",
     feedbackDesc: "Share suggestions or report issues with the OnRopePro team",
     sendFeedback: "Send Feedback",
@@ -755,6 +757,8 @@ const translations = {
     improveHarness: "Effectuer l'inspection du harnais avant de pointer",
     improveDocs: "Signer tous les documents de sécurité assignés",
     // Feedback
+    personalSafetyDocs: "Documents de securite",
+    personalSafetyDocsDesc: "Suivez vos inspections d'equipement",
     feedback: "Commentaires",
     feedbackDesc: "Partagez vos suggestions ou signalez des problèmes à l'équipe OnRopePro",
     sendFeedback: "Envoyer des commentaires",
@@ -2065,6 +2069,17 @@ export default function TechnicianPortal() {
                     {combinedTotalHours.toFixed(1)} {t.totalHoursLabel}
                   </p>
                 )}
+              </button>
+              
+              {/* Personal Safety Documents */}
+              <button
+                onClick={() => setLocation("/personal-safety-documents")}
+                className="p-4 rounded-lg border bg-gradient-to-br from-green-500/5 to-green-500/10 hover-elevate text-left"
+                data-testid="quick-action-personal-safety"
+              >
+                <Shield className="w-8 h-8 text-green-600 mb-2" />
+                <p className="font-medium text-sm">{t.personalSafetyDocs}</p>
+                <p className="text-xs text-muted-foreground">{t.personalSafetyDocsDesc}</p>
               </button>
             </div>
 
