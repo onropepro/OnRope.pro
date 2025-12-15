@@ -12954,6 +12954,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Personal harness inspection routes (for technicians' personal safety documents)
+  app.post("/api/personal-harness-inspections", requireAuth, requireRole("rope_access_tech"), async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      
+      // Convert empty strings to undefined for optional fields
+      const cleanedBody = {
+        ...req.body,
+        dateInService: req.body.dateInService || undefined,
+        projectId: undefined, // Personal inspections don't have projects
+      };
+      
+      // For personal inspections, set companyId and workerId to the technician's own ID
+      // and mark as personal
+      const inspectionData = insertHarnessInspectionSchema.parse({
+        ...cleanedBody,
+        companyId: userId,
+        workerId: userId,
+        isPersonal: true,
+      });
+      
+      const inspection = await storage.createHarnessInspection(inspectionData);
+      res.json({ inspection });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Create personal harness inspection error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/personal-harness-inspections", requireAuth, requireRole("rope_access_tech"), async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const inspections = await storage.getPersonalHarnessInspections(userId);
+      res.json({ inspections });
+    } catch (error) {
+      console.error("Get personal harness inspections error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/personal-harness-inspections/:id", requireAuth, requireRole("rope_access_tech"), async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const userId = req.session.userId!;
+      
+      // Verify the inspection belongs to this user and is personal
+      const inspection = await storage.getHarnessInspectionById(id);
+      if (!inspection) {
+        return res.status(404).json({ message: "Inspection not found" });
+      }
+      if (inspection.workerId !== userId || !inspection.isPersonal) {
+        return res.status(403).json({ message: "Not authorized to delete this inspection" });
+      }
+      
+      await storage.deleteHarnessInspection(id);
+      res.json({ message: "Personal harness inspection deleted successfully" });
+    } catch (error) {
+      console.error("Delete personal harness inspection error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Toolbox meeting routes
   app.post("/api/toolbox-meetings", requireAuth, requireRole("rope_access_tech", "general_supervisor", "rope_access_supervisor", "supervisor", "operations_manager", "company"), async (req: Request, res: Response) => {
     try {

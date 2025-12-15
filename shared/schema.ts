@@ -911,12 +911,17 @@ export const harnessInspections = pgTable("harness_inspections", {
   // Reference to the specific gear item from inventory
   gearItemId: varchar("gear_item_id").references(() => gearItems.id, { onDelete: "set null" }),
   
+  // Personal inspection flag - when true, this is a technician's personal inspection
+  // not tied to any company CSR rating (technician created for their own records)
+  isPersonal: boolean("is_personal").notNull().default(false),
+  
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => [
   index("IDX_harness_inspections_company_date").on(table.companyId, table.inspectionDate),
   index("IDX_harness_inspections_worker").on(table.workerId, table.inspectionDate),
   index("IDX_harness_inspections_project").on(table.projectId),
   index("IDX_harness_inspections_kit").on(table.kitInspectionId),
+  index("IDX_harness_inspections_personal").on(table.isPersonal, table.workerId),
 ]);
 
 // Toolbox meetings table

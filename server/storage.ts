@@ -1436,6 +1436,21 @@ export class Storage {
       .orderBy(desc(harnessInspections.inspectionDate));
   }
 
+  async getPersonalHarnessInspections(userId: string): Promise<HarnessInspection[]> {
+    return db.select().from(harnessInspections)
+      .where(and(
+        eq(harnessInspections.workerId, userId),
+        eq(harnessInspections.isPersonal, true)
+      ))
+      .orderBy(desc(harnessInspections.inspectionDate));
+  }
+
+  async getHarnessInspectionById(id: string): Promise<HarnessInspection | undefined> {
+    const [inspection] = await db.select().from(harnessInspections)
+      .where(eq(harnessInspections.id, id));
+    return inspection;
+  }
+
   // Gear items operations
   async createGearItem(item: InsertGearItem, serialEntries?: Array<{serialNumber: string, dateOfManufacture?: string, dateInService?: string}>): Promise<GearItem & { serialEntries: GearSerialNumber[] }> {
     const result = await db.insert(gearItems).values(item).returning();
