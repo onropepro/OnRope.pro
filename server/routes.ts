@@ -10578,7 +10578,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (isPercentageBasedJob) {
         // Check if there are other sessions that overlap with today's calendar work day
         // Using project-local timezone for accurate day boundary calculations
-        const allProjectSessions = await storage.getWorkSessionsByProject(project.id);
+        const allProjectSessions = await storage.getWorkSessionsByProject(project.id, project.companyId);
         
         // Get company to determine timezone (project timezone overrides company default)
         const company = await storage.getUserById(project.companyId);
