@@ -9731,7 +9731,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (currentUser.role === "company") {
         // Return only THIS company's projects, filtered by status (all if not specified)
         projects = await storage.getProjectsByCompany(currentUser.id, statusFilter);
-      } else if (currentUser.role === "operations_manager" || currentUser.role === "supervisor" || currentUser.role === "general_supervisor" || currentUser.role === "rope_access_supervisor" || currentUser.role === "rope_access_tech") {
+      } else if (EMPLOYEE_ROLES.includes(currentUser.role)) {
         // Return projects for their company, filtered by status (all if not specified)
         const companyId = currentUser.companyId;
         if (companyId) {
