@@ -297,7 +297,10 @@ export default function SuperUserTasks() {
     // Hide completed tasks unless explicitly viewing "completed" filter
     if (statusFilter === "all" && task.status === "completed") return false;
     if (statusFilter !== "all" && task.status !== statusFilter) return false;
+    // Filter by assignee dropdown OR by current user (Working as)
     if (assigneeFilter !== "all" && task.assignee !== assigneeFilter) return false;
+    // Also filter by current user - only show tasks assigned to the logged-in user
+    if (task.assignee !== currentUser) return false;
     return true;
   });
 
