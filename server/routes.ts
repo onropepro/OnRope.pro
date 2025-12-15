@@ -10246,12 +10246,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const isInSuite = project.jobType === 'in_suite_dryer_vent_cleaning';
       const isParkade = project.jobType === 'parkade_pressure_cleaning';
       
+      // Check if this job uses percentage-based progress (hours-based or non-elevation jobs)
+      const usesPercentage = usesPercentageProgress(project.jobType, project.requiresElevation ?? true);
+      
       const totalUnits = isInSuite 
         ? (project.floorCount ?? 0) 
         : isParkade 
         ? (project.floorCount ?? 0)  // For parkade, floorCount stores total stalls
         : totalDrops;
-      const progressPercentage = totalUnits > 0 ? (total / totalUnits) * 100 : 0;
+      
+      // For percentage-based jobs, use overallCompletionPercentage from the project
+      // For unit-based jobs, calculate from completed units
+      let progressPercentage: number;
+      if (usesPercentage) {
+        progressPercentage = project.overallCompletionPercentage ?? 0;
+      } else {
+        progressPercentage = totalUnits > 0 ? (total / totalUnits) * 100 : 0;
+      }
       
       res.json({
         completedDrops: total,
@@ -10267,6 +10278,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         totalStalls: isParkade ? (project.floorCount ?? 0) : undefined,
         completedStalls: isParkade ? total : undefined,
         progressPercentage: Math.round(progressPercentage),
+        usesPercentageProgress: usesPercentage,
+        overallCompletionPercentage: project.overallCompletionPercentage,
       });
     } catch (error) {
       console.error("Get project progress error:", error);
