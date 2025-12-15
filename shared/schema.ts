@@ -411,6 +411,12 @@ export const projects = pgTable("projects", {
   peaceWork: boolean("peace_work").notNull().default(false), // Peace work toggle for project billing/tracking
   pricePerDrop: integer("price_per_drop"), // Price per drop when peace work is enabled
   
+  // Overall completion percentage for percentage-based jobs (non-elevation or hours-based)
+  // Updated by the "last one out" technician at end of day
+  overallCompletionPercentage: integer("overall_completion_percentage"), // 0-100
+  lastProgressUpdateBy: varchar("last_progress_update_by"), // User ID of last tech to update progress
+  lastProgressUpdateAt: timestamp("last_progress_update_at"), // When progress was last updated
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

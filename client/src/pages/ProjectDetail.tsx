@@ -130,6 +130,10 @@ export default function ProjectDetail() {
   const [selectedIrataTasks, setSelectedIrataTasks] = useState<string[]>([]);
   const [irataTaskNotes, setIrataTaskNotes] = useState("");
   const [ropeAccessTaskHours, setRopeAccessTaskHours] = useState("");
+  // "Last one out" progress prompt state
+  const [showProgressPrompt, setShowProgressPrompt] = useState(false);
+  const [currentOverallProgress, setCurrentOverallProgress] = useState<number>(0);
+  const [newProgressValue, setNewProgressValue] = useState<string>("");
   const [endedSessionData, setEndedSessionData] = useState<{
     sessionId: string;
     hoursWorked: number;
@@ -550,8 +554,15 @@ export default function ProjectDetail() {
       queryClient.invalidateQueries({ queryKey: ["/api/my-drops-today"] });
       endDayForm.reset();
       
-      // Show log hours prompt for all users to log their rope access hours if applicable
-      setShowLogHoursPrompt(true);
+      // Check if this is a "last one out" situation for percentage-based jobs
+      if (data.requiresProgressPrompt) {
+        setCurrentOverallProgress(data.currentOverallProgress ?? 0);
+        setNewProgressValue(String(data.currentOverallProgress ?? 0));
+        setShowProgressPrompt(true);
+      } else {
+        // Show log hours prompt for all users to log their rope access hours if applicable
+        setShowLogHoursPrompt(true);
+      }
     },
     onError: (error: Error) => {
       toast({ title: t('projectDetail.toasts.error', 'Error'), description: error.message, variant: "destructive" });
@@ -634,6 +645,68 @@ export default function ProjectDetail() {
     setRopeAccessTaskHours("");
     setEndedSessionData(null);
     toast({ title: t('projectDetail.toasts.sessionEnded', 'Work session ended'), description: t('projectDetail.toasts.greatWork', 'Great work today!') });
+  };
+
+  // Update project overall progress mutation (for "last one out" scenario)
+  const updateProgressMutation = useMutation({
+    mutationFn: async (data: { completionPercentage?: number; skip?: boolean }) => {
+      const response = await fetch(`/api/projects/${id}/overall-progress`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to update progress");
+      }
+
+      return response.json();
+    },
+    onSuccess: (data, variables) => {
+      setShowProgressPrompt(false);
+      setNewProgressValue("");
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects", id] });
+      
+      if (variables.skip) {
+        toast({ 
+          title: t('projectDetail.toasts.sessionEnded', 'Work session ended'), 
+          description: t('projectDetail.toasts.progressSkipped', 'Progress update skipped') 
+        });
+      } else {
+        toast({ 
+          title: t('projectDetail.toasts.progressUpdated', 'Progress Updated'), 
+          description: `Project is now ${variables.completionPercentage}% complete` 
+        });
+      }
+      
+      // Continue to log hours prompt
+      setShowLogHoursPrompt(true);
+    },
+    onError: (error: Error) => {
+      toast({ title: t('projectDetail.toasts.error', 'Error'), description: error.message, variant: "destructive" });
+    },
+  });
+
+  // Handle progress update submission
+  const handleProgressSubmit = () => {
+    const percentage = parseInt(newProgressValue, 10);
+    if (isNaN(percentage) || percentage < 0 || percentage > 100) {
+      toast({ 
+        title: t('projectDetail.toasts.error', 'Error'), 
+        description: "Please enter a valid percentage between 0 and 100", 
+        variant: "destructive" 
+      });
+      return;
+    }
+    updateProgressMutation.mutate({ completionPercentage: percentage });
+  };
+
+  // Handle skip progress update
+  const handleProgressSkip = () => {
+    updateProgressMutation.mutate({ skip: true });
   };
 
   // Toggle irata task selection
@@ -3974,6 +4047,85 @@ export default function ProjectDetail() {
               </div>
             </form>
           </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* "Last One Out" Progress Prompt Dialog */}
+      <Dialog open={showProgressPrompt} onOpenChange={setShowProgressPrompt}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <span className="material-icons text-primary">trending_up</span>
+              {t('projectDetail.dialogs.progressPrompt.title', 'Update Project Progress')}
+            </DialogTitle>
+            <DialogDescription>
+              {t('projectDetail.dialogs.progressPrompt.description', "You're the last one clocking out today. Please update the overall project completion.")}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="py-4 space-y-4">
+            {/* Current Progress */}
+            <div className="p-4 bg-muted rounded-md">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-muted-foreground">{t('projectDetail.dialogs.progressPrompt.currentProgress', 'Current Progress')}</span>
+                <span className="text-lg font-semibold">{currentOverallProgress}%</span>
+              </div>
+              <div className="w-full bg-background rounded-full h-2">
+                <div 
+                  className="bg-primary h-2 rounded-full transition-all"
+                  style={{ width: `${currentOverallProgress}%` }}
+                />
+              </div>
+            </div>
+
+            {/* New Progress Input */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                {t('projectDetail.dialogs.progressPrompt.newProgress', 'New Overall Completion (%)')}
+              </label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={newProgressValue}
+                  onChange={(e) => setNewProgressValue(e.target.value)}
+                  placeholder="0-100"
+                  className="flex-1"
+                  data-testid="input-new-progress"
+                />
+                <span className="text-lg font-semibold">%</span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {t('projectDetail.dialogs.progressPrompt.hint', 'Enter the overall project completion percentage (not just your contribution)')}
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter className="flex gap-2 sm:gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleProgressSkip}
+              disabled={updateProgressMutation.isPending}
+              data-testid="button-skip-progress"
+            >
+              {t('projectDetail.dialogs.progressPrompt.skip', "Skip - I'm Not The Last One")}
+            </Button>
+            <Button
+              type="button"
+              onClick={handleProgressSubmit}
+              disabled={updateProgressMutation.isPending || !newProgressValue}
+              data-testid="button-submit-progress"
+            >
+              {updateProgressMutation.isPending ? (
+                <span className="material-icons animate-spin mr-2 text-sm">refresh</span>
+              ) : (
+                <span className="material-icons mr-2 text-sm">check</span>
+              )}
+              {t('projectDetail.dialogs.progressPrompt.update', 'Update Progress')}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 

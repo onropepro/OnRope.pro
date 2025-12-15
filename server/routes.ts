@@ -14,7 +14,7 @@ import Stripe from "stripe";
 import { type TierName, type Currency, TIER_CONFIG, ADDON_CONFIG } from "../shared/stripe-config";
 import { checkSubscriptionLimits } from "./subscription-middleware";
 import { getTodayString, toLocalDateString, parseLocalDate, getStartOfWeek, getEndOfWeek } from "./dateUtils";
-import { getDefaultElevation } from "@shared/jobTypes";
+import { getDefaultElevation, usesPercentageProgress } from "@shared/jobTypes";
 import { Resend } from "resend";
 import rateLimit from "express-rate-limit";
 import OpenAI from "openai";
@@ -9785,15 +9785,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
             return sum;
           }, 0);
           
-          // Sum all manual completion percentages for hours-based projects (each session tracks contribution %)
-          const sessionsWithPercentage = completedSessions.filter(s => s.manualCompletionPercentage !== null && s.manualCompletionPercentage !== undefined);
-          const cumulativeCompletionPercentage = sessionsWithPercentage.length > 0
-            ? sessionsWithPercentage.reduce((sum: number, s) => sum + Number(s.manualCompletionPercentage ?? 0), 0)
-            : null;
-          // Cap at 100% and guard against NaN
-          const latestCompletionPercentage = cumulativeCompletionPercentage !== null && !isNaN(cumulativeCompletionPercentage)
-            ? Math.min(100, cumulativeCompletionPercentage) 
-            : null;
+          // For percentage-based jobs, use the overallCompletionPercentage field (set by "last one out" technician)
+          // Fall back to summing session percentages for backward compatibility with existing data
+          let latestCompletionPercentage: number | null = null;
+          
+          if (project.overallCompletionPercentage !== null && project.overallCompletionPercentage !== undefined) {
+            // Use the new "last one out" progress tracking system
+            latestCompletionPercentage = project.overallCompletionPercentage;
+          } else {
+            // Fall back to legacy cumulative session percentage calculation
+            const sessionsWithPercentage = completedSessions.filter(s => s.manualCompletionPercentage !== null && s.manualCompletionPercentage !== undefined);
+            const cumulativeCompletionPercentage = sessionsWithPercentage.length > 0
+              ? sessionsWithPercentage.reduce((sum: number, s) => sum + Number(s.manualCompletionPercentage ?? 0), 0)
+              : null;
+            // Cap at 100% and guard against NaN
+            latestCompletionPercentage = cumulativeCompletionPercentage !== null && !isNaN(cumulativeCompletionPercentage)
+              ? Math.min(100, cumulativeCompletionPercentage) 
+              : null;
+          }
           
           // Get assigned technicians from scheduled jobs and active workers
           const technicianMap = new Map<string, { id: string; name: string; photoUrl?: string | null; isActive: boolean }>();
@@ -10550,9 +10559,127 @@ export async function registerRoutes(app: Express): Promise<Server> {
         validatedRopeAccessHours
       );
       
-      res.json({ session });
+      // Check if this is a percentage-based job and if this tech is the "last one out" for today
+      let requiresProgressPrompt = false;
+      const isPercentageBasedJob = usesPercentageProgress(project.jobType, project.requiresElevation);
+      
+      if (isPercentageBasedJob) {
+        // Check if there are other sessions that overlap with today's calendar work day
+        // A session overlaps today if [startTime, endTime ?? now) ∩ [todayStart, tomorrowStart) is non-empty
+        // This correctly handles:
+        // - Completed sessions from yesterday: excluded (sessionEnd <= todayStart)
+        // - Overnight sessions still open: included (overlaps today)
+        // - Same-day sessions: included
+        const allProjectSessions = await storage.getWorkSessionsByProject(project.id);
+        
+        const now = new Date();
+        // Use UTC boundaries for consistency with database timestamps
+        const todayStartUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0));
+        const tomorrowStartUTC = new Date(todayStartUTC.getTime() + 24 * 60 * 60 * 1000);
+        
+        const otherActiveSessions = allProjectSessions.filter(s => {
+          if (s.id === sessionId) return false; // Not the session we just ended
+          if (!s.startTime) return false; // Invalid session (no start time)
+          
+          const sessionStart = new Date(s.startTime);
+          const sessionEnd = s.endTime ? new Date(s.endTime) : now;
+          
+          // Check if session interval overlaps with today's window (UTC)
+          // Two intervals [a, b) and [c, d) overlap if a < d AND b > c
+          const overlapsToday = sessionStart < tomorrowStartUTC && sessionEnd > todayStartUTC;
+          
+          return overlapsToday;
+        });
+        
+        // If no other sessions overlap with today, this tech is the "last one out"
+        if (otherActiveSessions.length === 0) {
+          requiresProgressPrompt = true;
+        }
+      }
+      
+      res.json({ 
+        session,
+        requiresProgressPrompt,
+        currentOverallProgress: isPercentageBasedJob ? (project.overallCompletionPercentage ?? 0) : undefined
+      });
     } catch (error) {
       console.error("End work session error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Update project overall completion percentage (called by "last one out" technician)
+  app.patch("/api/projects/:projectId/overall-progress", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const { projectId } = req.params;
+      const { completionPercentage, skip } = req.body;
+      
+      // Get project
+      const project = await storage.getProjectById(projectId);
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      // Verify the user belongs to this company
+      const userCompanyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (project.companyId !== userCompanyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      // Check if this is a percentage-based job
+      const isPercentageBasedJob = usesPercentageProgress(project.jobType, project.requiresElevation);
+      if (!isPercentageBasedJob) {
+        return res.status(400).json({ message: "This project does not use percentage-based progress tracking" });
+      }
+      
+      // If skip is true, just return success without updating
+      if (skip === true) {
+        return res.json({ 
+          message: "Progress update skipped",
+          project: { 
+            id: project.id, 
+            overallCompletionPercentage: project.overallCompletionPercentage 
+          } 
+        });
+      }
+      
+      // Validate completion percentage
+      if (completionPercentage === undefined || completionPercentage === null) {
+        return res.status(400).json({ message: "Completion percentage is required" });
+      }
+      
+      const percentage = typeof completionPercentage === 'string' 
+        ? parseInt(completionPercentage, 10) 
+        : completionPercentage;
+      
+      if (isNaN(percentage) || percentage < 0 || percentage > 100) {
+        return res.status(400).json({ message: "Completion percentage must be between 0 and 100" });
+      }
+      
+      // Update the project with the new overall completion percentage
+      const updatedProject = await storage.updateProject(projectId, {
+        overallCompletionPercentage: percentage,
+        lastProgressUpdateBy: currentUser.id,
+        lastProgressUpdateAt: new Date(),
+      });
+      
+      console.log(`[PROGRESS UPDATE] Project ${projectId}: Updated to ${percentage}% by ${currentUser.fullName || currentUser.email}`);
+      
+      res.json({ 
+        message: "Progress updated successfully",
+        project: { 
+          id: updatedProject.id, 
+          overallCompletionPercentage: updatedProject.overallCompletionPercentage 
+        } 
+      });
+    } catch (error) {
+      console.error("Update project progress error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
