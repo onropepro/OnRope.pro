@@ -6,13 +6,16 @@ import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { PublicHeader } from "@/components/PublicHeader";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { 
   HardHat, 
-  ArrowLeft, 
+  ArrowLeft,
+  ArrowRight,
   Mail, 
   CreditCard, 
   CheckCircle2, 
@@ -170,7 +173,6 @@ export default function TechnicianLogin() {
   const [loginMethod, setLoginMethod] = useState<"license" | "email">("license");
   const [showRegistration, setShowRegistration] = useState(false);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
-  const [showProblemsColumn, setShowProblemsColumn] = useState(true);
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -379,7 +381,7 @@ export default function TechnicianLogin() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row">
+    <div className="min-h-screen bg-white dark:bg-slate-950">
       <style>{`
         @keyframes scroll-left {
           0% { transform: translateX(0); }
@@ -401,120 +403,90 @@ export default function TechnicianLogin() {
         }
       `}</style>
 
-      {/* Left Column - 70% Marketing Content (or 100% when problems column is hidden) */}
-      <div className={`flex-1 ${showProblemsColumn ? 'lg:w-[70%]' : 'lg:w-full'} overflow-y-auto bg-background transition-all duration-300`}>
-        {/* Header */}
-        <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
-          <div className="container mx-auto px-6 py-4 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-3">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setLocation("/")}
-                  data-testid="button-back-home"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                </Button>
-                <img 
-                  src={onRopeProLogo} 
-                  alt="OnRopePro" 
-                  className="h-8 object-contain"
-                />
-              </div>
-              <nav className="hidden md:flex items-center gap-1">
-                <Button
-                  variant="ghost"
-                  className="text-sm font-medium"
-                  onClick={() => setLocation("#")}
-                  data-testid="nav-employer"
-                >
-                  Employer
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="text-sm font-medium"
-                  onClick={() => setLocation("/technician-login")}
-                  data-testid="nav-technician"
-                >
-                  Technician
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="text-sm font-medium"
-                  onClick={() => setLocation("#")}
-                  data-testid="nav-property-manager"
-                >
-                  Property Manager
-                </Button>
-              </nav>
-            </div>
-            <div className="flex items-center gap-2">
-              <InstallPWAButton />
-              <Button
-                variant="outline"
+      <PublicHeader activeNav="technician" />
+
+      {/* Hero Section - Passport Landing Design */}
+      <section className="relative text-white pb-[120px]" style={{backgroundImage: 'linear-gradient(135deg, #0B64A3 0%, #0369A1 100%)'}}>
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMtOS45NDEgMC0xOCA4LjA1OS0xOCAxOHM4LjA1OSAxOCAxOCAxOGM5Ljk0MSAwIDE4LTguMDU5IDE4LTE4cy04LjA1OS0xOC0xOC0xOHptMCAzMmMtNy43MzIgMC0xNC02LjI2OC0xNC0xNHM2LjI2OC0xNCAxNC0xNHMxNCA2LjI2OCAxNCAxNC02LjI2OCAxNC0xNCAxNHoiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wMykiLz48L2c+PC9zdmc+')] opacity-30"></div>
+        
+        <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
+          <div className="text-center space-y-6 pt-16">
+            <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-module-label">
+              Technician Passport Module
+            </Badge>
+            
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
+              Your Hours. Your Certs. Your Career.<br />
+              <span className="text-blue-100">Finally in One Place.</span>
+            </h1>
+            
+            <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
+              Your portable professional identity. One account that travels with you across every employer, every project, every assessment.<br />
+              <strong>Never lose another hour of work history.</strong>
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+              <Button 
+                size="lg" 
+                className="bg-white text-[#0B64A3] hover:bg-blue-50" 
+                onClick={() => setShowRegistration(true)}
+                data-testid="button-hero-cta"
+              >
+                Create Your Free Passport
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="border-white/40 text-white hover:bg-white/10"
                 onClick={() => setShowLoginDialog(true)}
-                data-testid="button-sign-in"
+                data-testid="button-hero-signin"
               >
                 Sign In
+                <BookOpen className="ml-2 w-5 h-5" />
               </Button>
             </div>
           </div>
-        </header>
+        </div>
+        
+        {/* Wave separator */}
+        <div className="absolute bottom-0 left-0 right-0 z-10">
+          <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto block">
+            <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" className="fill-white dark:fill-slate-950"/>
+          </svg>
+        </div>
+      </section>
 
-        {/* Hero Section - Flowbite Style */}
-        <section className="py-20 lg:py-32">
-          <div className="container mx-auto px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto text-center">
-              {/* Pill Badge */}
-              <div 
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8 border"
-                style={{
-                  backgroundColor: "rgba(121, 174, 163, 0.1)",
-                  borderColor: "rgba(121, 174, 163, 0.2)"
-                }}
-              >
-                <HardHat className="w-4 h-4" style={{ color: "#79AEA3" }} />
-                <span className="text-sm font-medium" style={{ color: "#79AEA3" }}>For irata & SPRAT Technicians</span>
+      {/* Stats Panel */}
+      <section className="relative bg-white dark:bg-slate-950 -mt-px overflow-visible">
+        <div className="max-w-3xl mx-auto px-4 pt-4 pb-12">
+          <Card className="shadow-xl border-0 relative z-20 -mt-20">
+            <CardContent className="p-8">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+                <div className="text-center">
+                  <div className="text-3xl md:text-4xl font-bold text-blue-600">10s</div>
+                  <div className="text-base text-muted-foreground mt-1">Onboarding time</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl md:text-4xl font-bold text-emerald-600">Zero</div>
+                  <div className="text-base text-muted-foreground mt-1">Guesswork on hours</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl md:text-4xl font-bold text-amber-600">100%</div>
+                  <div className="text-base text-muted-foreground mt-1">Safety compliance</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl md:text-4xl font-bold text-violet-600">Forever</div>
+                  <div className="text-base text-muted-foreground mt-1">Career protection</div>
+                </div>
               </div>
-              
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
-                You Work.{" "}
-                <span className="text-action-500">Everything Else Is Already Done.</span>
-              </h1>
-              
-              <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
-                One profile. Plug in to any employer using OnRopePro and hours submit themselves. Certs already verified. 
-                Logbook entries you didn't have to make up. Paperwork done before you arrive.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-                <Button 
-                  size="lg" 
-                  className="gap-2 rounded-full bg-action-500 hover:bg-action-600 shadow-lg shadow-action-500/25 focus:ring-4 focus:ring-action-500/50"
-                  onClick={() => setShowRegistration(true)}
-                  data-testid="button-hero-cta"
-                >
-                  Create Your Free Profile
-                  <ChevronRight className="w-5 h-5" />
-                </Button>
-                <Button 
-                  variant="outline"
-                  size="lg" 
-                  className="gap-2 rounded-full"
-                  onClick={() => setShowLoginDialog(true)}
-                  data-testid="button-hero-signin"
-                >
-                  Sign In
-                </Button>
-              </div>
-              
-              <p className="text-sm text-muted-foreground">
-                Free forever. No credit card. Takes 2 minutes.
-              </p>
-            </div>
-          </div>
-        </section>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* Main Content */}
+      <div className="bg-white dark:bg-slate-950">
 
         {/* Problem Section - Flowbite Style */}
         <section className="py-20 lg:py-28 bg-neutral-100 dark:bg-navy-950">
@@ -1133,51 +1105,14 @@ export default function TechnicianLogin() {
           </div>
         </footer>
 
-        {/* Mobile: Show scrolling problems at bottom */}
-        <div className="lg:hidden bg-muted/50 py-8 overflow-hidden">
+        {/* Scrolling problems at bottom */}
+        <div className="bg-muted/50 py-8 overflow-hidden">
           <p className="text-sm font-medium text-muted-foreground text-center mb-4">Sound familiar?</p>
           {problemRows.map((row, index) => (
             <ScrollingProblems key={index} problems={row.problems} direction={row.direction} />
           ))}
         </div>
       </div>
-
-      {/* Right Column - 30% Scrolling Problems (Desktop only) */}
-      {showProblemsColumn ? (
-        <div className="hidden lg:block lg:w-[30%] bg-muted/50 border-l h-screen sticky top-0 overflow-hidden transition-all duration-300">
-          <div className="h-full flex flex-col">
-            <div className="shrink-0 bg-muted/50 border-b p-4 flex items-center justify-between gap-2">
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={() => setShowProblemsColumn(false)}
-                data-testid="button-close-problems"
-              >
-                <X className="w-4 h-4" />
-              </Button>
-              <p className="text-base font-medium text-muted-foreground flex-1 text-center">Sound familiar?</p>
-              <div className="w-9" />
-            </div>
-          <div className="flex-1 flex flex-col justify-evenly py-6">
-            {problemRows.map((row, index) => (
-              <ScrollingProblems key={index} problems={row.problems} direction={row.direction} />
-            ))}
-          </div>
-        </div>
-      </div>
-      ) : (
-        <div className="hidden lg:flex lg:items-start lg:pt-4 lg:pr-4 fixed right-0 top-0 z-50">
-          <Button
-            size="icon"
-            variant="outline"
-            className="shadow-lg"
-            onClick={() => setShowProblemsColumn(true)}
-            data-testid="button-open-problems"
-          >
-            <MessageSquareWarning className="w-4 h-4" />
-          </Button>
-        </div>
-      )}
 
       {/* Login Dialog */}
       <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
