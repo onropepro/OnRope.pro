@@ -1219,9 +1219,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Check if user has been terminated (only applies to non-technicians)
       // Technicians can still access their portal even if terminated from a company
-      const isTechnician = !!(user.ropeAccessLicenseNumber || user.irataCertNumber || user.spratCertNumber);
+      // Self-resigned users (technicians who voluntarily left) are ALWAYS allowed to log in
+      const isTechnician = user.role === 'rope_access_tech' || !!(user.ropeAccessLicenseNumber || user.irataCertNumber || user.spratCertNumber);
+      const isSelfResigned = user.terminationReason === "Self-resigned";
       
-      if (user.terminatedDate && !isTechnician) {
+      if (user.terminatedDate && !isTechnician && !isSelfResigned) {
         return res.status(403).json({ message: "Your employment has been terminated. Please contact your administrator for more information." });
       }
       
