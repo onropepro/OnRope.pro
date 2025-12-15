@@ -498,8 +498,8 @@ export default function ProjectDetail() {
       };
       
       if (isPercentageBasedJob) {
-        // For hours-based projects, send manual completion percentage
-        payload.manualCompletionPercentage = parseInt(data.manualCompletionPercentage || "0");
+        // For percentage-based jobs, no upfront percentage is sent
+        // Only the "last one out" will be prompted to update overall progress after session ends
       } else {
         // For drop-based projects, send drop counts
         payload.dropsCompletedNorth = parseInt(data.dropsCompletedNorth || "0");
@@ -875,14 +875,9 @@ export default function ProjectDetail() {
     const isPercentageBasedJob = usesPercentageProgress(project.jobType, project.requiresElevation);
     
     if (isPercentageBasedJob) {
-      // For hours-based projects, validate percentage
-      const percentage = parseInt(data.manualCompletionPercentage || "0");
-      if (percentage < 0 || percentage > 100) {
-        endDayForm.setError("manualCompletionPercentage", {
-          message: "Percentage must be between 0 and 100"
-        });
-        return;
-      }
+      // For percentage-based jobs, no upfront input needed
+      // Only the "last one out" will be prompted for overall progress after the session ends
+      // Just proceed with ending the session
     } else {
       // For drop-based projects, validate drops and daily target
       const north = parseInt(data.dropsCompletedNorth || "0");
@@ -3768,7 +3763,7 @@ export default function ProjectDetail() {
             <DialogTitle>{t('projectDetail.dialogs.endDay.title', 'End Your Work Day')}</DialogTitle>
             <DialogDescription>
               {isPercentageBased
-                ? t('projectDetail.dialogs.endDay.descriptionHours', 'Enter how much of the job YOU completed today. This percentage will be added to the total project progress.', { buildingName: project.buildingName })
+                ? t('projectDetail.dialogs.endDay.descriptionPercentage', 'End your work session for {{buildingName}}. If you are the last one to clock out today, you will be asked to update the overall project progress.', { buildingName: project.buildingName })
                 : project.jobType === "in_suite_dryer_vent_cleaning" 
                 ? t('projectDetail.dialogs.endDay.descriptionUnits', 'Enter the number of units you completed today for {{buildingName}}.', { buildingName: project.buildingName })
                 : project.jobType === "parkade_pressure_cleaning"
@@ -3780,31 +3775,12 @@ export default function ProjectDetail() {
           <Form {...endDayForm}>
             <form onSubmit={endDayForm.handleSubmit(onEndDaySubmit)} className="space-y-4">
               {isPercentageBased ? (
-                <FormField
-                  control={endDayForm.control}
-                  name="manualCompletionPercentage"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('projectDetail.dialogs.endDay.completionPercentage', 'Your Contribution Today (%)')}</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          min="0"
-                          max="100"
-                          placeholder="0"
-                          {...field}
-                          data-testid="input-completion-percentage"
-                          className="h-16 text-3xl font-bold text-center"
-                          autoComplete="off"
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        {t('projectDetail.dialogs.endDay.completionPercentageHelp', 'How much of the job did YOU complete today? This adds to the total progress.')}
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                /* For percentage-based jobs, no input needed upfront - only the "last one out" will be prompted for overall progress after session ends */
+                <div className="p-4 bg-muted rounded-md">
+                  <p className="text-sm text-muted-foreground">
+                    {t('projectDetail.dialogs.endDay.percentageNote', 'Your work session will be recorded. Only the last person to clock out will update the project progress.')}
+                  </p>
+                </div>
               ) : project.jobType === "in_suite_dryer_vent_cleaning" ? (
                 <FormField
                   control={endDayForm.control}

@@ -10419,12 +10419,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const isPercentageBasedJob = usesPercentageProgress(project.jobType, project.requiresElevation);
       let validatedPercentage: number | undefined = undefined;
       
-      if (isPercentageBasedJob) {
-        // Manual completion percentage is REQUIRED for hours-based job types
-        if (manualCompletionPercentage === undefined || manualCompletionPercentage === null) {
-          return res.status(400).json({ message: "Completion percentage is required for this job type" });
-        }
-        
+      // For percentage-based jobs, the completion percentage is NOT required upfront
+      // Only the "last one out" will be prompted to update overall project progress AFTER session ends
+      // If a percentage is provided (optional), validate it
+      if (isPercentageBasedJob && manualCompletionPercentage !== undefined && manualCompletionPercentage !== null) {
         // Only accept string or number types
         if (typeof manualCompletionPercentage !== 'string' && typeof manualCompletionPercentage !== 'number') {
           return res.status(400).json({ message: "Completion percentage must be a number" });
