@@ -294,6 +294,8 @@ export default function SuperUserTasks() {
   const attachments = attachmentsData?.attachments || [];
 
   const filteredTasks = tasks.filter((task) => {
+    // Hide completed tasks unless explicitly viewing "completed" filter
+    if (statusFilter === "all" && task.status === "completed") return false;
     if (statusFilter !== "all" && task.status !== statusFilter) return false;
     if (assigneeFilter !== "all" && task.assignee !== assigneeFilter) return false;
     return true;
@@ -308,7 +310,7 @@ export default function SuperUserTasks() {
   }, {});
 
   const stats = {
-    all: tasks.length,
+    active: tasks.filter((t) => t.status !== "completed").length, // All non-completed tasks
     todo: tasks.filter((t) => t.status === "todo").length,
     in_progress: tasks.filter((t) => t.status === "in_progress").length,
     completed: tasks.filter((t) => t.status === "completed").length,
@@ -393,8 +395,8 @@ export default function SuperUserTasks() {
                   onClick={() => setStatusFilter("all")}
                   data-testid="filter-all"
                 >
-                  All Tasks
-                  <Badge variant="secondary" className="ml-2">{stats.all}</Badge>
+                  Active
+                  <Badge variant="secondary" className="ml-2">{stats.active}</Badge>
                 </Button>
                 <Button
                   variant={statusFilter === "todo" ? "default" : "ghost"}
