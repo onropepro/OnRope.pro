@@ -7,7 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { ClipboardList, CheckCircle2, XCircle, Clock, ArrowRight, Loader2, Trophy, AlertCircle, ChevronLeft, ChevronRight, Award, GraduationCap } from "lucide-react";
+import { ClipboardList, CheckCircle2, XCircle, Clock, ArrowRight, Loader2, Trophy, AlertCircle, ChevronLeft, ChevronRight, Award, GraduationCap, ShieldCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 
@@ -17,7 +17,9 @@ interface Quiz {
   title?: string;
   certification?: "irata" | "sprat";
   level?: number;
-  quizCategory: "company" | "certification";
+  quizCategory: "company" | "certification" | "safety";
+  category?: "swp" | "flha" | "harness" | "general_safety";
+  jobType?: string;
   questionCount: number;
   createdAt?: string;
   hasPassed: boolean;
@@ -67,16 +69,23 @@ export function QuizSection() {
   const questions = questionsData?.quiz?.questions || [];
   const currentQuestion = questions[currentQuestionIndex];
 
-  // Separate company quizzes from certification quizzes
+  // Separate quizzes by category
   const companyQuizzes = quizzes.filter(q => q.quizCategory === 'company');
   const certificationQuizzes = quizzes.filter(q => q.quizCategory === 'certification');
+  const safetyQuizzes = quizzes.filter(q => q.quizCategory === 'safety');
 
   const getQuizTitle = (quiz: Quiz) => {
-    if (quiz.quizCategory === 'certification' && quiz.title) {
+    // Certification and safety quizzes have title field
+    if ((quiz.quizCategory === 'certification' || quiz.quizCategory === 'safety') && quiz.title) {
       return quiz.title;
     }
+    // Company quizzes use documentType
     if (quiz.documentType) {
       return getDocumentTypeLabel(quiz.documentType);
+    }
+    // Fallback to title if available
+    if (quiz.title) {
+      return quiz.title;
     }
     return 'Quiz';
   };
@@ -153,9 +162,28 @@ export function QuizSection() {
 
   const renderQuizCard = (quiz: Quiz) => {
     const isCertQuiz = quiz.quizCategory === 'certification';
+    const isSafetyQuiz = quiz.quizCategory === 'safety';
     const certBadgeColor = quiz.certification === 'irata' 
       ? 'bg-blue-600 text-white' 
       : 'bg-orange-600 text-white';
+    
+    const getSafetyBadgeColor = (category?: string) => {
+      switch (category) {
+        case 'swp': return 'bg-green-600 text-white';
+        case 'flha': return 'bg-amber-600 text-white';
+        case 'harness': return 'bg-purple-600 text-white';
+        default: return 'bg-teal-600 text-white';
+      }
+    };
+    
+    const getSafetyCategoryLabel = (category?: string) => {
+      switch (category) {
+        case 'swp': return 'SWP';
+        case 'flha': return 'FLHA';
+        case 'harness': return 'Harness';
+        default: return 'Safety';
+      }
+    };
 
     return (
       <div
@@ -163,9 +191,11 @@ export function QuizSection() {
         className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate"
         data-testid={`quiz-card-${quiz.id}`}
       >
-        <div className={`p-3 rounded-xl ${isCertQuiz ? (quiz.certification === 'irata' ? 'bg-blue-500/10' : 'bg-orange-500/10') : 'bg-primary/10'}`}>
+        <div className={`p-3 rounded-xl ${isCertQuiz ? (quiz.certification === 'irata' ? 'bg-blue-500/10' : 'bg-orange-500/10') : isSafetyQuiz ? 'bg-teal-500/10' : 'bg-primary/10'}`}>
           {isCertQuiz ? (
             <GraduationCap className={`h-6 w-6 ${quiz.certification === 'irata' ? 'text-blue-600' : 'text-orange-600'}`} />
+          ) : isSafetyQuiz ? (
+            <ShieldCheck className="h-6 w-6 text-teal-600" />
           ) : (
             <ClipboardList className="h-6 w-6 text-primary" />
           )}
@@ -176,6 +206,11 @@ export function QuizSection() {
             {isCertQuiz && quiz.certification && quiz.level && (
               <Badge className={certBadgeColor} size="sm">
                 {quiz.certification.toUpperCase()} L{quiz.level}
+              </Badge>
+            )}
+            {isSafetyQuiz && quiz.category && (
+              <Badge className={getSafetyBadgeColor(quiz.category)} size="sm">
+                {getSafetyCategoryLabel(quiz.category)}
               </Badge>
             )}
           </div>
@@ -266,6 +301,23 @@ export function QuizSection() {
             <CardContent>
               <div className="grid gap-4">
                 {certificationQuizzes.map(renderQuizCard)}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {safetyQuizzes.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ShieldCheck className="h-5 w-5 text-teal-600" />
+                Safety Practice Quizzes
+              </CardTitle>
+              <CardDescription>Test your knowledge of Safe Work Procedures, FLHA, and harness inspections</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4">
+                {safetyQuizzes.map(renderQuizCard)}
               </div>
             </CardContent>
           </Card>
