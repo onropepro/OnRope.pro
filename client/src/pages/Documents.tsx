@@ -2512,6 +2512,7 @@ export default function Documents() {
     queryKey: ["/api/quiz/company"],
     enabled: userData?.user?.role === 'company' || userData?.user?.role === 'operations_manager',
   });
+  const companyQuizzes = quizzesData?.quizzes || [];
 
   // Mutation to generate quiz from document
   const generateQuizMutation = useMutation({
@@ -7265,7 +7266,7 @@ export default function Documents() {
                         </div>
                         <div className="text-sm text-muted-foreground">
                           {Array.isArray(quiz.questions) ? quiz.questions.length : 0} {t('documents.questions', 'questions')} 
-                          {quiz.createdAt && ` • ${t('documents.createdOn', 'Created')} ${formatLocalDateMedium(new Date(quiz.createdAt))}`}
+                          {quiz.createdAt && ` • ${t('documents.createdOn', 'Created')} ${formatLocalDateMedium(quiz.createdAt)}`}
                         </div>
                       </div>
                       <Badge variant="outline">
