@@ -8548,7 +8548,7 @@ export default function Dashboard() {
 
       {/* Employee Detail Dialog */}
       <Dialog open={showEmployeeDetailDialog} onOpenChange={setShowEmployeeDetailDialog}>
-        <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col p-0">
+        <DialogContent className="max-w-5xl max-h-[90vh] flex flex-col p-0">
           {employeeToView && (
             <>
               <DialogHeader className="p-6 border-b flex-shrink-0">
@@ -9205,11 +9205,11 @@ export default function Dashboard() {
                   </Card>
 
                   {/* Document Requests - Only for rope access technicians */}
-                  {employeeToView.role === 'rope_access_tech' && user?.companyId && (
+                  {employeeToView.role === 'rope_access_tech' && companyIdForData && (
                     <EmployerDocumentRequests
                       technicianId={employeeToView.id}
                       technicianName={employeeToView.name || employeeToView.email}
-                      companyId={user.companyId}
+                      companyId={companyIdForData}
                     />
                   )}
                 </div>
