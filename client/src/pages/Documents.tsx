@@ -5476,6 +5476,19 @@ export default function Documents() {
                   </button>
                 </>
               )}
+              {canUploadDocuments && (
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('quizzes')}
+                  className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover-elevate ${activeTab === 'quizzes' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}
+                  data-testid="option-quizzes"
+                >
+                  <ClipboardList className={`h-6 w-6 ${activeTab === 'quizzes' ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <span className={`text-sm font-medium text-center ${activeTab === 'quizzes' ? 'text-primary' : ''}`}>
+                    {t('documents.quizzes', 'Quizzes')}
+                  </span>
+                </button>
+              )}
             </div>
           </div>
 
