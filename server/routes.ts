@@ -9769,6 +9769,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         projects = [];
       }
       
+      // Filter out completed/deleted projects for users without view_past_projects permission
+      // Company owners, property managers, and management roles have access by default
+      const MANAGEMENT_ROLES_BACKEND = [
+        'company', 'owner_ceo', 'human_resources', 'accounting', 
+        'operations_manager', 'general_supervisor', 'rope_access_supervisor', 'account_manager'
+      ];
+      const hasViewPastProjectsPermission = 
+        currentUser.role === 'company' ||
+        currentUser.role === 'property_manager' ||
+        MANAGEMENT_ROLES_BACKEND.includes(currentUser.role) ||
+        (currentUser.permissions?.includes('view_past_projects') ?? false);
+      
+      if (!hasViewPastProjectsPermission) {
+        // Filter to only active projects
+        projects = projects.filter(p => p.status === 'active');
+      }
+      
       // Add completedDrops, totalDrops, and totalHoursWorked to each project
       const projectsWithProgress = await Promise.all(
         projects.map(async (project) => {

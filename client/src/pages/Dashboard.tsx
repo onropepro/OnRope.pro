@@ -40,7 +40,7 @@ import { Switch } from "@/components/ui/switch";
 import type { Project, Client, InsertClient } from "@shared/schema";
 import { normalizeStrataPlan } from "@shared/schema";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip as RechartsTooltip } from "recharts";
-import { isManagement, hasFinancialAccess, canManageEmployees, canViewPerformance, hasPermission, isReadOnly, canViewSchedule } from "@/lib/permissions";
+import { isManagement, hasFinancialAccess, canManageEmployees, canViewPerformance, hasPermission, isReadOnly, canViewSchedule, canViewPastProjects } from "@/lib/permissions";
 import { DocumentUploader } from "@/components/DocumentUploader";
 import { RefreshButton } from "@/components/RefreshButton";
 import { CSRBadge } from "@/components/CSRBadge";
@@ -141,6 +141,7 @@ const PERMISSION_CATEGORIES = [
     nameKey: "dashboard.permissions.categories.projects",
     permissions: [
       { id: "view_projects", labelKey: "dashboard.permissions.viewProjects" },
+      { id: "view_past_projects", labelKey: "dashboard.permissions.viewPastProjects" },
       { id: "create_projects", labelKey: "dashboard.permissions.createProjects" },
       { id: "edit_projects", labelKey: "dashboard.permissions.editProjects" },
       { id: "delete_projects", labelKey: "dashboard.permissions.deleteProjects" },
@@ -4632,26 +4633,28 @@ export default function Dashboard() {
                     <div className="h-8 w-1 bg-primary rounded-full"></div>
                     <h2 className="text-xl font-bold">{t('dashboard.projects.title', 'Projects')}</h2>
                   </div>
-                  <Tabs value={projectsSubTab} onValueChange={(v) => setProjectsSubTab(v as "active" | "past")}>
-                    <TabsList className="bg-muted/80 p-1 h-auto">
-                      <TabsTrigger 
-                        value="active" 
-                        data-testid="tab-active-projects"
-                        className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2 gap-2"
-                      >
-                        <span className="material-icons text-base">play_circle</span>
-                        {t('dashboard.projects.activeProjects', 'Active Projects')}
-                      </TabsTrigger>
-                      <TabsTrigger 
-                        value="past" 
-                        data-testid="tab-past-projects"
-                        className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2 gap-2"
-                      >
-                        <span className="material-icons text-base">history</span>
-                        {t('dashboard.projects.pastProjects', 'Past Projects')}
-                      </TabsTrigger>
-                    </TabsList>
-                  </Tabs>
+                  {canViewPastProjects(currentUser) && (
+                    <Tabs value={projectsSubTab} onValueChange={(v) => setProjectsSubTab(v as "active" | "past")}>
+                      <TabsList className="bg-muted/80 p-1 h-auto">
+                        <TabsTrigger 
+                          value="active" 
+                          data-testid="tab-active-projects"
+                          className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2 gap-2"
+                        >
+                          <span className="material-icons text-base">play_circle</span>
+                          {t('dashboard.projects.activeProjects', 'Active Projects')}
+                        </TabsTrigger>
+                        <TabsTrigger 
+                          value="past" 
+                          data-testid="tab-past-projects"
+                          className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2 gap-2"
+                        >
+                          <span className="material-icons text-base">history</span>
+                          {t('dashboard.projects.pastProjects', 'Past Projects')}
+                        </TabsTrigger>
+                      </TabsList>
+                    </Tabs>
+                  )}
                 </div>
 
                 {/* Active Projects */}
