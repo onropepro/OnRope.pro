@@ -9881,7 +9881,9 @@ export default function Dashboard() {
       {/* Last One Out - Progress Prompt Dialog */}
       <Dialog open={showProgressPromptDialog} onOpenChange={(open) => {
         if (!open) {
-          handleSubmitOverallProgress(true);
+          setShowProgressPromptDialog(false);
+          setProgressPromptProjectId(null);
+          setProgressInputValue("");
         }
       }}>
         <DialogContent className="max-w-md">
