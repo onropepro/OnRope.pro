@@ -6538,7 +6538,8 @@ export default function Dashboard() {
                                 >
                                   <span className="material-icons text-sm">edit</span>
                                 </Button>
-                                {user?.role === "company" && (
+                                {/* Password change only for company-created employees, NOT rope access technicians who own their own accounts */}
+                                {user?.role === "company" && employee.role !== "rope_access_tech" && (
                                   <Button
                                     variant="ghost"
                                     size="icon"

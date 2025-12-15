@@ -6509,6 +6509,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Cannot change another company owner's password" });
       }
       
+      // SECURITY: Prevent employers from changing rope access technician passwords
+      // Technicians own their own accounts through the Technician Portal
+      if (employee.role === "rope_access_tech") {
+        return res.status(403).json({ message: "Cannot change password for rope access technicians. They manage their own accounts." });
+      }
+      
       const { newPassword } = req.body;
       
       // SECURITY: Validate password strength
