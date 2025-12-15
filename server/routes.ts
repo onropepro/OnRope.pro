@@ -19378,8 +19378,11 @@ Do not include any other text, just the JSON object.`
       }
 
       // Get certification quizzes based on user's IRATA/SPRAT level
-      const { getQuizzesForUser } = await import('./certificationQuizzes');
-      const certQuizzes = getQuizzesForUser(currentUser.irataLevel, currentUser.spratLevel);
+      // Company owners see ALL certification quizzes so they can test the system
+      const { certificationQuizzes, getQuizzesForUser } = await import('./certificationQuizzes');
+      const certQuizzes = currentUser.role === 'company' 
+        ? certificationQuizzes 
+        : getQuizzesForUser(currentUser.irataLevel, currentUser.spratLevel);
       
       const certQuizzesWithStatus = await Promise.all(
         certQuizzes.map(async (certQuiz) => {
@@ -19431,11 +19434,14 @@ Do not include any other text, just the JSON object.`
           return res.status(404).json({ message: "Certification quiz not found" });
         }
 
-        // Verify user has the required certification level
-        const userQuizzes = getQuizzesForUser(currentUser.irataLevel, currentUser.spratLevel);
-        const hasAccess = userQuizzes.some(q => q.quizType === quizType);
-        if (!hasAccess) {
-          return res.status(403).json({ message: "You do not have access to this certification quiz" });
+        // Verify user has the required certification level (company owners can access all)
+        const isCompanyOwner = currentUser.role === 'company';
+        if (!isCompanyOwner) {
+          const userQuizzes = getQuizzesForUser(currentUser.irataLevel, currentUser.spratLevel);
+          const hasAccess = userQuizzes.some(q => q.quizType === quizType);
+          if (!hasAccess) {
+            return res.status(403).json({ message: "You do not have access to this certification quiz" });
+          }
         }
 
         // Return questions WITHOUT correct answers
@@ -19516,11 +19522,14 @@ Do not include any other text, just the JSON object.`
           return res.status(404).json({ message: "Certification quiz not found" });
         }
         
-        // Verify access based on user's certification level
-        const userQuizzes = getQuizzesForUser(currentUser.irataLevel, currentUser.spratLevel);
-        const hasAccess = userQuizzes.some(q => q.quizType === quizType);
-        if (!hasAccess) {
-          return res.status(403).json({ message: "Access denied - insufficient certification level" });
+        // Verify access based on user's certification level (company owners can access all)
+        const isCompanyOwner = currentUser.role === 'company';
+        if (!isCompanyOwner) {
+          const userQuizzes = getQuizzesForUser(currentUser.irataLevel, currentUser.spratLevel);
+          const hasAccess = userQuizzes.some(q => q.quizType === quizType);
+          if (!hasAccess) {
+            return res.status(403).json({ message: "Access denied - insufficient certification level" });
+          }
         }
         
         // Convert answers array to lookup object
