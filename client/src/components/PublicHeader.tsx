@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
-import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users } from "lucide-react";
+import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 interface PublicHeaderProps {
@@ -15,6 +15,8 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
   const { t, i18n } = useTranslation();
   const [, setLocation] = useLocation();
   const [showModulesMenu, setShowModulesMenu] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileModulesExpanded, setMobileModulesExpanded] = useState(false);
   const [landingLanguage, setLandingLanguage] = useState<'en' | 'fr'>(() => {
     return (i18n.language?.startsWith('fr') ? 'fr' : 'en');
   });
@@ -95,7 +97,18 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
             </Link>
           </div>
           
-          {/* Navigation - Right Aligned */}
+          {/* Mobile Menu Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="lg:hidden"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            data-testid="button-mobile-menu-toggle"
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </Button>
+
+          {/* Navigation - Right Aligned (Desktop) */}
           <nav className="hidden lg:flex items-center justify-end gap-1 flex-1">
             {/* Employer with Modules Dropdown */}
             <div 
@@ -263,6 +276,141 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
           </nav>
         </div>
       </div>
+
+      {/* Mobile Navigation Menu */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden bg-background border-b border-border shadow-lg">
+          <nav className="max-w-7xl mx-auto px-4 py-4 space-y-2">
+            {/* Employer with expandable modules */}
+            <div>
+              <button
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-lg text-left font-medium transition-colors ${
+                  activeNav === "employer" || activeNav === "modules" 
+                    ? "bg-primary text-primary-foreground" 
+                    : "hover-elevate"
+                }`}
+                onClick={() => setMobileModulesExpanded(!mobileModulesExpanded)}
+                data-testid="nav-mobile-employer"
+              >
+                <span>Employer</span>
+                <ChevronDown className={`w-5 h-5 transition-transform ${mobileModulesExpanded ? "rotate-180" : ""}`} />
+              </button>
+              
+              {mobileModulesExpanded && (
+                <div className="mt-2 ml-4 space-y-1">
+                  <button
+                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
+                    onClick={() => {
+                      setLocation("/modules/safety-compliance");
+                      setMobileMenuOpen(false);
+                    }}
+                    data-testid="nav-mobile-safety-compliance"
+                  >
+                    <Shield className="w-5 h-5 text-sky-600" />
+                    <span className="text-sm">Safety & Compliance</span>
+                  </button>
+                  <button
+                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
+                    onClick={() => {
+                      setLocation("/modules/user-access-authentication");
+                      setMobileMenuOpen(false);
+                    }}
+                    data-testid="nav-mobile-user-access"
+                  >
+                    <Lock className="w-5 h-5 text-blue-600" />
+                    <span className="text-sm">User Access & Authentication</span>
+                  </button>
+                  <button
+                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
+                    onClick={() => {
+                      setLocation("/modules/project-management");
+                      setMobileMenuOpen(false);
+                    }}
+                    data-testid="nav-mobile-project-management"
+                  >
+                    <Briefcase className="w-5 h-5 text-emerald-600" />
+                    <span className="text-sm">Project Management</span>
+                  </button>
+                  <button
+                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
+                    onClick={() => {
+                      setLocation("/modules/company-safety-rating");
+                      setMobileMenuOpen(false);
+                    }}
+                    data-testid="nav-mobile-company-safety-rating"
+                  >
+                    <Gauge className="w-5 h-5 text-orange-600" />
+                    <span className="text-sm">Company Safety Rating</span>
+                  </button>
+                  <button
+                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
+                    onClick={() => {
+                      setLocation("/modules/work-session-time-tracking");
+                      setMobileMenuOpen(false);
+                    }}
+                    data-testid="nav-mobile-work-session"
+                  >
+                    <Clock className="w-5 h-5 text-amber-600" />
+                    <span className="text-sm">Work Session & Time Tracking</span>
+                  </button>
+                  <button
+                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
+                    onClick={() => {
+                      setLocation("/modules/irata-sprat-task-logging");
+                      setMobileMenuOpen(false);
+                    }}
+                    data-testid="nav-mobile-irata-logging"
+                  >
+                    <ClipboardCheck className="w-5 h-5 text-cyan-600" />
+                    <span className="text-sm">IRATA/SPRAT Task Logging</span>
+                  </button>
+                  <button
+                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
+                    onClick={() => {
+                      setLocation("/modules/document-management");
+                      setMobileMenuOpen(false);
+                    }}
+                    data-testid="nav-mobile-document-management"
+                  >
+                    <FileText className="w-5 h-5 text-violet-600" />
+                    <span className="text-sm">Document Management</span>
+                  </button>
+                  <button
+                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
+                    onClick={() => {
+                      setLocation("/modules/employee-management");
+                      setMobileMenuOpen(false);
+                    }}
+                    data-testid="nav-mobile-employee-management"
+                  >
+                    <Users className="w-5 h-5 text-blue-600" />
+                    <span className="text-sm">Employee Management</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Other nav items */}
+            {navItems.filter(item => item.id !== "employer").map((item) => (
+              <button
+                key={item.id}
+                className={`w-full px-4 py-3 rounded-lg text-left font-medium transition-colors ${
+                  activeNav === item.id 
+                    ? "bg-primary text-primary-foreground" 
+                    : "hover-elevate"
+                }`}
+                onClick={() => {
+                  setLocation(item.href);
+                  setMobileMenuOpen(false);
+                }}
+                data-testid={`nav-mobile-${item.id}`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </nav>
+        </div>
+      )}
     </header>
   );
 }
