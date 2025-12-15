@@ -4706,26 +4706,28 @@ export default function Dashboard() {
                       
                       if (isHoursBased) {
                         // Hours-based tracking for NDT, Rock Scaling, General Pressure Washing, Ground Window
-                        // Show hours worked vs estimated hours if available, otherwise use completion percentage
-                        if (project.estimatedHours && project.estimatedHours > 0) {
+                        // Priority: overallCompletionPercentage > estimatedHours > session-based percentage
+                        if ((project as any).overallCompletionPercentage !== null && (project as any).overallCompletionPercentage !== undefined) {
+                          // Use project-level overall completion percentage (set by "last one out" technician)
+                          progressPercent = (project as any).overallCompletionPercentage;
+                          completed = progressPercent;
+                          total = 100;
+                          unitLabel = "%";
+                        } else if (project.estimatedHours && project.estimatedHours > 0) {
+                          // Fall back to hours-based progress if no overall percentage set
                           completed = Math.round(totalHoursWorked * 10) / 10;
                           total = project.estimatedHours;
                           progressPercent = Math.min((totalHoursWorked / project.estimatedHours) * 100, 100);
                           unitLabel = t('dashboard.projects.hours', 'hrs');
                         } else {
-                          // Use project-level overall completion percentage (set by "last one out" technician)
-                          // Fall back to session-based calculation for legacy data
-                          if ((project as any).overallCompletionPercentage !== null && (project as any).overallCompletionPercentage !== undefined) {
-                            progressPercent = (project as any).overallCompletionPercentage;
-                          } else {
-                            const sessionsWithPercentage = allWorkSessions.filter((s: any) => 
-                              s.projectId === project.id && s.endTime && s.manualCompletionPercentage !== null
-                            );
-                            const latestSession = sessionsWithPercentage.sort((a: any, b: any) => 
-                              new Date(b.endTime).getTime() - new Date(a.endTime).getTime()
-                            )[0];
-                            progressPercent = latestSession?.manualCompletionPercentage || 0;
-                          }
+                          // Legacy: Fall back to session-based calculation
+                          const sessionsWithPercentage = allWorkSessions.filter((s: any) => 
+                            s.projectId === project.id && s.endTime && s.manualCompletionPercentage !== null
+                          );
+                          const latestSession = sessionsWithPercentage.sort((a: any, b: any) => 
+                            new Date(b.endTime).getTime() - new Date(a.endTime).getTime()
+                          )[0];
+                          progressPercent = latestSession?.manualCompletionPercentage || 0;
                           completed = progressPercent;
                           total = 100;
                           unitLabel = "%";
