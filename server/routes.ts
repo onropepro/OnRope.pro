@@ -15,6 +15,7 @@ import { type TierName, type Currency, TIER_CONFIG, ADDON_CONFIG } from "../shar
 import { checkSubscriptionLimits } from "./subscription-middleware";
 import { getTodayString, toLocalDateString, parseLocalDate, getStartOfWeek, getEndOfWeek } from "./dateUtils";
 import { getDefaultElevation, usesPercentageProgress } from "@shared/jobTypes";
+import { getProjectTimezone, sessionOverlapsDay } from "./timezoneUtils";
 import { Resend } from "resend";
 import rateLimit from "express-rate-limit";
 import OpenAI from "openai";
@@ -6465,6 +6466,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Convert empty string to null, otherwise parse as number
           updates.hourlyRate = req.body.hourlyRate === '' ? null : req.body.hourlyRate;
         }
+        if (req.body.timezone !== undefined) {
+          updates.timezone = req.body.timezone || "America/Vancouver";
+        }
       }
       
       await storage.updateUser(user.id, updates);
@@ -10565,30 +10569,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (isPercentageBasedJob) {
         // Check if there are other sessions that overlap with today's calendar work day
-        // A session overlaps today if [startTime, endTime ?? now) ∩ [todayStart, tomorrowStart) is non-empty
-        // This correctly handles:
-        // - Completed sessions from yesterday: excluded (sessionEnd <= todayStart)
-        // - Overnight sessions still open: included (overlaps today)
-        // - Same-day sessions: included
+        // Using project-local timezone for accurate day boundary calculations
         const allProjectSessions = await storage.getWorkSessionsByProject(project.id);
         
-        const now = new Date();
-        // Use UTC boundaries for consistency with database timestamps
-        const todayStartUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0));
-        const tomorrowStartUTC = new Date(todayStartUTC.getTime() + 24 * 60 * 60 * 1000);
+        // Get company to determine timezone (project timezone overrides company default)
+        const company = await storage.getUserById(project.companyId);
+        const projectTimezone = getProjectTimezone(project, company || {});
         
         const otherActiveSessions = allProjectSessions.filter(s => {
           if (s.id === sessionId) return false; // Not the session we just ended
           if (!s.startTime) return false; // Invalid session (no start time)
           
           const sessionStart = new Date(s.startTime);
-          const sessionEnd = s.endTime ? new Date(s.endTime) : now;
+          const sessionEnd = s.endTime ? new Date(s.endTime) : null;
           
-          // Check if session interval overlaps with today's window (UTC)
-          // Two intervals [a, b) and [c, d) overlap if a < d AND b > c
-          const overlapsToday = sessionStart < tomorrowStartUTC && sessionEnd > todayStartUTC;
-          
-          return overlapsToday;
+          // Check if session interval overlaps with today's window in project timezone
+          return sessionOverlapsDay(sessionStart, sessionEnd, projectTimezone);
         });
         
         // If no other sessions overlap with today, this tech is the "last one out"
