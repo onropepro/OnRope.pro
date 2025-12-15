@@ -6,6 +6,7 @@ import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { PublicHeader } from "@/components/PublicHeader";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -627,6 +628,155 @@ export default function TechnicianLogin() {
                   </Button>
                 </div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Your Career Lives in Too Many Places Section */}
+        <section className="py-16 md:py-20 px-4">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
+              Your Career Lives in Too Many Places
+            </h2>
+            
+            <Card className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+              <CardContent className="p-6 md:p-8 space-y-4 text-muted-foreground">
+                <p className="text-lg leading-relaxed">
+                  Your hours are in a crumpled notebook. Your certs are in a folder somewhere. Your last three employers have records you'll never see again.
+                </p>
+                <p>
+                  When assessment day comes, you reconstruct months of work from memory. You guess at heights. You estimate dates. You hope the numbers add up.
+                </p>
+                <p>
+                  Every new job means 15 forms with the same information. Banking details. Emergency contacts. Certification copies. Again. And again. And again.
+                </p>
+                <p>
+                  Meanwhile, your Level 3 renewal is 47 days away. Or is it 67? You meant to check.
+                </p>
+                <Separator className="my-6" />
+                <p className="font-medium text-foreground text-lg">
+                  The rope access industry treats your work history like company property. OnRopePro treats it like what it is: <strong>yours</strong>.
+                </p>
+                <p className="font-medium text-foreground">
+                  One account. Complete history. Always with you.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* What Your Passport Contains Section */}
+        <section id="features" className="pt-8 md:pt-12 pb-16 md:pb-20 px-4 bg-slate-50 dark:bg-slate-900">
+          <div className="max-w-5xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+              What Your Passport Contains
+            </h2>
+            <p className="text-center text-muted-foreground text-lg mb-12 max-w-3xl mx-auto">
+              Your Technician Passport is the single source of truth for your professional identity.
+            </p>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              {/* Card 1: Your Work History */}
+              <Card className="relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-cyan-600"></div>
+                <CardHeader>
+                  <div className="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-3">
+                    <Clock className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <CardTitle className="text-xl">Your Work History</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3 text-base text-muted-foreground">
+                  <p className="font-medium text-foreground">Your hours, your drops, your projects. All in one place.</p>
+                  <p>When you connect to an employer using OnRopePro, every work session logs automatically: building address, heights, specific tasks, and duration. Sessions group by project with totals calculated for you.</p>
+                  <p className="font-medium text-foreground mt-4">What gets tracked:</p>
+                  <ul className="space-y-2">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-1 shrink-0" />
+                      <span>Total logged hours with detailed session breakdowns</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-1 shrink-0" />
+                      <span>Drop counts and elevation data</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-1 shrink-0" />
+                      <span>Task categories matching IRATA logbook requirements</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-1 shrink-0" />
+                      <span>Building addresses and project dates</span>
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              {/* Card 2: Your Certifications */}
+              <Card className="relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-orange-600"></div>
+                <CardHeader>
+                  <div className="w-12 h-12 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center mb-3">
+                    <Award className="w-6 h-6 text-amber-600" />
+                  </div>
+                  <CardTitle className="text-xl">Your Certifications</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3 text-base text-muted-foreground">
+                  <p className="font-medium text-foreground">Your credentials, verified and visible.</p>
+                  <p>Store your IRATA or SPRAT certification with level and expiry date. Upload First Aid, fall protection, and additional qualifications. Your certification status is visible to employers searching for qualified techs.</p>
+                  <p className="font-medium text-foreground mt-4">What gets stored:</p>
+                  <ul className="space-y-2">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-1 shrink-0" />
+                      <span>IRATA/SPRAT level and license number</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-1 shrink-0" />
+                      <span>Certification expiry dates</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-1 shrink-0" />
+                      <span>First Aid and supplementary certifications</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-1 shrink-0" />
+                      <span>Resume/CV upload</span>
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              {/* Card 3: Your Safety Record */}
+              <Card className="relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-600"></div>
+                <CardHeader>
+                  <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center mb-3">
+                    <Shield className="w-6 h-6 text-emerald-600" />
+                  </div>
+                  <CardTitle className="text-xl">Your Safety Record</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3 text-base text-muted-foreground">
+                  <p className="font-medium text-foreground">Your compliance history demonstrates professionalism.</p>
+                  <p>Your personal safety rating calculates from document acknowledgments and harness inspections across all employers. A strong rating shows you take safety seriously. It follows you to every new job.</p>
+                  <p className="font-medium text-foreground mt-4">What gets measured:</p>
+                  <ul className="space-y-2">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-1 shrink-0" />
+                      <span>Harness inspection completion rate</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-1 shrink-0" />
+                      <span>Safety document acknowledgment history</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-1 shrink-0" />
+                      <span>Compliance score across all employers</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-1 shrink-0" />
+                      <span>Audit-ready documentation trail</span>
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </section>
