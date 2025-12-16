@@ -500,6 +500,9 @@ export const projectBuildings = pgTable("project_buildings", {
   floorCount: integer("floor_count"),
   buildingHeight: varchar("building_height"), // e.g., "25 floors", "100m"
   
+  // Daily drop target for this building (for scheduling/analytics)
+  dailyDropTarget: integer("daily_drop_target").default(0),
+  
   // Elevation-specific drop totals for this building
   totalDropsNorth: integer("total_drops_north").default(0),
   totalDropsEast: integer("total_drops_east").default(0),
