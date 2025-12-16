@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, quoteHistory, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff, documentReviewSignatures, equipmentDamageReports, featureRequests, featureRequestMessages, churnEvents, buildings, buildingInstructions, normalizeStrataPlan, teamInvitations, historicalHours, technicianEmployerConnections, csrRatingHistory, documentQuizzes, quizAttempts, technicianDocumentRequests, technicianDocumentRequestFiles } from "@shared/schema";
-import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, QuoteHistory, InsertQuoteHistory, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff, DocumentReviewSignature, InsertDocumentReviewSignature, EquipmentDamageReport, InsertEquipmentDamageReport, FeatureRequest, InsertFeatureRequest, FeatureRequestMessage, InsertFeatureRequestMessage, FeatureRequestWithMessages, ChurnEvent, InsertChurnEvent, Building, InsertBuilding, BuildingInstructions, InsertBuildingInstructions, TeamInvitation, InsertTeamInvitation, HistoricalHours, InsertHistoricalHours, CsrRatingHistory, InsertCsrRatingHistory, DocumentQuiz, InsertDocumentQuiz, QuizAttempt, InsertQuizAttempt, TechnicianDocumentRequest, InsertTechnicianDocumentRequest, TechnicianDocumentRequestFile, InsertTechnicianDocumentRequestFile } from "@shared/schema";
+import { users, clients, projects, projectBuildings, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, quoteHistory, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff, documentReviewSignatures, equipmentDamageReports, featureRequests, featureRequestMessages, churnEvents, buildings, buildingInstructions, normalizeStrataPlan, teamInvitations, historicalHours, technicianEmployerConnections, csrRatingHistory, documentQuizzes, quizAttempts, technicianDocumentRequests, technicianDocumentRequestFiles } from "@shared/schema";
+import type { User, InsertUser, Client, InsertClient, Project, InsertProject, ProjectBuilding, InsertProjectBuilding, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, QuoteHistory, InsertQuoteHistory, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff, DocumentReviewSignature, InsertDocumentReviewSignature, EquipmentDamageReport, InsertEquipmentDamageReport, FeatureRequest, InsertFeatureRequest, FeatureRequestMessage, InsertFeatureRequestMessage, FeatureRequestWithMessages, ChurnEvent, InsertChurnEvent, Building, InsertBuilding, BuildingInstructions, InsertBuildingInstructions, TeamInvitation, InsertTeamInvitation, HistoricalHours, InsertHistoricalHours, CsrRatingHistory, InsertCsrRatingHistory, DocumentQuiz, InsertDocumentQuiz, QuizAttempt, InsertQuizAttempt, TechnicianDocumentRequest, InsertTechnicianDocumentRequest, TechnicianDocumentRequestFile, InsertTechnicianDocumentRequestFile } from "@shared/schema";
 import { eq, and, or, desc, sql, isNull, isNotNull, not, gte, lte, between, inArray } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import { encryptSensitiveFields, decryptSensitiveFields } from "./encryption";
@@ -645,6 +645,47 @@ export class Storage {
 
   async permanentlyDeleteProject(id: string): Promise<void> {
     await db.delete(projects).where(eq(projects.id, id));
+  }
+
+  // Project buildings operations (for multi-building complexes)
+  async getProjectBuildings(projectId: string): Promise<ProjectBuilding[]> {
+    return db.select().from(projectBuildings)
+      .where(eq(projectBuildings.projectId, projectId))
+      .orderBy(projectBuildings.displayOrder);
+  }
+
+  async getProjectBuildingById(id: string): Promise<ProjectBuilding | undefined> {
+    const result = await db.select().from(projectBuildings)
+      .where(eq(projectBuildings.id, id))
+      .limit(1);
+    return result[0];
+  }
+
+  async createProjectBuilding(building: InsertProjectBuilding): Promise<ProjectBuilding> {
+    const result = await db.insert(projectBuildings).values(building).returning();
+    return result[0];
+  }
+
+  async createProjectBuildings(buildings: InsertProjectBuilding[]): Promise<ProjectBuilding[]> {
+    if (buildings.length === 0) return [];
+    const result = await db.insert(projectBuildings).values(buildings).returning();
+    return result;
+  }
+
+  async updateProjectBuilding(id: string, updates: Partial<InsertProjectBuilding>): Promise<ProjectBuilding> {
+    const result = await db.update(projectBuildings)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(projectBuildings.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteProjectBuilding(id: string): Promise<void> {
+    await db.delete(projectBuildings).where(eq(projectBuildings.id, id));
+  }
+
+  async deleteProjectBuildingsByProject(projectId: string): Promise<void> {
+    await db.delete(projectBuildings).where(eq(projectBuildings.projectId, projectId));
   }
 
   // Custom job type operations
@@ -2768,51 +2809,111 @@ export class Storage {
     startDate: Date, 
     endDate: Date,
     excludeJobId?: string
-  ): Promise<Array<{ employeeId: string; employeeName: string; conflictingJobTitle: string }>> {
-    const conflicts: Array<{ employeeId: string; employeeName: string; conflictingJobTitle: string }> = [];
+  ): Promise<Array<{ employeeId: string; employeeName: string; conflictingJobTitle: string; conflictType?: 'job' | 'time_off'; timeOffType?: string }>> {
+    console.log("[CONFLICT CHECK] Checking conflicts for:", {
+      employeeIds,
+      startDate,
+      endDate,
+      excludeJobId
+    });
+    
+    const conflicts: Array<{ employeeId: string; employeeName: string; conflictingJobTitle: string; conflictType?: 'job' | 'time_off'; timeOffType?: string }> = [];
     
     for (const employeeId of employeeIds) {
+      // Check for time-off conflicts FIRST (runs for all employees regardless of job assignments)
+      const startDateStr = startDate.toISOString().split('T')[0];
+      const endDateStr = endDate.toISOString().split('T')[0];
+      
+      const timeOffEntries = await db.select().from(employeeTimeOff)
+        .where(
+          and(
+            eq(employeeTimeOff.employeeId, employeeId),
+            gte(employeeTimeOff.date, startDateStr),
+            lte(employeeTimeOff.date, endDateStr)
+          )
+        );
+      
+      console.log(`[CONFLICT CHECK] Found ${timeOffEntries.length} time-off entries for employee ${employeeId}`);
+      
+      if (timeOffEntries.length > 0) {
+        const employee = await this.getUserById(employeeId);
+        const timeOffType = timeOffEntries[0].timeOffType;
+        const timeOffLabels: Record<string, string> = {
+          'day_off': 'Day Off',
+          'paid_day_off': 'Paid Day Off',
+          'stat_holiday': 'Stat Holiday',
+          'sick_day': 'Sick Day',
+          'sick_paid_day': 'Paid Sick Day',
+          'vacation': 'Vacation',
+          'personal_day': 'Personal Day',
+          'bereavement': 'Bereavement',
+          'jury_duty': 'Jury Duty',
+          'training': 'Training',
+        };
+        const label = timeOffLabels[timeOffType] || timeOffType;
+        conflicts.push({
+          employeeId,
+          employeeName: employee?.name || 'Unknown',
+          conflictingJobTitle: `${label} (${timeOffEntries[0].date})`,
+          conflictType: 'time_off',
+          timeOffType: timeOffType,
+        });
+      }
+      
       // Get all assignments for this employee
       const assignments = await db.select().from(jobAssignments)
         .where(eq(jobAssignments.employeeId, employeeId));
       
       const jobIds = assignments.map(a => a.jobId);
       
+      console.log(`[CONFLICT CHECK] Employee ${employeeId} has ${assignments.length} existing assignments:`, jobIds);
+      
       if (jobIds.length === 0) {
         continue;
       }
       
-      // Check if any of their assigned jobs overlap with the new time range
-      let query = db.select().from(scheduledJobs)
-        .where(
+      // Get all jobs for this employee to see their date ranges
+      const existingJobs = await db.select().from(scheduledJobs)
+        .where(inArray(scheduledJobs.id, jobIds));
+      
+      console.log(`[CONFLICT CHECK] Existing jobs for employee:`, existingJobs.map(j => ({
+        id: j.id,
+        title: j.title,
+        startDate: j.startDate,
+        endDate: j.endDate
+      })));
+      
+      // Build where conditions - include excludeJobId filter if provided
+      const whereConditions = [
+        inArray(scheduledJobs.id, jobIds),
+        or(
+          // New job starts during existing job
           and(
-            sql`${scheduledJobs.id} = ANY(${jobIds})`,
-            or(
-              // New job starts during existing job
-              and(
-                lte(scheduledJobs.startDate, startDate),
-                gte(scheduledJobs.endDate, startDate)
-              ),
-              // New job ends during existing job
-              and(
-                lte(scheduledJobs.startDate, endDate),
-                gte(scheduledJobs.endDate, endDate)
-              ),
-              // New job completely contains existing job
-              and(
-                gte(scheduledJobs.startDate, startDate),
-                lte(scheduledJobs.endDate, endDate)
-              )
-            )
+            lte(scheduledJobs.startDate, startDate),
+            gte(scheduledJobs.endDate, startDate)
+          ),
+          // New job ends during existing job
+          and(
+            lte(scheduledJobs.startDate, endDate),
+            gte(scheduledJobs.endDate, endDate)
+          ),
+          // New job completely contains existing job
+          and(
+            gte(scheduledJobs.startDate, startDate),
+            lte(scheduledJobs.endDate, endDate)
           )
-        );
+        )
+      ];
       
       // Exclude the job being edited (if any)
       if (excludeJobId) {
-        query = query.where(not(eq(scheduledJobs.id, excludeJobId)));
+        whereConditions.push(not(eq(scheduledJobs.id, excludeJobId)));
       }
       
-      const conflictingJobs = await query;
+      const conflictingJobs = await db.select().from(scheduledJobs)
+        .where(and(...whereConditions));
+      
+      console.log(`[CONFLICT CHECK] Found ${conflictingJobs.length} conflicting jobs:`, conflictingJobs.map(j => j.title));
       
       if (conflictingJobs.length > 0) {
         const employee = await this.getUserById(employeeId);
@@ -2820,10 +2921,12 @@ export class Storage {
           employeeId,
           employeeName: employee?.name || 'Unknown',
           conflictingJobTitle: conflictingJobs[0].title,
+          conflictType: 'job',
         });
       }
     }
     
+    console.log("[CONFLICT CHECK] Total conflicts found:", conflicts.length, conflicts);
     return conflicts;
   }
 

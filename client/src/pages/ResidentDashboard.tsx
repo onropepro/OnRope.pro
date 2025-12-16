@@ -125,10 +125,17 @@ export default function ResidentDashboard() {
     const contentWidth = pageWidth - margin * 2;
     let yPos = 25;
 
+    // Use mapped field names with fallbacks to original field names
+    const noticeTitle = notice.title || notice.noticeTitle || 'Work Notice';
+    const noticeContent = notice.content || notice.noticeDetails || '';
+    const noticeStartDate = notice.workStartDate || notice.startDate;
+    const noticeEndDate = notice.workEndDate || notice.endDate;
+    const noticeLogo = notice.logoUrl || notice.companyLogoUrl;
+
     // Header with logo if available
-    if (notice.logoUrl) {
+    if (noticeLogo) {
       try {
-        const logoData = await loadLogoAsBase64(notice.logoUrl);
+        const logoData = await loadLogoAsBase64(noticeLogo);
         if (logoData) {
           const logoHeight = 15;
           const logoWidth = logoHeight * logoData.aspectRatio;
@@ -153,7 +160,7 @@ export default function ResidentDashboard() {
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
-    const titleLines = doc.splitTextToSize(notice.title, contentWidth);
+    const titleLines = doc.splitTextToSize(noticeTitle, contentWidth);
     doc.text(titleLines, margin, yPos);
     yPos += titleLines.length * 8 + 5;
 
@@ -176,8 +183,8 @@ export default function ResidentDashboard() {
     doc.text('WORK PERIOD:', margin + 5, yPos + 8);
     doc.setFont('helvetica', 'normal');
     
-    const startDate = notice.workStartDate ? new Date(notice.workStartDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD';
-    const endDate = notice.workEndDate ? new Date(notice.workEndDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD';
+    const startDate = noticeStartDate ? new Date(noticeStartDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD';
+    const endDate = noticeEndDate ? new Date(noticeEndDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD';
     doc.text(`${startDate} - ${endDate}`, margin + 35, yPos + 8);
     
     // Job type
@@ -193,7 +200,7 @@ export default function ResidentDashboard() {
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
-    const contentLines = doc.splitTextToSize(notice.content, contentWidth);
+    const contentLines = doc.splitTextToSize(noticeContent, contentWidth);
     
     const lineHeight = 5;
     const remainingHeight = doc.internal.pageSize.getHeight() - yPos - 30;
@@ -219,6 +226,58 @@ export default function ResidentDashboard() {
       yPos += contentLines.length * lineHeight + 10;
     }
 
+    // Unit/Stall Schedule section
+    const unitSchedule = notice.unitSchedule;
+    if (unitSchedule && Array.isArray(unitSchedule) && unitSchedule.length > 0) {
+      // Check if we need a new page
+      if (yPos > doc.internal.pageSize.getHeight() - 80) {
+        doc.addPage();
+        yPos = 25;
+      }
+      
+      // Schedule header
+      doc.setFillColor(240, 240, 240);
+      doc.rect(margin, yPos, contentWidth, 12, 'F');
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'bold');
+      const scheduleTitle = notice.jobType === 'parkade_pressure_cleaning' ? 'STALL SCHEDULE' : 'UNIT SCHEDULE';
+      doc.text(scheduleTitle, margin + 5, yPos + 8);
+      yPos += 18;
+      
+      // Schedule entries
+      doc.setFontSize(10);
+      for (const day of unitSchedule) {
+        // Check if we need a new page
+        if (yPos > doc.internal.pageSize.getHeight() - 50) {
+          doc.addPage();
+          yPos = 25;
+        }
+        
+        // Date header
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(51, 65, 85);
+        const dateText = day.date ? new Date(day.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : 'Date TBD';
+        doc.text(dateText, margin, yPos);
+        yPos += 6;
+        
+        // Time slots
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(0, 0, 0);
+        if (day.slots && Array.isArray(day.slots)) {
+          for (const slot of day.slots) {
+            const timeText = `${slot.startTime || '??:??'} - ${slot.endTime || '??:??'}`;
+            const unitLabel = notice.jobType === 'parkade_pressure_cleaning' ? 'Stalls' : 'Units';
+            const slotText = `${timeText}  |  ${unitLabel}: ${slot.units || 'TBD'}`;
+            doc.text(slotText, margin + 10, yPos);
+            yPos += 5;
+          }
+        }
+        yPos += 4;
+      }
+      yPos += 5;
+    }
+
     // Footer
     doc.setDrawColor(200, 200, 200);
     doc.line(margin, doc.internal.pageSize.getHeight() - 20, pageWidth - margin, doc.internal.pageSize.getHeight() - 20);
@@ -231,7 +290,7 @@ export default function ResidentDashboard() {
     doc.text(`Generated: ${new Date().toLocaleDateString()}`, pageWidth - margin - 40, doc.internal.pageSize.getHeight() - 14);
 
     // Download
-    const filename = `Notice-${(notice.title || 'Work-Notice').replace(/[^a-zA-Z0-9]/g, '_').substring(0, 30)}.pdf`;
+    const filename = `Notice-${(noticeTitle).replace(/[^a-zA-Z0-9]/g, '_').substring(0, 30)}.pdf`;
     doc.save(filename);
     
     toast({
@@ -1704,6 +1763,40 @@ export default function ResidentDashboard() {
                   {selectedNotice.content}
                 </div>
               </div>
+
+              {/* Unit/Stall Schedule */}
+              {selectedNotice.unitSchedule && Array.isArray(selectedNotice.unitSchedule) && selectedNotice.unitSchedule.length > 0 && (
+                <div className="mb-6 border rounded-lg overflow-hidden">
+                  <div className="bg-muted px-4 py-2 border-b">
+                    <h4 className="font-medium text-sm flex items-center gap-2">
+                      <span className="material-icons text-sm">schedule</span>
+                      {selectedNotice.jobType === 'parkade_pressure_cleaning' ? 'Stall Schedule' : 'Unit Schedule'}
+                    </h4>
+                  </div>
+                  <div className="divide-y">
+                    {selectedNotice.unitSchedule.map((day: any, dayIndex: number) => (
+                      <div key={dayIndex} className="p-3">
+                        <div className="font-medium text-sm mb-2 flex items-center gap-2">
+                          <span className="material-icons text-sm text-primary">event</span>
+                          {day.date ? new Date(day.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : 'Date TBD'}
+                        </div>
+                        <div className="space-y-1 ml-6">
+                          {day.slots && day.slots.map((slot: any, slotIndex: number) => (
+                            <div key={slotIndex} className="flex items-center gap-3 text-sm">
+                              <span className="text-muted-foreground font-mono">
+                                {slot.startTime || '??:??'} - {slot.endTime || '??:??'}
+                              </span>
+                              <span className="text-foreground">
+                                {selectedNotice.jobType === 'parkade_pressure_cleaning' ? 'Stalls' : 'Units'}: <span className="font-medium">{slot.units || 'TBD'}</span>
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Contact Info */}
               {(selectedNotice.contractors || selectedNotice.contactInfo) && (

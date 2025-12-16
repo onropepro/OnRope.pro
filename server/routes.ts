@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates } from "@shared/schema";
 import { eq, sql, and, or, isNull, gt, desc, asc, inArray } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -6345,6 +6345,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               logoUrl: company?.whitelabelBrandingActive ? company?.brandingLogoUrl : null,
               propertyManagerName: notice.propertyManagerName,
               createdAt: notice.createdAt,
+              unitSchedule: notice.unitSchedule,
             });
           }
         }
@@ -9603,6 +9604,99 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get custom notice templates for a company
+  app.get("/api/custom-notice-templates", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const templates = await db.select().from(customNoticeTemplates)
+        .where(eq(customNoticeTemplates.companyId, companyId))
+        .orderBy(desc(customNoticeTemplates.createdAt));
+      
+      res.json({ templates });
+    } catch (error) {
+      console.error("Get custom notice templates error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Create a custom notice template
+  app.post("/api/custom-notice-templates", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const { jobType, title, details } = req.body;
+      
+      if (!jobType || !title || !details) {
+        return res.status(400).json({ message: "Job type, title, and details are required" });
+      }
+      
+      const result = await db.insert(customNoticeTemplates).values({
+        companyId,
+        jobType,
+        title,
+        details,
+      }).returning();
+      
+      res.json({ template: result[0] });
+    } catch (error) {
+      console.error("Create custom notice template error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Delete a custom notice template
+  app.delete("/api/custom-notice-templates/:id", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Verify the template belongs to this company
+      const [template] = await db.select().from(customNoticeTemplates)
+        .where(eq(customNoticeTemplates.id, req.params.id))
+        .limit(1);
+        
+      if (!template || template.companyId !== companyId) {
+        return res.status(404).json({ message: "Template not found" });
+      }
+      
+      await db.delete(customNoticeTemplates).where(eq(customNoticeTemplates.id, req.params.id));
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete custom notice template error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
   // Create project
   app.post("/api/projects", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
     try {
@@ -9705,6 +9799,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Assign employees to the job if any were selected
         if (project.assignedEmployees && project.assignedEmployees.length > 0) {
+          // Check for double-booking conflicts (unless forceAssignment is true)
+          if (!req.body.forceAssignment) {
+            const conflicts = await storage.checkEmployeeConflicts(project.assignedEmployees, startDate, endDate, job.id);
+            
+            if (conflicts.length > 0) {
+              // Delete the job and project we just created
+              await storage.deleteScheduledJob(job.id);
+              await storage.deleteProject(project.id);
+              return res.status(409).json({
+                message: "Schedule conflict detected",
+                conflicts,
+              });
+            }
+          }
+          
           await storage.replaceJobAssignments(job.id, project.assignedEmployees, currentUser.id);
         }
       }
@@ -10240,6 +10349,175 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==================== PROJECT BUILDINGS ROUTES ====================
+  // For managing multiple buildings within a single project (e.g., Tower 1, Tower 2)
+  
+  // Get all buildings for a project
+  app.get("/api/projects/:projectId/buildings", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const hasAccess = await storage.verifyProjectAccess(
+        req.params.projectId,
+        currentUser.id,
+        currentUser.role,
+        currentUser.companyId
+      );
+      
+      if (!hasAccess) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const buildings = await storage.getProjectBuildings(req.params.projectId);
+      res.json({ buildings });
+    } catch (error) {
+      console.error("Get project buildings error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Create a building for a project
+  app.post("/api/projects/:projectId/buildings", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const hasAccess = await storage.verifyProjectAccess(
+        req.params.projectId,
+        currentUser.id,
+        currentUser.role,
+        currentUser.companyId
+      );
+      
+      if (!hasAccess) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const buildingData = {
+        ...req.body,
+        projectId: req.params.projectId,
+      };
+      
+      const building = await storage.createProjectBuilding(buildingData);
+      res.status(201).json({ building });
+    } catch (error) {
+      console.error("Create project building error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Bulk create/update buildings for a project
+  app.put("/api/projects/:projectId/buildings", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const hasAccess = await storage.verifyProjectAccess(
+        req.params.projectId,
+        currentUser.id,
+        currentUser.role,
+        currentUser.companyId
+      );
+      
+      if (!hasAccess) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const { buildings: buildingsData } = req.body;
+      
+      if (!Array.isArray(buildingsData)) {
+        return res.status(400).json({ message: "Buildings must be an array" });
+      }
+      
+      // Delete existing buildings and recreate
+      await storage.deleteProjectBuildingsByProject(req.params.projectId);
+      
+      const buildingsToCreate = buildingsData.map((b: any, index: number) => ({
+        projectId: req.params.projectId,
+        name: b.name,
+        buildingAddress: b.buildingAddress,
+        floorCount: b.floorCount,
+        buildingHeight: b.buildingHeight,
+        totalDropsNorth: b.totalDropsNorth || 0,
+        totalDropsEast: b.totalDropsEast || 0,
+        totalDropsSouth: b.totalDropsSouth || 0,
+        totalDropsWest: b.totalDropsWest || 0,
+        dropsAdjustmentNorth: b.dropsAdjustmentNorth || 0,
+        dropsAdjustmentEast: b.dropsAdjustmentEast || 0,
+        dropsAdjustmentSouth: b.dropsAdjustmentSouth || 0,
+        dropsAdjustmentWest: b.dropsAdjustmentWest || 0,
+        displayOrder: index,
+      }));
+      
+      const buildings = await storage.createProjectBuildings(buildingsToCreate);
+      res.json({ buildings });
+    } catch (error) {
+      console.error("Update project buildings error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Update a specific building
+  app.patch("/api/projects/:projectId/buildings/:buildingId", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const hasAccess = await storage.verifyProjectAccess(
+        req.params.projectId,
+        currentUser.id,
+        currentUser.role,
+        currentUser.companyId
+      );
+      
+      if (!hasAccess) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const building = await storage.updateProjectBuilding(req.params.buildingId, req.body);
+      res.json({ building });
+    } catch (error) {
+      console.error("Update project building error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Delete a specific building
+  app.delete("/api/projects/:projectId/buildings/:buildingId", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const hasAccess = await storage.verifyProjectAccess(
+        req.params.projectId,
+        currentUser.id,
+        currentUser.role,
+        currentUser.companyId
+      );
+      
+      if (!hasAccess) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      await storage.deleteProjectBuilding(req.params.buildingId);
+      res.json({ message: "Building deleted successfully" });
+    } catch (error) {
+      console.error("Delete project building error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // ==================== WORK NOTICES ROUTES ====================
   
   // Get work notices for a project
@@ -10422,12 +10700,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Get published work notices for the resident's building
-      const notices = await db.select().from(workNotices)
+      const rawNotices = await db.select().from(workNotices)
         .where(and(
           eq(workNotices.strataPlanNumber, currentUser.strataPlanNumber),
           eq(workNotices.isPublished, true)
         ))
         .orderBy(desc(workNotices.createdAt));
+      
+      // Map field names for frontend compatibility and fetch company branding
+      const notices = await Promise.all(rawNotices.map(async (notice) => {
+        // Get company branding if available (from users table brandingLogoUrl)
+        let logoUrl = notice.companyLogoUrl;
+        if (!logoUrl && notice.companyId) {
+          const [company] = await db.select({ brandingLogoUrl: users.brandingLogoUrl })
+            .from(users)
+            .where(eq(users.id, notice.companyId))
+            .limit(1);
+          if (company?.brandingLogoUrl) {
+            logoUrl = company.brandingLogoUrl;
+          }
+        }
+        
+        return {
+          ...notice,
+          // Map to frontend-expected field names
+          title: notice.noticeTitle,
+          content: notice.noticeDetails,
+          workStartDate: notice.startDate,
+          workEndDate: notice.endDate,
+          logoUrl: logoUrl,
+          contractors: notice.contractorName,
+          // Ensure unit schedule is included
+          unitSchedule: notice.unitSchedule,
+          jobType: notice.jobType,
+        };
+      }));
       
       res.json({ notices });
     } catch (error) {
@@ -13847,6 +14154,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
         .where(eq(gearSerialNumbers.id, req.params.id))
         .returning();
+      
+      // Decrement the quantity on the parent gear item
+      const [parentItem] = await db.select()
+        .from(gearItems)
+        .where(eq(gearItems.id, existingSerial.gearItemId))
+        .limit(1);
+      
+      if (parentItem && parentItem.quantity > 0) {
+        await db.update(gearItems)
+          .set({
+            quantity: parentItem.quantity - 1,
+            updatedAt: new Date(),
+          })
+          .where(eq(gearItems.id, existingSerial.gearItemId));
+      }
       
       res.json({ serialNumber: retiredSerial });
     } catch (error) {
@@ -18470,7 +18792,7 @@ Do not include any other text, just the JSON object.`
         return res.status(400).json({ message: "Unable to determine company" });
       }
       
-      const { employeeIds, ...jobFields } = req.body;
+      const { employeeIds, forceAssignment, ...jobFields } = req.body;
       
       const jobData = insertScheduledJobSchema.parse({
         ...jobFields,
@@ -18482,6 +18804,20 @@ Do not include any other text, just the JSON object.`
       
       // Assign employees if provided
       if (employeeIds && Array.isArray(employeeIds) && employeeIds.length > 0) {
+        // Check for double-booking conflicts (unless forceAssignment is true)
+        if (!forceAssignment) {
+          const conflicts = await storage.checkEmployeeConflicts(employeeIds, job.startDate, job.endDate, job.id);
+          
+          if (conflicts.length > 0) {
+            // Delete the job we just created since we can't assign
+            await storage.deleteScheduledJob(job.id);
+            return res.status(409).json({
+              message: "Schedule conflict detected",
+              conflicts,
+            });
+          }
+        }
+        
         await storage.replaceJobAssignments(job.id, employeeIds, currentUser.id);
       }
       
@@ -18527,6 +18863,19 @@ Do not include any other text, just the JSON object.`
       
       // Update employee assignments if provided
       if (employeeIds !== undefined && Array.isArray(employeeIds)) {
+        // Get the job dates for conflict checking
+        const jobForDates = updatedJob || job;
+        
+        // Check for double-booking conflicts
+        const conflicts = await storage.checkEmployeeConflicts(employeeIds, jobForDates.startDate, jobForDates.endDate, req.params.id);
+        
+        if (conflicts.length > 0) {
+          return res.status(409).json({
+            message: "Schedule conflict detected",
+            conflicts,
+          });
+        }
+        
         await storage.replaceJobAssignments(req.params.id, employeeIds, currentUser.id);
       }
       
@@ -20072,6 +20421,97 @@ Do not include any other text, just the JSON object.`
     }
   });
 
+  // Helper function to calculate individual technician safety rating
+  function calculateTechnicianSafetyRating(tech: any): { safetyRating: number; safetyLabel: string; safetyColor: string; safetyBreakdown: any } {
+    const now = new Date();
+    let totalPoints = 0;
+    let maxPoints = 0;
+    
+    const breakdown: any = {
+      irataValid: false,
+      spratValid: false,
+      hasValidCertification: false,
+      yearsExperience: 0,
+      hasResume: false,
+    };
+    
+    // 1. IRATA Certification (up to 40 points)
+    if (tech.irataLevel) {
+      maxPoints += 40;
+      const irataExpDate = tech.irataExpirationDate ? new Date(tech.irataExpirationDate) : null;
+      if (irataExpDate && irataExpDate > now) {
+        // Valid IRATA certification
+        totalPoints += 40;
+        breakdown.irataValid = true;
+        breakdown.hasValidCertification = true;
+      } else if (irataExpDate && irataExpDate <= now) {
+        // Expired - partial credit (10 points for having it at all)
+        totalPoints += 10;
+      }
+    }
+    
+    // 2. SPRAT Certification (up to 40 points)
+    if (tech.spratLevel) {
+      maxPoints += 40;
+      const spratExpDate = tech.spratExpirationDate ? new Date(tech.spratExpirationDate) : null;
+      if (spratExpDate && spratExpDate > now) {
+        // Valid SPRAT certification
+        totalPoints += 40;
+        breakdown.spratValid = true;
+        breakdown.hasValidCertification = true;
+      } else if (spratExpDate && spratExpDate <= now) {
+        // Expired - partial credit (10 points for having it at all)
+        totalPoints += 10;
+      }
+    }
+    
+    // If no certifications at all, use baseline score
+    if (!tech.irataLevel && !tech.spratLevel) {
+      maxPoints = 100;
+      // No certifications = 20 points baseline
+      totalPoints = 20;
+    }
+    
+    // 3. Experience points (up to 15 points)
+    maxPoints += 15;
+    if (tech.ropeAccessStartDate) {
+      const startDate = new Date(tech.ropeAccessStartDate);
+      const yearsExp = Math.floor((now.getTime() - startDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+      breakdown.yearsExperience = yearsExp;
+      // 3 points per year, max 15
+      totalPoints += Math.min(15, yearsExp * 3);
+    }
+    
+    // 4. Resume uploaded (5 points)
+    maxPoints += 5;
+    if (tech.resumeDocuments && tech.resumeDocuments.length > 0) {
+      totalPoints += 5;
+      breakdown.hasResume = true;
+    }
+    
+    // Calculate percentage
+    const safetyRating = maxPoints > 0 ? Math.round((totalPoints / maxPoints) * 100) : 0;
+    
+    // Determine label and color
+    let safetyLabel: string;
+    let safetyColor: string;
+    if (safetyRating >= 90) {
+      safetyLabel = "Excellent";
+      safetyColor = "green";
+    } else if (safetyRating >= 70) {
+      safetyLabel = "Good";
+      safetyColor = "yellow";
+    } else if (safetyRating >= 50) {
+      safetyLabel = "Fair";
+      safetyColor = "orange";
+    } else {
+      safetyLabel = "Needs Attention";
+      safetyColor = "red";
+    }
+    
+    return { safetyRating, safetyLabel, safetyColor, safetyBreakdown: breakdown };
+  }
+
   // Get visible technicians (for companies browsing)
   app.get("/api/visible-technicians", requireAuth, requireRole("company", "superuser"), async (req: Request, res: Response) => {
     try {
@@ -20107,7 +20547,19 @@ Do not include any other text, just the JSON object.`
         ))
         .orderBy(sql`${users.visibilityEnabledAt} DESC`);
 
-      res.json({ technicians: visibleTechs });
+      // Add safety rating to each technician
+      const techniciansWithRating = visibleTechs.map(tech => {
+        const { safetyRating, safetyLabel, safetyColor, safetyBreakdown } = calculateTechnicianSafetyRating(tech);
+        return {
+          ...tech,
+          safetyRating,
+          safetyLabel,
+          safetyColor,
+          safetyBreakdown,
+        };
+      });
+
+      res.json({ technicians: techniciansWithRating });
     } catch (error) {
       console.error("Get visible technicians error:", error);
       res.status(500).json({ message: "Internal server error" });

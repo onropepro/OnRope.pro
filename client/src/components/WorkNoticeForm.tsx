@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,9 +33,29 @@ const workNoticeFormSchema = z.object({
   noticeDetails: z.string().min(1, "Notice details are required"),
   additionalInstructions: z.string().optional(),
   propertyManagerName: z.string().optional(),
+  unitSchedule: z.array(z.object({
+    date: z.string(),
+    slots: z.array(z.object({
+      startTime: z.string(),
+      endTime: z.string(),
+      units: z.string(), // comma-separated units or stalls
+    })),
+  })).optional(),
 });
 
 type WorkNoticeFormData = z.infer<typeof workNoticeFormSchema>;
+
+// Schedule entry type for in-suite and parkade jobs
+interface ScheduleSlot {
+  startTime: string;
+  endTime: string;
+  units: string;
+}
+
+interface ScheduleDay {
+  date: string;
+  slots: ScheduleSlot[];
+}
 
 const NOTICE_TEMPLATES: Record<string, { title: string; details: string }[]> = {
   window_cleaning: [
@@ -50,7 +70,6 @@ For your privacy and comfort, we strongly recommend closing your blinds, curtain
 
 SAFETY REQUIREMENTS:
 - Please keep all windows closed and locked during work hours
-- Do not attempt to open windows or communicate with technicians
 - Keep balcony doors closed to prevent water or cleaning solution entry
 - Secure any loose items on balconies
 
@@ -93,19 +112,50 @@ Please keep windows closed throughout the cleaning period. Contact the property 
   ],
   dryer_vent_cleaning: [
     {
-      title: "Exterior Dryer Vent Cleaning Notice",
+      title: "Exterior Dryer Vent Cleaning - Fire Prevention",
       details: `Dear Residents,
 
-Our team will be cleaning the exterior dryer vents on your building. This is important maintenance that helps prevent fire hazards and improves dryer efficiency.
+Professional exterior dryer vent cleaning services are scheduled for your building. This critical maintenance helps prevent dryer fires caused by lint buildup and improves your dryer's efficiency.
+
+WHAT WE WILL BE DOING:
+Our certified rope access technicians will clean the exterior dryer vent exhaust points on the building facade. This involves:
+- Removing lint buildup from exterior vent covers
+- Clearing any blockages in the exhaust outlet
+- Inspecting vent condition and airflow
+
+NO ACCESS TO YOUR UNIT IS REQUIRED. All work is performed from outside the building.
 
 WHAT TO EXPECT:
-- Technicians working on ropes near dryer vent locations
-- Brief noise from cleaning equipment
-- No action required from residents
+- Technicians on ropes near balconies and vent locations
+- Brief equipment noise during cleaning
+- Some lint debris may fall during cleaning (will be cleaned up)
 
-This maintenance is for your safety. Please be aware of workers near your unit during the scheduled dates.
+BENEFITS:
+- Reduced fire risk from lint buildup
+- Improved dryer efficiency and faster drying times
+- Lower energy costs
+- Extended dryer lifespan
 
-Thank you for your understanding.`,
+No action is required from residents. Thank you for your cooperation.`,
+    },
+    {
+      title: "Scheduled Dryer Vent Maintenance",
+      details: `Dear Residents,
+
+Your building's exterior dryer vents will be professionally cleaned on the scheduled dates. This routine maintenance is essential for fire safety and dryer performance.
+
+OUR TECHNICIANS WILL:
+- Access exterior vent locations using rope access equipment
+- Remove accumulated lint from vent openings
+- Ensure proper airflow from your dryer exhaust
+
+RESIDENT INFORMATION:
+- No unit access needed - all work is external
+- You may notice technicians near your balcony or windows
+- Brief noise from cleaning tools is expected
+- Work typically takes a few minutes per vent
+
+This maintenance helps prevent the leading cause of household fires. We appreciate your patience.`,
     },
   ],
   building_wash: [
@@ -183,19 +233,69 @@ Thank you for your understanding.`,
   ],
   in_suite_dryer_vent_cleaning: [
     {
-      title: "In-Suite Dryer Vent Cleaning Notice",
+      title: "In-Suite Dryer Vent Cleaning - Access Required",
       details: `Dear Residents,
 
-We will be cleaning dryer vents inside individual units. Our technicians will need access to your suite.
+Professional in-suite dryer vent cleaning has been scheduled for your building. Our certified technicians will need to enter your unit to clean the dryer vent from inside.
 
-PREPARATION REQUIRED:
-- Ensure your dryer is accessible
+WHY THIS IS IMPORTANT:
+Lint buildup inside dryer vents is a leading cause of household fires. Regular cleaning also improves your dryer's efficiency and reduces energy costs.
+
+ACCESS REQUIREMENTS:
+Our technicians will need access to:
+- Your laundry area
+- The dryer and the wall/ceiling vent connection
+- The vent ductwork running through your unit
+
+PLEASE PREPARE BY:
+1. Ensuring clear access to your dryer (move any items blocking the area)
+2. Pulling the dryer away from the wall if possible (technicians can assist)
+3. Being home during your scheduled appointment OR arranging alternate access
+4. Ensuring pets are secured
+
+APPOINTMENT SCHEDULING:
+You will receive a separate notice with your specific appointment date and time window. If the scheduled time does not work, please contact property management to reschedule.
+
+WHAT TO EXPECT:
+- The cleaning takes approximately 20-30 minutes per unit
+- There may be brief noise from cleaning equipment
+- Some lint and debris removal is normal
+
+Thank you for your cooperation in this important fire safety maintenance.`,
+    },
+    {
+      title: "Dryer Vent Cleaning - Unit Entry Notice",
+      details: `Dear Residents,
+
+Scheduled dryer vent cleaning will be performed inside all units. Technicians require entry to your suite to complete this service.
+
+SERVICE DETAILS:
+- Full cleaning of dryer vent ductwork from inside your unit
+- Inspection of vent connections and condition
+- Removal of lint buildup throughout the vent system
+
+RESIDENT PREPARATION:
+- Clear access path to your laundry area
+- Secure pets in a separate room
+- Be present or provide access authorization
+
+You will receive your scheduled time slot in a separate notice. This maintenance is mandatory for fire safety compliance.`,
+    },
+    {
+      title: "Annual Dryer Vent Service - Suite Access",
+      details: `Dear Residents,
+
+As part of our annual fire prevention program, professional dryer vent cleaning will be conducted in all units.
+
+WHAT THE SERVICE INCLUDES:
+- Complete lint removal from interior ductwork
+
+YOUR RESPONSIBILITIES:
+- Provide access to your unit at the scheduled time
 - Clear the area around your dryer
-- Be present during your scheduled time slot
+- Ensure someone is home or arrange building access
 
-You will receive a separate notice with your scheduled appointment time.
-
-This maintenance helps prevent fire hazards and improves dryer efficiency.`,
+This service helps protect you and your neighbors from dryer-related fires. Appointment times will be provided separately.`,
     },
   ],
   parkade_pressure_cleaning: [
@@ -207,8 +307,6 @@ The parking garage will be pressure washed during the scheduled dates.
 
 VEHICLE REMOVAL REQUIRED:
 Please move your vehicle from the parkade during the cleaning period. Failure to move your vehicle may result in it being wet or splashed with cleaning solution.
-
-Designated parking areas will be available during the cleaning.
 
 Thank you for your cooperation.`,
     },
@@ -298,16 +396,123 @@ A scheduled inspection of the building's rope access anchor points will take pla
 This is important safety maintenance ensuring our building meets all safety requirements. No action is required from residents.`,
     },
   ],
-  other: [
+  balcony_pressure_washing: [
     {
-      title: "Scheduled Maintenance Notice",
+      title: "Balcony Pressure Washing - Preparation Required",
       details: `Dear Residents,
 
-Scheduled building maintenance work will be performed by our professional team.
+Professional balcony pressure washing services are scheduled for your building. Our rope access technicians will be cleaning all balcony surfaces including floors, railings, and dividers.
 
-Workers may be visible from your windows. Close blinds if you prefer privacy. Please keep windows closed during work hours.
+MANDATORY PREPARATION - PLEASE COMPLETE BEFORE WORK BEGINS:
+1. REMOVE all items from your balcony including:
+   - Furniture (chairs, tables, loungers)
+   - Plants and planters
+   - BBQ/grills (if permitted)
+   - Rugs, mats, and decorations
+   - Storage containers and personal items
 
-We appreciate your patience and cooperation during this time.`,
+2. SECURE your balcony:
+   - Close and lock balcony doors during work hours
+   - Close blinds or curtains for privacy
+   - Keep windows near balcony closed
+
+WHAT TO EXPECT:
+- High-pressure water will be used to clean balcony surfaces
+- Technicians will be visible on ropes and may access your balcony
+- Significant noise from pressure washing equipment
+- Water may temporarily pool on balcony surfaces
+- Work takes approximately 10-15 minutes per balcony
+
+ITEMS LEFT ON BALCONIES:
+Any items remaining on balconies may be damaged by high-pressure water or cleaning solutions. The building is not responsible for damage to items left on balconies.
+
+After cleaning is complete, you may return items to your balcony once surfaces are dry (typically 1-2 hours).
+
+Thank you for your cooperation.`,
+    },
+    {
+      title: "Balcony Cleaning Notice - Clear Your Balcony",
+      details: `Dear Residents,
+
+Your building's balconies will be pressure washed by our professional cleaning team.
+
+ACTION REQUIRED:
+Please remove ALL items from your balcony before the scheduled start date:
+- All furniture and seating
+- Plants, pots, and garden items  
+- Personal belongings and decorations
+- Floor mats and rugs
+- Any loose items
+
+DURING THE WORK:
+- Keep balcony doors closed and locked
+- Close window coverings for privacy
+- Technicians will be working outside your balcony
+
+Items left on balconies will be moved and may be damaged. Please prepare your balcony in advance.`,
+    },
+    {
+      title: "Exterior Balcony Maintenance",
+      details: `Dear Residents,
+
+Scheduled balcony pressure washing will be performed. This maintenance removes dirt, mildew, and debris to maintain your building's appearance and prevent surface damage.
+
+RESIDENT REQUIREMENTS:
+- Clear all personal items from balcony before work begins
+- Keep balcony doors sealed during cleaning
+- Allow 1-2 hours drying time before using balcony
+
+Technicians will access balconies from ropes. Please close blinds if you prefer privacy.
+
+We appreciate your cooperation in preparing your balcony.`,
+    },
+  ],
+  other: [
+    {
+      title: "Scheduled Building Maintenance",
+      details: `Dear Residents,
+
+Professional maintenance work has been scheduled for your building. Our trained technicians will be on site during the scheduled dates.
+
+WHAT TO EXPECT:
+- Workers may be visible from windows and balconies
+- Some noise from equipment is expected
+- Work areas may be temporarily restricted
+
+FOR YOUR PRIVACY:
+Close blinds or curtains if you prefer not to be visible from outside during work hours.
+
+GENERAL PRECAUTIONS:
+- Keep windows closed during work unless advised otherwise
+- Secure balcony items if work is being done on exterior surfaces
+- Follow any specific instructions from property management
+
+Thank you for your patience and cooperation during this maintenance work.`,
+    },
+    {
+      title: "Building Maintenance Notice",
+      details: `Dear Residents,
+
+Maintenance work will be performed on your building. Our professional team will be on site during the scheduled period.
+
+Workers may be visible near windows and common areas. Please close window coverings for privacy if preferred.
+
+If you have questions, please contact your property manager.
+
+We appreciate your understanding.`,
+    },
+    {
+      title: "Exterior Work Notice",
+      details: `Dear Residents,
+
+Exterior maintenance work is scheduled for your building. Technicians will be working on the building facade during the scheduled dates.
+
+RESIDENT GUIDELINES:
+- Keep windows closed during work hours
+- Close blinds for privacy as workers may be near windows
+- Secure any loose balcony items
+
+No unit access is required. Thank you for your cooperation.`,
     },
   ],
 };
@@ -321,10 +526,69 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
   const { t } = useTranslation();
   const { toast } = useToast();
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  const [showSaveTemplateDialog, setShowSaveTemplateDialog] = useState(false);
+  const [savedNoticeData, setSavedNoticeData] = useState<{ title: string; details: string } | null>(null);
+  
+  // Fetch clients to get property manager name for this project's strata plan
+  const { data: clientsResponse } = useQuery<{ clients: any[] }>({
+    queryKey: ["/api/clients"],
+  });
+  
+  // Fetch custom notice templates
+  const { data: customTemplatesData } = useQuery<{ templates: any[] }>({
+    queryKey: ["/api/custom-notice-templates"],
+  });
+  
+  // Find the client associated with this project's strata plan number
+  const getPropertyManagerName = (): string => {
+    if (existingNotice?.propertyManagerName) return existingNotice.propertyManagerName;
+    if ((project as any).propertyManagerName) return (project as any).propertyManagerName;
+    
+    // Try to find from clients data
+    const clients = clientsResponse?.clients || [];
+    for (const client of clients) {
+      const lmsNumbers = client.lmsNumbers || [];
+      const hasMatchingStrata = lmsNumbers.some((lms: any) => 
+        lms.number === project.strataPlanNumber
+      );
+      if (hasMatchingStrata) {
+        return `${client.firstName || ''} ${client.lastName || ''}`.trim();
+      }
+    }
+    return "";
+  };
+  
+  // Check if this job type needs scheduling (unit/stall or elevation-based)
+  const needsUnitSchedule = project.jobType === 'in_suite_dryer_vent_cleaning' || project.jobType === 'parkade_pressure_cleaning';
+  const needsElevationSchedule = project.jobType === 'window_cleaning' || project.jobType === 'building_wash' || project.jobType === 'building_wash_pressure' || project.jobType === 'general_pressure_washing';
+  const needsSchedule = needsUnitSchedule || needsElevationSchedule;
+  
+  // Determine label based on job type
+  const getScheduleLabel = () => {
+    if (project.jobType === 'parkade_pressure_cleaning') return 'Stall';
+    if (needsElevationSchedule) return 'Elevation';
+    return 'Unit';
+  };
+  const scheduleLabel = getScheduleLabel();
+  
+  // Schedule state for in-suite and parkade jobs
+  const [schedule, setSchedule] = useState<ScheduleDay[]>(() => {
+    if (existingNotice?.unitSchedule) {
+      try {
+        return existingNotice.unitSchedule as ScheduleDay[];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  });
 
   const jobTypeConfig = getJobTypeConfig(project.jobType);
   const jobTypeName = project.customJobType || jobTypeConfig?.label || project.jobType;
   const templates = NOTICE_TEMPLATES[project.jobType] || NOTICE_TEMPLATES.other;
+  
+  // Get the property manager name (may update when clients data loads)
+  const propertyManagerName = getPropertyManagerName();
 
   const form = useForm<WorkNoticeFormData>({
     resolver: zodResolver(workNoticeFormSchema),
@@ -334,18 +598,47 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
       noticeTitle: existingNotice?.noticeTitle || "",
       noticeDetails: existingNotice?.noticeDetails || "",
       additionalInstructions: existingNotice?.additionalInstructions || "",
-      propertyManagerName: existingNotice?.propertyManagerName || "",
+      propertyManagerName: "",
     },
   });
+  
+  // Update property manager name when clients data loads
+  useEffect(() => {
+    if (propertyManagerName && !form.getValues("propertyManagerName")) {
+      form.setValue("propertyManagerName", propertyManagerName);
+    }
+  }, [propertyManagerName, form]);
 
   const createNoticeMutation = useMutation({
     mutationFn: async (data: WorkNoticeFormData) => {
       return apiRequest("POST", `/api/projects/${project.id}/work-notices`, data);
     },
-    onSuccess: () => {
+    onSuccess: (_response, variables) => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects", project.id, "work-notices"] });
       toast({ title: "Work notice created", description: "The notice is now visible to residents." });
       onSuccess?.();
+      
+      // If no template was used, ask if they want to save as template
+      if (!selectedTemplate && variables.noticeTitle && variables.noticeDetails) {
+        setSavedNoticeData({ title: variables.noticeTitle, details: variables.noticeDetails });
+        setShowSaveTemplateDialog(true);
+      } else {
+        onClose();
+      }
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+  
+  const saveTemplateMutation = useMutation({
+    mutationFn: async (data: { jobType: string; title: string; details: string }) => {
+      return apiRequest("POST", "/api/custom-notice-templates", data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/custom-notice-templates"] });
+      toast({ title: "Template saved", description: "You can now use this template for future notices." });
+      setShowSaveTemplateDialog(false);
       onClose();
     },
     onError: (error: Error) => {
@@ -373,16 +666,69 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
     if (template) {
       form.setValue("noticeTitle", template.title);
       form.setValue("noticeDetails", template.details);
-      setSelectedTemplate(String(index));
+      setSelectedTemplate(`builtin-${index}`);
     }
   };
+  
+  const handleCustomTemplateSelect = (template: { id: string; title: string; details: string }) => {
+    form.setValue("noticeTitle", template.title);
+    form.setValue("noticeDetails", template.details);
+    setSelectedTemplate(`custom-${template.id}`);
+  };
+  
+  // Get custom templates for this job type
+  const customTemplates = (customTemplatesData?.templates || []).filter(
+    (t: any) => t.jobType === project.jobType
+  );
 
   const onSubmit = (data: WorkNoticeFormData) => {
+    // Include schedule data for in-suite and parkade jobs
+    const submitData = needsSchedule ? { ...data, unitSchedule: schedule } : data;
+    
     if (existingNotice) {
-      updateNoticeMutation.mutate(data);
+      updateNoticeMutation.mutate(submitData);
     } else {
-      createNoticeMutation.mutate(data);
+      createNoticeMutation.mutate(submitData);
     }
+  };
+  
+  // Schedule management functions
+  const addScheduleDay = () => {
+    const defaultSlot = needsElevationSchedule 
+      ? { startTime: '', endTime: '', units: '' }
+      : { startTime: '09:00', endTime: '12:00', units: '' };
+    setSchedule([...schedule, { date: '', slots: [defaultSlot] }]);
+  };
+  
+  const removeScheduleDay = (dayIndex: number) => {
+    setSchedule(schedule.filter((_, i) => i !== dayIndex));
+  };
+  
+  const updateScheduleDay = (dayIndex: number, date: string) => {
+    const newSchedule = [...schedule];
+    newSchedule[dayIndex].date = date;
+    setSchedule(newSchedule);
+  };
+  
+  const addSlot = (dayIndex: number) => {
+    const newSchedule = [...schedule];
+    const newSlot = needsElevationSchedule 
+      ? { startTime: '', endTime: '', units: '' }
+      : { startTime: '09:00', endTime: '12:00', units: '' };
+    newSchedule[dayIndex].slots.push(newSlot);
+    setSchedule(newSchedule);
+  };
+  
+  const removeSlot = (dayIndex: number, slotIndex: number) => {
+    const newSchedule = [...schedule];
+    newSchedule[dayIndex].slots = newSchedule[dayIndex].slots.filter((_, i) => i !== slotIndex);
+    setSchedule(newSchedule);
+  };
+  
+  const updateSlot = (dayIndex: number, slotIndex: number, field: keyof ScheduleSlot, value: string) => {
+    const newSchedule = [...schedule];
+    newSchedule[dayIndex].slots[slotIndex][field] = value;
+    setSchedule(newSchedule);
   };
 
   const isSubmitting = createNoticeMutation.isPending || updateNoticeMutation.isPending;
@@ -425,9 +771,9 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
         <div className="flex flex-wrap gap-2">
           {templates.map((template, index) => (
             <Button
-              key={index}
+              key={`builtin-${index}`}
               type="button"
-              variant={selectedTemplate === String(index) ? "default" : "outline"}
+              variant={selectedTemplate === `builtin-${index}` ? "default" : "outline"}
               size="sm"
               onClick={() => handleTemplateSelect(index)}
               data-testid={`button-template-${index}`}
@@ -435,7 +781,27 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
               {template.title}
             </Button>
           ))}
+          {customTemplates.map((template: any) => (
+            <Button
+              key={`custom-${template.id}`}
+              type="button"
+              variant={selectedTemplate === `custom-${template.id}` ? "default" : "outline"}
+              size="sm"
+              onClick={() => handleCustomTemplateSelect(template)}
+              data-testid={`button-custom-template-${template.id}`}
+              className="border-dashed"
+            >
+              <span className="material-icons text-xs mr-1">star</span>
+              {template.title}
+            </Button>
+          ))}
         </div>
+        {customTemplates.length > 0 && (
+          <p className="text-xs text-muted-foreground mt-2">
+            <span className="material-icons text-xs align-middle mr-1">star</span>
+            Custom templates you've saved
+          </p>
+        )}
       </div>
 
       <Form {...form}>
@@ -536,6 +902,170 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
             )}
           />
 
+          {needsSchedule && (
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="material-icons text-primary">schedule</span>
+                    {needsElevationSchedule ? 'Work Schedule by Elevation' : `${scheduleLabel} Schedule`}
+                  </div>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={addScheduleDay}
+                    data-testid="button-add-schedule-day"
+                  >
+                    <span className="material-icons mr-1 text-sm">add</span>
+                    Add Day
+                  </Button>
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  {needsElevationSchedule 
+                    ? 'Specify which elevations (North, South, East, West) will be worked on each day' 
+                    : `Specify which ${scheduleLabel.toLowerCase()}s will be serviced on which days and times`}
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {schedule.length === 0 ? (
+                  <div className="text-center py-6 text-muted-foreground border border-dashed rounded-md">
+                    <span className="material-icons text-3xl mb-2 block">event_note</span>
+                    <p>No schedule entries yet</p>
+                    <p className="text-sm">Click "Add Day" to create a schedule for residents</p>
+                  </div>
+                ) : (
+                  schedule.map((day, dayIndex) => (
+                    <Card key={dayIndex} className="bg-muted/30">
+                      <CardContent className="pt-4 space-y-3">
+                        <div className="flex items-center gap-3">
+                          <div className="flex-1">
+                            <Label className="text-xs text-muted-foreground">Date</Label>
+                            <Input
+                              type="date"
+                              value={day.date}
+                              onChange={(e) => updateScheduleDay(dayIndex, e.target.value)}
+                              className="h-9"
+                              data-testid={`input-schedule-date-${dayIndex}`}
+                            />
+                          </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeScheduleDay(dayIndex)}
+                            className="mt-5"
+                            data-testid={`button-remove-day-${dayIndex}`}
+                          >
+                            <span className="material-icons text-destructive">delete</span>
+                          </Button>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <Label className="text-xs text-muted-foreground">
+                              {needsElevationSchedule ? 'Elevation Details' : 'Time Slots'}
+                            </Label>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => addSlot(dayIndex)}
+                              className="h-7 text-xs"
+                              data-testid={`button-add-slot-${dayIndex}`}
+                            >
+                              <span className="material-icons text-sm mr-1">add</span>
+                              {needsElevationSchedule ? 'Add Elevation' : 'Add Time Slot'}
+                            </Button>
+                          </div>
+                          
+                          {day.slots.map((slot, slotIndex) => (
+                            <div key={slotIndex} className="flex items-center gap-2 bg-background p-2 rounded-md">
+                              {needsElevationSchedule ? (
+                                <>
+                                  <div className="flex-1">
+                                    <Input
+                                      placeholder="Elevation (e.g., North, South, East, West, Floors 1-5)"
+                                      value={slot.units}
+                                      onChange={(e) => updateSlot(dayIndex, slotIndex, 'units', e.target.value)}
+                                      className="h-8"
+                                      data-testid={`input-slot-elevation-${dayIndex}-${slotIndex}`}
+                                    />
+                                  </div>
+                                  <div className="flex items-center gap-1 flex-shrink-0">
+                                    <Input
+                                      type="time"
+                                      value={slot.startTime}
+                                      onChange={(e) => updateSlot(dayIndex, slotIndex, 'startTime', e.target.value)}
+                                      className="h-8 w-24"
+                                      placeholder="Start"
+                                      data-testid={`input-slot-start-${dayIndex}-${slotIndex}`}
+                                    />
+                                    <span className="text-muted-foreground text-xs">to</span>
+                                    <Input
+                                      type="time"
+                                      value={slot.endTime}
+                                      onChange={(e) => updateSlot(dayIndex, slotIndex, 'endTime', e.target.value)}
+                                      className="h-8 w-24"
+                                      placeholder="End"
+                                      data-testid={`input-slot-end-${dayIndex}-${slotIndex}`}
+                                    />
+                                    <span className="text-xs text-muted-foreground">(optional)</span>
+                                  </div>
+                                </>
+                              ) : (
+                                <>
+                                  <div className="flex items-center gap-1 flex-shrink-0">
+                                    <Input
+                                      type="time"
+                                      value={slot.startTime}
+                                      onChange={(e) => updateSlot(dayIndex, slotIndex, 'startTime', e.target.value)}
+                                      className="h-8 w-24"
+                                      data-testid={`input-slot-start-${dayIndex}-${slotIndex}`}
+                                    />
+                                    <span className="text-muted-foreground">-</span>
+                                    <Input
+                                      type="time"
+                                      value={slot.endTime}
+                                      onChange={(e) => updateSlot(dayIndex, slotIndex, 'endTime', e.target.value)}
+                                      className="h-8 w-24"
+                                      data-testid={`input-slot-end-${dayIndex}-${slotIndex}`}
+                                    />
+                                  </div>
+                                  <div className="flex-1">
+                                    <Input
+                                      placeholder={`${scheduleLabel}s (e.g., 4509, 3509, 2509)`}
+                                      value={slot.units}
+                                      onChange={(e) => updateSlot(dayIndex, slotIndex, 'units', e.target.value)}
+                                      className="h-8"
+                                      data-testid={`input-slot-units-${dayIndex}-${slotIndex}`}
+                                    />
+                                  </div>
+                                </>
+                              )}
+                              {day.slots.length > 1 && (
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => removeSlot(dayIndex, slotIndex)}
+                                  className="h-8 w-8"
+                                  data-testid={`button-remove-slot-${dayIndex}-${slotIndex}`}
+                                >
+                                  <span className="material-icons text-sm text-muted-foreground">close</span>
+                                </Button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
+              </CardContent>
+            </Card>
+          )}
+
           <Card className="bg-muted/50 border-dashed">
             <CardContent className="pt-4">
               <div className="flex items-start gap-3">
@@ -573,6 +1103,73 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
           </div>
         </form>
       </Form>
+      
+      {/* Save as Template Dialog */}
+      <Dialog open={showSaveTemplateDialog} onOpenChange={(open) => {
+        if (!open) {
+          setShowSaveTemplateDialog(false);
+          onClose();
+        }
+      }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <span className="material-icons text-primary">bookmark_add</span>
+              Save as Template?
+            </DialogTitle>
+            <DialogDescription>
+              Would you like to save this notice as a quick template for future use with {jobTypeName} projects?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            {savedNoticeData && (
+              <div className="bg-muted rounded-lg p-3 text-sm">
+                <p className="font-medium">{savedNoticeData.title}</p>
+                <p className="text-muted-foreground text-xs mt-1 line-clamp-2">
+                  {savedNoticeData.details.substring(0, 100)}...
+                </p>
+              </div>
+            )}
+          </div>
+          <div className="flex gap-3 justify-end">
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setShowSaveTemplateDialog(false);
+                onClose();
+              }}
+              data-testid="button-skip-save-template"
+            >
+              No, thanks
+            </Button>
+            <Button 
+              onClick={() => {
+                if (savedNoticeData) {
+                  saveTemplateMutation.mutate({
+                    jobType: project.jobType,
+                    title: savedNoticeData.title,
+                    details: savedNoticeData.details,
+                  });
+                }
+              }}
+              disabled={saveTemplateMutation.isPending}
+              data-testid="button-save-template"
+            >
+              {saveTemplateMutation.isPending ? (
+                <>
+                  <span className="material-icons animate-spin mr-2">refresh</span>
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <span className="material-icons mr-2">bookmark_add</span>
+                  Save Template
+                </>
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

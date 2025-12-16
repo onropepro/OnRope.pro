@@ -64,13 +64,16 @@ export default function Schedule() {
   // Employee schedule week navigation
   const [weekOffset, setWeekOffset] = useState(0);
   
+  // Timeline view mode: day, week, or month
+  const [timelineViewMode, setTimelineViewMode] = useState<'day' | 'week' | 'month'>('week');
+  
   // Mobile: collapse availability section by default
   const [availabilityOpen, setAvailabilityOpen] = useState(false);
   
   // Double-booking warning dialog state
   const [conflictDialogOpen, setConflictDialogOpen] = useState(false);
   const [conflictInfo, setConflictInfo] = useState<{
-    conflicts: Array<{ employeeId: string; employeeName: string; conflictingJob: string }>;
+    conflicts: Array<{ employeeId: string; employeeName: string; conflictingJob: string; conflictType?: 'job' | 'time_off' }>;
     pendingAssignment: { jobId: string; employeeIds?: string[]; employeeId?: string; startDate?: string; endDate?: string } | null;
     assignmentType: 'batch' | 'single';
   }>({ conflicts: [], pendingAssignment: null, assignmentType: 'batch' });
@@ -316,34 +319,66 @@ export default function Schedule() {
     });
   });
 
-  // Simple Employee Schedule Week View helpers
-  const getWeekDates = useMemo(() => {
+  // Simple Employee Schedule View helpers - supports day, week, month
+  const getViewDates = useMemo(() => {
     const today = new Date();
-    const dayOfWeek = today.getDay();
-    const startOfWeek = new Date(today);
-    startOfWeek.setDate(today.getDate() - dayOfWeek + (weekOffset * 7));
-    
     const days: Date[] = [];
-    for (let i = 0; i < 7; i++) {
-      const day = new Date(startOfWeek);
-      day.setDate(startOfWeek.getDate() + i);
-      days.push(day);
+    
+    if (timelineViewMode === 'day') {
+      // Single day view
+      const targetDay = new Date(today);
+      targetDay.setDate(today.getDate() + weekOffset);
+      days.push(targetDay);
+    } else if (timelineViewMode === 'week') {
+      // Week view (7 days)
+      const dayOfWeek = today.getDay();
+      const startOfWeek = new Date(today);
+      startOfWeek.setDate(today.getDate() - dayOfWeek + (weekOffset * 7));
+      for (let i = 0; i < 7; i++) {
+        const day = new Date(startOfWeek);
+        day.setDate(startOfWeek.getDate() + i);
+        days.push(day);
+      }
+    } else {
+      // Month view
+      const targetMonth = new Date(today.getFullYear(), today.getMonth() + weekOffset, 1);
+      const daysInMonth = new Date(targetMonth.getFullYear(), targetMonth.getMonth() + 1, 0).getDate();
+      for (let i = 0; i < daysInMonth; i++) {
+        const day = new Date(targetMonth);
+        day.setDate(i + 1);
+        days.push(day);
+      }
     }
     return days;
-  }, [weekOffset]);
+  }, [weekOffset, timelineViewMode]);
+  
+  // Legacy alias for compatibility
+  const getWeekDates = getViewDates;
 
-  const formatWeekRange = useMemo(() => {
-    const start = getWeekDates[0];
-    const end = getWeekDates[6];
-    const startMonth = start.toLocaleDateString('en-US', { month: 'short' });
-    const endMonth = end.toLocaleDateString('en-US', { month: 'short' });
-    const year = end.getFullYear();
-    
-    if (startMonth === endMonth) {
-      return `${startMonth} ${start.getDate()} - ${end.getDate()}, ${year}`;
+  const formatViewRange = useMemo(() => {
+    if (timelineViewMode === 'day') {
+      const day = getViewDates[0];
+      return day.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' });
+    } else if (timelineViewMode === 'week') {
+      const start = getViewDates[0];
+      const end = getViewDates[getViewDates.length - 1];
+      const startMonth = start.toLocaleDateString('en-US', { month: 'short' });
+      const endMonth = end.toLocaleDateString('en-US', { month: 'short' });
+      const year = end.getFullYear();
+      
+      if (startMonth === endMonth) {
+        return `${startMonth} ${start.getDate()} - ${end.getDate()}, ${year}`;
+      }
+      return `${startMonth} ${start.getDate()} - ${endMonth} ${end.getDate()}, ${year}`;
+    } else {
+      // Month view
+      const day = getViewDates[0];
+      return day.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
     }
-    return `${startMonth} ${start.getDate()} - ${endMonth} ${end.getDate()}, ${year}`;
-  }, [getWeekDates]);
+  }, [getViewDates, timelineViewMode]);
+  
+  // Legacy alias for compatibility
+  const formatWeekRange = formatViewRange;
 
   // Get employee assignments for a specific day (using local date to avoid timezone issues)
   const getEmployeeJobsForDay = (employeeId: string, date: Date) => {
@@ -1518,16 +1553,49 @@ export default function Schedule() {
                 `
               }}
             />
-            {/* Week Navigation Header - Mobile optimized */}
+            {/* Timeline Navigation Header - Mobile optimized */}
             <div className="flex flex-col gap-3 mb-4 md:mb-6 relative z-10">
-              {/* Top row: navigation and date */}
+              {/* View mode toggle */}
+              <div className="flex items-center justify-center gap-1">
+                <div className="inline-flex rounded-md border bg-muted p-0.5">
+                  <Button 
+                    variant={timelineViewMode === 'day' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => { setTimelineViewMode('day'); setWeekOffset(0); }}
+                    data-testid="button-view-day"
+                    className="px-3 text-xs"
+                  >
+                    {t('schedule.day', 'Day')}
+                  </Button>
+                  <Button 
+                    variant={timelineViewMode === 'week' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => { setTimelineViewMode('week'); setWeekOffset(0); }}
+                    data-testid="button-view-week"
+                    className="px-3 text-xs"
+                  >
+                    {t('schedule.week', 'Week')}
+                  </Button>
+                  <Button 
+                    variant={timelineViewMode === 'month' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => { setTimelineViewMode('month'); setWeekOffset(0); }}
+                    data-testid="button-view-month"
+                    className="px-3 text-xs"
+                  >
+                    {t('schedule.month', 'Month')}
+                  </Button>
+                </div>
+              </div>
+              
+              {/* Navigation row: prev/next and date */}
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-1">
                   <Button 
                     variant="outline" 
                     size="icon"
                     onClick={() => setWeekOffset(prev => prev - 1)}
-                    data-testid="button-prev-week"
+                    data-testid="button-prev-period"
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
@@ -1544,8 +1612,8 @@ export default function Schedule() {
                   )}
                 </div>
                 
-                <h3 className="text-sm md:text-lg font-semibold text-center" data-testid="text-week-range">
-                  {formatWeekRange}
+                <h3 className="text-sm md:text-lg font-semibold text-center" data-testid="text-date-range">
+                  {formatViewRange}
                 </h3>
                 
                 <div className="flex items-center gap-1">
@@ -1553,14 +1621,14 @@ export default function Schedule() {
                     variant="outline" 
                     size="icon"
                     onClick={() => setWeekOffset(prev => prev + 1)}
-                    data-testid="button-next-week"
+                    data-testid="button-next-period"
                   >
                     <ChevronRight className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
               
-              {/* Bottom row: action button (full width on mobile) */}
+              {/* Action button (full width on mobile) */}
               <Button 
                 variant="outline"
                 size="sm"
@@ -1575,23 +1643,29 @@ export default function Schedule() {
 
             {/* Day Headers + Employee Rows - Scrollable on mobile */}
             <div className="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0 relative z-10">
-              <div className="min-w-[700px] md:min-w-0">
+              <div style={{ minWidth: timelineViewMode === 'month' ? '1200px' : timelineViewMode === 'day' ? '400px' : '700px' }}>
                 {/* Day Headers */}
-                <div className="grid grid-cols-8 gap-1 mb-2">
+                <div 
+                  className="gap-1 mb-2"
+                  style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: `minmax(80px, 120px) repeat(${getViewDates.length}, 1fr)` 
+                  }}
+                >
                   <div className="font-medium text-xs md:text-sm text-muted-foreground px-2 flex items-center">{t('schedule.team', 'Team')}</div>
-                  {getWeekDates.map((date, idx) => (
+                  {getViewDates.map((date, idx) => (
                     <div 
                       key={idx}
-                      className={`text-center py-1.5 md:py-2 rounded-md ${
+                      className={`text-center py-1 md:py-1.5 rounded-md ${
                         isToday(date) 
                           ? 'bg-primary text-primary-foreground font-semibold' 
                           : 'bg-muted font-medium'
                       }`}
                     >
-                      <div className="text-[10px] md:text-xs uppercase">
-                        {date.toLocaleDateString(i18n.language?.startsWith('fr') ? 'fr-CA' : 'en-US', { weekday: 'short' })}
+                      <div className={`uppercase ${timelineViewMode === 'month' ? 'text-[8px]' : 'text-[10px] md:text-xs'}`}>
+                        {date.toLocaleDateString(i18n.language?.startsWith('fr') ? 'fr-CA' : 'en-US', { weekday: timelineViewMode === 'month' ? 'narrow' : 'short' })}
                       </div>
-                      <div className="text-sm md:text-lg">
+                      <div className={timelineViewMode === 'month' ? 'text-xs' : 'text-sm md:text-lg'}>
                         {date.getDate()}
                       </div>
                     </div>
@@ -1609,7 +1683,11 @@ export default function Schedule() {
                     employees.map((employee) => (
                       <div 
                         key={employee.id}
-                        className="grid grid-cols-8 gap-1 items-stretch"
+                        className="gap-1 items-stretch"
+                        style={{ 
+                          display: 'grid', 
+                          gridTemplateColumns: `minmax(80px, 120px) repeat(${getViewDates.length}, 1fr)` 
+                        }}
                         data-testid={`employee-row-${employee.id}`}
                       >
                         {/* Employee Name */}
@@ -1628,27 +1706,28 @@ export default function Schedule() {
                         </div>
                     
                     {/* Day Cells */}
-                    {getWeekDates.map((date, dayIdx) => {
+                    {getViewDates.map((date, dayIdx) => {
                       const dayJobs = getEmployeeJobsForDay(employee.id, date);
                       const hasJobs = dayJobs.length > 0;
                       const timeOff = getTimeOffForDay(employee.id, date);
+                      const isMonthView = timelineViewMode === 'month';
                       
                       return (
                         <div 
                           key={dayIdx}
-                          className={`min-h-[60px] rounded-md p-1 ${
+                          className={`rounded-md ${isMonthView ? 'min-h-[40px] p-0.5' : 'min-h-[60px] p-1'} ${
                             isToday(date) 
                               ? 'bg-primary/5 border border-primary/20' 
                               : 'bg-muted/30 border border-transparent'
                           }`}
                           data-testid={`day-cell-${employee.id}-${dayIdx}`}
                         >
-                          <div className="space-y-1">
+                          <div className={isMonthView ? 'space-y-0.5' : 'space-y-1'}>
                             {timeOff && (
                               <Tooltip>
                                 <TooltipTrigger asChild>
                                   <div 
-                                    className="px-2 py-1 rounded text-xs font-semibold text-white cursor-pointer text-center"
+                                    className={`rounded font-semibold text-white cursor-pointer text-center ${isMonthView ? 'px-0.5 py-0.5 text-[8px]' : 'px-2 py-1 text-xs'}`}
                                     style={{ backgroundColor: getTimeOffColor(timeOff.timeOffType) }}
                                     onClick={() => {
                                       if (window.confirm(`Remove ${getTimeOffLabel(timeOff.timeOffType)} for ${employee.name}?`)) {
@@ -1657,7 +1736,7 @@ export default function Schedule() {
                                     }}
                                     data-testid={`time-off-${employee.id}-${dayIdx}`}
                                   >
-                                    {getTimeOffLabel(timeOff.timeOffType)}
+                                    {isMonthView ? getTimeOffLabel(timeOff.timeOffType).substring(0, 3) : getTimeOffLabel(timeOff.timeOffType)}
                                   </div>
                                 </TooltipTrigger>
                                 <TooltipContent side="top">
@@ -1671,11 +1750,11 @@ export default function Schedule() {
                             )}
                             {hasJobs && (
                               <>
-                                {dayJobs.slice(0, timeOff ? 1 : 2).map((job) => (
+                                {dayJobs.slice(0, timeOff ? 1 : (isMonthView ? 1 : 2)).map((job) => (
                                   <Tooltip key={job.id}>
                                     <TooltipTrigger asChild>
                                       <div 
-                                        className={`px-2 py-1.5 rounded text-xs font-medium text-white truncate cursor-pointer hover-elevate ${timeOff ? 'opacity-60' : ''}`}
+                                        className={`rounded font-medium text-white truncate cursor-pointer hover-elevate ${timeOff ? 'opacity-60' : ''} ${isMonthView ? 'px-0.5 py-0.5 text-[8px]' : 'px-2 py-1.5 text-xs'}`}
                                         style={{ backgroundColor: job.color || defaultJobColor }}
                                         onClick={() => {
                                           setSelectedJob(job);
@@ -1683,7 +1762,7 @@ export default function Schedule() {
                                         }}
                                         data-testid={`job-block-${job.id}-${dayIdx}`}
                                       >
-                                        {job.project?.buildingName || job.title}
+                                        {isMonthView ? (job.project?.buildingName || job.title).substring(0, 4) : (job.project?.buildingName || job.title)}
                                       </div>
                                     </TooltipTrigger>
                                     <TooltipContent side="top" className="max-w-xs">
@@ -1702,14 +1781,14 @@ export default function Schedule() {
                                     </TooltipContent>
                                   </Tooltip>
                                 ))}
-                                {dayJobs.length > (timeOff ? 1 : 2) && (
-                                  <div className="text-xs text-muted-foreground text-center">
-                                    +{dayJobs.length - (timeOff ? 1 : 2)} more
+                                {dayJobs.length > (timeOff ? 1 : (isMonthView ? 1 : 2)) && (
+                                  <div className={`text-muted-foreground text-center ${isMonthView ? 'text-[7px]' : 'text-xs'}`}>
+                                    +{dayJobs.length - (timeOff ? 1 : (isMonthView ? 1 : 2))}
                                   </div>
                                 )}
                               </>
                             )}
-                            {!timeOff && !hasJobs && (
+                            {!timeOff && !hasJobs && !isMonthView && (
                               <div className="h-full min-h-[52px] flex items-center justify-center text-muted-foreground/30">
                                 <span className="text-xs">-</span>
                               </div>
@@ -1774,7 +1853,7 @@ export default function Schedule() {
                 onValueChange={setSelectedEmployeeForTimeOff}
               >
                 <SelectTrigger data-testid="select-time-off-employee">
-                  <SelectValue placeholder={t('schedule.selectProject', 'Select employee...')} />
+                  <SelectValue placeholder={t('schedule.selectEmployee', 'Select employee...')} />
                 </SelectTrigger>
                 <SelectContent>
                   {employees.map((employee) => (
@@ -1899,6 +1978,7 @@ export default function Schedule() {
           setSelectedJob(selectedJob);
           setEditDialogOpen(true);
         }}
+        onJobUpdate={setSelectedJob}
       />
 
       {/* Edit Job Dialog */}
@@ -2078,6 +2158,11 @@ function CreateJobDialog({
   const { brandColors, brandingActive } = useContext(BrandingContext);
   const defaultJobColor = brandingActive && brandColors.length > 0 ? brandColors[0] : "hsl(var(--primary))";
   
+  // Conflict dialog state
+  const [conflictDialogOpen, setConflictDialogOpen] = useState(false);
+  const [pendingConflicts, setPendingConflicts] = useState<Array<{ employeeId: string; employeeName: string; conflictingJob: string; conflictType?: 'job' | 'time_off' }>>([]);
+  const [pendingJobData, setPendingJobData] = useState<any>(null);
+  
   // Fetch projects for dropdown
   const { data: projectsData } = useQuery<{ projects: any[] }>({
     queryKey: ["/api/projects"],
@@ -2137,20 +2222,59 @@ function CreateJobDialog({
       onOpenChange(false);
       resetForm();
     },
-    onError: (error: any) => {
-      if (error.conflicts) {
-        toast({
-          title: t('schedule.error', 'Schedule conflict'),
-          description: `${error.conflicts[0].employeeName} ${t('schedule.error', 'is already assigned to')} "${error.conflicts[0].conflictingJob}"`,
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: t('schedule.error', 'Error'),
-          description: error.message || t('schedule.error', 'Failed to create job'),
-          variant: "destructive",
-        });
+    onError: (error: Error) => {
+      // Check if this is a conflict error (409)
+      if (error.message.startsWith('409:')) {
+        try {
+          const jsonStr = error.message.substring(5).trim();
+          const errorData = JSON.parse(jsonStr);
+          if (errorData?.conflicts && errorData.conflicts.length > 0) {
+            // Show professional conflict dialog
+            setPendingConflicts(errorData.conflicts.map((c: any) => ({
+              employeeId: c.employeeId,
+              employeeName: c.employeeName,
+              conflictingJob: c.conflictingJobTitle,
+              conflictType: c.conflictType,
+            })));
+            setConflictDialogOpen(true);
+            return;
+          }
+        } catch (e) {
+          console.error("Failed to parse conflict response:", e);
+        }
       }
+      toast({
+        title: t('schedule.error', 'Error'),
+        description: error.message || t('schedule.error', 'Failed to create job'),
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Force create mutation (bypasses conflict check)
+  const forceCreateJobMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await apiRequest("POST", "/api/schedule", { ...data, forceAssignment: true });
+      return await response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
+      toast({
+        title: t('schedule.jobCreated', 'Job created'),
+        description: t('schedule.jobCreated', 'Job has been added to the schedule'),
+      });
+      setConflictDialogOpen(false);
+      setPendingConflicts([]);
+      setPendingJobData(null);
+      onOpenChange(false);
+      resetForm();
+    },
+    onError: (error: Error) => {
+      toast({
+        title: t('schedule.error', 'Error'),
+        description: error.message || t('schedule.error', 'Failed to create job'),
+        variant: "destructive",
+      });
     },
   });
 
@@ -2177,7 +2301,7 @@ function CreateJobDialog({
     const startDate = new Date(formData.startDate);
     const endDate = new Date(formData.endDate);
 
-    const result = await createJobMutation.mutateAsync({
+    const jobData = {
       projectId: formData.projectId || null,
       title: formData.title,
       description: formData.description,
@@ -2191,7 +2315,18 @@ function CreateJobDialog({
       color: formData.color,
       status: "upcoming",
       employeeIds: formData.employeeIds,
-    });
+    };
+    
+    // Save for potential force submit
+    setPendingJobData(jobData);
+    
+    await createJobMutation.mutateAsync(jobData);
+  };
+  
+  const handleForceCreate = () => {
+    if (pendingJobData) {
+      forceCreateJobMutation.mutate(pendingJobData);
+    }
   };
 
   return (
@@ -2426,6 +2561,17 @@ function CreateJobDialog({
           </DialogFooter>
         </form>
       </DialogContent>
+      
+      <DoubleBookingWarningDialog
+        open={conflictDialogOpen}
+        onClose={() => {
+          setConflictDialogOpen(false);
+          setPendingConflicts([]);
+        }}
+        onProceed={handleForceCreate}
+        conflicts={pendingConflicts}
+        isPending={forceCreateJobMutation.isPending}
+      />
     </Dialog>
   );
 }
@@ -2437,12 +2583,14 @@ function JobDetailDialog({
   job,
   onEdit,
   employees,
+  onJobUpdate,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   job: ScheduledJobWithAssignments | null;
   onEdit: () => void;
   employees: User[];
+  onJobUpdate?: (updatedJob: ScheduledJobWithAssignments) => void;
 }) {
   const { t } = useTranslation();
   const { toast } = useToast();
@@ -2454,6 +2602,11 @@ function JobDetailDialog({
     startDate: "",
     endDate: "",
   });
+  const [conflictDialogOpen, setConflictDialogOpen] = useState(false);
+  const [conflictInfo, setConflictInfo] = useState<{
+    conflicts: Array<{ employeeId: string; employeeName: string; conflictingJob: string; conflictType?: 'job' | 'time_off' }>;
+    pendingAssignment: { jobId: string; employeeId: string; startDate: string; endDate: string } | null;
+  }>({ conflicts: [], pendingAssignment: null });
 
   const deleteJobMutation = useMutation({
     mutationFn: async (jobId: string) => {
@@ -2477,23 +2630,40 @@ function JobDetailDialog({
   });
 
   const assignEmployeeMutation = useMutation({
-    mutationFn: async ({ jobId, employeeId, startDate, endDate }: { 
+    mutationFn: async ({ jobId, employeeId, startDate, endDate, forceAssignment }: { 
       jobId: string; 
       employeeId: string; 
       startDate?: string; 
       endDate?: string; 
+      forceAssignment?: boolean;
     }) => {
-      console.log("assignEmployeeMutation executing with:", { jobId, employeeId, startDate, endDate });
+      console.log("assignEmployeeMutation executing with:", { jobId, employeeId, startDate, endDate, forceAssignment });
       const result = await apiRequest("POST", `/api/schedule/${jobId}/assign-employee`, { 
         employeeId, 
         startDate, 
-        endDate 
+        endDate,
+        forceAssignment
       });
       console.log("assignEmployeeMutation result:", result);
       return result;
     },
+    onMutate: async (variables) => {
+      return { jobId: variables.jobId, employeeId: variables.employeeId, startDate: variables.startDate, endDate: variables.endDate };
+    },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
+      setConflictDialogOpen(false);
+      setConflictInfo({ conflicts: [], pendingAssignment: null });
+      // Use refetchQueries to wait for fresh data before updating dialog
+      await queryClient.refetchQueries({ queryKey: ["/api/schedule"] });
+      // Update the job in parent state for immediate UI refresh
+      if (job && onJobUpdate) {
+        const scheduleData = queryClient.getQueryData(["/api/schedule"]) as { jobs?: ScheduledJobWithAssignments[] } | ScheduledJobWithAssignments[] | undefined;
+        const jobsArray = Array.isArray(scheduleData) ? scheduleData : (scheduleData?.jobs || []);
+        const updatedJob = jobsArray.find((j: ScheduledJobWithAssignments) => j.id === job.id);
+        if (updatedJob) {
+          onJobUpdate(updatedJob);
+        }
+      }
       toast({
         title: t('schedule.assignmentCreated', 'Employee assigned'),
         description: t('schedule.assignmentCreated', 'Team member has been assigned to this job'),
@@ -2502,7 +2672,30 @@ function JobDetailDialog({
       setSelectedEmployee(null);
       setShowAssignEmployees(false);
     },
-    onError: (error: Error) => {
+    onError: async (error: Error, _variables, context) => {
+      // Check if this is a conflict error (409)
+      if (error.message.startsWith('409:')) {
+        try {
+          // Error format is "409: {json_body}"
+          const jsonStr = error.message.substring(5).trim();
+          const errorData = JSON.parse(jsonStr);
+          if (errorData?.conflicts && errorData.conflicts.length > 0) {
+            setConflictInfo({
+              conflicts: errorData.conflicts,
+              pendingAssignment: context ? {
+                jobId: context.jobId,
+                employeeId: context.employeeId,
+                startDate: context.startDate || '',
+                endDate: context.endDate || '',
+              } : null,
+            });
+            setConflictDialogOpen(true);
+            return;
+          }
+        } catch (e) {
+          console.error("Failed to parse conflict response:", e);
+        }
+      }
       toast({
         title: t('schedule.error', 'Error'),
         description: error.message || t('schedule.error', 'Failed to assign employee'),
@@ -2511,12 +2704,33 @@ function JobDetailDialog({
     },
   });
 
+  const handleForceAssignment = () => {
+    if (!conflictInfo.pendingAssignment) return;
+    assignEmployeeMutation.mutate({
+      jobId: conflictInfo.pendingAssignment.jobId,
+      employeeId: conflictInfo.pendingAssignment.employeeId,
+      startDate: conflictInfo.pendingAssignment.startDate,
+      endDate: conflictInfo.pendingAssignment.endDate,
+      forceAssignment: true,
+    });
+  };
+
   const unassignEmployeeMutation = useMutation({
     mutationFn: async ({ jobId, assignmentId }: { jobId: string; assignmentId: string }) => {
       await apiRequest("DELETE", `/api/schedule/${jobId}/assignments/${assignmentId}`);
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
+      // Use refetchQueries to wait for fresh data before updating dialog
+      await queryClient.refetchQueries({ queryKey: ["/api/schedule"] });
+      // Update the job in parent state for immediate UI refresh
+      if (job && onJobUpdate) {
+        const scheduleData = queryClient.getQueryData(["/api/schedule"]) as { jobs?: ScheduledJobWithAssignments[] } | ScheduledJobWithAssignments[] | undefined;
+        const jobsArray = Array.isArray(scheduleData) ? scheduleData : (scheduleData?.jobs || []);
+        const updatedJob = jobsArray.find((j: ScheduledJobWithAssignments) => j.id === job.id);
+        if (updatedJob) {
+          onJobUpdate(updatedJob);
+        }
+      }
       toast({
         title: t('schedule.assignmentRemoved', 'Employee unassigned'),
         description: t('schedule.assignmentRemoved', 'Team member has been removed from this job'),
@@ -2775,14 +2989,14 @@ function JobDetailDialog({
             data-testid="button-delete-job"
           >
             <Trash2 className="w-4 h-4 mr-2" />
-            {t('schedule.delete', 'Delete')}
+            {t('schedule.removeJobFromCalendar', 'Remove Job from Calendar')}
           </Button>
           <Button
             onClick={onEdit}
             data-testid="button-edit-job"
           >
             <Edit2 className="w-4 h-4 mr-2" />
-            {t('schedule.editJob', 'Edit')}
+            {t('schedule.editJob', 'Edit Job')}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -2791,9 +3005,9 @@ function JobDetailDialog({
     <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{t('schedule.deleteJob', 'Delete Job')}?</AlertDialogTitle>
+          <AlertDialogTitle>{t('schedule.removeJobFromCalendar', 'Remove Job from Calendar')}?</AlertDialogTitle>
           <AlertDialogDescription>
-            {t('schedule.confirmDelete', 'Are you sure you want to delete')} "{job?.title}"? {t('schedule.confirmDelete', 'This action cannot be undone and will remove all assignments for this job.')}
+            {t('schedule.confirmRemove', 'Are you sure you want to remove')} "{job?.title}" {t('schedule.confirmRemove', 'from the calendar? This will remove all employee assignments for this scheduled job.')}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -2807,7 +3021,7 @@ function JobDetailDialog({
             }}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {t('schedule.deleteJob', 'Delete Job')}
+            {t('schedule.removeJobFromCalendar', 'Remove Job from Calendar')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -2869,6 +3083,17 @@ function JobDetailDialog({
         </SheetContent>
       </Sheet>
     )}
+
+    <DoubleBookingWarningDialog
+      open={conflictDialogOpen}
+      onClose={() => {
+        setConflictDialogOpen(false);
+        setConflictInfo({ conflicts: [], pendingAssignment: null });
+      }}
+      onProceed={handleForceAssignment}
+      conflicts={conflictInfo.conflicts}
+      isPending={assignEmployeeMutation.isPending}
+    />
   </>
   );
 }

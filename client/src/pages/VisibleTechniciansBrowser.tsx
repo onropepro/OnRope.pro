@@ -177,6 +177,16 @@ interface VisibleTechnician {
   employeeCountry: string | null;
   visibilityEnabledAt: Date | string | null;
   ropeAccessSpecialties: string[] | null;
+  safetyRating?: number;
+  safetyLabel?: string;
+  safetyColor?: string;
+  safetyBreakdown?: {
+    irataValid: boolean;
+    spratValid: boolean;
+    hasValidCertification: boolean;
+    yearsExperience: number;
+    hasResume: boolean;
+  };
 }
 
 export default function VisibleTechniciansBrowser() {
@@ -521,6 +531,71 @@ export default function VisibleTechniciansBrowser() {
               </DialogHeader>
 
               <div className="space-y-4 mt-4">
+                {/* Safety Rating */}
+                {selectedTech.safetyRating !== undefined && (
+                  <div className={`flex items-center gap-3 p-3 rounded-lg ${
+                    selectedTech.safetyColor === 'green' ? 'bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800' :
+                    selectedTech.safetyColor === 'yellow' ? 'bg-yellow-50 dark:bg-yellow-950/30 border border-yellow-200 dark:border-yellow-800' :
+                    selectedTech.safetyColor === 'orange' ? 'bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-800' :
+                    'bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800'
+                  }`}>
+                    <Shield className={`w-5 h-5 ${
+                      selectedTech.safetyColor === 'green' ? 'text-green-600 dark:text-green-400' :
+                      selectedTech.safetyColor === 'yellow' ? 'text-yellow-600 dark:text-yellow-400' :
+                      selectedTech.safetyColor === 'orange' ? 'text-orange-600 dark:text-orange-400' :
+                      'text-red-600 dark:text-red-400'
+                    }`} />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold">PSR</p>
+                        <p className="text-xs text-muted-foreground">Personal Safety Rating</p>
+                        <Badge variant={
+                          selectedTech.safetyColor === 'green' ? 'default' :
+                          selectedTech.safetyColor === 'yellow' ? 'secondary' :
+                          'destructive'
+                        } className={`text-xs ${
+                          selectedTech.safetyColor === 'green' ? 'bg-green-600 dark:bg-green-500' :
+                          selectedTech.safetyColor === 'yellow' ? 'bg-yellow-500 text-black' : ''
+                        }`}>
+                          {selectedTech.safetyRating}%
+                        </Badge>
+                      </div>
+                      <p className={`font-medium ${
+                        selectedTech.safetyColor === 'green' ? 'text-green-700 dark:text-green-300' :
+                        selectedTech.safetyColor === 'yellow' ? 'text-yellow-700 dark:text-yellow-300' :
+                        selectedTech.safetyColor === 'orange' ? 'text-orange-700 dark:text-orange-300' :
+                        'text-red-700 dark:text-red-300'
+                      }`}>
+                        {selectedTech.safetyLabel}
+                      </p>
+                      {selectedTech.safetyBreakdown && (
+                        <div className="mt-1 text-xs text-muted-foreground space-y-0.5">
+                          {selectedTech.safetyBreakdown.irataValid && (
+                            <p className="flex items-center gap-1">
+                              <Eye className="w-3 h-3 text-green-500" /> Valid IRATA certification
+                            </p>
+                          )}
+                          {selectedTech.safetyBreakdown.spratValid && (
+                            <p className="flex items-center gap-1">
+                              <Eye className="w-3 h-3 text-green-500" /> Valid SPRAT certification
+                            </p>
+                          )}
+                          {selectedTech.safetyBreakdown.yearsExperience > 0 && (
+                            <p className="flex items-center gap-1">
+                              <Clock className="w-3 h-3" /> {selectedTech.safetyBreakdown.yearsExperience}+ years experience
+                            </p>
+                          )}
+                          {selectedTech.safetyBreakdown.hasResume && (
+                            <p className="flex items-center gap-1">
+                              <FileText className="w-3 h-3" /> Resume on file
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {/* Experience */}
                 {selectedTech.ropeAccessStartDate && (
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">

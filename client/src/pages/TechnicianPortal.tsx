@@ -390,7 +390,7 @@ const translations = {
     addExperience: "Add your experience start date",
     referralCodeGenerating: "Your referral code will be generated when you complete registration",
     // Safety Rating
-    performanceSafetyRating: "Safety Rating",
+    performanceSafetyRating: "Personal Safety Rating",
     overallScore: "Overall Score",
     harnessCompliance: "Harness Inspections",
     documentCompliance: "Documents Signed",
@@ -2903,7 +2903,8 @@ export default function TechnicianPortal() {
                   <Shield className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                 </div>
                 <div className="flex-1">
-                  <CardTitle className="text-lg">{t.performanceSafetyRating}</CardTitle>
+                  <CardTitle className="text-lg">PSR</CardTitle>
+                  <p className="text-xs text-muted-foreground">Personal Safety Rating</p>
                 </div>
               </div>
             </CardHeader>
