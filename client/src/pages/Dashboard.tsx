@@ -218,6 +218,13 @@ const PERMISSION_CATEGORIES = [
       { id: "view_financial_data", labelKey: "dashboard.permissions.viewFinancialData" },
     ],
   },
+  {
+    nameKey: "dashboard.permissions.categories.quotes",
+    permissions: [
+      { id: "view_quotes", labelKey: "dashboard.permissions.viewQuotes" },
+      { id: "edit_quotes", labelKey: "dashboard.permissions.editQuotes" },
+    ],
+  },
 ] as const;
 
 // Helper function to get translated job type label

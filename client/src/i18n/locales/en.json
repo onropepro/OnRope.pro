@@ -636,7 +636,8 @@
         "workSessions": "Work Sessions",
         "feedback": "Feedback",
         "schedule": "Schedule",
-        "analyticsFinancial": "Analytics & Financial"
+        "analyticsFinancial": "Analytics & Financial",
+        "quotes": "Quotes"
       },
       "viewProjects": "View Projects",
       "createProjects": "Create Projects",
@@ -665,7 +666,10 @@
       "viewOwnSchedule": "View Employee Calendar Only (Own Shifts)",
       "editSchedule": "Edit Calendar (Manage Assignments)",
       "viewAnalytics": "View Analytics",
-      "viewFinancialData": "View Financial Data (Labor Costs, Wages)"
+      "viewFinancialData": "View Financial Data (Labor Costs, Wages)",
+      "viewQuotes": "View Quotes",
+      "editQuotes": "Create/Edit Quotes",
+      "viewPastProjects": "View Past Projects"
     },
     "jobCategories": {
       "building_maintenance": "Building Maintenance",
