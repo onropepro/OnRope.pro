@@ -114,6 +114,13 @@ export function canAccessPayroll(user: User | null | undefined): boolean {
   return hasFinancialAccess(user);
 }
 
+/** Check if user can view quote financials (prices, costs) */
+export function canViewQuoteFinancials(user: User | null | undefined): boolean {
+  if (!user) return false;
+  if (isCompanyOwner(user)) return true;
+  return checkPermission(user, 'view_quote_financials');
+}
+
 // ============================================================================
 // OPERATIONS PERMISSIONS
 // ============================================================================

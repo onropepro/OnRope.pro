@@ -668,6 +668,7 @@
       "viewOwnSchedule": "Voir le calendrier de l'employé uniquement (Propres quarts)",
       "editSchedule": "Modifier le calendrier (Gérer les affectations)",
       "viewQuotes": "Voir les soumissions",
+      "viewQuoteFinancials": "Voir les finances des soumissions (Prix, Coûts)",
       "editQuotes": "Créer/Modifier les soumissions",
       "viewPastProjects": "Voir les projets passés"
     },

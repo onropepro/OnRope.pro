@@ -223,6 +223,7 @@ const PERMISSION_CATEGORIES = [
     nameKey: "dashboard.permissions.categories.quotes",
     permissions: [
       { id: "view_quotes", labelKey: "dashboard.permissions.viewQuotes" },
+      { id: "view_quote_financials", labelKey: "dashboard.permissions.viewQuoteFinancials" },
       { id: "edit_quotes", labelKey: "dashboard.permissions.editQuotes" },
     ],
   },

@@ -668,6 +668,7 @@
       "viewAnalytics": "View Analytics",
       "viewFinancialData": "View Financial Data (Labor Costs, Wages)",
       "viewQuotes": "View Quotes",
+      "viewQuoteFinancials": "View Quote Financials (Prices, Costs)",
       "editQuotes": "Create/Edit Quotes",
       "viewPastProjects": "View Past Projects"
     },
