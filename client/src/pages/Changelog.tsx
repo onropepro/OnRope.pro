@@ -85,6 +85,12 @@ type RecentChange = {
 
 const recentChangesData: RecentChange[] = [
   {
+    date: "December 16, 2025",
+    title: "JobBoardGuide Design System Compliance",
+    description: "Complete rewrite of Job Board feature guide to comply with Changelog Pages Design System. Added proper section ordering (Introduction, Golden Rule, Key Features, Problems Solved), Accordion component with Expand/Collapse All toggle, four-part problem structure (The Pain, Real Example, Solution, Benefit), and stakeholder color coding (Employers=Blue, Technicians=Orange, Building Managers=Violet)",
+    type: "improvement"
+  },
+  {
     date: "December 13, 2025",
     title: "AI-Powered Insurance Expiry Detection",
     description: "Certificate of Insurance uploads now feature automatic expiry date extraction using Gemini AI. The system analyzes uploaded PDF documents and extracts policy expiration dates. Expired policies display a red 'EXPIRED' badge, and policies expiring within 30 days show a red 'Expiring Soon' warning. Helps companies maintain valid insurance coverage and avoid compliance gaps",
@@ -415,6 +421,27 @@ const pagesData: PageCategory[] = [
       { name: "Multi-Language Guide", path: "/changelog/language", description: "Internationalization and localization", roles: ["Public"] },
       { name: "GPS & Location Guide", path: "/changelog/gps", description: "Location tracking and verification", roles: ["Public"] },
       { name: "Property Manager Guide", path: "/changelog/property-manager", description: "Vendor management interface", roles: ["Public"] },
+      { name: "CSR Guide", path: "/changelog/csr", description: "Company Safety Rating system", roles: ["Public"] },
+      { name: "Technician Registration Guide", path: "/changelog/technician-registration", description: "Self-registration workflow", roles: ["Public"] },
+      { name: "Payroll Guide", path: "/changelog/payroll", description: "Timesheet and payroll processing", roles: ["Public"] },
+      { name: "Mobile Design Guide", path: "/changelog/mobile-design", description: "Mobile-first design patterns", roles: ["Public"] },
+      { name: "Job Board Guide", path: "/changelog/job-board", description: "Employment marketplace ecosystem", roles: ["Public"] },
+    ]
+  },
+  {
+    category: "Module Landing Pages",
+    icon: Globe,
+    iconColor: "text-action-600 dark:text-action-400",
+    pages: [
+      { name: "Safety Compliance", path: "/modules/safety-compliance", description: "Safety documentation module overview", roles: ["Public"] },
+      { name: "User Access & Auth", path: "/modules/user-access-authentication", description: "Authentication module overview", roles: ["Public"] },
+      { name: "Project Management", path: "/modules/project-management", description: "Project tracking module overview", roles: ["Public"] },
+      { name: "Work Session Tracking", path: "/modules/work-session-time-tracking", description: "Time tracking module overview", roles: ["Public"] },
+      { name: "Company Safety Rating", path: "/modules/company-safety-rating", description: "CSR module overview", roles: ["Public"] },
+      { name: "IRATA Task Logging", path: "/modules/irata-sprat-task-logging", description: "Certification hours logging overview", roles: ["Public"] },
+      { name: "Document Management", path: "/modules/document-management", description: "Document storage module overview", roles: ["Public"] },
+      { name: "Employee Management", path: "/modules/employee-management", description: "Workforce admin module overview", roles: ["Public"] },
+      { name: "Technician Passport", path: "/modules/technician-passport", description: "Technician profile and PLUS tier overview", roles: ["Public"] },
     ]
   },
   {
@@ -428,7 +455,8 @@ const pagesData: PageCategory[] = [
       { name: "My Gear", path: "/technician/gear", description: "Personal equipment assignments", roles: ["Technician"] },
       { name: "My Employers", path: "/technician/employers", description: "Connected companies and PLUS multi-employer management", roles: ["Technician"] },
       { name: "Pending Invitations", path: "/technician/invitations", description: "Team invitations from companies", roles: ["Technician"] },
-      { name: "Technician Registration", path: "/technician-register", description: "4-screen simplified self-registration", roles: ["Public"] },
+      { name: "Personal Safety Docs", path: "/personal-safety-documents", description: "View personal safety documentation", roles: ["Technician"] },
+      { name: "Technician Registration", path: "/technician-login", description: "Technician signup and PLUS upgrade page", roles: ["Public"] },
     ]
   },
   {
@@ -548,8 +576,17 @@ const pagesData: PageCategory[] = [
       { name: "Task Management", path: "/superuser/tasks", description: "Internal project management with comments", roles: ["SuperUser"] },
       { name: "Feature Requests", path: "/superuser/feature-requests", description: "Customer feature requests and messaging", roles: ["SuperUser"] },
       { name: "Global Buildings", path: "/superuser/buildings", description: "Central database of all buildings", roles: ["SuperUser"] },
-      { name: "Founder Resources", path: "/superuser/resources", description: "Private development tools and roadmap", roles: ["SuperUser"] },
+      { name: "Founder Resources", path: "/superuser/founder-resources", description: "Private development tools and roadmap", roles: ["SuperUser"] },
       { name: "View as Company", path: "/superuser/view-as/:id", description: "Impersonation mode for support", roles: ["SuperUser"] },
+      { name: "Future Ideas", path: "/superuser/future-ideas", description: "Backlog of planned features", roles: ["SuperUser"] },
+    ]
+  },
+  {
+    category: "Tools & Utilities",
+    icon: Zap,
+    iconColor: "text-amber-600 dark:text-amber-400",
+    pages: [
+      { name: "ROI Calculator", path: "/roi-calculator", description: "Calculate platform return on investment", roles: ["Public"] },
     ]
   },
 ];
@@ -1003,7 +1040,7 @@ export default function Changelog() {
     <ChangelogGuideLayout 
       title="Platform Changelog"
       version="1.0"
-      lastUpdated="December 10, 2025"
+      lastUpdated="December 16, 2025"
     >
       <div className="space-y-8">
         <div className="text-lg text-muted-foreground">
