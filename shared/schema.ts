@@ -446,6 +446,10 @@ export const workNotices = pgTable("work_notices", {
   noticeDetails: text("notice_details").notNull(), // Full notice text (can include selected template)
   additionalInstructions: text("additional_instructions"), // Extra instructions from user
   
+  // Unit/stall scheduling for in-suite and parkade jobs
+  // Format: [{ date: "2024-12-12", slots: [{ startTime: "09:00", endTime: "12:00", units: ["4509", "3509"] }] }]
+  unitSchedule: jsonb("unit_schedule"),
+  
   // White label branding
   companyLogoUrl: text("company_logo_url"), // Logo URL if white label is enabled
   

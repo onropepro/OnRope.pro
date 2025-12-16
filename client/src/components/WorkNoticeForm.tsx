@@ -33,9 +33,29 @@ const workNoticeFormSchema = z.object({
   noticeDetails: z.string().min(1, "Notice details are required"),
   additionalInstructions: z.string().optional(),
   propertyManagerName: z.string().optional(),
+  unitSchedule: z.array(z.object({
+    date: z.string(),
+    slots: z.array(z.object({
+      startTime: z.string(),
+      endTime: z.string(),
+      units: z.string(), // comma-separated units or stalls
+    })),
+  })).optional(),
 });
 
 type WorkNoticeFormData = z.infer<typeof workNoticeFormSchema>;
+
+// Schedule entry type for in-suite and parkade jobs
+interface ScheduleSlot {
+  startTime: string;
+  endTime: string;
+  units: string;
+}
+
+interface ScheduleDay {
+  date: string;
+  slots: ScheduleSlot[];
+}
 
 const NOTICE_TEMPLATES: Record<string, { title: string; details: string }[]> = {
   window_cleaning: [
@@ -511,6 +531,22 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
   const { t } = useTranslation();
   const { toast } = useToast();
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  
+  // Check if this job type needs unit/stall scheduling
+  const needsUnitSchedule = project.jobType === 'in_suite_dryer_vent_cleaning' || project.jobType === 'parkade_pressure_cleaning';
+  const scheduleLabel = project.jobType === 'parkade_pressure_cleaning' ? 'Stall' : 'Unit';
+  
+  // Schedule state for in-suite and parkade jobs
+  const [schedule, setSchedule] = useState<ScheduleDay[]>(() => {
+    if (existingNotice?.unitSchedule) {
+      try {
+        return existingNotice.unitSchedule as ScheduleDay[];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  });
 
   const jobTypeConfig = getJobTypeConfig(project.jobType);
   const jobTypeName = project.customJobType || jobTypeConfig?.label || project.jobType;
@@ -568,11 +604,47 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
   };
 
   const onSubmit = (data: WorkNoticeFormData) => {
+    // Include schedule data for in-suite and parkade jobs
+    const submitData = needsUnitSchedule ? { ...data, unitSchedule: schedule } : data;
+    
     if (existingNotice) {
-      updateNoticeMutation.mutate(data);
+      updateNoticeMutation.mutate(submitData);
     } else {
-      createNoticeMutation.mutate(data);
+      createNoticeMutation.mutate(submitData);
     }
+  };
+  
+  // Schedule management functions
+  const addScheduleDay = () => {
+    setSchedule([...schedule, { date: '', slots: [{ startTime: '09:00', endTime: '12:00', units: '' }] }]);
+  };
+  
+  const removeScheduleDay = (dayIndex: number) => {
+    setSchedule(schedule.filter((_, i) => i !== dayIndex));
+  };
+  
+  const updateScheduleDay = (dayIndex: number, date: string) => {
+    const newSchedule = [...schedule];
+    newSchedule[dayIndex].date = date;
+    setSchedule(newSchedule);
+  };
+  
+  const addSlot = (dayIndex: number) => {
+    const newSchedule = [...schedule];
+    newSchedule[dayIndex].slots.push({ startTime: '09:00', endTime: '12:00', units: '' });
+    setSchedule(newSchedule);
+  };
+  
+  const removeSlot = (dayIndex: number, slotIndex: number) => {
+    const newSchedule = [...schedule];
+    newSchedule[dayIndex].slots = newSchedule[dayIndex].slots.filter((_, i) => i !== slotIndex);
+    setSchedule(newSchedule);
+  };
+  
+  const updateSlot = (dayIndex: number, slotIndex: number, field: keyof ScheduleSlot, value: string) => {
+    const newSchedule = [...schedule];
+    newSchedule[dayIndex].slots[slotIndex][field] = value;
+    setSchedule(newSchedule);
   };
 
   const isSubmitting = createNoticeMutation.isPending || updateNoticeMutation.isPending;
@@ -725,6 +797,130 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
               </FormItem>
             )}
           />
+
+          {needsUnitSchedule && (
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="material-icons text-primary">schedule</span>
+                    {scheduleLabel} Schedule
+                  </div>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={addScheduleDay}
+                    data-testid="button-add-schedule-day"
+                  >
+                    <span className="material-icons mr-1 text-sm">add</span>
+                    Add Day
+                  </Button>
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Specify which {scheduleLabel.toLowerCase()}s will be serviced on which days and times
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {schedule.length === 0 ? (
+                  <div className="text-center py-6 text-muted-foreground border border-dashed rounded-md">
+                    <span className="material-icons text-3xl mb-2 block">event_note</span>
+                    <p>No schedule entries yet</p>
+                    <p className="text-sm">Click "Add Day" to create a schedule for residents</p>
+                  </div>
+                ) : (
+                  schedule.map((day, dayIndex) => (
+                    <Card key={dayIndex} className="bg-muted/30">
+                      <CardContent className="pt-4 space-y-3">
+                        <div className="flex items-center gap-3">
+                          <div className="flex-1">
+                            <Label className="text-xs text-muted-foreground">Date</Label>
+                            <Input
+                              type="date"
+                              value={day.date}
+                              onChange={(e) => updateScheduleDay(dayIndex, e.target.value)}
+                              className="h-9"
+                              data-testid={`input-schedule-date-${dayIndex}`}
+                            />
+                          </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeScheduleDay(dayIndex)}
+                            className="mt-5"
+                            data-testid={`button-remove-day-${dayIndex}`}
+                          >
+                            <span className="material-icons text-destructive">delete</span>
+                          </Button>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <Label className="text-xs text-muted-foreground">Time Slots</Label>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => addSlot(dayIndex)}
+                              className="h-7 text-xs"
+                              data-testid={`button-add-slot-${dayIndex}`}
+                            >
+                              <span className="material-icons text-sm mr-1">add</span>
+                              Add Time Slot
+                            </Button>
+                          </div>
+                          
+                          {day.slots.map((slot, slotIndex) => (
+                            <div key={slotIndex} className="flex items-center gap-2 bg-background p-2 rounded-md">
+                              <div className="flex items-center gap-1 flex-shrink-0">
+                                <Input
+                                  type="time"
+                                  value={slot.startTime}
+                                  onChange={(e) => updateSlot(dayIndex, slotIndex, 'startTime', e.target.value)}
+                                  className="h-8 w-24"
+                                  data-testid={`input-slot-start-${dayIndex}-${slotIndex}`}
+                                />
+                                <span className="text-muted-foreground">-</span>
+                                <Input
+                                  type="time"
+                                  value={slot.endTime}
+                                  onChange={(e) => updateSlot(dayIndex, slotIndex, 'endTime', e.target.value)}
+                                  className="h-8 w-24"
+                                  data-testid={`input-slot-end-${dayIndex}-${slotIndex}`}
+                                />
+                              </div>
+                              <div className="flex-1">
+                                <Input
+                                  placeholder={`${scheduleLabel}s (e.g., 4509, 3509, 2509)`}
+                                  value={slot.units}
+                                  onChange={(e) => updateSlot(dayIndex, slotIndex, 'units', e.target.value)}
+                                  className="h-8"
+                                  data-testid={`input-slot-units-${dayIndex}-${slotIndex}`}
+                                />
+                              </div>
+                              {day.slots.length > 1 && (
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => removeSlot(dayIndex, slotIndex)}
+                                  className="h-8 w-8"
+                                  data-testid={`button-remove-slot-${dayIndex}-${slotIndex}`}
+                                >
+                                  <span className="material-icons text-sm text-muted-foreground">close</span>
+                                </Button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
+              </CardContent>
+            </Card>
+          )}
 
           <Card className="bg-muted/50 border-dashed">
             <CardContent className="pt-4">
