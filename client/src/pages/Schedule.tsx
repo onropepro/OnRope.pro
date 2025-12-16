@@ -2576,8 +2576,9 @@ function JobDetailDialog({
       await queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
       // Update the job in parent state for immediate UI refresh
       if (job && onJobUpdate) {
-        const scheduleData = queryClient.getQueryData<ScheduledJobWithAssignments[]>(["/api/schedule"]);
-        const updatedJob = scheduleData?.find(j => j.id === job.id);
+        const scheduleData = queryClient.getQueryData(["/api/schedule"]);
+        const jobsArray = Array.isArray(scheduleData) ? scheduleData : [];
+        const updatedJob = jobsArray.find((j: ScheduledJobWithAssignments) => j.id === job.id);
         if (updatedJob) {
           onJobUpdate(updatedJob);
         }
@@ -2641,8 +2642,9 @@ function JobDetailDialog({
       await queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
       // Update the job in parent state for immediate UI refresh
       if (job && onJobUpdate) {
-        const scheduleData = queryClient.getQueryData<ScheduledJobWithAssignments[]>(["/api/schedule"]);
-        const updatedJob = scheduleData?.find(j => j.id === job.id);
+        const scheduleData = queryClient.getQueryData(["/api/schedule"]);
+        const jobsArray = Array.isArray(scheduleData) ? scheduleData : [];
+        const updatedJob = jobsArray.find((j: ScheduledJobWithAssignments) => j.id === job.id);
         if (updatedJob) {
           onJobUpdate(updatedJob);
         }
