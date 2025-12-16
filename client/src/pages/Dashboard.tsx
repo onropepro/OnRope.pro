@@ -4665,6 +4665,47 @@ export default function Dashboard() {
                                     </div>
                                     
                                     <div>
+                                      <label className="text-xs text-muted-foreground">{t('dashboard.projectForm.buildingHeight', 'Building Height')}</label>
+                                      <div className="flex gap-2">
+                                        <Input
+                                          placeholder={t('dashboard.projectForm.buildingHeightPlaceholder', 'e.g., 100m or 300ft')}
+                                          value={building.buildingHeight}
+                                          onChange={(e) => {
+                                            const updated = [...projectBuildings];
+                                            updated[index] = { ...building, buildingHeight: e.target.value };
+                                            setProjectBuildings(updated);
+                                          }}
+                                          className="h-10 flex-1"
+                                          data-testid={`input-building-height-${index}`}
+                                        />
+                                        {building.floorCount && parseInt(building.floorCount) > 0 && (
+                                          <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => {
+                                              const floors = parseInt(building.floorCount);
+                                              const feetPerFloor = 9;
+                                              const totalFeet = floors * feetPerFloor;
+                                              const totalMeters = Math.round(totalFeet * 0.3048);
+                                              const updated = [...projectBuildings];
+                                              updated[index] = { ...building, buildingHeight: `${totalFeet}ft (${totalMeters}m)` };
+                                              setProjectBuildings(updated);
+                                            }}
+                                            className="whitespace-nowrap"
+                                            data-testid={`button-calculate-building-height-${index}`}
+                                          >
+                                            <Calculator className="w-4 h-4 mr-1" />
+                                            {t('dashboard.projectForm.calculateHeight', 'Calculate')}
+                                          </Button>
+                                        )}
+                                      </div>
+                                      <p className="text-xs text-muted-foreground mt-1">
+                                        {t('dashboard.projectForm.buildingHeightImportant', 'Important for technicians:')} {t('dashboard.projectForm.buildingHeightExplain', 'Building height is required for irata logbook entries.')}
+                                      </p>
+                                    </div>
+                                    
+                                    <div>
                                       <label className="text-xs text-muted-foreground">{t('dashboard.projectForm.dailyDropTarget', 'Daily Drop Target')}</label>
                                       <Input
                                         type="number"

@@ -25,7 +25,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Calendar, Plus, Edit2, Trash2, Users, ArrowLeft, UserCheck, UserX, Lock, ChevronLeft, ChevronRight, Briefcase, ChevronDown } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import type { ScheduledJobWithAssignments, User, EmployeeTimeOff } from "@shared/schema";
+import type { ScheduledJobWithAssignments, User, EmployeeTimeOff, ProjectBuilding } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DndContext, DragOverlay, useDraggable, useDroppable, closestCenter, DragEndEvent } from '@dnd-kit/core';
@@ -46,6 +46,7 @@ export default function Schedule() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState<ScheduledJobWithAssignments | null>(null);
+  const [selectedBuilding, setSelectedBuilding] = useState<{ id: string; name: string } | null>(null);
   const [selectedDates, setSelectedDates] = useState<{ start: Date; end: Date } | null>(null);
   const [activeEmployeeId, setActiveEmployeeId] = useState<string | null>(null);
   
@@ -408,52 +409,17 @@ export default function Schedule() {
     return date.toDateString() === today.toDateString();
   };
 
-  // Transform jobs into FullCalendar events
-  // Create separate event blocks for each day in multi-day jobs
-  // Uses timezone-safe date utilities to prevent date shifting
-  const events: EventInput[] = jobs.flatMap((job) => {
-    const color = job.color || defaultJobColor;
-    // Use project dates if job is linked to a project, otherwise use job dates
-    const rawStartDate = job.project?.startDate || job.startDate;
-    const rawEndDate = job.project?.endDate || job.endDate;
-    
-    // Extract date-only strings in local timezone
-    const startDateStr = String(rawStartDate).split('T')[0];
-    const endDateStr = String(rawEndDate).split('T')[0];
-    
-    // If same day, return single event
-    if (startDateStr === endDateStr) {
-      // For single-day jobs, filter employees by their assignment date range
-      const employeesForThisDay = job.employeeAssignments?.filter((assignment: any) => {
-        if (!assignment.startDate && !assignment.endDate) return true;
-        const empStart = String(assignment.startDate || startDateStr).split('T')[0];
-        const empEnd = String(assignment.endDate || endDateStr).split('T')[0];
-        return startDateStr >= empStart && startDateStr <= empEnd;
-      }) || [];
-      
-      let displayTitle = job.project?.buildingName || job.title;
-      if (employeesForThisDay.length > 0) {
-        const employeeNames = employeesForThisDay.map((a: any) => `${a.employee.name} (${a.employee.role?.replace(/_/g, ' ') || 'Staff'})`).join(", ");
-        displayTitle = `${job.project?.buildingName || job.title}\n${employeeNames}`;
-      }
-      
-      return [{
-        id: job.id,
-        title: displayTitle,
-        start: startDateStr,
-        end: nextDateOnly(startDateStr),
-        allDay: true,
-        backgroundColor: color,
-        borderColor: color,
-        extendedProps: {
-          job,
-          employeesForThisDay,
-        },
-      }];
-    }
-    
-    // Multi-day: create separate all-day events for each day
-    const dayEvents = [];
+  // Helper function to create day events for a date range
+  const createDayEvents = (
+    job: ScheduledJobWithAssignments,
+    startDateStr: string,
+    endDateStr: string,
+    color: string,
+    titlePrefix: string,
+    idSuffix: string = "",
+    buildingData?: { id: string; name: string }
+  ) => {
+    const dayEvents: EventInput[] = [];
     let currentDateStr = startDateStr;
     
     while (currentDateStr <= endDateStr) {
@@ -465,14 +431,14 @@ export default function Schedule() {
         return currentDateStr >= empStart && currentDateStr <= empEnd;
       }) || [];
       
-      let displayTitle = job.project?.buildingName || job.title;
+      let displayTitle = titlePrefix;
       if (employeesForThisDay.length > 0) {
         const employeeNames = employeesForThisDay.map((a: any) => `${a.employee.name} (${a.employee.role?.replace(/_/g, ' ') || 'Staff'})`).join(", ");
-        displayTitle = `${job.project?.buildingName || job.title}\n${employeeNames}`;
+        displayTitle = `${titlePrefix}\n${employeeNames}`;
       }
       
       dayEvents.push({
-        id: `${job.id}-${currentDateStr}`,
+        id: `${job.id}${idSuffix}-${currentDateStr}`,
         title: displayTitle,
         start: currentDateStr,
         end: nextDateOnly(currentDateStr),
@@ -482,12 +448,58 @@ export default function Schedule() {
         extendedProps: {
           job,
           employeesForThisDay,
+          building: buildingData,
         },
       });
       currentDateStr = addDaysToDateString(currentDateStr, 1);
     }
     
     return dayEvents;
+  };
+  
+  // Transform jobs into FullCalendar events
+  // Create separate event blocks for each day in multi-day jobs
+  // For multi-building projects, create separate events for each building with their own dates
+  // Uses timezone-safe date utilities to prevent date shifting
+  const events: EventInput[] = jobs.flatMap((job) => {
+    const color = job.color || defaultJobColor;
+    
+    // Check if this is a multi-building project with buildings that have their own dates
+    const buildings = job.projectBuildings;
+    if (buildings && buildings.length > 1) {
+      // Multi-building project: create separate events for each building
+      return buildings.flatMap((building: ProjectBuilding) => {
+        // Use building-specific dates if available, otherwise fall back to project/job dates
+        const buildingStartDate = building.startDate || job.project?.startDate || job.startDate;
+        const buildingEndDate = building.endDate || job.project?.endDate || job.endDate;
+        
+        const startDateStr = String(buildingStartDate).split('T')[0];
+        const endDateStr = String(buildingEndDate).split('T')[0];
+        
+        // Skip buildings without valid dates
+        if (!startDateStr || startDateStr === 'null' || startDateStr === 'undefined') {
+          return [];
+        }
+        
+        // Use building name as title prefix
+        const titlePrefix = `${job.project?.buildingName || job.title} - ${building.name}`;
+        const buildingData = { id: building.id, name: building.name };
+        
+        return createDayEvents(job, startDateStr, endDateStr, color, titlePrefix, `-building-${building.id}`, buildingData);
+      });
+    }
+    
+    // Single building or no buildings: use project/job dates
+    const rawStartDate = job.project?.startDate || job.startDate;
+    const rawEndDate = job.project?.endDate || job.endDate;
+    
+    // Extract date-only strings in local timezone
+    const startDateStr = String(rawStartDate).split('T')[0];
+    const endDateStr = String(rawEndDate).split('T')[0];
+    
+    const titlePrefix = job.project?.buildingName || job.title;
+    
+    return createDayEvents(job, startDateStr, endDateStr, color, titlePrefix);
   });
 
   // Add time-off events to the calendar
@@ -545,6 +557,7 @@ export default function Schedule() {
     }
 
     const job = clickInfo.event.extendedProps.job as ScheduledJobWithAssignments;
+    const building = clickInfo.event.extendedProps.building as { id: string; name: string } | undefined;
     
     // If dragging an employee, assign/unassign them
     if (activeEmployeeId) {
@@ -564,8 +577,9 @@ export default function Schedule() {
       return;
     }
     
-    // Otherwise, show job details
+    // Otherwise, show job details (including building info for multi-building projects)
     setSelectedJob(job);
+    setSelectedBuilding(building || null);
     setDetailDialogOpen(true);
   };
 
@@ -1068,15 +1082,29 @@ export default function Schedule() {
         )}
 
         {/* Job Detail Dialog - Read Only */}
-        <Dialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen}>
+        <Dialog open={detailDialogOpen} onOpenChange={(open) => {
+          setDetailDialogOpen(open);
+          if (!open) setSelectedBuilding(null);
+        }}>
           <DialogContent className="max-w-lg">
             <DialogHeader>
-              <DialogTitle>{selectedJob?.project?.buildingName || selectedJob?.title}</DialogTitle>
+              <DialogTitle>
+                {selectedBuilding 
+                  ? `${selectedJob?.project?.buildingName || selectedJob?.title} - ${selectedBuilding.name}`
+                  : (selectedJob?.project?.buildingName || selectedJob?.title)
+                }
+              </DialogTitle>
               <DialogDescription>
                 {selectedJob?.project?.buildingAddress}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
+              {selectedBuilding && (
+                <div>
+                  <Label className="text-muted-foreground">{t('schedule.tower', 'Tower/Building')}</Label>
+                  <p className="font-medium">{selectedBuilding.name}</p>
+                </div>
+              )}
               <div>
                 <Label className="text-muted-foreground">{t('schedule.dates', 'Dates')}</Label>
                 <p className="font-medium">
@@ -1970,9 +1998,13 @@ export default function Schedule() {
       {/* Job Detail Dialog */}
       <JobDetailDialog
         open={detailDialogOpen}
-        onOpenChange={setDetailDialogOpen}
+        onOpenChange={(open) => {
+          setDetailDialogOpen(open);
+          if (!open) setSelectedBuilding(null);
+        }}
         job={selectedJob}
         employees={employees}
+        selectedBuilding={selectedBuilding}
         onEdit={() => {
           setDetailDialogOpen(false);
           setSelectedJob(selectedJob);
@@ -2584,6 +2616,7 @@ function JobDetailDialog({
   onEdit,
   employees,
   onJobUpdate,
+  selectedBuilding,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -2591,6 +2624,7 @@ function JobDetailDialog({
   onEdit: () => void;
   employees: User[];
   onJobUpdate?: (updatedJob: ScheduledJobWithAssignments) => void;
+  selectedBuilding?: { id: string; name: string } | null;
 }) {
   const { t } = useTranslation();
   const { toast } = useToast();
@@ -2798,7 +2832,12 @@ function JobDetailDialog({
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <div className="flex items-center justify-between">
-            <DialogTitle>{job.title}</DialogTitle>
+            <DialogTitle>
+              {selectedBuilding 
+                ? `${job.title} - ${selectedBuilding.name}`
+                : job.title
+              }
+            </DialogTitle>
             <Badge className={statusColors[job.status]} variant="outline">
               {job.status.replace("_", " ").toUpperCase()}
             </Badge>
@@ -2806,6 +2845,13 @@ function JobDetailDialog({
         </DialogHeader>
         
         <div className="space-y-4">
+          {selectedBuilding && (
+            <div className="bg-muted/50 rounded-md p-3 border">
+              <h3 className="font-medium text-sm mb-1">{t('schedule.tower', 'Tower/Building')}</h3>
+              <p className="text-sm">{selectedBuilding.name}</p>
+            </div>
+          )}
+          
           {job.description && (
             <div>
               <h3 className="font-medium text-sm mb-1">{t('common.description', 'Description')}</h3>

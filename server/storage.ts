@@ -2652,11 +2652,17 @@ export class Storage {
           ? await this.getProjectById(job.projectId)
           : null;
         
+        // Fetch project buildings if this is a multi-building project
+        const buildings = job.projectId
+          ? await this.getProjectBuildings(job.projectId)
+          : [];
+        
         return {
           ...job,
           assignedEmployees,
           employeeAssignments: employeeAssignments as any,
           project,
+          projectBuildings: buildings.length > 0 ? buildings : undefined,
         };
       })
     );
@@ -2751,11 +2757,17 @@ export class Storage {
       ? await this.getProjectById(job.projectId)
       : null;
     
+    // Fetch project buildings if this is a multi-building project
+    const buildings = job.projectId
+      ? await this.getProjectBuildings(job.projectId)
+      : [];
+    
     return {
       ...job,
       assignedEmployees, // Keep for backward compatibility
       employeeAssignments: employeeAssignments as any,
       project,
+      projectBuildings: buildings.length > 0 ? buildings : undefined,
     };
   }
 

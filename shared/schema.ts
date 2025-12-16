@@ -2677,6 +2677,7 @@ export type ScheduledJobWithAssignments = ScheduledJob & {
   assignedEmployees: User[]; // Kept for backward compatibility
   employeeAssignments?: EmployeeAssignment[]; // New: includes date ranges
   project?: Project | null;
+  projectBuildings?: ProjectBuilding[]; // Buildings for multi-building complex projects
 };
 
 // Team Invitations - Pending invitations for technicians to join companies
