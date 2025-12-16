@@ -9705,6 +9705,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Assign employees to the job if any were selected
         if (project.assignedEmployees && project.assignedEmployees.length > 0) {
+          // Check for double-booking conflicts (unless forceAssignment is true)
+          if (!req.body.forceAssignment) {
+            const conflicts = await storage.checkEmployeeConflicts(project.assignedEmployees, startDate, endDate, job.id);
+            
+            if (conflicts.length > 0) {
+              // Delete the job and project we just created
+              await storage.deleteScheduledJob(job.id);
+              await storage.deleteProject(project.id);
+              return res.status(409).json({
+                message: "Schedule conflict detected",
+                conflicts,
+              });
+            }
+          }
+          
           await storage.replaceJobAssignments(job.id, project.assignedEmployees, currentUser.id);
         }
       }

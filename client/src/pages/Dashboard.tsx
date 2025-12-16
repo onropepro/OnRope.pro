@@ -66,6 +66,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { ProgressPromptDialog } from "@/components/ProgressPromptDialog";
 import { BusinessCardScanner } from "@/components/BusinessCardScanner";
+import { DoubleBookingWarningDialog } from "@/components/DoubleBookingWarningDialog";
 
 import { JOB_CATEGORIES, JOB_TYPES, getJobTypesByCategory, getJobTypeConfig, getDefaultElevation, isElevationConfigurable, isDropBasedJobType, getAllJobTypeValues, getProgressType, getCategoryForJobType, type JobCategory } from "@shared/jobTypes";
 
@@ -974,6 +975,11 @@ export default function Dashboard() {
   const [isUploadingPlan, setIsUploadingPlan] = useState(false);
   const [uploadedAnchorCertFile, setUploadedAnchorCertFile] = useState<File | null>(null);
   const [isUploadingAnchorCert, setIsUploadingAnchorCert] = useState(false);
+  
+  // Project conflict detection state
+  const [projectConflictDialogOpen, setProjectConflictDialogOpen] = useState(false);
+  const [projectPendingConflicts, setProjectPendingConflicts] = useState<Array<{ employeeId: string; employeeName: string; conflictingJob: string }>>([]);
+  const [pendingProjectData, setPendingProjectData] = useState<any>(null);
   const [selectedInspection, setSelectedInspection] = useState<any>(null);
   const [selectedMeeting, setSelectedMeeting] = useState<any>(null);
   const [employeeFormStep, setEmployeeFormStep] = useState<0 | 1 | 2>(0); // Track form step (0 = choose mode, 1 = info, 2 = permissions)
@@ -1866,7 +1872,7 @@ export default function Dashboard() {
   }, [projectForm, defaultCalendarColor, toast, t, clientsData]);
 
   const createProjectMutation = useMutation({
-    mutationFn: async (data: ProjectFormData & { ropeAccessPlanUrl?: string | null; anchorInspectionCertificateUrl?: string | null }) => {
+    mutationFn: async (data: ProjectFormData & { ropeAccessPlanUrl?: string | null; anchorInspectionCertificateUrl?: string | null; forceAssignment?: boolean }) => {
       const response = await fetch("/api/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1900,13 +1906,26 @@ export default function Dashboard() {
           assignedEmployees: data.assignedEmployees || [],
           peaceWork: data.peaceWork || false,
           pricePerDrop: data.pricePerDrop ? parseInt(data.pricePerDrop) : undefined,
+          forceAssignment: data.forceAssignment || false,
         }),
         credentials: "include",
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to create project");
+        const errorData = await response.json();
+        // Check for conflict error (409)
+        if (response.status === 409 && errorData.conflicts) {
+          // Store data for potential force submit and show dialog
+          setPendingProjectData(data);
+          setProjectPendingConflicts(errorData.conflicts.map((c: any) => ({
+            employeeId: c.employeeId,
+            employeeName: c.employeeName,
+            conflictingJob: c.conflictingJobTitle,
+          })));
+          setProjectConflictDialogOpen(true);
+          throw new Error("CONFLICT_DETECTED");
+        }
+        throw new Error(errorData.message || "Failed to create project");
       }
 
       return response.json();
@@ -1948,9 +1967,21 @@ export default function Dashboard() {
       }
     },
     onError: (error: Error) => {
+      // Don't show toast for conflict detection - dialog handles it
+      if (error.message === "CONFLICT_DETECTED") return;
       toast({ title: t('dashboard.toast.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
+  
+  // Force create project (bypasses conflict check)
+  const handleForceCreateProject = () => {
+    if (pendingProjectData) {
+      createProjectMutation.mutate({ ...pendingProjectData, forceAssignment: true });
+      setProjectConflictDialogOpen(false);
+      setProjectPendingConflicts([]);
+      setPendingProjectData(null);
+    }
+  };
 
   const createEmployeeMutation = useMutation({
     mutationFn: async (data: EmployeeFormData) => {
@@ -10667,6 +10698,19 @@ export default function Dashboard() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Project Double Booking Warning Dialog */}
+      <DoubleBookingWarningDialog
+        open={projectConflictDialogOpen}
+        onClose={() => {
+          setProjectConflictDialogOpen(false);
+          setProjectPendingConflicts([]);
+          setPendingProjectData(null);
+        }}
+        onProceed={handleForceCreateProject}
+        conflicts={projectPendingConflicts}
+        isPending={createProjectMutation.isPending}
+      />
 
       {/* Accepted Team Invitation Notification Dialog */}
       <Dialog open={acceptedInvitations.length > 0 && !showInvitationEmployeeForm}>
