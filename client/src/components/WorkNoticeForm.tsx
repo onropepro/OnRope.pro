@@ -308,8 +308,6 @@ The parking garage will be pressure washed during the scheduled dates.
 VEHICLE REMOVAL REQUIRED:
 Please move your vehicle from the parkade during the cleaning period. Failure to move your vehicle may result in it being wet or splashed with cleaning solution.
 
-Designated parking areas will be available during the cleaning.
-
 Thank you for your cooperation.`,
     },
   ],
