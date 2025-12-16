@@ -40,88 +40,274 @@ type WorkNoticeFormData = z.infer<typeof workNoticeFormSchema>;
 const NOTICE_TEMPLATES: Record<string, { title: string; details: string }[]> = {
   window_cleaning: [
     {
-      title: "Window Cleaning Notice",
-      details: "Our professional window cleaning team will be on site to clean the exterior windows of your building. For your privacy, please close your blinds or curtains during work hours. We apologize for any inconvenience and appreciate your cooperation.",
+      title: "Window Cleaning Notice - Privacy Advisory",
+      details: `Dear Residents,
+
+Professional window cleaning services are scheduled for your building. Our certified rope access technicians will be working on suspended ropes cleaning the exterior glass surfaces of all windows.
+
+PRIVACY NOTICE:
+For your privacy and comfort, we strongly recommend closing your blinds, curtains, or window coverings during the scheduled work hours. Our technicians are trained professionals focused on their work, but you may prefer additional privacy.
+
+SAFETY REQUIREMENTS:
+- Please keep all windows closed and locked during work hours
+- Do not attempt to open windows or communicate with technicians
+- Keep balcony doors closed to prevent water or cleaning solution entry
+- Secure any loose items on balconies
+
+We appreciate your cooperation and understanding. If you have any concerns, please contact your property manager.`,
     },
     {
-      title: "Scheduled Window Maintenance",
-      details: "We will be performing scheduled window cleaning services. Technicians will be working on ropes outside your windows. Please keep blinds closed and avoid opening windows during this time. Thank you for your understanding.",
+      title: "Exterior Window Maintenance",
+      details: `Dear Residents,
+
+Scheduled exterior window cleaning will be performed by our professional rope access team. Technicians secured by safety ropes will be working outside your windows.
+
+RESIDENT PRIVACY:
+We understand your privacy is important. Please close your blinds or curtains during work hours if you prefer not to be visible from outside. Our team will move efficiently to minimize time spent at each window.
+
+IMPORTANT REMINDERS:
+- All windows must remain closed during the work period
+- Do not open balcony doors or attempt to speak with workers
+- Remove or secure items from window sills and balconies
+- Some water spotting on windows is normal immediately after cleaning
+
+Thank you for your patience and cooperation.`,
+    },
+    {
+      title: "High-Rise Window Cleaning - Rope Access Work",
+      details: `Dear Residents,
+
+Our building maintenance program includes professional exterior window cleaning using rope access methods. Trained technicians will descend the building facade on safety ropes to clean all exterior glass.
+
+PRIVACY CONSIDERATIONS:
+Technicians will be positioned outside your windows during cleaning. For your comfort, please consider closing window coverings during work hours. Workers are focused on their safety and cleaning tasks.
+
+WHAT TO EXPECT:
+- Technicians visible outside windows at various times
+- Sound of equipment and water on glass
+- Brief presence at each window (typically 2-5 minutes)
+- Possible minor water spots that will clear
+
+Please keep windows closed throughout the cleaning period. Contact the property manager with any questions.`,
     },
   ],
   dryer_vent_cleaning: [
     {
       title: "Exterior Dryer Vent Cleaning Notice",
-      details: "Our team will be cleaning the exterior dryer vents on your building. This is important maintenance that helps prevent fire hazards and improves dryer efficiency. No action is required from residents, but please be aware of workers on ropes near your unit.",
+      details: `Dear Residents,
+
+Our team will be cleaning the exterior dryer vents on your building. This is important maintenance that helps prevent fire hazards and improves dryer efficiency.
+
+WHAT TO EXPECT:
+- Technicians working on ropes near dryer vent locations
+- Brief noise from cleaning equipment
+- No action required from residents
+
+This maintenance is for your safety. Please be aware of workers near your unit during the scheduled dates.
+
+Thank you for your understanding.`,
     },
   ],
   building_wash: [
     {
-      title: "Building Wash Notice",
-      details: "We will be pressure washing the exterior of your building. Please ensure all windows are closed and any outdoor items on balconies are secured or brought inside. There may be some noise during the work, and we appreciate your patience.",
+      title: "Building Pressure Washing - Privacy & Safety Notice",
+      details: `Dear Residents,
+
+Professional pressure washing services are scheduled to clean your building's exterior facade. Our rope access technicians will be working on suspended ropes with high-pressure cleaning equipment.
+
+PRIVACY ADVISORY:
+Technicians will be positioned outside windows and balconies during this work. For your privacy, we recommend closing blinds and curtains during the scheduled hours. Workers are professionals focused on their cleaning tasks.
+
+MANDATORY REQUIREMENTS:
+- Close and lock ALL windows tightly
+- Close all balcony and patio doors completely
+- Bring in or secure all balcony furniture, plants, and decorations
+- Remove items from window sills
+- Do not attempt to open doors or windows during work
+
+WHAT TO EXPECT:
+- High-pressure water noise
+- Technicians visible outside your unit
+- Possible overspray - keep windows sealed
+- Some areas may be temporarily restricted
+
+Failure to close windows may result in water damage to your unit.
+
+We appreciate your full cooperation for this important building maintenance.`,
     },
     {
       title: "Facade Cleaning Notice",
-      details: "Professional building washing services are scheduled. Workers will be on ropes cleaning the building exterior. Please close all windows and keep balcony doors shut during work hours. Thank you for your cooperation.",
+      details: `Dear Residents,
+
+Professional building washing services are scheduled. Workers will be on ropes cleaning the building exterior with pressure washing equipment.
+
+IMPORTANT - PLEASE READ:
+- Close ALL windows and balcony doors - water will spray near your unit
+- Secure or remove all balcony items
+- Close blinds for privacy as workers will be outside windows
+- Do not open windows or doors during work hours
+
+This cleaning maintains your building's appearance and prevents long-term damage. Thank you for your cooperation.`,
+    },
+    {
+      title: "Exterior Building Wash - Rope Access Work",
+      details: `Dear Residents,
+
+Your building is scheduled for exterior cleaning. Our certified rope access team will pressure wash the facade, balconies, and common areas.
+
+RESIDENT REQUIREMENTS:
+1. Windows: Close and lock all windows before the start date
+2. Balconies: Remove all personal items, furniture, and plants
+3. Privacy: Close blinds/curtains as technicians work outside units
+4. Doors: Keep all balcony doors closed and locked
+
+HIGH-PRESSURE WATER WARNING:
+Any open windows or doors will result in water entering your unit. Please verify all openings are sealed.
+
+Contact property management if you need assistance securing your balcony items.
+
+Thank you for helping maintain our building.`,
     },
   ],
   gutter_cleaning: [
     {
       title: "Gutter Cleaning Notice",
-      details: "Our team will be on site to clean and inspect the building gutters. This helps prevent water damage and maintains proper drainage. Workers may be visible from upper floor windows. Thank you for your understanding.",
+      details: `Dear Residents,
+
+Our team will be on site to clean and inspect the building gutters. This helps prevent water damage and maintains proper drainage.
+
+Workers may be visible from upper floor windows during this maintenance. No action is required from residents, but please be aware of activity near the roofline.
+
+Thank you for your understanding.`,
     },
   ],
   in_suite_dryer_vent_cleaning: [
     {
       title: "In-Suite Dryer Vent Cleaning Notice",
-      details: "We will be cleaning dryer vents inside individual units. Our technicians will need access to your suite. Please ensure your dryer is accessible and the area around it is clear. You will receive a separate notice with your scheduled time slot.",
+      details: `Dear Residents,
+
+We will be cleaning dryer vents inside individual units. Our technicians will need access to your suite.
+
+PREPARATION REQUIRED:
+- Ensure your dryer is accessible
+- Clear the area around your dryer
+- Be present during your scheduled time slot
+
+You will receive a separate notice with your scheduled appointment time.
+
+This maintenance helps prevent fire hazards and improves dryer efficiency.`,
     },
   ],
   parkade_pressure_cleaning: [
     {
       title: "Parkade Cleaning Notice",
-      details: "The parking garage will be pressure washed. Please move your vehicle from the parkade during the scheduled cleaning time. Failure to move your vehicle may result in it being wet or splashed with cleaning solution.",
+      details: `Dear Residents,
+
+The parking garage will be pressure washed during the scheduled dates.
+
+VEHICLE REMOVAL REQUIRED:
+Please move your vehicle from the parkade during the cleaning period. Failure to move your vehicle may result in it being wet or splashed with cleaning solution.
+
+Designated parking areas will be available during the cleaning.
+
+Thank you for your cooperation.`,
     },
   ],
   painting: [
     {
-      title: "Exterior Painting Notice",
-      details: "Professional painters will be working on the exterior of your building. Please keep windows closed and avoid touching freshly painted surfaces. There may be paint odors during and after work hours. Thank you for your patience.",
+      title: "Exterior Painting Notice - Rope Access Work",
+      details: `Dear Residents,
+
+Professional painters will be working on the exterior of your building using rope access methods.
+
+PRIVACY NOTICE:
+Painters will be positioned outside your windows while working. Close blinds or curtains for privacy if preferred.
+
+IMPORTANT REQUIREMENTS:
+- Keep all windows closed - paint fumes and overspray possible
+- Do not touch or lean against freshly painted surfaces
+- Keep balcony doors closed during work hours
+
+There may be paint odors during and after work hours. Please ensure good ventilation inside your unit.
+
+Thank you for your patience.`,
     },
   ],
   caulking: [
     {
       title: "Caulking and Sealing Notice",
-      details: "Our team will be performing caulking and sealing work on the building exterior. This helps prevent water infiltration and improves energy efficiency. Workers will be on ropes near windows and balconies.",
+      details: `Dear Residents,
+
+Our team will be performing caulking and sealing work on the building exterior. This helps prevent water infiltration and improves energy efficiency.
+
+Workers will be on ropes near windows and balconies. For your privacy, please close blinds or curtains during work hours.
+
+Keep windows closed as workers may be applying sealants near openings.
+
+Thank you for your cooperation.`,
     },
   ],
   inspection: [
     {
       title: "Building Inspection Notice",
-      details: "A scheduled building inspection will take place. Our inspectors will be examining the building exterior and may be visible from your windows. No action is required from residents.",
+      details: `Dear Residents,
+
+A scheduled building inspection will take place. Our inspectors will be examining the building exterior and may be visible from your windows.
+
+This is routine maintenance inspection. No action is required from residents.
+
+Please close blinds if you prefer privacy during the inspection period.`,
     },
   ],
   general_pressure_washing: [
     {
-      title: "Pressure Washing Notice",
-      details: "General pressure washing services are scheduled. Please close all windows and secure any outdoor items. There may be water spray and noise during the work. Thank you for your cooperation.",
+      title: "Pressure Washing Notice - Privacy Advisory",
+      details: `Dear Residents,
+
+General pressure washing services are scheduled. Our rope access team will be cleaning exterior surfaces.
+
+REQUIREMENTS:
+- Close all windows and balcony doors
+- Secure or remove outdoor items
+- Close blinds for privacy as workers will be near windows
+
+There may be water spray and noise during the work.
+
+Thank you for your cooperation.`,
     },
   ],
   ground_window_cleaning: [
     {
       title: "Ground Level Window Cleaning",
-      details: "Our team will be cleaning ground floor and accessible windows. Please be aware of workers and cleaning equipment near entrances and ground-level units. We appreciate your patience.",
+      details: `Dear Residents,
+
+Our team will be cleaning ground floor and accessible windows.
+
+Please be aware of workers and cleaning equipment near entrances and ground-level units. Close blinds if you prefer privacy.
+
+We appreciate your patience.`,
     },
   ],
   anchor_inspection: [
     {
       title: "Rope Access Anchor Inspection",
-      details: "A scheduled inspection of the building's rope access anchor points will take place. Inspectors may be visible on the roof and exterior. This is important safety maintenance. No action is required from residents.",
+      details: `Dear Residents,
+
+A scheduled inspection of the building's rope access anchor points will take place. Inspectors may be visible on the roof and exterior.
+
+This is important safety maintenance ensuring our building meets all safety requirements. No action is required from residents.`,
     },
   ],
   other: [
     {
       title: "Scheduled Maintenance Notice",
-      details: "Scheduled building maintenance work will be performed. Our professional team will be on site. We appreciate your patience and cooperation during this time.",
+      details: `Dear Residents,
+
+Scheduled building maintenance work will be performed by our professional team.
+
+Workers may be visible from your windows. Close blinds if you prefer privacy. Please keep windows closed during work hours.
+
+We appreciate your patience and cooperation during this time.`,
     },
   ],
 };

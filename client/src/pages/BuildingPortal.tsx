@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import { jsPDF } from "jspdf";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,8 +14,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate, formatLocalDateLong } from "@/lib/dateUtils";
-import { Loader2, Building2, History, CheckCircle, Clock, AlertCircle, LogOut, Lock, Hash, ArrowLeft, KeyRound, DoorOpen, Phone, User, Wrench, FileText, Pencil, Save, Copy, Users } from "lucide-react";
+import { Loader2, Building2, History, CheckCircle, Clock, AlertCircle, LogOut, Lock, Hash, ArrowLeft, KeyRound, DoorOpen, Phone, User, Wrench, FileText, Pencil, Save, Copy, Users, Download, Megaphone } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { loadLogoAsBase64 } from "@/lib/pdfBranding";
 import type { BuildingInstructions } from "@shared/schema";
 
 interface BuildingData {
@@ -68,9 +70,27 @@ interface ProjectHistoryItem {
   loggedHours?: number;
 }
 
+interface WorkNoticeItem {
+  id: string;
+  title: string;
+  content: string;
+  additionalInstructions?: string | null;
+  workStartDate: string | null;
+  workEndDate: string | null;
+  projectId: string;
+  buildingName: string;
+  jobType: string;
+  companyName: string;
+  companyPhone?: string | null;
+  logoUrl?: string | null;
+  propertyManagerName?: string | null;
+  createdAt: string;
+}
+
 interface PortalData {
   building: BuildingData;
   projectHistory: ProjectHistoryItem[];
+  workNotices?: WorkNoticeItem[];
   stats: {
     totalProjects: number;
     completedProjects: number;
@@ -476,7 +496,145 @@ export default function BuildingPortal() {
 
   const building = portalData?.building;
   const projectHistory = portalData?.projectHistory || [];
+  const workNotices = portalData?.workNotices || [];
   const stats = portalData?.stats;
+
+  // PDF Download function for work notices
+  const downloadNoticePdf = async (notice: WorkNoticeItem) => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 20;
+    const contentWidth = pageWidth - margin * 2;
+    let yPos = 25;
+
+    // Header with logo if available
+    if (notice.logoUrl) {
+      try {
+        const logoData = await loadLogoAsBase64(notice.logoUrl);
+        if (logoData) {
+          const logoHeight = 15;
+          const logoWidth = logoHeight * logoData.aspectRatio;
+          doc.addImage(logoData.base64, 'PNG', margin, yPos, logoWidth, logoHeight);
+          yPos += logoHeight + 10;
+        }
+      } catch (e) {
+        console.error('Failed to load logo for PDF:', e);
+      }
+    }
+
+    // Title banner
+    doc.setFillColor(51, 65, 85); // Slate-700
+    doc.rect(margin, yPos, contentWidth, 16, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('OFFICIAL NOTICE', margin + 5, yPos + 11);
+    yPos += 22;
+
+    // Notice title
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    const titleLines = doc.splitTextToSize(notice.title, contentWidth);
+    doc.text(titleLines, margin, yPos);
+    yPos += titleLines.length * 8 + 5;
+
+    // Building name
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(100, 100, 100);
+    doc.text(notice.buildingName, margin, yPos);
+    yPos += 10;
+
+    // Dates banner
+    doc.setFillColor(254, 243, 199); // Amber-100
+    doc.rect(margin, yPos, contentWidth, 20, 'F');
+    doc.setDrawColor(217, 119, 6); // Amber-600
+    doc.rect(margin, yPos, contentWidth, 20, 'S');
+    
+    doc.setTextColor(146, 64, 14); // Amber-800
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.text('WORK PERIOD:', margin + 5, yPos + 8);
+    doc.setFont('helvetica', 'normal');
+    
+    const startDate = notice.workStartDate ? new Date(notice.workStartDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD';
+    const endDate = notice.workEndDate ? new Date(notice.workEndDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD';
+    doc.text(`${startDate} - ${endDate}`, margin + 35, yPos + 8);
+    
+    // Job type
+    doc.setFont('helvetica', 'bold');
+    doc.text('SERVICE TYPE:', margin + 5, yPos + 16);
+    doc.setFont('helvetica', 'normal');
+    doc.text(notice.jobType.replace(/_/g, ' ').toUpperCase(), margin + 35, yPos + 16);
+    yPos += 28;
+
+    // Notice content
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    const contentLines = doc.splitTextToSize(notice.content, contentWidth);
+    
+    // Check if we need a new page
+    const lineHeight = 5;
+    const remainingHeight = doc.internal.pageSize.getHeight() - yPos - 30;
+    const contentHeight = contentLines.length * lineHeight;
+    
+    if (contentHeight > remainingHeight) {
+      // Split content across pages
+      let currentLine = 0;
+      while (currentLine < contentLines.length) {
+        const linesPerPage = Math.floor((doc.internal.pageSize.getHeight() - yPos - 30) / lineHeight);
+        const pageLines = contentLines.slice(currentLine, currentLine + linesPerPage);
+        doc.text(pageLines, margin, yPos);
+        currentLine += linesPerPage;
+        
+        if (currentLine < contentLines.length) {
+          doc.addPage();
+          yPos = 25;
+        } else {
+          yPos += pageLines.length * lineHeight + 10;
+        }
+      }
+    } else {
+      doc.text(contentLines, margin, yPos);
+      yPos += contentLines.length * lineHeight + 10;
+    }
+
+    // Additional instructions if present
+    if (notice.additionalInstructions) {
+      yPos += 5;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.text('ADDITIONAL INSTRUCTIONS:', margin, yPos);
+      yPos += 6;
+      doc.setFont('helvetica', 'normal');
+      const instructionLines = doc.splitTextToSize(notice.additionalInstructions, contentWidth);
+      doc.text(instructionLines, margin, yPos);
+      yPos += instructionLines.length * 5 + 10;
+    }
+
+    // Footer
+    doc.setDrawColor(200, 200, 200);
+    doc.line(margin, doc.internal.pageSize.getHeight() - 25, pageWidth - margin, doc.internal.pageSize.getHeight() - 25);
+    
+    doc.setFontSize(9);
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Posted by: ${notice.companyName}`, margin, doc.internal.pageSize.getHeight() - 18);
+    if (notice.companyPhone) {
+      doc.text(`Contact: ${notice.companyPhone}`, margin, doc.internal.pageSize.getHeight() - 12);
+    }
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, pageWidth - margin - 40, doc.internal.pageSize.getHeight() - 18);
+
+    // Download
+    const filename = `Notice-${notice.title.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 30)}.pdf`;
+    doc.save(filename);
+    
+    toast({
+      title: "PDF Downloaded",
+      description: "Notice has been downloaded. You can print it for elevator posting.",
+    });
+  };
 
   return (
     <div className="min-h-screen page-gradient p-4 md:p-6">
@@ -775,6 +933,113 @@ export default function BuildingPortal() {
                   <Pencil className="h-4 w-4 mr-2" />
                   Add Instructions
                 </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Work Notices Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Megaphone className="h-5 w-5 text-purple-600" />
+              Work Notices
+              {workNotices.length > 0 && (
+                <Badge variant="secondary" className="ml-2">{workNotices.length}</Badge>
+              )}
+            </CardTitle>
+            <CardDescription>
+              Active notices for upcoming or ongoing maintenance work - download and post in elevators
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {workNotices.length === 0 ? (
+              <div className="text-center py-8">
+                <div className="mx-auto h-12 w-12 rounded-full bg-muted flex items-center justify-center mb-3">
+                  <Megaphone className="h-6 w-6 text-muted-foreground" />
+                </div>
+                <p className="text-muted-foreground">No active work notices at this time</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {workNotices.map((notice) => (
+                  <div 
+                    key={notice.id}
+                    className="border rounded-lg overflow-hidden"
+                    data-testid={`work-notice-${notice.id}`}
+                  >
+                    {/* Professional Header */}
+                    <div className="bg-gradient-to-r from-slate-800 to-slate-700 dark:from-slate-900 dark:to-slate-800 px-4 py-3 text-white">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          {notice.logoUrl ? (
+                            <div className="flex-shrink-0 bg-white rounded p-1.5">
+                              <img 
+                                src={notice.logoUrl} 
+                                alt="Company logo" 
+                                className="h-8 w-auto object-contain"
+                              />
+                            </div>
+                          ) : (
+                            <div className="flex-shrink-0 bg-white/10 rounded p-2">
+                              <Building2 className="h-5 w-5" />
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <span className="text-xs font-medium uppercase tracking-wider text-white/70">Official Notice</span>
+                            <h4 className="font-semibold truncate">{notice.title}</h4>
+                          </div>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => downloadNoticePdf(notice)}
+                          className="flex-shrink-0"
+                          data-testid={`button-download-notice-${notice.id}`}
+                        >
+                          <Download className="h-4 w-4 mr-1" />
+                          PDF
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Dates Banner */}
+                    <div className="bg-amber-50 dark:bg-amber-950/30 border-b border-amber-200 dark:border-amber-800 px-4 py-3">
+                      <div className="flex flex-wrap items-center gap-4 text-sm">
+                        <div className="flex items-center gap-2">
+                          <Clock className="h-4 w-4 text-amber-700 dark:text-amber-400" />
+                          <span className="font-medium text-amber-900 dark:text-amber-100">
+                            {notice.workStartDate && notice.workEndDate ? (
+                              <>
+                                {new Date(notice.workStartDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} 
+                                {' - '}
+                                {new Date(notice.workEndDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                              </>
+                            ) : notice.workStartDate ? (
+                              <>Starting {new Date(notice.workStartDate).toLocaleDateString()}</>
+                            ) : (
+                              'Dates TBD'
+                            )}
+                          </span>
+                        </div>
+                        <Badge variant="outline" className="capitalize text-xs">
+                          {notice.jobType.replace(/_/g, ' ')}
+                        </Badge>
+                      </div>
+                    </div>
+
+                    {/* Content Preview */}
+                    <div className="p-4">
+                      <p className="text-sm text-muted-foreground line-clamp-3 whitespace-pre-wrap">
+                        {notice.content}
+                      </p>
+                      <div className="mt-3 pt-3 border-t flex items-center justify-between text-xs text-muted-foreground">
+                        <span>From: {notice.companyName}</span>
+                        <span>Posted: {formatLocalDate(notice.createdAt)}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </CardContent>
