@@ -22,6 +22,17 @@ export default function ScheduleRouter() {
   const hasSchedulePermission = canViewSchedule(currentUser);
   const hasFullScheduleAccess = canViewFullSchedule(currentUser);
   const hasOwnScheduleOnly = canViewOwnSchedule(currentUser) && !hasFullScheduleAccess;
+  
+  // Debug logging
+  console.log("ScheduleRouter Debug:", {
+    isLoadingUser,
+    hasUser: !!currentUser,
+    role: currentUser?.role,
+    permissions: currentUser?.permissions,
+    hasSchedulePermission,
+    hasFullScheduleAccess,
+    hasOwnScheduleOnly
+  });
 
   if (isLoadingUser) {
     return (

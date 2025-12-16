@@ -16,21 +16,33 @@ import { BrandingContext } from "@/App";
 export function TechnicianSchedule() {
   const { t, i18n } = useTranslation();
   const [, setLocation] = useLocation();
-  const { brandColors, brandingActive } = useContext(BrandingContext);
+  const brandingContext = useContext(BrandingContext);
+  const brandColors = brandingContext?.brandColors || [];
+  const brandingActive = brandingContext?.brandingActive || false;
   const defaultJobColor = brandingActive && brandColors.length > 0 ? brandColors[0] : "hsl(var(--primary))";
 
   const calendarLocale = i18n.language === 'fr' ? 'fr' : 'en';
 
-  const { data: currentUserData, isLoading: isLoadingUser } = useQuery<{ user: User }>({
+  const { data: currentUserData, isLoading: isLoadingUser, error: userError } = useQuery<{ user: User }>({
     queryKey: ["/api/user"],
   });
   const currentUser = currentUserData?.user;
 
-  const { data: jobsData, isLoading } = useQuery<{ jobs: ScheduledJobWithAssignments[] }>({
+  const { data: jobsData, isLoading, error: jobsError } = useQuery<{ jobs: ScheduledJobWithAssignments[] }>({
     queryKey: ["/api/schedule/my-jobs"],
     enabled: !!currentUser,
   });
   const jobs = jobsData?.jobs || [];
+  
+  // Debug logging
+  console.log("TechnicianSchedule Debug:", {
+    isLoadingUser,
+    isLoading,
+    hasUser: !!currentUser,
+    jobsCount: jobs.length,
+    userError: userError?.message,
+    jobsError: jobsError?.message
+  });
 
   if (isLoadingUser || isLoading) {
     return (
@@ -44,7 +56,15 @@ export function TechnicianSchedule() {
   }
 
   if (!currentUser) {
-    return null;
+    console.error("TechnicianSchedule: No current user found");
+    return (
+      <div className="p-4 md:p-6 space-y-6">
+        <BackButton to="/dashboard" label={t('schedule.backToDashboard', 'Back to Dashboard')} />
+        <div className="text-center py-12 text-muted-foreground">
+          <p>Unable to load user data. Please try refreshing the page.</p>
+        </div>
+      </div>
+    );
   }
 
   const myAssignments = jobs.filter(job => 
