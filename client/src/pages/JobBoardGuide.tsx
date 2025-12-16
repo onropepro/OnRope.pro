@@ -36,7 +36,11 @@ import {
   Link,
   Shield,
   DollarSign,
-  ChevronDown
+  ChevronDown,
+  TrendingUp,
+  Lightbulb,
+  HelpCircle,
+  Target
 } from "lucide-react";
 import { useState } from "react";
 
@@ -55,7 +59,7 @@ function ProblemCard({
   
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-      <Card className="overflow-hidden">
+      <Card className="overflow-visible">
         <CollapsibleTrigger className="w-full text-left">
           <CardHeader className="pb-2 cursor-pointer">
             <CardTitle className="text-base flex items-center justify-between gap-2">
@@ -89,6 +93,7 @@ export default function JobBoardGuide() {
       lastUpdated="December 15, 2025"
     >
       <div className="space-y-8">
+        {/* Introduction */}
         <section className="space-y-4">
           <p className="text-muted-foreground leading-relaxed text-base">
             Stop posting on Indeed, Craigslist, and Facebook hoping qualified rope techs see your job. OnRopePro's Job Board is a closed ecosystem exclusively for rope access building maintenance. Every employer is verified. Every technician is relevant. No $22 per-application fees. No filtering through 50 resumes to find 2 actual rope techs. No spam.
@@ -97,6 +102,112 @@ export default function JobBoardGuide() {
 
         <Separator />
 
+        {/* Golden Rule Section */}
+        <section>
+          <div className="flex items-center gap-3 mb-4">
+            <Target className="w-6 h-6 text-action-500" />
+            <h2 className="text-xl md:text-2xl font-semibold">The Golden Rule</h2>
+          </div>
+
+          <Card className="bg-action-50 dark:bg-action-950 border-action-200 dark:border-action-800">
+            <CardContent className="pt-4 space-y-4">
+              <p className="text-lg font-semibold text-action-800 dark:text-action-200">
+                The Job Board is a closed-garden ecosystem. Every employer is verified. Every technician is relevant. No noise.
+              </p>
+              
+              <div className="bg-white/50 dark:bg-black/20 p-4 rounded">
+                <p className="font-semibold text-sm mb-2">The Network Effect Formula</p>
+                <p className="font-mono text-base text-action-700 dark:text-action-300">
+                  Value = Verified Employers x Qualified Technicians x Industry Specificity
+                </p>
+              </div>
+
+              <p className="text-muted-foreground text-base">
+                Unlike Indeed where rope access jobs are buried among thousands of irrelevant listings and you pay $22 per application, OnRopePro creates a focused marketplace. Employers only see rope access technicians. Technicians only see rope access building maintenance jobs. No bakeries posting jobs. No pipe fitters applying. The more companies and techs join, the more valuable it becomes for everyone.
+              </p>
+            </CardContent>
+          </Card>
+        </section>
+
+        <Separator />
+
+        {/* Key Features Summary */}
+        <section>
+          <div className="flex items-center gap-3 mb-4">
+            <Star className="w-6 h-6 text-warning-500" />
+            <h2 className="text-xl md:text-2xl font-semibold">Key Features Summary</h2>
+          </div>
+
+          <div className="grid gap-3 md:grid-cols-2">
+            <div className="flex items-start gap-3 p-3 bg-muted rounded">
+              <Building2 className="w-5 h-5 text-action-500 mt-0.5 shrink-0" />
+              <div>
+                <p className="font-semibold text-sm">Closed Garden Ecosystem</p>
+                <p className="text-muted-foreground text-xs">Exclusively for rope access building maintenance. No unrelated industries, no spam, no noise.</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 p-3 bg-muted rounded">
+              <Search className="w-5 h-5 text-action-500 mt-0.5 shrink-0" />
+              <div>
+                <p className="font-semibold text-sm">Talent Browser</p>
+                <p className="text-muted-foreground text-xs">Employers search technicians by location, name, certifications, experience level, and expected pay rate.</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 p-3 bg-muted rounded">
+              <Eye className="w-5 h-5 text-warning-500 mt-0.5 shrink-0" />
+              <div>
+                <p className="font-semibold text-sm">Profile Visibility Toggle</p>
+                <p className="text-muted-foreground text-xs">Technicians control exactly what employers see. Opt-in only. Full privacy control.</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 p-3 bg-muted rounded">
+              <DollarSign className="w-5 h-5 text-success-500 mt-0.5 shrink-0" />
+              <div>
+                <p className="font-semibold text-sm">Expected Pay Rate Display</p>
+                <p className="text-muted-foreground text-xs">Technicians set rate expectations. Employers see before reaching out. No wasted interviews.</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 p-3 bg-muted rounded">
+              <Send className="w-5 h-5 text-action-500 mt-0.5 shrink-0" />
+              <div>
+                <p className="font-semibold text-sm">Direct Job Offers</p>
+                <p className="text-muted-foreground text-xs">Send offers directly to technicians from Talent Browser. Linked to active job posting.</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 p-3 bg-muted rounded">
+              <Shield className="w-5 h-5 text-success-500 mt-0.5 shrink-0" />
+              <div>
+                <p className="font-semibold text-sm">Safety Rating Visible</p>
+                <p className="text-muted-foreground text-xs">Individual Safety Rating (ISR) helps employers assess candidate reliability.</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 p-3 bg-muted rounded">
+              <FileText className="w-5 h-5 text-warning-500 mt-0.5 shrink-0" />
+              <div>
+                <p className="font-semibold text-sm">One-Click Application</p>
+                <p className="text-muted-foreground text-xs">Profile data, resume, and certifications auto-attach. Apply in 30 seconds.</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 p-3 bg-muted rounded">
+              <Bell className="w-5 h-5 text-warning-500 mt-0.5 shrink-0" />
+              <div>
+                <p className="font-semibold text-sm">Offer Notifications</p>
+                <p className="text-muted-foreground text-xs">Technicians receive in-portal notifications. Accept or decline with one tap.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <Separator />
+
+        {/* Problems Solved Section */}
         <section>
           <div className="flex items-center gap-3 mb-4">
             <AlertTriangle className="w-6 h-6 text-warning-500" />
@@ -147,11 +258,26 @@ export default function JobBoardGuide() {
                 />
               </div>
             </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                <Briefcase className="w-5 h-5 text-violet-500" />
+                For Building Managers / Property Managers
+              </h3>
+              <div className="grid gap-3">
+                <ProblemCard
+                  title="How Do I Know This Contractor Hires Qualified Workers?"
+                  pain="You hire a rope access contractor but have no visibility into who they're actually sending to your building. Are these people certified? Do they have safety records? You're trusting the contractor's word."
+                  solution="When contractors use OnRopePro, their technicians have verified IRATA/SPRAT certifications and visible safety ratings. You're not just trusting their word. You're seeing documented credentials."
+                />
+              </div>
+            </div>
           </div>
         </section>
 
         <Separator />
 
+        {/* For Employers Section */}
         <section>
           <div className="flex items-center gap-3 mb-4">
             <Building2 className="w-6 h-6 text-action-500" />
@@ -254,6 +380,7 @@ export default function JobBoardGuide() {
 
         <Separator />
 
+        {/* For Technicians Section */}
         <section>
           <div className="flex items-center gap-3 mb-4">
             <HardHat className="w-6 h-6 text-warning-500" />
@@ -349,6 +476,7 @@ export default function JobBoardGuide() {
 
         <Separator />
 
+        {/* Application Status Tracking */}
         <section>
           <div className="flex items-center gap-3 mb-4">
             <Clock className="w-6 h-6 text-action-500" />
@@ -404,6 +532,60 @@ export default function JobBoardGuide() {
 
         <Separator />
 
+        {/* Measurable Results Section */}
+        <section>
+          <div className="flex items-center gap-3 mb-4">
+            <TrendingUp className="w-6 h-6 text-success-500" />
+            <h2 className="text-xl md:text-2xl font-semibold">Measurable Results</h2>
+          </div>
+
+          <Card>
+            <CardContent className="pt-4">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="font-semibold">Metric</TableHead>
+                      <TableHead className="font-semibold text-muted-foreground">Before OnRopePro</TableHead>
+                      <TableHead className="font-semibold text-success-600 dark:text-success-400">With OnRopePro</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell className="font-medium">Time filtering irrelevant applicants</TableCell>
+                      <TableCell className="text-muted-foreground">2-4 hours per hire</TableCell>
+                      <TableCell className="text-success-600 dark:text-success-400">0 hours (100% relevant)</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium">Recruitment platform fees</TableCell>
+                      <TableCell className="text-muted-foreground">$500-2,000/year</TableCell>
+                      <TableCell className="text-success-600 dark:text-success-400">$0 (included in subscription)</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium">Time to find qualified candidates</TableCell>
+                      <TableCell className="text-muted-foreground">2-3 weeks</TableCell>
+                      <TableCell className="text-success-600 dark:text-success-400">1-3 days</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium">Application time per job (technicians)</TableCell>
+                      <TableCell className="text-muted-foreground">15-20 minutes</TableCell>
+                      <TableCell className="text-success-600 dark:text-success-400">30 seconds</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium">Visibility into application status</TableCell>
+                      <TableCell className="text-muted-foreground">None</TableCell>
+                      <TableCell className="text-success-600 dark:text-success-400">Real-time tracking</TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        <Separator />
+
+        {/* Why It's Different */}
         <section>
           <div className="flex items-center gap-3 mb-4">
             <Shield className="w-6 h-6 text-action-500" />
@@ -454,6 +636,7 @@ export default function JobBoardGuide() {
 
         <Separator />
 
+        {/* Connected Modules */}
         <section>
           <div className="flex items-center gap-3 mb-4">
             <Link className="w-6 h-6 text-action-500" />
@@ -508,7 +691,7 @@ export default function JobBoardGuide() {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-amber-500" />
+                  <CheckCircle2 className="w-5 h-5 text-success-500" />
                   Onboarding
                 </CardTitle>
               </CardHeader>
@@ -523,6 +706,7 @@ export default function JobBoardGuide() {
 
         <Separator />
 
+        {/* SuperUser Management */}
         <section>
           <div className="flex items-center gap-3 mb-4">
             <Star className="w-6 h-6 text-amber-500" />
@@ -545,64 +729,274 @@ export default function JobBoardGuide() {
           </Card>
         </section>
 
+        <Separator />
+
+        {/* Best Practices & Tips */}
+        <section>
+          <div className="flex items-center gap-3 mb-4">
+            <Lightbulb className="w-6 h-6 text-warning-500" />
+            <h2 className="text-xl md:text-2xl font-semibold">Best Practices & Tips</h2>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Building2 className="w-5 h-5 text-action-500" />
+                  For Employers
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <p className="font-semibold text-sm text-success-600 dark:text-success-400 mb-2">Do:</p>
+                  <ul className="space-y-1 text-muted-foreground text-sm">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-success-500 mt-0.5 shrink-0" />
+                      <span>Include salary range in job postings (attracts more qualified applicants)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-success-500 mt-0.5 shrink-0" />
+                      <span>Check expected pay rates in Talent Browser before sending offers</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-success-500 mt-0.5 shrink-0" />
+                      <span>Respond to applications promptly (builds your platform reputation)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-success-500 mt-0.5 shrink-0" />
+                      <span>Review Individual Safety Rating when evaluating candidates</span>
+                    </li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="font-semibold text-sm text-rust-600 dark:text-rust-400 mb-2">Don't:</p>
+                  <ul className="space-y-1 text-muted-foreground text-sm">
+                    <li className="flex items-start gap-2">
+                      <XCircle className="w-4 h-4 text-rust-500 mt-0.5 shrink-0" />
+                      <span>Post vague job descriptions (reduces quality of applicants)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <XCircle className="w-4 h-4 text-rust-500 mt-0.5 shrink-0" />
+                      <span>Send offers without an active job posting linked</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <XCircle className="w-4 h-4 text-rust-500 mt-0.5 shrink-0" />
+                      <span>Ignore safety ratings when making hiring decisions</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <XCircle className="w-4 h-4 text-rust-500 mt-0.5 shrink-0" />
+                      <span>Wait weeks to respond to applications (top candidates move fast)</span>
+                    </li>
+                  </ul>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <HardHat className="w-5 h-5 text-warning-500" />
+                  For Technicians
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <p className="font-semibold text-sm text-success-600 dark:text-success-400 mb-2">Do:</p>
+                  <ul className="space-y-1 text-muted-foreground text-sm">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-success-500 mt-0.5 shrink-0" />
+                      <span>Keep profile updated with current certifications and experience</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-success-500 mt-0.5 shrink-0" />
+                      <span>Set a realistic expected pay rate based on your level and market</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-success-500 mt-0.5 shrink-0" />
+                      <span>Use profile visibility toggle strategically (on when looking, off when not)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-success-500 mt-0.5 shrink-0" />
+                      <span>Upload a professional photo and current resume</span>
+                    </li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="font-semibold text-sm text-rust-600 dark:text-rust-400 mb-2">Don't:</p>
+                  <ul className="space-y-1 text-muted-foreground text-sm">
+                    <li className="flex items-start gap-2">
+                      <XCircle className="w-4 h-4 text-rust-500 mt-0.5 shrink-0" />
+                      <span>Leave profile incomplete (reduces chances of being found by employers)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <XCircle className="w-4 h-4 text-rust-500 mt-0.5 shrink-0" />
+                      <span>Set expected pay rate artificially high (filters you out of searches)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <XCircle className="w-4 h-4 text-rust-500 mt-0.5 shrink-0" />
+                      <span>Apply to jobs you're not qualified for (hurts your platform reputation)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <XCircle className="w-4 h-4 text-rust-500 mt-0.5 shrink-0" />
+                      <span>Forget to check your portal for job offer notifications</span>
+                    </li>
+                  </ul>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        <Separator />
+
+        {/* FAQ Section */}
+        <section>
+          <div className="flex items-center gap-3 mb-4">
+            <HelpCircle className="w-6 h-6 text-action-500" />
+            <h2 className="text-xl md:text-2xl font-semibold">Frequently Asked Questions</h2>
+          </div>
+
+          <div className="grid gap-4">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">"Is there a cost per application like Indeed?"</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground text-sm">
+                  No. Unlike Indeed's $22 per-application fee structure, OnRopePro includes unlimited job postings and applications in your subscription. Post as many jobs as you want. Receive as many applications as you want. No surprise charges.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">"Will you scrape jobs from Indeed or other sites?"</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground text-sm">
+                  No. OnRopePro's Job Board grows organically. We don't import jobs from other platforms. This ensures every listing is from a verified rope access building maintenance company within our ecosystem.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">"Can I see who applied to my jobs?"</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground text-sm">
+                  Yes. Employers see all applications with profile details, resume, certifications, and safety ratings for technicians who have enabled profile visibility.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">"What if I'm employed but casually looking?"</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground text-sm">
+                  Keep your profile visibility toggled off. You can still browse and apply to jobs. Toggle it on only when you want employers to find you proactively.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">"Can technicians see my company information before applying?"</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground text-sm">
+                  Yes. Technicians can view company details, job requirements, location, and salary range (if provided) before deciding to apply.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">"How do I send a job offer to a specific technician?"</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground text-sm">
+                  From the Talent Browser, find the technician you want to hire. Click "Send Job Offer" and select which of your active job postings to link the offer to. The technician receives a notification in their portal.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">"What happens after I accept a job offer?"</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground text-sm">
+                  If you're already on the platform, onboarding is nearly instant. The employer enters your salary and permissions. You're ready to work on day one with no re-entry of your information.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        <Separator />
+
+        {/* Access Requirements */}
         <section>
           <Card className="bg-muted/30">
             <CardContent className="pt-4">
-              <div className="flex items-start gap-3">
-                <Info className="w-5 h-5 text-muted-foreground mt-0.5 flex-shrink-0" />
-                <div className="space-y-3 w-full">
+              <div className="flex items-start gap-3 mb-4">
+                <Info className="w-5 h-5 text-muted-foreground mt-0.5" />
+                <div>
                   <p className="font-semibold">Access Requirements</p>
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="font-semibold">Role</TableHead>
-                          <TableHead className="font-semibold text-center">Post Jobs</TableHead>
-                          <TableHead className="font-semibold text-center">Browse Talent</TableHead>
-                          <TableHead className="font-semibold text-center">Apply to Jobs</TableHead>
-                          <TableHead className="font-semibold text-center">Send Offers</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        <TableRow>
-                          <TableCell className="font-medium">Company Owner</TableCell>
-                          <TableCell className="text-center text-success-600 dark:text-success-400">Yes</TableCell>
-                          <TableCell className="text-center text-success-600 dark:text-success-400">Yes</TableCell>
-                          <TableCell className="text-center text-muted-foreground">No</TableCell>
-                          <TableCell className="text-center text-success-600 dark:text-success-400">Yes</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell className="font-medium">Operations Manager</TableCell>
-                          <TableCell className="text-center text-success-600 dark:text-success-400">Yes</TableCell>
-                          <TableCell className="text-center text-success-600 dark:text-success-400">Yes</TableCell>
-                          <TableCell className="text-center text-muted-foreground">No</TableCell>
-                          <TableCell className="text-center text-success-600 dark:text-success-400">Yes</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell className="font-medium">Supervisor</TableCell>
-                          <TableCell className="text-center text-muted-foreground">No</TableCell>
-                          <TableCell className="text-center text-muted-foreground">View only</TableCell>
-                          <TableCell className="text-center text-muted-foreground">No</TableCell>
-                          <TableCell className="text-center text-muted-foreground">No</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell className="font-medium">Technician</TableCell>
-                          <TableCell className="text-center text-muted-foreground">No</TableCell>
-                          <TableCell className="text-center text-muted-foreground">No</TableCell>
-                          <TableCell className="text-center text-success-600 dark:text-success-400">Yes</TableCell>
-                          <TableCell className="text-center text-muted-foreground">No</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell className="font-medium">SuperUser</TableCell>
-                          <TableCell className="text-center text-success-600 dark:text-success-400">Yes</TableCell>
-                          <TableCell className="text-center text-success-600 dark:text-success-400">Yes</TableCell>
-                          <TableCell className="text-center text-muted-foreground">No</TableCell>
-                          <TableCell className="text-center text-success-600 dark:text-success-400">Yes</TableCell>
-                        </TableRow>
-                      </TableBody>
-                    </Table>
-                  </div>
                 </div>
+              </div>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="font-semibold">Role</TableHead>
+                      <TableHead className="font-semibold text-center">Post Jobs</TableHead>
+                      <TableHead className="font-semibold text-center">Browse Talent</TableHead>
+                      <TableHead className="font-semibold text-center">Apply to Jobs</TableHead>
+                      <TableHead className="font-semibold text-center">Send Offers</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell className="font-medium">Company Owner</TableCell>
+                      <TableCell className="text-center text-success-600 dark:text-success-400">Yes</TableCell>
+                      <TableCell className="text-center text-success-600 dark:text-success-400">Yes</TableCell>
+                      <TableCell className="text-center text-muted-foreground">No</TableCell>
+                      <TableCell className="text-center text-success-600 dark:text-success-400">Yes</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium">Operations Manager</TableCell>
+                      <TableCell className="text-center text-success-600 dark:text-success-400">Yes</TableCell>
+                      <TableCell className="text-center text-success-600 dark:text-success-400">Yes</TableCell>
+                      <TableCell className="text-center text-muted-foreground">No</TableCell>
+                      <TableCell className="text-center text-success-600 dark:text-success-400">Yes</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium">Supervisor</TableCell>
+                      <TableCell className="text-center text-muted-foreground">No</TableCell>
+                      <TableCell className="text-center text-muted-foreground">View only</TableCell>
+                      <TableCell className="text-center text-muted-foreground">No</TableCell>
+                      <TableCell className="text-center text-muted-foreground">No</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium">Technician</TableCell>
+                      <TableCell className="text-center text-muted-foreground">No</TableCell>
+                      <TableCell className="text-center text-muted-foreground">No</TableCell>
+                      <TableCell className="text-center text-success-600 dark:text-success-400">Yes</TableCell>
+                      <TableCell className="text-center text-muted-foreground">No</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium">SuperUser</TableCell>
+                      <TableCell className="text-center text-success-600 dark:text-success-400">Yes</TableCell>
+                      <TableCell className="text-center text-success-600 dark:text-success-400">Yes</TableCell>
+                      <TableCell className="text-center text-muted-foreground">No</TableCell>
+                      <TableCell className="text-center text-success-600 dark:text-success-400">Yes</TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
               </div>
             </CardContent>
           </Card>
