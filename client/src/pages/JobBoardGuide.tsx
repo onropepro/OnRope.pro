@@ -2,6 +2,19 @@ import ChangelogGuideLayout from "@/components/ChangelogGuideLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { 
   Briefcase,
   Building2,
@@ -17,22 +30,127 @@ import {
   XCircle,
   Star,
   Info,
-  Users
+  Users,
+  AlertTriangle,
+  Bell,
+  Link,
+  Shield,
+  DollarSign,
+  ChevronDown
 } from "lucide-react";
+import { useState } from "react";
+
+function ProblemCard({ 
+  title, 
+  pain, 
+  solution,
+  defaultOpen = false 
+}: { 
+  title: string; 
+  pain: string; 
+  solution: string;
+  defaultOpen?: boolean;
+}) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+  
+  return (
+    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+      <Card className="overflow-hidden">
+        <CollapsibleTrigger className="w-full text-left">
+          <CardHeader className="pb-2 cursor-pointer">
+            <CardTitle className="text-base flex items-center justify-between gap-2">
+              <span className="flex-1">{title}</span>
+              <ChevronDown className={`w-5 h-5 text-muted-foreground transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+            </CardTitle>
+          </CardHeader>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <CardContent className="pt-0 space-y-4">
+            <div className="bg-rust-50 dark:bg-rust-950 border border-rust-200 dark:border-rust-800 p-3 rounded">
+              <p className="font-semibold text-sm text-rust-700 dark:text-rust-300 mb-1">The Pain</p>
+              <p className="text-muted-foreground text-sm">{pain}</p>
+            </div>
+            <div className="bg-success-50 dark:bg-success-950 border border-success-200 dark:border-success-800 p-3 rounded">
+              <p className="font-semibold text-sm text-success-700 dark:text-success-300 mb-1">The Solution</p>
+              <p className="text-muted-foreground text-sm">{solution}</p>
+            </div>
+          </CardContent>
+        </CollapsibleContent>
+      </Card>
+    </Collapsible>
+  );
+}
 
 export default function JobBoardGuide() {
   return (
     <ChangelogGuideLayout
       title="Job Board Ecosystem Guide"
-      version="1.0"
-      lastUpdated="December 10, 2025"
+      version="2.0"
+      lastUpdated="December 15, 2025"
     >
       <div className="space-y-8">
         <section className="space-y-4">
           <p className="text-muted-foreground leading-relaxed text-base">
-            The Job Board Ecosystem connects rope access technicians with employment opportunities across the platform. Companies and SuperUsers can post jobs, while technicians can browse listings, apply directly, and make their profiles visible to potential employers.
+            Stop posting on Indeed, Craigslist, and Facebook hoping qualified rope techs see your job. OnRopePro's Job Board is a closed ecosystem exclusively for rope access building maintenance. Every employer is verified. Every technician is relevant. No $22 per-application fees. No filtering through 50 resumes to find 2 actual rope techs. No spam.
           </p>
         </section>
+
+        <Separator />
+
+        <section>
+          <div className="flex items-center gap-3 mb-4">
+            <AlertTriangle className="w-6 h-6 text-warning-500" />
+            <h2 className="text-xl md:text-2xl font-semibold">Problems Solved</h2>
+          </div>
+
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                <Building2 className="w-5 h-5 text-action-500" />
+                For Employers
+              </h3>
+              <div className="grid gap-3">
+                <ProblemCard
+                  title="I Post on Indeed and Get 50 Applicants, But Only 2 Are Actual Rope Access Techs"
+                  pain="You post on Indeed, LinkedIn, Craigslist, and Facebook. You get flooded with applications from people who have never touched a rope system. Shop laborers, general construction workers, people who 'are interested in learning.' Hours wasted filtering irrelevant resumes."
+                  solution="OnRopePro's Job Board is a closed ecosystem. Every technician on the platform is in rope access building maintenance. Every employer is verified. When you post a job, 100% of applicants are relevant."
+                  defaultOpen={true}
+                />
+                <ProblemCard
+                  title="Indeed Keeps Charging Me Even When I'm Not Hiring"
+                  pain="Indeed charges $22 per application if you don't respond within 2 days. A single job posting can cost $300+ in 'engagement fees' before you've hired anyone. Someone has to log in daily, open every application, decline or respond. Miss a few days? That's $22 times every unopened application."
+                  solution="OnRopePro's Job Board is included in your subscription. Post unlimited jobs. Receive unlimited applications. No per-application fees. No surprise charges."
+                />
+                <ProblemCard
+                  title="I Found a Good Tech But They Want Way More Than I Can Pay"
+                  pain="You spend an hour interviewing a candidate, checking references, preparing an offer, only to discover their salary expectations are $20/hour above your budget. Complete waste of time for both parties."
+                  solution="Technicians set their expected pay rate in their profile. When you browse talent, you see what they're looking for before you reach out. If someone won't work under $60/hour and your budget is $45, you know immediately."
+                />
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                <HardHat className="w-5 h-5 text-warning-500" />
+                For Technicians
+              </h3>
+              <div className="grid gap-3">
+                <ProblemCard
+                  title="I Want to Find a Rope Access Job But Indeed Shows Me Pipe Fitter and Welder Jobs"
+                  pain="You search 'rope access' on Indeed and get results for offshore oil rigs, industrial access in Alberta, and random construction gigs. You spend 30 minutes scrolling through irrelevant listings to find 2-3 that might be building maintenance."
+                  solution="OnRopePro's Job Board is exclusively for rope access building maintenance. Every job posted is relevant. Filter by job type, location, and certifications. No oil rigs. No pipe fitting. Just building maintenance."
+                />
+                <ProblemCard
+                  title="I Don't Want Every Company to See My Profile"
+                  pain="You're currently employed but casually looking. You don't want your current employer to know you're browsing jobs. Or you simply value your privacy."
+                  solution="Profile visibility is opt-in. Toggle it on when actively looking. Toggle it off when you're not. Control exactly which fields employers see."
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <Separator />
 
         <section>
           <div className="flex items-center gap-3 mb-4">
@@ -62,7 +180,7 @@ export default function JobBoardGuide() {
                   <div className="bg-muted p-3 rounded">
                     <p className="font-semibold text-sm mb-1">Requirements</p>
                     <ul className="list-disc list-inside text-muted-foreground text-xs space-y-0.5">
-                      <li>Required certifications (irata/SPRAT)</li>
+                      <li>Required certifications (IRATA/SPRAT)</li>
                       <li>Experience level</li>
                       <li>Special skills</li>
                     </ul>
@@ -102,10 +220,33 @@ export default function JobBoardGuide() {
                   <li>View resume/CV documents</li>
                   <li>Safety rating scores</li>
                   <li>Years of experience</li>
-                  <li>irata/SPRAT certification details</li>
+                  <li>IRATA/SPRAT certification details</li>
                   <li>Profile photo and contact info</li>
                   <li>Rope access specialties</li>
+                  <li className="font-medium text-foreground">Expected pay rate</li>
+                  <li className="font-medium text-foreground">Search by location and name</li>
                 </ul>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Send className="w-5 h-5 text-action-500" />
+                  Send Job Offers
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-base space-y-2">
+                <p className="text-muted-foreground">Send offers directly to technicians from the Talent Browser:</p>
+                <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                  <li>Select a technician from search results</li>
+                  <li>Link offer to an active job posting</li>
+                  <li>Technician receives in-portal notification</li>
+                  <li>Accept or decline response returned to you</li>
+                </ul>
+                <p className="text-sm text-muted-foreground italic pt-2">
+                  No email chains. No phone tag. Direct connection to qualified candidates.
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -175,10 +316,32 @@ export default function JobBoardGuide() {
                     <li>Safety rating</li>
                     <li>Name and photo</li>
                     <li>Years of experience</li>
-                    <li>irata/SPRAT certification numbers and levels</li>
+                    <li>IRATA/SPRAT certification numbers and levels</li>
                     <li>Rope access specialties</li>
+                    <li className="font-medium text-amber-800 dark:text-amber-200">Expected pay rate</li>
                   </ul>
                 </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Bell className="w-5 h-5 text-amber-500" />
+                  Job Offer Notifications
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-base space-y-2">
+                <p className="text-muted-foreground">Receive offers directly from employers:</p>
+                <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                  <li>Notification appears in your tech portal</li>
+                  <li>View job details and company information</li>
+                  <li>Accept or decline with one tap</li>
+                  <li>No need to check external email</li>
+                </ul>
+                <p className="text-sm text-muted-foreground italic pt-2">
+                  Employers find you. You decide.
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -243,6 +406,125 @@ export default function JobBoardGuide() {
 
         <section>
           <div className="flex items-center gap-3 mb-4">
+            <Shield className="w-6 h-6 text-action-500" />
+            <h2 className="text-xl md:text-2xl font-semibold">Why It's Different</h2>
+          </div>
+
+          <Card>
+            <CardContent className="pt-4">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="font-semibold">OnRopePro</TableHead>
+                      <TableHead className="font-semibold">Indeed/Craigslist</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell className="text-success-600 dark:text-success-400 font-medium">Closed ecosystem</TableCell>
+                      <TableCell className="text-muted-foreground">Open to everyone</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="text-success-600 dark:text-success-400 font-medium">Verified employers</TableCell>
+                      <TableCell className="text-muted-foreground">Anyone can post</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="text-success-600 dark:text-success-400 font-medium">100% relevant applicants</TableCell>
+                      <TableCell className="text-muted-foreground">2-5% relevant applicants</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="text-success-600 dark:text-success-400 font-medium">Flat monthly pricing</TableCell>
+                      <TableCell className="text-muted-foreground">$22+ per application</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="text-success-600 dark:text-success-400 font-medium">Safety ratings visible</TableCell>
+                      <TableCell className="text-muted-foreground">No verification</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="text-success-600 dark:text-success-400 font-medium">Industry-specific filters</TableCell>
+                      <TableCell className="text-muted-foreground">Generic filters</TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        <Separator />
+
+        <section>
+          <div className="flex items-center gap-3 mb-4">
+            <Link className="w-6 h-6 text-action-500" />
+            <h2 className="text-xl md:text-2xl font-semibold">Connected Modules</h2>
+          </div>
+
+          <p className="text-muted-foreground mb-4 text-base">The Job Board connects with other OnRopePro modules:</p>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Users className="w-5 h-5 text-action-500" />
+                  Employee Management
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground text-sm">
+                  Technician profiles, certifications, and work history flow directly into job applications.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-success-500" />
+                  Safety & Compliance
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground text-sm">
+                  Individual Safety Rating (ISR) displays on talent profiles, helping employers assess candidates.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-warning-500" />
+                  Document Management
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground text-sm">
+                  Resume/CV documents stored once, attached to every application automatically.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-amber-500" />
+                  Onboarding
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground text-sm">
+                  Hired technicians already on the platform? 10-second setup. Enter salary and permissions. Done.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        <Separator />
+
+        <section>
+          <div className="flex items-center gap-3 mb-4">
             <Star className="w-6 h-6 text-amber-500" />
             <h2 className="text-xl md:text-2xl font-semibold">SuperUser Management</h2>
           </div>
@@ -267,12 +549,59 @@ export default function JobBoardGuide() {
           <Card className="bg-muted/30">
             <CardContent className="pt-4">
               <div className="flex items-start gap-3">
-                <Info className="w-5 h-5 text-muted-foreground mt-0.5" />
-                <div>
+                <Info className="w-5 h-5 text-muted-foreground mt-0.5 flex-shrink-0" />
+                <div className="space-y-3 w-full">
                   <p className="font-semibold">Access Requirements</p>
-                  <p className="text-base text-muted-foreground">
-                    Job posting requires Company Owner or Operations Manager role. All technicians can browse jobs and manage their profile visibility.
-                  </p>
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="font-semibold">Role</TableHead>
+                          <TableHead className="font-semibold text-center">Post Jobs</TableHead>
+                          <TableHead className="font-semibold text-center">Browse Talent</TableHead>
+                          <TableHead className="font-semibold text-center">Apply to Jobs</TableHead>
+                          <TableHead className="font-semibold text-center">Send Offers</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        <TableRow>
+                          <TableCell className="font-medium">Company Owner</TableCell>
+                          <TableCell className="text-center text-success-600 dark:text-success-400">Yes</TableCell>
+                          <TableCell className="text-center text-success-600 dark:text-success-400">Yes</TableCell>
+                          <TableCell className="text-center text-muted-foreground">No</TableCell>
+                          <TableCell className="text-center text-success-600 dark:text-success-400">Yes</TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="font-medium">Operations Manager</TableCell>
+                          <TableCell className="text-center text-success-600 dark:text-success-400">Yes</TableCell>
+                          <TableCell className="text-center text-success-600 dark:text-success-400">Yes</TableCell>
+                          <TableCell className="text-center text-muted-foreground">No</TableCell>
+                          <TableCell className="text-center text-success-600 dark:text-success-400">Yes</TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="font-medium">Supervisor</TableCell>
+                          <TableCell className="text-center text-muted-foreground">No</TableCell>
+                          <TableCell className="text-center text-muted-foreground">View only</TableCell>
+                          <TableCell className="text-center text-muted-foreground">No</TableCell>
+                          <TableCell className="text-center text-muted-foreground">No</TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="font-medium">Technician</TableCell>
+                          <TableCell className="text-center text-muted-foreground">No</TableCell>
+                          <TableCell className="text-center text-muted-foreground">No</TableCell>
+                          <TableCell className="text-center text-success-600 dark:text-success-400">Yes</TableCell>
+                          <TableCell className="text-center text-muted-foreground">No</TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="font-medium">SuperUser</TableCell>
+                          <TableCell className="text-center text-success-600 dark:text-success-400">Yes</TableCell>
+                          <TableCell className="text-center text-success-600 dark:text-success-400">Yes</TableCell>
+                          <TableCell className="text-center text-muted-foreground">No</TableCell>
+                          <TableCell className="text-center text-success-600 dark:text-success-400">Yes</TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
+                  </div>
                 </div>
               </div>
             </CardContent>
