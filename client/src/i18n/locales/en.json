@@ -635,6 +635,7 @@
         "inventoryGear": "Inventory & Gear",
         "workSessions": "Work Sessions",
         "feedback": "Feedback",
+        "schedule": "Schedule",
         "analyticsFinancial": "Analytics & Financial"
       },
       "viewProjects": "View Projects",
@@ -660,6 +661,9 @@
       "viewActiveWorkers": "View Active Workers",
       "viewFeedback": "View Feedback",
       "manageFeedback": "Manage Feedback",
+      "viewFullSchedule": "View All Calendar (Full Schedule)",
+      "viewOwnSchedule": "View Employee Calendar Only (Own Shifts)",
+      "editSchedule": "Edit Calendar (Manage Assignments)",
       "viewAnalytics": "View Analytics",
       "viewFinancialData": "View Financial Data (Labor Costs, Wages)"
     },

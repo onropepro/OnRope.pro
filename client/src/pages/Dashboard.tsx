@@ -204,6 +204,14 @@ const PERMISSION_CATEGORIES = [
     ],
   },
   {
+    nameKey: "dashboard.permissions.categories.schedule",
+    permissions: [
+      { id: "view_full_schedule", labelKey: "dashboard.permissions.viewFullSchedule" },
+      { id: "view_own_schedule", labelKey: "dashboard.permissions.viewOwnSchedule" },
+      { id: "edit_schedule", labelKey: "dashboard.permissions.editSchedule" },
+    ],
+  },
+  {
     nameKey: "dashboard.permissions.categories.analyticsFinancial",
     permissions: [
       { id: "view_analytics", labelKey: "dashboard.permissions.viewAnalytics" },
