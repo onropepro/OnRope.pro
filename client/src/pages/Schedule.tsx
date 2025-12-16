@@ -2905,14 +2905,14 @@ function JobDetailDialog({
             data-testid="button-delete-job"
           >
             <Trash2 className="w-4 h-4 mr-2" />
-            {t('schedule.delete', 'Delete')}
+            {t('schedule.removeFromCalendar', 'Remove from Calendar')}
           </Button>
           <Button
             onClick={onEdit}
             data-testid="button-edit-job"
           >
             <Edit2 className="w-4 h-4 mr-2" />
-            {t('schedule.editJob', 'Edit')}
+            {t('schedule.editJob', 'Edit Job')}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -2921,9 +2921,9 @@ function JobDetailDialog({
     <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{t('schedule.deleteJob', 'Delete Job')}?</AlertDialogTitle>
+          <AlertDialogTitle>{t('schedule.removeFromCalendar', 'Remove Job from Calendar')}?</AlertDialogTitle>
           <AlertDialogDescription>
-            {t('schedule.confirmDelete', 'Are you sure you want to delete')} "{job?.title}"? {t('schedule.confirmDelete', 'This action cannot be undone and will remove all assignments for this job.')}
+            {t('schedule.confirmRemove', 'Are you sure you want to remove')} "{job?.title}" {t('schedule.confirmRemove', 'from the calendar? This will remove all employee assignments for this scheduled job.')}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -2937,7 +2937,7 @@ function JobDetailDialog({
             }}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {t('schedule.deleteJob', 'Delete Job')}
+            {t('schedule.removeFromCalendar', 'Remove from Calendar')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
