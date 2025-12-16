@@ -772,6 +772,7 @@ export const complaints = pgTable("complaints", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }), // Company this belongs to
   projectId: varchar("project_id").references(() => projects.id, { onDelete: "cascade" }), // Optional - null for general messages
+  projectBuildingId: varchar("project_building_id").references(() => projectBuildings.id, { onDelete: "set null" }), // For multi-building projects
   residentId: varchar("resident_id").references(() => users.id, { onDelete: "set null" }), // Optional link to resident user
   residentName: varchar("resident_name").notNull(),
   phoneNumber: varchar("phone_number").notNull(),

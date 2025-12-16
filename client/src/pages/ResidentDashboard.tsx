@@ -32,6 +32,7 @@ const complaintSchema = z.object({
   unitNumber: z.string().min(1, "Unit number is required"),
   message: z.string().optional(),
   projectId: z.string().optional(),
+  projectBuildingId: z.string().optional(),
 });
 
 type ComplaintFormData = z.infer<typeof complaintSchema>;
@@ -41,6 +42,7 @@ export default function ResidentDashboard() {
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const [selectedBuildingId, setSelectedBuildingId] = useState<string | null>(null);
   const [selectedNotice, setSelectedNotice] = useState<any | null>(null);
   const [lastPhotoViewTime, setLastPhotoViewTime] = useState<number>(() => {
     const stored = localStorage.getItem('lastPhotoViewTime');
@@ -83,9 +85,32 @@ export default function ResidentDashboard() {
   }, [activeProjects, selectedProjectId]);
   
   const { data: progressData } = useQuery({
-    queryKey: ["/api/projects", activeProject?.id, "progress"],
+    queryKey: ["/api/projects", activeProject?.id, "progress", selectedBuildingId ? { buildingId: selectedBuildingId } : null],
     enabled: !!activeProject?.id,
   });
+  
+  // Fetch project buildings for multi-building projects
+  const { data: buildingsData } = useQuery<{ buildings: any[] }>({
+    queryKey: ["/api/projects", activeProject?.id, "buildings"],
+    enabled: !!activeProject?.id,
+  });
+  
+  const projectBuildings = buildingsData?.buildings || [];
+  const isMultiBuilding = projectBuildings.length > 0;
+  
+  // Auto-select first building when project buildings load
+  useEffect(() => {
+    if (projectBuildings.length > 0 && !selectedBuildingId) {
+      setSelectedBuildingId(projectBuildings[0].id);
+    } else if (projectBuildings.length === 0) {
+      setSelectedBuildingId(null);
+    }
+  }, [projectBuildings, selectedBuildingId]);
+  
+  // Reset building selection when project changes
+  useEffect(() => {
+    setSelectedBuildingId(null);
+  }, [selectedProjectId]);
 
   // Fetch company information for active project
   const { data: companyData } = useQuery({
@@ -369,6 +394,7 @@ export default function ResidentDashboard() {
       unitNumber: "",
       message: "",
       projectId: "",
+      projectBuildingId: "",
     },
   });
 
@@ -405,6 +431,11 @@ export default function ResidentDashboard() {
       // Only append projectId if it's provided
       if (data.projectId) {
         formData.append("projectId", data.projectId);
+      }
+      
+      // Include building ID for multi-building projects
+      if (data.projectBuildingId) {
+        formData.append("projectBuildingId", data.projectBuildingId);
       }
       
       if (selectedPhoto) {
@@ -1057,6 +1088,37 @@ export default function ResidentDashboard() {
 
           <TabsContent value="building" className="mt-6">
             <div className="bg-card/60 backdrop-blur-sm rounded-2xl border border-border/50 shadow-xl p-6 sm:p-8">
+              {/* Building selector for multi-building projects */}
+              {isMultiBuilding && (
+                <div className="mb-6">
+                  <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                    Select Building
+                  </label>
+                  <Select
+                    value={selectedBuildingId || ""}
+                    onValueChange={(value) => setSelectedBuildingId(value)}
+                  >
+                    <SelectTrigger className="h-12" data-testid="select-building-progress">
+                      <SelectValue placeholder="Choose a building..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {projectBuildings.map((building: any) => (
+                        <SelectItem key={building.id} value={building.id}>
+                          <div className="flex flex-col items-start">
+                            <span className="font-medium">{building.name}</span>
+                            {building.strataPlanNumber && (
+                              <span className="text-xs text-muted-foreground">
+                                Strata: {building.strataPlanNumber}
+                              </span>
+                            )}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+              
               {(() => {
                 // Determine job type category
                 const isHoursBased = activeProject?.jobType === 'general_pressure_washing' || 
@@ -1365,6 +1427,41 @@ export default function ResidentDashboard() {
                                 {activeProjects.map((project: any) => (
                                   <SelectItem key={project.id} value={project.id.toString()}>
                                     {project.buildingName || `${project.strataPlanNumber}`} - {project.jobType?.replace(/_/g, ' ')}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+
+                    {/* Building selector for multi-building projects */}
+                    {isMultiBuilding && (
+                      <FormField
+                        control={form.control}
+                        name="projectBuildingId"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Which Building?</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger data-testid="select-building-complaint" className="h-12">
+                                  <SelectValue placeholder="Select the building this is about" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {projectBuildings.map((building: any) => (
+                                  <SelectItem key={building.id} value={building.id}>
+                                    <div className="flex flex-col items-start">
+                                      <span className="font-medium">{building.name}</span>
+                                      {building.strataPlanNumber && (
+                                        <span className="text-xs text-muted-foreground">
+                                          Strata: {building.strataPlanNumber}
+                                        </span>
+                                      )}
+                                    </div>
                                   </SelectItem>
                                 ))}
                               </SelectContent>
