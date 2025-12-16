@@ -10437,12 +10437,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Get published work notices for the resident's building
-      const notices = await db.select().from(workNotices)
+      const rawNotices = await db.select().from(workNotices)
         .where(and(
           eq(workNotices.strataPlanNumber, currentUser.strataPlanNumber),
           eq(workNotices.isPublished, true)
         ))
         .orderBy(desc(workNotices.createdAt));
+      
+      // Map field names for frontend compatibility and fetch company branding
+      const notices = await Promise.all(rawNotices.map(async (notice) => {
+        // Get company branding if available (from users table brandingLogoUrl)
+        let logoUrl = notice.companyLogoUrl;
+        if (!logoUrl && notice.companyId) {
+          const [company] = await db.select({ brandingLogoUrl: users.brandingLogoUrl })
+            .from(users)
+            .where(eq(users.id, notice.companyId))
+            .limit(1);
+          if (company?.brandingLogoUrl) {
+            logoUrl = company.brandingLogoUrl;
+          }
+        }
+        
+        return {
+          ...notice,
+          // Map to frontend-expected field names
+          title: notice.noticeTitle,
+          content: notice.noticeDetails,
+          workStartDate: notice.startDate,
+          workEndDate: notice.endDate,
+          logoUrl: logoUrl,
+          contractors: notice.contractorName,
+        };
+      }));
       
       res.json({ notices });
     } catch (error) {
