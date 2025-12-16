@@ -30,6 +30,45 @@ import { formatLocalDate, formatLocalDateLong, parseLocalDate, toLocalDateString
 // Helper to get date locale based on current language
 const getDateLocale = () => i18n.language?.startsWith('fr') ? fr : enUS;
 
+// Calculate how long an item has been in service
+const getServiceDuration = (dateInService: string | null | undefined): string | null => {
+  if (!dateInService) return null;
+  
+  try {
+    const inServiceDate = new Date(dateInService);
+    const now = new Date();
+    
+    if (isNaN(inServiceDate.getTime())) return null;
+    
+    const diffMs = now.getTime() - inServiceDate.getTime();
+    if (diffMs < 0) return null; // Future date
+    
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    if (diffDays < 30) {
+      return diffDays === 1 ? "1 day" : `${diffDays} days`;
+    }
+    
+    const months = Math.floor(diffDays / 30);
+    const years = Math.floor(months / 12);
+    const remainingMonths = months % 12;
+    
+    if (years === 0) {
+      return months === 1 ? "1 month" : `${months} months`;
+    }
+    
+    if (remainingMonths === 0) {
+      return years === 1 ? "1 year" : `${years} years`;
+    }
+    
+    const yearPart = years === 1 ? "1 yr" : `${years} yrs`;
+    const monthPart = remainingMonths === 1 ? "1 mo" : `${remainingMonths} mo`;
+    return `${yearPart}, ${monthPart}`;
+  } catch {
+    return null;
+  }
+};
+
 const gearTypes = [
   { name: "Harness", icon: Shield },
   { name: "Rope", icon: Cable },
@@ -136,6 +175,15 @@ export default function Inventory() {
   const [customBrand, setCustomBrand] = useState("");
   const [customModel, setCustomModel] = useState("");
   const [catalogSearch, setCatalogSearch] = useState("");
+  
+  // Retire gear state
+  const [showRetireDialog, setShowRetireDialog] = useState(false);
+  const [serialToRetire, setSerialToRetire] = useState<GearSerialNumber | null>(null);
+  const [retireReason, setRetireReason] = useState<string>("");
+  
+  // Gear item detail dialog state
+  const [showItemDetailDialog, setShowItemDetailDialog] = useState(false);
+  const [selectedDetailItem, setSelectedDetailItem] = useState<GearItem | null>(null);
 
   // Fetch current user
   const { data: userData } = useQuery<{ user: any }>({
@@ -220,6 +268,13 @@ export default function Inventory() {
   const { data: damageReportsData, isLoading: damageReportsLoading } = useQuery<{ reports: any[] }>({
     queryKey: ["/api/equipment-damage-reports"],
   });
+
+  // Fetch retired gear
+  const { data: retiredGearData, isLoading: retiredGearLoading } = useQuery<{ retiredGear: any[] }>({
+    queryKey: ["/api/retired-gear"],
+    enabled: canManageInventory(currentUser),
+  });
+  const retiredGear = retiredGearData?.retiredGear || [];
 
   // Equipment types that have catalog support (all except Gas powered equipment, Soap, and Other)
   const CATALOG_SUPPORTED_TYPES = [
@@ -748,6 +803,32 @@ export default function Inventory() {
       toast({
         title: t('common.error', 'Error'),
         description: error.message || t('inventory.toast.deleteError', 'Failed to delete item'),
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Retire gear serial number mutation
+  const retireGearMutation = useMutation({
+    mutationFn: async ({ id, reason }: { id: string; reason: string }) => {
+      return apiRequest("PATCH", `/api/gear-serial-numbers/${id}/retire`, { reason });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/gear-items"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/retired-gear"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/gear-assignments"] });
+      toast({
+        title: t('inventory.toast.retireSuccess', 'Item Retired'),
+        description: t('inventory.toast.retireDescription', 'The gear item has been retired and removed from active inventory.'),
+      });
+      setShowRetireDialog(false);
+      setSerialToRetire(null);
+      setRetireReason("");
+    },
+    onError: (error: any) => {
+      toast({
+        title: t('common.error', 'Error'),
+        description: error.message || t('inventory.toast.retireError', 'Failed to retire item'),
         variant: "destructive",
       });
     },
@@ -1508,6 +1589,12 @@ export default function Inventory() {
             {canManageInventory(currentUser) && (
               <TabsTrigger value="manage" className="flex-1 min-w-fit" data-testid="tab-manage-gear">{t('inventory.tabs.manageGear', 'Manage Gear')}</TabsTrigger>
             )}
+            {canManageInventory(currentUser) && (
+              <TabsTrigger value="retired" className="flex-1 min-w-fit" data-testid="tab-retired-gear">
+                <span className="material-icons text-sm mr-1">archive</span>
+                {t('inventory.tabs.retiredGear', 'Retired')}
+              </TabsTrigger>
+            )}
             <TabsTrigger value="inspections" className="flex-1 min-w-fit" data-testid="tab-inspections">{t('inventory.tabs.inspections', 'Inspections')}</TabsTrigger>
             <TabsTrigger value="daily-harness" className="flex-1 min-w-fit" data-testid="tab-daily-harness">
               {t('inventory.tabs.dailyHarnessInspection', 'Daily Harness Inspection')}
@@ -1647,10 +1734,42 @@ export default function Inventory() {
 
                           {/* Serial Number - prominent display */}
                           {myAssignment?.serialNumber ? (
-                            <div className="mb-3">
+                            <div className="mb-3 flex items-center gap-2 flex-wrap">
                               <Badge variant="secondary" className="font-mono text-sm px-3 py-1">
                                 S/N: {myAssignment.serialNumber}
                               </Badge>
+                              {/* Service duration badge */}
+                              {getServiceDuration(myAssignment.dateInService) && (
+                                <Badge variant="secondary" className="text-xs bg-primary/10 text-primary border-primary/20">
+                                  <span className="material-icons text-xs mr-1">schedule</span>
+                                  {getServiceDuration(myAssignment.dateInService)} in service
+                                </Badge>
+                              )}
+                              {/* Retire button for serial number */}
+                              {(() => {
+                                const serialEntry = ((item as any).serialEntries || []).find(
+                                  (se: GearSerialNumber) => se.serialNumber === myAssignment.serialNumber
+                                );
+                                if (serialEntry) {
+                                  return (
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      className="h-6 px-2 text-xs text-muted-foreground"
+                                      onClick={() => {
+                                        setSerialToRetire(serialEntry);
+                                        setShowRetireDialog(true);
+                                      }}
+                                      title={t('inventory.retireItem', 'Retire this item')}
+                                      data-testid={`button-retire-mygear-${serialEntry.id}`}
+                                    >
+                                      <span className="material-icons text-sm mr-1">archive</span>
+                                      {t('inventory.retire', 'Retire')}
+                                    </Button>
+                                  );
+                                }
+                                return null;
+                              })()}
                             </div>
                           ) : (
                             <div className="mb-3">
@@ -2089,7 +2208,15 @@ export default function Inventory() {
                               <CardContent className="pt-0">
                                 <div className="space-y-2">
                                   {items.map((item) => (
-                  <Card key={item.id} className="bg-muted/30" data-testid={`item-${item.id}`}>
+                  <Card 
+                    key={item.id} 
+                    className="bg-muted/30 cursor-pointer hover-elevate" 
+                    data-testid={`item-${item.id}`}
+                    onClick={() => {
+                      setSelectedDetailItem(item);
+                      setShowItemDetailDialog(true);
+                    }}
+                  >
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between gap-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 flex-1">
@@ -2104,11 +2231,34 @@ export default function Inventory() {
                             <div className="text-sm font-medium text-foreground mt-1">
                               {t('inventory.quantity', 'Quantity')}: {item.quantity || 1}
                             </div>
-                            {item.serialNumbers && item.serialNumbers.length > 0 && (
-                              <div className="text-sm text-muted-foreground space-y-0.5">
+                            {(item as any).serialEntries && (item as any).serialEntries.length > 0 && (
+                              <div className="text-sm text-muted-foreground space-y-1">
                                 <div className="font-medium">{t('inventory.serialNumbers', 'Serial Numbers')}:</div>
-                                {item.serialNumbers.map((sn, idx) => (
-                                  <div key={idx} className="pl-2">• {sn}</div>
+                                {(item as any).serialEntries.map((entry: GearSerialNumber) => (
+                                  <div key={entry.id} className="flex items-center justify-between pl-2 group">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <span>• {entry.serialNumber}</span>
+                                      {getServiceDuration(entry.dateInService) && (
+                                        <span className="text-xs text-primary">
+                                          ({getServiceDuration(entry.dateInService)})
+                                        </span>
+                                      )}
+                                    </div>
+                                    <Button
+                                      size="icon"
+                                      variant="ghost"
+                                      className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSerialToRetire(entry);
+                                        setShowRetireDialog(true);
+                                      }}
+                                      title={t('inventory.retireItem', 'Retire this item')}
+                                      data-testid={`button-retire-${entry.id}`}
+                                    >
+                                      <span className="material-icons text-sm text-muted-foreground">archive</span>
+                                    </Button>
+                                  </div>
                                 ))}
                               </div>
                             )}
@@ -2173,7 +2323,7 @@ export default function Inventory() {
                             )}
                           </div>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
                           <Button
                             size="icon"
                             variant="ghost"
@@ -2214,6 +2364,83 @@ export default function Inventory() {
                 </div>
               );
             })()}
+          </TabsContent>
+          )}
+
+          {/* Retired Gear Tab */}
+          {canManageInventory(currentUser) && (
+          <TabsContent value="retired" className="space-y-4">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-semibold">{t('inventory.retiredGear', 'Retired Gear')}</h2>
+                <p className="text-sm text-muted-foreground">{t('inventory.retiredGearDescription', 'Equipment that has been retired from active inventory')}</p>
+              </div>
+            </div>
+
+            {retiredGearLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            ) : retiredGear.length === 0 ? (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <div className="flex flex-col items-center gap-4">
+                    <span className="material-icons text-4xl text-muted-foreground">archive</span>
+                    <h3 className="font-semibold">{t('inventory.noRetiredGear', 'No Retired Gear')}</h3>
+                    <p className="text-muted-foreground">
+                      {t('inventory.noRetiredGearDescription', 'Retired equipment will appear here. Use the manage gear tab to retire items.')}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-2">
+                {retiredGear.map((item: any) => (
+                  <Card key={item.id} className="bg-muted/30">
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-semibold">{item.gearItemType || item.gearItemCategory}</span>
+                            <Badge variant="secondary" className="text-xs">
+                              <span className="material-icons text-xs mr-1">archive</span>
+                              {t('inventory.retired', 'Retired')}
+                            </Badge>
+                          </div>
+                          {item.gearItemBrand && (
+                            <div className="text-sm text-muted-foreground">{t('inventory.brand', 'Brand')}: {item.gearItemBrand}</div>
+                          )}
+                          {item.gearItemModel && (
+                            <div className="text-sm text-muted-foreground">{t('inventory.model', 'Model')}: {item.gearItemModel}</div>
+                          )}
+                          <div className="text-sm text-muted-foreground">{t('inventory.serialNumber', 'Serial')}: {item.serialNumber}</div>
+                          {item.dateOfManufacture && (
+                            <div className="text-sm text-muted-foreground">
+                              {t('inventory.mfg', 'Mfg Date')}: {formatLocalDate(item.dateOfManufacture)}
+                            </div>
+                          )}
+                          {item.dateInService && (
+                            <div className="text-sm text-muted-foreground">
+                              {t('inventory.inServiceDate', 'In Service')}: {formatLocalDate(item.dateInService)}
+                            </div>
+                          )}
+                          <div className="mt-2 p-2 bg-muted rounded-md">
+                            <div className="text-sm">
+                              <span className="font-medium">{t('inventory.retiredReason', 'Reason')}:</span>{' '}
+                              {item.retiredReason}
+                            </div>
+                            <div className="text-xs text-muted-foreground mt-1">
+                              {t('inventory.retiredOn', 'Retired')}: {item.retiredAt ? formatLocalDate(item.retiredAt) : 'N/A'}
+                              {item.retiredByName && ` by ${item.retiredByName}`}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </TabsContent>
           )}
 
@@ -3075,14 +3302,14 @@ export default function Inventory() {
                       
                       <Button
                         type="button"
-                        variant="default"
+                        variant="outline"
                         onClick={handleAddSerialNumber}
                         disabled={serialEntries.length >= (form.watch("quantity") || 1)}
                         data-testid="button-add-serial"
                         className="w-full"
                       >
                         <Plus className="h-5 w-5 mr-2" />
-                        {t('inventory.addItemCount', 'Add Item')} ({serialEntries.length}/{form.watch("quantity") || 1})
+                        {t('inventory.addToList', 'Add to List')} ({serialEntries.length}/{form.watch("quantity") || 1})
                       </Button>
                     </div>
 
@@ -3171,7 +3398,7 @@ export default function Inventory() {
                       {t('common.back', 'Back')}
                     </Button>
                     <Button type="submit" disabled={addItemMutation.isPending} data-testid="button-submit" className="flex-1">
-                      {addItemMutation.isPending ? t('inventory.adding', 'Adding...') : t('inventory.addItem', 'Add Item')}
+                      {addItemMutation.isPending ? t('inventory.saving', 'Saving...') : t('inventory.saveToInventory', 'Save to Inventory')}
                     </Button>
                   </div>
                 </>
@@ -3356,14 +3583,14 @@ export default function Inventory() {
                   
                   <Button
                     type="button"
-                    variant="default"
+                    variant="outline"
                     onClick={handleAddSerialNumber}
                     disabled={serialEntries.length >= (form.watch("quantity") || 1)}
                     data-testid="button-add-serial-edit"
                     className="w-full"
                   >
                     <Plus className="h-5 w-5 mr-2" />
-                    {t('inventory.addItemCount', 'Add Item')} ({serialEntries.length}/{form.watch("quantity") || 1})
+                    {t('inventory.addToList', 'Add to List')} ({serialEntries.length}/{form.watch("quantity") || 1})
                   </Button>
                 </div>
 
@@ -3548,6 +3775,305 @@ export default function Inventory() {
               data-testid="button-confirm-delete"
             >
               {deleteItemMutation.isPending ? t('inventory.deleting', 'Deleting...') : t('inventory.dialog.deleteItem', 'Delete Item')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Retire Gear Dialog */}
+      <Dialog open={showRetireDialog} onOpenChange={(open) => {
+        setShowRetireDialog(open);
+        if (!open) {
+          setSerialToRetire(null);
+          setRetireReason("");
+        }
+      }}>
+        <DialogContent data-testid="dialog-retire-item">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <span className="material-icons text-muted-foreground">archive</span>
+              {t('inventory.dialog.retireItem', 'Retire Item')}
+            </DialogTitle>
+            <DialogDescription>
+              {t('inventory.dialog.retireItemDescription', 'Retiring an item removes it from active inventory and unassigns it from any technician. This action is for items that are worn out, damaged beyond repair, or at end of life.')}
+            </DialogDescription>
+          </DialogHeader>
+          {serialToRetire && (
+            <div className="py-2">
+              <div className="p-3 bg-muted/50 rounded-md">
+                <div className="font-medium text-sm">{t('inventory.serialNumber', 'Serial Number')}: {serialToRetire.serialNumber}</div>
+                {serialToRetire.dateOfManufacture && (
+                  <div className="text-xs text-muted-foreground mt-1">
+                    {t('inventory.mfg', 'Mfg Date')}: {formatLocalDate(serialToRetire.dateOfManufacture)}
+                  </div>
+                )}
+                {serialToRetire.dateInService && (
+                  <div className="text-xs text-muted-foreground">
+                    {t('inventory.inServiceDate', 'In Service')}: {formatLocalDate(serialToRetire.dateInService)}
+                  </div>
+                )}
+              </div>
+              <div className="mt-4">
+                <Label htmlFor="retire-reason">{t('inventory.retireReason', 'Reason for Retirement')} *</Label>
+                <Select value={retireReason} onValueChange={setRetireReason}>
+                  <SelectTrigger id="retire-reason" data-testid="select-retire-reason">
+                    <SelectValue placeholder={t('inventory.selectReason', 'Select a reason...')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="End of life - wear and tear">{t('inventory.reason.endOfLife', 'End of life - wear and tear')}</SelectItem>
+                    <SelectItem value="Damaged beyond repair">{t('inventory.reason.damaged', 'Damaged beyond repair')}</SelectItem>
+                    <SelectItem value="Failed inspection">{t('inventory.reason.failedInspection', 'Failed inspection')}</SelectItem>
+                    <SelectItem value="Recalled by manufacturer">{t('inventory.reason.recalled', 'Recalled by manufacturer')}</SelectItem>
+                    <SelectItem value="Lost">{t('inventory.reason.lost', 'Lost')}</SelectItem>
+                    <SelectItem value="Stolen">{t('inventory.reason.stolen', 'Stolen')}</SelectItem>
+                    <SelectItem value="Other">{t('inventory.reason.other', 'Other')}</SelectItem>
+                  </SelectContent>
+                </Select>
+                {retireReason === "Other" && (
+                  <Input
+                    className="mt-2"
+                    placeholder={t('inventory.specifyReason', 'Please specify the reason...')}
+                    value={retireReason === "Other" ? "" : retireReason}
+                    onChange={(e) => setRetireReason(e.target.value || "Other")}
+                    data-testid="input-retire-reason-other"
+                  />
+                )}
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setShowRetireDialog(false);
+                setSerialToRetire(null);
+                setRetireReason("");
+              }}
+              data-testid="button-cancel-retire"
+            >
+              {t('common.cancel', 'Cancel')}
+            </Button>
+            <Button
+              onClick={() => {
+                if (serialToRetire && retireReason) {
+                  retireGearMutation.mutate({ id: serialToRetire.id, reason: retireReason });
+                }
+              }}
+              disabled={!retireReason || retireGearMutation.isPending}
+              data-testid="button-confirm-retire"
+            >
+              <span className="material-icons text-sm mr-1">archive</span>
+              {retireGearMutation.isPending ? t('inventory.retiring', 'Retiring...') : t('inventory.dialog.retireItem', 'Retire Item')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Item Detail Dialog */}
+      <Dialog open={showItemDetailDialog} onOpenChange={(open) => {
+        setShowItemDetailDialog(open);
+        if (!open) setSelectedDetailItem(null);
+      }}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto" data-testid="dialog-item-detail">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <span className="material-icons text-primary">
+                  {EQUIPMENT_ICONS[selectedDetailItem?.equipmentType || ""] || "category"}
+                </span>
+              </div>
+              <div>
+                <div>{selectedDetailItem?.equipmentType || t('inventory.gearItem', 'Gear Item')}</div>
+                {(selectedDetailItem?.brand || selectedDetailItem?.model) && (
+                  <div className="text-sm font-normal text-muted-foreground">
+                    {[selectedDetailItem?.brand, selectedDetailItem?.model].filter(Boolean).join(" - ")}
+                  </div>
+                )}
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedDetailItem && (
+            <div className="space-y-6 py-2">
+              {/* Basic Info */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <div className="text-sm text-muted-foreground">{t('inventory.quantity', 'Quantity')}</div>
+                  <div className="font-semibold">{selectedDetailItem.quantity || 1}</div>
+                </div>
+                <div>
+                  <div className="text-sm text-muted-foreground">{t('inventory.available', 'Available')}</div>
+                  <div className="font-semibold">{getAvailableQuantity(selectedDetailItem)} / {selectedDetailItem.quantity || 0}</div>
+                </div>
+                {canViewFinancials && selectedDetailItem.itemPrice && (
+                  <>
+                    <div>
+                      <div className="text-sm text-muted-foreground">{t('inventory.priceEach', 'Price Each')}</div>
+                      <div className="font-semibold text-primary">${parseFloat(selectedDetailItem.itemPrice).toFixed(2)}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-muted-foreground">{t('inventory.totalValue', 'Total Value')}</div>
+                      <div className="font-semibold text-primary">${(parseFloat(selectedDetailItem.itemPrice) * (selectedDetailItem.quantity || 1)).toFixed(2)}</div>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Rope-specific info */}
+              {selectedDetailItem.equipmentType === "Rope" && (
+                <div className="grid grid-cols-2 gap-4">
+                  {selectedDetailItem.ropeLength && (
+                    <div>
+                      <div className="text-sm text-muted-foreground">{t('inventory.ropeLength', 'Rope Length')}</div>
+                      <div className="font-semibold">{selectedDetailItem.ropeLength} ft</div>
+                    </div>
+                  )}
+                  {selectedDetailItem.pricePerFeet && canViewFinancials && (
+                    <div>
+                      <div className="text-sm text-muted-foreground">{t('inventory.pricePerFt', 'Price per ft')}</div>
+                      <div className="font-semibold text-primary">${parseFloat(selectedDetailItem.pricePerFeet).toFixed(2)}</div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Notes */}
+              {selectedDetailItem.notes && (
+                <div>
+                  <div className="text-sm text-muted-foreground mb-1">{t('inventory.notes', 'Notes')}</div>
+                  <div className="text-sm p-3 bg-muted/50 rounded-md">{selectedDetailItem.notes}</div>
+                </div>
+              )}
+
+              {/* Serial Numbers Section */}
+              {(selectedDetailItem as any).serialEntries && (selectedDetailItem as any).serialEntries.length > 0 && (
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-semibold">{t('inventory.serialNumbers', 'Serial Numbers')}</h4>
+                    <Badge variant="secondary">{(selectedDetailItem as any).serialEntries.length} {t('inventory.units', 'units')}</Badge>
+                  </div>
+                  <div className="space-y-2">
+                    {(selectedDetailItem as any).serialEntries.map((entry: GearSerialNumber) => {
+                      const assignment = gearData?.assignments?.find(
+                        (a: any) => a.gearItemId === selectedDetailItem.id && a.serialNumber === entry.serialNumber
+                      );
+                      const assignedEmployee = assignment ? activeEmployees.find(e => e.id === assignment.employeeId) : null;
+                      
+                      return (
+                        <div key={entry.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-md">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <Badge variant="outline" className="font-mono">
+                                {entry.serialNumber}
+                              </Badge>
+                              {getServiceDuration(entry.dateInService) && (
+                                <Badge variant="secondary" className="text-xs bg-primary/10 text-primary border-primary/20">
+                                  <span className="material-icons text-xs mr-1">schedule</span>
+                                  {getServiceDuration(entry.dateInService)} in service
+                                </Badge>
+                              )}
+                              {assignedEmployee && (
+                                <Badge variant="secondary" className="text-xs">
+                                  <span className="material-icons text-xs mr-1">person</span>
+                                  {assignedEmployee.name}
+                                </Badge>
+                              )}
+                            </div>
+                            <div className="flex gap-4 mt-1 text-xs text-muted-foreground">
+                              {entry.dateOfManufacture && (
+                                <span>{t('inventory.mfg', 'Mfg')}: {formatLocalDate(entry.dateOfManufacture)}</span>
+                              )}
+                              {entry.dateInService && (
+                                <span>{t('inventory.inService', 'In Service')}: {formatLocalDate(entry.dateInService)}</span>
+                              )}
+                            </div>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="text-muted-foreground"
+                            onClick={() => {
+                              setSerialToRetire(entry);
+                              setShowRetireDialog(true);
+                            }}
+                            data-testid={`button-retire-detail-${entry.id}`}
+                          >
+                            <span className="material-icons text-sm mr-1">archive</span>
+                            {t('inventory.retire', 'Retire')}
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Current Assignments */}
+              {getItemAssignments(selectedDetailItem.id).length > 0 && (
+                <div>
+                  <h4 className="font-semibold mb-3">{t('inventory.currentAssignments', 'Current Assignments')}</h4>
+                  <div className="space-y-2">
+                    {getItemAssignments(selectedDetailItem.id).map((assignment) => {
+                      const employee = activeEmployees.find(e => e.id === assignment.employeeId);
+                      return (
+                        <div key={assignment.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-md">
+                          <div>
+                            <div className="font-medium">{employee?.name || t('common.unknown', 'Unknown')}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {t('inventory.quantity', 'Qty')}: {assignment.quantity}
+                              {assignment.serialNumber && ` | S/N: ${assignment.serialNumber}`}
+                            </div>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="text-destructive"
+                            onClick={() => deleteAssignmentMutation.mutate(assignment.id)}
+                            disabled={deleteAssignmentMutation.isPending}
+                            data-testid={`button-unassign-detail-${assignment.id}`}
+                          >
+                            <X className="h-4 w-4 mr-1" />
+                            {t('common.remove', 'Remove')}
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (selectedDetailItem) openAssignDialog(selectedDetailItem);
+                setShowItemDetailDialog(false);
+              }}
+              data-testid="button-assign-from-detail"
+            >
+              <Users className="h-4 w-4 mr-2" />
+              {t('inventory.assignGear', 'Assign Gear')}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (selectedDetailItem) openEditDialog(selectedDetailItem);
+                setShowItemDetailDialog(false);
+              }}
+              data-testid="button-edit-from-detail"
+            >
+              <Pencil className="h-4 w-4 mr-2" />
+              {t('inventory.edit', 'Edit')}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setShowItemDetailDialog(false)}
+              data-testid="button-close-detail"
+            >
+              {t('common.close', 'Close')}
             </Button>
           </DialogFooter>
         </DialogContent>
