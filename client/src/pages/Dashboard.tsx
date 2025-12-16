@@ -2495,6 +2495,48 @@ export default function Dashboard() {
     setEditEmployeeFormStep(1); // Reset to first step
     setShowEditEmployeeDialog(true);
   };
+
+  // Handle editing employee permissions directly (skips to step 2)
+  const handleEditEmployeePermissions = (employee: any) => {
+    setEmployeeToEdit(employee);
+    editEmployeeForm.reset({
+      name: employee.name ?? "",
+      email: employee.email ?? "",
+      role: employee.role,
+      hourlyRate: employee.hourlyRate != null ? String(employee.hourlyRate) : "",
+      isSalary: employee.isSalary ?? false,
+      salary: employee.salary != null ? String(employee.salary) : "",
+      permissions: employee.permissions || [],
+      startDate: employee.startDate ?? "",
+      birthday: employee.birthday ?? "",
+      socialInsuranceNumber: employee.socialInsuranceNumber ?? "",
+      driversLicenseNumber: employee.driversLicenseNumber ?? "",
+      driversLicenseProvince: employee.driversLicenseProvince ?? "",
+      driversLicenseDocuments: employee.driversLicenseDocuments || [],
+      homeAddress: employee.homeAddress ?? "",
+      employeePhoneNumber: employee.employeePhoneNumber ?? "",
+      emergencyContactName: employee.emergencyContactName ?? "",
+      emergencyContactPhone: employee.emergencyContactPhone ?? "",
+      specialMedicalConditions: employee.specialMedicalConditions ?? "",
+      irataLevel: employee.irataLevel ?? "",
+      irataLicenseNumber: employee.irataLicenseNumber ?? "",
+      irataIssuedDate: employee.irataIssuedDate ?? "",
+      irataExpirationDate: employee.irataExpirationDate ?? "",
+      spratLevel: employee.spratLevel ?? "",
+      spratLicenseNumber: employee.spratLicenseNumber ?? "",
+      spratIssuedDate: employee.spratIssuedDate ?? "",
+      spratExpirationDate: employee.spratExpirationDate ?? "",
+      terminatedDate: employee.terminatedDate ?? "",
+      terminationReason: employee.terminationReason ?? "",
+      terminationNotes: employee.terminationNotes ?? "",
+      hasFirstAid: employee.hasFirstAid ?? false,
+      firstAidType: employee.firstAidType ?? "",
+      firstAidExpiry: employee.firstAidExpiry ?? "",
+      firstAidDocuments: employee.firstAidDocuments || [],
+    });
+    setEditEmployeeFormStep(2); // Go directly to permissions step
+    setShowEditEmployeeDialog(true);
+  };
   
   // Watch for termination date changes
   const watchedTerminationDate = editEmployeeForm.watch("terminatedDate");
@@ -7114,6 +7156,19 @@ export default function Dashboard() {
                                   disabled={userIsReadOnly}
                                 >
                                   <span className="material-icons text-sm">edit</span>
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleEditEmployeePermissions(employee);
+                                  }}
+                                  data-testid={`button-edit-permissions-${employee.id}`}
+                                  disabled={userIsReadOnly}
+                                >
+                                  <span className="material-icons text-sm mr-1">admin_panel_settings</span>
+                                  {t('dashboard.employees.editPermissions', 'Edit Permissions')}
                                 </Button>
                                 {/* Password change only for company-created employees, NOT rope access technicians who own their own accounts */}
                                 {user?.role === "company" && employee.role !== "rope_access_tech" && (
