@@ -1121,6 +1121,9 @@ export default function ProjectDetail() {
     ? projectBuildings.find((b: any) => b.id === selectedBuildingId) 
     : null;
   
+  // Use building-specific daily drop target if a building is selected, otherwise use project-level
+  const effectiveDailyDropTarget = selectedBuilding?.dailyDropTarget || project.dailyDropTarget;
+  
   // Determine tracking type and calculate progress
   // Use shared utility function that accounts for hours-based jobs AND non-elevation drop-based jobs
   const isPercentageBased = usesPercentageProgress(project.jobType, project.requiresElevation);
@@ -1193,14 +1196,14 @@ export default function ProjectDetail() {
   const targetMetCount = completedSessions.filter((s: any) => {
     const totalSessionDrops = (s.dropsCompletedNorth ?? 0) + (s.dropsCompletedEast ?? 0) + 
                               (s.dropsCompletedSouth ?? 0) + (s.dropsCompletedWest ?? 0);
-    return totalSessionDrops >= project.dailyDropTarget;
+    return totalSessionDrops >= effectiveDailyDropTarget;
   }).length;
   
   // Valid Reason: below target but has a valid shortfall reason code (not 'other' and not empty)
   const validReasonCount = completedSessions.filter((s: any) => {
     const totalSessionDrops = (s.dropsCompletedNorth ?? 0) + (s.dropsCompletedEast ?? 0) + 
                               (s.dropsCompletedSouth ?? 0) + (s.dropsCompletedWest ?? 0);
-    const isBelowTarget = totalSessionDrops < project.dailyDropTarget;
+    const isBelowTarget = totalSessionDrops < effectiveDailyDropTarget;
     const hasValidReasonCode = s.validShortfallReasonCode && s.validShortfallReasonCode !== '' && s.validShortfallReasonCode !== 'other';
     return isBelowTarget && hasValidReasonCode;
   }).length;
@@ -1209,7 +1212,7 @@ export default function ProjectDetail() {
   const belowTargetCount = completedSessions.filter((s: any) => {
     const totalSessionDrops = (s.dropsCompletedNorth ?? 0) + (s.dropsCompletedEast ?? 0) + 
                               (s.dropsCompletedSouth ?? 0) + (s.dropsCompletedWest ?? 0);
-    const isBelowTarget = totalSessionDrops < project.dailyDropTarget;
+    const isBelowTarget = totalSessionDrops < effectiveDailyDropTarget;
     const hasValidReasonCode = s.validShortfallReasonCode && s.validShortfallReasonCode !== '' && s.validShortfallReasonCode !== 'other';
     return isBelowTarget && !hasValidReasonCode;
   }).length;
@@ -1500,7 +1503,7 @@ export default function ProjectDetail() {
                       ? project.suitesPerDay 
                       : project.jobType === "parkade_pressure_cleaning" 
                       ? project.stallsPerDay 
-                      : project.dailyDropTarget}
+                      : effectiveDailyDropTarget}
                   </div>
                   <div className="text-sm text-muted-foreground mt-1">
                     {project.jobType === "in_suite_dryer_vent_cleaning" 
@@ -1518,7 +1521,7 @@ export default function ProjectDetail() {
                             ? project.suitesPerDay 
                             : project.jobType === "parkade_pressure_cleaning" 
                             ? project.stallsPerDay 
-                            : project.dailyDropTarget;
+                            : effectiveDailyDropTarget;
                           const remaining = totalDrops - completedDrops;
                           return Math.ceil(remaining / (dailyTarget || 1));
                         })()
@@ -2102,7 +2105,7 @@ export default function ProjectDetail() {
                                                       const isCompleted = session.endTime !== null;
                                                       const sessionDrops = (session.dropsCompletedNorth ?? 0) + (session.dropsCompletedEast ?? 0) + 
                                                                            (session.dropsCompletedSouth ?? 0) + (session.dropsCompletedWest ?? 0);
-                                                      const metTarget = sessionDrops >= project.dailyDropTarget;
+                                                      const metTarget = sessionDrops >= effectiveDailyDropTarget;
                                                       const isPercentageBasedSession = usesPercentageProgress(project.jobType, project.requiresElevation);
                                                       const contributionPct = session.manualCompletionPercentage;
                                                       const sessionLaborCost = session.laborCost ? parseFloat(session.laborCost) : null;

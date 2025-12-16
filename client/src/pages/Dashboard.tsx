@@ -1006,6 +1006,7 @@ export default function Dashboard() {
     buildingAddress: string;
     floorCount: string;
     buildingHeight: string;
+    dailyDropTarget: string;
     totalDropsNorth: string;
     totalDropsEast: string;
     totalDropsSouth: string;
@@ -1958,6 +1959,7 @@ export default function Dashboard() {
               buildingAddress: b.buildingAddress,
               floorCount: b.floorCount ? parseInt(b.floorCount) : undefined,
               buildingHeight: b.buildingHeight,
+              dailyDropTarget: b.dailyDropTarget ? parseInt(b.dailyDropTarget) : 0,
               totalDropsNorth: b.totalDropsNorth ? parseInt(b.totalDropsNorth) : 0,
               totalDropsEast: b.totalDropsEast ? parseInt(b.totalDropsEast) : 0,
               totalDropsSouth: b.totalDropsSouth ? parseInt(b.totalDropsSouth) : 0,
@@ -4382,6 +4384,7 @@ export default function Dashboard() {
                                       buildingAddress: "",
                                       floorCount: "",
                                       buildingHeight: "",
+                                      dailyDropTarget: "",
                                       totalDropsNorth: "",
                                       totalDropsEast: "",
                                       totalDropsSouth: "",
@@ -4455,6 +4458,23 @@ export default function Dashboard() {
                                           data-testid={`input-building-address-${index}`}
                                         />
                                       </div>
+                                    </div>
+                                    
+                                    <div>
+                                      <label className="text-xs text-muted-foreground">{t('dashboard.projectForm.dailyDropTarget', 'Daily Drop Target')}</label>
+                                      <Input
+                                        type="number"
+                                        min="1"
+                                        placeholder="e.g., 10"
+                                        value={building.dailyDropTarget}
+                                        onChange={(e) => {
+                                          const updated = [...projectBuildings];
+                                          updated[index] = { ...building, dailyDropTarget: e.target.value };
+                                          setProjectBuildings(updated);
+                                        }}
+                                        className="h-10"
+                                        data-testid={`input-building-drop-target-${index}`}
+                                      />
                                     </div>
                                     
                                     <div className="grid grid-cols-4 gap-2">
@@ -4537,6 +4557,7 @@ export default function Dashboard() {
                                       buildingAddress: "",
                                       floorCount: "",
                                       buildingHeight: "",
+                                      dailyDropTarget: "",
                                       totalDropsNorth: "",
                                       totalDropsEast: "",
                                       totalDropsSouth: "",
