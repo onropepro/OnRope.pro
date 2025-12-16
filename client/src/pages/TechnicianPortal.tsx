@@ -390,7 +390,7 @@ const translations = {
     addExperience: "Add your experience start date",
     referralCodeGenerating: "Your referral code will be generated when you complete registration",
     // Safety Rating
-    performanceSafetyRating: "Safety Rating",
+    performanceSafetyRating: "Personal Safety Rating",
     overallScore: "Overall Score",
     harnessCompliance: "Harness Inspections",
     documentCompliance: "Documents Signed",
