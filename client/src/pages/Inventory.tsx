@@ -1691,10 +1691,35 @@ export default function Inventory() {
 
                           {/* Serial Number - prominent display */}
                           {myAssignment?.serialNumber ? (
-                            <div className="mb-3">
+                            <div className="mb-3 flex items-center gap-2">
                               <Badge variant="secondary" className="font-mono text-sm px-3 py-1">
                                 S/N: {myAssignment.serialNumber}
                               </Badge>
+                              {/* Retire button for serial number */}
+                              {(() => {
+                                const serialEntry = ((item as any).serialEntries || []).find(
+                                  (se: GearSerialNumber) => se.serialNumber === myAssignment.serialNumber
+                                );
+                                if (serialEntry) {
+                                  return (
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      className="h-6 px-2 text-xs text-muted-foreground"
+                                      onClick={() => {
+                                        setSerialToRetire(serialEntry);
+                                        setShowRetireDialog(true);
+                                      }}
+                                      title={t('inventory.retireItem', 'Retire this item')}
+                                      data-testid={`button-retire-mygear-${serialEntry.id}`}
+                                    >
+                                      <span className="material-icons text-sm mr-1">archive</span>
+                                      {t('inventory.retire', 'Retire')}
+                                    </Button>
+                                  );
+                                }
+                                return null;
+                              })()}
                             </div>
                           ) : (
                             <div className="mb-3">
