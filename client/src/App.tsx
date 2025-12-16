@@ -5,7 +5,6 @@ import { QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { usePermissionSync } from "@/hooks/use-permission-sync";
-import DebugConsole from "@/components/DebugConsole";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 // Pages
@@ -659,7 +658,6 @@ function App() {
           <BrandingProvider>
             <Router />
             <Toaster />
-            <DebugConsole />
           </BrandingProvider>
         </ErrorBoundary>
       </TooltipProvider>
