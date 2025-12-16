@@ -104,27 +104,36 @@ export default function JobBoardGuide() {
 
         {/* Golden Rule Section */}
         <section>
-          <div className="flex items-center gap-3 mb-4">
-            <Target className="w-6 h-6 text-action-500" />
-            <h2 className="text-xl md:text-2xl font-semibold">The Golden Rule</h2>
-          </div>
-
-          <Card className="bg-action-50 dark:bg-action-950 border-action-200 dark:border-action-800">
-            <CardContent className="pt-4 space-y-4">
-              <p className="text-lg font-semibold text-action-800 dark:text-action-200">
-                The Job Board is a closed-garden ecosystem. Every employer is verified. Every technician is relevant. No noise.
-              </p>
-              
-              <div className="bg-white/50 dark:bg-black/20 p-4 rounded">
-                <p className="font-semibold text-sm mb-2">The Network Effect Formula</p>
-                <p className="font-mono text-base text-action-700 dark:text-action-300">
+          <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950">
+            <CardHeader>
+              <CardTitle className="text-xl md:text-2xl flex items-center gap-2 text-amber-900 dark:text-amber-100">
+                <Target className="w-5 h-5" />
+                The Golden Rule: Closed Garden Ecosystem
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-amber-900 dark:text-amber-100 space-y-4">
+              <div className="bg-white dark:bg-amber-900 rounded-lg p-4 text-center">
+                <p className="text-xl md:text-2xl font-mono font-bold">
                   Value = Verified Employers x Qualified Technicians x Industry Specificity
                 </p>
               </div>
+              
+              <div className="space-y-2 text-base">
+                <p><strong>Key Principles:</strong></p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li><strong>Verified Employers</strong>: Only rope access building maintenance companies can post jobs. No bakeries, no unrelated industries.</li>
+                  <li><strong>Qualified Technicians</strong>: Every applicant is a rope access professional. No pipe fitters, no general laborers.</li>
+                  <li><strong>Industry Specificity</strong>: Focused marketplace creates higher match quality for everyone.</li>
+                </ul>
+              </div>
 
-              <p className="text-muted-foreground text-base">
-                Unlike Indeed where rope access jobs are buried among thousands of irrelevant listings and you pay $22 per application, OnRopePro creates a focused marketplace. Employers only see rope access technicians. Technicians only see rope access building maintenance jobs. No bakeries posting jobs. No pipe fitters applying. The more companies and techs join, the more valuable it becomes for everyone.
-              </p>
+              <div className="bg-amber-100 dark:bg-amber-800 rounded-lg p-3 text-sm">
+                <p className="font-semibold flex items-center gap-2">
+                  <Info className="w-4 h-4" />
+                  Why This Matters
+                </p>
+                <p className="mt-1">Unlike Indeed where rope access jobs are buried among thousands of irrelevant listings and you pay $22 per application, OnRopePro creates a focused marketplace. No filtering through 50 resumes to find 2 actual rope techs. The more companies and techs join, the more valuable it becomes for everyone.</p>
+              </div>
             </CardContent>
           </Card>
         </section>
