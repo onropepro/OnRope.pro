@@ -3159,7 +3159,7 @@ export default function Dashboard() {
       icon: "calendar_today",
       onClick: () => setLocation("/schedule"),
       testId: "button-schedule",
-      isVisible: (user: any) => canViewSchedule(user), // Schedule permission
+      isVisible: () => true, // Visible for everyone
       borderColor: "#0ea5e9",
       category: "operations",
     },
