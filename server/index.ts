@@ -5,6 +5,7 @@ import { pool } from "./db";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { runMigrations } from "./migrate";
+import { seedEquipmentCatalog } from "./seedEquipmentCatalog";
 import { wsHub } from "./websocket-hub";
 import { SESSION_SECRET, SESSION_COOKIE_NAME } from "./session-config";
 
@@ -94,6 +95,9 @@ app.use((req, res, next) => {
 (async () => {
   // Run database migrations (triggers, constraints)
   await runMigrations();
+  
+  // Seed equipment catalog with pre-populated items if empty
+  await seedEquipmentCatalog();
   
   const server = await registerRoutes(app);
 
