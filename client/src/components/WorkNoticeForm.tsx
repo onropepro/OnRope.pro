@@ -92,19 +92,50 @@ Please keep windows closed throughout the cleaning period. Contact the property 
   ],
   dryer_vent_cleaning: [
     {
-      title: "Exterior Dryer Vent Cleaning Notice",
+      title: "Exterior Dryer Vent Cleaning - Fire Prevention",
       details: `Dear Residents,
 
-Our team will be cleaning the exterior dryer vents on your building. This is important maintenance that helps prevent fire hazards and improves dryer efficiency.
+Professional exterior dryer vent cleaning services are scheduled for your building. This critical maintenance helps prevent dryer fires caused by lint buildup and improves your dryer's efficiency.
+
+WHAT WE WILL BE DOING:
+Our certified rope access technicians will clean the exterior dryer vent exhaust points on the building facade. This involves:
+- Removing lint buildup from exterior vent covers
+- Clearing any blockages in the exhaust outlet
+- Inspecting vent condition and airflow
+
+NO ACCESS TO YOUR UNIT IS REQUIRED. All work is performed from outside the building.
 
 WHAT TO EXPECT:
-- Technicians working on ropes near dryer vent locations
-- Brief noise from cleaning equipment
-- No action required from residents
+- Technicians on ropes near balconies and vent locations
+- Brief equipment noise during cleaning
+- Some lint debris may fall during cleaning (will be cleaned up)
 
-This maintenance is for your safety. Please be aware of workers near your unit during the scheduled dates.
+BENEFITS:
+- Reduced fire risk from lint buildup
+- Improved dryer efficiency and faster drying times
+- Lower energy costs
+- Extended dryer lifespan
 
-Thank you for your understanding.`,
+No action is required from residents. Thank you for your cooperation.`,
+    },
+    {
+      title: "Scheduled Dryer Vent Maintenance",
+      details: `Dear Residents,
+
+Your building's exterior dryer vents will be professionally cleaned on the scheduled dates. This routine maintenance is essential for fire safety and dryer performance.
+
+OUR TECHNICIANS WILL:
+- Access exterior vent locations using rope access equipment
+- Remove accumulated lint from vent openings
+- Ensure proper airflow from your dryer exhaust
+
+RESIDENT INFORMATION:
+- No unit access needed - all work is external
+- You may notice technicians near your balcony or windows
+- Brief noise from cleaning tools is expected
+- Work typically takes a few minutes per vent
+
+This maintenance helps prevent the leading cause of household fires. We appreciate your patience.`,
     },
   ],
   building_wash: [
@@ -182,19 +213,72 @@ Thank you for your understanding.`,
   ],
   in_suite_dryer_vent_cleaning: [
     {
-      title: "In-Suite Dryer Vent Cleaning Notice",
+      title: "In-Suite Dryer Vent Cleaning - Access Required",
       details: `Dear Residents,
 
-We will be cleaning dryer vents inside individual units. Our technicians will need access to your suite.
+Professional in-suite dryer vent cleaning has been scheduled for your building. Our certified technicians will need to enter your unit to clean the dryer vent from inside.
 
-PREPARATION REQUIRED:
-- Ensure your dryer is accessible
+WHY THIS IS IMPORTANT:
+Lint buildup inside dryer vents is a leading cause of household fires. Regular cleaning also improves your dryer's efficiency and reduces energy costs.
+
+ACCESS REQUIREMENTS:
+Our technicians will need access to:
+- Your laundry area
+- The dryer and the wall/ceiling vent connection
+- The vent ductwork running through your unit
+
+PLEASE PREPARE BY:
+1. Ensuring clear access to your dryer (move any items blocking the area)
+2. Pulling the dryer away from the wall if possible (technicians can assist)
+3. Being home during your scheduled appointment OR arranging alternate access
+4. Ensuring pets are secured
+
+APPOINTMENT SCHEDULING:
+You will receive a separate notice with your specific appointment date and time window. If the scheduled time does not work, please contact property management to reschedule.
+
+WHAT TO EXPECT:
+- The cleaning takes approximately 20-30 minutes per unit
+- There may be brief noise from cleaning equipment
+- Some lint and debris removal is normal
+
+Thank you for your cooperation in this important fire safety maintenance.`,
+    },
+    {
+      title: "Dryer Vent Cleaning - Unit Entry Notice",
+      details: `Dear Residents,
+
+Scheduled dryer vent cleaning will be performed inside all units. Technicians require entry to your suite to complete this service.
+
+SERVICE DETAILS:
+- Full cleaning of dryer vent ductwork from inside your unit
+- Inspection of vent connections and condition
+- Removal of lint buildup throughout the vent system
+
+RESIDENT PREPARATION:
+- Clear access path to your laundry area
+- Secure pets in a separate room
+- Be present or provide access authorization
+
+You will receive your scheduled time slot in a separate notice. This maintenance is mandatory for fire safety compliance.`,
+    },
+    {
+      title: "Annual Dryer Vent Service - Suite Access",
+      details: `Dear Residents,
+
+As part of our annual fire prevention program, professional dryer vent cleaning will be conducted in all units.
+
+WHAT THE SERVICE INCLUDES:
+- Complete lint removal from interior ductwork
+- Vent connection inspection
+- Airflow testing
+- Fire hazard assessment
+
+YOUR RESPONSIBILITIES:
+- Provide access to your unit at the scheduled time
 - Clear the area around your dryer
-- Be present during your scheduled time slot
+- Ensure someone is home or arrange building access
 
-You will receive a separate notice with your scheduled appointment time.
-
-This maintenance helps prevent fire hazards and improves dryer efficiency.`,
+This service helps protect you and your neighbors from dryer-related fires. Appointment times will be provided separately.`,
     },
   ],
   parkade_pressure_cleaning: [
@@ -297,16 +381,123 @@ A scheduled inspection of the building's rope access anchor points will take pla
 This is important safety maintenance ensuring our building meets all safety requirements. No action is required from residents.`,
     },
   ],
-  other: [
+  balcony_pressure_washing: [
     {
-      title: "Scheduled Maintenance Notice",
+      title: "Balcony Pressure Washing - Preparation Required",
       details: `Dear Residents,
 
-Scheduled building maintenance work will be performed by our professional team.
+Professional balcony pressure washing services are scheduled for your building. Our rope access technicians will be cleaning all balcony surfaces including floors, railings, and dividers.
 
-Workers may be visible from your windows. Close blinds if you prefer privacy. Please keep windows closed during work hours.
+MANDATORY PREPARATION - PLEASE COMPLETE BEFORE WORK BEGINS:
+1. REMOVE all items from your balcony including:
+   - Furniture (chairs, tables, loungers)
+   - Plants and planters
+   - BBQ/grills (if permitted)
+   - Rugs, mats, and decorations
+   - Storage containers and personal items
 
-We appreciate your patience and cooperation during this time.`,
+2. SECURE your balcony:
+   - Close and lock balcony doors during work hours
+   - Close blinds or curtains for privacy
+   - Keep windows near balcony closed
+
+WHAT TO EXPECT:
+- High-pressure water will be used to clean balcony surfaces
+- Technicians will be visible on ropes and may access your balcony
+- Significant noise from pressure washing equipment
+- Water may temporarily pool on balcony surfaces
+- Work takes approximately 10-15 minutes per balcony
+
+ITEMS LEFT ON BALCONIES:
+Any items remaining on balconies may be damaged by high-pressure water or cleaning solutions. The building is not responsible for damage to items left on balconies.
+
+After cleaning is complete, you may return items to your balcony once surfaces are dry (typically 1-2 hours).
+
+Thank you for your cooperation.`,
+    },
+    {
+      title: "Balcony Cleaning Notice - Clear Your Balcony",
+      details: `Dear Residents,
+
+Your building's balconies will be pressure washed by our professional cleaning team.
+
+ACTION REQUIRED:
+Please remove ALL items from your balcony before the scheduled start date:
+- All furniture and seating
+- Plants, pots, and garden items  
+- Personal belongings and decorations
+- Floor mats and rugs
+- Any loose items
+
+DURING THE WORK:
+- Keep balcony doors closed and locked
+- Close window coverings for privacy
+- Technicians will be working outside your balcony
+
+Items left on balconies will be moved and may be damaged. Please prepare your balcony in advance.`,
+    },
+    {
+      title: "Exterior Balcony Maintenance",
+      details: `Dear Residents,
+
+Scheduled balcony pressure washing will be performed. This maintenance removes dirt, mildew, and debris to maintain your building's appearance and prevent surface damage.
+
+RESIDENT REQUIREMENTS:
+- Clear all personal items from balcony before work begins
+- Keep balcony doors sealed during cleaning
+- Allow 1-2 hours drying time before using balcony
+
+Technicians will access balconies from ropes. Please close blinds if you prefer privacy.
+
+We appreciate your cooperation in preparing your balcony.`,
+    },
+  ],
+  other: [
+    {
+      title: "Scheduled Building Maintenance",
+      details: `Dear Residents,
+
+Professional maintenance work has been scheduled for your building. Our trained technicians will be on site during the scheduled dates.
+
+WHAT TO EXPECT:
+- Workers may be visible from windows and balconies
+- Some noise from equipment is expected
+- Work areas may be temporarily restricted
+
+FOR YOUR PRIVACY:
+Close blinds or curtains if you prefer not to be visible from outside during work hours.
+
+GENERAL PRECAUTIONS:
+- Keep windows closed during work unless advised otherwise
+- Secure balcony items if work is being done on exterior surfaces
+- Follow any specific instructions from property management
+
+Thank you for your patience and cooperation during this maintenance work.`,
+    },
+    {
+      title: "Building Maintenance Notice",
+      details: `Dear Residents,
+
+Maintenance work will be performed on your building. Our professional team will be on site during the scheduled period.
+
+Workers may be visible near windows and common areas. Please close window coverings for privacy if preferred.
+
+If you have questions, please contact your property manager.
+
+We appreciate your understanding.`,
+    },
+    {
+      title: "Exterior Work Notice",
+      details: `Dear Residents,
+
+Exterior maintenance work is scheduled for your building. Technicians will be working on the building facade during the scheduled dates.
+
+RESIDENT GUIDELINES:
+- Keep windows closed during work hours
+- Close blinds for privacy as workers may be near windows
+- Secure any loose balcony items
+
+No unit access is required. Thank you for your cooperation.`,
     },
   ],
 };

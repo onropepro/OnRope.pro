@@ -27,6 +27,7 @@ export const JOB_TYPES: JobTypeConfig[] = [
   { value: 'inspection', category: 'building_maintenance', labelKey: 'dashboard.jobTypes.inspection', label: 'Inspection', icon: 'fact_check', elevationRequirement: 'configurable', progressType: 'hours' },
   
   // Building Maintenance - Hours-based
+  { value: 'balcony_pressure_washing', category: 'building_maintenance', labelKey: 'dashboard.jobTypes.balcony_pressure_washing', label: 'Balcony Pressure Washing', icon: 'cleaning_services', elevationRequirement: 'configurable', progressType: 'drops' },
   { value: 'general_pressure_washing', category: 'building_maintenance', labelKey: 'dashboard.jobTypes.general_pressure_washing', label: 'General Pressure Washing', icon: 'cleaning_services', elevationRequirement: 'configurable', progressType: 'hours' },
   { value: 'ground_window_cleaning', category: 'building_maintenance', labelKey: 'dashboard.jobTypes.ground_window_cleaning', label: 'Ground Window Cleaning', icon: 'storefront', elevationRequirement: 'never', progressType: 'hours' },
   { value: 'rescue_standby', category: 'building_maintenance', labelKey: 'dashboard.jobTypes.rescue_standby', label: 'Rescue Stand by', icon: 'health_and_safety', elevationRequirement: 'never', progressType: 'hours' },
