@@ -18470,7 +18470,7 @@ Do not include any other text, just the JSON object.`
         return res.status(400).json({ message: "Unable to determine company" });
       }
       
-      const { employeeIds, ...jobFields } = req.body;
+      const { employeeIds, forceAssignment, ...jobFields } = req.body;
       
       const jobData = insertScheduledJobSchema.parse({
         ...jobFields,
@@ -18482,16 +18482,18 @@ Do not include any other text, just the JSON object.`
       
       // Assign employees if provided
       if (employeeIds && Array.isArray(employeeIds) && employeeIds.length > 0) {
-        // Check for double-booking conflicts
-        const conflicts = await storage.checkEmployeeConflicts(employeeIds, job.startDate, job.endDate, job.id);
-        
-        if (conflicts.length > 0) {
-          // Delete the job we just created since we can't assign
-          await storage.deleteScheduledJob(job.id);
-          return res.status(409).json({
-            message: "Schedule conflict detected",
-            conflicts,
-          });
+        // Check for double-booking conflicts (unless forceAssignment is true)
+        if (!forceAssignment) {
+          const conflicts = await storage.checkEmployeeConflicts(employeeIds, job.startDate, job.endDate, job.id);
+          
+          if (conflicts.length > 0) {
+            // Delete the job we just created since we can't assign
+            await storage.deleteScheduledJob(job.id);
+            return res.status(409).json({
+              message: "Schedule conflict detected",
+              conflicts,
+            });
+          }
         }
         
         await storage.replaceJobAssignments(job.id, employeeIds, currentUser.id);

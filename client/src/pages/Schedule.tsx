@@ -2078,6 +2078,11 @@ function CreateJobDialog({
   const { brandColors, brandingActive } = useContext(BrandingContext);
   const defaultJobColor = brandingActive && brandColors.length > 0 ? brandColors[0] : "hsl(var(--primary))";
   
+  // Conflict dialog state
+  const [conflictDialogOpen, setConflictDialogOpen] = useState(false);
+  const [pendingConflicts, setPendingConflicts] = useState<Array<{ employeeId: string; employeeName: string; conflictingJobTitle: string }>>([]);
+  const [pendingJobData, setPendingJobData] = useState<any>(null);
+  
   // Fetch projects for dropdown
   const { data: projectsData } = useQuery<{ projects: any[] }>({
     queryKey: ["/api/projects"],
@@ -2144,18 +2149,46 @@ function CreateJobDialog({
           const jsonStr = error.message.substring(5).trim();
           const errorData = JSON.parse(jsonStr);
           if (errorData?.conflicts && errorData.conflicts.length > 0) {
-            const conflict = errorData.conflicts[0];
-            toast({
-              title: t('schedule.error', 'Schedule conflict'),
-              description: `${conflict.employeeName} ${t('schedule.alreadyAssigned', 'is already assigned to')} "${conflict.conflictingJobTitle}"`,
-              variant: "destructive",
-            });
+            // Show professional conflict dialog
+            setPendingConflicts(errorData.conflicts.map((c: any) => ({
+              employeeId: c.employeeId,
+              employeeName: c.employeeName,
+              conflictingJob: c.conflictingJobTitle,
+            })));
+            setConflictDialogOpen(true);
             return;
           }
         } catch (e) {
           console.error("Failed to parse conflict response:", e);
         }
       }
+      toast({
+        title: t('schedule.error', 'Error'),
+        description: error.message || t('schedule.error', 'Failed to create job'),
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Force create mutation (bypasses conflict check)
+  const forceCreateJobMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await apiRequest("POST", "/api/schedule", { ...data, forceAssignment: true });
+      return await response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
+      toast({
+        title: t('schedule.jobCreated', 'Job created'),
+        description: t('schedule.jobCreated', 'Job has been added to the schedule'),
+      });
+      setConflictDialogOpen(false);
+      setPendingConflicts([]);
+      setPendingJobData(null);
+      onOpenChange(false);
+      resetForm();
+    },
+    onError: (error: Error) => {
       toast({
         title: t('schedule.error', 'Error'),
         description: error.message || t('schedule.error', 'Failed to create job'),
@@ -2187,7 +2220,7 @@ function CreateJobDialog({
     const startDate = new Date(formData.startDate);
     const endDate = new Date(formData.endDate);
 
-    const result = await createJobMutation.mutateAsync({
+    const jobData = {
       projectId: formData.projectId || null,
       title: formData.title,
       description: formData.description,
@@ -2201,7 +2234,18 @@ function CreateJobDialog({
       color: formData.color,
       status: "upcoming",
       employeeIds: formData.employeeIds,
-    });
+    };
+    
+    // Save for potential force submit
+    setPendingJobData(jobData);
+    
+    await createJobMutation.mutateAsync(jobData);
+  };
+  
+  const handleForceCreate = () => {
+    if (pendingJobData) {
+      forceCreateJobMutation.mutate(pendingJobData);
+    }
   };
 
   return (
@@ -2436,6 +2480,17 @@ function CreateJobDialog({
           </DialogFooter>
         </form>
       </DialogContent>
+      
+      <DoubleBookingWarningDialog
+        open={conflictDialogOpen}
+        onClose={() => {
+          setConflictDialogOpen(false);
+          setPendingConflicts([]);
+        }}
+        onProceed={handleForceCreate}
+        conflicts={pendingConflicts}
+        isPending={forceCreateJobMutation.isPending}
+      />
     </Dialog>
   );
 }

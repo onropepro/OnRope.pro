@@ -2793,7 +2793,7 @@ export class Storage {
       
       // Get all jobs for this employee to see their date ranges
       const existingJobs = await db.select().from(scheduledJobs)
-        .where(sql`${scheduledJobs.id} = ANY(${jobIds})`);
+        .where(inArray(scheduledJobs.id, jobIds));
       
       console.log(`[CONFLICT CHECK] Existing jobs for employee:`, existingJobs.map(j => ({
         id: j.id,
@@ -2804,7 +2804,7 @@ export class Storage {
       
       // Build where conditions - include excludeJobId filter if provided
       const whereConditions = [
-        sql`${scheduledJobs.id} = ANY(${jobIds})`,
+        inArray(scheduledJobs.id, jobIds),
         or(
           // New job starts during existing job
           and(
