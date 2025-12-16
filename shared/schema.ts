@@ -508,6 +508,10 @@ export const projectBuildings = pgTable("project_buildings", {
   // Daily drop target for this building (for scheduling/analytics)
   dailyDropTarget: integer("daily_drop_target").default(0),
   
+  // Building-specific scheduling dates
+  startDate: date("start_date"), // When work on this specific building starts
+  endDate: date("end_date"), // When work on this specific building ends
+  
   // Elevation-specific drop totals for this building
   totalDropsNorth: integer("total_drops_north").default(0),
   totalDropsEast: integer("total_drops_east").default(0),

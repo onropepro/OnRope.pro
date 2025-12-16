@@ -1080,6 +1080,8 @@ export default function Dashboard() {
     totalDropsEast: string;
     totalDropsSouth: string;
     totalDropsWest: string;
+    startDate: string;
+    endDate: string;
   }
   const [projectBuildings, setProjectBuildings] = useState<ProjectBuildingEntry[]>([]);
   const [isMultiBuildingComplex, setIsMultiBuildingComplex] = useState(false);
@@ -2037,6 +2039,8 @@ export default function Dashboard() {
               totalDropsEast: b.totalDropsEast ? parseInt(b.totalDropsEast) : 0,
               totalDropsSouth: b.totalDropsSouth ? parseInt(b.totalDropsSouth) : 0,
               totalDropsWest: b.totalDropsWest ? parseInt(b.totalDropsWest) : 0,
+              startDate: b.startDate || undefined,
+              endDate: b.endDate || undefined,
               displayOrder: index,
             })),
           });
@@ -4573,6 +4577,8 @@ export default function Dashboard() {
                                       totalDropsEast: "",
                                       totalDropsSouth: "",
                                       totalDropsWest: "",
+                                      startDate: "",
+                                      endDate: "",
                                     }]);
                                   }
                                 }}
@@ -4675,6 +4681,37 @@ export default function Dashboard() {
                                       />
                                     </div>
                                     
+                                    <div className="grid grid-cols-2 gap-2">
+                                      <div>
+                                        <label className="text-xs text-muted-foreground">{t('dashboard.projectForm.startDate', 'Start Date')}</label>
+                                        <Input
+                                          type="date"
+                                          value={building.startDate}
+                                          onChange={(e) => {
+                                            const updated = [...projectBuildings];
+                                            updated[index] = { ...building, startDate: e.target.value };
+                                            setProjectBuildings(updated);
+                                          }}
+                                          className="h-10"
+                                          data-testid={`input-building-start-date-${index}`}
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="text-xs text-muted-foreground">{t('dashboard.projectForm.endDate', 'End Date')}</label>
+                                        <Input
+                                          type="date"
+                                          value={building.endDate}
+                                          onChange={(e) => {
+                                            const updated = [...projectBuildings];
+                                            updated[index] = { ...building, endDate: e.target.value };
+                                            setProjectBuildings(updated);
+                                          }}
+                                          className="h-10"
+                                          data-testid={`input-building-end-date-${index}`}
+                                        />
+                                      </div>
+                                    </div>
+                                    
                                     <div className="grid grid-cols-4 gap-2">
                                       <div>
                                         <label className="text-xs text-muted-foreground">{t('dashboard.projectForm.north', 'North')}</label>
@@ -4761,6 +4798,8 @@ export default function Dashboard() {
                                       totalDropsEast: "",
                                       totalDropsSouth: "",
                                       totalDropsWest: "",
+                                      startDate: "",
+                                      endDate: "",
                                     }]);
                                   }}
                                   data-testid="button-add-building"

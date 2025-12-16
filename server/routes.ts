@@ -10470,6 +10470,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         dropsAdjustmentEast: b.dropsAdjustmentEast || 0,
         dropsAdjustmentSouth: b.dropsAdjustmentSouth || 0,
         dropsAdjustmentWest: b.dropsAdjustmentWest || 0,
+        startDate: b.startDate || null,
+        endDate: b.endDate || null,
         displayOrder: index,
       }));
       
