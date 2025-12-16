@@ -13863,6 +13863,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .where(eq(gearSerialNumbers.id, req.params.id))
         .returning();
       
+      // Decrement the quantity on the parent gear item
+      const [parentItem] = await db.select()
+        .from(gearItems)
+        .where(eq(gearItems.id, existingSerial.gearItemId))
+        .limit(1);
+      
+      if (parentItem && parentItem.quantity > 0) {
+        await db.update(gearItems)
+          .set({
+            quantity: parentItem.quantity - 1,
+            updatedAt: new Date(),
+          })
+          .where(eq(gearItems.id, existingSerial.gearItemId));
+      }
+      
       res.json({ serialNumber: retiredSerial });
     } catch (error) {
       console.error("Retire gear serial number error:", error);
