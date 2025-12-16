@@ -334,7 +334,7 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
       noticeTitle: existingNotice?.noticeTitle || "",
       noticeDetails: existingNotice?.noticeDetails || "",
       additionalInstructions: existingNotice?.additionalInstructions || "",
-      propertyManagerName: existingNotice?.propertyManagerName || "",
+      propertyManagerName: existingNotice?.propertyManagerName || (project as any).propertyManagerName || "",
     },
   });
 
