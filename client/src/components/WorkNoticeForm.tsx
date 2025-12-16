@@ -50,7 +50,6 @@ For your privacy and comfort, we strongly recommend closing your blinds, curtain
 
 SAFETY REQUIREMENTS:
 - Please keep all windows closed and locked during work hours
-- Do not attempt to open windows or communicate with technicians
 - Keep balcony doors closed to prevent water or cleaning solution entry
 - Secure any loose items on balconies
 
