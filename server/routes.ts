@@ -6351,10 +6351,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      // Collect all project buildings for active projects (for multi-building complexes)
+      const allProjectBuildings: any[] = [];
+      for (const project of activeProjects) {
+        const projectBldgs = await storage.getProjectBuildings(project.id);
+        for (const bldg of projectBldgs) {
+          allProjectBuildings.push({
+            ...bldg,
+            projectId: project.id,
+            projectJobType: project.customJobType || project.jobType,
+          });
+        }
+      }
+      
       res.json({ 
         building: buildingData,
         projectHistory,
         workNotices,
+        projectBuildings: allProjectBuildings,
         stats: {
           totalProjects: allProjects.length,
           completedProjects: allProjects.filter(p => p.status === 'completed').length,
