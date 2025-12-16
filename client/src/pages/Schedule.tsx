@@ -2137,20 +2137,30 @@ function CreateJobDialog({
       onOpenChange(false);
       resetForm();
     },
-    onError: (error: any) => {
-      if (error.conflicts) {
-        toast({
-          title: t('schedule.error', 'Schedule conflict'),
-          description: `${error.conflicts[0].employeeName} ${t('schedule.error', 'is already assigned to')} "${error.conflicts[0].conflictingJob}"`,
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: t('schedule.error', 'Error'),
-          description: error.message || t('schedule.error', 'Failed to create job'),
-          variant: "destructive",
-        });
+    onError: (error: Error) => {
+      // Check if this is a conflict error (409)
+      if (error.message.startsWith('409:')) {
+        try {
+          const jsonStr = error.message.substring(5).trim();
+          const errorData = JSON.parse(jsonStr);
+          if (errorData?.conflicts && errorData.conflicts.length > 0) {
+            const conflict = errorData.conflicts[0];
+            toast({
+              title: t('schedule.error', 'Schedule conflict'),
+              description: `${conflict.employeeName} ${t('schedule.alreadyAssigned', 'is already assigned to')} "${conflict.conflictingJobTitle}"`,
+              variant: "destructive",
+            });
+            return;
+          }
+        } catch (e) {
+          console.error("Failed to parse conflict response:", e);
+        }
       }
+      toast({
+        title: t('schedule.error', 'Error'),
+        description: error.message || t('schedule.error', 'Failed to create job'),
+        variant: "destructive",
+      });
     },
   });
 

@@ -18482,6 +18482,18 @@ Do not include any other text, just the JSON object.`
       
       // Assign employees if provided
       if (employeeIds && Array.isArray(employeeIds) && employeeIds.length > 0) {
+        // Check for double-booking conflicts
+        const conflicts = await storage.checkEmployeeConflicts(employeeIds, job.startDate, job.endDate, job.id);
+        
+        if (conflicts.length > 0) {
+          // Delete the job we just created since we can't assign
+          await storage.deleteScheduledJob(job.id);
+          return res.status(409).json({
+            message: "Schedule conflict detected",
+            conflicts,
+          });
+        }
+        
         await storage.replaceJobAssignments(job.id, employeeIds, currentUser.id);
       }
       
@@ -18527,6 +18539,19 @@ Do not include any other text, just the JSON object.`
       
       // Update employee assignments if provided
       if (employeeIds !== undefined && Array.isArray(employeeIds)) {
+        // Get the job dates for conflict checking
+        const jobForDates = updatedJob || job;
+        
+        // Check for double-booking conflicts
+        const conflicts = await storage.checkEmployeeConflicts(employeeIds, jobForDates.startDate, jobForDates.endDate, req.params.id);
+        
+        if (conflicts.length > 0) {
+          return res.status(409).json({
+            message: "Schedule conflict detected",
+            conflicts,
+          });
+        }
+        
         await storage.replaceJobAssignments(req.params.id, employeeIds, currentUser.id);
       }
       
