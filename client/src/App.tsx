@@ -322,7 +322,7 @@ function Router() {
         </ProtectedRoute>
       </Route>
       <Route path="/schedule">
-        <ProtectedRoute allowedRoles={["company", "operations_manager", "supervisor"]}>
+        <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
           <Schedule />
         </ProtectedRoute>
       </Route>
