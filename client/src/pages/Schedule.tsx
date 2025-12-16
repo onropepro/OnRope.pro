@@ -87,6 +87,46 @@ export default function Schedule() {
   const hasOwnScheduleOnly = canViewOwnSchedule(currentUser) && !hasFullScheduleAccess;
   const hasEditPermission = canEditSchedule(currentUser);
 
+  // ALL HOOKS MUST BE DEFINED BEFORE ANY EARLY RETURNS (React rules of hooks)
+  
+  // Time off dialog state
+  const [timeOffDialogOpen, setTimeOffDialogOpen] = useState(false);
+  const [selectedEmployeeForTimeOff, setSelectedEmployeeForTimeOff] = useState<string>("");
+  const [selectedTimeOffStartDate, setSelectedTimeOffStartDate] = useState<string>("");
+  const [selectedTimeOffEndDate, setSelectedTimeOffEndDate] = useState<string>("");
+  const [selectedTimeOffType, setSelectedTimeOffType] = useState<string>("day_off");
+  const [timeOffNotes, setTimeOffNotes] = useState<string>("");
+
+  // Fetch scheduled jobs - for full schedule access users, get all jobs
+  // For own schedule only users, use the dedicated my-jobs endpoint
+  const { data: jobsData, isLoading } = useQuery<{ jobs: ScheduledJobWithAssignments[] }>({
+    queryKey: hasOwnScheduleOnly ? ["/api/schedule/my-jobs"] : ["/api/schedule"],
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    staleTime: 0,
+    enabled: hasSchedulePermission && !isLoadingUser,
+  });
+  const jobs = jobsData?.jobs || [];
+
+  // Fetch employees for assignment - ONLY for full schedule access (managers)
+  const { data: employeesData } = useQuery<{ employees: (User & { connectionStatus?: string })[] }>({
+    queryKey: ["/api/employees"],
+    enabled: hasFullScheduleAccess && !isLoadingUser,
+  });
+  // Filter out suspended and terminated employees from schedule
+  // Check both users.suspendedAt (primary) and connectionStatus (PLUS multi-employer)
+  const employees = (employeesData?.employees || []).filter(e => 
+    !e.suspendedAt && !e.terminatedDate && e.connectionStatus !== 'suspended'
+  );
+
+  // Fetch employee time off entries - ONLY for full schedule access (managers)
+  const { data: timeOffData } = useQuery<{ timeOff: EmployeeTimeOff[] }>({
+    queryKey: ["/api/employee-time-off"],
+    enabled: hasFullScheduleAccess && !isLoadingUser,
+  });
+  const timeOffEntries = timeOffData?.timeOff || [];
+
+  // EARLY RETURNS - must be after all hooks
   // If still loading user, show nothing (prevent flash of access denied)
   if (isLoadingUser) {
     return null;
@@ -119,39 +159,6 @@ export default function Schedule() {
       </div>
     );
   }
-
-  // Fetch scheduled jobs
-  const { data: jobsData, isLoading } = useQuery<{ jobs: ScheduledJobWithAssignments[] }>({
-    queryKey: ["/api/schedule"],
-    refetchOnMount: true,
-    refetchOnWindowFocus: true,
-    staleTime: 0,
-  });
-  const jobs = jobsData?.jobs || [];
-
-  // Fetch employees for assignment
-  const { data: employeesData } = useQuery<{ employees: (User & { connectionStatus?: string })[] }>({
-    queryKey: ["/api/employees"],
-  });
-  // Filter out suspended and terminated employees from schedule
-  // Check both users.suspendedAt (primary) and connectionStatus (PLUS multi-employer)
-  const employees = (employeesData?.employees || []).filter(e => 
-    !e.suspendedAt && !e.terminatedDate && e.connectionStatus !== 'suspended'
-  );
-
-  // Fetch employee time off entries
-  const { data: timeOffData } = useQuery<{ timeOff: EmployeeTimeOff[] }>({
-    queryKey: ["/api/employee-time-off"],
-  });
-  const timeOffEntries = timeOffData?.timeOff || [];
-
-  // Time off dialog state
-  const [timeOffDialogOpen, setTimeOffDialogOpen] = useState(false);
-  const [selectedEmployeeForTimeOff, setSelectedEmployeeForTimeOff] = useState<string>("");
-  const [selectedTimeOffStartDate, setSelectedTimeOffStartDate] = useState<string>("");
-  const [selectedTimeOffEndDate, setSelectedTimeOffEndDate] = useState<string>("");
-  const [selectedTimeOffType, setSelectedTimeOffType] = useState<string>("day_off");
-  const [timeOffNotes, setTimeOffNotes] = useState<string>("");
 
   // Time off type options with display labels and colors
   const timeOffTypes = [
