@@ -17,7 +17,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { DollarSign, Calendar, Users, Settings, Clock, Pencil, Trash2 } from "lucide-react";
+import { DollarSign, Calendar, Users, Settings, Clock, Pencil, Trash2, Download, FileText, FileSpreadsheet } from "lucide-react";
+import jsPDF from 'jspdf';
 import { BackButton } from "@/components/BackButton";
 import { MainMenuButton } from "@/components/MainMenuButton";
 import { format } from "date-fns";
@@ -287,6 +288,174 @@ export default function Payroll() {
       });
     },
   });
+
+  // Export to CSV function
+  const exportToCSV = () => {
+    if (!hoursData || !hoursData.hoursSummary || hoursData.hoursSummary.length === 0) {
+      toast({
+        title: t('payroll.error', 'Error'),
+        description: t('payroll.noDataToExport', 'No data to export'),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const period = hoursData.period;
+    const periodLabel = `${format(parseLocalDate(period.startDate), 'yyyy-MM-dd')}_to_${format(parseLocalDate(period.endDate), 'yyyy-MM-dd')}`;
+    
+    // Build CSV content
+    const headers = ['Employee Name', 'Hourly Rate', 'Regular Hours', 'Overtime Hours', 'Double Time Hours', 'Total Hours', 'Total Pay'];
+    const rows = hoursData.hoursSummary.map(emp => [
+      emp.employeeName,
+      `$${emp.hourlyRate}`,
+      emp.regularHours.toFixed(2),
+      emp.overtimeHours.toFixed(2),
+      emp.doubleTimeHours.toFixed(2),
+      emp.totalHours.toFixed(2),
+      `$${emp.totalPay.toFixed(2)}`
+    ]);
+
+    // Add totals row
+    const totals = hoursData.hoursSummary.reduce((acc, emp) => ({
+      regularHours: acc.regularHours + emp.regularHours,
+      overtimeHours: acc.overtimeHours + emp.overtimeHours,
+      doubleTimeHours: acc.doubleTimeHours + emp.doubleTimeHours,
+      totalHours: acc.totalHours + emp.totalHours,
+      totalPay: acc.totalPay + emp.totalPay,
+    }), { regularHours: 0, overtimeHours: 0, doubleTimeHours: 0, totalHours: 0, totalPay: 0 });
+
+    rows.push([
+      'TOTALS',
+      '',
+      totals.regularHours.toFixed(2),
+      totals.overtimeHours.toFixed(2),
+      totals.doubleTimeHours.toFixed(2),
+      totals.totalHours.toFixed(2),
+      `$${totals.totalPay.toFixed(2)}`
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+
+    // Download file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `payroll_${periodLabel}.csv`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+
+    toast({
+      title: t('common.success', 'Success'),
+      description: t('payroll.exportedCSV', 'Payroll exported to CSV'),
+    });
+  };
+
+  // Export to PDF function
+  const exportToPDF = () => {
+    if (!hoursData || !hoursData.hoursSummary || hoursData.hoursSummary.length === 0) {
+      toast({
+        title: t('payroll.error', 'Error'),
+        description: t('payroll.noDataToExport', 'No data to export'),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const period = hoursData.period;
+    const periodLabel = `${format(parseLocalDate(period.startDate), 'MMM dd, yyyy')} - ${format(parseLocalDate(period.endDate), 'MMM dd, yyyy')}`;
+    const fileLabel = `${format(parseLocalDate(period.startDate), 'yyyy-MM-dd')}_to_${format(parseLocalDate(period.endDate), 'yyyy-MM-dd')}`;
+
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    
+    // Title
+    doc.setFontSize(18);
+    doc.text('Payroll Report', pageWidth / 2, 20, { align: 'center' });
+    
+    // Period
+    doc.setFontSize(12);
+    doc.text(`Pay Period: ${periodLabel}`, pageWidth / 2, 30, { align: 'center' });
+    doc.text(`Status: ${period.status.charAt(0).toUpperCase() + period.status.slice(1)}`, pageWidth / 2, 37, { align: 'center' });
+
+    // Calculate totals
+    const totals = hoursData.hoursSummary.reduce((acc, emp) => ({
+      regularHours: acc.regularHours + emp.regularHours,
+      overtimeHours: acc.overtimeHours + emp.overtimeHours,
+      doubleTimeHours: acc.doubleTimeHours + emp.doubleTimeHours,
+      totalHours: acc.totalHours + emp.totalHours,
+      totalPay: acc.totalPay + emp.totalPay,
+    }), { regularHours: 0, overtimeHours: 0, doubleTimeHours: 0, totalHours: 0, totalPay: 0 });
+
+    // Summary box
+    doc.setFontSize(10);
+    doc.setDrawColor(200);
+    doc.rect(14, 45, pageWidth - 28, 25);
+    doc.text(`Total Employees: ${hoursData.hoursSummary.length}`, 20, 55);
+    doc.text(`Total Hours: ${totals.totalHours.toFixed(2)}`, 70, 55);
+    doc.text(`Total Labor Cost: $${totals.totalPay.toFixed(2)}`, 130, 55);
+    doc.text(`Regular: ${totals.regularHours.toFixed(2)}h | OT: ${totals.overtimeHours.toFixed(2)}h | 2x: ${totals.doubleTimeHours.toFixed(2)}h`, 20, 63);
+
+    // Table headers
+    let yPos = 80;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Employee', 14, yPos);
+    doc.text('Rate', 70, yPos);
+    doc.text('Regular', 95, yPos);
+    doc.text('OT', 120, yPos);
+    doc.text('2x', 140, yPos);
+    doc.text('Total Hrs', 155, yPos);
+    doc.text('Pay', 180, yPos);
+    
+    yPos += 5;
+    doc.line(14, yPos, pageWidth - 14, yPos);
+    yPos += 7;
+
+    // Table rows
+    doc.setFont('helvetica', 'normal');
+    hoursData.hoursSummary.forEach((emp) => {
+      if (yPos > 270) {
+        doc.addPage();
+        yPos = 20;
+      }
+      
+      doc.text(emp.employeeName.substring(0, 25), 14, yPos);
+      doc.text(`$${emp.hourlyRate}`, 70, yPos);
+      doc.text(emp.regularHours.toFixed(2), 95, yPos);
+      doc.text(emp.overtimeHours.toFixed(2), 120, yPos);
+      doc.text(emp.doubleTimeHours.toFixed(2), 140, yPos);
+      doc.text(emp.totalHours.toFixed(2), 155, yPos);
+      doc.text(`$${emp.totalPay.toFixed(2)}`, 180, yPos);
+      yPos += 7;
+    });
+
+    // Totals row
+    yPos += 3;
+    doc.line(14, yPos, pageWidth - 14, yPos);
+    yPos += 7;
+    doc.setFont('helvetica', 'bold');
+    doc.text('TOTALS', 14, yPos);
+    doc.text(totals.regularHours.toFixed(2), 95, yPos);
+    doc.text(totals.overtimeHours.toFixed(2), 120, yPos);
+    doc.text(totals.doubleTimeHours.toFixed(2), 140, yPos);
+    doc.text(totals.totalHours.toFixed(2), 155, yPos);
+    doc.text(`$${totals.totalPay.toFixed(2)}`, 180, yPos);
+
+    // Footer
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Generated on ${format(new Date(), 'MMM dd, yyyy h:mm a')}`, 14, 285);
+
+    doc.save(`payroll_${fileLabel}.pdf`);
+
+    toast({
+      title: t('common.success', 'Success'),
+      description: t('payroll.exportedPDF', 'Payroll exported to PDF'),
+    });
+  };
 
   // Save configuration mutation
   const saveConfigMutation = useMutation({
@@ -569,32 +738,60 @@ export default function Payroll() {
               <CardDescription>{t('payroll.selectPeriod', 'Select a pay period to view employee hours and labor costs')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="period-select">{t('payroll.payPeriods', 'Pay Period')}</Label>
-                <Select 
-                  value={selectedPeriodId || ""} 
-                  onValueChange={setSelectedPeriodId}
-                >
-                  <SelectTrigger id="period-select" data-testid="select-pay-period">
-                    <SelectValue placeholder={t('payroll.selectPeriod', 'Select a pay period')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {periodsData?.periods
-                      .slice()
-                      .sort((a, b) => {
-                        const statusOrder = { current: 0, upcoming: 1, past: 2 };
-                        const aOrder = statusOrder[a.status as keyof typeof statusOrder] ?? 3;
-                        const bOrder = statusOrder[b.status as keyof typeof statusOrder] ?? 3;
-                        if (aOrder !== bOrder) return aOrder - bOrder;
-                        return parseLocalDate(b.startDate).getTime() - parseLocalDate(a.startDate).getTime();
-                      })
-                      .map((period) => (
-                      <SelectItem key={period.id} value={period.id}>
-                        {format(parseLocalDate(period.startDate), 'MMM dd, yyyy', { locale: getDateLocale() })} - {format(parseLocalDate(period.endDate), 'MMM dd, yyyy', { locale: getDateLocale() })} ({period.status})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <div className="flex flex-col sm:flex-row gap-4 sm:items-end">
+                <div className="flex-1 space-y-2">
+                  <Label htmlFor="period-select">{t('payroll.payPeriods', 'Pay Period')}</Label>
+                  <Select 
+                    value={selectedPeriodId || ""} 
+                    onValueChange={setSelectedPeriodId}
+                  >
+                    <SelectTrigger id="period-select" data-testid="select-pay-period">
+                      <SelectValue placeholder={t('payroll.selectPeriod', 'Select a pay period')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {periodsData?.periods
+                        .slice()
+                        .sort((a, b) => {
+                          const statusOrder = { current: 0, upcoming: 1, past: 2 };
+                          const aOrder = statusOrder[a.status as keyof typeof statusOrder] ?? 3;
+                          const bOrder = statusOrder[b.status as keyof typeof statusOrder] ?? 3;
+                          if (aOrder !== bOrder) return aOrder - bOrder;
+                          return parseLocalDate(b.startDate).getTime() - parseLocalDate(a.startDate).getTime();
+                        })
+                        .map((period) => (
+                        <SelectItem key={period.id} value={period.id}>
+                          {format(parseLocalDate(period.startDate), 'MMM dd, yyyy', { locale: getDateLocale() })} - {format(parseLocalDate(period.endDate), 'MMM dd, yyyy', { locale: getDateLocale() })} ({period.status})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {/* Export buttons */}
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="default"
+                    onClick={exportToCSV}
+                    disabled={!hoursData || hoursData.hoursSummary.length === 0}
+                    data-testid="button-export-csv"
+                  >
+                    <FileSpreadsheet className="w-4 h-4 mr-2" />
+                    <span className="hidden sm:inline">{t('payroll.exportCSV', 'Export CSV')}</span>
+                    <span className="sm:hidden">CSV</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="default"
+                    onClick={exportToPDF}
+                    disabled={!hoursData || hoursData.hoursSummary.length === 0}
+                    data-testid="button-export-pdf"
+                  >
+                    <FileText className="w-4 h-4 mr-2" />
+                    <span className="hidden sm:inline">{t('payroll.exportPDF', 'Export PDF')}</span>
+                    <span className="sm:hidden">PDF</span>
+                  </Button>
+                </div>
               </div>
 
               {selectedPeriodId && hoursLoading && (
