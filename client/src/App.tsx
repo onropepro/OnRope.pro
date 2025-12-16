@@ -396,6 +396,12 @@ export const BrandingContext = createContext<BrandingContextType>({
   brandingActive: false,
 });
 
+// Separate component for permission sync to ensure stable React hooks
+function PermissionSyncManager({ isAuthenticated }: { isAuthenticated: boolean }) {
+  usePermissionSync(isAuthenticated);
+  return null;
+}
+
 // White Label Branding Provider
 function BrandingProvider({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
@@ -410,9 +416,6 @@ function BrandingProvider({ children }: { children: React.ReactNode }) {
   
   // Only apply branding if user is authenticated AND not on public pages
   const isAuthenticated = !!userData?.user && !isPublicPage;
-  
-  // Real-time permission sync - notifies user when permissions change or they're terminated
-  usePermissionSync(isAuthenticated);
 
   // Determine company ID to fetch branding for
   // For company users: use their own ID
@@ -638,6 +641,7 @@ function BrandingProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <BrandingContext.Provider value={contextValue}>
+      <PermissionSyncManager isAuthenticated={isAuthenticated} />
       {children}
     </BrandingContext.Provider>
   );
