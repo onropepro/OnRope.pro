@@ -278,6 +278,22 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                         <div className="text-xs text-muted-foreground mt-0.5">Portable work history, certifications, career-long records</div>
                       </div>
                     </button>
+                    <button
+                      className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                      onClick={() => {
+                        setLocation("/modules/employer-job-board");
+                        setShowModulesMenu(false);
+                      }}
+                      data-testid="nav-employer-job-board"
+                    >
+                      <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <Search className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <div className="font-semibold text-sm">Job Board Ecosystem</div>
+                        <div className="text-xs text-muted-foreground mt-0.5">Talent browser, unlimited postings, direct offers</div>
+                      </div>
+                    </button>
                   </div>
                 </div>
               )}
@@ -457,6 +473,17 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                   >
                     <IdCard className="w-5 h-5 text-amber-600" />
                     <span className="text-sm">Technician Passport</span>
+                  </button>
+                  <button
+                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
+                    onClick={() => {
+                      setLocation("/modules/employer-job-board");
+                      setMobileMenuOpen(false);
+                    }}
+                    data-testid="nav-mobile-employer-job-board"
+                  >
+                    <Search className="w-5 h-5 text-blue-600" />
+                    <span className="text-sm">Job Board Ecosystem</span>
                   </button>
                 </div>
               )}

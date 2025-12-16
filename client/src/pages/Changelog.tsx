@@ -443,6 +443,7 @@ const pagesData: PageCategory[] = [
       { name: "Employee Management", path: "/modules/employee-management", description: "Workforce admin module overview", roles: ["Public"] },
       { name: "Technician Passport", path: "/modules/technician-passport", description: "Technician profile and PLUS tier overview", roles: ["Public"] },
       { name: "Technician Job Board", path: "/modules/technician-job-board", description: "Job browser, applications, and profile visibility", roles: ["Public"] },
+      { name: "Employer Job Board", path: "/modules/employer-job-board", description: "Talent browser, unlimited postings, direct offers", roles: ["Public"] },
     ]
   },
   {
