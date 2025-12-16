@@ -2573,11 +2573,12 @@ function JobDetailDialog({
     onSuccess: async () => {
       setConflictDialogOpen(false);
       setConflictInfo({ conflicts: [], pendingAssignment: null });
-      await queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
+      // Use refetchQueries to wait for fresh data before updating dialog
+      await queryClient.refetchQueries({ queryKey: ["/api/schedule"] });
       // Update the job in parent state for immediate UI refresh
       if (job && onJobUpdate) {
-        const scheduleData = queryClient.getQueryData(["/api/schedule"]);
-        const jobsArray = Array.isArray(scheduleData) ? scheduleData : [];
+        const scheduleData = queryClient.getQueryData(["/api/schedule"]) as { jobs?: ScheduledJobWithAssignments[] } | ScheduledJobWithAssignments[] | undefined;
+        const jobsArray = Array.isArray(scheduleData) ? scheduleData : (scheduleData?.jobs || []);
         const updatedJob = jobsArray.find((j: ScheduledJobWithAssignments) => j.id === job.id);
         if (updatedJob) {
           onJobUpdate(updatedJob);
@@ -2639,11 +2640,12 @@ function JobDetailDialog({
       await apiRequest("DELETE", `/api/schedule/${jobId}/assignments/${assignmentId}`);
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
+      // Use refetchQueries to wait for fresh data before updating dialog
+      await queryClient.refetchQueries({ queryKey: ["/api/schedule"] });
       // Update the job in parent state for immediate UI refresh
       if (job && onJobUpdate) {
-        const scheduleData = queryClient.getQueryData(["/api/schedule"]);
-        const jobsArray = Array.isArray(scheduleData) ? scheduleData : [];
+        const scheduleData = queryClient.getQueryData(["/api/schedule"]) as { jobs?: ScheduledJobWithAssignments[] } | ScheduledJobWithAssignments[] | undefined;
+        const jobsArray = Array.isArray(scheduleData) ? scheduleData : (scheduleData?.jobs || []);
         const updatedJob = jobsArray.find((j: ScheduledJobWithAssignments) => j.id === job.id);
         if (updatedJob) {
           onJobUpdate(updatedJob);
