@@ -30,6 +30,45 @@ import { formatLocalDate, formatLocalDateLong, parseLocalDate, toLocalDateString
 // Helper to get date locale based on current language
 const getDateLocale = () => i18n.language?.startsWith('fr') ? fr : enUS;
 
+// Calculate how long an item has been in service
+const getServiceDuration = (dateInService: string | null | undefined): string | null => {
+  if (!dateInService) return null;
+  
+  try {
+    const inServiceDate = new Date(dateInService);
+    const now = new Date();
+    
+    if (isNaN(inServiceDate.getTime())) return null;
+    
+    const diffMs = now.getTime() - inServiceDate.getTime();
+    if (diffMs < 0) return null; // Future date
+    
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    if (diffDays < 30) {
+      return diffDays === 1 ? "1 day" : `${diffDays} days`;
+    }
+    
+    const months = Math.floor(diffDays / 30);
+    const years = Math.floor(months / 12);
+    const remainingMonths = months % 12;
+    
+    if (years === 0) {
+      return months === 1 ? "1 month" : `${months} months`;
+    }
+    
+    if (remainingMonths === 0) {
+      return years === 1 ? "1 year" : `${years} years`;
+    }
+    
+    const yearPart = years === 1 ? "1 yr" : `${years} yrs`;
+    const monthPart = remainingMonths === 1 ? "1 mo" : `${remainingMonths} mo`;
+    return `${yearPart}, ${monthPart}`;
+  } catch {
+    return null;
+  }
+};
+
 const gearTypes = [
   { name: "Harness", icon: Shield },
   { name: "Rope", icon: Cable },
@@ -1695,10 +1734,17 @@ export default function Inventory() {
 
                           {/* Serial Number - prominent display */}
                           {myAssignment?.serialNumber ? (
-                            <div className="mb-3 flex items-center gap-2">
+                            <div className="mb-3 flex items-center gap-2 flex-wrap">
                               <Badge variant="secondary" className="font-mono text-sm px-3 py-1">
                                 S/N: {myAssignment.serialNumber}
                               </Badge>
+                              {/* Service duration badge */}
+                              {getServiceDuration(myAssignment.dateInService) && (
+                                <Badge variant="secondary" className="text-xs bg-primary/10 text-primary border-primary/20">
+                                  <span className="material-icons text-xs mr-1">schedule</span>
+                                  {getServiceDuration(myAssignment.dateInService)} in service
+                                </Badge>
+                              )}
                               {/* Retire button for serial number */}
                               {(() => {
                                 const serialEntry = ((item as any).serialEntries || []).find(
@@ -2190,12 +2236,20 @@ export default function Inventory() {
                                 <div className="font-medium">{t('inventory.serialNumbers', 'Serial Numbers')}:</div>
                                 {(item as any).serialEntries.map((entry: GearSerialNumber) => (
                                   <div key={entry.id} className="flex items-center justify-between pl-2 group">
-                                    <span>• {entry.serialNumber}</span>
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <span>• {entry.serialNumber}</span>
+                                      {getServiceDuration(entry.dateInService) && (
+                                        <span className="text-xs text-primary">
+                                          ({getServiceDuration(entry.dateInService)})
+                                        </span>
+                                      )}
+                                    </div>
                                     <Button
                                       size="icon"
                                       variant="ghost"
                                       className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity"
-                                      onClick={() => {
+                                      onClick={(e) => {
+                                        e.stopPropagation();
                                         setSerialToRetire(entry);
                                         setShowRetireDialog(true);
                                       }}
@@ -3909,10 +3963,16 @@ export default function Inventory() {
                       return (
                         <div key={entry.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-md">
                           <div className="flex-1">
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 flex-wrap">
                               <Badge variant="outline" className="font-mono">
                                 {entry.serialNumber}
                               </Badge>
+                              {getServiceDuration(entry.dateInService) && (
+                                <Badge variant="secondary" className="text-xs bg-primary/10 text-primary border-primary/20">
+                                  <span className="material-icons text-xs mr-1">schedule</span>
+                                  {getServiceDuration(entry.dateInService)} in service
+                                </Badge>
+                              )}
                               {assignedEmployee && (
                                 <Badge variant="secondary" className="text-xs">
                                   <span className="material-icons text-xs mr-1">person</span>
