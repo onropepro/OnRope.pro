@@ -286,6 +286,8 @@ export type InsertBuilding = z.infer<typeof insertBuildingSchema>;
 export const buildingInstructions = pgTable("building_instructions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   buildingId: varchar("building_id").notNull().references(() => buildings.id, { onDelete: "cascade" }),
+  // For multi-building complexes, instructions can be specific to a building within the project
+  projectBuildingId: varchar("project_building_id").references(() => projectBuildings.id, { onDelete: "cascade" }),
   
   // Instruction categories
   buildingAccess: text("building_access"), // How to access the building
@@ -318,6 +320,7 @@ export const buildingInstructions = pgTable("building_instructions", {
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [
   index("IDX_building_instructions_building").on(table.buildingId),
+  index("IDX_building_instructions_project_building").on(table.projectBuildingId),
 ]);
 
 export const insertBuildingInstructionsSchema = createInsertSchema(buildingInstructions).omit({
