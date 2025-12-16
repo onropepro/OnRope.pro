@@ -27,6 +27,7 @@ export interface User {
 
 /** Management roles with elevated privileges */
 export const MANAGEMENT_ROLES = [
+  'superuser',
   'company',
   'owner_ceo',
   'human_resources',
