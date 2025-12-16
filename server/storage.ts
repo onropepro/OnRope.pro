@@ -2782,37 +2782,35 @@ export class Storage {
         continue;
       }
       
-      // Check if any of their assigned jobs overlap with the new time range
-      let query = db.select().from(scheduledJobs)
-        .where(
+      // Build where conditions - include excludeJobId filter if provided
+      const whereConditions = [
+        sql`${scheduledJobs.id} = ANY(${jobIds})`,
+        or(
+          // New job starts during existing job
           and(
-            sql`${scheduledJobs.id} = ANY(${jobIds})`,
-            or(
-              // New job starts during existing job
-              and(
-                lte(scheduledJobs.startDate, startDate),
-                gte(scheduledJobs.endDate, startDate)
-              ),
-              // New job ends during existing job
-              and(
-                lte(scheduledJobs.startDate, endDate),
-                gte(scheduledJobs.endDate, endDate)
-              ),
-              // New job completely contains existing job
-              and(
-                gte(scheduledJobs.startDate, startDate),
-                lte(scheduledJobs.endDate, endDate)
-              )
-            )
+            lte(scheduledJobs.startDate, startDate),
+            gte(scheduledJobs.endDate, startDate)
+          ),
+          // New job ends during existing job
+          and(
+            lte(scheduledJobs.startDate, endDate),
+            gte(scheduledJobs.endDate, endDate)
+          ),
+          // New job completely contains existing job
+          and(
+            gte(scheduledJobs.startDate, startDate),
+            lte(scheduledJobs.endDate, endDate)
           )
-        );
+        )
+      ];
       
       // Exclude the job being edited (if any)
       if (excludeJobId) {
-        query = query.where(not(eq(scheduledJobs.id, excludeJobId)));
+        whereConditions.push(not(eq(scheduledJobs.id, excludeJobId)));
       }
       
-      const conflictingJobs = await query;
+      const conflictingJobs = await db.select().from(scheduledJobs)
+        .where(and(...whereConditions));
       
       if (conflictingJobs.length > 0) {
         const employee = await this.getUserById(employeeId);
