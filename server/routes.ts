@@ -20072,6 +20072,97 @@ Do not include any other text, just the JSON object.`
     }
   });
 
+  // Helper function to calculate individual technician safety rating
+  function calculateTechnicianSafetyRating(tech: any): { safetyRating: number; safetyLabel: string; safetyColor: string; safetyBreakdown: any } {
+    const now = new Date();
+    let totalPoints = 0;
+    let maxPoints = 0;
+    
+    const breakdown: any = {
+      irataValid: false,
+      spratValid: false,
+      hasValidCertification: false,
+      yearsExperience: 0,
+      hasResume: false,
+    };
+    
+    // 1. IRATA Certification (up to 40 points)
+    if (tech.irataLevel) {
+      maxPoints += 40;
+      const irataExpDate = tech.irataExpirationDate ? new Date(tech.irataExpirationDate) : null;
+      if (irataExpDate && irataExpDate > now) {
+        // Valid IRATA certification
+        totalPoints += 40;
+        breakdown.irataValid = true;
+        breakdown.hasValidCertification = true;
+      } else if (irataExpDate && irataExpDate <= now) {
+        // Expired - partial credit (10 points for having it at all)
+        totalPoints += 10;
+      }
+    }
+    
+    // 2. SPRAT Certification (up to 40 points)
+    if (tech.spratLevel) {
+      maxPoints += 40;
+      const spratExpDate = tech.spratExpirationDate ? new Date(tech.spratExpirationDate) : null;
+      if (spratExpDate && spratExpDate > now) {
+        // Valid SPRAT certification
+        totalPoints += 40;
+        breakdown.spratValid = true;
+        breakdown.hasValidCertification = true;
+      } else if (spratExpDate && spratExpDate <= now) {
+        // Expired - partial credit (10 points for having it at all)
+        totalPoints += 10;
+      }
+    }
+    
+    // If no certifications at all, use baseline score
+    if (!tech.irataLevel && !tech.spratLevel) {
+      maxPoints = 100;
+      // No certifications = 20 points baseline
+      totalPoints = 20;
+    }
+    
+    // 3. Experience points (up to 15 points)
+    maxPoints += 15;
+    if (tech.ropeAccessStartDate) {
+      const startDate = new Date(tech.ropeAccessStartDate);
+      const yearsExp = Math.floor((now.getTime() - startDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+      breakdown.yearsExperience = yearsExp;
+      // 3 points per year, max 15
+      totalPoints += Math.min(15, yearsExp * 3);
+    }
+    
+    // 4. Resume uploaded (5 points)
+    maxPoints += 5;
+    if (tech.resumeDocuments && tech.resumeDocuments.length > 0) {
+      totalPoints += 5;
+      breakdown.hasResume = true;
+    }
+    
+    // Calculate percentage
+    const safetyRating = maxPoints > 0 ? Math.round((totalPoints / maxPoints) * 100) : 0;
+    
+    // Determine label and color
+    let safetyLabel: string;
+    let safetyColor: string;
+    if (safetyRating >= 90) {
+      safetyLabel = "Excellent";
+      safetyColor = "green";
+    } else if (safetyRating >= 70) {
+      safetyLabel = "Good";
+      safetyColor = "yellow";
+    } else if (safetyRating >= 50) {
+      safetyLabel = "Fair";
+      safetyColor = "orange";
+    } else {
+      safetyLabel = "Needs Attention";
+      safetyColor = "red";
+    }
+    
+    return { safetyRating, safetyLabel, safetyColor, safetyBreakdown: breakdown };
+  }
+
   // Get visible technicians (for companies browsing)
   app.get("/api/visible-technicians", requireAuth, requireRole("company", "superuser"), async (req: Request, res: Response) => {
     try {
@@ -20107,7 +20198,19 @@ Do not include any other text, just the JSON object.`
         ))
         .orderBy(sql`${users.visibilityEnabledAt} DESC`);
 
-      res.json({ technicians: visibleTechs });
+      // Add safety rating to each technician
+      const techniciansWithRating = visibleTechs.map(tech => {
+        const { safetyRating, safetyLabel, safetyColor, safetyBreakdown } = calculateTechnicianSafetyRating(tech);
+        return {
+          ...tech,
+          safetyRating,
+          safetyLabel,
+          safetyColor,
+          safetyBreakdown,
+        };
+      });
+
+      res.json({ technicians: techniciansWithRating });
     } catch (error) {
       console.error("Get visible technicians error:", error);
       res.status(500).json({ message: "Internal server error" });
