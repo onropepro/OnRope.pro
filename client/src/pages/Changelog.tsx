@@ -442,6 +442,7 @@ const pagesData: PageCategory[] = [
       { name: "Document Management", path: "/modules/document-management", description: "Document storage module overview", roles: ["Public"] },
       { name: "Employee Management", path: "/modules/employee-management", description: "Workforce admin module overview", roles: ["Public"] },
       { name: "Technician Passport", path: "/modules/technician-passport", description: "Technician profile and PLUS tier overview", roles: ["Public"] },
+      { name: "Technician Job Board", path: "/modules/technician-job-board", description: "Job browser, applications, and profile visibility", roles: ["Public"] },
     ]
   },
   {

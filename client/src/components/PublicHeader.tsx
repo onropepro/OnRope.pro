@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
-import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown, IdCard } from "lucide-react";
+import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown, IdCard, HardHat, Search } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 interface PublicHeaderProps {
@@ -15,12 +15,15 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
   const { t, i18n } = useTranslation();
   const [, setLocation] = useLocation();
   const [showModulesMenu, setShowModulesMenu] = useState(false);
+  const [showTechnicianMenu, setShowTechnicianMenu] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileModulesExpanded, setMobileModulesExpanded] = useState(false);
+  const [mobileTechnicianExpanded, setMobileTechnicianExpanded] = useState(false);
   const [landingLanguage, setLandingLanguage] = useState<'en' | 'fr'>(() => {
     return (i18n.language?.startsWith('fr') ? 'fr' : 'en');
   });
   const modulesMenuRef = useRef<HTMLDivElement>(null);
+  const technicianMenuRef = useRef<HTMLDivElement>(null);
 
   const toggleLandingLanguage = () => {
     const newLang = landingLanguage === 'en' ? 'fr' : 'en';
@@ -33,13 +36,16 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
       if (modulesMenuRef.current && !modulesMenuRef.current.contains(e.target as Node)) {
         setShowModulesMenu(false);
       }
+      if (technicianMenuRef.current && !technicianMenuRef.current.contains(e.target as Node)) {
+        setShowTechnicianMenu(false);
+      }
     };
     
-    if (showModulesMenu) {
+    if (showModulesMenu || showTechnicianMenu) {
       document.addEventListener("mousedown", handleClickOutside);
       return () => document.removeEventListener("mousedown", handleClickOutside);
     }
-  }, [showModulesMenu]);
+  }, [showModulesMenu, showTechnicianMenu]);
 
   const navItems = [
     { id: "employer", label: "Employer", href: "/employer" },
@@ -277,8 +283,47 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
               )}
             </div>
             
-            {/* Other nav items (excluding employer since it's handled above) */}
-            {navItems.filter(item => item.id !== "employer").map((item) => (
+            {/* Technician with Modules Dropdown */}
+            <div 
+              className="relative flex items-center" 
+              ref={technicianMenuRef}
+              onMouseEnter={() => setShowTechnicianMenu(true)}
+              onMouseLeave={() => setShowTechnicianMenu(false)}
+            >
+              <Button
+                variant={activeNav === "technician" ? "default" : "ghost"}
+                className="text-sm font-medium"
+                onClick={() => setLocation("/technician-login")}
+                data-testid="nav-technician"
+              >
+                Technician
+              </Button>
+              {showTechnicianMenu && (
+                <div className="absolute top-full left-0 mt-1 bg-card border border-border rounded-xl shadow-xl p-4 w-[320px] z-50">
+                  <div className="space-y-3">
+                    <button
+                      className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group w-full"
+                      onClick={() => {
+                        setLocation("/modules/technician-job-board");
+                        setShowTechnicianMenu(false);
+                      }}
+                      data-testid="nav-technician-job-board"
+                    >
+                      <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <Search className="w-5 h-5 text-amber-600" />
+                      </div>
+                      <div>
+                        <div className="font-semibold text-sm">Job Board Ecosystem</div>
+                        <div className="text-xs text-muted-foreground mt-0.5">Browse jobs, apply instantly, control profile visibility</div>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            {/* Other nav items (excluding employer and technician since they're handled above) */}
+            {navItems.filter(item => item.id !== "employer" && item.id !== "technician").map((item) => (
               <Button
                 key={item.id}
                 variant={activeNav === item.id ? "default" : "ghost"}
@@ -417,8 +462,40 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
               )}
             </div>
 
+            {/* Technician with expandable modules */}
+            <div>
+              <button
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-lg text-left font-medium transition-colors ${
+                  activeNav === "technician" 
+                    ? "bg-primary text-primary-foreground" 
+                    : "hover-elevate"
+                }`}
+                onClick={() => setMobileTechnicianExpanded(!mobileTechnicianExpanded)}
+                data-testid="nav-mobile-technician"
+              >
+                <span>Technician</span>
+                <ChevronDown className={`w-5 h-5 transition-transform ${mobileTechnicianExpanded ? "rotate-180" : ""}`} />
+              </button>
+              
+              {mobileTechnicianExpanded && (
+                <div className="mt-2 ml-4 space-y-1">
+                  <button
+                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
+                    onClick={() => {
+                      setLocation("/modules/technician-job-board");
+                      setMobileMenuOpen(false);
+                    }}
+                    data-testid="nav-mobile-technician-job-board"
+                  >
+                    <Search className="w-5 h-5 text-amber-600" />
+                    <span className="text-sm">Job Board Ecosystem</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
             {/* Other nav items */}
-            {navItems.filter(item => item.id !== "employer").map((item) => (
+            {navItems.filter(item => item.id !== "employer" && item.id !== "technician").map((item) => (
               <button
                 key={item.id}
                 className={`w-full px-4 py-3 rounded-lg text-left font-medium transition-colors ${
