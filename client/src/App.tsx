@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { usePermissionSync } from "@/hooks/use-permission-sync";
 import DebugConsole from "@/components/DebugConsole";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 // Pages
 import Register from "@/pages/Register";
@@ -654,11 +655,13 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <BrandingProvider>
-          <Router />
-          <Toaster />
-          <DebugConsole />
-        </BrandingProvider>
+        <ErrorBoundary>
+          <BrandingProvider>
+            <Router />
+            <Toaster />
+            <DebugConsole />
+          </BrandingProvider>
+        </ErrorBoundary>
       </TooltipProvider>
     </QueryClientProvider>
   );
