@@ -13782,6 +13782,141 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Retire a specific gear serial number (soft delete - keeps record but marks as retired)
+  app.patch("/api/gear-serial-numbers/:id/retire", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check manage inventory permission
+      if (!canManageInventory(currentUser)) {
+        return res.status(403).json({ message: "Access denied - Insufficient inventory permissions" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const { reason } = req.body;
+      
+      if (!reason || typeof reason !== 'string' || reason.trim().length === 0) {
+        return res.status(400).json({ message: "Retirement reason is required" });
+      }
+      
+      // Verify the serial number exists and belongs to the company
+      const [existingSerial] = await db.select()
+        .from(gearSerialNumbers)
+        .where(and(
+          eq(gearSerialNumbers.id, req.params.id),
+          eq(gearSerialNumbers.companyId, companyId)
+        ))
+        .limit(1);
+      
+      if (!existingSerial) {
+        return res.status(404).json({ message: "Serial number not found" });
+      }
+      
+      if (existingSerial.isRetired) {
+        return res.status(400).json({ message: "This item is already retired" });
+      }
+      
+      // If the serial number is assigned to someone, unassign it first
+      await db.delete(gearAssignments)
+        .where(and(
+          eq(gearAssignments.serialNumber, existingSerial.serialNumber),
+          eq(gearAssignments.gearItemId, existingSerial.gearItemId),
+          eq(gearAssignments.companyId, companyId)
+        ));
+      
+      // Mark as retired
+      const [retiredSerial] = await db.update(gearSerialNumbers)
+        .set({
+          isRetired: true,
+          retiredAt: new Date(),
+          retiredById: currentUser.id,
+          retiredReason: reason.trim(),
+          updatedAt: new Date(),
+        })
+        .where(eq(gearSerialNumbers.id, req.params.id))
+        .returning();
+      
+      res.json({ serialNumber: retiredSerial });
+    } catch (error) {
+      console.error("Retire gear serial number error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get retired gear for a company
+  app.get("/api/retired-gear", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check view inventory permission
+      if (!canViewInventory(currentUser)) {
+        return res.status(403).json({ message: "Access denied - Insufficient inventory permissions" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Get all retired serial numbers with their gear item info
+      const retiredItems = await db.select({
+        id: gearSerialNumbers.id,
+        serialNumber: gearSerialNumbers.serialNumber,
+        dateOfManufacture: gearSerialNumbers.dateOfManufacture,
+        dateInService: gearSerialNumbers.dateInService,
+        retiredAt: gearSerialNumbers.retiredAt,
+        retiredById: gearSerialNumbers.retiredById,
+        retiredReason: gearSerialNumbers.retiredReason,
+        gearItemId: gearSerialNumbers.gearItemId,
+        gearItemCategory: gearItems.category,
+        gearItemType: gearItems.type,
+        gearItemBrand: gearItems.brand,
+        gearItemModel: gearItems.model,
+      })
+        .from(gearSerialNumbers)
+        .innerJoin(gearItems, eq(gearSerialNumbers.gearItemId, gearItems.id))
+        .where(and(
+          eq(gearSerialNumbers.companyId, companyId),
+          eq(gearSerialNumbers.isRetired, true)
+        ))
+        .orderBy(sql`${gearSerialNumbers.retiredAt} DESC`);
+      
+      // Get the names of people who retired items
+      const retiredByIds = [...new Set(retiredItems.filter(i => i.retiredById).map(i => i.retiredById!))];
+      const retiredByUsers = retiredByIds.length > 0 
+        ? await db.select({ id: users.id, firstName: users.firstName, lastName: users.lastName })
+            .from(users)
+            .where(inArray(users.id, retiredByIds))
+        : [];
+      
+      const userMap = new Map(retiredByUsers.map(u => [u.id, `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Unknown']));
+      
+      const retiredGearWithNames = retiredItems.map(item => ({
+        ...item,
+        retiredByName: item.retiredById ? userMap.get(item.retiredById) || 'Unknown' : null,
+      }));
+      
+      res.json({ retiredGear: retiredGearWithNames });
+    } catch (error) {
+      console.error("Get retired gear error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Equipment Damage Report routes
   app.get("/api/equipment-damage-reports", requireAuth, async (req: Request, res: Response) => {
     try {
