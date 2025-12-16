@@ -5,6 +5,7 @@ import { QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { usePermissionSync } from "@/hooks/use-permission-sync";
+import DebugConsole from "@/components/DebugConsole";
 
 // Pages
 import Register from "@/pages/Register";
@@ -654,6 +655,7 @@ function App() {
         <BrandingProvider>
           <Router />
           <Toaster />
+          <DebugConsole />
         </BrandingProvider>
       </TooltipProvider>
     </QueryClientProvider>
