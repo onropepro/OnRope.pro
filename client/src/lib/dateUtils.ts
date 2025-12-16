@@ -19,10 +19,19 @@ export function parseLocalDate(dateString: string): Date {
 }
 
 /**
- * Convert a Date object to a date-only string (YYYY-MM-DD) in LOCAL timezone.
+ * Convert a Date object or date string to a date-only string (YYYY-MM-DD) in LOCAL timezone.
  * This avoids the UTC conversion that toISOString() causes.
+ * Handles both Date objects and ISO date strings from the API.
  */
-export function toLocalDateString(date: Date): string {
+export function toLocalDateString(date: Date | string | null | undefined): string {
+  if (!date) return getTodayString();
+  
+  // If it's already a string, extract just the date part
+  if (typeof date === 'string') {
+    return date.split('T')[0];
+  }
+  
+  // If it's a Date object
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
