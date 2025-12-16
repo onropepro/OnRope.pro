@@ -184,6 +184,7 @@ export default function Inventory() {
   // Gear item detail dialog state
   const [showItemDetailDialog, setShowItemDetailDialog] = useState(false);
   const [selectedDetailItem, setSelectedDetailItem] = useState<GearItem | null>(null);
+  const [detailDialogSource, setDetailDialogSource] = useState<"myGear" | "manageGear">("manageGear");
 
   // Fetch current user
   const { data: userData } = useQuery<{ user: any }>({
@@ -1679,6 +1680,7 @@ export default function Inventory() {
                     className="overflow-visible cursor-pointer hover-elevate"
                     onClick={() => {
                       setSelectedDetailItem(item);
+                      setDetailDialogSource("myGear");
                       setShowItemDetailDialog(true);
                     }}
                     data-testid={`mygear-item-${item.id}`}
@@ -2228,6 +2230,7 @@ export default function Inventory() {
                     data-testid={`item-${item.id}`}
                     onClick={() => {
                       setSelectedDetailItem(item);
+                      setDetailDialogSource("manageGear");
                       setShowItemDetailDialog(true);
                     }}
                   >
@@ -3955,70 +3958,88 @@ export default function Inventory() {
               )}
 
               {/* Serial Numbers Section */}
-              {(selectedDetailItem as any).serialEntries && (selectedDetailItem as any).serialEntries.length > 0 && (
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <h4 className="font-semibold">{t('inventory.serialNumbers', 'Serial Numbers')}</h4>
-                    <Badge variant="secondary">{(selectedDetailItem as any).serialEntries.length} {t('inventory.units', 'units')}</Badge>
-                  </div>
-                  <div className="space-y-2">
-                    {(selectedDetailItem as any).serialEntries.map((entry: GearSerialNumber) => {
-                      const assignment = gearData?.assignments?.find(
-                        (a: any) => a.gearItemId === selectedDetailItem.id && a.serialNumber === entry.serialNumber
-                      );
-                      const assignedEmployee = assignment ? activeEmployees.find(e => e.id === assignment.employeeId) : null;
-                      
-                      return (
-                        <div key={entry.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-md">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <Badge variant="outline" className="font-mono">
-                                {entry.serialNumber}
-                              </Badge>
-                              {getServiceDuration(entry.dateInService) && (
-                                <Badge variant="secondary" className="text-xs bg-primary/10 text-primary border-primary/20">
-                                  <span className="material-icons text-xs mr-1">schedule</span>
-                                  {getServiceDuration(entry.dateInService)} in service
+              {(() => {
+                // Filter serial entries based on source
+                const allSerialEntries = (selectedDetailItem as any).serialEntries || [];
+                const myAssignments = getItemAssignments(selectedDetailItem.id).filter(a => a.employeeId === currentUser?.id);
+                const mySerialNumbers = myAssignments.map(a => a.serialNumber).filter(Boolean);
+                
+                // If viewing from My Gear, only show MY serial numbers
+                const serialEntriesToShow = detailDialogSource === "myGear" 
+                  ? allSerialEntries.filter((entry: GearSerialNumber) => mySerialNumbers.includes(entry.serialNumber))
+                  : allSerialEntries;
+                
+                if (serialEntriesToShow.length === 0) return null;
+                
+                return (
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="font-semibold">
+                        {detailDialogSource === "myGear" 
+                          ? t('inventory.mySerialNumbers', 'My Serial Numbers')
+                          : t('inventory.serialNumbers', 'Serial Numbers')}
+                      </h4>
+                      <Badge variant="secondary">{serialEntriesToShow.length} {t('inventory.units', 'units')}</Badge>
+                    </div>
+                    <div className="space-y-2">
+                      {serialEntriesToShow.map((entry: GearSerialNumber) => {
+                        const assignment = gearData?.assignments?.find(
+                          (a: any) => a.gearItemId === selectedDetailItem.id && a.serialNumber === entry.serialNumber
+                        );
+                        const assignedEmployee = assignment ? activeEmployees.find(e => e.id === assignment.employeeId) : null;
+                        
+                        return (
+                          <div key={entry.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-md">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <Badge variant="outline" className="font-mono">
+                                  {entry.serialNumber}
                                 </Badge>
-                              )}
-                              {assignedEmployee && (
-                                <Badge variant="secondary" className="text-xs">
-                                  <span className="material-icons text-xs mr-1">person</span>
-                                  {assignedEmployee.name}
-                                </Badge>
-                              )}
+                                {getServiceDuration(entry.dateInService) && (
+                                  <Badge variant="secondary" className="text-xs bg-primary/10 text-primary border-primary/20">
+                                    <span className="material-icons text-xs mr-1">schedule</span>
+                                    {getServiceDuration(entry.dateInService)} in service
+                                  </Badge>
+                                )}
+                                {assignedEmployee && detailDialogSource !== "myGear" && (
+                                  <Badge variant="secondary" className="text-xs">
+                                    <span className="material-icons text-xs mr-1">person</span>
+                                    {assignedEmployee.name}
+                                  </Badge>
+                                )}
+                              </div>
+                              <div className="flex gap-4 mt-1 text-xs text-muted-foreground">
+                                {entry.dateOfManufacture && (
+                                  <span>{t('inventory.mfg', 'Mfg')}: {formatLocalDate(entry.dateOfManufacture)}</span>
+                                )}
+                                {entry.dateInService && (
+                                  <span>{t('inventory.inService', 'In Service')}: {formatLocalDate(entry.dateInService)}</span>
+                                )}
+                              </div>
                             </div>
-                            <div className="flex gap-4 mt-1 text-xs text-muted-foreground">
-                              {entry.dateOfManufacture && (
-                                <span>{t('inventory.mfg', 'Mfg')}: {formatLocalDate(entry.dateOfManufacture)}</span>
-                              )}
-                              {entry.dateInService && (
-                                <span>{t('inventory.inService', 'In Service')}: {formatLocalDate(entry.dateInService)}</span>
-                              )}
-                            </div>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-muted-foreground"
+                              onClick={() => {
+                                setSerialToRetire(entry);
+                                setShowRetireDialog(true);
+                              }}
+                              data-testid={`button-retire-detail-${entry.id}`}
+                            >
+                              <span className="material-icons text-sm mr-1">archive</span>
+                              {t('inventory.retire', 'Retire')}
+                            </Button>
                           </div>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="text-muted-foreground"
-                            onClick={() => {
-                              setSerialToRetire(entry);
-                              setShowRetireDialog(true);
-                            }}
-                            data-testid={`button-retire-detail-${entry.id}`}
-                          >
-                            <span className="material-icons text-sm mr-1">archive</span>
-                            {t('inventory.retire', 'Retire')}
-                          </Button>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
 
-              {/* Current Assignments */}
-              {getItemAssignments(selectedDetailItem.id).length > 0 && (
+              {/* Current Assignments - only show in Manage Gear view */}
+              {detailDialogSource === "manageGear" && getItemAssignments(selectedDetailItem.id).length > 0 && (
                 <div>
                   <h4 className="font-semibold mb-3">{t('inventory.currentAssignments', 'Current Assignments')}</h4>
                   <div className="space-y-2">
@@ -4054,28 +4075,33 @@ export default function Inventory() {
           )}
           
           <DialogFooter className="flex-col sm:flex-row gap-2">
-            <Button
-              variant="outline"
-              onClick={() => {
-                if (selectedDetailItem) openAssignDialog(selectedDetailItem);
-                setShowItemDetailDialog(false);
-              }}
-              data-testid="button-assign-from-detail"
-            >
-              <Users className="h-4 w-4 mr-2" />
-              {t('inventory.assignGear', 'Assign Gear')}
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => {
-                if (selectedDetailItem) openEditDialog(selectedDetailItem);
-                setShowItemDetailDialog(false);
-              }}
-              data-testid="button-edit-from-detail"
-            >
-              <Pencil className="h-4 w-4 mr-2" />
-              {t('inventory.edit', 'Edit')}
-            </Button>
+            {/* Management buttons only shown when viewing from Manage Gear */}
+            {detailDialogSource === "manageGear" && (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    if (selectedDetailItem) openAssignDialog(selectedDetailItem);
+                    setShowItemDetailDialog(false);
+                  }}
+                  data-testid="button-assign-from-detail"
+                >
+                  <Users className="h-4 w-4 mr-2" />
+                  {t('inventory.assignGear', 'Assign Gear')}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    if (selectedDetailItem) openEditDialog(selectedDetailItem);
+                    setShowItemDetailDialog(false);
+                  }}
+                  data-testid="button-edit-from-detail"
+                >
+                  <Pencil className="h-4 w-4 mr-2" />
+                  {t('inventory.edit', 'Edit')}
+                </Button>
+              </>
+            )}
             <Button
               variant="outline"
               onClick={() => setShowItemDetailDialog(false)}
