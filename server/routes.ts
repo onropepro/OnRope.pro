@@ -6345,6 +6345,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               logoUrl: company?.whitelabelBrandingActive ? company?.brandingLogoUrl : null,
               propertyManagerName: notice.propertyManagerName,
               createdAt: notice.createdAt,
+              unitSchedule: notice.unitSchedule,
             });
           }
         }
@@ -10467,6 +10468,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           workEndDate: notice.endDate,
           logoUrl: logoUrl,
           contractors: notice.contractorName,
+          // Ensure unit schedule is included
+          unitSchedule: notice.unitSchedule,
+          jobType: notice.jobType,
         };
       }));
       
