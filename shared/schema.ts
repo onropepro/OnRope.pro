@@ -666,12 +666,15 @@ export const gearSerialNumbers = pgTable("gear_serial_numbers", {
   dateInService: date("date_in_service"), // Per-item in-service date
   isRetired: boolean("is_retired").notNull().default(false), // Whether this specific unit is retired
   retiredAt: timestamp("retired_at"), // When this unit was retired
+  retiredById: varchar("retired_by_id").references(() => users.id, { onDelete: "set null" }), // Who retired the item
+  retiredReason: text("retired_reason"), // Reason for retirement (e.g., "End of life", "Damaged", etc.)
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [
   index("IDX_gear_serial_numbers_item").on(table.gearItemId),
   index("IDX_gear_serial_numbers_company").on(table.companyId),
   index("IDX_gear_serial_numbers_serial").on(table.serialNumber),
+  index("IDX_gear_serial_numbers_retired").on(table.isRetired),
   sql`UNIQUE ("gear_item_id", "serial_number")`,
 ]);
 
