@@ -125,10 +125,17 @@ export default function ResidentDashboard() {
     const contentWidth = pageWidth - margin * 2;
     let yPos = 25;
 
+    // Use mapped field names with fallbacks to original field names
+    const noticeTitle = notice.title || notice.noticeTitle || 'Work Notice';
+    const noticeContent = notice.content || notice.noticeDetails || '';
+    const noticeStartDate = notice.workStartDate || notice.startDate;
+    const noticeEndDate = notice.workEndDate || notice.endDate;
+    const noticeLogo = notice.logoUrl || notice.companyLogoUrl;
+
     // Header with logo if available
-    if (notice.logoUrl) {
+    if (noticeLogo) {
       try {
-        const logoData = await loadLogoAsBase64(notice.logoUrl);
+        const logoData = await loadLogoAsBase64(noticeLogo);
         if (logoData) {
           const logoHeight = 15;
           const logoWidth = logoHeight * logoData.aspectRatio;
@@ -153,7 +160,7 @@ export default function ResidentDashboard() {
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
-    const titleLines = doc.splitTextToSize(notice.title, contentWidth);
+    const titleLines = doc.splitTextToSize(noticeTitle, contentWidth);
     doc.text(titleLines, margin, yPos);
     yPos += titleLines.length * 8 + 5;
 
@@ -176,8 +183,8 @@ export default function ResidentDashboard() {
     doc.text('WORK PERIOD:', margin + 5, yPos + 8);
     doc.setFont('helvetica', 'normal');
     
-    const startDate = notice.workStartDate ? new Date(notice.workStartDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD';
-    const endDate = notice.workEndDate ? new Date(notice.workEndDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD';
+    const startDate = noticeStartDate ? new Date(noticeStartDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD';
+    const endDate = noticeEndDate ? new Date(noticeEndDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD';
     doc.text(`${startDate} - ${endDate}`, margin + 35, yPos + 8);
     
     // Job type
@@ -193,7 +200,7 @@ export default function ResidentDashboard() {
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
-    const contentLines = doc.splitTextToSize(notice.content, contentWidth);
+    const contentLines = doc.splitTextToSize(noticeContent, contentWidth);
     
     const lineHeight = 5;
     const remainingHeight = doc.internal.pageSize.getHeight() - yPos - 30;
@@ -231,7 +238,7 @@ export default function ResidentDashboard() {
     doc.text(`Generated: ${new Date().toLocaleDateString()}`, pageWidth - margin - 40, doc.internal.pageSize.getHeight() - 14);
 
     // Download
-    const filename = `Notice-${(notice.title || 'Work-Notice').replace(/[^a-zA-Z0-9]/g, '_').substring(0, 30)}.pdf`;
+    const filename = `Notice-${(noticeTitle).replace(/[^a-zA-Z0-9]/g, '_').substring(0, 30)}.pdf`;
     doc.save(filename);
     
     toast({
