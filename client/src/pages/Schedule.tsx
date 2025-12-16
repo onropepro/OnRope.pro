@@ -1899,6 +1899,7 @@ export default function Schedule() {
           setSelectedJob(selectedJob);
           setEditDialogOpen(true);
         }}
+        onJobUpdate={setSelectedJob}
       />
 
       {/* Edit Job Dialog */}
@@ -2502,12 +2503,14 @@ function JobDetailDialog({
   job,
   onEdit,
   employees,
+  onJobUpdate,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   job: ScheduledJobWithAssignments | null;
   onEdit: () => void;
   employees: User[];
+  onJobUpdate?: (updatedJob: ScheduledJobWithAssignments) => void;
 }) {
   const { t } = useTranslation();
   const { toast } = useToast();
@@ -2571,6 +2574,14 @@ function JobDetailDialog({
       setConflictDialogOpen(false);
       setConflictInfo({ conflicts: [], pendingAssignment: null });
       await queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
+      // Update the job in parent state for immediate UI refresh
+      if (job && onJobUpdate) {
+        const scheduleData = queryClient.getQueryData<ScheduledJobWithAssignments[]>(["/api/schedule"]);
+        const updatedJob = scheduleData?.find(j => j.id === job.id);
+        if (updatedJob) {
+          onJobUpdate(updatedJob);
+        }
+      }
       toast({
         title: t('schedule.assignmentCreated', 'Employee assigned'),
         description: t('schedule.assignmentCreated', 'Team member has been assigned to this job'),
@@ -2628,6 +2639,14 @@ function JobDetailDialog({
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
+      // Update the job in parent state for immediate UI refresh
+      if (job && onJobUpdate) {
+        const scheduleData = queryClient.getQueryData<ScheduledJobWithAssignments[]>(["/api/schedule"]);
+        const updatedJob = scheduleData?.find(j => j.id === job.id);
+        if (updatedJob) {
+          onJobUpdate(updatedJob);
+        }
+      }
       toast({
         title: t('schedule.assignmentRemoved', 'Employee unassigned'),
         description: t('schedule.assignmentRemoved', 'Team member has been removed from this job'),
