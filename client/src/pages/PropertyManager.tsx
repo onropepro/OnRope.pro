@@ -20,6 +20,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
 import {
   DropdownMenu,
@@ -58,6 +59,7 @@ export default function PropertyManager() {
   const [vendorToRemove, setVendorToRemove] = useState<VendorSummary | null>(null);
   const [selectedComplaint, setSelectedComplaint] = useState<any | null>(null);
   const [editBuildingInstructionsOpen, setEditBuildingInstructionsOpen] = useState(false);
+  const [selectedProgressBuildingId, setSelectedProgressBuildingId] = useState<string | null>(null);
   const [buildingInstructionsForm, setBuildingInstructionsForm] = useState({
     buildingAccess: "",
     keysAndFob: "",
@@ -1678,20 +1680,39 @@ export default function PropertyManager() {
                         </CardHeader>
                         <CardContent>
                           {(() => {
-                            // Calculate completed drops from all work sessions
-                            const completedDropsNorth = (projectDetailsData.project.workSessions || [])
+                            // Check if this is a multi-building project
+                            const projectBuildingsList = (projectDetailsData as any).projectBuildings || [];
+                            const hasMultipleBuildings = projectBuildingsList.length > 1;
+                            
+                            // Filter work sessions by selected building if in multi-building mode
+                            const workSessions = projectDetailsData.project.workSessions || [];
+                            const filteredSessions = hasMultipleBuildings && selectedProgressBuildingId
+                              ? workSessions.filter((s: any) => s.projectBuildingId === selectedProgressBuildingId)
+                              : workSessions;
+                            
+                            // Get the selected building's drop counts for multi-building projects
+                            const selectedBuilding = hasMultipleBuildings && selectedProgressBuildingId
+                              ? projectBuildingsList.find((b: any) => b.id === selectedProgressBuildingId)
+                              : null;
+                            
+                            // Calculate completed drops from filtered work sessions
+                            const completedDropsNorth = filteredSessions
                               .reduce((sum: number, s: any) => sum + (s.dropsCompletedNorth ?? 0), 0);
-                            const completedDropsEast = (projectDetailsData.project.workSessions || [])
+                            const completedDropsEast = filteredSessions
                               .reduce((sum: number, s: any) => sum + (s.dropsCompletedEast ?? 0), 0);
-                            const completedDropsSouth = (projectDetailsData.project.workSessions || [])
+                            const completedDropsSouth = filteredSessions
                               .reduce((sum: number, s: any) => sum + (s.dropsCompletedSouth ?? 0), 0);
-                            const completedDropsWest = (projectDetailsData.project.workSessions || [])
+                            const completedDropsWest = filteredSessions
                               .reduce((sum: number, s: any) => sum + (s.dropsCompletedWest ?? 0), 0);
                             
-                            const totalDrops = (projectDetailsData.project.totalDropsNorth ?? 0) + 
-                              (projectDetailsData.project.totalDropsEast ?? 0) + 
-                              (projectDetailsData.project.totalDropsSouth ?? 0) + 
-                              (projectDetailsData.project.totalDropsWest ?? 0);
+                            // Use selected building's totals if multi-building, otherwise use project totals
+                            const totalDropsNorth = selectedBuilding?.totalDropsNorth ?? projectDetailsData.project.totalDropsNorth ?? 0;
+                            const totalDropsEast = selectedBuilding?.totalDropsEast ?? projectDetailsData.project.totalDropsEast ?? 0;
+                            const totalDropsSouth = selectedBuilding?.totalDropsSouth ?? projectDetailsData.project.totalDropsSouth ?? 0;
+                            const totalDropsWest = selectedBuilding?.totalDropsWest ?? projectDetailsData.project.totalDropsWest ?? 0;
+                            const buildingFloors = selectedBuilding?.floors ?? projectDetailsData.project.floors ?? 25;
+                            
+                            const totalDrops = totalDropsNorth + totalDropsEast + totalDropsSouth + totalDropsWest;
                             
                             const completedDrops = completedDropsNorth + completedDropsEast + completedDropsSouth + completedDropsWest;
                             const progressPercent = totalDrops > 0 
@@ -1700,12 +1721,43 @@ export default function PropertyManager() {
 
                             return (
                               <>
+                                {/* Building selector for multi-building projects */}
+                                {hasMultipleBuildings && (
+                                  <div className="mb-6">
+                                    <Label className="text-sm font-medium mb-2 block">
+                                      {t('propertyManager.projectDetails.buildingProgress.selectBuilding', 'Select Building')}
+                                    </Label>
+                                    <Select
+                                      value={selectedProgressBuildingId || "all"}
+                                      onValueChange={(value) => setSelectedProgressBuildingId(value === "all" ? null : value)}
+                                    >
+                                      <SelectTrigger className="w-full" data-testid="select-progress-building">
+                                        <SelectValue placeholder={t('propertyManager.projectDetails.buildingProgress.allBuildings', 'All Buildings')} />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="all">
+                                          {t('propertyManager.projectDetails.buildingProgress.allBuildings', 'All Buildings (Combined)')}
+                                        </SelectItem>
+                                        {projectBuildingsList.map((bldg: any) => (
+                                          <SelectItem key={bldg.id} value={bldg.id}>
+                                            {bldg.name}
+                                            {bldg.strataPlanNumber && ` (${bldg.strataPlanNumber})`}
+                                          </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                    <p className="text-xs text-muted-foreground mt-2">
+                                      {t('propertyManager.projectDetails.buildingProgress.selectBuildingDesc', 'This complex has {{count}} buildings. Select one to view its individual progress.', { count: projectBuildingsList.length })}
+                                    </p>
+                                  </div>
+                                )}
+                                
                                 <HighRiseBuilding
-                                  floors={projectDetailsData.project.floors || 25}
-                                  totalDropsNorth={projectDetailsData.project.totalDropsNorth ?? 0}
-                                  totalDropsEast={projectDetailsData.project.totalDropsEast ?? 0}
-                                  totalDropsSouth={projectDetailsData.project.totalDropsSouth ?? 0}
-                                  totalDropsWest={projectDetailsData.project.totalDropsWest ?? 0}
+                                  floors={buildingFloors}
+                                  totalDropsNorth={totalDropsNorth}
+                                  totalDropsEast={totalDropsEast}
+                                  totalDropsSouth={totalDropsSouth}
+                                  totalDropsWest={totalDropsWest}
                                   completedDropsNorth={completedDropsNorth}
                                   completedDropsEast={completedDropsEast}
                                   completedDropsSouth={completedDropsSouth}
@@ -1715,7 +1767,11 @@ export default function PropertyManager() {
                                 {/* Overall Progress Bar */}
                                 <div className="mt-6 space-y-2">
                                   <div className="flex items-center justify-between text-sm">
-                                    <span className="text-muted-foreground">{t('propertyManager.projectDetails.buildingProgress.overallProgress', 'Overall Progress')}</span>
+                                    <span className="text-muted-foreground">
+                                      {selectedProgressBuildingId 
+                                        ? t('propertyManager.projectDetails.buildingProgress.buildingProgress', 'Building Progress')
+                                        : t('propertyManager.projectDetails.buildingProgress.overallProgress', 'Overall Progress')}
+                                    </span>
                                     <span className="font-medium">{progressPercent}%</span>
                                   </div>
                                   <Progress value={progressPercent} className="h-2" />

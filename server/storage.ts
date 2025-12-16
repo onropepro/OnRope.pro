@@ -3267,6 +3267,12 @@ export class Storage {
       }
     }
     
+    // Get project buildings if this is a multi-building complex
+    const projectBuildingsList = await db.select()
+      .from(projectBuildings)
+      .where(eq(projectBuildings.projectId, projectId))
+      .orderBy(projectBuildings.sortOrder);
+    
     return {
       project: {
         ...project,
@@ -3274,6 +3280,7 @@ export class Storage {
       },
       complaints: projectComplaints,
       buildingInstructions: projectBuildingInstructions,
+      projectBuildings: projectBuildingsList,
     };
   }
 
