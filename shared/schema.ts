@@ -429,6 +429,7 @@ export const workNotices = pgTable("work_notices", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
   companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  projectBuildingId: varchar("project_building_id").references(() => projectBuildings.id, { onDelete: "set null" }), // For multi-building projects
   
   // Auto-filled from project (stored for historical reference)
   buildingName: varchar("building_name"),
