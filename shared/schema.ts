@@ -494,6 +494,7 @@ export const projectBuildings = pgTable("project_buildings", {
   
   // Building identification
   name: varchar("name").notNull(), // e.g., "Tower 1", "Building A", "North Tower"
+  strataPlanNumber: varchar("strata_plan_number"), // Each building can have its own strata number
   buildingAddress: text("building_address"), // Specific address for this building if different
   
   // Building specifications

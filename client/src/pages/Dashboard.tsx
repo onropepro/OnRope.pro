@@ -1011,6 +1011,7 @@ export default function Dashboard() {
   // Multi-building state for complex projects (window cleaning, building wash)
   interface ProjectBuildingEntry {
     name: string;
+    strataPlanNumber: string;
     buildingAddress: string;
     floorCount: string;
     buildingHeight: string;
@@ -1964,6 +1965,7 @@ export default function Dashboard() {
           await apiRequest("PUT", `/api/projects/${projectId}/buildings`, {
             buildings: projectBuildings.map((b, index) => ({
               name: b.name,
+              strataPlanNumber: b.strataPlanNumber || undefined,
               buildingAddress: b.buildingAddress,
               floorCount: b.floorCount ? parseInt(b.floorCount) : undefined,
               buildingHeight: b.buildingHeight,
@@ -4389,6 +4391,7 @@ export default function Dashboard() {
                                   if (checked && projectBuildings.length === 0) {
                                     setProjectBuildings([{
                                       name: "Tower A",
+                                      strataPlanNumber: "",
                                       buildingAddress: "",
                                       floorCount: "",
                                       buildingHeight: "",
@@ -4436,6 +4439,20 @@ export default function Dashboard() {
                                     </div>
                                     
                                     <div className="grid grid-cols-2 gap-2">
+                                      <div>
+                                        <label className="text-xs text-muted-foreground">{t('dashboard.projectForm.strataPlanNumber', 'Strata Plan #')}</label>
+                                        <Input
+                                          placeholder="e.g., LMS 1234"
+                                          value={building.strataPlanNumber}
+                                          onChange={(e) => {
+                                            const updated = [...projectBuildings];
+                                            updated[index] = { ...building, strataPlanNumber: e.target.value };
+                                            setProjectBuildings(updated);
+                                          }}
+                                          className="h-10"
+                                          data-testid={`input-building-strata-${index}`}
+                                        />
+                                      </div>
                                       <div>
                                         <label className="text-xs text-muted-foreground">{t('dashboard.projectForm.floorCount', 'Floor Count')}</label>
                                         <Input
@@ -4562,6 +4579,7 @@ export default function Dashboard() {
                                     const nextLetter = String.fromCharCode(65 + projectBuildings.length); // A, B, C...
                                     setProjectBuildings([...projectBuildings, {
                                       name: `Tower ${nextLetter}`,
+                                      strataPlanNumber: "",
                                       buildingAddress: "",
                                       floorCount: "",
                                       buildingHeight: "",

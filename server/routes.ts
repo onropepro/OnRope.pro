@@ -10442,9 +10442,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const buildingsToCreate = buildingsData.map((b: any, index: number) => ({
         projectId: req.params.projectId,
         name: b.name,
+        strataPlanNumber: b.strataPlanNumber || null,
         buildingAddress: b.buildingAddress,
         floorCount: b.floorCount,
         buildingHeight: b.buildingHeight,
+        dailyDropTarget: b.dailyDropTarget || 0,
         totalDropsNorth: b.totalDropsNorth || 0,
         totalDropsEast: b.totalDropsEast || 0,
         totalDropsSouth: b.totalDropsSouth || 0,
