@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
-import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown, IdCard, HardHat, Search } from "lucide-react";
+import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown, IdCard, HardHat, Search, Package } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 interface PublicHeaderProps {
@@ -294,6 +294,22 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                         <div className="text-xs text-muted-foreground mt-0.5">Talent browser, unlimited postings, direct offers</div>
                       </div>
                     </button>
+                    <button
+                      className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                      onClick={() => {
+                        setLocation("/modules/gear-inventory");
+                        setShowModulesMenu(false);
+                      }}
+                      data-testid="nav-gear-inventory"
+                    >
+                      <div className="w-10 h-10 rounded-lg bg-teal-100 dark:bg-teal-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <Package className="w-5 h-5 text-teal-600" />
+                      </div>
+                      <div>
+                        <div className="font-semibold text-sm">Gear Inventory Management</div>
+                        <div className="text-xs text-muted-foreground mt-0.5">Equipment tracking, assignments, service life</div>
+                      </div>
+                    </button>
                   </div>
                 </div>
               )}
@@ -484,6 +500,17 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                   >
                     <Search className="w-5 h-5 text-blue-600" />
                     <span className="text-sm">Job Board Ecosystem</span>
+                  </button>
+                  <button
+                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
+                    onClick={() => {
+                      setLocation("/modules/gear-inventory");
+                      setMobileMenuOpen(false);
+                    }}
+                    data-testid="nav-mobile-gear-inventory"
+                  >
+                    <Package className="w-5 h-5 text-teal-600" />
+                    <span className="text-sm">Gear Inventory Management</span>
                   </button>
                 </div>
               )}
