@@ -1774,7 +1774,7 @@ export default function Schedule() {
                 onValueChange={setSelectedEmployeeForTimeOff}
               >
                 <SelectTrigger data-testid="select-time-off-employee">
-                  <SelectValue placeholder={t('schedule.selectProject', 'Select employee...')} />
+                  <SelectValue placeholder={t('schedule.selectEmployee', 'Select employee...')} />
                 </SelectTrigger>
                 <SelectContent>
                   {employees.map((employee) => (
