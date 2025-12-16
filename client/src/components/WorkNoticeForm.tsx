@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -532,6 +532,30 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
   const { toast } = useToast();
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   
+  // Fetch clients to get property manager name for this project's strata plan
+  const { data: clientsResponse } = useQuery<{ clients: any[] }>({
+    queryKey: ["/api/clients"],
+  });
+  
+  // Find the client associated with this project's strata plan number
+  const getPropertyManagerName = (): string => {
+    if (existingNotice?.propertyManagerName) return existingNotice.propertyManagerName;
+    if ((project as any).propertyManagerName) return (project as any).propertyManagerName;
+    
+    // Try to find from clients data
+    const clients = clientsResponse?.clients || [];
+    for (const client of clients) {
+      const lmsNumbers = client.lmsNumbers || [];
+      const hasMatchingStrata = lmsNumbers.some((lms: any) => 
+        lms.number === project.strataPlanNumber
+      );
+      if (hasMatchingStrata) {
+        return `${client.firstName || ''} ${client.lastName || ''}`.trim();
+      }
+    }
+    return "";
+  };
+  
   // Check if this job type needs unit/stall scheduling
   const needsUnitSchedule = project.jobType === 'in_suite_dryer_vent_cleaning' || project.jobType === 'parkade_pressure_cleaning';
   const scheduleLabel = project.jobType === 'parkade_pressure_cleaning' ? 'Stall' : 'Unit';
@@ -551,6 +575,9 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
   const jobTypeConfig = getJobTypeConfig(project.jobType);
   const jobTypeName = project.customJobType || jobTypeConfig?.label || project.jobType;
   const templates = NOTICE_TEMPLATES[project.jobType] || NOTICE_TEMPLATES.other;
+  
+  // Get the property manager name (may update when clients data loads)
+  const propertyManagerName = getPropertyManagerName();
 
   const form = useForm<WorkNoticeFormData>({
     resolver: zodResolver(workNoticeFormSchema),
@@ -560,9 +587,16 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
       noticeTitle: existingNotice?.noticeTitle || "",
       noticeDetails: existingNotice?.noticeDetails || "",
       additionalInstructions: existingNotice?.additionalInstructions || "",
-      propertyManagerName: existingNotice?.propertyManagerName || (project as any).propertyManagerName || "",
+      propertyManagerName: "",
     },
   });
+  
+  // Update property manager name when clients data loads
+  useEffect(() => {
+    if (propertyManagerName && !form.getValues("propertyManagerName")) {
+      form.setValue("propertyManagerName", propertyManagerName);
+    }
+  }, [propertyManagerName, form]);
 
   const createNoticeMutation = useMutation({
     mutationFn: async (data: WorkNoticeFormData) => {
