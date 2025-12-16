@@ -739,8 +739,8 @@ export default function PropertyManager() {
                       <CardContent className="p-6 relative z-10">
                         <div className="flex items-start gap-4">
                           <Avatar className="w-12 h-12 ring-2 ring-offset-2" style={primaryColor ? {
-                            ringColor: primaryColor,
-                          } : undefined}>
+                            '--tw-ring-color': primaryColor,
+                          } as React.CSSProperties : undefined}>
                             <AvatarImage src={vendor.logo || undefined} />
                             <AvatarFallback 
                               style={primaryColor ? {
