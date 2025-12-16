@@ -3906,6 +3906,39 @@ export default function Dashboard() {
                       className="h-14 px-6 gap-2 shadow-md hover:shadow-lg text-base font-semibold" 
                       data-testid="button-create-project"
                       disabled={userIsReadOnly || (projectsData?.projectInfo?.atProjectLimit ?? false)}
+                      onClick={() => {
+                        // Reset form when button is clicked to clear any stale data
+                        if (!skipProjectFormResetRef.current) {
+                          projectForm.reset({
+                            strataPlanNumber: "",
+                            buildingName: "",
+                            buildingAddress: "",
+                            jobCategory: "building_maintenance",
+                            jobType: "window_cleaning",
+                            customJobType: "",
+                            requiresElevation: true,
+                            totalDropsNorth: "",
+                            totalDropsEast: "",
+                            totalDropsSouth: "",
+                            totalDropsWest: "",
+                            dailyDropTarget: "",
+                            floorCount: "",
+                            buildingHeight: "",
+                            startDate: "",
+                            endDate: "",
+                            targetCompletionDate: "",
+                            estimatedHours: "",
+                            calendarColor: "#3b82f6",
+                            assignedEmployees: [],
+                            peaceWork: false,
+                            pricePerDrop: "",
+                          });
+                          setSelectedClientForProject("");
+                          setSelectedStrataForProject("");
+                          setProjectBuildings([]);
+                          setIsMultiBuildingComplex(false);
+                        }
+                      }}
                     >
                       <span className="material-icons text-xl text-primary-foreground">add_circle</span>
                       <span className="hidden sm:inline">{projectsData?.projectInfo?.atProjectLimit ? t('dashboard.projects.limitReached', 'Project Limit Reached') : t('dashboard.projects.newProject', 'New Project')}</span>
