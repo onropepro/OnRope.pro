@@ -3075,14 +3075,14 @@ export default function Inventory() {
                       
                       <Button
                         type="button"
-                        variant="default"
+                        variant="outline"
                         onClick={handleAddSerialNumber}
                         disabled={serialEntries.length >= (form.watch("quantity") || 1)}
                         data-testid="button-add-serial"
                         className="w-full"
                       >
                         <Plus className="h-5 w-5 mr-2" />
-                        {t('inventory.addItemCount', 'Add Item')} ({serialEntries.length}/{form.watch("quantity") || 1})
+                        {t('inventory.addToList', 'Add to List')} ({serialEntries.length}/{form.watch("quantity") || 1})
                       </Button>
                     </div>
 
@@ -3171,7 +3171,7 @@ export default function Inventory() {
                       {t('common.back', 'Back')}
                     </Button>
                     <Button type="submit" disabled={addItemMutation.isPending} data-testid="button-submit" className="flex-1">
-                      {addItemMutation.isPending ? t('inventory.adding', 'Adding...') : t('inventory.addItem', 'Add Item')}
+                      {addItemMutation.isPending ? t('inventory.saving', 'Saving...') : t('inventory.saveToInventory', 'Save to Inventory')}
                     </Button>
                   </div>
                 </>
@@ -3356,14 +3356,14 @@ export default function Inventory() {
                   
                   <Button
                     type="button"
-                    variant="default"
+                    variant="outline"
                     onClick={handleAddSerialNumber}
                     disabled={serialEntries.length >= (form.watch("quantity") || 1)}
                     data-testid="button-add-serial-edit"
                     className="w-full"
                   >
                     <Plus className="h-5 w-5 mr-2" />
-                    {t('inventory.addItemCount', 'Add Item')} ({serialEntries.length}/{form.watch("quantity") || 1})
+                    {t('inventory.addToList', 'Add to List')} ({serialEntries.length}/{form.watch("quantity") || 1})
                   </Button>
                 </div>
 
