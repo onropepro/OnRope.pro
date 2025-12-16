@@ -1027,6 +1027,7 @@ export default function Dashboard() {
   const [selectedClientForProject, setSelectedClientForProject] = useState<string>("");
   const [selectedStrataForProject, setSelectedStrataForProject] = useState<string>("");
   const isManualEntryRef = useRef(false);
+  const skipProjectFormResetRef = useRef(false); // Skip form reset when opening from quote import
   const [clientDropdownOpen, setClientDropdownOpen] = useState(false);
   const [clientSearchQuery, setClientSearchQuery] = useState("");
   const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
@@ -1935,6 +1936,9 @@ export default function Dashboard() {
               setSelectedClientForProject(quoteData.clientId);
             }
           }
+          
+          // Skip form reset when opening from quote (data is already prefilled)
+          skipProjectFormResetRef.current = true;
           
           // Open the project creation dialog
           setShowProjectDialog(true);
@@ -3860,6 +3864,41 @@ export default function Dashboard() {
                   if (!open) {
                     setProjectBuildings([]);
                     setIsMultiBuildingComplex(false);
+                  } else {
+                    // Skip reset if opening from quote import (data is already prefilled)
+                    if (skipProjectFormResetRef.current) {
+                      skipProjectFormResetRef.current = false; // Reset the flag
+                    } else {
+                      // Reset form when opening dialog to clear any stale data
+                      projectForm.reset({
+                        strataPlanNumber: "",
+                        buildingName: "",
+                        buildingAddress: "",
+                        jobCategory: "building_maintenance",
+                        jobType: "window_cleaning",
+                        customJobType: "",
+                        requiresElevation: true,
+                        totalDropsNorth: "",
+                        totalDropsEast: "",
+                        totalDropsSouth: "",
+                        totalDropsWest: "",
+                        dailyDropTarget: "",
+                        floorCount: "",
+                        buildingHeight: "",
+                        startDate: "",
+                        endDate: "",
+                        targetCompletionDate: "",
+                        estimatedHours: "",
+                        calendarColor: "#3b82f6",
+                        assignedEmployees: [],
+                        peaceWork: false,
+                        pricePerDrop: "",
+                      });
+                      setSelectedClientForProject("");
+                      setSelectedStrataForProject("");
+                      setProjectBuildings([]);
+                      setIsMultiBuildingComplex(false);
+                    }
                   }
                 }}>
                   <DialogTrigger asChild>
