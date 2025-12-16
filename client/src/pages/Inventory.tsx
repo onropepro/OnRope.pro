@@ -141,6 +141,10 @@ export default function Inventory() {
   const [showRetireDialog, setShowRetireDialog] = useState(false);
   const [serialToRetire, setSerialToRetire] = useState<GearSerialNumber | null>(null);
   const [retireReason, setRetireReason] = useState<string>("");
+  
+  // Gear item detail dialog state
+  const [showItemDetailDialog, setShowItemDetailDialog] = useState(false);
+  const [selectedDetailItem, setSelectedDetailItem] = useState<GearItem | null>(null);
 
   // Fetch current user
   const { data: userData } = useQuery<{ user: any }>({
@@ -2158,7 +2162,15 @@ export default function Inventory() {
                               <CardContent className="pt-0">
                                 <div className="space-y-2">
                                   {items.map((item) => (
-                  <Card key={item.id} className="bg-muted/30" data-testid={`item-${item.id}`}>
+                  <Card 
+                    key={item.id} 
+                    className="bg-muted/30 cursor-pointer hover-elevate" 
+                    data-testid={`item-${item.id}`}
+                    onClick={() => {
+                      setSelectedDetailItem(item);
+                      setShowItemDetailDialog(true);
+                    }}
+                  >
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between gap-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 flex-1">
@@ -2257,7 +2269,7 @@ export default function Inventory() {
                             )}
                           </div>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
                           <Button
                             size="icon"
                             variant="ghost"
@@ -3799,6 +3811,209 @@ export default function Inventory() {
             >
               <span className="material-icons text-sm mr-1">archive</span>
               {retireGearMutation.isPending ? t('inventory.retiring', 'Retiring...') : t('inventory.dialog.retireItem', 'Retire Item')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Item Detail Dialog */}
+      <Dialog open={showItemDetailDialog} onOpenChange={(open) => {
+        setShowItemDetailDialog(open);
+        if (!open) setSelectedDetailItem(null);
+      }}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto" data-testid="dialog-item-detail">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <span className="material-icons text-primary">
+                  {EQUIPMENT_ICONS[selectedDetailItem?.equipmentType || ""] || "category"}
+                </span>
+              </div>
+              <div>
+                <div>{selectedDetailItem?.equipmentType || t('inventory.gearItem', 'Gear Item')}</div>
+                {(selectedDetailItem?.brand || selectedDetailItem?.model) && (
+                  <div className="text-sm font-normal text-muted-foreground">
+                    {[selectedDetailItem?.brand, selectedDetailItem?.model].filter(Boolean).join(" - ")}
+                  </div>
+                )}
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedDetailItem && (
+            <div className="space-y-6 py-2">
+              {/* Basic Info */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <div className="text-sm text-muted-foreground">{t('inventory.quantity', 'Quantity')}</div>
+                  <div className="font-semibold">{selectedDetailItem.quantity || 1}</div>
+                </div>
+                <div>
+                  <div className="text-sm text-muted-foreground">{t('inventory.available', 'Available')}</div>
+                  <div className="font-semibold">{getAvailableQuantity(selectedDetailItem)} / {selectedDetailItem.quantity || 0}</div>
+                </div>
+                {canViewFinancials && selectedDetailItem.itemPrice && (
+                  <>
+                    <div>
+                      <div className="text-sm text-muted-foreground">{t('inventory.priceEach', 'Price Each')}</div>
+                      <div className="font-semibold text-primary">${parseFloat(selectedDetailItem.itemPrice).toFixed(2)}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-muted-foreground">{t('inventory.totalValue', 'Total Value')}</div>
+                      <div className="font-semibold text-primary">${(parseFloat(selectedDetailItem.itemPrice) * (selectedDetailItem.quantity || 1)).toFixed(2)}</div>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Rope-specific info */}
+              {selectedDetailItem.equipmentType === "Rope" && (
+                <div className="grid grid-cols-2 gap-4">
+                  {selectedDetailItem.ropeLength && (
+                    <div>
+                      <div className="text-sm text-muted-foreground">{t('inventory.ropeLength', 'Rope Length')}</div>
+                      <div className="font-semibold">{selectedDetailItem.ropeLength} ft</div>
+                    </div>
+                  )}
+                  {selectedDetailItem.pricePerFeet && canViewFinancials && (
+                    <div>
+                      <div className="text-sm text-muted-foreground">{t('inventory.pricePerFt', 'Price per ft')}</div>
+                      <div className="font-semibold text-primary">${parseFloat(selectedDetailItem.pricePerFeet).toFixed(2)}</div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Notes */}
+              {selectedDetailItem.notes && (
+                <div>
+                  <div className="text-sm text-muted-foreground mb-1">{t('inventory.notes', 'Notes')}</div>
+                  <div className="text-sm p-3 bg-muted/50 rounded-md">{selectedDetailItem.notes}</div>
+                </div>
+              )}
+
+              {/* Serial Numbers Section */}
+              {(selectedDetailItem as any).serialEntries && (selectedDetailItem as any).serialEntries.length > 0 && (
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-semibold">{t('inventory.serialNumbers', 'Serial Numbers')}</h4>
+                    <Badge variant="secondary">{(selectedDetailItem as any).serialEntries.length} {t('inventory.units', 'units')}</Badge>
+                  </div>
+                  <div className="space-y-2">
+                    {(selectedDetailItem as any).serialEntries.map((entry: GearSerialNumber) => {
+                      const assignment = gearData?.assignments?.find(
+                        (a: any) => a.gearItemId === selectedDetailItem.id && a.serialNumber === entry.serialNumber
+                      );
+                      const assignedEmployee = assignment ? activeEmployees.find(e => e.id === assignment.employeeId) : null;
+                      
+                      return (
+                        <div key={entry.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-md">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className="font-mono">
+                                {entry.serialNumber}
+                              </Badge>
+                              {assignedEmployee && (
+                                <Badge variant="secondary" className="text-xs">
+                                  <span className="material-icons text-xs mr-1">person</span>
+                                  {assignedEmployee.name}
+                                </Badge>
+                              )}
+                            </div>
+                            <div className="flex gap-4 mt-1 text-xs text-muted-foreground">
+                              {entry.dateOfManufacture && (
+                                <span>{t('inventory.mfg', 'Mfg')}: {formatLocalDate(entry.dateOfManufacture)}</span>
+                              )}
+                              {entry.dateInService && (
+                                <span>{t('inventory.inService', 'In Service')}: {formatLocalDate(entry.dateInService)}</span>
+                              )}
+                            </div>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="text-muted-foreground"
+                            onClick={() => {
+                              setSerialToRetire(entry);
+                              setShowRetireDialog(true);
+                            }}
+                            data-testid={`button-retire-detail-${entry.id}`}
+                          >
+                            <span className="material-icons text-sm mr-1">archive</span>
+                            {t('inventory.retire', 'Retire')}
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Current Assignments */}
+              {getItemAssignments(selectedDetailItem.id).length > 0 && (
+                <div>
+                  <h4 className="font-semibold mb-3">{t('inventory.currentAssignments', 'Current Assignments')}</h4>
+                  <div className="space-y-2">
+                    {getItemAssignments(selectedDetailItem.id).map((assignment) => {
+                      const employee = activeEmployees.find(e => e.id === assignment.employeeId);
+                      return (
+                        <div key={assignment.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-md">
+                          <div>
+                            <div className="font-medium">{employee?.name || t('common.unknown', 'Unknown')}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {t('inventory.quantity', 'Qty')}: {assignment.quantity}
+                              {assignment.serialNumber && ` | S/N: ${assignment.serialNumber}`}
+                            </div>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="text-destructive"
+                            onClick={() => deleteAssignmentMutation.mutate(assignment.id)}
+                            disabled={deleteAssignmentMutation.isPending}
+                            data-testid={`button-unassign-detail-${assignment.id}`}
+                          >
+                            <X className="h-4 w-4 mr-1" />
+                            {t('common.remove', 'Remove')}
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (selectedDetailItem) openAssignDialog(selectedDetailItem);
+                setShowItemDetailDialog(false);
+              }}
+              data-testid="button-assign-from-detail"
+            >
+              <Users className="h-4 w-4 mr-2" />
+              {t('inventory.assignGear', 'Assign Gear')}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (selectedDetailItem) openEditDialog(selectedDetailItem);
+                setShowItemDetailDialog(false);
+              }}
+              data-testid="button-edit-from-detail"
+            >
+              <Pencil className="h-4 w-4 mr-2" />
+              {t('inventory.edit', 'Edit')}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setShowItemDetailDialog(false)}
+              data-testid="button-close-detail"
+            >
+              {t('common.close', 'Close')}
             </Button>
           </DialogFooter>
         </DialogContent>
