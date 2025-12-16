@@ -21,6 +21,7 @@ app.get('/health', (_req, res) => {
 app.set('trust proxy', 1);
 
 // Session configuration
+// Note: Replit uses HTTPS for all requests, so we need secure cookies even in development
 const PgSession = connectPg(session);
 app.use(session({
   store: new PgSession({
@@ -33,9 +34,9 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: process.env.NODE_ENV === "production",
+    secure: true, // Always true - Replit proxies all requests over HTTPS
     httpOnly: true,
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    sameSite: "none", // Required for cross-origin cookies with secure: true
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
   },
 }));
