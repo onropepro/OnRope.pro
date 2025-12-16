@@ -2454,6 +2454,11 @@ function JobDetailDialog({
     startDate: "",
     endDate: "",
   });
+  const [conflictDialogOpen, setConflictDialogOpen] = useState(false);
+  const [conflictInfo, setConflictInfo] = useState<{
+    conflicts: Array<{ employeeId: string; employeeName: string; conflictingJob: string }>;
+    pendingAssignment: { jobId: string; employeeId: string; startDate: string; endDate: string } | null;
+  }>({ conflicts: [], pendingAssignment: null });
 
   const deleteJobMutation = useMutation({
     mutationFn: async (jobId: string) => {
@@ -2477,22 +2482,29 @@ function JobDetailDialog({
   });
 
   const assignEmployeeMutation = useMutation({
-    mutationFn: async ({ jobId, employeeId, startDate, endDate }: { 
+    mutationFn: async ({ jobId, employeeId, startDate, endDate, forceAssignment }: { 
       jobId: string; 
       employeeId: string; 
       startDate?: string; 
       endDate?: string; 
+      forceAssignment?: boolean;
     }) => {
-      console.log("assignEmployeeMutation executing with:", { jobId, employeeId, startDate, endDate });
+      console.log("assignEmployeeMutation executing with:", { jobId, employeeId, startDate, endDate, forceAssignment });
       const result = await apiRequest("POST", `/api/schedule/${jobId}/assign-employee`, { 
         employeeId, 
         startDate, 
-        endDate 
+        endDate,
+        forceAssignment
       });
       console.log("assignEmployeeMutation result:", result);
       return result;
     },
+    onMutate: async (variables) => {
+      return { jobId: variables.jobId, employeeId: variables.employeeId, startDate: variables.startDate, endDate: variables.endDate };
+    },
     onSuccess: async () => {
+      setConflictDialogOpen(false);
+      setConflictInfo({ conflicts: [], pendingAssignment: null });
       await queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
       toast({
         title: t('schedule.assignmentCreated', 'Employee assigned'),
@@ -2502,7 +2514,30 @@ function JobDetailDialog({
       setSelectedEmployee(null);
       setShowAssignEmployees(false);
     },
-    onError: (error: Error) => {
+    onError: async (error: Error, _variables, context) => {
+      // Check if this is a conflict error (409)
+      if (error.message.startsWith('409:')) {
+        try {
+          // Error format is "409: {json_body}"
+          const jsonStr = error.message.substring(5).trim();
+          const errorData = JSON.parse(jsonStr);
+          if (errorData?.conflicts && errorData.conflicts.length > 0) {
+            setConflictInfo({
+              conflicts: errorData.conflicts,
+              pendingAssignment: context ? {
+                jobId: context.jobId,
+                employeeId: context.employeeId,
+                startDate: context.startDate || '',
+                endDate: context.endDate || '',
+              } : null,
+            });
+            setConflictDialogOpen(true);
+            return;
+          }
+        } catch (e) {
+          console.error("Failed to parse conflict response:", e);
+        }
+      }
       toast({
         title: t('schedule.error', 'Error'),
         description: error.message || t('schedule.error', 'Failed to assign employee'),
@@ -2510,6 +2545,17 @@ function JobDetailDialog({
       });
     },
   });
+
+  const handleForceAssignment = () => {
+    if (!conflictInfo.pendingAssignment) return;
+    assignEmployeeMutation.mutate({
+      jobId: conflictInfo.pendingAssignment.jobId,
+      employeeId: conflictInfo.pendingAssignment.employeeId,
+      startDate: conflictInfo.pendingAssignment.startDate,
+      endDate: conflictInfo.pendingAssignment.endDate,
+      forceAssignment: true,
+    });
+  };
 
   const unassignEmployeeMutation = useMutation({
     mutationFn: async ({ jobId, assignmentId }: { jobId: string; assignmentId: string }) => {
@@ -2869,6 +2915,17 @@ function JobDetailDialog({
         </SheetContent>
       </Sheet>
     )}
+
+    <DoubleBookingWarningDialog
+      open={conflictDialogOpen}
+      onClose={() => {
+        setConflictDialogOpen(false);
+        setConflictInfo({ conflicts: [], pendingAssignment: null });
+      }}
+      onProceed={handleForceAssignment}
+      conflicts={conflictInfo.conflicts}
+      isPending={assignEmployeeMutation.isPending}
+    />
   </>
   );
 }

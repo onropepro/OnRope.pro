@@ -2769,6 +2769,13 @@ export class Storage {
     endDate: Date,
     excludeJobId?: string
   ): Promise<Array<{ employeeId: string; employeeName: string; conflictingJobTitle: string }>> {
+    console.log("[CONFLICT CHECK] Checking conflicts for:", {
+      employeeIds,
+      startDate,
+      endDate,
+      excludeJobId
+    });
+    
     const conflicts: Array<{ employeeId: string; employeeName: string; conflictingJobTitle: string }> = [];
     
     for (const employeeId of employeeIds) {
@@ -2778,9 +2785,22 @@ export class Storage {
       
       const jobIds = assignments.map(a => a.jobId);
       
+      console.log(`[CONFLICT CHECK] Employee ${employeeId} has ${assignments.length} existing assignments:`, jobIds);
+      
       if (jobIds.length === 0) {
         continue;
       }
+      
+      // Get all jobs for this employee to see their date ranges
+      const existingJobs = await db.select().from(scheduledJobs)
+        .where(sql`${scheduledJobs.id} = ANY(${jobIds})`);
+      
+      console.log(`[CONFLICT CHECK] Existing jobs for employee:`, existingJobs.map(j => ({
+        id: j.id,
+        title: j.title,
+        startDate: j.startDate,
+        endDate: j.endDate
+      })));
       
       // Build where conditions - include excludeJobId filter if provided
       const whereConditions = [
@@ -2812,6 +2832,8 @@ export class Storage {
       const conflictingJobs = await db.select().from(scheduledJobs)
         .where(and(...whereConditions));
       
+      console.log(`[CONFLICT CHECK] Found ${conflictingJobs.length} conflicting jobs:`, conflictingJobs.map(j => j.title));
+      
       if (conflictingJobs.length > 0) {
         const employee = await this.getUserById(employeeId);
         conflicts.push({
@@ -2822,6 +2844,7 @@ export class Storage {
       }
     }
     
+    console.log("[CONFLICT CHECK] Total conflicts found:", conflicts.length, conflicts);
     return conflicts;
   }
 
