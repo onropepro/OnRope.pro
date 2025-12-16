@@ -30,7 +30,7 @@ import ActiveWorkers from "@/pages/ActiveWorkers";
 import NonBillableHours from "@/pages/NonBillableHours";
 import Inventory from "@/pages/Inventory";
 import HoursAnalytics from "@/pages/HoursAnalytics";
-import Schedule from "@/pages/Schedule";
+import ScheduleRouter from "@/pages/ScheduleRouter";
 import SuperUser from "@/pages/SuperUser";
 import AllCompanies from "@/pages/AllCompanies";
 import CompanyDetail from "@/pages/CompanyDetail";
@@ -323,7 +323,7 @@ function Router() {
       </Route>
       <Route path="/schedule">
         <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
-          <Schedule />
+          <ScheduleRouter />
         </ProtectedRoute>
       </Route>
       <Route path="/residents">
