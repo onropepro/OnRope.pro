@@ -289,9 +289,6 @@ As part of our annual fire prevention program, professional dryer vent cleaning 
 
 WHAT THE SERVICE INCLUDES:
 - Complete lint removal from interior ductwork
-- Vent connection inspection
-- Airflow testing
-- Fire hazard assessment
 
 YOUR RESPONSIBILITIES:
 - Provide access to your unit at the scheduled time
