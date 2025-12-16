@@ -70,7 +70,7 @@ export default function Schedule() {
   // Double-booking warning dialog state
   const [conflictDialogOpen, setConflictDialogOpen] = useState(false);
   const [conflictInfo, setConflictInfo] = useState<{
-    conflicts: Array<{ employeeId: string; employeeName: string; conflictingJob: string }>;
+    conflicts: Array<{ employeeId: string; employeeName: string; conflictingJob: string; conflictType?: 'job' | 'time_off' }>;
     pendingAssignment: { jobId: string; employeeIds?: string[]; employeeId?: string; startDate?: string; endDate?: string } | null;
     assignmentType: 'batch' | 'single';
   }>({ conflicts: [], pendingAssignment: null, assignmentType: 'batch' });
@@ -2081,7 +2081,7 @@ function CreateJobDialog({
   
   // Conflict dialog state
   const [conflictDialogOpen, setConflictDialogOpen] = useState(false);
-  const [pendingConflicts, setPendingConflicts] = useState<Array<{ employeeId: string; employeeName: string; conflictingJobTitle: string }>>([]);
+  const [pendingConflicts, setPendingConflicts] = useState<Array<{ employeeId: string; employeeName: string; conflictingJob: string; conflictType?: 'job' | 'time_off' }>>([]);
   const [pendingJobData, setPendingJobData] = useState<any>(null);
   
   // Fetch projects for dropdown
@@ -2155,6 +2155,7 @@ function CreateJobDialog({
               employeeId: c.employeeId,
               employeeName: c.employeeName,
               conflictingJob: c.conflictingJobTitle,
+              conflictType: c.conflictType,
             })));
             setConflictDialogOpen(true);
             return;
@@ -2524,7 +2525,7 @@ function JobDetailDialog({
   });
   const [conflictDialogOpen, setConflictDialogOpen] = useState(false);
   const [conflictInfo, setConflictInfo] = useState<{
-    conflicts: Array<{ employeeId: string; employeeName: string; conflictingJob: string }>;
+    conflicts: Array<{ employeeId: string; employeeName: string; conflictingJob: string; conflictType?: 'job' | 'time_off' }>;
     pendingAssignment: { jobId: string; employeeId: string; startDate: string; endDate: string } | null;
   }>({ conflicts: [], pendingAssignment: null });
 

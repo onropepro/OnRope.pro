@@ -978,7 +978,7 @@ export default function Dashboard() {
   
   // Project conflict detection state
   const [projectConflictDialogOpen, setProjectConflictDialogOpen] = useState(false);
-  const [projectPendingConflicts, setProjectPendingConflicts] = useState<Array<{ employeeId: string; employeeName: string; conflictingJob: string }>>([]);
+  const [projectPendingConflicts, setProjectPendingConflicts] = useState<Array<{ employeeId: string; employeeName: string; conflictingJob: string; conflictType?: 'job' | 'time_off' }>>([]);
   const [pendingProjectData, setPendingProjectData] = useState<any>(null);
   const [selectedInspection, setSelectedInspection] = useState<any>(null);
   const [selectedMeeting, setSelectedMeeting] = useState<any>(null);
@@ -1921,6 +1921,7 @@ export default function Dashboard() {
             employeeId: c.employeeId,
             employeeName: c.employeeName,
             conflictingJob: c.conflictingJobTitle,
+            conflictType: c.conflictType,
           })));
           setProjectConflictDialogOpen(true);
           throw new Error("CONFLICT_DETECTED");
