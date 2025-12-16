@@ -106,7 +106,12 @@ import {
   FileCheck,
   Plus,
   Eye,
-  EyeOff
+  EyeOff,
+  FolderOpen,
+  Download,
+  FileImage,
+  FileArchive,
+  File
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import { QuizSection } from "@/components/QuizSection";
@@ -846,6 +851,122 @@ const createProfileSchema = (t: typeof translations['en']) => z.object({
 });
 
 type ProfileFormData = z.infer<ReturnType<typeof createProfileSchema>>;
+
+// Helper component to display submitted documents from document requests
+function MySubmittedDocuments({ language }: { language: Language }) {
+  const { data: requestsData, isLoading } = useQuery<{ 
+    requests: Array<{
+      id: string;
+      title: string;
+      status: string;
+      requestedAt: string;
+      respondedAt: string | null;
+      files: Array<{
+        id: string;
+        fileName: string;
+        fileSize: number;
+        fileType: string;
+        uploadedAt: string;
+      }>;
+      company?: {
+        id: string;
+        name?: string | null;
+      };
+    }>;
+  }>({
+    queryKey: ["/api/technicians/me/document-requests"],
+  });
+
+  const fulfilledRequests = requestsData?.requests?.filter(r => r.status === 'fulfilled' && r.files?.length > 0) || [];
+  const allFiles = fulfilledRequests.flatMap(request => 
+    request.files.map(file => ({
+      ...file,
+      requestTitle: request.title,
+      companyName: request.company?.name || (language === 'en' ? 'Unknown Employer' : 'Employeur inconnu'),
+      respondedAt: request.respondedAt,
+    }))
+  );
+
+  // Sort files by upload date (newest first)
+  const sortedFiles = allFiles.sort((a, b) => 
+    new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
+  );
+
+  const getFileIcon = (fileType: string) => {
+    if (fileType.startsWith('image/')) return FileImage;
+    if (fileType.includes('pdf')) return FileText;
+    if (fileType.includes('zip') || fileType.includes('archive')) return FileArchive;
+    return File;
+  };
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-4">
+        <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (sortedFiles.length === 0) {
+    return (
+      <div className="text-center py-4 text-muted-foreground">
+        <FolderOpen className="w-8 h-8 mx-auto mb-2 opacity-50" />
+        <p className="text-sm">
+          {language === 'en' 
+            ? 'No submitted documents yet'
+            : 'Aucun document soumis pour le moment'}
+        </p>
+        <p className="text-xs mt-1">
+          {language === 'en'
+            ? 'Documents you upload for employer requests will appear here'
+            : 'Les documents que vous téléchargez pour les demandes employeur apparaîtront ici'}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      {sortedFiles.map((file) => {
+        const FileIcon = getFileIcon(file.fileType);
+        return (
+          <div 
+            key={file.id} 
+            className="flex items-center gap-3 p-3 border rounded-lg bg-muted/30"
+            data-testid={`my-submitted-doc-${file.id}`}
+          >
+            <FileIcon className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium truncate">{file.fileName}</p>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
+                <span>{formatFileSize(file.fileSize)}</span>
+                <span>•</span>
+                <span>{file.companyName}</span>
+                <span>•</span>
+                <span>{file.requestTitle}</span>
+              </div>
+            </div>
+            <a
+              href={`/api/document-request-files/${file.id}/download`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 hover:bg-muted rounded-md transition-colors flex-shrink-0"
+              data-testid={`download-my-doc-${file.id}`}
+            >
+              <Download className="w-4 h-4 text-muted-foreground" />
+            </a>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function TechnicianPortal() {
   const { toast } = useToast();
@@ -4817,6 +4938,21 @@ export default function TechnicianPortal() {
                       <p className="text-xs text-muted-foreground mt-1">{t.plusLockedDesc}</p>
                     </div>
                   )}
+                </div>
+
+                {/* My Submitted Documents Section - Documents uploaded in response to employer requests */}
+                <Separator />
+                <div className="space-y-3">
+                  <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
+                    <FolderOpen className="w-4 h-4" />
+                    {language === 'en' ? 'My Submitted Documents' : 'Mes documents soumis'}
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    {language === 'en' 
+                      ? 'Documents you have uploaded in response to employer requests'
+                      : 'Documents que vous avez téléchargés en réponse aux demandes des employeurs'}
+                  </p>
+                  <MySubmittedDocuments language={language} />
                 </div>
               </div>
             )}
