@@ -10944,7 +10944,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const { projectId } = req.params;
-      const { startLatitude, startLongitude, workDate } = req.body;
+      const { startLatitude, startLongitude, workDate, projectBuildingId } = req.body;
       
       // Verify employee has access to this project
       const hasAccess = await storage.verifyProjectAccess(
@@ -10971,6 +10971,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Project not found" });
       }
       
+      // For multi-building projects, require a building selection
+      const projectBuildings = await storage.getProjectBuildings(projectId);
+      if (projectBuildings.length > 1 && !projectBuildingId) {
+        return res.status(400).json({ message: "Please select a building before starting your work session" });
+      }
+      
       // Create new work session
       const now = new Date();
       // Use client's local date if provided, otherwise fall back to server date
@@ -10983,6 +10989,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         startTime: now,
         startLatitude: startLatitude || null,
         startLongitude: startLongitude || null,
+        projectBuildingId: projectBuildingId || null, // For multi-building projects
       });
       
       res.json({ session });

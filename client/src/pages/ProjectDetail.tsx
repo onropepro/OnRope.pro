@@ -125,6 +125,7 @@ export default function ProjectDetail() {
   const [selectedPhoto, setSelectedPhoto] = useState<any>(null);
   const [showStartDayDialog, setShowStartDayDialog] = useState(false);
   const [showEndDayDialog, setShowEndDayDialog] = useState(false);
+  const [sessionBuildingId, setSessionBuildingId] = useState<string | null>(null);
   const [activeSession, setActiveSession] = useState<any>(null);
   const [showHarnessInspectionDialog, setShowHarnessInspectionDialog] = useState(false);
   const [showLogHoursPrompt, setShowLogHoursPrompt] = useState(false);
@@ -432,7 +433,7 @@ export default function ProjectDetail() {
   };
 
   const startDayMutation = useMutation({
-    mutationFn: async (projectId: string) => {
+    mutationFn: async ({ projectId, buildingId }: { projectId: string; buildingId?: string | null }) => {
       // Get current location
       let locationData = {};
       try {
@@ -461,6 +462,7 @@ export default function ProjectDetail() {
         body: JSON.stringify({
           ...locationData,
           workDate: localDateString, // Send client's local date
+          projectBuildingId: buildingId || null, // Include building ID for multi-building projects
         }),
         credentials: "include",
       });
@@ -771,17 +773,22 @@ export default function ProjectDetail() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/harness-inspections"] });
       setShowHarnessInspectionDialog(false);
-      // Start work session directly without a second confirmation
-      if (id) {
-        startDayMutation.mutate(id);
+      // For multi-building projects, show start dialog so technician can confirm/select building
+      // For single building projects, start directly
+      if (projectBuildings.length > 1) {
+        setShowStartDayDialog(true);
+      } else if (id) {
+        startDayMutation.mutate({ projectId: id, buildingId: sessionBuildingId });
       }
     },
     onError: (error: Error) => {
       console.error("Error creating not applicable inspection:", error);
       // Still proceed to start work session even if this fails
       setShowHarnessInspectionDialog(false);
-      if (id) {
-        startDayMutation.mutate(id);
+      if (projectBuildings.length > 1) {
+        setShowStartDayDialog(true);
+      } else if (id) {
+        startDayMutation.mutate({ projectId: id, buildingId: sessionBuildingId });
       }
     },
   });
@@ -908,7 +915,12 @@ export default function ProjectDetail() {
       // Check if shortfall reason is required but missing
       const isInSuite = project.jobType === "in_suite_dryer_vent_cleaning";
       const isParkade = project.jobType === "parkade_pressure_cleaning";
-      const target = isInSuite || isParkade ? (project.suitesPerDay || project.stallsPerDay || 0) : project.dailyDropTarget;
+      // Use building-specific daily drop target if session has a building, otherwise fall back to project target
+      const sessionBuilding = activeSession?.projectBuildingId 
+        ? projectBuildings.find((b: any) => b.id === activeSession.projectBuildingId) 
+        : null;
+      const buildingDropTarget = sessionBuilding?.dailyDropTarget || project.dailyDropTarget;
+      const target = isInSuite || isParkade ? (project.suitesPerDay || project.stallsPerDay || 0) : buildingDropTarget;
       
       // Require either a valid reason code OR a custom explanation when below target
       const hasValidReasonCode = data.validShortfallReasonCode && data.validShortfallReasonCode !== '' && data.validShortfallReasonCode !== 'other';
@@ -928,7 +940,7 @@ export default function ProjectDetail() {
 
   const confirmStartDay = () => {
     if (id) {
-      startDayMutation.mutate(id);
+      startDayMutation.mutate({ projectId: id, buildingId: sessionBuildingId });
     }
   };
 
@@ -1264,6 +1276,10 @@ export default function ProjectDetail() {
             {!activeSession && project.status === "active" && (
               <Button
                 onClick={() => {
+                  // For multi-building projects, auto-select first building if none selected
+                  if (projectBuildings.length > 1 && !sessionBuildingId) {
+                    setSessionBuildingId(projectBuildings[0].id);
+                  }
                   // If user already did harness inspection today, skip the dialog
                   if (hasHarnessInspectionToday) {
                     setShowStartDayDialog(true);
@@ -2105,7 +2121,12 @@ export default function ProjectDetail() {
                                                       const isCompleted = session.endTime !== null;
                                                       const sessionDrops = (session.dropsCompletedNorth ?? 0) + (session.dropsCompletedEast ?? 0) + 
                                                                            (session.dropsCompletedSouth ?? 0) + (session.dropsCompletedWest ?? 0);
-                                                      const metTarget = sessionDrops >= effectiveDailyDropTarget;
+                                                      // Get building-specific target for this session
+                                                      const sessionBld = session.projectBuildingId 
+                                                        ? projectBuildings.find((b: any) => b.id === session.projectBuildingId)
+                                                        : null;
+                                                      const sessionDropTarget = sessionBld?.dailyDropTarget || project.dailyDropTarget;
+                                                      const metTarget = sessionDrops >= sessionDropTarget;
                                                       const isPercentageBasedSession = usesPercentageProgress(project.jobType, project.requiresElevation);
                                                       const contributionPct = session.manualCompletionPercentage;
                                                       const sessionLaborCost = session.laborCost ? parseFloat(session.laborCost) : null;
@@ -2129,6 +2150,13 @@ export default function ProjectDetail() {
                                                                 <MapPin className="h-4 w-4 text-primary" />
                                                               )}
                                                             </div>
+                                                            {/* Show building name for multi-building projects */}
+                                                            {sessionBld && projectBuildings.length > 1 && (
+                                                              <p className="text-xs text-muted-foreground flex items-center gap-1">
+                                                                <span className="material-icons text-xs">apartment</span>
+                                                                {sessionBld.name || sessionBld.buildingName}
+                                                              </p>
+                                                            )}
                                                             {isCompleted && (isPercentageBasedSession || sessionLaborCost) && (
                                                               <div className="flex items-center gap-3 text-xs text-muted-foreground">
                                                                 {isPercentageBasedSession && contributionPct !== null && contributionPct !== undefined && (
@@ -3036,8 +3064,11 @@ export default function ProjectDetail() {
               variant="default"
               onClick={() => {
                 setShowHarnessInspectionDialog(false);
-                if (id) {
-                  startDayMutation.mutate(id);
+                // For multi-building projects, show start dialog so technician can confirm/select building
+                if (projectBuildings.length > 1) {
+                  setShowStartDayDialog(true);
+                } else if (id) {
+                  startDayMutation.mutate({ projectId: id, buildingId: sessionBuildingId });
                 }
               }}
               disabled={startDayMutation.isPending}
@@ -3066,16 +3097,41 @@ export default function ProjectDetail() {
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
+          
+          {/* Building selector for multi-building projects */}
+          {projectBuildings.length > 1 && (
+            <div className="py-2">
+              <label className="text-sm font-medium mb-2 block">
+                {t('projectDetail.dialogs.startSession.selectBuilding', 'Which building are you working on?')}
+              </label>
+              <Select
+                value={sessionBuildingId || ""}
+                onValueChange={(value) => setSessionBuildingId(value)}
+              >
+                <SelectTrigger data-testid="select-session-building">
+                  <SelectValue placeholder={t('projectDetail.dialogs.startSession.selectBuildingPlaceholder', 'Select a building...')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {projectBuildings.map((building: any) => (
+                    <SelectItem key={building.id} value={building.id}>
+                      {building.name || building.buildingName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+          
           <AlertDialogFooter>
             <AlertDialogCancel data-testid="button-cancel-start-day">{t('common.cancel', 'Cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 if (id) {
-                  startDayMutation.mutate(id);
+                  startDayMutation.mutate({ projectId: id, buildingId: sessionBuildingId });
                 }
               }}
               data-testid="button-confirm-start-day"
-              disabled={startDayMutation.isPending}
+              disabled={startDayMutation.isPending || (projectBuildings.length > 1 && !sessionBuildingId)}
               className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
               {startDayMutation.isPending ? t('projectDetail.workSession.starting', 'Starting...') : t('projectDetail.workSession.startSession', 'Start Work Session')}
