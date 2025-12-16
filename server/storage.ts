@@ -4064,23 +4064,42 @@ export class Storage {
   // ========================
 
   /**
-   * Get building instructions by building ID
+   * Get building instructions by building ID (and optionally project building ID for multi-building complexes)
    */
-  async getBuildingInstructions(buildingId: string): Promise<BuildingInstructions | undefined> {
+  async getBuildingInstructions(buildingId: string, projectBuildingId?: string): Promise<BuildingInstructions | undefined> {
+    if (projectBuildingId) {
+      // Look for building-specific instructions first
+      const specificResult = await db.select().from(buildingInstructions)
+        .where(and(
+          eq(buildingInstructions.buildingId, buildingId),
+          eq(buildingInstructions.projectBuildingId, projectBuildingId)
+        ))
+        .limit(1);
+      if (specificResult[0]) return specificResult[0];
+    }
+    
+    // Fall back to general building instructions (no projectBuildingId)
     const result = await db.select().from(buildingInstructions)
-      .where(eq(buildingInstructions.buildingId, buildingId))
+      .where(and(
+        eq(buildingInstructions.buildingId, buildingId),
+        isNull(buildingInstructions.projectBuildingId)
+      ))
       .limit(1);
     return result[0];
   }
 
   /**
-   * Create or update building instructions
+   * Create or update building instructions (supports per-building instructions for multi-building complexes)
    */
   async upsertBuildingInstructions(data: InsertBuildingInstructions): Promise<BuildingInstructions> {
-    // Check if instructions already exist for this building
-    const existing = await this.getBuildingInstructions(data.buildingId);
+    // Check if instructions already exist for this building (and optionally project building)
+    const projectBuildingId = (data as any).projectBuildingId;
+    const existing = await this.getBuildingInstructions(data.buildingId, projectBuildingId);
     
-    if (existing) {
+    // If we have a projectBuildingId but found generic instructions, we need to create new
+    const shouldCreateNew = projectBuildingId && existing && !existing.projectBuildingId;
+    
+    if (existing && !shouldCreateNew) {
       // Update existing
       const result = await db.update(buildingInstructions)
         .set({ ...data, updatedAt: new Date() })

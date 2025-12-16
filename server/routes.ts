@@ -5341,10 +5341,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/buildings/:buildingId/instructions", async (req: Request, res: Response) => {
     try {
       const { buildingId } = req.params;
+      const projectBuildingId = req.query.projectBuildingId as string | undefined;
 
       // SuperUser can access all
       if (req.session.userId === 'superuser') {
-        const instructions = await storage.getBuildingInstructions(buildingId);
+        const instructions = await storage.getBuildingInstructions(buildingId, projectBuildingId);
         return res.json(instructions || null);
       }
 
@@ -5352,7 +5353,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (req.session.role === 'building' && req.session.buildingId) {
         // Building managers can only access their own building's instructions
         if (req.session.buildingId === buildingId) {
-          const instructions = await storage.getBuildingInstructions(buildingId);
+          const instructions = await storage.getBuildingInstructions(buildingId, projectBuildingId);
           return res.json(instructions || null);
         }
         return res.status(403).json({ message: "Access denied" });
@@ -5379,7 +5380,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             building.strataPlanNumber.toUpperCase().replace(/\s/g, '')
           );
           if (hasProjectForBuilding) {
-            const instructions = await storage.getBuildingInstructions(buildingId);
+            const instructions = await storage.getBuildingInstructions(buildingId, projectBuildingId);
             return res.json(instructions || null);
           }
         }
