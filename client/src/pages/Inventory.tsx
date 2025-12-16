@@ -1674,7 +1674,15 @@ export default function Inventory() {
                 {myGear.map((item: any) => {
                   const myAssignment = getItemAssignments(item.id).find(a => a.employeeId === currentUser?.id);
                   return (
-                  <Card key={item.id} className="overflow-hidden">
+                  <Card 
+                    key={item.id} 
+                    className="overflow-visible cursor-pointer hover-elevate"
+                    onClick={() => {
+                      setSelectedDetailItem(item);
+                      setShowItemDetailDialog(true);
+                    }}
+                    data-testid={`mygear-item-${item.id}`}
+                  >
                     <CardContent className="p-4">
                       <div className="flex items-start gap-4">
                         {/* Icon */}
@@ -1708,7 +1716,8 @@ export default function Inventory() {
                                 <Button
                                   size="icon"
                                   variant="ghost"
-                                  onClick={() => {
+                                  onClick={(e) => {
+                                    e.stopPropagation();
                                     setEditingMyAssignment({ ...myAssignment, gearItem: item });
                                     setEditMySerialNumber(myAssignment.serialNumber || "");
                                     setEditMyDateOfManufacture(myAssignment.dateOfManufacture || "");
@@ -1722,7 +1731,10 @@ export default function Inventory() {
                                 <Button
                                   size="icon"
                                   variant="ghost"
-                                  onClick={() => removeSelfAssignedMutation.mutate(myAssignment.id)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    removeSelfAssignedMutation.mutate(myAssignment.id);
+                                  }}
                                   disabled={removeSelfAssignedMutation.isPending}
                                   data-testid={`button-remove-gear-${item.id}`}
                                 >
@@ -1756,7 +1768,8 @@ export default function Inventory() {
                                       size="sm"
                                       variant="ghost"
                                       className="h-6 px-2 text-xs text-muted-foreground"
-                                      onClick={() => {
+                                      onClick={(e) => {
+                                        e.stopPropagation();
                                         setSerialToRetire(serialEntry);
                                         setShowRetireDialog(true);
                                       }}
@@ -1776,7 +1789,8 @@ export default function Inventory() {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => {
+                                onClick={(e) => {
+                                  e.stopPropagation();
                                   setEditingMyAssignment({ ...myAssignment, gearItem: item });
                                   setEditMySerialNumber("");
                                   setEditMyDateOfManufacture("");
