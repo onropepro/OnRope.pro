@@ -3531,32 +3531,26 @@ export default function Inventory() {
                 )}
               />
 
-              {/* Assigned To Field */}
-              <FormField
-                control={form.control}
-                name="assignedTo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('inventory.assignedTo', 'Assigned To')}</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || "Not in use"}>
-                      <FormControl>
-                        <SelectTrigger data-testid="select-assigned-to-edit">
-                          <SelectValue placeholder={t('inventory.placeholders.selectEmployeeOrNone', 'Select employee or Not in use')} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="Not in use">{t('inventory.notInUse', 'Not in use')}</SelectItem>
-                        {activeEmployees.filter((emp: any) => emp.name && emp.name.trim() !== "").map((emp: any) => (
-                          <SelectItem key={emp.id} value={emp.name}>
-                            {emp.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Assignment Info */}
+              {editingItem && getItemAssignments(editingItem.id).length > 0 && (
+                <div className="p-3 bg-muted/30 rounded-md">
+                  <div className="text-sm font-medium mb-2">{t('inventory.currentAssignments', 'Current Assignments')}</div>
+                  <div className="space-y-1">
+                    {getItemAssignments(editingItem.id).map((assignment) => {
+                      const employee = activeEmployees.find((e: any) => e.id === assignment.employeeId);
+                      return (
+                        <div key={assignment.id} className="text-sm text-muted-foreground flex items-center gap-2">
+                          <span className="material-icons text-xs">person</span>
+                          {employee?.name || 'Unknown'} ({assignment.quantity})
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    {t('inventory.useAssignButtonToManage', 'Use the "Assign Gear" button to manage assignments.')}
+                  </p>
+                </div>
+              )}
 
               {/* Serial Number Entry with Per-Item Dates */}
               <div className="space-y-3">
