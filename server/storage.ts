@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, quoteHistory, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff, documentReviewSignatures, equipmentDamageReports, featureRequests, featureRequestMessages, churnEvents, buildings, buildingInstructions, normalizeStrataPlan, teamInvitations, historicalHours, technicianEmployerConnections, csrRatingHistory, documentQuizzes, quizAttempts, technicianDocumentRequests, technicianDocumentRequestFiles } from "@shared/schema";
-import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, QuoteHistory, InsertQuoteHistory, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff, DocumentReviewSignature, InsertDocumentReviewSignature, EquipmentDamageReport, InsertEquipmentDamageReport, FeatureRequest, InsertFeatureRequest, FeatureRequestMessage, InsertFeatureRequestMessage, FeatureRequestWithMessages, ChurnEvent, InsertChurnEvent, Building, InsertBuilding, BuildingInstructions, InsertBuildingInstructions, TeamInvitation, InsertTeamInvitation, HistoricalHours, InsertHistoricalHours, CsrRatingHistory, InsertCsrRatingHistory, DocumentQuiz, InsertDocumentQuiz, QuizAttempt, InsertQuizAttempt, TechnicianDocumentRequest, InsertTechnicianDocumentRequest, TechnicianDocumentRequestFile, InsertTechnicianDocumentRequestFile } from "@shared/schema";
+import { users, clients, projects, projectBuildings, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, quoteHistory, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff, documentReviewSignatures, equipmentDamageReports, featureRequests, featureRequestMessages, churnEvents, buildings, buildingInstructions, normalizeStrataPlan, teamInvitations, historicalHours, technicianEmployerConnections, csrRatingHistory, documentQuizzes, quizAttempts, technicianDocumentRequests, technicianDocumentRequestFiles } from "@shared/schema";
+import type { User, InsertUser, Client, InsertClient, Project, InsertProject, ProjectBuilding, InsertProjectBuilding, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, QuoteHistory, InsertQuoteHistory, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff, DocumentReviewSignature, InsertDocumentReviewSignature, EquipmentDamageReport, InsertEquipmentDamageReport, FeatureRequest, InsertFeatureRequest, FeatureRequestMessage, InsertFeatureRequestMessage, FeatureRequestWithMessages, ChurnEvent, InsertChurnEvent, Building, InsertBuilding, BuildingInstructions, InsertBuildingInstructions, TeamInvitation, InsertTeamInvitation, HistoricalHours, InsertHistoricalHours, CsrRatingHistory, InsertCsrRatingHistory, DocumentQuiz, InsertDocumentQuiz, QuizAttempt, InsertQuizAttempt, TechnicianDocumentRequest, InsertTechnicianDocumentRequest, TechnicianDocumentRequestFile, InsertTechnicianDocumentRequestFile } from "@shared/schema";
 import { eq, and, or, desc, sql, isNull, isNotNull, not, gte, lte, between, inArray } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import { encryptSensitiveFields, decryptSensitiveFields } from "./encryption";
@@ -645,6 +645,47 @@ export class Storage {
 
   async permanentlyDeleteProject(id: string): Promise<void> {
     await db.delete(projects).where(eq(projects.id, id));
+  }
+
+  // Project buildings operations (for multi-building complexes)
+  async getProjectBuildings(projectId: string): Promise<ProjectBuilding[]> {
+    return db.select().from(projectBuildings)
+      .where(eq(projectBuildings.projectId, projectId))
+      .orderBy(projectBuildings.displayOrder);
+  }
+
+  async getProjectBuildingById(id: string): Promise<ProjectBuilding | undefined> {
+    const result = await db.select().from(projectBuildings)
+      .where(eq(projectBuildings.id, id))
+      .limit(1);
+    return result[0];
+  }
+
+  async createProjectBuilding(building: InsertProjectBuilding): Promise<ProjectBuilding> {
+    const result = await db.insert(projectBuildings).values(building).returning();
+    return result[0];
+  }
+
+  async createProjectBuildings(buildings: InsertProjectBuilding[]): Promise<ProjectBuilding[]> {
+    if (buildings.length === 0) return [];
+    const result = await db.insert(projectBuildings).values(buildings).returning();
+    return result;
+  }
+
+  async updateProjectBuilding(id: string, updates: Partial<InsertProjectBuilding>): Promise<ProjectBuilding> {
+    const result = await db.update(projectBuildings)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(projectBuildings.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteProjectBuilding(id: string): Promise<void> {
+    await db.delete(projectBuildings).where(eq(projectBuildings.id, id));
+  }
+
+  async deleteProjectBuildingsByProject(projectId: string): Promise<void> {
+    await db.delete(projectBuildings).where(eq(projectBuildings.projectId, projectId));
   }
 
   // Custom job type operations

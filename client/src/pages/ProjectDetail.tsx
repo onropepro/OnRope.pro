@@ -218,6 +218,21 @@ export default function ProjectDetail() {
     queryKey: ["/api/projects", id, "complaints"],
     enabled: !!id,
   });
+  
+  // Fetch project buildings for multi-building projects
+  const { data: projectBuildingsData } = useQuery<{ buildings: any[] }>({
+    queryKey: ["/api/projects", id, "buildings"],
+    enabled: !!id,
+  });
+  const projectBuildings = projectBuildingsData?.buildings || [];
+  const [selectedBuildingId, setSelectedBuildingId] = useState<string | null>(null);
+  
+  // Auto-select the first building when buildings are loaded (only if more than one)
+  useEffect(() => {
+    if (projectBuildings.length > 1 && !selectedBuildingId) {
+      setSelectedBuildingId(projectBuildings[0].id);
+    }
+  }, [projectBuildings, selectedBuildingId]);
 
   // Fetch complaint metrics for company-wide average resolution time
   const { data: complaintMetricsData, isLoading: metricsLoading } = useQuery<{
@@ -1095,8 +1110,16 @@ export default function ProjectDetail() {
     );
   }
 
-  // Calculate completed sessions
-  const completedSessions = workSessions.filter((s: any) => s.endTime !== null);
+  // Calculate completed sessions - filter by building if one is selected
+  const allCompletedSessions = workSessions.filter((s: any) => s.endTime !== null);
+  const completedSessions = selectedBuildingId 
+    ? allCompletedSessions.filter((s: any) => s.projectBuildingId === selectedBuildingId)
+    : allCompletedSessions;
+  
+  // Get selected building data (if a building is selected)
+  const selectedBuilding = selectedBuildingId 
+    ? projectBuildings.find((b: any) => b.id === selectedBuildingId) 
+    : null;
   
   // Determine tracking type and calculate progress
   // Use shared utility function that accounts for hours-based jobs AND non-elevation drop-based jobs
@@ -1133,19 +1156,31 @@ export default function ProjectDetail() {
     totalDrops = 100;
     completedDrops = progressPercent;
   } else {
-    // Drop/Unit-based tracking
-    totalDrops = isInSuite 
-      ? project.floorCount  // For dryer vent, use total suite count
-      : isParkade
-      ? (project.totalStalls || project.floorCount)  // For parkade, use total stalls
-      : (project.totalDropsNorth ?? 0) + (project.totalDropsEast ?? 0) + 
-        (project.totalDropsSouth ?? 0) + (project.totalDropsWest ?? 0);  // For window cleaning, use elevation drops
+    // Drop/Unit-based tracking - use selected building's totals if available
+    if (selectedBuilding) {
+      // Use selected building's drop totals
+      totalDrops = (selectedBuilding.totalDropsNorth ?? 0) + (selectedBuilding.totalDropsEast ?? 0) + 
+                   (selectedBuilding.totalDropsSouth ?? 0) + (selectedBuilding.totalDropsWest ?? 0);
+    } else {
+      totalDrops = isInSuite 
+        ? project.floorCount  // For dryer vent, use total suite count
+        : isParkade
+        ? (project.totalStalls || project.floorCount)  // For parkade, use total stalls
+        : (project.totalDropsNorth ?? 0) + (project.totalDropsEast ?? 0) + 
+          (project.totalDropsSouth ?? 0) + (project.totalDropsWest ?? 0);  // For window cleaning, use elevation drops
+    }
     
     // Calculate completed drops from work sessions (elevation-specific) + adjustments
-    completedDropsNorth = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedNorth ?? 0), 0) + (project.dropsAdjustmentNorth ?? 0);
-    completedDropsEast = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedEast ?? 0), 0) + (project.dropsAdjustmentEast ?? 0);
-    completedDropsSouth = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedSouth ?? 0), 0) + (project.dropsAdjustmentSouth ?? 0);
-    completedDropsWest = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedWest ?? 0), 0) + (project.dropsAdjustmentWest ?? 0);
+    // Note: Adjustments are project-level, so we only apply them when viewing all buildings
+    const adjustmentNorth = selectedBuildingId ? 0 : (project.dropsAdjustmentNorth ?? 0);
+    const adjustmentEast = selectedBuildingId ? 0 : (project.dropsAdjustmentEast ?? 0);
+    const adjustmentSouth = selectedBuildingId ? 0 : (project.dropsAdjustmentSouth ?? 0);
+    const adjustmentWest = selectedBuildingId ? 0 : (project.dropsAdjustmentWest ?? 0);
+    
+    completedDropsNorth = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedNorth ?? 0), 0) + adjustmentNorth;
+    completedDropsEast = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedEast ?? 0), 0) + adjustmentEast;
+    completedDropsSouth = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedSouth ?? 0), 0) + adjustmentSouth;
+    completedDropsWest = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedWest ?? 0), 0) + adjustmentWest;
     
     completedDrops = completedDropsNorth + completedDropsEast + completedDropsSouth + completedDropsWest;
     
@@ -1260,7 +1295,27 @@ export default function ProjectDetail() {
         {/* Progress Card */}
         <Card className="glass-card border-0 shadow-premium">
           <CardHeader>
-            <CardTitle className="text-base">{t('projectDetail.progress.title', 'Progress')}</CardTitle>
+            <div className="flex items-center justify-between gap-4">
+              <CardTitle className="text-base">{t('projectDetail.progress.title', 'Progress')}</CardTitle>
+              {projectBuildings.length > 1 && (
+                <Select
+                  value={selectedBuildingId || "all"}
+                  onValueChange={(value) => setSelectedBuildingId(value === "all" ? null : value)}
+                >
+                  <SelectTrigger className="w-[180px] h-9" data-testid="select-building">
+                    <SelectValue placeholder={t('projectDetail.progress.selectBuilding', 'Select Building')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t('projectDetail.progress.allBuildings', 'All Buildings')}</SelectItem>
+                    {projectBuildings.map((building: any) => (
+                      <SelectItem key={building.id} value={building.id}>
+                        {building.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Building Visualization */}
@@ -1409,11 +1464,11 @@ export default function ProjectDetail() {
             ) : (
               <>
                 <HighRiseBuilding
-                  floors={project.floorCount}
-                  totalDropsNorth={project.totalDropsNorth ?? Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 0 ? 1 : 0)}
-                  totalDropsEast={project.totalDropsEast ?? Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 1 ? 1 : 0)}
-                  totalDropsSouth={project.totalDropsSouth ?? Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 2 ? 1 : 0)}
-                  totalDropsWest={project.totalDropsWest ?? Math.floor(project.totalDrops / 4)}
+                  floors={selectedBuilding?.floorCount ?? project.floorCount}
+                  totalDropsNorth={selectedBuilding?.totalDropsNorth ?? project.totalDropsNorth ?? Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 0 ? 1 : 0)}
+                  totalDropsEast={selectedBuilding?.totalDropsEast ?? project.totalDropsEast ?? Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 1 ? 1 : 0)}
+                  totalDropsSouth={selectedBuilding?.totalDropsSouth ?? project.totalDropsSouth ?? Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 2 ? 1 : 0)}
+                  totalDropsWest={selectedBuilding?.totalDropsWest ?? project.totalDropsWest ?? Math.floor(project.totalDrops / 4)}
                   completedDropsNorth={completedDropsNorth}
                   completedDropsEast={completedDropsEast}
                   completedDropsSouth={completedDropsSouth}

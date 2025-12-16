@@ -10349,6 +10349,175 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==================== PROJECT BUILDINGS ROUTES ====================
+  // For managing multiple buildings within a single project (e.g., Tower 1, Tower 2)
+  
+  // Get all buildings for a project
+  app.get("/api/projects/:projectId/buildings", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const hasAccess = await storage.verifyProjectAccess(
+        req.params.projectId,
+        currentUser.id,
+        currentUser.role,
+        currentUser.companyId
+      );
+      
+      if (!hasAccess) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const buildings = await storage.getProjectBuildings(req.params.projectId);
+      res.json({ buildings });
+    } catch (error) {
+      console.error("Get project buildings error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Create a building for a project
+  app.post("/api/projects/:projectId/buildings", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const hasAccess = await storage.verifyProjectAccess(
+        req.params.projectId,
+        currentUser.id,
+        currentUser.role,
+        currentUser.companyId
+      );
+      
+      if (!hasAccess) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const buildingData = {
+        ...req.body,
+        projectId: req.params.projectId,
+      };
+      
+      const building = await storage.createProjectBuilding(buildingData);
+      res.status(201).json({ building });
+    } catch (error) {
+      console.error("Create project building error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Bulk create/update buildings for a project
+  app.put("/api/projects/:projectId/buildings", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const hasAccess = await storage.verifyProjectAccess(
+        req.params.projectId,
+        currentUser.id,
+        currentUser.role,
+        currentUser.companyId
+      );
+      
+      if (!hasAccess) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const { buildings: buildingsData } = req.body;
+      
+      if (!Array.isArray(buildingsData)) {
+        return res.status(400).json({ message: "Buildings must be an array" });
+      }
+      
+      // Delete existing buildings and recreate
+      await storage.deleteProjectBuildingsByProject(req.params.projectId);
+      
+      const buildingsToCreate = buildingsData.map((b: any, index: number) => ({
+        projectId: req.params.projectId,
+        name: b.name,
+        buildingAddress: b.buildingAddress,
+        floorCount: b.floorCount,
+        buildingHeight: b.buildingHeight,
+        totalDropsNorth: b.totalDropsNorth || 0,
+        totalDropsEast: b.totalDropsEast || 0,
+        totalDropsSouth: b.totalDropsSouth || 0,
+        totalDropsWest: b.totalDropsWest || 0,
+        dropsAdjustmentNorth: b.dropsAdjustmentNorth || 0,
+        dropsAdjustmentEast: b.dropsAdjustmentEast || 0,
+        dropsAdjustmentSouth: b.dropsAdjustmentSouth || 0,
+        dropsAdjustmentWest: b.dropsAdjustmentWest || 0,
+        displayOrder: index,
+      }));
+      
+      const buildings = await storage.createProjectBuildings(buildingsToCreate);
+      res.json({ buildings });
+    } catch (error) {
+      console.error("Update project buildings error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Update a specific building
+  app.patch("/api/projects/:projectId/buildings/:buildingId", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const hasAccess = await storage.verifyProjectAccess(
+        req.params.projectId,
+        currentUser.id,
+        currentUser.role,
+        currentUser.companyId
+      );
+      
+      if (!hasAccess) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const building = await storage.updateProjectBuilding(req.params.buildingId, req.body);
+      res.json({ building });
+    } catch (error) {
+      console.error("Update project building error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Delete a specific building
+  app.delete("/api/projects/:projectId/buildings/:buildingId", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const hasAccess = await storage.verifyProjectAccess(
+        req.params.projectId,
+        currentUser.id,
+        currentUser.role,
+        currentUser.companyId
+      );
+      
+      if (!hasAccess) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      await storage.deleteProjectBuilding(req.params.buildingId);
+      res.json({ message: "Building deleted successfully" });
+    } catch (error) {
+      console.error("Delete project building error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // ==================== WORK NOTICES ROUTES ====================
   
   // Get work notices for a project

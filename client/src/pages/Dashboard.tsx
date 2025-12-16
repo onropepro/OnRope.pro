@@ -25,7 +25,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Check, ChevronsUpDown, Star, Calculator } from "lucide-react";
+import { Check, ChevronsUpDown, Star, Calculator, X, Plus } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
@@ -999,6 +999,21 @@ export default function Dashboard() {
   const [showSaveAsClientDialog, setShowSaveAsClientDialog] = useState(false);
   const [projectDataForClient, setProjectDataForClient] = useState<any>(null);
   const [showOtherElevationFields, setShowOtherElevationFields] = useState(false);
+  
+  // Multi-building state for complex projects (window cleaning, building wash)
+  interface ProjectBuildingEntry {
+    name: string;
+    buildingAddress: string;
+    floorCount: string;
+    buildingHeight: string;
+    totalDropsNorth: string;
+    totalDropsEast: string;
+    totalDropsSouth: string;
+    totalDropsWest: string;
+  }
+  const [projectBuildings, setProjectBuildings] = useState<ProjectBuildingEntry[]>([]);
+  const [isMultiBuildingComplex, setIsMultiBuildingComplex] = useState(false);
+  
   const [invitationToConvert, setInvitationToConvert] = useState<any>(null); // Invitation being converted to employee
   const [showInvitationEmployeeForm, setShowInvitationEmployeeForm] = useState(false); // Show employee form for invitation
   const [showLeaveCompanyDialog, setShowLeaveCompanyDialog] = useState(false); // For technicians to leave company
@@ -1931,7 +1946,30 @@ export default function Dashboard() {
 
       return response.json();
     },
-    onSuccess: (data) => {
+    onSuccess: async (responseData) => {
+      const projectId = responseData.project?.id;
+      
+      // Save buildings if this is a multi-building project
+      if (projectId && isMultiBuildingComplex && projectBuildings.length > 0) {
+        try {
+          await apiRequest("PUT", `/api/projects/${projectId}/buildings`, {
+            buildings: projectBuildings.map((b, index) => ({
+              name: b.name,
+              buildingAddress: b.buildingAddress,
+              floorCount: b.floorCount ? parseInt(b.floorCount) : undefined,
+              buildingHeight: b.buildingHeight,
+              totalDropsNorth: b.totalDropsNorth ? parseInt(b.totalDropsNorth) : 0,
+              totalDropsEast: b.totalDropsEast ? parseInt(b.totalDropsEast) : 0,
+              totalDropsSouth: b.totalDropsSouth ? parseInt(b.totalDropsSouth) : 0,
+              totalDropsWest: b.totalDropsWest ? parseInt(b.totalDropsWest) : 0,
+              displayOrder: index,
+            })),
+          });
+        } catch (error) {
+          console.error("Failed to save project buildings:", error);
+        }
+      }
+      
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
       
       // Store project data BEFORE resetting
@@ -1955,6 +1993,8 @@ export default function Dashboard() {
       setSelectedClientForProject("");
       setSelectedStrataForProject("");
       setShowOtherElevationFields(false);
+      setProjectBuildings([]);
+      setIsMultiBuildingComplex(false);
       isManualEntryRef.current = false;
       
       toast({ title: t('dashboard.toast.projectCreated', 'Project created successfully') });
@@ -3702,7 +3742,13 @@ export default function Dashboard() {
                     data-testid="input-search-projects"
                   />
                 </div>
-                <Dialog open={showProjectDialog} onOpenChange={setShowProjectDialog}>
+                <Dialog open={showProjectDialog} onOpenChange={(open) => {
+                  setShowProjectDialog(open);
+                  if (!open) {
+                    setProjectBuildings([]);
+                    setIsMultiBuildingComplex(false);
+                  }
+                }}>
                   <DialogTrigger asChild>
                     <Button 
                       className="h-14 px-6 gap-2 shadow-md hover:shadow-lg text-base font-semibold" 
@@ -4310,6 +4356,201 @@ export default function Dashboard() {
                               )}
                             />
                           </>
+                        )}
+
+                        {/* Multi-building toggle for window cleaning and building wash projects */}
+                        {(() => {
+                          const currentJobType = projectForm.watch("jobType");
+                          const supportsMultiBuilding = ["window_cleaning", "building_wash", "building_wash_pressure"].includes(currentJobType);
+                          return supportsMultiBuilding;
+                        })() && (
+                          <div className="space-y-4 border rounded-md p-4">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <label className="text-sm font-medium">{t('dashboard.projectForm.multiBuildingComplex', 'Multi-Building Complex')}</label>
+                                <p className="text-xs text-muted-foreground">
+                                  {t('dashboard.projectForm.multiBuildingDesc', 'Enable for projects with multiple towers or buildings')}
+                                </p>
+                              </div>
+                              <Switch
+                                checked={isMultiBuildingComplex}
+                                onCheckedChange={(checked) => {
+                                  setIsMultiBuildingComplex(checked);
+                                  if (checked && projectBuildings.length === 0) {
+                                    setProjectBuildings([{
+                                      name: "Tower A",
+                                      buildingAddress: "",
+                                      floorCount: "",
+                                      buildingHeight: "",
+                                      totalDropsNorth: "",
+                                      totalDropsEast: "",
+                                      totalDropsSouth: "",
+                                      totalDropsWest: "",
+                                    }]);
+                                  }
+                                }}
+                                data-testid="switch-multi-building"
+                              />
+                            </div>
+                            
+                            {isMultiBuildingComplex && (
+                              <div className="space-y-4">
+                                {projectBuildings.map((building, index) => (
+                                  <div key={index} className="border rounded-md p-3 space-y-3 bg-muted/30">
+                                    <div className="flex items-center justify-between gap-2">
+                                      <Input
+                                        placeholder={t('dashboard.projectForm.buildingName', 'Building name (e.g., Tower A)')}
+                                        value={building.name}
+                                        onChange={(e) => {
+                                          const updated = [...projectBuildings];
+                                          updated[index] = { ...building, name: e.target.value };
+                                          setProjectBuildings(updated);
+                                        }}
+                                        className="h-10"
+                                        data-testid={`input-building-name-${index}`}
+                                      />
+                                      {projectBuildings.length > 1 && (
+                                        <Button
+                                          type="button"
+                                          variant="ghost"
+                                          size="icon"
+                                          onClick={() => {
+                                            setProjectBuildings(projectBuildings.filter((_, i) => i !== index));
+                                          }}
+                                          data-testid={`button-remove-building-${index}`}
+                                        >
+                                          <X className="h-4 w-4" />
+                                        </Button>
+                                      )}
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-2 gap-2">
+                                      <div>
+                                        <label className="text-xs text-muted-foreground">{t('dashboard.projectForm.floorCount', 'Floor Count')}</label>
+                                        <Input
+                                          type="number"
+                                          min="1"
+                                          placeholder="e.g., 20"
+                                          value={building.floorCount}
+                                          onChange={(e) => {
+                                            const updated = [...projectBuildings];
+                                            updated[index] = { ...building, floorCount: e.target.value };
+                                            setProjectBuildings(updated);
+                                          }}
+                                          className="h-10"
+                                          data-testid={`input-building-floors-${index}`}
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="text-xs text-muted-foreground">{t('dashboard.projectForm.address', 'Address')}</label>
+                                        <Input
+                                          placeholder={t('common.optional', 'Optional')}
+                                          value={building.buildingAddress}
+                                          onChange={(e) => {
+                                            const updated = [...projectBuildings];
+                                            updated[index] = { ...building, buildingAddress: e.target.value };
+                                            setProjectBuildings(updated);
+                                          }}
+                                          className="h-10"
+                                          data-testid={`input-building-address-${index}`}
+                                        />
+                                      </div>
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-4 gap-2">
+                                      <div>
+                                        <label className="text-xs text-muted-foreground">{t('dashboard.projectForm.north', 'North')}</label>
+                                        <Input
+                                          type="number"
+                                          min="0"
+                                          placeholder="0"
+                                          value={building.totalDropsNorth}
+                                          onChange={(e) => {
+                                            const updated = [...projectBuildings];
+                                            updated[index] = { ...building, totalDropsNorth: e.target.value };
+                                            setProjectBuildings(updated);
+                                          }}
+                                          className="h-10"
+                                          data-testid={`input-building-drops-north-${index}`}
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="text-xs text-muted-foreground">{t('dashboard.projectForm.east', 'East')}</label>
+                                        <Input
+                                          type="number"
+                                          min="0"
+                                          placeholder="0"
+                                          value={building.totalDropsEast}
+                                          onChange={(e) => {
+                                            const updated = [...projectBuildings];
+                                            updated[index] = { ...building, totalDropsEast: e.target.value };
+                                            setProjectBuildings(updated);
+                                          }}
+                                          className="h-10"
+                                          data-testid={`input-building-drops-east-${index}`}
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="text-xs text-muted-foreground">{t('dashboard.projectForm.south', 'South')}</label>
+                                        <Input
+                                          type="number"
+                                          min="0"
+                                          placeholder="0"
+                                          value={building.totalDropsSouth}
+                                          onChange={(e) => {
+                                            const updated = [...projectBuildings];
+                                            updated[index] = { ...building, totalDropsSouth: e.target.value };
+                                            setProjectBuildings(updated);
+                                          }}
+                                          className="h-10"
+                                          data-testid={`input-building-drops-south-${index}`}
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="text-xs text-muted-foreground">{t('dashboard.projectForm.west', 'West')}</label>
+                                        <Input
+                                          type="number"
+                                          min="0"
+                                          placeholder="0"
+                                          value={building.totalDropsWest}
+                                          onChange={(e) => {
+                                            const updated = [...projectBuildings];
+                                            updated[index] = { ...building, totalDropsWest: e.target.value };
+                                            setProjectBuildings(updated);
+                                          }}
+                                          className="h-10"
+                                          data-testid={`input-building-drops-west-${index}`}
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                                
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    const nextLetter = String.fromCharCode(65 + projectBuildings.length); // A, B, C...
+                                    setProjectBuildings([...projectBuildings, {
+                                      name: `Tower ${nextLetter}`,
+                                      buildingAddress: "",
+                                      floorCount: "",
+                                      buildingHeight: "",
+                                      totalDropsNorth: "",
+                                      totalDropsEast: "",
+                                      totalDropsSouth: "",
+                                      totalDropsWest: "",
+                                    }]);
+                                  }}
+                                  data-testid="button-add-building"
+                                >
+                                  <Plus className="h-4 w-4 mr-2" />
+                                  {t('dashboard.projectForm.addBuilding', 'Add Another Building')}
+                                </Button>
+                              </div>
+                            )}
+                          </div>
                         )}
 
                         <div className="space-y-2">
