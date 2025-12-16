@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
-import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown, IdCard, HardHat, Search, Package } from "lucide-react";
+import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown, IdCard, HardHat, Search, Package, Calendar } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 interface PublicHeaderProps {
@@ -310,6 +310,22 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                         <div className="text-xs text-muted-foreground mt-0.5">Equipment tracking, assignments, service life</div>
                       </div>
                     </button>
+                    <button
+                      className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                      onClick={() => {
+                        setLocation("/modules/scheduling-calendar");
+                        setShowModulesMenu(false);
+                      }}
+                      data-testid="nav-scheduling-calendar"
+                    >
+                      <div className="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <Calendar className="w-5 h-5 text-indigo-600" />
+                      </div>
+                      <div>
+                        <div className="font-semibold text-sm">Scheduling & Calendar</div>
+                        <div className="text-xs text-muted-foreground mt-0.5">Conflict detection, dual calendars, time-off management</div>
+                      </div>
+                    </button>
                   </div>
                 </div>
               )}
@@ -511,6 +527,17 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                   >
                     <Package className="w-5 h-5 text-teal-600" />
                     <span className="text-sm">Gear Inventory Management</span>
+                  </button>
+                  <button
+                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
+                    onClick={() => {
+                      setLocation("/modules/scheduling-calendar");
+                      setMobileMenuOpen(false);
+                    }}
+                    data-testid="nav-mobile-scheduling-calendar"
+                  >
+                    <Calendar className="w-5 h-5 text-indigo-600" />
+                    <span className="text-sm">Scheduling & Calendar</span>
                   </button>
                 </div>
               )}
