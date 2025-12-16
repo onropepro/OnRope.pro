@@ -87,10 +87,21 @@ interface WorkNoticeItem {
   createdAt: string;
 }
 
+interface ProjectBuildingItem {
+  id: string;
+  name: string;
+  strataPlanNumber: string | null;
+  buildingAddress: string | null;
+  floorCount: number | null;
+  projectId: string;
+  projectJobType: string;
+}
+
 interface PortalData {
   building: BuildingData;
   projectHistory: ProjectHistoryItem[];
   workNotices?: WorkNoticeItem[];
+  projectBuildings?: ProjectBuildingItem[];
   stats: {
     totalProjects: number;
     completedProjects: number;
@@ -105,6 +116,7 @@ export default function BuildingPortal() {
   const [password, setPassword] = useState("");
   const [showInstructionsDialog, setShowInstructionsDialog] = useState(false);
   const [showChangePasswordDialog, setShowChangePasswordDialog] = useState(false);
+  const [selectedProjectBuildingId, setSelectedProjectBuildingId] = useState<string | null>(null);
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: "",
     newPassword: "",
@@ -143,11 +155,24 @@ export default function BuildingPortal() {
 
   // Fetch building instructions when we have building data
   const buildingId = portalData?.building?.id;
+  const projectBuildings = portalData?.projectBuildings || [];
+  const hasMultipleBuildings = projectBuildings.length > 1;
+  
+  // Auto-select first building when project buildings are loaded
+  useEffect(() => {
+    if (projectBuildings.length > 0 && !selectedProjectBuildingId) {
+      setSelectedProjectBuildingId(projectBuildings[0].id);
+    }
+  }, [projectBuildings, selectedProjectBuildingId]);
+  
   const { data: buildingInstructions, isLoading: isLoadingInstructions } = useQuery<BuildingInstructions | null>({
-    queryKey: ["/api/buildings", buildingId, "instructions"],
+    queryKey: ["/api/buildings", buildingId, "instructions", selectedProjectBuildingId],
     queryFn: async () => {
       if (!buildingId) return null;
-      const response = await fetch(`/api/buildings/${buildingId}/instructions`, { credentials: "include" });
+      const url = selectedProjectBuildingId 
+        ? `/api/buildings/${buildingId}/instructions?projectBuildingId=${selectedProjectBuildingId}`
+        : `/api/buildings/${buildingId}/instructions`;
+      const response = await fetch(url, { credentials: "include" });
       if (!response.ok) return null;
       return response.json();
     },
@@ -180,7 +205,11 @@ export default function BuildingPortal() {
 
   const saveInstructionsMutation = useMutation({
     mutationFn: async (data: typeof instructionsForm) => {
-      const response = await apiRequest("POST", `/api/buildings/${buildingId}/instructions`, data);
+      // Include projectBuildingId when saving for multi-building complexes
+      const payload = selectedProjectBuildingId 
+        ? { ...data, projectBuildingId: selectedProjectBuildingId }
+        : data;
+      const response = await apiRequest("POST", `/api/buildings/${buildingId}/instructions`, payload);
       return response.json();
     },
     onSuccess: () => {
@@ -188,7 +217,7 @@ export default function BuildingPortal() {
         title: "Instructions Saved",
         description: "Building instructions have been updated successfully.",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/buildings", buildingId, "instructions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/buildings", buildingId, "instructions", selectedProjectBuildingId] });
       setShowInstructionsDialog(false);
     },
     onError: (error: any) => {
@@ -1189,6 +1218,40 @@ export default function BuildingPortal() {
               Add access information and contact details for contractors working at this building.
             </DialogDescription>
           </DialogHeader>
+          
+          {/* Building selector for multi-building complexes */}
+          {hasMultipleBuildings && (
+            <div className="py-4 border-b">
+              <Label className="text-sm font-medium mb-2 block">
+                Select Building
+              </Label>
+              <Select
+                value={selectedProjectBuildingId || ""}
+                onValueChange={(value) => setSelectedProjectBuildingId(value)}
+              >
+                <SelectTrigger className="h-12" data-testid="select-building-instructions">
+                  <SelectValue placeholder="Choose a building..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {projectBuildings.map((bldg) => (
+                    <SelectItem key={bldg.id} value={bldg.id}>
+                      <div className="flex flex-col items-start">
+                        <span className="font-medium">{bldg.name}</span>
+                        {bldg.strataPlanNumber && (
+                          <span className="text-xs text-muted-foreground">
+                            Strata: {bldg.strataPlanNumber}
+                          </span>
+                        )}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground mt-2">
+                Each building in the complex can have its own access instructions
+              </p>
+            </div>
+          )}
           
           <div className="space-y-6 py-4">
             {/* Contact Information Section */}
