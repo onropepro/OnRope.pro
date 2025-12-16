@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates } from "@shared/schema";
 import { eq, sql, and, or, isNull, gt, desc, asc, inArray } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -9600,6 +9600,99 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true });
     } catch (error) {
       console.error("Delete custom job type error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Get custom notice templates for a company
+  app.get("/api/custom-notice-templates", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const templates = await db.select().from(customNoticeTemplates)
+        .where(eq(customNoticeTemplates.companyId, companyId))
+        .orderBy(desc(customNoticeTemplates.createdAt));
+      
+      res.json({ templates });
+    } catch (error) {
+      console.error("Get custom notice templates error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Create a custom notice template
+  app.post("/api/custom-notice-templates", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const { jobType, title, details } = req.body;
+      
+      if (!jobType || !title || !details) {
+        return res.status(400).json({ message: "Job type, title, and details are required" });
+      }
+      
+      const result = await db.insert(customNoticeTemplates).values({
+        companyId,
+        jobType,
+        title,
+        details,
+      }).returning();
+      
+      res.json({ template: result[0] });
+    } catch (error) {
+      console.error("Create custom notice template error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Delete a custom notice template
+  app.delete("/api/custom-notice-templates/:id", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Verify the template belongs to this company
+      const [template] = await db.select().from(customNoticeTemplates)
+        .where(eq(customNoticeTemplates.id, req.params.id))
+        .limit(1);
+        
+      if (!template || template.companyId !== companyId) {
+        return res.status(404).json({ message: "Template not found" });
+      }
+      
+      await db.delete(customNoticeTemplates).where(eq(customNoticeTemplates.id, req.params.id));
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete custom notice template error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

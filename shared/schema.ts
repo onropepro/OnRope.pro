@@ -473,6 +473,19 @@ export const customJobTypes = pgTable("custom_job_types", {
   index("IDX_custom_job_types_company").on(table.companyId),
 ]);
 
+// Custom notice templates table - user-saved work notice templates
+export const customNoticeTemplates = pgTable("custom_notice_templates", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  jobType: varchar("job_type").notNull(), // Which job type this template is for
+  title: varchar("title").notNull(),
+  details: text("details").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_custom_notice_templates_company").on(table.companyId),
+  index("IDX_custom_notice_templates_job_type").on(table.jobType),
+]);
+
 // Drop logs table - tracks daily drops per project per tech per elevation
 export const dropLogs = pgTable("drop_logs", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -1780,6 +1793,11 @@ export const insertCustomJobTypeSchema = createInsertSchema(customJobTypes).omit
   createdAt: true,
 });
 
+export const insertCustomNoticeTemplateSchema = createInsertSchema(customNoticeTemplates).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const insertDropLogSchema = createInsertSchema(dropLogs).omit({
   id: true,
   createdAt: true,
@@ -2045,6 +2063,9 @@ export type InsertWorkNotice = z.infer<typeof insertWorkNoticeSchema>;
 
 export type CustomJobType = typeof customJobTypes.$inferSelect;
 export type InsertCustomJobType = z.infer<typeof insertCustomJobTypeSchema>;
+
+export type CustomNoticeTemplate = typeof customNoticeTemplates.$inferSelect;
+export type InsertCustomNoticeTemplate = z.infer<typeof insertCustomNoticeTemplateSchema>;
 
 export type DropLog = typeof dropLogs.$inferSelect;
 export type InsertDropLog = z.infer<typeof insertDropLogSchema>;

@@ -528,10 +528,17 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
   const { t } = useTranslation();
   const { toast } = useToast();
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  const [showSaveTemplateDialog, setShowSaveTemplateDialog] = useState(false);
+  const [savedNoticeData, setSavedNoticeData] = useState<{ title: string; details: string } | null>(null);
   
   // Fetch clients to get property manager name for this project's strata plan
   const { data: clientsResponse } = useQuery<{ clients: any[] }>({
     queryKey: ["/api/clients"],
+  });
+  
+  // Fetch custom notice templates
+  const { data: customTemplatesData } = useQuery<{ templates: any[] }>({
+    queryKey: ["/api/custom-notice-templates"],
   });
   
   // Find the client associated with this project's strata plan number
@@ -599,10 +606,32 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
     mutationFn: async (data: WorkNoticeFormData) => {
       return apiRequest("POST", `/api/projects/${project.id}/work-notices`, data);
     },
-    onSuccess: () => {
+    onSuccess: (_response, variables) => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects", project.id, "work-notices"] });
       toast({ title: "Work notice created", description: "The notice is now visible to residents." });
       onSuccess?.();
+      
+      // If no template was used, ask if they want to save as template
+      if (!selectedTemplate && variables.noticeTitle && variables.noticeDetails) {
+        setSavedNoticeData({ title: variables.noticeTitle, details: variables.noticeDetails });
+        setShowSaveTemplateDialog(true);
+      } else {
+        onClose();
+      }
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+  
+  const saveTemplateMutation = useMutation({
+    mutationFn: async (data: { jobType: string; title: string; details: string }) => {
+      return apiRequest("POST", "/api/custom-notice-templates", data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/custom-notice-templates"] });
+      toast({ title: "Template saved", description: "You can now use this template for future notices." });
+      setShowSaveTemplateDialog(false);
       onClose();
     },
     onError: (error: Error) => {
@@ -630,9 +659,20 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
     if (template) {
       form.setValue("noticeTitle", template.title);
       form.setValue("noticeDetails", template.details);
-      setSelectedTemplate(String(index));
+      setSelectedTemplate(`builtin-${index}`);
     }
   };
+  
+  const handleCustomTemplateSelect = (template: { id: string; title: string; details: string }) => {
+    form.setValue("noticeTitle", template.title);
+    form.setValue("noticeDetails", template.details);
+    setSelectedTemplate(`custom-${template.id}`);
+  };
+  
+  // Get custom templates for this job type
+  const customTemplates = (customTemplatesData?.templates || []).filter(
+    (t: any) => t.jobType === project.jobType
+  );
 
   const onSubmit = (data: WorkNoticeFormData) => {
     // Include schedule data for in-suite and parkade jobs
@@ -718,9 +758,9 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
         <div className="flex flex-wrap gap-2">
           {templates.map((template, index) => (
             <Button
-              key={index}
+              key={`builtin-${index}`}
               type="button"
-              variant={selectedTemplate === String(index) ? "default" : "outline"}
+              variant={selectedTemplate === `builtin-${index}` ? "default" : "outline"}
               size="sm"
               onClick={() => handleTemplateSelect(index)}
               data-testid={`button-template-${index}`}
@@ -728,7 +768,27 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
               {template.title}
             </Button>
           ))}
+          {customTemplates.map((template: any) => (
+            <Button
+              key={`custom-${template.id}`}
+              type="button"
+              variant={selectedTemplate === `custom-${template.id}` ? "default" : "outline"}
+              size="sm"
+              onClick={() => handleCustomTemplateSelect(template)}
+              data-testid={`button-custom-template-${template.id}`}
+              className="border-dashed"
+            >
+              <span className="material-icons text-xs mr-1">star</span>
+              {template.title}
+            </Button>
+          ))}
         </div>
+        {customTemplates.length > 0 && (
+          <p className="text-xs text-muted-foreground mt-2">
+            <span className="material-icons text-xs align-middle mr-1">star</span>
+            Custom templates you've saved
+          </p>
+        )}
       </div>
 
       <Form {...form}>
@@ -990,6 +1050,73 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
           </div>
         </form>
       </Form>
+      
+      {/* Save as Template Dialog */}
+      <Dialog open={showSaveTemplateDialog} onOpenChange={(open) => {
+        if (!open) {
+          setShowSaveTemplateDialog(false);
+          onClose();
+        }
+      }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <span className="material-icons text-primary">bookmark_add</span>
+              Save as Template?
+            </DialogTitle>
+            <DialogDescription>
+              Would you like to save this notice as a quick template for future use with {jobTypeName} projects?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            {savedNoticeData && (
+              <div className="bg-muted rounded-lg p-3 text-sm">
+                <p className="font-medium">{savedNoticeData.title}</p>
+                <p className="text-muted-foreground text-xs mt-1 line-clamp-2">
+                  {savedNoticeData.details.substring(0, 100)}...
+                </p>
+              </div>
+            )}
+          </div>
+          <div className="flex gap-3 justify-end">
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setShowSaveTemplateDialog(false);
+                onClose();
+              }}
+              data-testid="button-skip-save-template"
+            >
+              No, thanks
+            </Button>
+            <Button 
+              onClick={() => {
+                if (savedNoticeData) {
+                  saveTemplateMutation.mutate({
+                    jobType: project.jobType,
+                    title: savedNoticeData.title,
+                    details: savedNoticeData.details,
+                  });
+                }
+              }}
+              disabled={saveTemplateMutation.isPending}
+              data-testid="button-save-template"
+            >
+              {saveTemplateMutation.isPending ? (
+                <>
+                  <span className="material-icons animate-spin mr-2">refresh</span>
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <span className="material-icons mr-2">bookmark_add</span>
+                  Save Template
+                </>
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
