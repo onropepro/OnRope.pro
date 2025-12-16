@@ -245,6 +245,65 @@ const getJobTypeLabel = (t: (key: string) => string, jobType: string): string =>
 // Flat list of all permissions for compatibility
 const AVAILABLE_PERMISSIONS = PERMISSION_CATEGORIES.flatMap(cat => cat.permissions);
 
+// Quick permission presets for common roles
+const PERMISSION_PRESETS = {
+  // Regular Rope Access Tech / Labourer: Basic technician permissions
+  regular_tech: [
+    "view_projects",
+    "log_drops",
+    "view_own_schedule",
+  ],
+  // Supervisor: Regular tech + management capabilities
+  supervisor: [
+    "view_projects",
+    "log_drops",
+    "view_own_schedule",
+    "edit_quotes",
+    "view_active_workers",
+    "assign_gear",
+    "view_employees",
+  ],
+  // Operations Manager: Full operational access
+  operations_manager: [
+    // Projects - all
+    "view_projects",
+    "view_past_projects",
+    "create_projects",
+    "edit_projects",
+    "delete_projects",
+    "log_drops",
+    // Employees - all
+    "view_employees",
+    "create_employees",
+    "edit_employees",
+    "delete_employees",
+    // Work Sessions - all
+    "view_work_sessions",
+    "manage_work_sessions",
+    "view_work_history",
+    "view_active_workers",
+    // Schedule - all
+    "view_full_schedule",
+    "view_own_schedule",
+    "edit_schedule",
+    // Quotes
+    "view_quotes",
+    "edit_quotes",
+    // Documents - all
+    "view_sensitive_documents",
+    // Safety & Compliance - all
+    "view_csr",
+    // Inventory - all
+    "view_inventory",
+    "manage_inventory",
+    "assign_gear",
+    "view_gear_assignments",
+    // Feedback - all
+    "view_complaints",
+    "manage_complaints",
+  ],
+} as const;
+
 const employeeSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address"),
@@ -6685,6 +6744,58 @@ export default function Dashboard() {
                                   {t('dashboard.employeeForm.selectAll', 'Select All')}
                                 </Button>
                               </div>
+                              
+                              {/* Quick Permission Presets */}
+                              <div className="mt-4 p-4 bg-muted/30 rounded-lg border">
+                                <p className="text-sm font-medium mb-3">{t('dashboard.employeeForm.quickPermissions', 'Quick Permission Presets')}</p>
+                                <div className="flex flex-wrap gap-2">
+                                  <Button
+                                    type="button"
+                                    variant="secondary"
+                                    size="sm"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      employeeForm.setValue("permissions", [...PERMISSION_PRESETS.regular_tech]);
+                                    }}
+                                    data-testid="button-preset-regular-tech"
+                                  >
+                                    <span className="material-icons text-base mr-1">construction</span>
+                                    {t('dashboard.employeeForm.presetRegularTech', 'Technician / Labourer')}
+                                  </Button>
+                                  <Button
+                                    type="button"
+                                    variant="secondary"
+                                    size="sm"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      employeeForm.setValue("permissions", [...PERMISSION_PRESETS.supervisor]);
+                                    }}
+                                    data-testid="button-preset-supervisor"
+                                  >
+                                    <span className="material-icons text-base mr-1">supervisor_account</span>
+                                    {t('dashboard.employeeForm.presetSupervisor', 'Supervisor')}
+                                  </Button>
+                                  <Button
+                                    type="button"
+                                    variant="secondary"
+                                    size="sm"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      employeeForm.setValue("permissions", [...PERMISSION_PRESETS.operations_manager]);
+                                    }}
+                                    data-testid="button-preset-ops-manager"
+                                  >
+                                    <span className="material-icons text-base mr-1">engineering</span>
+                                    {t('dashboard.employeeForm.presetOpsManager', 'Operations Manager')}
+                                  </Button>
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-2">
+                                  {t('dashboard.employeeForm.presetHint', 'Click a preset to auto-select permissions, then customize as needed')}
+                                </p>
+                              </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                               {PERMISSION_CATEGORIES.map((category) => (
@@ -9002,6 +9113,58 @@ export default function Dashboard() {
                           >
                             {t('dashboard.employeeForm.selectAll', 'Select All')}
                           </Button>
+                        </div>
+                        
+                        {/* Quick Permission Presets */}
+                        <div className="mt-4 p-4 bg-muted/30 rounded-lg border">
+                          <p className="text-sm font-medium mb-3">{t('dashboard.employeeForm.quickPermissions', 'Quick Permission Presets')}</p>
+                          <div className="flex flex-wrap gap-2">
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              size="sm"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                editEmployeeForm.setValue("permissions", [...PERMISSION_PRESETS.regular_tech]);
+                              }}
+                              data-testid="button-edit-preset-regular-tech"
+                            >
+                              <span className="material-icons text-base mr-1">construction</span>
+                              {t('dashboard.employeeForm.presetRegularTech', 'Technician / Labourer')}
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              size="sm"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                editEmployeeForm.setValue("permissions", [...PERMISSION_PRESETS.supervisor]);
+                              }}
+                              data-testid="button-edit-preset-supervisor"
+                            >
+                              <span className="material-icons text-base mr-1">supervisor_account</span>
+                              {t('dashboard.employeeForm.presetSupervisor', 'Supervisor')}
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              size="sm"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                editEmployeeForm.setValue("permissions", [...PERMISSION_PRESETS.operations_manager]);
+                              }}
+                              data-testid="button-edit-preset-ops-manager"
+                            >
+                              <span className="material-icons text-base mr-1">engineering</span>
+                              {t('dashboard.employeeForm.presetOpsManager', 'Operations Manager')}
+                            </Button>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-2">
+                            {t('dashboard.employeeForm.presetHint', 'Click a preset to auto-select permissions, then customize as needed')}
+                          </p>
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
