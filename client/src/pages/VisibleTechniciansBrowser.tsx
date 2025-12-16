@@ -547,7 +547,8 @@ export default function VisibleTechniciansBrowser() {
                     }`} />
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <p className="text-sm text-muted-foreground">Personal Safety Rating</p>
+                        <p className="font-semibold">PSR</p>
+                        <p className="text-xs text-muted-foreground">Personal Safety Rating</p>
                         <Badge variant={
                           selectedTech.safetyColor === 'green' ? 'default' :
                           selectedTech.safetyColor === 'yellow' ? 'secondary' :
