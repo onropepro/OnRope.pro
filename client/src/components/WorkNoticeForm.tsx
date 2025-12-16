@@ -560,9 +560,18 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
     return "";
   };
   
-  // Check if this job type needs unit/stall scheduling
+  // Check if this job type needs scheduling (unit/stall or elevation-based)
   const needsUnitSchedule = project.jobType === 'in_suite_dryer_vent_cleaning' || project.jobType === 'parkade_pressure_cleaning';
-  const scheduleLabel = project.jobType === 'parkade_pressure_cleaning' ? 'Stall' : 'Unit';
+  const needsElevationSchedule = project.jobType === 'window_cleaning' || project.jobType === 'building_wash' || project.jobType === 'building_wash_pressure' || project.jobType === 'general_pressure_washing';
+  const needsSchedule = needsUnitSchedule || needsElevationSchedule;
+  
+  // Determine label based on job type
+  const getScheduleLabel = () => {
+    if (project.jobType === 'parkade_pressure_cleaning') return 'Stall';
+    if (needsElevationSchedule) return 'Elevation';
+    return 'Unit';
+  };
+  const scheduleLabel = getScheduleLabel();
   
   // Schedule state for in-suite and parkade jobs
   const [schedule, setSchedule] = useState<ScheduleDay[]>(() => {
@@ -676,7 +685,7 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
 
   const onSubmit = (data: WorkNoticeFormData) => {
     // Include schedule data for in-suite and parkade jobs
-    const submitData = needsUnitSchedule ? { ...data, unitSchedule: schedule } : data;
+    const submitData = needsSchedule ? { ...data, unitSchedule: schedule } : data;
     
     if (existingNotice) {
       updateNoticeMutation.mutate(submitData);
@@ -687,7 +696,10 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
   
   // Schedule management functions
   const addScheduleDay = () => {
-    setSchedule([...schedule, { date: '', slots: [{ startTime: '09:00', endTime: '12:00', units: '' }] }]);
+    const defaultSlot = needsElevationSchedule 
+      ? { startTime: '', endTime: '', units: '' }
+      : { startTime: '09:00', endTime: '12:00', units: '' };
+    setSchedule([...schedule, { date: '', slots: [defaultSlot] }]);
   };
   
   const removeScheduleDay = (dayIndex: number) => {
@@ -702,7 +714,10 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
   
   const addSlot = (dayIndex: number) => {
     const newSchedule = [...schedule];
-    newSchedule[dayIndex].slots.push({ startTime: '09:00', endTime: '12:00', units: '' });
+    const newSlot = needsElevationSchedule 
+      ? { startTime: '', endTime: '', units: '' }
+      : { startTime: '09:00', endTime: '12:00', units: '' };
+    newSchedule[dayIndex].slots.push(newSlot);
     setSchedule(newSchedule);
   };
   
@@ -889,13 +904,13 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
             )}
           />
 
-          {needsUnitSchedule && (
+          {needsSchedule && (
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <span className="material-icons text-primary">schedule</span>
-                    {scheduleLabel} Schedule
+                    {needsElevationSchedule ? 'Work Schedule by Elevation' : `${scheduleLabel} Schedule`}
                   </div>
                   <Button 
                     type="button" 
@@ -909,7 +924,9 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
                   </Button>
                 </CardTitle>
                 <p className="text-sm text-muted-foreground">
-                  Specify which {scheduleLabel.toLowerCase()}s will be serviced on which days and times
+                  {needsElevationSchedule 
+                    ? 'Specify which elevations (North, South, East, West) will be worked on each day' 
+                    : `Specify which ${scheduleLabel.toLowerCase()}s will be serviced on which days and times`}
                 </p>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -948,7 +965,9 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
                         
                         <div className="space-y-2">
                           <div className="flex items-center justify-between">
-                            <Label className="text-xs text-muted-foreground">Time Slots</Label>
+                            <Label className="text-xs text-muted-foreground">
+                              {needsElevationSchedule ? 'Elevation Details' : 'Time Slots'}
+                            </Label>
                             <Button
                               type="button"
                               variant="ghost"
@@ -958,38 +977,74 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
                               data-testid={`button-add-slot-${dayIndex}`}
                             >
                               <span className="material-icons text-sm mr-1">add</span>
-                              Add Time Slot
+                              {needsElevationSchedule ? 'Add Elevation' : 'Add Time Slot'}
                             </Button>
                           </div>
                           
                           {day.slots.map((slot, slotIndex) => (
                             <div key={slotIndex} className="flex items-center gap-2 bg-background p-2 rounded-md">
-                              <div className="flex items-center gap-1 flex-shrink-0">
-                                <Input
-                                  type="time"
-                                  value={slot.startTime}
-                                  onChange={(e) => updateSlot(dayIndex, slotIndex, 'startTime', e.target.value)}
-                                  className="h-8 w-24"
-                                  data-testid={`input-slot-start-${dayIndex}-${slotIndex}`}
-                                />
-                                <span className="text-muted-foreground">-</span>
-                                <Input
-                                  type="time"
-                                  value={slot.endTime}
-                                  onChange={(e) => updateSlot(dayIndex, slotIndex, 'endTime', e.target.value)}
-                                  className="h-8 w-24"
-                                  data-testid={`input-slot-end-${dayIndex}-${slotIndex}`}
-                                />
-                              </div>
-                              <div className="flex-1">
-                                <Input
-                                  placeholder={`${scheduleLabel}s (e.g., 4509, 3509, 2509)`}
-                                  value={slot.units}
-                                  onChange={(e) => updateSlot(dayIndex, slotIndex, 'units', e.target.value)}
-                                  className="h-8"
-                                  data-testid={`input-slot-units-${dayIndex}-${slotIndex}`}
-                                />
-                              </div>
+                              {needsElevationSchedule ? (
+                                <>
+                                  <div className="flex-1">
+                                    <Input
+                                      placeholder="Elevation (e.g., North, South, East, West, Floors 1-5)"
+                                      value={slot.units}
+                                      onChange={(e) => updateSlot(dayIndex, slotIndex, 'units', e.target.value)}
+                                      className="h-8"
+                                      data-testid={`input-slot-elevation-${dayIndex}-${slotIndex}`}
+                                    />
+                                  </div>
+                                  <div className="flex items-center gap-1 flex-shrink-0">
+                                    <Input
+                                      type="time"
+                                      value={slot.startTime}
+                                      onChange={(e) => updateSlot(dayIndex, slotIndex, 'startTime', e.target.value)}
+                                      className="h-8 w-24"
+                                      placeholder="Start"
+                                      data-testid={`input-slot-start-${dayIndex}-${slotIndex}`}
+                                    />
+                                    <span className="text-muted-foreground text-xs">to</span>
+                                    <Input
+                                      type="time"
+                                      value={slot.endTime}
+                                      onChange={(e) => updateSlot(dayIndex, slotIndex, 'endTime', e.target.value)}
+                                      className="h-8 w-24"
+                                      placeholder="End"
+                                      data-testid={`input-slot-end-${dayIndex}-${slotIndex}`}
+                                    />
+                                    <span className="text-xs text-muted-foreground">(optional)</span>
+                                  </div>
+                                </>
+                              ) : (
+                                <>
+                                  <div className="flex items-center gap-1 flex-shrink-0">
+                                    <Input
+                                      type="time"
+                                      value={slot.startTime}
+                                      onChange={(e) => updateSlot(dayIndex, slotIndex, 'startTime', e.target.value)}
+                                      className="h-8 w-24"
+                                      data-testid={`input-slot-start-${dayIndex}-${slotIndex}`}
+                                    />
+                                    <span className="text-muted-foreground">-</span>
+                                    <Input
+                                      type="time"
+                                      value={slot.endTime}
+                                      onChange={(e) => updateSlot(dayIndex, slotIndex, 'endTime', e.target.value)}
+                                      className="h-8 w-24"
+                                      data-testid={`input-slot-end-${dayIndex}-${slotIndex}`}
+                                    />
+                                  </div>
+                                  <div className="flex-1">
+                                    <Input
+                                      placeholder={`${scheduleLabel}s (e.g., 4509, 3509, 2509)`}
+                                      value={slot.units}
+                                      onChange={(e) => updateSlot(dayIndex, slotIndex, 'units', e.target.value)}
+                                      className="h-8"
+                                      data-testid={`input-slot-units-${dayIndex}-${slotIndex}`}
+                                    />
+                                  </div>
+                                </>
+                              )}
                               {day.slots.length > 1 && (
                                 <Button
                                   type="button"
