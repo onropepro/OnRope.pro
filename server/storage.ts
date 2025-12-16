@@ -1484,13 +1484,16 @@ export class Storage {
       .where(eq(gearItems.companyId, companyId))
       .orderBy(desc(gearItems.createdAt));
     
-    // Fetch serial entries for all items
+    // Fetch active (non-retired) serial entries for all items
     if (items.length === 0) return [];
     
     const itemIds = items.map(item => item.id);
     const allSerialEntries = await db.select()
       .from(gearSerialNumbers)
-      .where(inArray(gearSerialNumbers.gearItemId, itemIds));
+      .where(and(
+        inArray(gearSerialNumbers.gearItemId, itemIds),
+        eq(gearSerialNumbers.isRetired, false)
+      ));
     
     // Group serial entries by gearItemId
     const serialEntriesByItem: Record<string, GearSerialNumber[]> = {};

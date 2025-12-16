@@ -12932,10 +12932,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       })));
       console.log('[GEAR-ITEMS] Summed by item:', Object.fromEntries(assignedByItem));
       
-      // Get all serial numbers for this company
+      // Get all active (non-retired) serial numbers for this company
       const allSerialNumbers = await db.select()
         .from(gearSerialNumbers)
-        .where(eq(gearSerialNumbers.companyId, companyId));
+        .where(and(
+          eq(gearSerialNumbers.companyId, companyId),
+          eq(gearSerialNumbers.isRetired, false)
+        ));
       
       // Build set of assigned serial numbers
       const assignedSerials = new Set<string>();
