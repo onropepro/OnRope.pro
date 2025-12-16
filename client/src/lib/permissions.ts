@@ -140,11 +140,33 @@ export function canViewPerformance(user: User | null | undefined): boolean {
   return checkPermission(user, 'view_analytics');
 }
 
-/** Check if user can view/manage job schedule */
+/** Check if user can view the full job schedule (all employees) */
+export function canViewFullSchedule(user: User | null | undefined): boolean {
+  if (!user) return false;
+  if (isCompanyOwner(user)) return true;
+  return checkPermission(user, 'view_full_schedule');
+}
+
+/** Check if user can view their own schedule only */
+export function canViewOwnSchedule(user: User | null | undefined): boolean {
+  if (!user) return false;
+  // Everyone can view their own schedule if they have this permission
+  return checkPermission(user, 'view_own_schedule');
+}
+
+/** Check if user can edit the schedule (create/modify assignments) */
+export function canEditSchedule(user: User | null | undefined): boolean {
+  if (!user) return false;
+  if (isCompanyOwner(user)) return true;
+  return checkPermission(user, 'edit_schedule');
+}
+
+/** Check if user can view any schedule (full or own) - legacy compatibility */
 export function canViewSchedule(user: User | null | undefined): boolean {
   if (!user) return false;
   if (isCompanyOwner(user)) return true;
-  return checkPermission(user, 'view_schedule');
+  // Can view if they have full schedule access OR own schedule access
+  return canViewFullSchedule(user) || canViewOwnSchedule(user);
 }
 
 // ============================================================================
@@ -288,6 +310,9 @@ export const permissions = {
     canManageEmployees,
     canViewPerformance,
     canViewSchedule,
+    canViewFullSchedule,
+    canViewOwnSchedule,
+    canEditSchedule,
   },
   safety: {
     canViewDocuments: canViewSafetyDocuments,
