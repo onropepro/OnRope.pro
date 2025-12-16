@@ -2768,7 +2768,7 @@ export class Storage {
     startDate: Date, 
     endDate: Date,
     excludeJobId?: string
-  ): Promise<Array<{ employeeId: string; employeeName: string; conflictingJobTitle: string }>> {
+  ): Promise<Array<{ employeeId: string; employeeName: string; conflictingJobTitle: string; conflictType?: 'job' | 'time_off'; timeOffType?: string }>> {
     console.log("[CONFLICT CHECK] Checking conflicts for:", {
       employeeIds,
       startDate,
@@ -2776,7 +2776,7 @@ export class Storage {
       excludeJobId
     });
     
-    const conflicts: Array<{ employeeId: string; employeeName: string; conflictingJobTitle: string }> = [];
+    const conflicts: Array<{ employeeId: string; employeeName: string; conflictingJobTitle: string; conflictType?: 'job' | 'time_off'; timeOffType?: string }> = [];
     
     for (const employeeId of employeeIds) {
       // Get all assignments for this employee
@@ -2840,6 +2840,48 @@ export class Storage {
           employeeId,
           employeeName: employee?.name || 'Unknown',
           conflictingJobTitle: conflictingJobs[0].title,
+          conflictType: 'job',
+        });
+      }
+      
+      // Check for time-off conflicts
+      const startDateStr = startDate.toISOString().split('T')[0];
+      const endDateStr = endDate.toISOString().split('T')[0];
+      
+      const timeOffEntries = await db.select().from(employeeTimeOff)
+        .where(
+          and(
+            eq(employeeTimeOff.employeeId, employeeId),
+            gte(employeeTimeOff.date, startDateStr),
+            lte(employeeTimeOff.date, endDateStr)
+          )
+        );
+      
+      console.log(`[CONFLICT CHECK] Found ${timeOffEntries.length} time-off entries for employee ${employeeId}`);
+      
+      if (timeOffEntries.length > 0) {
+        const employee = await this.getUserById(employeeId);
+        const timeOffType = timeOffEntries[0].timeOffType;
+        // Map time-off type to label
+        const timeOffLabels: Record<string, string> = {
+          'day_off': 'Day Off',
+          'paid_day_off': 'Paid Day Off',
+          'stat_holiday': 'Stat Holiday',
+          'sick_day': 'Sick Day',
+          'sick_paid_day': 'Paid Sick Day',
+          'vacation': 'Vacation',
+          'personal_day': 'Personal Day',
+          'bereavement': 'Bereavement',
+          'jury_duty': 'Jury Duty',
+          'training': 'Training',
+        };
+        const label = timeOffLabels[timeOffType] || timeOffType;
+        conflicts.push({
+          employeeId,
+          employeeName: employee?.name || 'Unknown',
+          conflictingJobTitle: `${label} (${timeOffEntries[0].date})`,
+          conflictType: 'time_off',
+          timeOffType: timeOffType,
         });
       }
     }
