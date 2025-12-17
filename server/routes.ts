@@ -9023,43 +9023,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ]
       };
 
-      // Check if user is logged in and has white-label branding
+      // Check if user is logged in as a COMPANY and has white-label branding
+      // Note: Technician portal is owned by the technician, NOT the company
+      // So we only apply company branding for company role users
       if (req.session && req.session.userId) {
         const user = await storage.getUserById(req.session.userId);
         
-        if (user) {
-          // Get the company (either the user is company, or get their companyId)
-          const companyId = user.role === 'company' ? user.id : user.companyId;
+        // Only apply white-label branding for company role users (not technicians)
+        if (user && user.role === 'company' && user.whitelabelBrandingActive && user.pwaAppIconUrl) {
+          // Return white-labeled manifest for company users only
+          const customManifest = {
+            ...defaultManifest,
+            name: user.companyName || defaultManifest.name,
+            short_name: user.companyName?.substring(0, 12) || defaultManifest.short_name,
+            theme_color: user.brandingColors?.[0] || defaultManifest.theme_color,
+            icons: [
+              {
+                src: user.pwaAppIconUrl,
+                sizes: '192x192',
+                type: 'image/png'
+              },
+              {
+                src: user.pwaAppIconUrl,
+                sizes: '512x512',
+                type: 'image/png',
+                purpose: 'any maskable'
+              }
+            ]
+          };
           
-          if (companyId) {
-            const company = await storage.getUserById(companyId);
-            
-            if (company && company.whitelabelBrandingActive && company.pwaAppIconUrl) {
-              // Return white-labeled manifest
-              const customManifest = {
-                ...defaultManifest,
-                name: company.companyName || defaultManifest.name,
-                short_name: company.companyName?.substring(0, 12) || defaultManifest.short_name,
-                theme_color: company.brandingColors?.[0] || defaultManifest.theme_color,
-                icons: [
-                  {
-                    src: company.pwaAppIconUrl,
-                    sizes: '192x192',
-                    type: 'image/png'
-                  },
-                  {
-                    src: company.pwaAppIconUrl,
-                    sizes: '512x512',
-                    type: 'image/png',
-                    purpose: 'any maskable'
-                  }
-                ]
-              };
-              
-              res.setHeader('Content-Type', 'application/manifest+json');
-              return res.json(customManifest);
-            }
-          }
+          res.setHeader('Content-Type', 'application/manifest+json');
+          return res.json(customManifest);
         }
       }
 
@@ -9083,27 +9077,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Dynamic apple-touch-icon for Safari/macOS "Add to Dock" white-label support
+  // Note: Only applies to company role users - technician portal stays independent
   app.get("/api/apple-touch-icon.png", async (req: Request, res: Response) => {
     try {
-      // Check if user is logged in and has white-label branding
+      // Only apply white-label branding for company role users (not technicians)
       if (req.session && req.session.userId) {
         const user = await storage.getUserById(req.session.userId);
         
-        if (user) {
-          const companyId = user.role === 'company' ? user.id : user.companyId;
-          
-          if (companyId) {
-            const company = await storage.getUserById(companyId);
-            
-            if (company && company.whitelabelBrandingActive && company.pwaAppIconUrl) {
-              // Redirect to the custom icon URL
-              return res.redirect(company.pwaAppIconUrl);
-            }
-          }
+        if (user && user.role === 'company' && user.whitelabelBrandingActive && user.pwaAppIconUrl) {
+          // Redirect to the custom icon URL for company users only
+          return res.redirect(user.pwaAppIconUrl);
         }
       }
 
-      // Serve default apple-touch-icon
+      // Serve default apple-touch-icon for everyone else (including technicians)
       res.redirect('/apple-touch-icon.png');
     } catch (error) {
       console.error("Error serving apple-touch-icon:", error);
