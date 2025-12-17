@@ -206,14 +206,23 @@ export function SubscriptionManagement() {
       const response = await apiRequest('POST', '/api/stripe/add-branding', {});
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/stripe/subscription-status'] });
       queryClient.invalidateQueries({ queryKey: ['/api/user'] });
       setShowAddBrandingDialog(false);
-      toast({
-        title: "White Label Branding Unlocked!",
-        description: "Refreshing page to apply changes...",
-      });
+      
+      // Show different message based on whether it was a free trial activation
+      if (data.freeTrialBenefit) {
+        toast({
+          title: "White Label Branding Activated!",
+          description: "Free during your trial period. Billing starts when your trial ends.",
+        });
+      } else {
+        toast({
+          title: "White Label Branding Unlocked!",
+          description: "Refreshing page to apply changes...",
+        });
+      }
       
       // Reload page after 1 second to ensure fresh data from server
       setTimeout(() => {
@@ -625,10 +634,20 @@ export function SubscriptionManagement() {
             </DialogTitle>
             <DialogDescription>
               <div className="space-y-4 pt-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">Price:</span>
-                  <span className="font-semibold text-base">$49/month</span>
-                </div>
+                {subStatus?.status === 'trialing' ? (
+                  <div className="bg-success/10 border border-success/30 rounded-lg p-3">
+                    <p className="text-sm font-medium text-success">Free During Trial!</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Activate white label branding for free during your trial period. 
+                      It will be added to your subscription ($49/month) when billing starts.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Price:</span>
+                    <span className="font-semibold text-base">$49/month</span>
+                  </div>
+                )}
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-primary" />
@@ -644,8 +663,14 @@ export function SubscriptionManagement() {
                   </div>
                 </div>
                 <div className="text-xs text-muted-foreground pt-2 border-t space-y-1">
-                  <p><strong>Prorated Billing:</strong> You'll only be charged for the time remaining in your current billing period.</p>
-                  <p>Changes take effect immediately. Configure your branding in Settings.</p>
+                  {subStatus?.status === 'trialing' ? (
+                    <p>Changes take effect immediately. Configure your branding in Settings.</p>
+                  ) : (
+                    <>
+                      <p><strong>Prorated Billing:</strong> You'll only be charged for the time remaining in your current billing period.</p>
+                      <p>Changes take effect immediately. Configure your branding in Settings.</p>
+                    </>
+                  )}
                 </div>
               </div>
             </DialogDescription>
@@ -664,7 +689,7 @@ export function SubscriptionManagement() {
               disabled={addBrandingMutation.isPending}
               data-testid="button-confirm-add-branding"
             >
-              {addBrandingMutation.isPending ? 'Processing...' : 'Confirm Purchase'}
+              {addBrandingMutation.isPending ? 'Processing...' : (subStatus?.status === 'trialing' ? 'Activate Free' : 'Confirm Purchase')}
             </Button>
           </DialogFooter>
         </DialogContent>
