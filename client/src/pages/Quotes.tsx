@@ -357,6 +357,49 @@ export default function Quotes() {
   const [currentTaxInfo, setCurrentTaxInfo] = useState<TaxInfo | null>(null);
   const [editTaxInfo, setEditTaxInfo] = useState<TaxInfo | null>(null);
   
+  // Track which individual tax components are removed (for multi-tax regions like GST+PST)
+  const [removedTaxTypes, setRemovedTaxTypes] = useState<Set<'gst' | 'pst' | 'hst' | 'state'>>(new Set());
+  const [editRemovedTaxTypes, setEditRemovedTaxTypes] = useState<Set<'gst' | 'pst' | 'hst' | 'state'>>(new Set());
+  
+  // Helper to get individual tax components from TaxInfo
+  const getTaxComponents = (taxInfo: TaxInfo | null, removed: Set<'gst' | 'pst' | 'hst' | 'state'>) => {
+    if (!taxInfo) return [];
+    const components: { type: 'gst' | 'pst' | 'hst' | 'state'; label: string; rate: number }[] = [];
+    
+    if (taxInfo.hstRate > 0 && !removed.has('hst')) {
+      components.push({ type: 'hst', label: `HST (${taxInfo.hstRate}%)`, rate: taxInfo.hstRate });
+    }
+    if (taxInfo.gstRate > 0 && !removed.has('gst')) {
+      components.push({ type: 'gst', label: `GST (${taxInfo.gstRate}%)`, rate: taxInfo.gstRate });
+    }
+    if (taxInfo.pstRate > 0 && !removed.has('pst')) {
+      const pstLabel = taxInfo.taxType === 'GST+QST' ? 'QST' : (taxInfo.country === 'US' ? 'State Tax' : 'PST');
+      components.push({ type: taxInfo.country === 'US' ? 'state' : 'pst', label: `${pstLabel} (${taxInfo.pstRate}%)`, rate: taxInfo.pstRate });
+    }
+    
+    return components;
+  };
+  
+  // Compute effective tax info with removed components zeroed out
+  const getEffectiveTaxInfo = (taxInfo: TaxInfo | null, removed: Set<'gst' | 'pst' | 'hst' | 'state'>): TaxInfo | null => {
+    if (!taxInfo) return null;
+    
+    const effectiveGst = removed.has('gst') ? 0 : taxInfo.gstRate;
+    const effectivePst = (removed.has('pst') || removed.has('state')) ? 0 : taxInfo.pstRate;
+    const effectiveHst = removed.has('hst') ? 0 : taxInfo.hstRate;
+    const effectiveTotal = effectiveGst + effectivePst + effectiveHst;
+    
+    if (effectiveTotal === 0) return null;
+    
+    return {
+      ...taxInfo,
+      gstRate: effectiveGst,
+      pstRate: effectivePst,
+      hstRate: effectiveHst,
+      totalRate: effectiveTotal,
+    };
+  };
+  
   // Custom adjustments (additional fees/taxes)
   type CustomAdjustment = {
     id: string;
@@ -492,19 +535,20 @@ export default function Quotes() {
         };
       });
       
-      // Calculate totals and tax
+      // Calculate totals and tax (use effective tax info with removed taxes zeroed out)
       const subtotal = services.reduce((sum, s) => sum + Number(s.totalCost || 0), 0);
       let taxData: any = {};
       
-      if (currentTaxInfo) {
-        const taxCalc = calculateTax(subtotal, currentTaxInfo);
+      const effectiveTax = getEffectiveTaxInfo(currentTaxInfo, removedTaxTypes);
+      if (effectiveTax) {
+        const taxCalc = calculateTax(subtotal, effectiveTax);
         taxData = {
-          taxRegion: currentTaxInfo.region,
-          taxCountry: currentTaxInfo.country,
-          taxType: currentTaxInfo.taxType,
-          gstRate: String(currentTaxInfo.gstRate),
-          pstRate: String(currentTaxInfo.pstRate),
-          hstRate: String(currentTaxInfo.hstRate),
+          taxRegion: effectiveTax.region,
+          taxCountry: effectiveTax.country,
+          taxType: effectiveTax.taxType,
+          gstRate: String(effectiveTax.gstRate),
+          pstRate: String(effectiveTax.pstRate),
+          hstRate: String(effectiveTax.hstRate),
           gstAmount: String(taxCalc.gstAmount),
           pstAmount: String(taxCalc.pstAmount),
           hstAmount: String(taxCalc.hstAmount),
@@ -900,6 +944,7 @@ export default function Quotes() {
     setSelectedPropertyIndex(null);
     setCreateStep("services");
     setCurrentTaxInfo(null); // Reset tax info when starting a new quote
+    setRemovedTaxTypes(new Set()); // Reset removed tax types
     setCustomAdjustments([]); // Reset custom adjustments
     buildingForm.reset();
     serviceForm.reset();
@@ -3365,24 +3410,28 @@ export default function Quotes() {
                       </Button>
                     </div>
                     
-                    {/* Auto-detected tax display */}
-                    {currentTaxInfo && currentTaxInfo.totalRate > 0 && (
-                      <div className="p-3 bg-muted/50 rounded-md border border-border flex items-center justify-between gap-2">
+                    {/* Auto-detected tax display - show each component separately */}
+                    {getTaxComponents(currentTaxInfo, removedTaxTypes).map((component) => (
+                      <div key={component.type} className="p-3 bg-muted/50 rounded-md border border-border flex items-center justify-between gap-2">
                         <div>
-                          <p className="text-sm font-medium">{getTaxLabel(currentTaxInfo)}</p>
+                          <p className="text-sm font-medium">{component.label}</p>
                           <p className="text-xs text-muted-foreground">Auto-detected from building address</p>
                         </div>
                         <Button
                           type="button"
                           variant="ghost"
                           size="sm"
-                          onClick={() => setCurrentTaxInfo(null)}
-                          data-testid="button-remove-auto-tax"
+                          onClick={() => {
+                            const newRemoved = new Set(removedTaxTypes);
+                            newRemoved.add(component.type);
+                            setRemovedTaxTypes(newRemoved);
+                          }}
+                          data-testid={`button-remove-tax-${component.type}`}
                         >
                           <X className="w-4 h-4" />
                         </Button>
                       </div>
-                    )}
+                    ))}
                     
                     {/* Custom adjustments list */}
                     {customAdjustments.map((adj, index) => (
@@ -3440,7 +3489,7 @@ export default function Quotes() {
                       </div>
                     ))}
                     
-                    {customAdjustments.length === 0 && !currentTaxInfo && (
+                    {customAdjustments.length === 0 && getTaxComponents(currentTaxInfo, removedTaxTypes).length === 0 && (
                       <p className="text-sm text-muted-foreground italic">No additional fees or taxes added</p>
                     )}
                   </div>
