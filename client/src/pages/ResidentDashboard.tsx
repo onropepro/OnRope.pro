@@ -96,7 +96,7 @@ export default function ResidentDashboard() {
   });
   
   const projectBuildings = buildingsData?.buildings || [];
-  const isMultiBuilding = projectBuildings.length > 0;
+  const isMultiBuilding = projectBuildings.length > 1;
   
   // Auto-select first building when project buildings load
   useEffect(() => {
