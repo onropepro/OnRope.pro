@@ -840,6 +840,7 @@ export default function Quotes() {
     setSelectedClientId(null);
     setSelectedPropertyIndex(null);
     setCreateStep("services");
+    setCurrentTaxInfo(null); // Reset tax info when starting a new quote
     buildingForm.reset();
     serviceForm.reset();
   };
@@ -3399,52 +3400,15 @@ export default function Quotes() {
                     <div className="text-right">
                       {(() => {
                         const subtotal = calculateQuoteTotal();
-                        const taxCalc = currentTaxInfo ? calculateTax(subtotal, currentTaxInfo) : null;
                         return (
                           <div className="space-y-1">
-                            <div className="flex justify-end items-center gap-2">
-                              <span className="text-sm text-muted-foreground">Subtotal:</span>
-                              <span className="text-lg font-semibold">${subtotal.toFixed(2)}</span>
-                            </div>
-                            {taxCalc && currentTaxInfo && currentTaxInfo.totalRate > 0 && (
-                              <>
-                                {currentTaxInfo.taxType === 'HST' && (
-                                  <div className="flex justify-end items-center gap-2">
-                                    <span className="text-sm text-muted-foreground">HST ({currentTaxInfo.hstRate}%):</span>
-                                    <span className="text-lg font-semibold">${taxCalc.hstAmount.toFixed(2)}</span>
-                                  </div>
-                                )}
-                                {(currentTaxInfo.taxType === 'GST' || currentTaxInfo.taxType === 'GST+PST' || currentTaxInfo.taxType === 'GST+QST') && (
-                                  <>
-                                    <div className="flex justify-end items-center gap-2">
-                                      <span className="text-sm text-muted-foreground">GST ({currentTaxInfo.gstRate}%):</span>
-                                      <span className="text-lg font-semibold">${taxCalc.gstAmount.toFixed(2)}</span>
-                                    </div>
-                                    {currentTaxInfo.pstRate > 0 && (
-                                      <div className="flex justify-end items-center gap-2">
-                                        <span className="text-sm text-muted-foreground">{currentTaxInfo.taxType === 'GST+QST' ? 'QST' : 'PST'} ({currentTaxInfo.pstRate}%):</span>
-                                        <span className="text-lg font-semibold">${taxCalc.pstAmount.toFixed(2)}</span>
-                                      </div>
-                                    )}
-                                  </>
-                                )}
-                                {currentTaxInfo.taxType === 'STATE' && (
-                                  <div className="flex justify-end items-center gap-2">
-                                    <span className="text-sm text-muted-foreground">Sales Tax ({currentTaxInfo.pstRate}%):</span>
-                                    <span className="text-lg font-semibold">${taxCalc.pstAmount.toFixed(2)}</span>
-                                  </div>
-                                )}
-                              </>
-                            )}
                             <div className="flex justify-end items-center gap-2 pt-1 border-t border-border">
-                              <span className="text-sm font-medium text-foreground">Total:</span>
+                              <span className="text-sm font-medium text-foreground">Subtotal:</span>
                               <span className="text-3xl font-bold text-primary">
-                                ${taxCalc ? taxCalc.grandTotal.toFixed(2) : subtotal.toFixed(2)}
+                                ${subtotal.toFixed(2)}
                               </span>
                             </div>
-                            {!currentTaxInfo && (
-                              <p className="text-xs text-muted-foreground">Select building address for tax calculation</p>
-                            )}
+                            <p className="text-xs text-muted-foreground">Tax will be calculated based on building address</p>
                           </div>
                         );
                       })()}
