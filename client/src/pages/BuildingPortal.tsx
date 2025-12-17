@@ -95,6 +95,16 @@ interface ProjectBuildingItem {
   floorCount: number | null;
   projectId: string;
   projectJobType: string;
+  // Per-building drop totals from project_buildings table
+  totalDropsNorth?: number;
+  totalDropsEast?: number;
+  totalDropsSouth?: number;
+  totalDropsWest?: number;
+  // Per-building completed drops calculated from work sessions
+  completedDropsNorth?: number;
+  completedDropsEast?: number;
+  completedDropsSouth?: number;
+  completedDropsWest?: number;
 }
 
 interface PortalData {
@@ -391,13 +401,31 @@ export default function BuildingPortal() {
   const getProjectProgress = (project: ProjectHistoryItem): { completed: number; total: number; label: string; hasProgress: boolean } | null => {
     if (!project.progressType) return null;
     
+    // Calculate project-level totals (used as fallback for single-building or no building selected)
+    const projectTotal = (project.totalDropsNorth || 0) + (project.totalDropsEast || 0) + 
+                        (project.totalDropsSouth || 0) + (project.totalDropsWest || 0);
+    const projectCompleted = (project.completedDropsNorth || 0) + (project.completedDropsEast || 0) + 
+                            (project.completedDropsSouth || 0) + (project.completedDropsWest || 0);
+    
     switch (project.progressType) {
       case 'drops': {
-        const total = (project.totalDropsNorth || 0) + (project.totalDropsEast || 0) + 
-                     (project.totalDropsSouth || 0) + (project.totalDropsWest || 0);
-        const completed = (project.completedDropsNorth || 0) + (project.completedDropsEast || 0) + 
-                         (project.completedDropsSouth || 0) + (project.completedDropsWest || 0);
-        return { completed, total, label: 'drops', hasProgress: total > 0 };
+        // For multi-building projects, use the selected building's data
+        if (selectedProjectBuildingId && projectBuildings.length > 0) {
+          const selectedBldg = projectBuildings.find(b => b.id === selectedProjectBuildingId && b.projectId === project.id);
+          if (selectedBldg) {
+            const buildingTotal = (selectedBldg.totalDropsNorth || 0) + (selectedBldg.totalDropsEast || 0) + 
+                                 (selectedBldg.totalDropsSouth || 0) + (selectedBldg.totalDropsWest || 0);
+            const buildingCompleted = (selectedBldg.completedDropsNorth || 0) + (selectedBldg.completedDropsEast || 0) + 
+                                     (selectedBldg.completedDropsSouth || 0) + (selectedBldg.completedDropsWest || 0);
+            
+            // Use building data if it has valid totals configured
+            if (buildingTotal > 0) {
+              return { completed: buildingCompleted, total: buildingTotal, label: 'drops', hasProgress: true };
+            }
+          }
+        }
+        // Fallback to project-level data when no building selected or building has no totals
+        return { completed: projectCompleted, total: projectTotal, label: 'drops', hasProgress: projectTotal > 0 };
       }
       case 'suites': {
         const total = project.totalSuites || 0;

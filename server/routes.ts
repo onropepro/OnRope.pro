@@ -6296,10 +6296,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
               projectInfo.totalDropsEast = project.totalDropsEast;
               projectInfo.totalDropsSouth = project.totalDropsSouth;
               projectInfo.totalDropsWest = project.totalDropsWest;
-              projectInfo.completedDropsNorth = project.completedDropsNorth;
-              projectInfo.completedDropsEast = project.completedDropsEast;
-              projectInfo.completedDropsSouth = project.completedDropsSouth;
-              projectInfo.completedDropsWest = project.completedDropsWest;
+              
+              // Calculate completed drops from ALL work sessions (including legacy ones without projectBuildingId)
+              const projectSessions = await storage.getWorkSessionsByProject(project.id, project.companyId);
+              projectInfo.completedDropsNorth = projectSessions.reduce((sum, s) => sum + (s.dropsCompletedNorth || 0), 0);
+              projectInfo.completedDropsEast = projectSessions.reduce((sum, s) => sum + (s.dropsCompletedEast || 0), 0);
+              projectInfo.completedDropsSouth = projectSessions.reduce((sum, s) => sum + (s.dropsCompletedSouth || 0), 0);
+              projectInfo.completedDropsWest = projectSessions.reduce((sum, s) => sum + (s.dropsCompletedWest || 0), 0);
             } else if (project.progressType === 'suites') {
               projectInfo.progressType = 'suites';
               projectInfo.totalSuites = project.totalSuites;
@@ -6353,14 +6356,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Collect all project buildings for active projects (for multi-building complexes)
+      // Include completed drops per-building calculated from work sessions
       const allProjectBuildings: any[] = [];
       for (const project of activeProjects) {
         const projectBldgs = await storage.getProjectBuildings(project.id);
+        
+        // Get work sessions for this project to calculate per-building completed drops
+        const projectSessions = await storage.getWorkSessionsByProject(project.id, project.companyId);
+        
         for (const bldg of projectBldgs) {
+          // Sum completed drops from work sessions for this specific building
+          // Include sessions with matching projectBuildingId OR sessions with no building ID (legacy data)
+          const buildingSessions = projectSessions.filter(s => s.projectBuildingId === bldg.id);
+          const legacySessions = projectSessions.filter(s => !s.projectBuildingId);
+          
+          // If there are no building-specific sessions but there are legacy sessions,
+          // distribute legacy drops proportionally across buildings based on their totals
+          let completedDropsNorth = buildingSessions.reduce((sum, s) => sum + (s.dropsCompletedNorth || 0), 0);
+          let completedDropsEast = buildingSessions.reduce((sum, s) => sum + (s.dropsCompletedEast || 0), 0);
+          let completedDropsSouth = buildingSessions.reduce((sum, s) => sum + (s.dropsCompletedSouth || 0), 0);
+          let completedDropsWest = buildingSessions.reduce((sum, s) => sum + (s.dropsCompletedWest || 0), 0);
+          
+          // For single-building projects or when all sessions are legacy, include legacy drops
+          if (projectBldgs.length === 1 && legacySessions.length > 0) {
+            completedDropsNorth += legacySessions.reduce((sum, s) => sum + (s.dropsCompletedNorth || 0), 0);
+            completedDropsEast += legacySessions.reduce((sum, s) => sum + (s.dropsCompletedEast || 0), 0);
+            completedDropsSouth += legacySessions.reduce((sum, s) => sum + (s.dropsCompletedSouth || 0), 0);
+            completedDropsWest += legacySessions.reduce((sum, s) => sum + (s.dropsCompletedWest || 0), 0);
+          }
+          
           allProjectBuildings.push({
             ...bldg,
             projectId: project.id,
             projectJobType: project.customJobType || project.jobType,
+            // Add computed completed drops for this building
+            completedDropsNorth,
+            completedDropsEast,
+            completedDropsSouth,
+            completedDropsWest,
           });
         }
       }
