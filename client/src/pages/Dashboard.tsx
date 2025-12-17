@@ -5608,6 +5608,9 @@ export default function Dashboard() {
                 isTrialing={currentUser?.subscriptionStatus === 'trialing'}
                 seatsUsed={employeesData?.seatInfo?.seatsUsed || 0}
                 baseSeatLimit={employeesData?.seatInfo?.baseSeatLimit || 2}
+                paidSeats={employeesData?.seatInfo?.paidSeats || 0}
+                giftedSeats={employeesData?.seatInfo?.giftedSeats || 0}
+                hasWhitelabelBranding={currentUser?.whitelabelBrandingActive || false}
               />
               
               {/* Employee Dialog */}
