@@ -9082,6 +9082,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Dynamic apple-touch-icon for Safari/macOS "Add to Dock" white-label support
+  app.get("/api/apple-touch-icon.png", async (req: Request, res: Response) => {
+    try {
+      // Check if user is logged in and has white-label branding
+      if (req.session && req.session.userId) {
+        const user = await storage.getUserById(req.session.userId);
+        
+        if (user) {
+          const companyId = user.role === 'company' ? user.id : user.companyId;
+          
+          if (companyId) {
+            const company = await storage.getUserById(companyId);
+            
+            if (company && company.whitelabelBrandingActive && company.pwaAppIconUrl) {
+              // Redirect to the custom icon URL
+              return res.redirect(company.pwaAppIconUrl);
+            }
+          }
+        }
+      }
+
+      // Serve default apple-touch-icon
+      res.redirect('/apple-touch-icon.png');
+    } catch (error) {
+      console.error("Error serving apple-touch-icon:", error);
+      res.redirect('/apple-touch-icon.png');
+    }
+  });
+  
   // ==================== RESIDENTS ROUTES ====================
   
   // Get all residents for the company
