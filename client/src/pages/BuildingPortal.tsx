@@ -244,12 +244,13 @@ export default function BuildingPortal() {
       const response = await apiRequest("POST", "/api/building/login", { strataPlanNumber, password });
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast({
         title: "Login Successful",
         description: "Welcome to your building portal.",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/building/portal"] });
+      // Force immediate refetch to update the portal data after login
+      await refetchPortal();
     },
     onError: (error: any) => {
       toast({
