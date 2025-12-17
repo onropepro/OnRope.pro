@@ -168,6 +168,16 @@ const PERMISSION_CATEGORIES = [
     ],
   },
   {
+    nameKey: "dashboard.permissions.categories.quotes",
+    permissions: [
+      { id: "view_quotes", labelKey: "dashboard.permissions.viewQuotes" },
+      { id: "create_quotes", labelKey: "dashboard.permissions.createQuotes" },
+      { id: "edit_quotes", labelKey: "dashboard.permissions.editQuotes" },
+      { id: "delete_quotes", labelKey: "dashboard.permissions.deleteQuotes" },
+      { id: "view_quote_financials", labelKey: "dashboard.permissions.viewQuoteFinancials" },
+    ],
+  },
+  {
     nameKey: "dashboard.permissions.categories.safetyCompliance",
     permissions: [
       { id: "view_csr", labelKey: "dashboard.permissions.viewCsr" },
