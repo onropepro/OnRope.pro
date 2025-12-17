@@ -80,6 +80,98 @@ const ai = new GoogleGenAI({
   },
 });
 
+// Export the ai instance for use in RAG service
+export { ai };
+
+/**
+ * Generate embeddings for text content using Gemini's text-embedding-004 model
+ * Used for RAG (Retrieval Augmented Generation) in the Knowledge Base
+ */
+export async function generateEmbedding(text: string): Promise<number[]> {
+  try {
+    const response = await ai.models.embedContent({
+      model: "text-embedding-004",
+      contents: [{ role: "user", parts: [{ text }] }],
+    });
+    
+    return response.embeddings?.[0]?.values || [];
+  } catch (error: any) {
+    console.error("[Gemini Embedding] Error:", error);
+    throw new Error(`Failed to generate embedding: ${error.message}`);
+  }
+}
+
+/**
+ * Generate embeddings for multiple texts in batch
+ * More efficient than calling generateEmbedding multiple times
+ */
+export async function generateEmbeddings(texts: string[]): Promise<number[][]> {
+  try {
+    const results: number[][] = [];
+    
+    // Process in batches of 10 to avoid rate limits
+    for (let i = 0; i < texts.length; i += 10) {
+      const batch = texts.slice(i, i + 10);
+      const embeddings = await Promise.all(
+        batch.map(text => generateEmbedding(text))
+      );
+      results.push(...embeddings);
+    }
+    
+    return results;
+  } catch (error: any) {
+    console.error("[Gemini Batch Embedding] Error:", error);
+    throw new Error(`Failed to generate batch embeddings: ${error.message}`);
+  }
+}
+
+/**
+ * Generate a conversational response using Gemini with context from RAG
+ */
+export async function generateChatResponse(
+  userMessage: string,
+  context: string,
+  conversationHistory: Array<{ role: 'user' | 'assistant'; content: string }> = []
+): Promise<string> {
+  try {
+    const systemPrompt = `You are a helpful assistant for OnRopePro, a rope access management platform. 
+You help users understand features, find information, and troubleshoot issues.
+
+Use the following context from our documentation to answer the user's question. 
+If the context doesn't contain relevant information, say so honestly but try to be helpful.
+Keep responses concise but complete. Use bullet points for lists.
+Do not make up features that aren't mentioned in the context.
+
+CONTEXT FROM DOCUMENTATION:
+${context}
+
+---
+Answer the user's question based on this context. Be friendly and professional.`;
+
+    const messages = [
+      ...conversationHistory.map(msg => ({
+        role: msg.role as "user" | "model",
+        parts: [{ text: msg.content }]
+      })),
+      {
+        role: "user" as const,
+        parts: [{ text: userMessage }]
+      }
+    ];
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      systemInstruction: systemPrompt,
+      contents: messages,
+    });
+
+    return response.text || "I'm sorry, I couldn't generate a response. Please try again.";
+  } catch (error: any) {
+    console.error("[Gemini Chat] Error:", error);
+    throw new Error(`Failed to generate chat response: ${error.message}`);
+  }
+}
+
 export interface IrataVerificationResult {
   isValid: boolean;
   technicianName: string | null;

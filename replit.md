@@ -55,6 +55,14 @@ The platform is built with a React 18 frontend (TypeScript, Wouter for routing),
 *   **Goals & KPIs Dashboard:** SuperUser section tracking tipping points for growth and feature rollout.
 *   **Analytics & Reporting:** Insights into billable vs. non-billable hours, employee productivity, project labor costs, and real-time active worker tracking.
 *   **Job Board System (In Progress):** Companies and SuperUsers can post employment opportunities. Technicians can browse jobs and opt-in to make their profile visible to employers. Visible profile includes: resume, safety rating, name, years of experience, IRATA/SPRAT cert numbers, photo, and rope access specialties. Schema: `job_postings` table with company_id, title, description, requirements, location, job_type, employment_type, salary range, required certifications, status. Users table has `isVisibleToEmployers`, `visibilityEnabledAt`, and `ropeAccessSpecialties` fields.
+*   **Knowledge Base & Help Center (/help):** Customer-facing RAG-powered help center with AI chat assistant. Features include:
+    - Semantic search using Gemini text-embedding-004 embeddings
+    - AI chat with conversation history and source attribution
+    - 16 module guides extracted from existing changelog Guide TSX files
+    - Stakeholder-specific navigation (Company Owners, Technicians, Building Managers, Property Managers)
+    - Mobile-first responsive design with accessibility features
+    - Database tables: help_articles, help_embeddings, help_conversations, help_messages, help_searches
+    - SuperUser-only reindexing endpoint for content updates
 *   **Building Maintenance Focus:** Platform exclusively supports building maintenance services with 10 specialized job types: Window Cleaning, Exterior Dryer Vent Cleaning, Building Wash/Pressure Washing, General Pressure Washing, Gutter Cleaning, In-Suite Dryer Vent Cleaning, Parkade Pressure Cleaning, Ground Window Cleaning, Painting, and Inspection. Each job type has category-specific progress tracking (drops/hours/suites/stalls). Companies can also create custom job types.
 *   **Security Architecture:** Session-based authentication with secure HTTP-only cookies, multi-tenant data isolation, permission-based API response filtering, and robust API security. Sensitive employee data (SIN, bank details, driver's license, medical conditions) is encrypted at rest using AES-256-GCM.
 *   **UI/UX Standards:** Emphasizes obvious, prominent buttons with icons, clear visual feedback, mobile-first design, and accessibility, using `max-w-4xl` for dialogs and `grid-cols-4 sm:grid-cols-6` for options.

@@ -2912,3 +2912,120 @@ export const insertTechnicianDocumentRequestFileSchema = createInsertSchema(tech
 
 export type TechnicianDocumentRequestFile = typeof technicianDocumentRequestFiles.$inferSelect;
 export type InsertTechnicianDocumentRequestFile = z.infer<typeof insertTechnicianDocumentRequestFileSchema>;
+
+// ============================================
+// HELP CENTER / KNOWLEDGE BASE TABLES
+// ============================================
+
+// Help Articles - Indexed content from Guide pages
+export const helpArticles = pgTable("help_articles", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  slug: varchar("slug").notNull().unique(), // URL-friendly identifier (e.g., "project-management")
+  title: varchar("title").notNull(), // Article title
+  description: text("description"), // Brief description for search results
+  category: varchar("category").notNull(), // Module category (e.g., "operations", "safety", "hr")
+  sourceFile: varchar("source_file").notNull(), // Original Guide TSX file path
+  content: text("content").notNull(), // Plain text content extracted from Guide
+  stakeholders: text("stakeholders").array().default(sql`ARRAY[]::text[]`), // Array of stakeholder types this applies to
+  isPublished: boolean("is_published").default(true).notNull(),
+  indexedAt: timestamp("indexed_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_help_articles_slug").on(table.slug),
+  index("IDX_help_articles_category").on(table.category),
+]);
+
+export const insertHelpArticleSchema = createInsertSchema(helpArticles).omit({
+  id: true,
+  indexedAt: true,
+  updatedAt: true,
+});
+
+export type HelpArticle = typeof helpArticles.$inferSelect;
+export type InsertHelpArticle = z.infer<typeof insertHelpArticleSchema>;
+
+// Help Embeddings - Vector embeddings for semantic search (using pgvector)
+// Note: Storing embeddings as JSONB array since pgvector requires extension setup
+export const helpEmbeddings = pgTable("help_embeddings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  articleId: varchar("article_id").notNull().references(() => helpArticles.id, { onDelete: "cascade" }),
+  chunkIndex: integer("chunk_index").notNull(), // Position of this chunk in the article
+  chunkText: text("chunk_text").notNull(), // The actual text chunk
+  embedding: jsonb("embedding").$type<number[]>().notNull(), // Vector embedding as JSON array
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_help_embeddings_article").on(table.articleId),
+]);
+
+export const insertHelpEmbeddingSchema = createInsertSchema(helpEmbeddings).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type HelpEmbedding = typeof helpEmbeddings.$inferSelect;
+export type InsertHelpEmbedding = z.infer<typeof insertHelpEmbeddingSchema>;
+
+// Help Conversations - Chat sessions with the AI assistant
+export const helpConversations = pgTable("help_conversations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionId: varchar("session_id"), // Browser session identifier (anonymous)
+  userId: varchar("user_id").references(() => users.id, { onDelete: "set null" }), // Optional logged-in user
+  userType: varchar("user_type").default("visitor"), // visitor | owner | technician | building-manager | property-manager
+  startedAt: timestamp("started_at").defaultNow().notNull(),
+  lastMessageAt: timestamp("last_message_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_help_conversations_user").on(table.userId),
+  index("IDX_help_conversations_session").on(table.sessionId),
+]);
+
+export const insertHelpConversationSchema = createInsertSchema(helpConversations).omit({
+  id: true,
+  startedAt: true,
+  lastMessageAt: true,
+});
+
+export type HelpConversation = typeof helpConversations.$inferSelect;
+export type InsertHelpConversation = z.infer<typeof insertHelpConversationSchema>;
+
+// Help Messages - Individual messages in a conversation
+export const helpMessages = pgTable("help_messages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  conversationId: varchar("conversation_id").notNull().references(() => helpConversations.id, { onDelete: "cascade" }),
+  role: varchar("role").notNull(), // "user" | "assistant"
+  content: text("content").notNull(),
+  sources: jsonb("sources").$type<Array<{ title: string; slug: string }>>(), // Referenced articles
+  feedback: varchar("feedback"), // "positive" | "negative" | null
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_help_messages_conversation").on(table.conversationId),
+]);
+
+export const insertHelpMessageSchema = createInsertSchema(helpMessages).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type HelpMessage = typeof helpMessages.$inferSelect;
+export type InsertHelpMessage = z.infer<typeof insertHelpMessageSchema>;
+
+// Help Searches - Track search queries for analytics
+export const helpSearches = pgTable("help_searches", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  query: text("query").notNull(),
+  resultsCount: integer("results_count").notNull(),
+  clickedArticleId: varchar("clicked_article_id").references(() => helpArticles.id, { onDelete: "set null" }),
+  userType: varchar("user_type").default("visitor"),
+  sessionId: varchar("session_id"),
+  searchedAt: timestamp("searched_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_help_searches_query").on(table.query),
+  index("IDX_help_searches_date").on(table.searchedAt),
+]);
+
+export const insertHelpSearchSchema = createInsertSchema(helpSearches).omit({
+  id: true,
+  searchedAt: true,
+});
+
+export type HelpSearch = typeof helpSearches.$inferSelect;
+export type InsertHelpSearch = z.infer<typeof insertHelpSearchSchema>;

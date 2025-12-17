@@ -20,6 +20,7 @@ import { Resend } from "resend";
 import rateLimit from "express-rate-limit";
 import OpenAI from "openai";
 import { generateQuizFromDocument } from "./gemini";
+import helpRouter from "./routes/help";
 
 // SECURITY: Rate limiting for login endpoint to prevent brute force attacks
 const loginRateLimiter = rateLimit({
@@ -805,6 +806,9 @@ async function generateReferralCode(): Promise<string> {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // ==================== HELP CENTER ROUTES ====================
+  app.use('/api/help', helpRouter);
+  
   // ==================== ADDRESS AUTOCOMPLETE ====================
   
   // Address autocomplete endpoint using Geoapify API
