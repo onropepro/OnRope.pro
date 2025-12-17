@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -284,6 +285,7 @@ const serviceFormSchema = z.object({
   serviceType: z.string(),
   customServiceName: z.string().optional(), // For custom services
   customServiceJobType: z.enum(["rope", "ground"]).optional(), // For custom services - rope vs ground work
+  description: z.string().optional(), // Service-specific notes/description
   // Elevation-based fields
   dropsNorth: z.coerce.number().optional(),
   dropsEast: z.coerce.number().optional(),
@@ -354,6 +356,16 @@ export default function Quotes() {
   // Tax information based on building address
   const [currentTaxInfo, setCurrentTaxInfo] = useState<TaxInfo | null>(null);
   const [editTaxInfo, setEditTaxInfo] = useState<TaxInfo | null>(null);
+  
+  // Custom adjustments (additional fees/taxes)
+  type CustomAdjustment = {
+    id: string;
+    name: string;
+    type: 'fixed' | 'percentage';
+    value: number;
+  };
+  const [customAdjustments, setCustomAdjustments] = useState<CustomAdjustment[]>([]);
+  const [editCustomAdjustments, setEditCustomAdjustments] = useState<CustomAdjustment[]>([]);
   
   // Helper function to detect tax from a full address string
   const detectTaxFromAddress = (address: string): TaxInfo | null => {
@@ -888,6 +900,7 @@ export default function Quotes() {
     setSelectedPropertyIndex(null);
     setCreateStep("services");
     setCurrentTaxInfo(null); // Reset tax info when starting a new quote
+    setCustomAdjustments([]); // Reset custom adjustments
     buildingForm.reset();
     serviceForm.reset();
   };
@@ -985,6 +998,7 @@ export default function Quotes() {
       serviceType: serviceId,
       customServiceName: existingConfig?.customServiceName,
       customServiceJobType: existingConfig?.customServiceJobType,
+      description: existingConfig?.description,
       dropsNorth: existingConfig?.dropsNorth,
       dropsEast: existingConfig?.dropsEast,
       dropsSouth: existingConfig?.dropsSouth,
@@ -1095,6 +1109,7 @@ export default function Quotes() {
     if (serviceBeingConfigured === "parkade") {
       configData = {
         serviceType: data.serviceType,
+        description: data.description,
         parkadeStalls: data.parkadeStalls,
         pricePerStall: data.pricePerStall,
         totalCost,
@@ -1102,6 +1117,7 @@ export default function Quotes() {
     } else if (serviceBeingConfigured === "dryer_vent_cleaning" && data.dryerVentPricingType === "per_unit") {
       configData = {
         serviceType: data.serviceType,
+        description: data.description,
         dryerVentPricingType: data.dryerVentPricingType,
         dryerVentUnits: data.dryerVentUnits,
         dryerVentPricePerUnit: data.dryerVentPricePerUnit,
@@ -1110,6 +1126,7 @@ export default function Quotes() {
     } else if (serviceBeingConfigured === "general_pressure_washing" || serviceBeingConfigured === "gutter_cleaning") {
       configData = {
         serviceType: data.serviceType,
+        description: data.description,
         simpleServiceHours: data.simpleServiceHours,
         pricePerHour: data.pricePerHour,
         totalHours,
@@ -1120,6 +1137,7 @@ export default function Quotes() {
       if (data.customServiceJobType === "rope") {
         configData = {
           serviceType: data.serviceType,
+          description: data.description,
           customServiceName: data.customServiceName,
           customServiceJobType: data.customServiceJobType,
           dropsNorth: data.dropsNorth,
@@ -1134,6 +1152,7 @@ export default function Quotes() {
       } else {
         configData = {
           serviceType: data.serviceType,
+          description: data.description,
           customServiceName: data.customServiceName,
           customServiceJobType: data.customServiceJobType,
           simpleServiceHours: data.simpleServiceHours,
@@ -3318,6 +3337,114 @@ export default function Quotes() {
                     </div>
                   </div>
 
+                  {/* Custom Adjustments (Fees/Taxes) */}
+                  <Separator className="my-4" />
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between gap-2">
+                      <div>
+                        <Label className="text-base font-semibold">Additional Fees & Taxes</Label>
+                        <p className="text-sm text-muted-foreground">Add custom fees, discounts, or additional taxes</p>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const newAdjustment: CustomAdjustment = {
+                            id: crypto.randomUUID(),
+                            name: '',
+                            type: 'fixed',
+                            value: 0,
+                          };
+                          setCustomAdjustments([...customAdjustments, newAdjustment]);
+                        }}
+                        data-testid="button-add-adjustment"
+                      >
+                        <Plus className="w-4 h-4 mr-1" />
+                        Add Fee
+                      </Button>
+                    </div>
+                    
+                    {/* Auto-detected tax display */}
+                    {currentTaxInfo && currentTaxInfo.totalRate > 0 && (
+                      <div className="p-3 bg-muted/50 rounded-md border border-border flex items-center justify-between gap-2">
+                        <div>
+                          <p className="text-sm font-medium">{getTaxLabel(currentTaxInfo)}</p>
+                          <p className="text-xs text-muted-foreground">Auto-detected from building address</p>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setCurrentTaxInfo(null)}
+                          data-testid="button-remove-auto-tax"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    )}
+                    
+                    {/* Custom adjustments list */}
+                    {customAdjustments.map((adj, index) => (
+                      <div key={adj.id} className="flex items-center gap-2 p-3 bg-muted/30 rounded-md border border-border">
+                        <Input
+                          placeholder="Fee name (e.g., Equipment Rental)"
+                          value={adj.name}
+                          onChange={(e) => {
+                            const updated = [...customAdjustments];
+                            updated[index] = { ...adj, name: e.target.value };
+                            setCustomAdjustments(updated);
+                          }}
+                          className="flex-1"
+                          data-testid={`input-adjustment-name-${index}`}
+                        />
+                        <Select
+                          value={adj.type}
+                          onValueChange={(value: 'fixed' | 'percentage') => {
+                            const updated = [...customAdjustments];
+                            updated[index] = { ...adj, type: value };
+                            setCustomAdjustments(updated);
+                          }}
+                        >
+                          <SelectTrigger className="w-28" data-testid={`select-adjustment-type-${index}`}>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="fixed">Fixed $</SelectItem>
+                            <SelectItem value="percentage">Percent %</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Input
+                          type="number"
+                          placeholder="0"
+                          value={adj.value || ''}
+                          onChange={(e) => {
+                            const updated = [...customAdjustments];
+                            updated[index] = { ...adj, value: parseFloat(e.target.value) || 0 };
+                            setCustomAdjustments(updated);
+                          }}
+                          className="w-24"
+                          data-testid={`input-adjustment-value-${index}`}
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => {
+                            setCustomAdjustments(customAdjustments.filter(a => a.id !== adj.id));
+                          }}
+                          data-testid={`button-remove-adjustment-${index}`}
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ))}
+                    
+                    {customAdjustments.length === 0 && !currentTaxInfo && (
+                      <p className="text-sm text-muted-foreground italic">No additional fees or taxes added</p>
+                    )}
+                  </div>
+
                   <Button
                     type="submit"
                     disabled={createQuoteMutation.isPending}
@@ -3946,6 +4073,26 @@ export default function Quotes() {
                       </div>
                     )
                   )}
+
+                  {/* Description field for service notes */}
+                  <FormField
+                    control={serviceForm.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Description / Notes (Optional)</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            {...field}
+                            placeholder="Add any specific notes, scope details, or special requirements for this service..."
+                            className="min-h-[100px] resize-none"
+                            data-testid="input-service-description"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
                   <Button
                     type="submit"

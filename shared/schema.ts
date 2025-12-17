@@ -1472,6 +1472,7 @@ export const quoteServices = pgTable("quote_services", {
   quoteId: varchar("quote_id").notNull().references(() => quotes.id, { onDelete: "cascade" }),
   serviceType: varchar("service_type").notNull(), // window_cleaning | dryer_vent_cleaning | building_wash | parkade | ground_windows | in_suite | custom
   customServiceName: varchar("custom_service_name"), // For custom services
+  description: text("description"), // Service-specific notes/description
   
   // Elevation-based services (window_cleaning, dryer_vent_cleaning, building_wash)
   dropsNorth: integer("drops_north"),
