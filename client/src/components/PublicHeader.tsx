@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
-import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown, IdCard, HardHat, Search, Package, Calendar, DollarSign } from "lucide-react";
+import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown, IdCard, HardHat, Search, Package, Calendar, DollarSign, Calculator } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 interface PublicHeaderProps {
@@ -350,6 +350,22 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                           <div className="text-xs text-muted-foreground mt-0.5">Automated timesheets, overtime calculation, payroll exports</div>
                         </div>
                       </button>
+                      <button
+                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                        onClick={() => {
+                          setLocation("/modules/quoting-sales-pipeline");
+                          setShowModulesMenu(false);
+                        }}
+                        data-testid="nav-quoting-sales-pipeline"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <Calculator className="w-5 h-5 text-rose-600" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-sm">Quoting & Sales Pipeline</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Service-specific quotes, financial privacy, visual pipeline</div>
+                        </div>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -563,6 +579,28 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                   >
                     <Calendar className="w-5 h-5 text-indigo-600" />
                     <span className="text-sm">Scheduling & Calendar</span>
+                  </button>
+                  <button
+                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
+                    onClick={() => {
+                      setLocation("/modules/payroll-financial");
+                      setMobileMenuOpen(false);
+                    }}
+                    data-testid="nav-mobile-payroll-financial"
+                  >
+                    <DollarSign className="w-5 h-5 text-emerald-600" />
+                    <span className="text-sm">Payroll & Financial</span>
+                  </button>
+                  <button
+                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
+                    onClick={() => {
+                      setLocation("/modules/quoting-sales-pipeline");
+                      setMobileMenuOpen(false);
+                    }}
+                    data-testid="nav-mobile-quoting-sales-pipeline"
+                  >
+                    <Calculator className="w-5 h-5 text-rose-600" />
+                    <span className="text-sm">Quoting & Sales Pipeline</span>
                   </button>
                 </div>
               )}
