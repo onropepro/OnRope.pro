@@ -210,6 +210,7 @@ export const users = pgTable("users", {
   // White label branding (company role only)
   brandingLogoUrl: text("branding_logo_url"), // Custom logo URL for resident portal
   brandingColors: text("branding_colors").array().default(sql`ARRAY[]::text[]`), // Array of brand colors (hex codes)
+  pwaAppIconUrl: text("pwa_app_icon_url"), // Custom PWA app icon URL (512x512 for installed app)
   
   // Language preference (all roles)
   preferredLanguage: varchar("preferred_language").default('en'), // en | fr - user's preferred language
