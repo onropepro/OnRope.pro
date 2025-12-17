@@ -37,7 +37,18 @@ export function PurchaseSeatsDialog({
   const [isPurchasing, setIsPurchasing] = useState(false);
   
   const SEAT_PRICE = 34.95;
-  const totalPrice = (quantity * SEAT_PRICE).toFixed(2);
+  const BASE_SUBSCRIPTION = 99.00;
+  const WHITELABEL_PRICE = 49.95;
+  
+  // Cost of new seats being added
+  const newSeatsCost = quantity * SEAT_PRICE;
+  const totalPrice = newSeatsCost.toFixed(2);
+  
+  // Full new monthly total (current bill + new seats)
+  const currentPaidSeatsCost = paidSeats * SEAT_PRICE;
+  const whitelabelCost = hasWhitelabelBranding ? WHITELABEL_PRICE : 0;
+  const currentMonthlyTotal = BASE_SUBSCRIPTION + currentPaidSeatsCost + whitelabelCost;
+  const newMonthlyTotal = currentMonthlyTotal + newSeatsCost;
 
   const handlePurchase = async () => {
     setIsPurchasing(true);
@@ -95,17 +106,6 @@ export function PurchaseSeatsDialog({
           
           {/* Billing Summary - shows current bill + what's being added */}
           {(() => {
-            // Current costs
-            const BASE_SUBSCRIPTION = 99.00;
-            const WHITELABEL_PRICE = 49.95;
-            const currentPaidSeatsCost = paidSeats * SEAT_PRICE;
-            const whitelabelCost = hasWhitelabelBranding ? WHITELABEL_PRICE : 0;
-            const currentMonthlyTotal = BASE_SUBSCRIPTION + currentPaidSeatsCost + whitelabelCost;
-            
-            // New costs after adding seats
-            const newSeatsCost = quantity * SEAT_PRICE;
-            const newMonthlyTotal = currentMonthlyTotal + newSeatsCost;
-            
             return (
               <div className={`p-4 rounded-lg border ${isTrialing ? 'bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800' : 'bg-muted/50 border-border'}`}>
                 <div className="flex items-start gap-3">
@@ -226,8 +226,8 @@ export function PurchaseSeatsDialog({
                 </div>
               </div>
               <div className="border-t pt-3 flex items-center justify-between gap-2">
-                <p className="font-medium">Monthly Total</p>
-                <p className="font-bold text-xl text-primary">${totalPrice}/month</p>
+                <p className="font-medium">New Monthly Total</p>
+                <p className="font-bold text-xl text-primary">${newMonthlyTotal.toFixed(2)}/month</p>
               </div>
             </div>
             <p className="text-xs text-muted-foreground">
@@ -247,7 +247,7 @@ export function PurchaseSeatsDialog({
               data-testid="button-confirm-purchase-seats"
             >
               <span className="material-icons text-sm mr-1">shopping_cart</span>
-              Confirm Purchase - ${totalPrice}
+              Add {quantity} Seat{quantity > 1 ? 's' : ''} (+${totalPrice}/mo)
             </Button>
           </DialogFooter>
         </DialogContent>
