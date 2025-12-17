@@ -249,7 +249,8 @@ export default function BuildingPortal() {
         title: "Login Successful",
         description: "Welcome to your building portal.",
       });
-      // Force immediate refetch to update the portal data after login
+      // Reset and refetch the portal query to clear any previous error state
+      await queryClient.resetQueries({ queryKey: ["/api/building/portal"] });
       await refetchPortal();
     },
     onError: (error: any) => {
