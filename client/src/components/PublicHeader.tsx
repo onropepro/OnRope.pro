@@ -132,7 +132,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                 Employer
               </Button>
               {showModulesMenu && (
-                <div className="absolute top-full left-0 mt-1 bg-card border border-border rounded-xl shadow-xl p-4 w-[960px] z-50">
+                <div className="absolute top-full right-0 mt-1 bg-card border border-border rounded-xl shadow-xl p-4 w-[960px] z-50">
                   <div className="flex gap-3">
                     {/* Column 1: Safety & Operations (4 items, Document Management at bottom) */}
                     <div className="flex-1 flex flex-col gap-2">
