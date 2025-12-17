@@ -42,7 +42,7 @@ const guideLinks: GuideLink[] = [
   { name: "Company Safety Rating (CSR)", path: "/changelog/csr", icon: Star },
   { name: "Document Management", path: "/changelog/documents", icon: FileText },
   { name: "Employee Management", path: "/changelog/employees", icon: Users },
-  { name: "Technician Self-Registration", path: "/changelog/technician-registration", icon: HardHat },
+  { name: "Technician Passport", path: "/changelog/technician-registration", icon: HardHat },
   { name: "Scheduling & Calendar", path: "/changelog/scheduling", icon: Calendar },
   { name: "Gear Inventory", path: "/changelog/inventory", icon: Package },
   { name: "Payroll & Financial", path: "/changelog/payroll", icon: CreditCard },
