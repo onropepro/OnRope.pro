@@ -354,6 +354,53 @@ export default function Quotes() {
   // Tax information based on building address
   const [currentTaxInfo, setCurrentTaxInfo] = useState<TaxInfo | null>(null);
   const [editTaxInfo, setEditTaxInfo] = useState<TaxInfo | null>(null);
+  
+  // Helper function to detect tax from a full address string
+  const detectTaxFromAddress = (address: string): TaxInfo | null => {
+    if (!address) return null;
+    
+    // Canadian province codes and names
+    const canadianProvinces = ['AB', 'BC', 'MB', 'NB', 'NL', 'NS', 'NT', 'NU', 'ON', 'PE', 'QC', 'SK', 'YT',
+      'Alberta', 'British Columbia', 'Manitoba', 'New Brunswick', 'Newfoundland', 'Nova Scotia', 
+      'Northwest Territories', 'Nunavut', 'Ontario', 'Prince Edward Island', 'Quebec', 'Saskatchewan', 'Yukon'];
+    
+    // US state codes
+    const usStates = ['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA',
+      'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY',
+      'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'];
+    
+    // Try to detect country first
+    const isCanada = /canada/i.test(address);
+    const isUSA = /\b(USA|United States|US)\b/i.test(address);
+    
+    // Parse address parts
+    const parts = address.split(',').map(p => p.trim());
+    
+    // Look for province/state in address parts
+    for (const part of parts) {
+      // Check for Canadian provinces (format: "BC V2R 4P4" or just "BC")
+      for (const prov of canadianProvinces) {
+        const regex = new RegExp(`\\b${prov}\\b`, 'i');
+        if (regex.test(part)) {
+          const taxInfo = getTaxInfo(prov, 'Canada');
+          if (taxInfo) return taxInfo;
+        }
+      }
+      
+      // Check for US states (format: "CA 90210" or just "CA")
+      if (!isCanada) {
+        for (const state of usStates) {
+          const regex = new RegExp(`\\b${state}\\b`, 'i');
+          if (regex.test(part)) {
+            const taxInfo = getTaxInfo(state, 'US');
+            if (taxInfo) return taxInfo;
+          }
+        }
+      }
+    }
+    
+    return null;
+  };
 
   // Building info form
   const buildingForm = useForm<BuildingInfoFormData>({
@@ -3052,6 +3099,13 @@ export default function Quotes() {
                                   buildingForm.setValue('buildingAddress', property.address || '');
                                   if (property.stories) {
                                     buildingForm.setValue('floorCount', property.stories);
+                                  }
+                                  // Detect tax from the autofilled address
+                                  if (property.address) {
+                                    const taxInfo = detectTaxFromAddress(property.address);
+                                    if (taxInfo) {
+                                      setCurrentTaxInfo(taxInfo);
+                                    }
                                   }
                                   toast({
                                     title: "Property details filled",
