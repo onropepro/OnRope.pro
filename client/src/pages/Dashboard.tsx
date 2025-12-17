@@ -548,17 +548,54 @@ function SortableCard({ card, isRearranging, colorIndex, brandColors }: { card: 
   );
 }
 
+// Helper function to group projects by date (year/month/day)
+// Uses numeric keys for proper sorting, with locale-safe month names for display
+function groupProjectsByDate(projects: Project[], dateField: 'updatedAt' | 'endDate' = 'updatedAt') {
+  const grouped: Record<string, Record<string, { monthName: string; days: Record<string, Project[]> }>> = {};
+  
+  projects.forEach(project => {
+    const date = project[dateField] ? new Date(project[dateField] as string | Date) : new Date();
+    const year = date.getFullYear().toString();
+    const monthNum = date.getMonth().toString().padStart(2, '0'); // 00-11 for proper sorting
+    const monthName = date.toLocaleString('default', { month: 'long' });
+    const day = date.getDate().toString().padStart(2, '0'); // Pad for proper sorting
+    
+    if (!grouped[year]) grouped[year] = {};
+    if (!grouped[year][monthNum]) grouped[year][monthNum] = { monthName, days: {} };
+    if (!grouped[year][monthNum].days[day]) grouped[year][monthNum].days[day] = [];
+    
+    grouped[year][monthNum].days[day].push(project);
+  });
+  
+  return grouped;
+}
+
 // Deleted Projects Tab Component
 function DeletedProjectsTab() {
   const { t } = useTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [searchQuery, setSearchQuery] = useState("");
   
   const { data: deletedProjectsData, isLoading } = useQuery<{ projects: Project[] }>({
     queryKey: ["/api/projects/deleted/list"],
   });
   
   const deletedProjects = deletedProjectsData?.projects || [];
+  
+  // Filter projects based on search query
+  const filteredProjects = deletedProjects.filter(project => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    const buildingName = (project.buildingName || "").toLowerCase();
+    const strata = (project.strataPlanNumber || "").toLowerCase();
+    const deletedDate = project.updatedAt ? formatTimestampDate(project.updatedAt).toLowerCase() : "";
+    return buildingName.includes(query) || strata.includes(query) || deletedDate.includes(query);
+  });
+  
+  // Group filtered projects by date
+  const groupedProjects = groupProjectsByDate(filteredProjects, 'updatedAt');
+  const sortedYears = Object.keys(groupedProjects).sort((a, b) => parseInt(b) - parseInt(a));
   
   const restoreMutation = useMutation({
     mutationFn: async (projectId: string) => {
@@ -585,57 +622,198 @@ function DeletedProjectsTab() {
   
   return (
     <div className="space-y-4">
-      {deletedProjects.length === 0 ? (
+      <div className="relative">
+        <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">search</span>
+        <Input
+          placeholder={t('dashboard.deletedProjects.searchPlaceholder', 'Search by building name, strata number, or date...')}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-10"
+          data-testid="input-search-deleted-projects"
+        />
+      </div>
+      
+      {filteredProjects.length === 0 ? (
         <Card>
           <CardContent className="p-8 text-center text-muted-foreground">
             <span className="material-icons text-4xl mb-2 opacity-50">delete</span>
-            <div>{t('dashboard.deletedProjects.noDeleted', 'No deleted projects')}</div>
+            <div>{searchQuery ? t('dashboard.deletedProjects.noResults', 'No deleted projects match your search') : t('dashboard.deletedProjects.noDeleted', 'No deleted projects')}</div>
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-4">
-          {deletedProjects.map((project: Project) => (
-            <Card 
-              key={project.id} 
-              className="group border-l-4 border-l-destructive shadow-md hover:shadow-lg transition-all duration-200 bg-gradient-to-br from-background to-destructive/5" 
-              data-testid={`deleted-project-${project.id}`}
-            >
-              <CardContent className="p-5">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="text-lg font-bold mb-1">{project.buildingName}</div>
-                    <div className="text-sm font-medium text-muted-foreground mb-1">{project.strataPlanNumber}</div>
-                    <div className="text-sm text-muted-foreground capitalize flex items-center gap-2">
-                      <span className="material-icons text-base text-destructive">delete</span>
-                      {getJobTypeLabel(t, project.jobType)}
-                    </div>
-                    {project.updatedAt && (
-                      <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-                        <span className="material-icons text-xs">event</span>
-                        {t('dashboard.deletedProjects.deleted', 'Deleted')} {formatTimestampDate(project.updatedAt)}
+        <div className="space-y-6">
+          {sortedYears.map(year => (
+            <div key={year} className="space-y-4">
+              <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
+                <span className="material-icons text-base">calendar_today</span>
+                {year}
+              </h3>
+              {Object.keys(groupedProjects[year]).sort((a, b) => b.localeCompare(a)).map(monthNum => {
+                const monthData = groupedProjects[year][monthNum];
+                return (
+                  <div key={monthNum} className="space-y-3 ml-4">
+                    <h4 className="text-base font-semibold text-muted-foreground">{monthData.monthName}</h4>
+                    {Object.keys(monthData.days).sort((a, b) => b.localeCompare(a)).map(day => (
+                      <div key={day} className="space-y-2 ml-4">
+                        <h5 className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+                          <span className="material-icons text-xs">event</span>
+                          {monthData.monthName} {parseInt(day)}, {year}
+                        </h5>
+                        {monthData.days[day].map((project: Project) => (
+                          <Card 
+                            key={project.id} 
+                            className="group shadow-md hover:shadow-lg transition-all duration-200 bg-gradient-to-br from-background to-destructive/5" 
+                            data-testid={`deleted-project-${project.id}`}
+                          >
+                            <CardContent className="p-4">
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="flex-1 min-w-0">
+                                  <div className="text-base font-bold mb-0.5 truncate">{project.buildingName}</div>
+                                  <div className="text-sm text-muted-foreground mb-0.5">{project.strataPlanNumber}</div>
+                                  <div className="text-sm text-muted-foreground capitalize flex items-center gap-1">
+                                    <span className="material-icons text-sm text-destructive">delete</span>
+                                    {getJobTypeLabel(t, project.jobType)}
+                                  </div>
+                                </div>
+                                <div className="flex flex-col gap-2 flex-shrink-0">
+                                  <Badge variant="destructive" className="flex items-center gap-1">
+                                    <span className="material-icons text-xs">delete</span>
+                                    {t('dashboard.deletedProjects.deleted', 'Deleted')}
+                                  </Badge>
+                                  <Button
+                                    size="sm"
+                                    variant="default"
+                                    onClick={() => restoreMutation.mutate(project.id)}
+                                    disabled={restoreMutation.isPending}
+                                    data-testid={`button-restore-${project.id}`}
+                                  >
+                                    <span className="material-icons text-sm mr-1">restore</span>
+                                    {t('dashboard.deletedProjects.restore', 'Restore')}
+                                  </Button>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
                       </div>
-                    )}
+                    ))}
                   </div>
-                  <div className="flex flex-col gap-2">
-                    <Badge variant="destructive" className="flex items-center gap-1">
-                      <span className="material-icons text-xs">delete</span>
-                      {t('dashboard.deletedProjects.deleted', 'Deleted')}
-                    </Badge>
-                    <Button
-                      size="sm"
-                      variant="default"
-                      onClick={() => restoreMutation.mutate(project.id)}
-                      disabled={restoreMutation.isPending}
-                      data-testid={`button-restore-${project.id}`}
-                      className="w-full"
-                    >
-                      <span className="material-icons text-sm mr-1">restore</span>
-                      {t('dashboard.deletedProjects.restore', 'Restore')}
-                    </Button>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Completed Projects Tab Component
+function CompletedProjectsTab() {
+  const { t } = useTranslation();
+  const [, setLocation] = useLocation();
+  const [searchQuery, setSearchQuery] = useState("");
+  
+  const { data: projectsData, isLoading } = useQuery<{ projects: Project[] }>({
+    queryKey: ["/api/projects"],
+  });
+  
+  const allProjects = projectsData?.projects || [];
+  const completedProjects = allProjects.filter(p => p.status === "completed" && !p.deleted);
+  
+  // Filter projects based on search query
+  const filteredProjects = completedProjects.filter(project => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    const buildingName = (project.buildingName || "").toLowerCase();
+    const strata = (project.strataPlanNumber || "").toLowerCase();
+    const completedDate = project.endDate ? formatTimestampDate(project.endDate).toLowerCase() : "";
+    const updatedDate = project.updatedAt ? formatTimestampDate(project.updatedAt).toLowerCase() : "";
+    return buildingName.includes(query) || strata.includes(query) || completedDate.includes(query) || updatedDate.includes(query);
+  });
+  
+  // Group filtered projects by date (using updatedAt as completion date)
+  const groupedProjects = groupProjectsByDate(filteredProjects, 'updatedAt');
+  const sortedYears = Object.keys(groupedProjects).sort((a, b) => parseInt(b) - parseInt(a));
+  
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <div className="text-muted-foreground">{t('common.loading', 'Loading...')}</div>
+      </div>
+    );
+  }
+  
+  return (
+    <div className="space-y-4">
+      <div className="relative">
+        <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">search</span>
+        <Input
+          placeholder={t('dashboard.completedProjects.searchPlaceholder', 'Search by building name, strata number, or date...')}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-10"
+          data-testid="input-search-completed-projects"
+        />
+      </div>
+      
+      {filteredProjects.length === 0 ? (
+        <Card>
+          <CardContent className="p-8 text-center text-muted-foreground">
+            <span className="material-icons text-4xl mb-2 opacity-50">done_all</span>
+            <div>{searchQuery ? t('dashboard.completedProjects.noResults', 'No completed projects match your search') : t('dashboard.projects.noCompletedProjects', 'No completed projects yet')}</div>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-6">
+          {sortedYears.map(year => (
+            <div key={year} className="space-y-4">
+              <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
+                <span className="material-icons text-base">calendar_today</span>
+                {year}
+              </h3>
+              {Object.keys(groupedProjects[year]).sort((a, b) => b.localeCompare(a)).map(monthNum => {
+                const monthData = groupedProjects[year][monthNum];
+                return (
+                  <div key={monthNum} className="space-y-3 ml-4">
+                    <h4 className="text-base font-semibold text-muted-foreground">{monthData.monthName}</h4>
+                    {Object.keys(monthData.days).sort((a, b) => b.localeCompare(a)).map(day => (
+                      <div key={day} className="space-y-2 ml-4">
+                        <h5 className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+                          <span className="material-icons text-xs">event</span>
+                          {monthData.monthName} {parseInt(day)}, {year}
+                        </h5>
+                        {monthData.days[day].map((project: Project) => (
+                          <Card 
+                            key={project.id} 
+                            className="group shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer bg-gradient-to-br from-background to-success/5" 
+                            data-testid={`completed-project-${project.id}`}
+                            onClick={() => setLocation(`/projects/${project.id}`)}
+                          >
+                            <CardContent className="p-4">
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="flex-1 min-w-0">
+                                  <div className="text-base font-bold mb-0.5 truncate">{project.buildingName}</div>
+                                  <div className="text-sm text-muted-foreground mb-0.5">{project.strataPlanNumber}</div>
+                                  <div className="text-sm text-muted-foreground capitalize flex items-center gap-1">
+                                    <span className="material-icons text-sm text-success">check_circle</span>
+                                    {getJobTypeLabel(t, project.jobType)}
+                                  </div>
+                                </div>
+                                <Badge variant="outline" className="bg-success/10 text-success border-success/30 flex-shrink-0">
+                                  <span className="material-icons text-xs mr-1">check_circle</span>
+                                  {t('dashboard.projects.completed', 'Completed')}
+                                </Badge>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    ))}
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                );
+              })}
+            </div>
           ))}
         </div>
       )}
@@ -4987,41 +5165,7 @@ export default function Dashboard() {
                     </TabsList>
 
                     <TabsContent value="completed" className="space-y-4">
-                      {filteredProjects.filter((p: Project) => p.status === "completed").length === 0 ? (
-                        <Card>
-                          <CardContent className="p-8 text-center text-muted-foreground">
-                            <span className="material-icons text-4xl mb-2 opacity-50">done_all</span>
-                            <div>{t('dashboard.projects.noCompletedProjects', 'No completed projects yet')}</div>
-                          </CardContent>
-                        </Card>
-                      ) : (
-                        <div className="space-y-4">
-                          {filteredProjects.filter((p: Project) => p.status === "completed").map((project: Project) => (
-                            <Card 
-                              key={project.id} 
-                              className="group border-l-4 border-l-success shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer bg-gradient-to-br from-background to-success/5" 
-                              data-testid={`completed-project-${project.id}`}
-                              onClick={() => setLocation(`/projects/${project.id}`)}
-                            >
-                              <CardContent className="p-5">
-                                <div className="flex items-start justify-between">
-                                  <div className="flex-1">
-                                    <div className="text-lg font-bold mb-1">{project.buildingName}</div>
-                                    <div className="text-sm font-medium text-muted-foreground mb-1">{project.strataPlanNumber}</div>
-                                    <div className="text-sm text-muted-foreground capitalize flex items-center gap-2">
-                                      <span className="material-icons text-base text-success">check_circle</span>
-                                      {getJobTypeLabel(t, project.jobType)}
-                                    </div>
-                                  </div>
-                                  <Badge variant="outline" className="bg-success/10 text-success border-success/30">
-                                    {t('dashboard.projects.completed', 'Completed')}
-                                  </Badge>
-                                </div>
-                              </CardContent>
-                            </Card>
-                          ))}
-                        </div>
-                      )}
+                      <CompletedProjectsTab />
                     </TabsContent>
 
                     <TabsContent value="deleted" className="space-y-4">
