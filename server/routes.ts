@@ -8949,10 +8949,136 @@ export async function registerRoutes(app: Express): Promise<Server> {
         colors: company.whitelabelBrandingActive ? (company.brandingColors || []) : [],
         companyName: company.companyName,
         subscriptionActive: company.whitelabelBrandingActive || false,
+        pwaAppIconUrl: company.whitelabelBrandingActive ? company.pwaAppIconUrl : null,
       });
     } catch (error) {
       console.error("Error fetching company branding:", error);
       res.status(500).json({ message: "Failed to fetch branding" });
+    }
+  });
+  
+  // Upload PWA app icon for white label branding
+  app.post("/api/company/branding/pwa-icon", requireAuth, requireRole("company"), imageUpload.single('icon'), async (req: Request, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser || currentUser.role !== "company") {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      // Generate unique filename
+      const timestamp = Date.now();
+      const filename = `pwa-icon-${currentUser.id}-${timestamp}.png`;
+
+      // Upload to public object storage
+      const objectStorageService = new ObjectStorageService();
+      const url = await objectStorageService.uploadPublicFile(
+        filename,
+        req.file.buffer,
+        'image/png'
+      );
+
+      // Update company's PWA app icon URL
+      await storage.updateUser(currentUser.id, {
+        pwaAppIconUrl: url
+      });
+
+      res.json({ url });
+    } catch (error) {
+      console.error("PWA icon upload error:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to upload icon";
+      res.status(500).json({ message: `Upload failed: ${errorMessage}` });
+    }
+  });
+  
+  // Dynamic manifest.json for PWA white-label support
+  app.get("/api/manifest.json", async (req: Request, res: Response) => {
+    try {
+      // Default manifest
+      const defaultManifest = {
+        name: 'OnRopePro - Rope Access Management',
+        short_name: 'OnRopePro',
+        description: 'Professional rope access and building maintenance management platform',
+        theme_color: '#1e293b',
+        background_color: '#ffffff',
+        display: 'standalone',
+        orientation: 'portrait',
+        start_url: '/',
+        scope: '/',
+        icons: [
+          {
+            src: '/pwa-192x192.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: '/pwa-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any maskable'
+          }
+        ]
+      };
+
+      // Check if user is logged in and has white-label branding
+      if (req.session && req.session.userId) {
+        const user = await storage.getUserById(req.session.userId);
+        
+        if (user) {
+          // Get the company (either the user is company, or get their companyId)
+          const companyId = user.role === 'company' ? user.id : user.companyId;
+          
+          if (companyId) {
+            const company = await storage.getUserById(companyId);
+            
+            if (company && company.whitelabelBrandingActive && company.pwaAppIconUrl) {
+              // Return white-labeled manifest
+              const customManifest = {
+                ...defaultManifest,
+                name: company.companyName || defaultManifest.name,
+                short_name: company.companyName?.substring(0, 12) || defaultManifest.short_name,
+                theme_color: company.brandingColors?.[0] || defaultManifest.theme_color,
+                icons: [
+                  {
+                    src: company.pwaAppIconUrl,
+                    sizes: '192x192',
+                    type: 'image/png'
+                  },
+                  {
+                    src: company.pwaAppIconUrl,
+                    sizes: '512x512',
+                    type: 'image/png',
+                    purpose: 'any maskable'
+                  }
+                ]
+              };
+              
+              res.setHeader('Content-Type', 'application/manifest+json');
+              return res.json(customManifest);
+            }
+          }
+        }
+      }
+
+      res.setHeader('Content-Type', 'application/manifest+json');
+      res.json(defaultManifest);
+    } catch (error) {
+      console.error("Error serving manifest:", error);
+      // Return default manifest on error
+      res.setHeader('Content-Type', 'application/manifest+json');
+      res.json({
+        name: 'OnRopePro - Rope Access Management',
+        short_name: 'OnRopePro',
+        display: 'standalone',
+        start_url: '/',
+        icons: [
+          { src: '/pwa-192x192.png', sizes: '192x192', type: 'image/png' },
+          { src: '/pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+        ]
+      });
     }
   });
   
