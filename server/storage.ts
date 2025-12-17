@@ -3225,10 +3225,23 @@ export class Storage {
     
     // Filter projects by normalized strata number
     // Only include projects that have a strataPlanNumber AND it matches the filter
-    return allProjects.filter(project => {
+    const filteredProjects = allProjects.filter(project => {
       const projectStrata = normalizeStrata(project.strataPlanNumber);
       return projectStrata !== null && projectStrata === normalizedStrata;
     });
+    
+    // Get the actual building name from the buildings table (if it exists)
+    const [building] = await db.select()
+      .from(buildings)
+      .where(eq(buildings.strataPlanNumber, normalizedStrata))
+      .limit(1);
+    
+    // Enhance projects with actual building name
+    return filteredProjects.map(project => ({
+      ...project,
+      // Use buildings table name if available, fall back to project's buildingName
+      buildingName: building?.buildingName || project.buildingName
+    }));
   }
 
   async getPropertyManagerProjectDetails(projectId: string, companyId: string, normalizedStrata: string): Promise<{ project: any; complaints: any[]; buildingInstructions: any | null }> {
