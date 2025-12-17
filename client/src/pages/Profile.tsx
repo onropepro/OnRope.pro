@@ -66,6 +66,14 @@ function BrandColorsSection({ user }: { user: any }) {
   }, [user?.brandingColors]);
 
   const addColor = () => {
+    if (colors.length >= 2) {
+      toast({
+        title: "Limit reached",
+        description: "You can only have up to 2 brand colors",
+        variant: "destructive"
+      });
+      return;
+    }
     setColors([...colors, '#3b82f6']);
   };
 
@@ -115,7 +123,7 @@ function BrandColorsSection({ user }: { user: any }) {
       <div>
         <Label className="text-sm font-medium">Brand Colors</Label>
         <p className="text-xs text-muted-foreground mt-1">
-          Choose colors that match your brand identity. These colors will be applied to the resident portal.
+          Choose up to 2 colors that match your brand identity. These colors will be applied to the resident portal.
         </p>
       </div>
 
@@ -153,15 +161,17 @@ function BrandColorsSection({ user }: { user: any }) {
       </div>
 
       <div className="flex gap-2">
-        <Button
-          variant="outline"
-          onClick={addColor}
-          data-testid="button-add-color"
-          className="h-12"
-        >
-          <span className="material-icons mr-2">add</span>
-          Add Color
-        </Button>
+        {colors.length < 2 && (
+          <Button
+            variant="outline"
+            onClick={addColor}
+            data-testid="button-add-color"
+            className="h-12"
+          >
+            <span className="material-icons mr-2">add</span>
+            Add Color
+          </Button>
+        )}
         <Button
           onClick={saveColors}
           disabled={isSaving}
