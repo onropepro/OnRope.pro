@@ -5025,41 +5025,7 @@ export default function Dashboard() {
                     </TabsContent>
 
                     <TabsContent value="deleted" className="space-y-4">
-                      {filteredProjects.filter((p: Project) => p.status === "deleted").length === 0 ? (
-                        <Card>
-                          <CardContent className="p-8 text-center text-muted-foreground">
-                            <span className="material-icons text-4xl mb-2 opacity-50">delete_outline</span>
-                            <div>{t('dashboard.projects.noDeletedProjects', 'No deleted projects')}</div>
-                          </CardContent>
-                        </Card>
-                      ) : (
-                        <div className="space-y-4">
-                          {filteredProjects.filter((p: Project) => p.status === "deleted").map((project: Project) => (
-                            <Card 
-                              key={project.id} 
-                              className="group border-l-4 border-l-destructive/50 shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer bg-gradient-to-br from-background to-destructive/5 opacity-75" 
-                              data-testid={`deleted-project-${project.id}`}
-                              onClick={() => setLocation(`/projects/${project.id}`)}
-                            >
-                              <CardContent className="p-5">
-                                <div className="flex items-start justify-between">
-                                  <div className="flex-1">
-                                    <div className="text-lg font-bold mb-1">{project.buildingName}</div>
-                                    <div className="text-sm font-medium text-muted-foreground mb-1">{project.strataPlanNumber}</div>
-                                    <div className="text-sm text-muted-foreground capitalize flex items-center gap-2">
-                                      <span className="material-icons text-base text-destructive/70">delete</span>
-                                      {getJobTypeLabel(t, project.jobType)}
-                                    </div>
-                                  </div>
-                                  <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/30">
-                                    {t('dashboard.projects.deleted', 'Deleted')}
-                                  </Badge>
-                                </div>
-                              </CardContent>
-                            </Card>
-                          ))}
-                        </div>
-                      )}
+                      <DeletedProjectsTab />
                     </TabsContent>
                   </Tabs>
                 )}
