@@ -66,6 +66,10 @@ export default function ProjectDetail() {
   const { toast } = useToast();
   const { t } = useTranslation();
   const [renderError, setRenderError] = useState<Error | null>(null);
+  
+  // Check if user came from building portal (via query param or by session type)
+  const searchParams = new URLSearchParams(window.location.search);
+  const fromSource = searchParams.get('from');
 
   // Catch any render errors
   useEffect(() => {
@@ -189,6 +193,12 @@ export default function ProjectDetail() {
   });
 
   const currentUser = userData?.user;
+  
+  // Determine back navigation path:
+  // 1. If ?from=building query param is set, go to Building Portal
+  // 2. If no user data (building session), go to Building Portal
+  // 3. Otherwise, go to Dashboard
+  const backPath = fromSource === 'building' ? '/building' : (currentUser ? '/dashboard' : '/building');
   
   // Check if user can view financial data using centralized permission helper
   const canViewFinancialData = hasFinancialAccess(currentUser);
@@ -1269,7 +1279,7 @@ export default function ProjectDetail() {
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
-              onClick={() => setLocation("/dashboard")}
+              onClick={() => setLocation(backPath)}
               className="h-12 gap-2"
               data-testid="button-back"
             >
