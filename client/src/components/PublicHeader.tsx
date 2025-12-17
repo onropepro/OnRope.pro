@@ -132,216 +132,225 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                 Employer
               </Button>
               {showModulesMenu && (
-                <div className="absolute top-full left-0 mt-1 bg-card border border-border rounded-xl shadow-xl p-4 w-[480px] z-50">
-                  <div className="grid grid-cols-2 gap-3">
-                    <button
-                      className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
-                      onClick={() => {
-                        setLocation("/modules/safety-compliance");
-                        setShowModulesMenu(false);
-                      }}
-                      data-testid="nav-safety-compliance"
-                    >
-                      <div className="w-10 h-10 rounded-lg bg-sky-100 dark:bg-sky-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                        <Shield className="w-5 h-5 text-sky-600" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-sm">Safety & Compliance</div>
-                        <div className="text-xs text-muted-foreground mt-0.5">Harness inspections, toolbox meetings, audit-ready exports</div>
-                      </div>
-                    </button>
-                    <button
-                      className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
-                      onClick={() => {
-                        setLocation("/modules/user-access-authentication");
-                        setShowModulesMenu(false);
-                      }}
-                      data-testid="nav-user-access"
-                    >
-                      <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                        <Lock className="w-5 h-5 text-blue-600" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-sm">User Access & Authentication</div>
-                        <div className="text-xs text-muted-foreground mt-0.5">Granular permissions, role-based access, audit trails</div>
-                      </div>
-                    </button>
-                    <button
-                      className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
-                      onClick={() => {
-                        setLocation("/modules/project-management");
-                        setShowModulesMenu(false);
-                      }}
-                      data-testid="nav-project-management"
-                    >
-                      <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                        <Briefcase className="w-5 h-5 text-emerald-600" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-sm">Project Management</div>
-                        <div className="text-xs text-muted-foreground mt-0.5">4-elevation tracking, real-time dashboards, crew scheduling</div>
-                      </div>
-                    </button>
-                    <button
-                      className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
-                      onClick={() => {
-                        setLocation("/modules/company-safety-rating");
-                        setShowModulesMenu(false);
-                      }}
-                      data-testid="nav-company-safety-rating"
-                    >
-                      <div className="w-10 h-10 rounded-lg bg-orange-100 dark:bg-orange-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                        <Gauge className="w-5 h-5 text-orange-600" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-sm">Company Safety Rating</div>
-                        <div className="text-xs text-muted-foreground mt-0.5">Penalty-based compliance scoring, real-time safety posture</div>
-                      </div>
-                    </button>
-                    <button
-                      className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
-                      onClick={() => {
-                        setLocation("/modules/work-session-time-tracking");
-                        setShowModulesMenu(false);
-                      }}
-                      data-testid="nav-work-session-time-tracking"
-                    >
-                      <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                        <Clock className="w-5 h-5 text-amber-600" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-sm">Work Session & Time Tracking</div>
-                        <div className="text-xs text-muted-foreground mt-0.5">GPS clock-in, drop tracking, automatic payroll aggregation</div>
-                      </div>
-                    </button>
-                    <button
-                      className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
-                      onClick={() => {
-                        setLocation("/modules/irata-sprat-task-logging");
-                        setShowModulesMenu(false);
-                      }}
-                      data-testid="nav-irata-task-logging"
-                    >
-                      <div className="w-10 h-10 rounded-lg bg-cyan-100 dark:bg-cyan-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                        <ClipboardCheck className="w-5 h-5 text-cyan-600" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-sm">IRATA/SPRAT Task Logging</div>
-                        <div className="text-xs text-muted-foreground mt-0.5">Same-day hour logging, OCR import, career-portable records</div>
-                      </div>
-                    </button>
-                    <button
-                      className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
-                      onClick={() => {
-                        setLocation("/modules/document-management");
-                        setShowModulesMenu(false);
-                      }}
-                      data-testid="nav-document-management"
-                    >
-                      <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                        <FileText className="w-5 h-5 text-violet-600" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-sm">Document Management</div>
-                        <div className="text-xs text-muted-foreground mt-0.5">Digital signatures, immutable audit trails, compliance reporting</div>
-                      </div>
-                    </button>
-                    <button
-                      className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
-                      onClick={() => {
-                        setLocation("/modules/employee-management");
-                        setShowModulesMenu(false);
-                      }}
-                      data-testid="nav-employee-management"
-                    >
-                      <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                        <Users className="w-5 h-5 text-blue-600" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-sm">Employee Management</div>
-                        <div className="text-xs text-muted-foreground mt-0.5">Portable identities, certification tracking, permissions</div>
-                      </div>
-                    </button>
-                    <button
-                      className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
-                      onClick={() => {
-                        setLocation("/modules/technician-passport");
-                        setShowModulesMenu(false);
-                      }}
-                      data-testid="nav-technician-passport"
-                    >
-                      <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                        <IdCard className="w-5 h-5 text-amber-600" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-sm">Technician Passport</div>
-                        <div className="text-xs text-muted-foreground mt-0.5">Portable work history, certifications, career-long records</div>
-                      </div>
-                    </button>
-                    <button
-                      className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
-                      onClick={() => {
-                        setLocation("/modules/employer-job-board");
-                        setShowModulesMenu(false);
-                      }}
-                      data-testid="nav-employer-job-board"
-                    >
-                      <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                        <Search className="w-5 h-5 text-blue-600" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-sm">Job Board Ecosystem</div>
-                        <div className="text-xs text-muted-foreground mt-0.5">Talent browser, unlimited postings, direct offers</div>
-                      </div>
-                    </button>
-                    <button
-                      className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
-                      onClick={() => {
-                        setLocation("/modules/gear-inventory");
-                        setShowModulesMenu(false);
-                      }}
-                      data-testid="nav-gear-inventory"
-                    >
-                      <div className="w-10 h-10 rounded-lg bg-teal-100 dark:bg-teal-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                        <Package className="w-5 h-5 text-teal-600" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-sm">Gear Inventory Management</div>
-                        <div className="text-xs text-muted-foreground mt-0.5">Equipment tracking, assignments, service life</div>
-                      </div>
-                    </button>
-                    <button
-                      className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
-                      onClick={() => {
-                        setLocation("/modules/scheduling-calendar");
-                        setShowModulesMenu(false);
-                      }}
-                      data-testid="nav-scheduling-calendar"
-                    >
-                      <div className="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                        <Calendar className="w-5 h-5 text-indigo-600" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-sm">Scheduling & Calendar</div>
-                        <div className="text-xs text-muted-foreground mt-0.5">Conflict detection, dual calendars, time-off management</div>
-                      </div>
-                    </button>
-                    <button
-                      className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
-                      onClick={() => {
-                        setLocation("/modules/payroll-financial");
-                        setShowModulesMenu(false);
-                      }}
-                      data-testid="nav-payroll-financial"
-                    >
-                      <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                        <DollarSign className="w-5 h-5 text-emerald-600" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-sm">Payroll & Financial</div>
-                        <div className="text-xs text-muted-foreground mt-0.5">Automated timesheets, overtime calculation, payroll exports</div>
-                      </div>
-                    </button>
+                <div className="absolute top-full left-0 mt-1 bg-card border border-border rounded-xl shadow-xl p-4 w-[720px] z-50">
+                  <div className="flex gap-3">
+                    {/* Column 1: Safety & Operations (4 items, Document Management at bottom) */}
+                    <div className="flex-1 flex flex-col gap-2">
+                      <button
+                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                        onClick={() => {
+                          setLocation("/modules/safety-compliance");
+                          setShowModulesMenu(false);
+                        }}
+                        data-testid="nav-safety-compliance"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-sky-100 dark:bg-sky-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <Shield className="w-5 h-5 text-sky-600" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-sm">Safety & Compliance</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Harness inspections, toolbox meetings, audit-ready exports</div>
+                        </div>
+                      </button>
+                      <button
+                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                        onClick={() => {
+                          setLocation("/modules/project-management");
+                          setShowModulesMenu(false);
+                        }}
+                        data-testid="nav-project-management"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <Briefcase className="w-5 h-5 text-emerald-600" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-sm">Project Management</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">4-elevation tracking, real-time dashboards, crew scheduling</div>
+                        </div>
+                      </button>
+                      <button
+                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                        onClick={() => {
+                          setLocation("/modules/work-session-time-tracking");
+                          setShowModulesMenu(false);
+                        }}
+                        data-testid="nav-work-session-time-tracking"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <Clock className="w-5 h-5 text-amber-600" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-sm">Work Session & Time Tracking</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">GPS clock-in, drop tracking, automatic payroll aggregation</div>
+                        </div>
+                      </button>
+                      <button
+                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                        onClick={() => {
+                          setLocation("/modules/document-management");
+                          setShowModulesMenu(false);
+                        }}
+                        data-testid="nav-document-management"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <FileText className="w-5 h-5 text-violet-600" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-sm">Document Management</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Digital signatures, immutable audit trails, compliance reporting</div>
+                        </div>
+                      </button>
+                    </div>
+                    {/* Column 2: Access & People (4 items) */}
+                    <div className="flex-1 flex flex-col gap-2">
+                      <button
+                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                        onClick={() => {
+                          setLocation("/modules/user-access-authentication");
+                          setShowModulesMenu(false);
+                        }}
+                        data-testid="nav-user-access"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <Lock className="w-5 h-5 text-blue-600" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-sm">User Access & Authentication</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Granular permissions, role-based access, audit trails</div>
+                        </div>
+                      </button>
+                      <button
+                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                        onClick={() => {
+                          setLocation("/modules/company-safety-rating");
+                          setShowModulesMenu(false);
+                        }}
+                        data-testid="nav-company-safety-rating"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-orange-100 dark:bg-orange-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <Gauge className="w-5 h-5 text-orange-600" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-sm">Company Safety Rating</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Penalty-based compliance scoring, real-time safety posture</div>
+                        </div>
+                      </button>
+                      <button
+                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                        onClick={() => {
+                          setLocation("/modules/irata-sprat-task-logging");
+                          setShowModulesMenu(false);
+                        }}
+                        data-testid="nav-irata-task-logging"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-cyan-100 dark:bg-cyan-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <ClipboardCheck className="w-5 h-5 text-cyan-600" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-sm">IRATA/SPRAT Task Logging</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Same-day hour logging, OCR import, career-portable records</div>
+                        </div>
+                      </button>
+                      <button
+                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                        onClick={() => {
+                          setLocation("/modules/employee-management");
+                          setShowModulesMenu(false);
+                        }}
+                        data-testid="nav-employee-management"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <Users className="w-5 h-5 text-blue-600" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-sm">Employee Management</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Portable identities, certification tracking, permissions</div>
+                        </div>
+                      </button>
+                    </div>
+                    {/* Column 3: Resources & Financial (5 items) */}
+                    <div className="flex-1 flex flex-col gap-2">
+                      <button
+                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                        onClick={() => {
+                          setLocation("/modules/technician-passport");
+                          setShowModulesMenu(false);
+                        }}
+                        data-testid="nav-technician-passport"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <IdCard className="w-5 h-5 text-amber-600" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-sm">Technician Passport</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Portable work history, certifications, career-long records</div>
+                        </div>
+                      </button>
+                      <button
+                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                        onClick={() => {
+                          setLocation("/modules/employer-job-board");
+                          setShowModulesMenu(false);
+                        }}
+                        data-testid="nav-employer-job-board"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <Search className="w-5 h-5 text-blue-600" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-sm">Job Board Ecosystem</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Talent browser, unlimited postings, direct offers</div>
+                        </div>
+                      </button>
+                      <button
+                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                        onClick={() => {
+                          setLocation("/modules/gear-inventory");
+                          setShowModulesMenu(false);
+                        }}
+                        data-testid="nav-gear-inventory"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-teal-100 dark:bg-teal-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <Package className="w-5 h-5 text-teal-600" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-sm">Gear Inventory Management</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Equipment tracking, assignments, service life</div>
+                        </div>
+                      </button>
+                      <button
+                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                        onClick={() => {
+                          setLocation("/modules/scheduling-calendar");
+                          setShowModulesMenu(false);
+                        }}
+                        data-testid="nav-scheduling-calendar"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <Calendar className="w-5 h-5 text-indigo-600" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-sm">Scheduling & Calendar</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Conflict detection, dual calendars, time-off management</div>
+                        </div>
+                      </button>
+                      <button
+                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                        onClick={() => {
+                          setLocation("/modules/payroll-financial");
+                          setShowModulesMenu(false);
+                        }}
+                        data-testid="nav-payroll-financial"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <DollarSign className="w-5 h-5 text-emerald-600" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-sm">Payroll & Financial</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Automated timesheets, overtime calculation, payroll exports</div>
+                        </div>
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
