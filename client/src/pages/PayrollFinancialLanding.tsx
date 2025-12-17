@@ -63,7 +63,7 @@ export default function PayrollFinancialLanding() {
       <PublicHeader activeNav="modules" />
 
       {/* Hero Section */}
-      <section className="relative text-white pb-[120px]" style={{backgroundImage: 'linear-gradient(135deg, #0B64A3 0%, #0369A1 100%)'}}>
+      <section className="relative text-white pb-[120px]" style={{backgroundImage: 'linear-gradient(135deg, #0B64A3 0%, #0369A1 100%)'}} data-testid="section-hero">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMtOS45NDEgMC0xOCA4LjA1OS0xOCAxOHM4LjA1OSAxOCAxOCAxOGM5Ljk0MSAwIDE4LTguMDU5IDE4LTE4cy04LjA1OS0xOC0xOC0xOHptMCAzMmMtNy43MzIgMC0xNC02LjI2OC0xNC0xNHM2LjI2OC0xNCAxNC0xNHMxNCA2LjI2OCAxNCAxNC02LjI2OCAxNC0xNCAxNHoiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wMykiLz48L2c+PC9zdmc+')] opacity-30"></div>
 
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
@@ -108,7 +108,7 @@ export default function PayrollFinancialLanding() {
       </section>
 
       {/* Stats Panel */}
-      <section className="relative bg-white dark:bg-slate-950 -mt-px overflow-visible">
+      <section className="relative bg-white dark:bg-slate-950 -mt-px overflow-visible" data-testid="section-stats">
         <div className="max-w-3xl mx-auto px-4 pt-4 pb-12">
           <Card className="shadow-xl border-0 relative z-20 -mt-20" data-testid="card-stats-panel">
             <CardContent className="p-8">
@@ -138,7 +138,7 @@ export default function PayrollFinancialLanding() {
       <Separator className="my-8" />
 
       {/* Problem Statement Section */}
-      <section className="py-16 md:py-20 px-4">
+      <section className="py-16 md:py-20 px-4" data-testid="section-problem-statement">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
             The Payroll Problem Nobody Admits
@@ -173,7 +173,7 @@ export default function PayrollFinancialLanding() {
       <Separator className="my-0" />
 
       {/* What This Module Does Section */}
-      <section id="features" className="pt-8 md:pt-12 pb-16 md:pb-20 px-4 bg-slate-50 dark:bg-slate-900">
+      <section id="features" className="pt-8 md:pt-12 pb-16 md:pb-20 px-4 bg-slate-50 dark:bg-slate-900" data-testid="section-what-module-does">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
             From Clock-In to Payroll Export
@@ -291,7 +291,7 @@ export default function PayrollFinancialLanding() {
       <Separator className="my-8" />
 
       {/* Who Benefits Section */}
-      <section className="py-16 md:py-20 px-4">
+      <section className="py-16 md:py-20 px-4" data-testid="section-who-benefits">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
             Who Benefits From This Module
@@ -419,7 +419,7 @@ export default function PayrollFinancialLanding() {
       <Separator className="my-8" />
 
       {/* Key Features Section */}
-      <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
+      <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900" data-testid="section-key-features">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
             Key Features
@@ -531,7 +531,7 @@ export default function PayrollFinancialLanding() {
       <Separator className="my-8" />
 
       {/* Measurable Results Section */}
-      <section className="py-16 md:py-20 px-4">
+      <section className="py-16 md:py-20 px-4" data-testid="section-measurable-results">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
             Measurable Results
@@ -615,7 +615,7 @@ export default function PayrollFinancialLanding() {
       <Separator className="my-8" />
 
       {/* Module Integration Section */}
-      <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
+      <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900" data-testid="section-module-integration">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
             Module Integration Points
@@ -727,7 +727,7 @@ export default function PayrollFinancialLanding() {
       <Separator className="my-8" />
 
       {/* Business Impact Section */}
-      <section className="py-16 md:py-20 px-4">
+      <section className="py-16 md:py-20 px-4" data-testid="section-business-impact">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
             Stop Dreading Payday
@@ -756,7 +756,7 @@ export default function PayrollFinancialLanding() {
       <Separator className="my-8" />
 
       {/* FAQs Section */}
-      <section id="faqs" className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
+      <section id="faqs" className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900" data-testid="section-faqs">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
             Frequently Asked Questions
@@ -860,7 +860,7 @@ export default function PayrollFinancialLanding() {
       </section>
 
       {/* Final CTA Section */}
-      <section className="py-16 md:py-20 px-4">
+      <section className="py-16 md:py-20 px-4" data-testid="section-final-cta">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Ready to Reclaim Your Time?
