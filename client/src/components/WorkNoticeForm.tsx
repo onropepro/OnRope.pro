@@ -17,17 +17,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { JOB_TYPES, getJobTypeConfig } from "@shared/jobTypes";
-import type { Project, WorkNotice, ProjectBuilding } from "@shared/schema";
+import type { Project, WorkNotice } from "@shared/schema";
 
 interface WorkNoticeFormProps {
   project: Project;
   existingNotice?: WorkNotice;
   onClose: () => void;
   onSuccess?: () => void;
-}
-
-interface ProjectBuildingsResponse {
-  buildings: ProjectBuilding[];
 }
 
 const workNoticeFormSchema = z.object({
@@ -532,17 +528,6 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [showSaveTemplateDialog, setShowSaveTemplateDialog] = useState(false);
   const [savedNoticeData, setSavedNoticeData] = useState<{ title: string; details: string } | null>(null);
-  const [selectedBuildingId, setSelectedBuildingId] = useState<string | null>(
-    existingNotice?.projectBuildingId || null
-  );
-  
-  // Fetch project buildings for multi-building projects
-  const { data: buildingsResponse } = useQuery<ProjectBuildingsResponse>({
-    queryKey: ["/api/projects", project.id, "buildings"],
-  });
-  
-  const projectBuildings = buildingsResponse?.buildings || [];
-  const isMultiBuilding = projectBuildings.length > 0;
   
   // Fetch clients to get property manager name for this project's strata plan
   const { data: clientsResponse } = useQuery<{ clients: any[] }>({
@@ -697,12 +682,8 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
   );
 
   const onSubmit = (data: WorkNoticeFormData) => {
-    // Include schedule data for in-suite and parkade jobs, and building ID for multi-building projects
-    const submitData = {
-      ...data,
-      ...(needsSchedule && { unitSchedule: schedule }),
-      ...(isMultiBuilding && selectedBuildingId && { projectBuildingId: selectedBuildingId }),
-    };
+    // Include schedule data for in-suite and parkade jobs
+    const submitData = needsSchedule ? { ...data, unitSchedule: schedule } : data;
     
     if (existingNotice) {
       updateNoticeMutation.mutate(submitData);
@@ -784,38 +765,6 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
           </div>
         </CardContent>
       </Card>
-
-      {/* Building selector for multi-building projects */}
-      {isMultiBuilding && (
-        <div className="space-y-2">
-          <Label className="text-sm font-medium">Select Building for Notice</Label>
-          <Select
-            value={selectedBuildingId || ""}
-            onValueChange={(value) => setSelectedBuildingId(value || null)}
-          >
-            <SelectTrigger className="h-12" data-testid="select-building-for-notice">
-              <SelectValue placeholder="Choose a building..." />
-            </SelectTrigger>
-            <SelectContent>
-              {projectBuildings.map((building) => (
-                <SelectItem key={building.id} value={building.id}>
-                  <div className="flex flex-col items-start">
-                    <span className="font-medium">{building.name}</span>
-                    {building.strataPlanNumber && (
-                      <span className="text-xs text-muted-foreground">
-                        Strata: {building.strataPlanNumber}
-                      </span>
-                    )}
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <p className="text-xs text-muted-foreground">
-            This notice will be specific to the selected building
-          </p>
-        </div>
-      )}
 
       <div>
         <Label className="text-sm font-medium mb-3 block">Quick Templates</Label>

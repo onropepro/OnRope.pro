@@ -635,9 +635,7 @@
         "inventoryGear": "Inventaire et équipement",
         "workSessions": "Sessions de travail",
         "feedback": "Commentaires",
-        "analyticsFinancial": "Analytique et finances",
-        "schedule": "Horaire",
-        "quotes": "Soumissions"
+        "analyticsFinancial": "Analytique et finances"
       },
       "viewProjects": "Voir les projets",
       "createProjects": "Créer des projets",
@@ -663,14 +661,7 @@
       "viewFeedback": "Voir les commentaires",
       "manageFeedback": "Gérer les commentaires",
       "viewAnalytics": "Voir les analyses",
-      "viewFinancialData": "Voir les données financières (Coûts de main-d'œuvre, Salaires)",
-      "viewFullSchedule": "Voir tout le calendrier (Horaire complet)",
-      "viewOwnSchedule": "Voir le calendrier de l'employé uniquement (Propres quarts)",
-      "editSchedule": "Modifier le calendrier (Gérer les affectations)",
-      "viewQuotes": "Voir les soumissions",
-      "viewQuoteFinancials": "Voir les finances des soumissions (Prix, Coûts)",
-      "editQuotes": "Créer/Modifier les soumissions",
-      "viewPastProjects": "Voir les projets passés"
+      "viewFinancialData": "Voir les données financières (Coûts de main-d'œuvre, Salaires)"
     },
     "jobCategories": {
       "building_maintenance": "Entretien de bâtiment",

@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates, projectBuildings } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates } from "@shared/schema";
 import { eq, sql, and, or, isNull, gt, desc, asc, inArray } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -5341,11 +5341,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/buildings/:buildingId/instructions", async (req: Request, res: Response) => {
     try {
       const { buildingId } = req.params;
-      const projectBuildingId = req.query.projectBuildingId as string | undefined;
 
       // SuperUser can access all
       if (req.session.userId === 'superuser') {
-        const instructions = await storage.getBuildingInstructions(buildingId, projectBuildingId);
+        const instructions = await storage.getBuildingInstructions(buildingId);
         return res.json(instructions || null);
       }
 
@@ -5353,7 +5352,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (req.session.role === 'building' && req.session.buildingId) {
         // Building managers can only access their own building's instructions
         if (req.session.buildingId === buildingId) {
-          const instructions = await storage.getBuildingInstructions(buildingId, projectBuildingId);
+          const instructions = await storage.getBuildingInstructions(buildingId);
           return res.json(instructions || null);
         }
         return res.status(403).json({ message: "Access denied" });
@@ -5380,7 +5379,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             building.strataPlanNumber.toUpperCase().replace(/\s/g, '')
           );
           if (hasProjectForBuilding) {
-            const instructions = await storage.getBuildingInstructions(buildingId, projectBuildingId);
+            const instructions = await storage.getBuildingInstructions(buildingId);
             return res.json(instructions || null);
           }
         }
@@ -6296,13 +6295,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
               projectInfo.totalDropsEast = project.totalDropsEast;
               projectInfo.totalDropsSouth = project.totalDropsSouth;
               projectInfo.totalDropsWest = project.totalDropsWest;
-              
-              // Calculate completed drops from ALL work sessions (including legacy ones without projectBuildingId)
-              const projectSessions = await storage.getWorkSessionsByProject(project.id, project.companyId);
-              projectInfo.completedDropsNorth = projectSessions.reduce((sum, s) => sum + (s.dropsCompletedNorth || 0), 0);
-              projectInfo.completedDropsEast = projectSessions.reduce((sum, s) => sum + (s.dropsCompletedEast || 0), 0);
-              projectInfo.completedDropsSouth = projectSessions.reduce((sum, s) => sum + (s.dropsCompletedSouth || 0), 0);
-              projectInfo.completedDropsWest = projectSessions.reduce((sum, s) => sum + (s.dropsCompletedWest || 0), 0);
+              projectInfo.completedDropsNorth = project.completedDropsNorth;
+              projectInfo.completedDropsEast = project.completedDropsEast;
+              projectInfo.completedDropsSouth = project.completedDropsSouth;
+              projectInfo.completedDropsWest = project.completedDropsWest;
             } else if (project.progressType === 'suites') {
               projectInfo.progressType = 'suites';
               projectInfo.totalSuites = project.totalSuites;
@@ -6355,54 +6351,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Collect all project buildings for active projects (for multi-building complexes)
-      // Include completed drops per-building calculated from work sessions
-      const allProjectBuildings: any[] = [];
-      for (const project of activeProjects) {
-        const projectBldgs = await storage.getProjectBuildings(project.id);
-        
-        // Get work sessions for this project to calculate per-building completed drops
-        const projectSessions = await storage.getWorkSessionsByProject(project.id, project.companyId);
-        
-        for (const bldg of projectBldgs) {
-          // Sum completed drops from work sessions for this specific building
-          // Include sessions with matching projectBuildingId OR sessions with no building ID (legacy data)
-          const buildingSessions = projectSessions.filter(s => s.projectBuildingId === bldg.id);
-          const legacySessions = projectSessions.filter(s => !s.projectBuildingId);
-          
-          // If there are no building-specific sessions but there are legacy sessions,
-          // distribute legacy drops proportionally across buildings based on their totals
-          let completedDropsNorth = buildingSessions.reduce((sum, s) => sum + (s.dropsCompletedNorth || 0), 0);
-          let completedDropsEast = buildingSessions.reduce((sum, s) => sum + (s.dropsCompletedEast || 0), 0);
-          let completedDropsSouth = buildingSessions.reduce((sum, s) => sum + (s.dropsCompletedSouth || 0), 0);
-          let completedDropsWest = buildingSessions.reduce((sum, s) => sum + (s.dropsCompletedWest || 0), 0);
-          
-          // For single-building projects or when all sessions are legacy, include legacy drops
-          if (projectBldgs.length === 1 && legacySessions.length > 0) {
-            completedDropsNorth += legacySessions.reduce((sum, s) => sum + (s.dropsCompletedNorth || 0), 0);
-            completedDropsEast += legacySessions.reduce((sum, s) => sum + (s.dropsCompletedEast || 0), 0);
-            completedDropsSouth += legacySessions.reduce((sum, s) => sum + (s.dropsCompletedSouth || 0), 0);
-            completedDropsWest += legacySessions.reduce((sum, s) => sum + (s.dropsCompletedWest || 0), 0);
-          }
-          
-          allProjectBuildings.push({
-            ...bldg,
-            projectId: project.id,
-            projectJobType: project.customJobType || project.jobType,
-            // Add computed completed drops for this building
-            completedDropsNorth,
-            completedDropsEast,
-            completedDropsSouth,
-            completedDropsWest,
-          });
-        }
-      }
-      
       res.json({ 
         building: buildingData,
         projectHistory,
         workNotices,
-        projectBuildings: allProjectBuildings,
         stats: {
           totalProjects: allProjects.length,
           completedProjects: allProjects.filter(p => p.status === 'completed').length,
@@ -10397,179 +10349,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ==================== PROJECT BUILDINGS ROUTES ====================
-  // For managing multiple buildings within a single project (e.g., Tower 1, Tower 2)
-  
-  // Get all buildings for a project
-  app.get("/api/projects/:projectId/buildings", requireAuth, async (req: Request, res: Response) => {
-    try {
-      const currentUser = await storage.getUserById(req.session.userId!);
-      if (!currentUser) {
-        return res.status(404).json({ message: "User not found" });
-      }
-      
-      const hasAccess = await storage.verifyProjectAccess(
-        req.params.projectId,
-        currentUser.id,
-        currentUser.role,
-        currentUser.companyId
-      );
-      
-      if (!hasAccess) {
-        return res.status(403).json({ message: "Access denied" });
-      }
-      
-      const buildings = await storage.getProjectBuildings(req.params.projectId);
-      res.json({ buildings });
-    } catch (error) {
-      console.error("Get project buildings error:", error);
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-  
-  // Create a building for a project
-  app.post("/api/projects/:projectId/buildings", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
-    try {
-      const currentUser = await storage.getUserById(req.session.userId!);
-      if (!currentUser) {
-        return res.status(404).json({ message: "User not found" });
-      }
-      
-      const hasAccess = await storage.verifyProjectAccess(
-        req.params.projectId,
-        currentUser.id,
-        currentUser.role,
-        currentUser.companyId
-      );
-      
-      if (!hasAccess) {
-        return res.status(403).json({ message: "Access denied" });
-      }
-      
-      const buildingData = {
-        ...req.body,
-        projectId: req.params.projectId,
-      };
-      
-      const building = await storage.createProjectBuilding(buildingData);
-      res.status(201).json({ building });
-    } catch (error) {
-      console.error("Create project building error:", error);
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-  
-  // Bulk create/update buildings for a project
-  app.put("/api/projects/:projectId/buildings", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
-    try {
-      const currentUser = await storage.getUserById(req.session.userId!);
-      if (!currentUser) {
-        return res.status(404).json({ message: "User not found" });
-      }
-      
-      const hasAccess = await storage.verifyProjectAccess(
-        req.params.projectId,
-        currentUser.id,
-        currentUser.role,
-        currentUser.companyId
-      );
-      
-      if (!hasAccess) {
-        return res.status(403).json({ message: "Access denied" });
-      }
-      
-      const { buildings: buildingsData } = req.body;
-      
-      if (!Array.isArray(buildingsData)) {
-        return res.status(400).json({ message: "Buildings must be an array" });
-      }
-      
-      // Delete existing buildings and recreate
-      await storage.deleteProjectBuildingsByProject(req.params.projectId);
-      
-      const buildingsToCreate = buildingsData.map((b: any, index: number) => ({
-        projectId: req.params.projectId,
-        name: b.name,
-        strataPlanNumber: b.strataPlanNumber || null,
-        buildingAddress: b.buildingAddress,
-        floorCount: b.floorCount,
-        buildingHeight: b.buildingHeight,
-        dailyDropTarget: b.dailyDropTarget || 0,
-        totalDropsNorth: b.totalDropsNorth || 0,
-        totalDropsEast: b.totalDropsEast || 0,
-        totalDropsSouth: b.totalDropsSouth || 0,
-        totalDropsWest: b.totalDropsWest || 0,
-        dropsAdjustmentNorth: b.dropsAdjustmentNorth || 0,
-        dropsAdjustmentEast: b.dropsAdjustmentEast || 0,
-        dropsAdjustmentSouth: b.dropsAdjustmentSouth || 0,
-        dropsAdjustmentWest: b.dropsAdjustmentWest || 0,
-        startDate: b.startDate || null,
-        endDate: b.endDate || null,
-        displayOrder: index,
-      }));
-      
-      const buildings = await storage.createProjectBuildings(buildingsToCreate);
-      res.json({ buildings });
-    } catch (error) {
-      console.error("Update project buildings error:", error);
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-  
-  // Update a specific building
-  app.patch("/api/projects/:projectId/buildings/:buildingId", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
-    try {
-      const currentUser = await storage.getUserById(req.session.userId!);
-      if (!currentUser) {
-        return res.status(404).json({ message: "User not found" });
-      }
-      
-      const hasAccess = await storage.verifyProjectAccess(
-        req.params.projectId,
-        currentUser.id,
-        currentUser.role,
-        currentUser.companyId
-      );
-      
-      if (!hasAccess) {
-        return res.status(403).json({ message: "Access denied" });
-      }
-      
-      const building = await storage.updateProjectBuilding(req.params.buildingId, req.body);
-      res.json({ building });
-    } catch (error) {
-      console.error("Update project building error:", error);
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-  
-  // Delete a specific building
-  app.delete("/api/projects/:projectId/buildings/:buildingId", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
-    try {
-      const currentUser = await storage.getUserById(req.session.userId!);
-      if (!currentUser) {
-        return res.status(404).json({ message: "User not found" });
-      }
-      
-      const hasAccess = await storage.verifyProjectAccess(
-        req.params.projectId,
-        currentUser.id,
-        currentUser.role,
-        currentUser.companyId
-      );
-      
-      if (!hasAccess) {
-        return res.status(403).json({ message: "Access denied" });
-      }
-      
-      await storage.deleteProjectBuilding(req.params.buildingId);
-      res.json({ message: "Building deleted successfully" });
-    } catch (error) {
-      console.error("Delete project building error:", error);
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
   // ==================== WORK NOTICES ROUTES ====================
   
   // Get work notices for a project
@@ -10637,31 +10416,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const company = await storage.getUserById(companyId);
       
-      // Get building-specific info if projectBuildingId is provided (multi-building projects)
-      let buildingName = project.buildingName;
-      let buildingAddress = project.buildingAddress;
-      let strataPlanNumber = project.strataPlanNumber;
-      
-      if (req.body.projectBuildingId) {
-        const [projectBuilding] = await db.select().from(projectBuildings)
-          .where(eq(projectBuildings.id, req.body.projectBuildingId));
-        
-        if (projectBuilding) {
-          buildingName = projectBuilding.name;
-          buildingAddress = projectBuilding.buildingAddress || project.buildingAddress;
-          strataPlanNumber = projectBuilding.strataPlanNumber || project.strataPlanNumber;
-        }
-      }
-      
       // Validate request body
       const validatedData = insertWorkNoticeSchema.parse({
         ...req.body,
         projectId: req.params.projectId,
         companyId: companyId,
-        projectBuildingId: req.body.projectBuildingId || null,
-        buildingName: buildingName,
-        buildingAddress: buildingAddress,
-        strataPlanNumber: strataPlanNumber,
+        buildingName: project.buildingName,
+        buildingAddress: project.buildingAddress,
+        strataPlanNumber: project.strataPlanNumber,
         contractorName: company?.companyName || "Contractor",
         jobType: project.jobType,
         customJobType: project.customJobType,
@@ -11013,7 +10775,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const { projectId } = req.params;
-      const { startLatitude, startLongitude, workDate, projectBuildingId } = req.body;
+      const { startLatitude, startLongitude, workDate } = req.body;
       
       // Verify employee has access to this project
       const hasAccess = await storage.verifyProjectAccess(
@@ -11040,12 +10802,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Project not found" });
       }
       
-      // For multi-building projects, require a building selection
-      const projectBuildings = await storage.getProjectBuildings(projectId);
-      if (projectBuildings.length > 1 && !projectBuildingId) {
-        return res.status(400).json({ message: "Please select a building before starting your work session" });
-      }
-      
       // Create new work session
       const now = new Date();
       // Use client's local date if provided, otherwise fall back to server date
@@ -11058,7 +10814,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         startTime: now,
         startLatitude: startLatitude || null,
         startLongitude: startLongitude || null,
-        projectBuildingId: projectBuildingId || null, // For multi-building projects
       });
       
       res.json({ session });
@@ -19021,7 +18776,7 @@ Do not include any other text, just the JSON object.`
         return res.status(403).json({ message: "Forbidden" });
       }
       
-      const { employeeIds, forceAssignment, projectBuildingId } = req.body;
+      const { employeeIds, forceAssignment } = req.body;
       
       if (!Array.isArray(employeeIds)) {
         return res.status(400).json({ message: "employeeIds must be an array" });
@@ -19043,8 +18798,8 @@ Do not include any other text, just the JSON object.`
         }
       }
       
-      // Remove existing assignments and add new ones (optionally for specific building)
-      await storage.replaceJobAssignments(req.params.id, employeeIds, currentUser.id, projectBuildingId);
+      // Remove existing assignments and add new ones
+      await storage.replaceJobAssignments(req.params.id, employeeIds, currentUser.id);
       
       const updatedJob = await storage.getScheduledJobWithAssignments(req.params.id);
       res.json({ job: updatedJob });

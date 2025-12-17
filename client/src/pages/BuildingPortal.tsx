@@ -87,31 +87,10 @@ interface WorkNoticeItem {
   createdAt: string;
 }
 
-interface ProjectBuildingItem {
-  id: string;
-  name: string;
-  strataPlanNumber: string | null;
-  buildingAddress: string | null;
-  floorCount: number | null;
-  projectId: string;
-  projectJobType: string;
-  // Per-building drop totals from project_buildings table
-  totalDropsNorth?: number;
-  totalDropsEast?: number;
-  totalDropsSouth?: number;
-  totalDropsWest?: number;
-  // Per-building completed drops calculated from work sessions
-  completedDropsNorth?: number;
-  completedDropsEast?: number;
-  completedDropsSouth?: number;
-  completedDropsWest?: number;
-}
-
 interface PortalData {
   building: BuildingData;
   projectHistory: ProjectHistoryItem[];
   workNotices?: WorkNoticeItem[];
-  projectBuildings?: ProjectBuildingItem[];
   stats: {
     totalProjects: number;
     completedProjects: number;
@@ -126,7 +105,6 @@ export default function BuildingPortal() {
   const [password, setPassword] = useState("");
   const [showInstructionsDialog, setShowInstructionsDialog] = useState(false);
   const [showChangePasswordDialog, setShowChangePasswordDialog] = useState(false);
-  const [selectedProjectBuildingId, setSelectedProjectBuildingId] = useState<string | null>(null);
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: "",
     newPassword: "",
@@ -165,24 +143,11 @@ export default function BuildingPortal() {
 
   // Fetch building instructions when we have building data
   const buildingId = portalData?.building?.id;
-  const projectBuildings = portalData?.projectBuildings || [];
-  const hasMultipleBuildings = projectBuildings.length > 1;
-  
-  // Auto-select first building when project buildings are loaded
-  useEffect(() => {
-    if (projectBuildings.length > 0 && !selectedProjectBuildingId) {
-      setSelectedProjectBuildingId(projectBuildings[0].id);
-    }
-  }, [projectBuildings, selectedProjectBuildingId]);
-  
   const { data: buildingInstructions, isLoading: isLoadingInstructions } = useQuery<BuildingInstructions | null>({
-    queryKey: ["/api/buildings", buildingId, "instructions", selectedProjectBuildingId],
+    queryKey: ["/api/buildings", buildingId, "instructions"],
     queryFn: async () => {
       if (!buildingId) return null;
-      const url = selectedProjectBuildingId 
-        ? `/api/buildings/${buildingId}/instructions?projectBuildingId=${selectedProjectBuildingId}`
-        : `/api/buildings/${buildingId}/instructions`;
-      const response = await fetch(url, { credentials: "include" });
+      const response = await fetch(`/api/buildings/${buildingId}/instructions`, { credentials: "include" });
       if (!response.ok) return null;
       return response.json();
     },
@@ -215,11 +180,7 @@ export default function BuildingPortal() {
 
   const saveInstructionsMutation = useMutation({
     mutationFn: async (data: typeof instructionsForm) => {
-      // Include projectBuildingId when saving for multi-building complexes
-      const payload = selectedProjectBuildingId 
-        ? { ...data, projectBuildingId: selectedProjectBuildingId }
-        : data;
-      const response = await apiRequest("POST", `/api/buildings/${buildingId}/instructions`, payload);
+      const response = await apiRequest("POST", `/api/buildings/${buildingId}/instructions`, data);
       return response.json();
     },
     onSuccess: () => {
@@ -227,7 +188,7 @@ export default function BuildingPortal() {
         title: "Instructions Saved",
         description: "Building instructions have been updated successfully.",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/buildings", buildingId, "instructions", selectedProjectBuildingId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/buildings", buildingId, "instructions"] });
       setShowInstructionsDialog(false);
     },
     onError: (error: any) => {
@@ -249,7 +210,6 @@ export default function BuildingPortal() {
         title: "Login Successful",
         description: "Welcome to your building portal.",
       });
-      // Invalidate the portal query to trigger a fresh fetch with the new session
       queryClient.invalidateQueries({ queryKey: ["/api/building/portal"] });
     },
     onError: (error: any) => {
@@ -402,31 +362,13 @@ export default function BuildingPortal() {
   const getProjectProgress = (project: ProjectHistoryItem): { completed: number; total: number; label: string; hasProgress: boolean } | null => {
     if (!project.progressType) return null;
     
-    // Calculate project-level totals (used as fallback for single-building or no building selected)
-    const projectTotal = (project.totalDropsNorth || 0) + (project.totalDropsEast || 0) + 
-                        (project.totalDropsSouth || 0) + (project.totalDropsWest || 0);
-    const projectCompleted = (project.completedDropsNorth || 0) + (project.completedDropsEast || 0) + 
-                            (project.completedDropsSouth || 0) + (project.completedDropsWest || 0);
-    
     switch (project.progressType) {
       case 'drops': {
-        // For multi-building projects, use the selected building's data
-        if (selectedProjectBuildingId && projectBuildings.length > 0) {
-          const selectedBldg = projectBuildings.find(b => b.id === selectedProjectBuildingId && b.projectId === project.id);
-          if (selectedBldg) {
-            const buildingTotal = (selectedBldg.totalDropsNorth || 0) + (selectedBldg.totalDropsEast || 0) + 
-                                 (selectedBldg.totalDropsSouth || 0) + (selectedBldg.totalDropsWest || 0);
-            const buildingCompleted = (selectedBldg.completedDropsNorth || 0) + (selectedBldg.completedDropsEast || 0) + 
-                                     (selectedBldg.completedDropsSouth || 0) + (selectedBldg.completedDropsWest || 0);
-            
-            // Use building data if it has valid totals configured
-            if (buildingTotal > 0) {
-              return { completed: buildingCompleted, total: buildingTotal, label: 'drops', hasProgress: true };
-            }
-          }
-        }
-        // Fallback to project-level data when no building selected or building has no totals
-        return { completed: projectCompleted, total: projectTotal, label: 'drops', hasProgress: projectTotal > 0 };
+        const total = (project.totalDropsNorth || 0) + (project.totalDropsEast || 0) + 
+                     (project.totalDropsSouth || 0) + (project.totalDropsWest || 0);
+        const completed = (project.completedDropsNorth || 0) + (project.completedDropsEast || 0) + 
+                         (project.completedDropsSouth || 0) + (project.completedDropsWest || 0);
+        return { completed, total, label: 'drops', hasProgress: total > 0 };
       }
       case 'suites': {
         const total = project.totalSuites || 0;
@@ -1247,40 +1189,6 @@ export default function BuildingPortal() {
               Add access information and contact details for contractors working at this building.
             </DialogDescription>
           </DialogHeader>
-          
-          {/* Building selector for multi-building complexes */}
-          {hasMultipleBuildings && (
-            <div className="py-4 border-b">
-              <Label className="text-sm font-medium mb-2 block">
-                Select Building
-              </Label>
-              <Select
-                value={selectedProjectBuildingId || ""}
-                onValueChange={(value) => setSelectedProjectBuildingId(value)}
-              >
-                <SelectTrigger className="h-12" data-testid="select-building-instructions">
-                  <SelectValue placeholder="Choose a building..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {projectBuildings.map((bldg) => (
-                    <SelectItem key={bldg.id} value={bldg.id}>
-                      <div className="flex flex-col items-start">
-                        <span className="font-medium">{bldg.name}</span>
-                        {bldg.strataPlanNumber && (
-                          <span className="text-xs text-muted-foreground">
-                            Strata: {bldg.strataPlanNumber}
-                          </span>
-                        )}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-muted-foreground mt-2">
-                Each building in the complex can have its own access instructions
-              </p>
-            </div>
-          )}
           
           <div className="space-y-6 py-4">
             {/* Contact Information Section */}

@@ -66,10 +66,6 @@ export default function ProjectDetail() {
   const { toast } = useToast();
   const { t } = useTranslation();
   const [renderError, setRenderError] = useState<Error | null>(null);
-  
-  // Check if user came from building portal (via query param or by session type)
-  const searchParams = new URLSearchParams(window.location.search);
-  const fromSource = searchParams.get('from');
 
   // Catch any render errors
   useEffect(() => {
@@ -129,7 +125,6 @@ export default function ProjectDetail() {
   const [selectedPhoto, setSelectedPhoto] = useState<any>(null);
   const [showStartDayDialog, setShowStartDayDialog] = useState(false);
   const [showEndDayDialog, setShowEndDayDialog] = useState(false);
-  const [sessionBuildingId, setSessionBuildingId] = useState<string | null>(null);
   const [activeSession, setActiveSession] = useState<any>(null);
   const [showHarnessInspectionDialog, setShowHarnessInspectionDialog] = useState(false);
   const [showLogHoursPrompt, setShowLogHoursPrompt] = useState(false);
@@ -194,12 +189,6 @@ export default function ProjectDetail() {
 
   const currentUser = userData?.user;
   
-  // Determine back navigation path:
-  // 1. If ?from=building query param is set, go to Building Portal
-  // 2. If no user data (building session), go to Building Portal
-  // 3. Otherwise, go to Dashboard
-  const backPath = fromSource === 'building' ? '/building' : (currentUser ? '/dashboard' : '/building');
-  
   // Check if user can view financial data using centralized permission helper
   const canViewFinancialData = hasFinancialAccess(currentUser);
 
@@ -229,21 +218,6 @@ export default function ProjectDetail() {
     queryKey: ["/api/projects", id, "complaints"],
     enabled: !!id,
   });
-  
-  // Fetch project buildings for multi-building projects
-  const { data: projectBuildingsData } = useQuery<{ buildings: any[] }>({
-    queryKey: ["/api/projects", id, "buildings"],
-    enabled: !!id,
-  });
-  const projectBuildings = projectBuildingsData?.buildings || [];
-  const [selectedBuildingId, setSelectedBuildingId] = useState<string | null>(null);
-  
-  // Auto-select the first building when buildings are loaded (only if more than one)
-  useEffect(() => {
-    if (projectBuildings.length > 1 && !selectedBuildingId) {
-      setSelectedBuildingId(projectBuildings[0].id);
-    }
-  }, [projectBuildings, selectedBuildingId]);
 
   // Fetch complaint metrics for company-wide average resolution time
   const { data: complaintMetricsData, isLoading: metricsLoading } = useQuery<{
@@ -300,9 +274,9 @@ export default function ProjectDetail() {
 
   const hasHarnessInspectionToday = harnessInspectionTodayData?.hasInspectionToday ?? false;
 
-  // Fetch building data by strata plan (for base building info)
+  // Fetch building data and instructions
   const projectStrataPlan = (projectData?.project as any)?.strataPlanNumber;
-  const { data: buildingBaseData, isLoading: isLoadingBuilding } = useQuery<{
+  const { data: buildingData, isLoading: isLoadingBuilding } = useQuery<{
     building: Building | null;
     instructions: BuildingInstructions | null;
   }>({
@@ -315,61 +289,36 @@ export default function ProjectDetail() {
     },
     enabled: !!projectStrataPlan,
   });
-  
-  // Fetch per-building instructions (for multi-building complexes)
-  // This query uses projectBuildingId to get building-specific instructions with fallback
-  const { data: perBuildingInstructions } = useQuery<BuildingInstructions | null>({
-    queryKey: ["/api/buildings", buildingBaseData?.building?.id, "instructions", selectedBuildingId],
-    queryFn: async () => {
-      if (!buildingBaseData?.building?.id) return null;
-      const url = selectedBuildingId 
-        ? `/api/buildings/${buildingBaseData.building.id}/instructions?projectBuildingId=${selectedBuildingId}`
-        : `/api/buildings/${buildingBaseData.building.id}/instructions`;
-      const response = await fetch(url, { credentials: "include" });
-      if (!response.ok) return null;
-      return response.json();
-    },
-    enabled: !!buildingBaseData?.building?.id,
-  });
-  
-  // Combine building data with per-building instructions
-  const buildingData = buildingBaseData ? {
-    building: buildingBaseData.building,
-    instructions: perBuildingInstructions ?? buildingBaseData.instructions,
-  } : undefined;
 
-  // Initialize instructions form when data loads (including when selected building changes)
+  // Initialize instructions form when data loads
   useEffect(() => {
-    const instructions = buildingData?.instructions;
-    setInstructionsForm({
-      buildingAccess: instructions?.buildingAccess || "",
-      keysAndFob: instructions?.keysAndFob || "",
-      keysReturnPolicy: (instructions as any)?.keysReturnPolicy || "",
-      roofAccess: instructions?.roofAccess || "",
-      specialRequests: instructions?.specialRequests || "",
-      buildingManagerName: instructions?.buildingManagerName || "",
-      buildingManagerPhone: instructions?.buildingManagerPhone || "",
-      conciergeNames: instructions?.conciergeNames || "",
-      conciergePhone: instructions?.conciergePhone || "",
-      conciergeHours: (instructions as any)?.conciergeHours || "",
-      maintenanceName: instructions?.maintenanceName || "",
-      maintenancePhone: instructions?.maintenancePhone || "",
-      councilMemberUnits: (instructions as any)?.councilMemberUnits || "",
-      tradeParkingInstructions: (instructions as any)?.tradeParkingInstructions || "",
-      tradeParkingSpots: (instructions as any)?.tradeParkingSpots?.toString() || "",
-      tradeWashroomLocation: (instructions as any)?.tradeWashroomLocation || "",
-    });
-  }, [buildingData?.instructions, selectedBuildingId, perBuildingInstructions]);
+    if (buildingData?.instructions) {
+      setInstructionsForm({
+        buildingAccess: buildingData.instructions.buildingAccess || "",
+        keysAndFob: buildingData.instructions.keysAndFob || "",
+        keysReturnPolicy: (buildingData.instructions as any).keysReturnPolicy || "",
+        roofAccess: buildingData.instructions.roofAccess || "",
+        specialRequests: buildingData.instructions.specialRequests || "",
+        buildingManagerName: buildingData.instructions.buildingManagerName || "",
+        buildingManagerPhone: buildingData.instructions.buildingManagerPhone || "",
+        conciergeNames: buildingData.instructions.conciergeNames || "",
+        conciergePhone: buildingData.instructions.conciergePhone || "",
+        conciergeHours: (buildingData.instructions as any).conciergeHours || "",
+        maintenanceName: buildingData.instructions.maintenanceName || "",
+        maintenancePhone: buildingData.instructions.maintenancePhone || "",
+        councilMemberUnits: (buildingData.instructions as any).councilMemberUnits || "",
+        tradeParkingInstructions: (buildingData.instructions as any).tradeParkingInstructions || "",
+        tradeParkingSpots: (buildingData.instructions as any).tradeParkingSpots?.toString() || "",
+        tradeWashroomLocation: (buildingData.instructions as any).tradeWashroomLocation || "",
+      });
+    }
+  }, [buildingData?.instructions]);
 
   // Save building instructions mutation
   const saveInstructionsMutation = useMutation({
     mutationFn: async (data: typeof instructionsForm) => {
       if (!buildingData?.building?.id) throw new Error("Building not found");
-      // Include projectBuildingId for multi-building complexes
-      const payload = selectedBuildingId 
-        ? { ...data, projectBuildingId: selectedBuildingId }
-        : data;
-      const response = await apiRequest("POST", `/api/buildings/${buildingData.building.id}/instructions`, payload);
+      const response = await apiRequest("POST", `/api/buildings/${buildingData.building.id}/instructions`, data);
       return response.json();
     },
     onSuccess: () => {
@@ -378,7 +327,6 @@ export default function ProjectDetail() {
         description: t('projectDetail.buildingInstructions.savedDesc', 'Building instructions have been updated.'),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/buildings/by-strata", projectStrataPlan] });
-      queryClient.invalidateQueries({ queryKey: ["/api/buildings", buildingData?.building?.id, "instructions", selectedBuildingId] });
       setShowEditInstructionsDialog(false);
     },
     onError: (error: Error) => {
@@ -469,7 +417,7 @@ export default function ProjectDetail() {
   };
 
   const startDayMutation = useMutation({
-    mutationFn: async ({ projectId, buildingId }: { projectId: string; buildingId?: string | null }) => {
+    mutationFn: async (projectId: string) => {
       // Get current location
       let locationData = {};
       try {
@@ -498,7 +446,6 @@ export default function ProjectDetail() {
         body: JSON.stringify({
           ...locationData,
           workDate: localDateString, // Send client's local date
-          projectBuildingId: buildingId || null, // Include building ID for multi-building projects
         }),
         credentials: "include",
       });
@@ -809,22 +756,17 @@ export default function ProjectDetail() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/harness-inspections"] });
       setShowHarnessInspectionDialog(false);
-      // For multi-building projects, show start dialog so technician can confirm/select building
-      // For single building projects, start directly
-      if (projectBuildings.length > 1) {
-        setShowStartDayDialog(true);
-      } else if (id) {
-        startDayMutation.mutate({ projectId: id, buildingId: sessionBuildingId });
+      // Start work session directly without a second confirmation
+      if (id) {
+        startDayMutation.mutate(id);
       }
     },
     onError: (error: Error) => {
       console.error("Error creating not applicable inspection:", error);
       // Still proceed to start work session even if this fails
       setShowHarnessInspectionDialog(false);
-      if (projectBuildings.length > 1) {
-        setShowStartDayDialog(true);
-      } else if (id) {
-        startDayMutation.mutate({ projectId: id, buildingId: sessionBuildingId });
+      if (id) {
+        startDayMutation.mutate(id);
       }
     },
   });
@@ -951,12 +893,7 @@ export default function ProjectDetail() {
       // Check if shortfall reason is required but missing
       const isInSuite = project.jobType === "in_suite_dryer_vent_cleaning";
       const isParkade = project.jobType === "parkade_pressure_cleaning";
-      // Use building-specific daily drop target if session has a building, otherwise fall back to project target
-      const sessionBuilding = activeSession?.projectBuildingId 
-        ? projectBuildings.find((b: any) => b.id === activeSession.projectBuildingId) 
-        : null;
-      const buildingDropTarget = sessionBuilding?.dailyDropTarget || project.dailyDropTarget;
-      const target = isInSuite || isParkade ? (project.suitesPerDay || project.stallsPerDay || 0) : buildingDropTarget;
+      const target = isInSuite || isParkade ? (project.suitesPerDay || project.stallsPerDay || 0) : project.dailyDropTarget;
       
       // Require either a valid reason code OR a custom explanation when below target
       const hasValidReasonCode = data.validShortfallReasonCode && data.validShortfallReasonCode !== '' && data.validShortfallReasonCode !== 'other';
@@ -976,7 +913,7 @@ export default function ProjectDetail() {
 
   const confirmStartDay = () => {
     if (id) {
-      startDayMutation.mutate({ projectId: id, buildingId: sessionBuildingId });
+      startDayMutation.mutate(id);
     }
   };
 
@@ -1158,19 +1095,8 @@ export default function ProjectDetail() {
     );
   }
 
-  // Calculate completed sessions - filter by building if one is selected
-  const allCompletedSessions = workSessions.filter((s: any) => s.endTime !== null);
-  const completedSessions = selectedBuildingId 
-    ? allCompletedSessions.filter((s: any) => s.projectBuildingId === selectedBuildingId)
-    : allCompletedSessions;
-  
-  // Get selected building data (if a building is selected)
-  const selectedBuilding = selectedBuildingId 
-    ? projectBuildings.find((b: any) => b.id === selectedBuildingId) 
-    : null;
-  
-  // Use building-specific daily drop target if a building is selected, otherwise use project-level
-  const effectiveDailyDropTarget = selectedBuilding?.dailyDropTarget || project.dailyDropTarget;
+  // Calculate completed sessions
+  const completedSessions = workSessions.filter((s: any) => s.endTime !== null);
   
   // Determine tracking type and calculate progress
   // Use shared utility function that accounts for hours-based jobs AND non-elevation drop-based jobs
@@ -1207,31 +1133,19 @@ export default function ProjectDetail() {
     totalDrops = 100;
     completedDrops = progressPercent;
   } else {
-    // Drop/Unit-based tracking - use selected building's totals if available
-    if (selectedBuilding) {
-      // Use selected building's drop totals
-      totalDrops = (selectedBuilding.totalDropsNorth ?? 0) + (selectedBuilding.totalDropsEast ?? 0) + 
-                   (selectedBuilding.totalDropsSouth ?? 0) + (selectedBuilding.totalDropsWest ?? 0);
-    } else {
-      totalDrops = isInSuite 
-        ? project.floorCount  // For dryer vent, use total suite count
-        : isParkade
-        ? (project.totalStalls || project.floorCount)  // For parkade, use total stalls
-        : (project.totalDropsNorth ?? 0) + (project.totalDropsEast ?? 0) + 
-          (project.totalDropsSouth ?? 0) + (project.totalDropsWest ?? 0);  // For window cleaning, use elevation drops
-    }
+    // Drop/Unit-based tracking
+    totalDrops = isInSuite 
+      ? project.floorCount  // For dryer vent, use total suite count
+      : isParkade
+      ? (project.totalStalls || project.floorCount)  // For parkade, use total stalls
+      : (project.totalDropsNorth ?? 0) + (project.totalDropsEast ?? 0) + 
+        (project.totalDropsSouth ?? 0) + (project.totalDropsWest ?? 0);  // For window cleaning, use elevation drops
     
     // Calculate completed drops from work sessions (elevation-specific) + adjustments
-    // Note: Adjustments are project-level, so we only apply them when viewing all buildings
-    const adjustmentNorth = selectedBuildingId ? 0 : (project.dropsAdjustmentNorth ?? 0);
-    const adjustmentEast = selectedBuildingId ? 0 : (project.dropsAdjustmentEast ?? 0);
-    const adjustmentSouth = selectedBuildingId ? 0 : (project.dropsAdjustmentSouth ?? 0);
-    const adjustmentWest = selectedBuildingId ? 0 : (project.dropsAdjustmentWest ?? 0);
-    
-    completedDropsNorth = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedNorth ?? 0), 0) + adjustmentNorth;
-    completedDropsEast = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedEast ?? 0), 0) + adjustmentEast;
-    completedDropsSouth = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedSouth ?? 0), 0) + adjustmentSouth;
-    completedDropsWest = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedWest ?? 0), 0) + adjustmentWest;
+    completedDropsNorth = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedNorth ?? 0), 0) + (project.dropsAdjustmentNorth ?? 0);
+    completedDropsEast = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedEast ?? 0), 0) + (project.dropsAdjustmentEast ?? 0);
+    completedDropsSouth = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedSouth ?? 0), 0) + (project.dropsAdjustmentSouth ?? 0);
+    completedDropsWest = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedWest ?? 0), 0) + (project.dropsAdjustmentWest ?? 0);
     
     completedDrops = completedDropsNorth + completedDropsEast + completedDropsSouth + completedDropsWest;
     
@@ -1244,14 +1158,14 @@ export default function ProjectDetail() {
   const targetMetCount = completedSessions.filter((s: any) => {
     const totalSessionDrops = (s.dropsCompletedNorth ?? 0) + (s.dropsCompletedEast ?? 0) + 
                               (s.dropsCompletedSouth ?? 0) + (s.dropsCompletedWest ?? 0);
-    return totalSessionDrops >= effectiveDailyDropTarget;
+    return totalSessionDrops >= project.dailyDropTarget;
   }).length;
   
   // Valid Reason: below target but has a valid shortfall reason code (not 'other' and not empty)
   const validReasonCount = completedSessions.filter((s: any) => {
     const totalSessionDrops = (s.dropsCompletedNorth ?? 0) + (s.dropsCompletedEast ?? 0) + 
                               (s.dropsCompletedSouth ?? 0) + (s.dropsCompletedWest ?? 0);
-    const isBelowTarget = totalSessionDrops < effectiveDailyDropTarget;
+    const isBelowTarget = totalSessionDrops < project.dailyDropTarget;
     const hasValidReasonCode = s.validShortfallReasonCode && s.validShortfallReasonCode !== '' && s.validShortfallReasonCode !== 'other';
     return isBelowTarget && hasValidReasonCode;
   }).length;
@@ -1260,7 +1174,7 @@ export default function ProjectDetail() {
   const belowTargetCount = completedSessions.filter((s: any) => {
     const totalSessionDrops = (s.dropsCompletedNorth ?? 0) + (s.dropsCompletedEast ?? 0) + 
                               (s.dropsCompletedSouth ?? 0) + (s.dropsCompletedWest ?? 0);
-    const isBelowTarget = totalSessionDrops < effectiveDailyDropTarget;
+    const isBelowTarget = totalSessionDrops < project.dailyDropTarget;
     const hasValidReasonCode = s.validShortfallReasonCode && s.validShortfallReasonCode !== '' && s.validShortfallReasonCode !== 'other';
     return isBelowTarget && !hasValidReasonCode;
   }).length;
@@ -1279,7 +1193,7 @@ export default function ProjectDetail() {
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
-              onClick={() => setLocation(backPath)}
+              onClick={() => setLocation("/dashboard")}
               className="h-12 gap-2"
               data-testid="button-back"
             >
@@ -1312,10 +1226,6 @@ export default function ProjectDetail() {
             {!activeSession && project.status === "active" && (
               <Button
                 onClick={() => {
-                  // For multi-building projects, auto-select first building if none selected
-                  if (projectBuildings.length > 1 && !sessionBuildingId) {
-                    setSessionBuildingId(projectBuildings[0].id);
-                  }
                   // If user already did harness inspection today, skip the dialog
                   if (hasHarnessInspectionToday) {
                     setShowStartDayDialog(true);
@@ -1350,27 +1260,7 @@ export default function ProjectDetail() {
         {/* Progress Card */}
         <Card className="glass-card border-0 shadow-premium">
           <CardHeader>
-            <div className="flex items-center justify-between gap-4">
-              <CardTitle className="text-base">{t('projectDetail.progress.title', 'Progress')}</CardTitle>
-              {projectBuildings.length > 1 && (
-                <Select
-                  value={selectedBuildingId || "all"}
-                  onValueChange={(value) => setSelectedBuildingId(value === "all" ? null : value)}
-                >
-                  <SelectTrigger className="w-[180px] h-9" data-testid="select-building">
-                    <SelectValue placeholder={t('projectDetail.progress.selectBuilding', 'Select Building')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">{t('projectDetail.progress.allBuildings', 'All Buildings')}</SelectItem>
-                    {projectBuildings.map((building: any) => (
-                      <SelectItem key={building.id} value={building.id}>
-                        {building.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            </div>
+            <CardTitle className="text-base">{t('projectDetail.progress.title', 'Progress')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Building Visualization */}
@@ -1519,11 +1409,11 @@ export default function ProjectDetail() {
             ) : (
               <>
                 <HighRiseBuilding
-                  floors={selectedBuilding?.floorCount ?? project.floorCount}
-                  totalDropsNorth={selectedBuilding?.totalDropsNorth ?? project.totalDropsNorth ?? Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 0 ? 1 : 0)}
-                  totalDropsEast={selectedBuilding?.totalDropsEast ?? project.totalDropsEast ?? Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 1 ? 1 : 0)}
-                  totalDropsSouth={selectedBuilding?.totalDropsSouth ?? project.totalDropsSouth ?? Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 2 ? 1 : 0)}
-                  totalDropsWest={selectedBuilding?.totalDropsWest ?? project.totalDropsWest ?? Math.floor(project.totalDrops / 4)}
+                  floors={project.floorCount}
+                  totalDropsNorth={project.totalDropsNorth ?? Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 0 ? 1 : 0)}
+                  totalDropsEast={project.totalDropsEast ?? Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 1 ? 1 : 0)}
+                  totalDropsSouth={project.totalDropsSouth ?? Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 2 ? 1 : 0)}
+                  totalDropsWest={project.totalDropsWest ?? Math.floor(project.totalDrops / 4)}
                   completedDropsNorth={completedDropsNorth}
                   completedDropsEast={completedDropsEast}
                   completedDropsSouth={completedDropsSouth}
@@ -1555,7 +1445,7 @@ export default function ProjectDetail() {
                       ? project.suitesPerDay 
                       : project.jobType === "parkade_pressure_cleaning" 
                       ? project.stallsPerDay 
-                      : effectiveDailyDropTarget}
+                      : project.dailyDropTarget}
                   </div>
                   <div className="text-sm text-muted-foreground mt-1">
                     {project.jobType === "in_suite_dryer_vent_cleaning" 
@@ -1573,7 +1463,7 @@ export default function ProjectDetail() {
                             ? project.suitesPerDay 
                             : project.jobType === "parkade_pressure_cleaning" 
                             ? project.stallsPerDay 
-                            : effectiveDailyDropTarget;
+                            : project.dailyDropTarget;
                           const remaining = totalDrops - completedDrops;
                           return Math.ceil(remaining / (dailyTarget || 1));
                         })()
@@ -2157,12 +2047,7 @@ export default function ProjectDetail() {
                                                       const isCompleted = session.endTime !== null;
                                                       const sessionDrops = (session.dropsCompletedNorth ?? 0) + (session.dropsCompletedEast ?? 0) + 
                                                                            (session.dropsCompletedSouth ?? 0) + (session.dropsCompletedWest ?? 0);
-                                                      // Get building-specific target for this session
-                                                      const sessionBld = session.projectBuildingId 
-                                                        ? projectBuildings.find((b: any) => b.id === session.projectBuildingId)
-                                                        : null;
-                                                      const sessionDropTarget = sessionBld?.dailyDropTarget || project.dailyDropTarget;
-                                                      const metTarget = sessionDrops >= sessionDropTarget;
+                                                      const metTarget = sessionDrops >= project.dailyDropTarget;
                                                       const isPercentageBasedSession = usesPercentageProgress(project.jobType, project.requiresElevation);
                                                       const contributionPct = session.manualCompletionPercentage;
                                                       const sessionLaborCost = session.laborCost ? parseFloat(session.laborCost) : null;
@@ -2186,13 +2071,6 @@ export default function ProjectDetail() {
                                                                 <MapPin className="h-4 w-4 text-primary" />
                                                               )}
                                                             </div>
-                                                            {/* Show building name for multi-building projects */}
-                                                            {sessionBld && projectBuildings.length > 1 && (
-                                                              <p className="text-xs text-muted-foreground flex items-center gap-1">
-                                                                <span className="material-icons text-xs">apartment</span>
-                                                                {sessionBld.name || sessionBld.buildingName}
-                                                              </p>
-                                                            )}
                                                             {isCompleted && (isPercentageBasedSession || sessionLaborCost) && (
                                                               <div className="flex items-center gap-3 text-xs text-muted-foreground">
                                                                 {isPercentageBasedSession && contributionPct !== null && contributionPct !== undefined && (
@@ -3100,11 +2978,8 @@ export default function ProjectDetail() {
               variant="default"
               onClick={() => {
                 setShowHarnessInspectionDialog(false);
-                // For multi-building projects, show start dialog so technician can confirm/select building
-                if (projectBuildings.length > 1) {
-                  setShowStartDayDialog(true);
-                } else if (id) {
-                  startDayMutation.mutate({ projectId: id, buildingId: sessionBuildingId });
+                if (id) {
+                  startDayMutation.mutate(id);
                 }
               }}
               disabled={startDayMutation.isPending}
@@ -3133,41 +3008,16 @@ export default function ProjectDetail() {
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          
-          {/* Building selector for multi-building projects */}
-          {projectBuildings.length > 1 && (
-            <div className="py-2">
-              <label className="text-sm font-medium mb-2 block">
-                {t('projectDetail.dialogs.startSession.selectBuilding', 'Which building are you working on?')}
-              </label>
-              <Select
-                value={sessionBuildingId || ""}
-                onValueChange={(value) => setSessionBuildingId(value)}
-              >
-                <SelectTrigger data-testid="select-session-building">
-                  <SelectValue placeholder={t('projectDetail.dialogs.startSession.selectBuildingPlaceholder', 'Select a building...')} />
-                </SelectTrigger>
-                <SelectContent>
-                  {projectBuildings.map((building: any) => (
-                    <SelectItem key={building.id} value={building.id}>
-                      {building.name || building.buildingName}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-          
           <AlertDialogFooter>
             <AlertDialogCancel data-testid="button-cancel-start-day">{t('common.cancel', 'Cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 if (id) {
-                  startDayMutation.mutate({ projectId: id, buildingId: sessionBuildingId });
+                  startDayMutation.mutate(id);
                 }
               }}
               data-testid="button-confirm-start-day"
-              disabled={startDayMutation.isPending || (projectBuildings.length > 1 && !sessionBuildingId)}
+              disabled={startDayMutation.isPending}
               className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
               {startDayMutation.isPending ? t('projectDetail.workSession.starting', 'Starting...') : t('projectDetail.workSession.startSession', 'Start Work Session')}

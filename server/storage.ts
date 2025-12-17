@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, clients, projects, projectBuildings, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, quoteHistory, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff, documentReviewSignatures, equipmentDamageReports, featureRequests, featureRequestMessages, churnEvents, buildings, buildingInstructions, normalizeStrataPlan, teamInvitations, historicalHours, technicianEmployerConnections, csrRatingHistory, documentQuizzes, quizAttempts, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices } from "@shared/schema";
-import type { User, InsertUser, Client, InsertClient, Project, InsertProject, ProjectBuilding, InsertProjectBuilding, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, QuoteHistory, InsertQuoteHistory, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff, DocumentReviewSignature, InsertDocumentReviewSignature, EquipmentDamageReport, InsertEquipmentDamageReport, FeatureRequest, InsertFeatureRequest, FeatureRequestMessage, InsertFeatureRequestMessage, FeatureRequestWithMessages, ChurnEvent, InsertChurnEvent, Building, InsertBuilding, BuildingInstructions, InsertBuildingInstructions, TeamInvitation, InsertTeamInvitation, HistoricalHours, InsertHistoricalHours, CsrRatingHistory, InsertCsrRatingHistory, DocumentQuiz, InsertDocumentQuiz, QuizAttempt, InsertQuizAttempt, TechnicianDocumentRequest, InsertTechnicianDocumentRequest, TechnicianDocumentRequestFile, InsertTechnicianDocumentRequestFile } from "@shared/schema";
+import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, quoteHistory, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff, documentReviewSignatures, equipmentDamageReports, featureRequests, featureRequestMessages, churnEvents, buildings, buildingInstructions, normalizeStrataPlan, teamInvitations, historicalHours, technicianEmployerConnections, csrRatingHistory, documentQuizzes, quizAttempts, technicianDocumentRequests, technicianDocumentRequestFiles } from "@shared/schema";
+import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, QuoteHistory, InsertQuoteHistory, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff, DocumentReviewSignature, InsertDocumentReviewSignature, EquipmentDamageReport, InsertEquipmentDamageReport, FeatureRequest, InsertFeatureRequest, FeatureRequestMessage, InsertFeatureRequestMessage, FeatureRequestWithMessages, ChurnEvent, InsertChurnEvent, Building, InsertBuilding, BuildingInstructions, InsertBuildingInstructions, TeamInvitation, InsertTeamInvitation, HistoricalHours, InsertHistoricalHours, CsrRatingHistory, InsertCsrRatingHistory, DocumentQuiz, InsertDocumentQuiz, QuizAttempt, InsertQuizAttempt, TechnicianDocumentRequest, InsertTechnicianDocumentRequest, TechnicianDocumentRequestFile, InsertTechnicianDocumentRequestFile } from "@shared/schema";
 import { eq, and, or, desc, sql, isNull, isNotNull, not, gte, lte, between, inArray } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import { encryptSensitiveFields, decryptSensitiveFields } from "./encryption";
@@ -647,47 +647,6 @@ export class Storage {
     await db.delete(projects).where(eq(projects.id, id));
   }
 
-  // Project buildings operations (for multi-building complexes)
-  async getProjectBuildings(projectId: string): Promise<ProjectBuilding[]> {
-    return db.select().from(projectBuildings)
-      .where(eq(projectBuildings.projectId, projectId))
-      .orderBy(projectBuildings.displayOrder);
-  }
-
-  async getProjectBuildingById(id: string): Promise<ProjectBuilding | undefined> {
-    const result = await db.select().from(projectBuildings)
-      .where(eq(projectBuildings.id, id))
-      .limit(1);
-    return result[0];
-  }
-
-  async createProjectBuilding(building: InsertProjectBuilding): Promise<ProjectBuilding> {
-    const result = await db.insert(projectBuildings).values(building).returning();
-    return result[0];
-  }
-
-  async createProjectBuildings(buildings: InsertProjectBuilding[]): Promise<ProjectBuilding[]> {
-    if (buildings.length === 0) return [];
-    const result = await db.insert(projectBuildings).values(buildings).returning();
-    return result;
-  }
-
-  async updateProjectBuilding(id: string, updates: Partial<InsertProjectBuilding>): Promise<ProjectBuilding> {
-    const result = await db.update(projectBuildings)
-      .set({ ...updates, updatedAt: new Date() })
-      .where(eq(projectBuildings.id, id))
-      .returning();
-    return result[0];
-  }
-
-  async deleteProjectBuilding(id: string): Promise<void> {
-    await db.delete(projectBuildings).where(eq(projectBuildings.id, id));
-  }
-
-  async deleteProjectBuildingsByProject(projectId: string): Promise<void> {
-    await db.delete(projectBuildings).where(eq(projectBuildings.projectId, projectId));
-  }
-
   // Custom job type operations
   async getCustomJobTypesByCompany(companyId: string): Promise<CustomJobType[]> {
     return db.select().from(customJobTypes)
@@ -1106,7 +1065,6 @@ export class Storage {
     const result = await db.select({
       id: workSessions.id,
       projectId: workSessions.projectId,
-      projectBuildingId: workSessions.projectBuildingId,
       employeeId: workSessions.employeeId,
       companyId: workSessions.companyId,
       workDate: workSessions.workDate,
@@ -1192,7 +1150,6 @@ export class Storage {
     const result = await db.select({
       id: workSessions.id,
       projectId: workSessions.projectId,
-      projectBuildingId: workSessions.projectBuildingId,
       employeeId: workSessions.employeeId,
       companyId: workSessions.companyId,
       workDate: workSessions.workDate,
@@ -1249,13 +1206,6 @@ export class Storage {
     return db.select().from(workSessions)
       .where(eq(workSessions.companyId, companyId))
       .orderBy(desc(workSessions.workDate), desc(workSessions.startTime));
-  }
-
-  // Work notices operations
-  async getWorkNoticesByProject(projectId: string): Promise<any[]> {
-    return db.select().from(workNotices)
-      .where(eq(workNotices.projectId, projectId))
-      .orderBy(desc(workNotices.createdAt));
   }
 
   // Non-billable work session operations
@@ -2196,7 +2146,6 @@ export class Storage {
         sessionId: workSessions.id,
         employeeId: workSessions.employeeId,
         projectId: workSessions.projectId,
-        projectBuildingId: workSessions.projectBuildingId,
         startTime: workSessions.startTime,
         endTime: workSessions.endTime,
         workDate: workSessions.workDate,
@@ -2644,7 +2593,7 @@ export class Storage {
             )
           : [];
         
-        // Map assignments with their metadata (including building ID for multi-building projects)
+        // Map assignments with their metadata
         const employeeAssignments = assignments.map(assignment => {
           const employee = assignedEmployees.find(e => e.id === assignment.employeeId);
           if (!employee) return null;
@@ -2654,7 +2603,6 @@ export class Storage {
             employee,
             startDate: assignment.startDate,
             endDate: assignment.endDate,
-            projectBuildingId: assignment.projectBuildingId || null,
           };
         }).filter(Boolean);
         
@@ -2663,17 +2611,11 @@ export class Storage {
           ? await this.getProjectById(job.projectId)
           : null;
         
-        // Fetch project buildings if this is a multi-building project
-        const buildings = job.projectId
-          ? await this.getProjectBuildings(job.projectId)
-          : [];
-        
         return {
           ...job,
           assignedEmployees,
           employeeAssignments: employeeAssignments as any,
           project,
-          projectBuildings: buildings.length > 0 ? buildings : undefined,
         };
       })
     );
@@ -2706,7 +2648,7 @@ export class Storage {
             )
           : [];
         
-        // Map assignments with their metadata (including building ID for multi-building projects)
+        // Map assignments with their metadata
         const employeeAssignments = jobAssignmentList.map(assignment => {
           const employee = assignedEmployees.find(e => e.id === assignment.employeeId);
           if (!employee) return null;
@@ -2716,7 +2658,6 @@ export class Storage {
             employee,
             startDate: assignment.startDate,
             endDate: assignment.endDate,
-            projectBuildingId: assignment.projectBuildingId || null,
           };
         }).filter(Boolean);
         
@@ -2751,7 +2692,7 @@ export class Storage {
         )
       : [];
     
-    // Map assignments with their metadata (including building ID for multi-building projects)
+    // Map assignments with their metadata
     const employeeAssignments = assignments.map(assignment => {
       const employee = assignedEmployees.find(e => e.id === assignment.employeeId);
       if (!employee) return null;
@@ -2761,7 +2702,6 @@ export class Storage {
         employee,
         startDate: assignment.startDate,
         endDate: assignment.endDate,
-        projectBuildingId: assignment.projectBuildingId || null,
       };
     }).filter(Boolean);
     
@@ -2770,17 +2710,11 @@ export class Storage {
       ? await this.getProjectById(job.projectId)
       : null;
     
-    // Fetch project buildings if this is a multi-building project
-    const buildings = job.projectId
-      ? await this.getProjectBuildings(job.projectId)
-      : [];
-    
     return {
       ...job,
       assignedEmployees, // Keep for backward compatibility
       employeeAssignments: employeeAssignments as any,
       project,
-      projectBuildings: buildings.length > 0 ? buildings : undefined,
     };
   }
 
@@ -2815,19 +2749,9 @@ export class Storage {
     await db.delete(jobAssignments).where(eq(jobAssignments.jobId, jobId));
   }
 
-  async replaceJobAssignments(jobId: string, employeeIds: string[], assignedBy: string, projectBuildingId?: string | null): Promise<void> {
-    // Delete existing assignments for this job (and building if specified)
-    if (projectBuildingId) {
-      // For building-specific assignments, only delete assignments for this building
-      await db.delete(jobAssignments).where(
-        and(
-          eq(jobAssignments.jobId, jobId),
-          eq(jobAssignments.projectBuildingId, projectBuildingId)
-        )
-      );
-    } else {
-      await this.deleteJobAssignmentsByJobId(jobId);
-    }
+  async replaceJobAssignments(jobId: string, employeeIds: string[], assignedBy: string): Promise<void> {
+    // Delete existing assignments
+    await this.deleteJobAssignmentsByJobId(jobId);
     
     // Create new assignments
     for (const employeeId of employeeIds) {
@@ -2835,7 +2759,6 @@ export class Storage {
         jobId,
         employeeId,
         assignedBy,
-        projectBuildingId: projectBuildingId || null,
       });
     }
   }
@@ -3232,23 +3155,10 @@ export class Storage {
     
     // Filter projects by normalized strata number
     // Only include projects that have a strataPlanNumber AND it matches the filter
-    const filteredProjects = allProjects.filter(project => {
+    return allProjects.filter(project => {
       const projectStrata = normalizeStrata(project.strataPlanNumber);
       return projectStrata !== null && projectStrata === normalizedStrata;
     });
-    
-    // Get the actual building name from the buildings table (if it exists)
-    const [building] = await db.select()
-      .from(buildings)
-      .where(eq(buildings.strataPlanNumber, normalizedStrata))
-      .limit(1);
-    
-    // Enhance projects with actual building name
-    return filteredProjects.map(project => ({
-      ...project,
-      // Use buildings table name if available, fall back to project's buildingName
-      buildingName: building?.buildingName || project.buildingName
-    }));
   }
 
   async getPropertyManagerProjectDetails(projectId: string, companyId: string, normalizedStrata: string): Promise<{ project: any; complaints: any[]; buildingInstructions: any | null }> {
@@ -3316,12 +3226,6 @@ export class Storage {
       }
     }
     
-    // Get project buildings if this is a multi-building complex
-    const projectBuildingsList = await db.select()
-      .from(projectBuildings)
-      .where(eq(projectBuildings.projectId, projectId))
-      .orderBy(projectBuildings.sortOrder);
-    
     return {
       project: {
         ...project,
@@ -3329,7 +3233,6 @@ export class Storage {
       },
       complaints: projectComplaints,
       buildingInstructions: projectBuildingInstructions,
-      projectBuildings: projectBuildingsList,
     };
   }
 
@@ -4120,42 +4023,23 @@ export class Storage {
   // ========================
 
   /**
-   * Get building instructions by building ID (and optionally project building ID for multi-building complexes)
+   * Get building instructions by building ID
    */
-  async getBuildingInstructions(buildingId: string, projectBuildingId?: string): Promise<BuildingInstructions | undefined> {
-    if (projectBuildingId) {
-      // Look for building-specific instructions first
-      const specificResult = await db.select().from(buildingInstructions)
-        .where(and(
-          eq(buildingInstructions.buildingId, buildingId),
-          eq(buildingInstructions.projectBuildingId, projectBuildingId)
-        ))
-        .limit(1);
-      if (specificResult[0]) return specificResult[0];
-    }
-    
-    // Fall back to general building instructions (no projectBuildingId)
+  async getBuildingInstructions(buildingId: string): Promise<BuildingInstructions | undefined> {
     const result = await db.select().from(buildingInstructions)
-      .where(and(
-        eq(buildingInstructions.buildingId, buildingId),
-        isNull(buildingInstructions.projectBuildingId)
-      ))
+      .where(eq(buildingInstructions.buildingId, buildingId))
       .limit(1);
     return result[0];
   }
 
   /**
-   * Create or update building instructions (supports per-building instructions for multi-building complexes)
+   * Create or update building instructions
    */
   async upsertBuildingInstructions(data: InsertBuildingInstructions): Promise<BuildingInstructions> {
-    // Check if instructions already exist for this building (and optionally project building)
-    const projectBuildingId = (data as any).projectBuildingId;
-    const existing = await this.getBuildingInstructions(data.buildingId, projectBuildingId);
+    // Check if instructions already exist for this building
+    const existing = await this.getBuildingInstructions(data.buildingId);
     
-    // If we have a projectBuildingId but found generic instructions, we need to create new
-    const shouldCreateNew = projectBuildingId && existing && !existing.projectBuildingId;
-    
-    if (existing && !shouldCreateNew) {
+    if (existing) {
       // Update existing
       const result = await db.update(buildingInstructions)
         .set({ ...data, updatedAt: new Date() })

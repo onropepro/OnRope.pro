@@ -7,7 +7,7 @@ import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { BackButton } from "@/components/BackButton";
-import { hasFinancialAccess, isManagement, hasPermission, canViewQuoteFinancials } from "@/lib/permissions";
+import { hasFinancialAccess, isManagement, hasPermission } from "@/lib/permissions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -384,9 +384,8 @@ export default function Quotes() {
 
   const currentUser = userData?.user;
   
-  // Check if user can view financial data using centralized permission helpers
-  // Either general financial access OR quote-specific financial permission
-  const canViewFinancialData = hasFinancialAccess(currentUser) || canViewQuoteFinancials(currentUser);
+  // Check if user can view financial data using centralized permission helper
+  const canViewFinancialData = hasFinancialAccess(currentUser);
   
   // Check if user can edit quotes using centralized permission helpers
   const canEditQuotes = isManagement(currentUser) || hasPermission(currentUser, 'edit_quotes');

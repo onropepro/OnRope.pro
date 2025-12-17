@@ -286,8 +286,6 @@ export type InsertBuilding = z.infer<typeof insertBuildingSchema>;
 export const buildingInstructions = pgTable("building_instructions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   buildingId: varchar("building_id").notNull().references(() => buildings.id, { onDelete: "cascade" }),
-  // For multi-building complexes, instructions can be specific to a building within the project
-  projectBuildingId: varchar("project_building_id").references(() => projectBuildings.id, { onDelete: "cascade" }),
   
   // Instruction categories
   buildingAccess: text("building_access"), // How to access the building
@@ -320,7 +318,6 @@ export const buildingInstructions = pgTable("building_instructions", {
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [
   index("IDX_building_instructions_building").on(table.buildingId),
-  index("IDX_building_instructions_project_building").on(table.projectBuildingId),
 ]);
 
 export const insertBuildingInstructionsSchema = createInsertSchema(buildingInstructions).omit({
@@ -432,7 +429,6 @@ export const workNotices = pgTable("work_notices", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
   companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  projectBuildingId: varchar("project_building_id").references(() => projectBuildings.id, { onDelete: "set null" }), // For multi-building projects
   
   // Auto-filled from project (stored for historical reference)
   buildingName: varchar("building_name"),
@@ -490,54 +486,10 @@ export const customNoticeTemplates = pgTable("custom_notice_templates", {
   index("IDX_custom_notice_templates_job_type").on(table.jobType),
 ]);
 
-// Project buildings table - for multi-building complexes (e.g., Tower 1, Tower 2, Tower 3)
-// Each project can have multiple buildings, each with their own drop totals and progress
-export const projectBuildings = pgTable("project_buildings", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
-  
-  // Building identification
-  name: varchar("name").notNull(), // e.g., "Tower 1", "Building A", "North Tower"
-  strataPlanNumber: varchar("strata_plan_number"), // Each building can have its own strata number
-  buildingAddress: text("building_address"), // Specific address for this building if different
-  
-  // Building specifications
-  floorCount: integer("floor_count"),
-  buildingHeight: varchar("building_height"), // e.g., "25 floors", "100m"
-  
-  // Daily drop target for this building (for scheduling/analytics)
-  dailyDropTarget: integer("daily_drop_target").default(0),
-  
-  // Building-specific scheduling dates
-  startDate: date("start_date"), // When work on this specific building starts
-  endDate: date("end_date"), // When work on this specific building ends
-  
-  // Elevation-specific drop totals for this building
-  totalDropsNorth: integer("total_drops_north").default(0),
-  totalDropsEast: integer("total_drops_east").default(0),
-  totalDropsSouth: integer("total_drops_south").default(0),
-  totalDropsWest: integer("total_drops_west").default(0),
-  
-  // Completed drops adjustments for this building
-  dropsAdjustmentNorth: integer("drops_adjustment_north").default(0),
-  dropsAdjustmentEast: integer("drops_adjustment_east").default(0),
-  dropsAdjustmentSouth: integer("drops_adjustment_south").default(0),
-  dropsAdjustmentWest: integer("drops_adjustment_west").default(0),
-  
-  // Order for display
-  displayOrder: integer("display_order").default(0),
-  
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-}, (table) => [
-  index("IDX_project_buildings_project").on(table.projectId),
-]);
-
 // Drop logs table - tracks daily drops per project per tech per elevation
 export const dropLogs = pgTable("drop_logs", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
-  projectBuildingId: varchar("project_building_id").references(() => projectBuildings.id, { onDelete: "set null" }), // For multi-building complexes
   userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   date: date("date").notNull(),
   
@@ -581,7 +533,6 @@ export type ValidShortfallReasonCode = typeof VALID_SHORTFALL_REASONS[number]['c
 export const workSessions = pgTable("work_sessions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
-  projectBuildingId: varchar("project_building_id").references(() => projectBuildings.id, { onDelete: "set null" }), // For multi-building complexes
   employeeId: varchar("employee_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }), // For multi-tenant isolation
   workDate: date("work_date").notNull(), // Date of the work session
@@ -780,7 +731,6 @@ export const complaints = pgTable("complaints", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }), // Company this belongs to
   projectId: varchar("project_id").references(() => projects.id, { onDelete: "cascade" }), // Optional - null for general messages
-  projectBuildingId: varchar("project_building_id").references(() => projectBuildings.id, { onDelete: "set null" }), // For multi-building projects
   residentId: varchar("resident_id").references(() => users.id, { onDelete: "set null" }), // Optional link to resident user
   residentName: varchar("resident_name").notNull(),
   phoneNumber: varchar("phone_number").notNull(),
@@ -1838,15 +1788,6 @@ export const insertWorkNoticeSchema = createInsertSchema(workNotices).omit({
   updatedAt: true,
 });
 
-export const insertProjectBuildingSchema = createInsertSchema(projectBuildings).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
-
-export type InsertProjectBuilding = z.infer<typeof insertProjectBuildingSchema>;
-export type ProjectBuilding = typeof projectBuildings.$inferSelect;
-
 export const insertCustomJobTypeSchema = createInsertSchema(customJobTypes).omit({
   id: true,
   createdAt: true,
@@ -2029,7 +1970,6 @@ export const insertScheduledJobSchema = createInsertSchema(scheduledJobs).omit({
 export const jobAssignments = pgTable("job_assignments", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   jobId: varchar("job_id").notNull().references(() => scheduledJobs.id, { onDelete: "cascade" }),
-  projectBuildingId: varchar("project_building_id").references(() => projectBuildings.id, { onDelete: "set null" }), // For multi-building complexes - which tower this assignment is for
   employeeId: varchar("employee_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   
   startDate: timestamp("start_date"), // Optional: when this employee starts on this job
@@ -2679,7 +2619,6 @@ export type ScheduledJobWithAssignments = ScheduledJob & {
   assignedEmployees: User[]; // Kept for backward compatibility
   employeeAssignments?: EmployeeAssignment[]; // New: includes date ranges
   project?: Project | null;
-  projectBuildings?: ProjectBuilding[]; // Buildings for multi-building complex projects
 };
 
 // Team Invitations - Pending invitations for technicians to join companies

@@ -25,7 +25,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Check, ChevronsUpDown, Star, Calculator, X, Plus } from "lucide-react";
+import { Check, ChevronsUpDown, Star, Calculator } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
@@ -219,14 +219,6 @@ const PERMISSION_CATEGORIES = [
       { id: "view_financial_data", labelKey: "dashboard.permissions.viewFinancialData" },
     ],
   },
-  {
-    nameKey: "dashboard.permissions.categories.quotes",
-    permissions: [
-      { id: "view_quotes", labelKey: "dashboard.permissions.viewQuotes" },
-      { id: "view_quote_financials", labelKey: "dashboard.permissions.viewQuoteFinancials" },
-      { id: "edit_quotes", labelKey: "dashboard.permissions.editQuotes" },
-    ],
-  },
 ] as const;
 
 // Helper function to get translated job type label
@@ -244,65 +236,6 @@ const getJobTypeLabel = (t: (key: string) => string, jobType: string): string =>
 
 // Flat list of all permissions for compatibility
 const AVAILABLE_PERMISSIONS = PERMISSION_CATEGORIES.flatMap(cat => cat.permissions);
-
-// Quick permission presets for common roles
-const PERMISSION_PRESETS = {
-  // Regular Rope Access Tech / Labourer: Basic technician permissions
-  regular_tech: [
-    "view_projects",
-    "log_drops",
-    "view_own_schedule",
-  ],
-  // Supervisor: Regular tech + management capabilities
-  supervisor: [
-    "view_projects",
-    "log_drops",
-    "view_own_schedule",
-    "edit_quotes",
-    "view_active_workers",
-    "assign_gear",
-    "view_employees",
-  ],
-  // Operations Manager: Full operational access
-  operations_manager: [
-    // Projects - all
-    "view_projects",
-    "view_past_projects",
-    "create_projects",
-    "edit_projects",
-    "delete_projects",
-    "log_drops",
-    // Employees - all
-    "view_employees",
-    "create_employees",
-    "edit_employees",
-    "delete_employees",
-    // Work Sessions - all
-    "view_work_sessions",
-    "manage_work_sessions",
-    "view_work_history",
-    "view_active_workers",
-    // Schedule - all
-    "view_full_schedule",
-    "view_own_schedule",
-    "edit_schedule",
-    // Quotes
-    "view_quotes",
-    "edit_quotes",
-    // Documents - all
-    "view_sensitive_documents",
-    // Safety & Compliance - all
-    "view_csr",
-    // Inventory - all
-    "view_inventory",
-    "manage_inventory",
-    "assign_gear",
-    "view_gear_assignments",
-    // Feedback - all
-    "view_complaints",
-    "manage_complaints",
-  ],
-} as const;
 
 const employeeSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -1027,7 +960,6 @@ export default function Dashboard() {
   const [selectedClientForProject, setSelectedClientForProject] = useState<string>("");
   const [selectedStrataForProject, setSelectedStrataForProject] = useState<string>("");
   const isManualEntryRef = useRef(false);
-  const skipProjectFormResetRef = useRef(false); // Skip form reset when opening from quote import
   const [clientDropdownOpen, setClientDropdownOpen] = useState(false);
   const [clientSearchQuery, setClientSearchQuery] = useState("");
   const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
@@ -1067,25 +999,6 @@ export default function Dashboard() {
   const [showSaveAsClientDialog, setShowSaveAsClientDialog] = useState(false);
   const [projectDataForClient, setProjectDataForClient] = useState<any>(null);
   const [showOtherElevationFields, setShowOtherElevationFields] = useState(false);
-  
-  // Multi-building state for complex projects (window cleaning, building wash)
-  interface ProjectBuildingEntry {
-    name: string;
-    strataPlanNumber: string;
-    buildingAddress: string;
-    floorCount: string;
-    buildingHeight: string;
-    dailyDropTarget: string;
-    totalDropsNorth: string;
-    totalDropsEast: string;
-    totalDropsSouth: string;
-    totalDropsWest: string;
-    startDate: string;
-    endDate: string;
-  }
-  const [projectBuildings, setProjectBuildings] = useState<ProjectBuildingEntry[]>([]);
-  const [isMultiBuildingComplex, setIsMultiBuildingComplex] = useState(false);
-  
   const [invitationToConvert, setInvitationToConvert] = useState<any>(null); // Invitation being converted to employee
   const [showInvitationEmployeeForm, setShowInvitationEmployeeForm] = useState(false); // Show employee form for invitation
   const [showLeaveCompanyDialog, setShowLeaveCompanyDialog] = useState(false); // For technicians to leave company
@@ -1939,9 +1852,6 @@ export default function Dashboard() {
             }
           }
           
-          // Skip form reset when opening from quote (data is already prefilled)
-          skipProjectFormResetRef.current = true;
-          
           // Open the project creation dialog
           setShowProjectDialog(true);
           
@@ -2021,34 +1931,7 @@ export default function Dashboard() {
 
       return response.json();
     },
-    onSuccess: async (responseData) => {
-      const projectId = responseData.project?.id;
-      
-      // Save buildings if this is a multi-building project
-      if (projectId && isMultiBuildingComplex && projectBuildings.length > 0) {
-        try {
-          await apiRequest("PUT", `/api/projects/${projectId}/buildings`, {
-            buildings: projectBuildings.map((b, index) => ({
-              name: b.name,
-              strataPlanNumber: b.strataPlanNumber || undefined,
-              buildingAddress: b.buildingAddress,
-              floorCount: b.floorCount ? parseInt(b.floorCount) : undefined,
-              buildingHeight: b.buildingHeight,
-              dailyDropTarget: b.dailyDropTarget ? parseInt(b.dailyDropTarget) : 0,
-              totalDropsNorth: b.totalDropsNorth ? parseInt(b.totalDropsNorth) : 0,
-              totalDropsEast: b.totalDropsEast ? parseInt(b.totalDropsEast) : 0,
-              totalDropsSouth: b.totalDropsSouth ? parseInt(b.totalDropsSouth) : 0,
-              totalDropsWest: b.totalDropsWest ? parseInt(b.totalDropsWest) : 0,
-              startDate: b.startDate || undefined,
-              endDate: b.endDate || undefined,
-              displayOrder: index,
-            })),
-          });
-        } catch (error) {
-          console.error("Failed to save project buildings:", error);
-        }
-      }
-      
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
       
       // Store project data BEFORE resetting
@@ -2072,8 +1955,6 @@ export default function Dashboard() {
       setSelectedClientForProject("");
       setSelectedStrataForProject("");
       setShowOtherElevationFields(false);
-      setProjectBuildings([]);
-      setIsMultiBuildingComplex(false);
       isManualEntryRef.current = false;
       
       toast({ title: t('dashboard.toast.projectCreated', 'Project created successfully') });
@@ -2501,48 +2382,6 @@ export default function Dashboard() {
       terminationNotes: employee.terminationNotes ?? "",
     });
     setEditEmployeeFormStep(1); // Reset to first step
-    setShowEditEmployeeDialog(true);
-  };
-
-  // Handle editing employee permissions directly (skips to step 2)
-  const handleEditEmployeePermissions = (employee: any) => {
-    setEmployeeToEdit(employee);
-    editEmployeeForm.reset({
-      name: employee.name ?? "",
-      email: employee.email ?? "",
-      role: employee.role,
-      hourlyRate: employee.hourlyRate != null ? String(employee.hourlyRate) : "",
-      isSalary: employee.isSalary ?? false,
-      salary: employee.salary != null ? String(employee.salary) : "",
-      permissions: employee.permissions || [],
-      startDate: employee.startDate ?? "",
-      birthday: employee.birthday ?? "",
-      socialInsuranceNumber: employee.socialInsuranceNumber ?? "",
-      driversLicenseNumber: employee.driversLicenseNumber ?? "",
-      driversLicenseProvince: employee.driversLicenseProvince ?? "",
-      driversLicenseDocuments: employee.driversLicenseDocuments || [],
-      homeAddress: employee.homeAddress ?? "",
-      employeePhoneNumber: employee.employeePhoneNumber ?? "",
-      emergencyContactName: employee.emergencyContactName ?? "",
-      emergencyContactPhone: employee.emergencyContactPhone ?? "",
-      specialMedicalConditions: employee.specialMedicalConditions ?? "",
-      irataLevel: employee.irataLevel ?? "",
-      irataLicenseNumber: employee.irataLicenseNumber ?? "",
-      irataIssuedDate: employee.irataIssuedDate ?? "",
-      irataExpirationDate: employee.irataExpirationDate ?? "",
-      spratLevel: employee.spratLevel ?? "",
-      spratLicenseNumber: employee.spratLicenseNumber ?? "",
-      spratIssuedDate: employee.spratIssuedDate ?? "",
-      spratExpirationDate: employee.spratExpirationDate ?? "",
-      terminatedDate: employee.terminatedDate ?? "",
-      terminationReason: employee.terminationReason ?? "",
-      terminationNotes: employee.terminationNotes ?? "",
-      hasFirstAid: employee.hasFirstAid ?? false,
-      firstAidType: employee.firstAidType ?? "",
-      firstAidExpiry: employee.firstAidExpiry ?? "",
-      firstAidDocuments: employee.firstAidDocuments || [],
-    });
-    setEditEmployeeFormStep(2); // Go directly to permissions step
     setShowEditEmployeeDialog(true);
   };
   
@@ -3863,86 +3702,12 @@ export default function Dashboard() {
                     data-testid="input-search-projects"
                   />
                 </div>
-                <Dialog open={showProjectDialog} onOpenChange={(open) => {
-                  setShowProjectDialog(open);
-                  if (!open) {
-                    setProjectBuildings([]);
-                    setIsMultiBuildingComplex(false);
-                  } else {
-                    // Skip reset if opening from quote import (data is already prefilled)
-                    if (skipProjectFormResetRef.current) {
-                      skipProjectFormResetRef.current = false; // Reset the flag
-                    } else {
-                      // Reset form when opening dialog to clear any stale data
-                      projectForm.reset({
-                        strataPlanNumber: "",
-                        buildingName: "",
-                        buildingAddress: "",
-                        jobCategory: "building_maintenance",
-                        jobType: "window_cleaning",
-                        customJobType: "",
-                        requiresElevation: true,
-                        totalDropsNorth: "",
-                        totalDropsEast: "",
-                        totalDropsSouth: "",
-                        totalDropsWest: "",
-                        dailyDropTarget: "",
-                        floorCount: "",
-                        buildingHeight: "",
-                        startDate: "",
-                        endDate: "",
-                        targetCompletionDate: "",
-                        estimatedHours: "",
-                        calendarColor: "#3b82f6",
-                        assignedEmployees: [],
-                        peaceWork: false,
-                        pricePerDrop: "",
-                      });
-                      setSelectedClientForProject("");
-                      setSelectedStrataForProject("");
-                      setProjectBuildings([]);
-                      setIsMultiBuildingComplex(false);
-                    }
-                  }
-                }}>
+                <Dialog open={showProjectDialog} onOpenChange={setShowProjectDialog}>
                   <DialogTrigger asChild>
                     <Button 
                       className="h-14 px-6 gap-2 shadow-md hover:shadow-lg text-base font-semibold" 
                       data-testid="button-create-project"
                       disabled={userIsReadOnly || (projectsData?.projectInfo?.atProjectLimit ?? false)}
-                      onClick={() => {
-                        // Reset form when button is clicked to clear any stale data
-                        if (!skipProjectFormResetRef.current) {
-                          projectForm.reset({
-                            strataPlanNumber: "",
-                            buildingName: "",
-                            buildingAddress: "",
-                            jobCategory: "building_maintenance",
-                            jobType: "window_cleaning",
-                            customJobType: "",
-                            requiresElevation: true,
-                            totalDropsNorth: "",
-                            totalDropsEast: "",
-                            totalDropsSouth: "",
-                            totalDropsWest: "",
-                            dailyDropTarget: "",
-                            floorCount: "",
-                            buildingHeight: "",
-                            startDate: "",
-                            endDate: "",
-                            targetCompletionDate: "",
-                            estimatedHours: "",
-                            calendarColor: "#3b82f6",
-                            assignedEmployees: [],
-                            peaceWork: false,
-                            pricePerDrop: "",
-                          });
-                          setSelectedClientForProject("");
-                          setSelectedStrataForProject("");
-                          setProjectBuildings([]);
-                          setIsMultiBuildingComplex(false);
-                        }
-                      }}
                     >
                       <span className="material-icons text-xl text-primary-foreground">add_circle</span>
                       <span className="hidden sm:inline">{projectsData?.projectInfo?.atProjectLimit ? t('dashboard.projects.limitReached', 'Project Limit Reached') : t('dashboard.projects.newProject', 'New Project')}</span>
@@ -4545,312 +4310,6 @@ export default function Dashboard() {
                               )}
                             />
                           </>
-                        )}
-
-                        {/* Multi-building toggle for window cleaning and building wash projects */}
-                        {(() => {
-                          const currentJobType = projectForm.watch("jobType");
-                          const supportsMultiBuilding = ["window_cleaning", "building_wash", "building_wash_pressure"].includes(currentJobType);
-                          return supportsMultiBuilding;
-                        })() && (
-                          <div className="space-y-4 border rounded-md p-4">
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <label className="text-sm font-medium">{t('dashboard.projectForm.multiBuildingComplex', 'Multi-Building Complex')}</label>
-                                <p className="text-xs text-muted-foreground">
-                                  {t('dashboard.projectForm.multiBuildingDesc', 'Enable for projects with multiple towers or buildings')}
-                                </p>
-                              </div>
-                              <Switch
-                                checked={isMultiBuildingComplex}
-                                onCheckedChange={(checked) => {
-                                  setIsMultiBuildingComplex(checked);
-                                  if (checked && projectBuildings.length === 0) {
-                                    setProjectBuildings([{
-                                      name: "Tower A",
-                                      strataPlanNumber: "",
-                                      buildingAddress: "",
-                                      floorCount: "",
-                                      buildingHeight: "",
-                                      dailyDropTarget: "",
-                                      totalDropsNorth: "",
-                                      totalDropsEast: "",
-                                      totalDropsSouth: "",
-                                      totalDropsWest: "",
-                                      startDate: "",
-                                      endDate: "",
-                                    }]);
-                                  }
-                                }}
-                                data-testid="switch-multi-building"
-                              />
-                            </div>
-                            
-                            {isMultiBuildingComplex && (
-                              <div className="space-y-4">
-                                {projectBuildings.map((building, index) => (
-                                  <div key={index} className="border rounded-md p-3 space-y-3 bg-muted/30">
-                                    <div className="flex items-center justify-between gap-2">
-                                      <Input
-                                        placeholder={t('dashboard.projectForm.buildingName', 'Building name (e.g., Tower A)')}
-                                        value={building.name}
-                                        onChange={(e) => {
-                                          const updated = [...projectBuildings];
-                                          updated[index] = { ...building, name: e.target.value };
-                                          setProjectBuildings(updated);
-                                        }}
-                                        className="h-10"
-                                        data-testid={`input-building-name-${index}`}
-                                      />
-                                      {projectBuildings.length > 1 && (
-                                        <Button
-                                          type="button"
-                                          variant="ghost"
-                                          size="icon"
-                                          onClick={() => {
-                                            setProjectBuildings(projectBuildings.filter((_, i) => i !== index));
-                                          }}
-                                          data-testid={`button-remove-building-${index}`}
-                                        >
-                                          <X className="h-4 w-4" />
-                                        </Button>
-                                      )}
-                                    </div>
-                                    
-                                    <div className="grid grid-cols-2 gap-2">
-                                      <div>
-                                        <label className="text-xs text-muted-foreground">{t('dashboard.projectForm.strataPlanNumber', 'Strata Plan #')}</label>
-                                        <Input
-                                          placeholder="e.g., LMS 1234"
-                                          value={building.strataPlanNumber}
-                                          onChange={(e) => {
-                                            const updated = [...projectBuildings];
-                                            updated[index] = { ...building, strataPlanNumber: e.target.value };
-                                            setProjectBuildings(updated);
-                                          }}
-                                          className="h-10"
-                                          data-testid={`input-building-strata-${index}`}
-                                        />
-                                      </div>
-                                      <div>
-                                        <label className="text-xs text-muted-foreground">{t('dashboard.projectForm.floorCount', 'Floor Count')}</label>
-                                        <Input
-                                          type="number"
-                                          min="1"
-                                          placeholder="e.g., 20"
-                                          value={building.floorCount}
-                                          onChange={(e) => {
-                                            const updated = [...projectBuildings];
-                                            updated[index] = { ...building, floorCount: e.target.value };
-                                            setProjectBuildings(updated);
-                                          }}
-                                          className="h-10"
-                                          data-testid={`input-building-floors-${index}`}
-                                        />
-                                      </div>
-                                      <div>
-                                        <label className="text-xs text-muted-foreground">{t('dashboard.projectForm.address', 'Address')}</label>
-                                        <Input
-                                          placeholder={t('common.optional', 'Optional')}
-                                          value={building.buildingAddress}
-                                          onChange={(e) => {
-                                            const updated = [...projectBuildings];
-                                            updated[index] = { ...building, buildingAddress: e.target.value };
-                                            setProjectBuildings(updated);
-                                          }}
-                                          className="h-10"
-                                          data-testid={`input-building-address-${index}`}
-                                        />
-                                      </div>
-                                    </div>
-                                    
-                                    <div>
-                                      <label className="text-xs text-muted-foreground">{t('dashboard.projectForm.buildingHeight', 'Building Height')}</label>
-                                      <div className="flex gap-2">
-                                        <Input
-                                          placeholder={t('dashboard.projectForm.buildingHeightPlaceholder', 'e.g., 100m or 300ft')}
-                                          value={building.buildingHeight}
-                                          onChange={(e) => {
-                                            const updated = [...projectBuildings];
-                                            updated[index] = { ...building, buildingHeight: e.target.value };
-                                            setProjectBuildings(updated);
-                                          }}
-                                          className="h-10 flex-1"
-                                          data-testid={`input-building-height-${index}`}
-                                        />
-                                        {building.floorCount && parseInt(building.floorCount) > 0 && (
-                                          <Button
-                                            type="button"
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => {
-                                              const floors = parseInt(building.floorCount);
-                                              const feetPerFloor = 9;
-                                              const totalFeet = floors * feetPerFloor;
-                                              const totalMeters = Math.round(totalFeet * 0.3048);
-                                              const updated = [...projectBuildings];
-                                              updated[index] = { ...building, buildingHeight: `${totalFeet}ft (${totalMeters}m)` };
-                                              setProjectBuildings(updated);
-                                            }}
-                                            className="whitespace-nowrap"
-                                            data-testid={`button-calculate-building-height-${index}`}
-                                          >
-                                            <Calculator className="w-4 h-4 mr-1" />
-                                            {t('dashboard.projectForm.calculateHeight', 'Calculate')}
-                                          </Button>
-                                        )}
-                                      </div>
-                                      <p className="text-xs text-muted-foreground mt-1">
-                                        {t('dashboard.projectForm.buildingHeightImportant', 'Important for technicians:')} {t('dashboard.projectForm.buildingHeightExplain', 'Building height is required for irata logbook entries.')}
-                                      </p>
-                                    </div>
-                                    
-                                    <div>
-                                      <label className="text-xs text-muted-foreground">{t('dashboard.projectForm.dailyDropTarget', 'Daily Drop Target')}</label>
-                                      <Input
-                                        type="number"
-                                        min="1"
-                                        placeholder="e.g., 10"
-                                        value={building.dailyDropTarget}
-                                        onChange={(e) => {
-                                          const updated = [...projectBuildings];
-                                          updated[index] = { ...building, dailyDropTarget: e.target.value };
-                                          setProjectBuildings(updated);
-                                        }}
-                                        className="h-10"
-                                        data-testid={`input-building-drop-target-${index}`}
-                                      />
-                                    </div>
-                                    
-                                    <div className="grid grid-cols-2 gap-2">
-                                      <div>
-                                        <label className="text-xs text-muted-foreground">{t('dashboard.projectForm.startDate', 'Start Date')}</label>
-                                        <Input
-                                          type="date"
-                                          value={building.startDate}
-                                          onChange={(e) => {
-                                            const updated = [...projectBuildings];
-                                            updated[index] = { ...building, startDate: e.target.value };
-                                            setProjectBuildings(updated);
-                                          }}
-                                          className="h-10"
-                                          data-testid={`input-building-start-date-${index}`}
-                                        />
-                                      </div>
-                                      <div>
-                                        <label className="text-xs text-muted-foreground">{t('dashboard.projectForm.endDate', 'End Date')}</label>
-                                        <Input
-                                          type="date"
-                                          value={building.endDate}
-                                          onChange={(e) => {
-                                            const updated = [...projectBuildings];
-                                            updated[index] = { ...building, endDate: e.target.value };
-                                            setProjectBuildings(updated);
-                                          }}
-                                          className="h-10"
-                                          data-testid={`input-building-end-date-${index}`}
-                                        />
-                                      </div>
-                                    </div>
-                                    
-                                    <div className="grid grid-cols-4 gap-2">
-                                      <div>
-                                        <label className="text-xs text-muted-foreground">{t('dashboard.projectForm.north', 'North')}</label>
-                                        <Input
-                                          type="number"
-                                          min="0"
-                                          placeholder="0"
-                                          value={building.totalDropsNorth}
-                                          onChange={(e) => {
-                                            const updated = [...projectBuildings];
-                                            updated[index] = { ...building, totalDropsNorth: e.target.value };
-                                            setProjectBuildings(updated);
-                                          }}
-                                          className="h-10"
-                                          data-testid={`input-building-drops-north-${index}`}
-                                        />
-                                      </div>
-                                      <div>
-                                        <label className="text-xs text-muted-foreground">{t('dashboard.projectForm.east', 'East')}</label>
-                                        <Input
-                                          type="number"
-                                          min="0"
-                                          placeholder="0"
-                                          value={building.totalDropsEast}
-                                          onChange={(e) => {
-                                            const updated = [...projectBuildings];
-                                            updated[index] = { ...building, totalDropsEast: e.target.value };
-                                            setProjectBuildings(updated);
-                                          }}
-                                          className="h-10"
-                                          data-testid={`input-building-drops-east-${index}`}
-                                        />
-                                      </div>
-                                      <div>
-                                        <label className="text-xs text-muted-foreground">{t('dashboard.projectForm.south', 'South')}</label>
-                                        <Input
-                                          type="number"
-                                          min="0"
-                                          placeholder="0"
-                                          value={building.totalDropsSouth}
-                                          onChange={(e) => {
-                                            const updated = [...projectBuildings];
-                                            updated[index] = { ...building, totalDropsSouth: e.target.value };
-                                            setProjectBuildings(updated);
-                                          }}
-                                          className="h-10"
-                                          data-testid={`input-building-drops-south-${index}`}
-                                        />
-                                      </div>
-                                      <div>
-                                        <label className="text-xs text-muted-foreground">{t('dashboard.projectForm.west', 'West')}</label>
-                                        <Input
-                                          type="number"
-                                          min="0"
-                                          placeholder="0"
-                                          value={building.totalDropsWest}
-                                          onChange={(e) => {
-                                            const updated = [...projectBuildings];
-                                            updated[index] = { ...building, totalDropsWest: e.target.value };
-                                            setProjectBuildings(updated);
-                                          }}
-                                          className="h-10"
-                                          data-testid={`input-building-drops-west-${index}`}
-                                        />
-                                      </div>
-                                    </div>
-                                  </div>
-                                ))}
-                                
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => {
-                                    const nextLetter = String.fromCharCode(65 + projectBuildings.length); // A, B, C...
-                                    setProjectBuildings([...projectBuildings, {
-                                      name: `Tower ${nextLetter}`,
-                                      strataPlanNumber: "",
-                                      buildingAddress: "",
-                                      floorCount: "",
-                                      buildingHeight: "",
-                                      dailyDropTarget: "",
-                                      totalDropsNorth: "",
-                                      totalDropsEast: "",
-                                      totalDropsSouth: "",
-                                      totalDropsWest: "",
-                                      startDate: "",
-                                      endDate: "",
-                                    }]);
-                                  }}
-                                  data-testid="button-add-building"
-                                >
-                                  <Plus className="h-4 w-4 mr-2" />
-                                  {t('dashboard.projectForm.addBuilding', 'Add Another Building')}
-                                </Button>
-                              </div>
-                            )}
-                          </div>
                         )}
 
                         <div className="space-y-2">
@@ -6938,58 +6397,6 @@ export default function Dashboard() {
                                   {t('dashboard.employeeForm.selectAll', 'Select All')}
                                 </Button>
                               </div>
-                              
-                              {/* Quick Permission Presets */}
-                              <div className="mt-4 p-4 bg-muted/30 rounded-lg border">
-                                <p className="text-sm font-medium mb-3">{t('dashboard.employeeForm.quickPermissions', 'Quick Permission Presets')}</p>
-                                <div className="flex flex-wrap gap-2">
-                                  <Button
-                                    type="button"
-                                    variant="secondary"
-                                    size="sm"
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      employeeForm.setValue("permissions", [...PERMISSION_PRESETS.regular_tech]);
-                                    }}
-                                    data-testid="button-preset-regular-tech"
-                                  >
-                                    <span className="material-icons text-base mr-1">construction</span>
-                                    {t('dashboard.employeeForm.presetRegularTech', 'Technician / Labourer')}
-                                  </Button>
-                                  <Button
-                                    type="button"
-                                    variant="secondary"
-                                    size="sm"
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      employeeForm.setValue("permissions", [...PERMISSION_PRESETS.supervisor]);
-                                    }}
-                                    data-testid="button-preset-supervisor"
-                                  >
-                                    <span className="material-icons text-base mr-1">supervisor_account</span>
-                                    {t('dashboard.employeeForm.presetSupervisor', 'Supervisor')}
-                                  </Button>
-                                  <Button
-                                    type="button"
-                                    variant="secondary"
-                                    size="sm"
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      employeeForm.setValue("permissions", [...PERMISSION_PRESETS.operations_manager]);
-                                    }}
-                                    data-testid="button-preset-ops-manager"
-                                  >
-                                    <span className="material-icons text-base mr-1">engineering</span>
-                                    {t('dashboard.employeeForm.presetOpsManager', 'Operations Manager')}
-                                  </Button>
-                                </div>
-                                <p className="text-xs text-muted-foreground mt-2">
-                                  {t('dashboard.employeeForm.presetHint', 'Click a preset to auto-select permissions, then customize as needed')}
-                                </p>
-                              </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                               {PERMISSION_CATEGORIES.map((category) => (
@@ -7308,19 +6715,6 @@ export default function Dashboard() {
                                   disabled={userIsReadOnly}
                                 >
                                   <span className="material-icons text-sm">edit</span>
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleEditEmployeePermissions(employee);
-                                  }}
-                                  data-testid={`button-edit-permissions-${employee.id}`}
-                                  disabled={userIsReadOnly}
-                                >
-                                  <span className="material-icons text-sm mr-1">admin_panel_settings</span>
-                                  {t('dashboard.employees.editPermissions', 'Edit Permissions')}
                                 </Button>
                                 {/* Password change only for company-created employees, NOT rope access technicians who own their own accounts */}
                                 {user?.role === "company" && employee.role !== "rope_access_tech" && (
@@ -9320,58 +8714,6 @@ export default function Dashboard() {
                           >
                             {t('dashboard.employeeForm.selectAll', 'Select All')}
                           </Button>
-                        </div>
-                        
-                        {/* Quick Permission Presets */}
-                        <div className="mt-4 p-4 bg-muted/30 rounded-lg border">
-                          <p className="text-sm font-medium mb-3">{t('dashboard.employeeForm.quickPermissions', 'Quick Permission Presets')}</p>
-                          <div className="flex flex-wrap gap-2">
-                            <Button
-                              type="button"
-                              variant="secondary"
-                              size="sm"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                editEmployeeForm.setValue("permissions", [...PERMISSION_PRESETS.regular_tech]);
-                              }}
-                              data-testid="button-edit-preset-regular-tech"
-                            >
-                              <span className="material-icons text-base mr-1">construction</span>
-                              {t('dashboard.employeeForm.presetRegularTech', 'Technician / Labourer')}
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="secondary"
-                              size="sm"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                editEmployeeForm.setValue("permissions", [...PERMISSION_PRESETS.supervisor]);
-                              }}
-                              data-testid="button-edit-preset-supervisor"
-                            >
-                              <span className="material-icons text-base mr-1">supervisor_account</span>
-                              {t('dashboard.employeeForm.presetSupervisor', 'Supervisor')}
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="secondary"
-                              size="sm"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                editEmployeeForm.setValue("permissions", [...PERMISSION_PRESETS.operations_manager]);
-                              }}
-                              data-testid="button-edit-preset-ops-manager"
-                            >
-                              <span className="material-icons text-base mr-1">engineering</span>
-                              {t('dashboard.employeeForm.presetOpsManager', 'Operations Manager')}
-                            </Button>
-                          </div>
-                          <p className="text-xs text-muted-foreground mt-2">
-                            {t('dashboard.employeeForm.presetHint', 'Click a preset to auto-select permissions, then customize as needed')}
-                          </p>
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
