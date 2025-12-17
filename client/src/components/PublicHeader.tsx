@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
-import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown, IdCard, HardHat, Search, Package, Calendar } from "lucide-react";
+import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown, IdCard, HardHat, Search, Package, Calendar, DollarSign } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 interface PublicHeaderProps {
@@ -324,6 +324,22 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                       <div>
                         <div className="font-semibold text-sm">Scheduling & Calendar</div>
                         <div className="text-xs text-muted-foreground mt-0.5">Conflict detection, dual calendars, time-off management</div>
+                      </div>
+                    </button>
+                    <button
+                      className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                      onClick={() => {
+                        setLocation("/modules/payroll-financial");
+                        setShowModulesMenu(false);
+                      }}
+                      data-testid="nav-payroll-financial"
+                    >
+                      <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <DollarSign className="w-5 h-5 text-emerald-600" />
+                      </div>
+                      <div>
+                        <div className="font-semibold text-sm">Payroll & Financial</div>
+                        <div className="text-xs text-muted-foreground mt-0.5">Automated timesheets, overtime calculation, payroll exports</div>
                       </div>
                     </button>
                   </div>

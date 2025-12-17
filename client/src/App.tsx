@@ -88,6 +88,7 @@ import TechnicianJobBoardLanding from "@/pages/TechnicianJobBoardLanding";
 import EmployerJobBoardLanding from "@/pages/EmployerJobBoardLanding";
 import GearInventoryLanding from "@/pages/GearInventoryLanding";
 import SchedulingCalendarLanding from "@/pages/SchedulingCalendarLanding";
+import PayrollFinancialLanding from "@/pages/PayrollFinancialLanding";
 import JobBoardGuide from "@/pages/JobBoardGuide";
 import Pricing from "@/pages/Pricing";
 import ROICalculator from "@/pages/ROICalculator";
@@ -362,6 +363,7 @@ function Router() {
       <Route path="/modules/employer-job-board" component={EmployerJobBoardLanding} />
       <Route path="/modules/gear-inventory" component={GearInventoryLanding} />
       <Route path="/modules/scheduling-calendar" component={SchedulingCalendarLanding} />
+      <Route path="/modules/payroll-financial" component={PayrollFinancialLanding} />
       <Route path="/changelog/user-access" component={UserAccessGuide} />
       <Route path="/changelog/projects" component={ProjectsGuide} />
       <Route path="/changelog/time-tracking" component={TimeTrackingGuide} />
