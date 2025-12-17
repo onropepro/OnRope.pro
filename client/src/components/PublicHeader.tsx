@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
-import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown, IdCard, HardHat, Search, Package, Calendar, DollarSign, Calculator } from "lucide-react";
+import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown, IdCard, HardHat, Search, Package, Calendar, DollarSign, Calculator, Palette } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 interface PublicHeaderProps {
@@ -369,6 +369,22 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                           <div className="text-xs text-muted-foreground mt-0.5">Service-specific quotes, financial privacy, visual pipeline</div>
                         </div>
                       </button>
+                      <button
+                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                        onClick={() => {
+                          setLocation("/modules/white-label-branding");
+                          setShowModulesMenu(false);
+                        }}
+                        data-testid="nav-white-label-branding"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <Palette className="w-5 h-5 text-purple-600" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-sm">White-Label Branding</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Your logo, colors, and brand across every touchpoint</div>
+                        </div>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -604,6 +620,17 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                   >
                     <Calculator className="w-5 h-5 text-rose-600" />
                     <span className="text-sm">Quoting & Sales Pipeline</span>
+                  </button>
+                  <button
+                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
+                    onClick={() => {
+                      setLocation("/modules/white-label-branding");
+                      setMobileMenuOpen(false);
+                    }}
+                    data-testid="nav-mobile-white-label-branding"
+                  >
+                    <Palette className="w-5 h-5 text-purple-600" />
+                    <span className="text-sm">White-Label Branding</span>
                   </button>
                 </div>
               )}
