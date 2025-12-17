@@ -471,49 +471,49 @@ export default function QuotingGuide() {
           </p>
 
           <div className="grid gap-3 md:grid-cols-2" data-testid="grid-service-types">
-            <Card>
+            <Card data-testid="card-service-window-cleaning">
               <CardContent className="p-4 space-y-2">
                 <h4 className="font-semibold text-base">Window Cleaning</h4>
                 <p className="text-muted-foreground text-base">Enter drops per elevation (N/E/S/W), your daily target drops, and hourly rate. System calculates total hours as (Total Drops / Drops per Day) x Hours.</p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card data-testid="card-service-building-wash">
               <CardContent className="p-4 space-y-2">
                 <h4 className="font-semibold text-base">Building Wash</h4>
                 <p className="text-muted-foreground text-base">Same structure as window cleaning. Configure drops per elevation and productivity rate. Ideal for pressure washing and exterior cleaning.</p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card data-testid="card-service-parkade-cleaning">
               <CardContent className="p-4 space-y-2">
                 <h4 className="font-semibold text-base">Parkade Cleaning</h4>
                 <p className="text-muted-foreground text-base">Enter total stalls and price per stall. Simple multiplication pricing. Hourly option in development for time-based parkade work.</p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card data-testid="card-service-dryer-vent">
               <CardContent className="p-4 space-y-2">
                 <h4 className="font-semibold text-base">Dryer Vent</h4>
                 <p className="text-muted-foreground text-base">Flexible pricing: per-unit rate for suite counts, or hourly rate for complex configurations. Choose the model that fits the job.</p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card data-testid="card-service-ground-windows">
               <CardContent className="p-4 space-y-2">
                 <h4 className="font-semibold text-base">Ground Windows</h4>
                 <p className="text-muted-foreground text-base">Estimated hours multiplied by hourly rate. Simple time-based pricing for ground-level window work not requiring rope access.</p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card data-testid="card-service-painting">
               <CardContent className="p-4 space-y-2">
                 <h4 className="font-semibold text-base">Painting</h4>
                 <p className="text-muted-foreground text-base">Per-drop pricing model. Enter drop count and rate per drop. Accounts for prep, paint, and finish work at height.</p>
               </CardContent>
             </Card>
 
-            <Card className="md:col-span-2">
+            <Card className="md:col-span-2" data-testid="card-service-custom">
               <CardContent className="p-4 space-y-2">
                 <h4 className="font-semibold text-base">Custom Service</h4>
                 <p className="text-muted-foreground text-base">User-defined pricing structure for work that doesn't fit standard categories. Specify whether it's rope access or ground work, and configure your own calculation method.</p>
@@ -560,7 +560,7 @@ export default function QuotingGuide() {
           </div>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4" data-testid="grid-workflow">
-            <Card>
+            <Card data-testid="card-workflow-step-1">
               <CardHeader className="pb-2">
                 <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-2">
                   <span className="font-bold text-blue-600">1</span>
@@ -572,7 +572,7 @@ export default function QuotingGuide() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card data-testid="card-workflow-step-2">
               <CardHeader className="pb-2">
                 <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-2">
                   <span className="font-bold text-blue-600">2</span>
@@ -584,7 +584,7 @@ export default function QuotingGuide() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card data-testid="card-workflow-step-3">
               <CardHeader className="pb-2">
                 <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-2">
                   <span className="font-bold text-blue-600">3</span>
@@ -596,7 +596,7 @@ export default function QuotingGuide() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card data-testid="card-workflow-step-4">
               <CardHeader className="pb-2">
                 <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-2">
                   <span className="font-bold text-blue-600">4</span>
@@ -736,7 +736,7 @@ export default function QuotingGuide() {
           </p>
 
           <div className="grid gap-4 md:grid-cols-2" data-testid="grid-integrations">
-            <Card>
+            <Card data-testid="card-integration-project-management">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base font-medium flex items-center gap-2">
                   <Briefcase className="w-5 h-5 text-emerald-600" />
@@ -755,7 +755,7 @@ export default function QuotingGuide() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card data-testid="card-integration-work-sessions">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base font-medium flex items-center gap-2">
                   <Settings className="w-5 h-5 text-amber-600" />
@@ -774,7 +774,7 @@ export default function QuotingGuide() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card data-testid="card-integration-resident-portal">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base font-medium flex items-center gap-2">
                   <Building2 className="w-5 h-5 text-violet-600" />
@@ -793,7 +793,7 @@ export default function QuotingGuide() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card data-testid="card-integration-analytics">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base font-medium flex items-center gap-2">
                   <BarChart3 className="w-5 h-5 text-blue-600" />
@@ -812,7 +812,7 @@ export default function QuotingGuide() {
               </CardContent>
             </Card>
 
-            <Card className="md:col-span-2">
+            <Card className="md:col-span-2" data-testid="card-integration-employee-management">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base font-medium flex items-center gap-2">
                   <Users className="w-5 h-5 text-blue-600" />
