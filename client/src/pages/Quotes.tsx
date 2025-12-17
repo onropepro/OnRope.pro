@@ -7,6 +7,7 @@ import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { BackButton } from "@/components/BackButton";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { hasFinancialAccess, isManagement, hasPermission } from "@/lib/permissions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -2235,7 +2236,16 @@ export default function Quotes() {
                         <FormItem className="col-span-2">
                           <FormLabel>Building Address</FormLabel>
                           <FormControl>
-                            <Input {...field} className="h-12" data-testid="input-edit-building-address" />
+                            <AddressAutocomplete
+                              value={field.value}
+                              placeholder="Start typing address..."
+                              data-testid="input-edit-building-address"
+                              onSelect={(address) => {
+                                field.onChange(address.formatted);
+                              }}
+                              onChange={(value) => field.onChange(value)}
+                              onBlur={field.onBlur}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -2317,7 +2327,16 @@ export default function Quotes() {
                         <FormItem className="col-span-2">
                           <FormLabel>Property Manager Address</FormLabel>
                           <FormControl>
-                            <Input {...field} className="h-12" data-testid="input-edit-strata-manager-address" />
+                            <AddressAutocomplete
+                              value={field.value || ""}
+                              placeholder="Start typing address..."
+                              data-testid="input-edit-strata-manager-address"
+                              onSelect={(address) => {
+                                field.onChange(address.formatted);
+                              }}
+                              onChange={(value) => field.onChange(value)}
+                              onBlur={field.onBlur}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -3002,11 +3021,15 @@ export default function Quotes() {
                       <FormItem>
                         <FormLabel>Building Address</FormLabel>
                         <FormControl>
-                          <Input
-                            {...field}
-                            placeholder="e.g., 123 Main Street, Vancouver, BC"
-                            className="h-12"
+                          <AddressAutocomplete
+                            value={field.value}
+                            placeholder="Start typing address..."
                             data-testid="input-building-address"
+                            onSelect={(address) => {
+                              field.onChange(address.formatted);
+                            }}
+                            onChange={(value) => field.onChange(value)}
+                            onBlur={field.onBlur}
                           />
                         </FormControl>
                         <FormMessage />
@@ -3061,11 +3084,15 @@ export default function Quotes() {
                       <FormItem>
                         <FormLabel>Manager Address</FormLabel>
                         <FormControl>
-                          <Input
-                            {...field}
-                            placeholder="e.g., 456 Business St, Vancouver, BC"
-                            className="h-12"
+                          <AddressAutocomplete
+                            value={field.value}
+                            placeholder="Start typing address..."
                             data-testid="input-manager-address"
+                            onSelect={(address) => {
+                              field.onChange(address.formatted);
+                            }}
+                            onChange={(value) => field.onChange(value)}
+                            onBlur={field.onBlur}
                           />
                         </FormControl>
                         <FormMessage />
