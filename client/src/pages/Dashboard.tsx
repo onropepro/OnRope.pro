@@ -6859,9 +6859,59 @@ export default function Dashboard() {
                             {/* Permissions - show for non-company roles */}
                             {employee.role !== "company" && (
                               <div className="text-xs text-muted-foreground space-y-1 pt-2 border-t">
-                                <div className="flex items-center gap-2">
-                                  <span className="material-icons text-sm">security</span>
-                                  <span className="font-medium">{t('employees.permissions', 'Permissions')}</span>
+                                <div className="flex items-center gap-2 justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <span className="material-icons text-sm">security</span>
+                                    <span className="font-medium">{t('employees.permissions', 'Permissions')}</span>
+                                  </div>
+                                  {user?.role === "company" && employee.id !== user?.id && !userIsReadOnly && (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-6 text-xs px-2"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setEmployeeToEdit(employee);
+                                        editEmployeeForm.reset({
+                                          name: employee.name ?? "",
+                                          email: employee.email ?? "",
+                                          role: employee.role,
+                                          hourlyRate: employee.hourlyRate != null ? String(employee.hourlyRate) : "",
+                                          isSalary: employee.isSalary ?? false,
+                                          salary: employee.salary != null ? String(employee.salary) : "",
+                                          permissions: employee.permissions || [],
+                                          startDate: employee.startDate ?? "",
+                                          birthday: employee.birthday ?? "",
+                                          socialInsuranceNumber: employee.socialInsuranceNumber ?? "",
+                                          driversLicenseNumber: employee.driversLicenseNumber ?? "",
+                                          driversLicenseProvince: employee.driversLicenseProvince ?? "",
+                                          driversLicenseDocuments: employee.driversLicenseDocuments || [],
+                                          homeAddress: employee.homeAddress ?? "",
+                                          employeePhoneNumber: employee.employeePhoneNumber ?? "",
+                                          emergencyContactName: employee.emergencyContactName ?? "",
+                                          emergencyContactPhone: employee.emergencyContactPhone ?? "",
+                                          specialMedicalConditions: employee.specialMedicalConditions ?? "",
+                                          irataLevel: employee.irataLevel ?? "",
+                                          irataLicenseNumber: employee.irataLicenseNumber ?? "",
+                                          irataIssuedDate: employee.irataIssuedDate ?? "",
+                                          irataExpirationDate: employee.irataExpirationDate ?? "",
+                                          spratLevel: employee.spratLevel ?? "",
+                                          spratLicenseNumber: employee.spratLicenseNumber ?? "",
+                                          spratIssuedDate: employee.spratIssuedDate ?? "",
+                                          spratExpirationDate: employee.spratExpirationDate ?? "",
+                                          terminatedDate: employee.terminatedDate ?? "",
+                                          terminationReason: employee.terminationReason ?? "",
+                                          terminationNotes: employee.terminationNotes ?? "",
+                                        });
+                                        setEditEmployeeFormStep(2);
+                                        setShowEditEmployeeDialog(true);
+                                      }}
+                                      data-testid={`button-update-permissions-${employee.id}`}
+                                    >
+                                      <span className="material-icons text-xs mr-1">edit</span>
+                                      {t('dashboard.employees.updatePermissions', 'Update')}
+                                    </Button>
+                                  )}
                                 </div>
                                 {employee.permissions && employee.permissions.length > 0 ? (
                                   <div className="ml-6 flex flex-wrap gap-1 mt-1">
