@@ -2185,6 +2185,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         giftedSeatsCount: user.giftedSeatsCount || 0,
         additionalProjectsCount: user.additionalProjectsCount || 0,
         currency,
+        trialEnd: subscription.trial_end,
       });
     } catch (error: any) {
       console.error('[Stripe] Get subscription details error:', error);
