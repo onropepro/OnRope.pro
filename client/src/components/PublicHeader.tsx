@@ -132,7 +132,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                 Employer
               </Button>
               {showModulesMenu && (
-                <div className="absolute top-full left-0 mt-1 bg-card border border-border rounded-xl shadow-xl p-4 w-[720px] z-50">
+                <div className="absolute top-full left-0 mt-1 bg-card border border-border rounded-xl shadow-xl p-4 w-[960px] z-50">
                   <div className="flex gap-3">
                     {/* Column 1: Safety & Operations (4 items, Document Management at bottom) */}
                     <div className="flex-1 flex flex-col gap-2">
@@ -268,7 +268,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                         </div>
                       </button>
                     </div>
-                    {/* Column 3: Resources & Financial (5 items) */}
+                    {/* Column 3: Resources & Scheduling (4 items) */}
                     <div className="flex-1 flex flex-col gap-2">
                       <button
                         className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
@@ -334,6 +334,9 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                           <div className="text-xs text-muted-foreground mt-0.5">Conflict detection, dual calendars, time-off management</div>
                         </div>
                       </button>
+                    </div>
+                    {/* Column 4: Financial & Sales (2 items) */}
+                    <div className="flex-1 flex flex-col gap-2">
                       <button
                         className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
                         onClick={() => {
