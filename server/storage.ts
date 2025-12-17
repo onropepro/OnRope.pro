@@ -1106,6 +1106,7 @@ export class Storage {
     const result = await db.select({
       id: workSessions.id,
       projectId: workSessions.projectId,
+      projectBuildingId: workSessions.projectBuildingId,
       employeeId: workSessions.employeeId,
       companyId: workSessions.companyId,
       workDate: workSessions.workDate,
@@ -1191,6 +1192,7 @@ export class Storage {
     const result = await db.select({
       id: workSessions.id,
       projectId: workSessions.projectId,
+      projectBuildingId: workSessions.projectBuildingId,
       employeeId: workSessions.employeeId,
       companyId: workSessions.companyId,
       workDate: workSessions.workDate,
@@ -2187,6 +2189,7 @@ export class Storage {
         sessionId: workSessions.id,
         employeeId: workSessions.employeeId,
         projectId: workSessions.projectId,
+        projectBuildingId: workSessions.projectBuildingId,
         startTime: workSessions.startTime,
         endTime: workSessions.endTime,
         workDate: workSessions.workDate,
@@ -2634,7 +2637,7 @@ export class Storage {
             )
           : [];
         
-        // Map assignments with their metadata
+        // Map assignments with their metadata (including building ID for multi-building projects)
         const employeeAssignments = assignments.map(assignment => {
           const employee = assignedEmployees.find(e => e.id === assignment.employeeId);
           if (!employee) return null;
@@ -2644,6 +2647,7 @@ export class Storage {
             employee,
             startDate: assignment.startDate,
             endDate: assignment.endDate,
+            projectBuildingId: assignment.projectBuildingId || null,
           };
         }).filter(Boolean);
         
@@ -2695,7 +2699,7 @@ export class Storage {
             )
           : [];
         
-        // Map assignments with their metadata
+        // Map assignments with their metadata (including building ID for multi-building projects)
         const employeeAssignments = jobAssignmentList.map(assignment => {
           const employee = assignedEmployees.find(e => e.id === assignment.employeeId);
           if (!employee) return null;
@@ -2705,6 +2709,7 @@ export class Storage {
             employee,
             startDate: assignment.startDate,
             endDate: assignment.endDate,
+            projectBuildingId: assignment.projectBuildingId || null,
           };
         }).filter(Boolean);
         
@@ -2739,7 +2744,7 @@ export class Storage {
         )
       : [];
     
-    // Map assignments with their metadata
+    // Map assignments with their metadata (including building ID for multi-building projects)
     const employeeAssignments = assignments.map(assignment => {
       const employee = assignedEmployees.find(e => e.id === assignment.employeeId);
       if (!employee) return null;
@@ -2749,6 +2754,7 @@ export class Storage {
         employee,
         startDate: assignment.startDate,
         endDate: assignment.endDate,
+        projectBuildingId: assignment.projectBuildingId || null,
       };
     }).filter(Boolean);
     
@@ -2802,9 +2808,19 @@ export class Storage {
     await db.delete(jobAssignments).where(eq(jobAssignments.jobId, jobId));
   }
 
-  async replaceJobAssignments(jobId: string, employeeIds: string[], assignedBy: string): Promise<void> {
-    // Delete existing assignments
-    await this.deleteJobAssignmentsByJobId(jobId);
+  async replaceJobAssignments(jobId: string, employeeIds: string[], assignedBy: string, projectBuildingId?: string | null): Promise<void> {
+    // Delete existing assignments for this job (and building if specified)
+    if (projectBuildingId) {
+      // For building-specific assignments, only delete assignments for this building
+      await db.delete(jobAssignments).where(
+        and(
+          eq(jobAssignments.jobId, jobId),
+          eq(jobAssignments.projectBuildingId, projectBuildingId)
+        )
+      );
+    } else {
+      await this.deleteJobAssignmentsByJobId(jobId);
+    }
     
     // Create new assignments
     for (const employeeId of employeeIds) {
@@ -2812,6 +2828,7 @@ export class Storage {
         jobId,
         employeeId,
         assignedBy,
+        projectBuildingId: projectBuildingId || null,
       });
     }
   }

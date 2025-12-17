@@ -18988,7 +18988,7 @@ Do not include any other text, just the JSON object.`
         return res.status(403).json({ message: "Forbidden" });
       }
       
-      const { employeeIds, forceAssignment } = req.body;
+      const { employeeIds, forceAssignment, projectBuildingId } = req.body;
       
       if (!Array.isArray(employeeIds)) {
         return res.status(400).json({ message: "employeeIds must be an array" });
@@ -19010,8 +19010,8 @@ Do not include any other text, just the JSON object.`
         }
       }
       
-      // Remove existing assignments and add new ones
-      await storage.replaceJobAssignments(req.params.id, employeeIds, currentUser.id);
+      // Remove existing assignments and add new ones (optionally for specific building)
+      await storage.replaceJobAssignments(req.params.id, employeeIds, currentUser.id, projectBuildingId);
       
       const updatedJob = await storage.getScheduledJobWithAssignments(req.params.id);
       res.json({ job: updatedJob });

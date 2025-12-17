@@ -561,7 +561,19 @@ export default function Schedule() {
     
     // If dragging an employee, assign/unassign them
     if (activeEmployeeId) {
-      const currentAssignments = job.assignedEmployees?.map(e => e.id) || [];
+      // For multi-building projects, only get employees assigned to this specific building
+      // For single building projects, get all assigned employees
+      let currentAssignments: string[];
+      if (building?.id && job.employeeAssignments) {
+        // Filter to only employees assigned to this specific building
+        currentAssignments = job.employeeAssignments
+          .filter((ea: any) => ea.projectBuildingId === building.id)
+          .map((ea: any) => ea.employee.id);
+      } else {
+        // No building filter - use all assigned employees
+        currentAssignments = job.assignedEmployees?.map(e => e.id) || [];
+      }
+      
       const isAssigned = currentAssignments.includes(activeEmployeeId);
       
       let newAssignments: string[];
@@ -571,7 +583,8 @@ export default function Schedule() {
         newAssignments = [...currentAssignments, activeEmployeeId];
       }
       
-      quickAssignMutation.mutate({ jobId: job.id, employeeIds: newAssignments });
+      // Include building ID for multi-building project assignments
+      quickAssignMutation.mutate({ jobId: job.id, employeeIds: newAssignments, projectBuildingId: building?.id || null });
       setActiveEmployeeId(null);
       setDropTargetJobId(null);
       return;
@@ -656,8 +669,8 @@ export default function Schedule() {
 
   // Mutation to assign/unassign employees via drag and drop (uses /api/schedule/:id/assign for conflict detection)
   const quickAssignMutation = useMutation({
-    mutationFn: async ({ jobId, employeeIds, forceAssignment }: { jobId: string; employeeIds: string[]; forceAssignment?: boolean }) => {
-      await apiRequest("POST", `/api/schedule/${jobId}/assign`, { employeeIds, forceAssignment });
+    mutationFn: async ({ jobId, employeeIds, forceAssignment, projectBuildingId }: { jobId: string; employeeIds: string[]; forceAssignment?: boolean; projectBuildingId?: string | null }) => {
+      await apiRequest("POST", `/api/schedule/${jobId}/assign`, { employeeIds, forceAssignment, projectBuildingId });
     },
     onMutate: async (variables) => {
       // Store the variables so we can access them in onError

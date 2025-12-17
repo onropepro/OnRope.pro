@@ -537,6 +537,7 @@ export const projectBuildings = pgTable("project_buildings", {
 export const dropLogs = pgTable("drop_logs", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
+  projectBuildingId: varchar("project_building_id").references(() => projectBuildings.id, { onDelete: "set null" }), // For multi-building complexes
   userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   date: date("date").notNull(),
   
@@ -2028,6 +2029,7 @@ export const insertScheduledJobSchema = createInsertSchema(scheduledJobs).omit({
 export const jobAssignments = pgTable("job_assignments", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   jobId: varchar("job_id").notNull().references(() => scheduledJobs.id, { onDelete: "cascade" }),
+  projectBuildingId: varchar("project_building_id").references(() => projectBuildings.id, { onDelete: "set null" }), // For multi-building complexes - which tower this assignment is for
   employeeId: varchar("employee_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   
   startDate: timestamp("start_date"), // Optional: when this employee starts on this job
