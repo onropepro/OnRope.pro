@@ -2,65 +2,96 @@
 
 This document defines the comprehensive review process for features and implementations. When this document is referenced, it means a full functionality review with zero possible errors.
 
-## Review Checklist
+---
 
-Every review must verify ALL of the following before completion:
+## Required Output Format
+
+When completing a review, the output MUST follow this exact structure:
+
+```
+## REVIEW REPORT: [Feature Name]
 
 ### 1. Backend Code
-- [ ] Backend code reviewed and working
-- [ ] All server-side logic correct
-- [ ] Error handling implemented
-- [ ] Authentication/authorization checks in place
+- Status: [PASS/FAIL]
+- Server-side logic: [Verified/Issue Found]
+- Error handling: [Implemented/Missing]
+- Auth checks: [In Place/Missing]
+- Notes: [Any findings]
 
 ### 2. Frontend Code
-- [ ] Frontend code reviewed and working
-- [ ] UI components render correctly
-- [ ] User interactions function as expected
-- [ ] Loading and error states handled
+- Status: [PASS/FAIL]
+- UI renders correctly: [Yes/No]
+- User interactions: [Working/Broken]
+- Loading states: [Handled/Missing]
+- Error states: [Handled/Missing]
+- Notes: [Any findings]
 
 ### 3. Database Schema
-- [ ] Database schema correct
-- [ ] All tables created and available
-- [ ] Relationships properly defined
-- [ ] Migrations applied successfully
+- Status: [PASS/FAIL]
+- Tables exist: [Yes/No]
+- Relationships correct: [Yes/No]
+- Migrations applied: [Yes/No]
+- Notes: [Any findings]
 
 ### 4. API Routes
-- [ ] Routes tested and functional
-- [ ] Correct HTTP methods used
-- [ ] Proper request validation
-- [ ] Appropriate response codes returned
+- Status: [PASS/FAIL]
+- Routes tested: [List endpoints tested]
+- HTTP methods: [Correct/Issues]
+- Request validation: [Implemented/Missing]
+- Response codes: [Appropriate/Issues]
+- Notes: [Any findings]
 
 ### 5. Code Quality
-- [ ] No LSP errors
-- [ ] No TypeScript errors
-- [ ] No console errors
-- [ ] Code follows project conventions
+- Status: [PASS/FAIL]
+- LSP errors: [None/Count]
+- TypeScript errors: [None/Count]
+- Console errors: [None/Count]
+- Follows conventions: [Yes/No]
+- Notes: [Any findings]
 
 ### 6. API Communication
-- [ ] API wording correct
-- [ ] API calls returning correct data
-- [ ] Request/response payloads accurate
-- [ ] Error messages clear and helpful
+- Status: [PASS/FAIL]
+- API wording: [Correct/Issues]
+- Data returned: [Correct/Issues]
+- Payloads accurate: [Yes/No]
+- Error messages: [Clear/Unclear]
+- Notes: [Any findings]
 
 ### 7. Endpoint Testing
-- [ ] Every endpoint tested
-- [ ] All CRUD operations verified
-- [ ] Edge cases handled
-- [ ] Authentication flows validated
+- Status: [PASS/FAIL]
+- Endpoints tested: [List all tested]
+- CRUD verified: [Create/Read/Update/Delete - each marked]
+- Edge cases: [Handled/Not tested]
+- Auth flows: [Validated/Issues]
+- Notes: [Any findings]
+
+### OVERALL STATUS: [PASS/FAIL]
+
+### Issues Found:
+1. [Issue description and location]
+2. [Issue description and location]
+
+### Fixes Applied:
+1. [Fix description]
+2. [Fix description]
+
+### Remaining Items:
+1. [Any items still pending]
+```
+
+---
 
 ## Review Process
 
-**Testing continues until NO errors remain and ALL items above are cleared.**
+**Testing continues until NO errors remain and ALL sections show PASS.**
 
 Using this document means full functionality verification with no possible errors.
-
-## Architect Requirement
 
 **Use Architect tool EVERY SINGLE TIME during review.**
 
 ---
 
-## Rule 2: Stay Within Scope
+## Scope Rules
 
 ### DO NOT:
 - Wander away doing things that were not asked
