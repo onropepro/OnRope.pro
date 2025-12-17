@@ -1415,6 +1415,33 @@ export default function Quotes() {
                                 {quote.services.length}
                               </Badge>
                             </div>
+                            {(() => {
+                              const subtotal = quote.services.reduce((sum, s) => sum + Number(s.totalCost || 0), 0);
+                              const totalTax = Number(quote.totalTax || 0);
+                              const grandTotal = Number(quote.grandTotal || 0) || subtotal;
+                              const hasTax = totalTax > 0;
+                              
+                              return (
+                                <div className="space-y-1 pt-2 border-t border-border/50">
+                                  <div className="flex items-center justify-between text-sm">
+                                    <span className="text-muted-foreground">{t('quotes.subtotal', 'Subtotal')}:</span>
+                                    <span className="font-medium">${subtotal.toFixed(2)}</span>
+                                  </div>
+                                  {hasTax && (
+                                    <div className="flex items-center justify-between text-sm">
+                                      <span className="text-muted-foreground">{t('quotes.tax', 'Tax')}:</span>
+                                      <span className="font-medium">${totalTax.toFixed(2)}</span>
+                                    </div>
+                                  )}
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-muted-foreground font-medium">{t('quotes.total', 'Total')}:</span>
+                                    <span className="text-2xl font-bold text-primary">
+                                      ${(hasTax ? grandTotal : subtotal).toFixed(2)}
+                                    </span>
+                                  </div>
+                                </div>
+                              );
+                            })()}
                           </div>
                         </CardContent>
                       </Card>
@@ -1595,14 +1622,33 @@ export default function Quotes() {
                               {quote.services.length}
                             </Badge>
                           </div>
-                          {canViewFinancialData && (
-                            <div className="flex items-center justify-between">
-                              <span className="text-muted-foreground">{t('quotes.total', 'Total')}:</span>
-                              <span className="text-2xl font-bold text-primary">
-                                ${quote.services.reduce((sum, s) => sum + Number(s.totalCost || 0), 0).toFixed(2)}
-                              </span>
-                            </div>
-                          )}
+                          {canViewFinancialData && (() => {
+                            const subtotal = quote.services.reduce((sum, s) => sum + Number(s.totalCost || 0), 0);
+                            const totalTax = Number(quote.totalTax || 0);
+                            const grandTotal = Number(quote.grandTotal || 0) || subtotal;
+                            const hasTax = totalTax > 0;
+                            
+                            return (
+                              <div className="space-y-1 pt-2 border-t border-border/50">
+                                <div className="flex items-center justify-between text-sm">
+                                  <span className="text-muted-foreground">{t('quotes.subtotal', 'Subtotal')}:</span>
+                                  <span className="font-medium">${subtotal.toFixed(2)}</span>
+                                </div>
+                                {hasTax && (
+                                  <div className="flex items-center justify-between text-sm">
+                                    <span className="text-muted-foreground">{t('quotes.tax', 'Tax')}:</span>
+                                    <span className="font-medium">${totalTax.toFixed(2)}</span>
+                                  </div>
+                                )}
+                                <div className="flex items-center justify-between">
+                                  <span className="text-muted-foreground font-medium">{t('quotes.total', 'Total')}:</span>
+                                  <span className="text-2xl font-bold text-primary">
+                                    ${(hasTax ? grandTotal : subtotal).toFixed(2)}
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })()}
                         </div>
                       </CardContent>
                     </Card>
