@@ -290,9 +290,9 @@ export default function ProjectDetail() {
 
   const hasHarnessInspectionToday = harnessInspectionTodayData?.hasInspectionToday ?? false;
 
-  // Fetch building data and instructions
+  // Fetch building data by strata plan (for base building info)
   const projectStrataPlan = (projectData?.project as any)?.strataPlanNumber;
-  const { data: buildingData, isLoading: isLoadingBuilding } = useQuery<{
+  const { data: buildingBaseData, isLoading: isLoadingBuilding } = useQuery<{
     building: Building | null;
     instructions: BuildingInstructions | null;
   }>({
@@ -305,36 +305,61 @@ export default function ProjectDetail() {
     },
     enabled: !!projectStrataPlan,
   });
+  
+  // Fetch per-building instructions (for multi-building complexes)
+  // This query uses projectBuildingId to get building-specific instructions with fallback
+  const { data: perBuildingInstructions } = useQuery<BuildingInstructions | null>({
+    queryKey: ["/api/buildings", buildingBaseData?.building?.id, "instructions", selectedBuildingId],
+    queryFn: async () => {
+      if (!buildingBaseData?.building?.id) return null;
+      const url = selectedBuildingId 
+        ? `/api/buildings/${buildingBaseData.building.id}/instructions?projectBuildingId=${selectedBuildingId}`
+        : `/api/buildings/${buildingBaseData.building.id}/instructions`;
+      const response = await fetch(url, { credentials: "include" });
+      if (!response.ok) return null;
+      return response.json();
+    },
+    enabled: !!buildingBaseData?.building?.id,
+  });
+  
+  // Combine building data with per-building instructions
+  const buildingData = buildingBaseData ? {
+    building: buildingBaseData.building,
+    instructions: perBuildingInstructions ?? buildingBaseData.instructions,
+  } : undefined;
 
-  // Initialize instructions form when data loads
+  // Initialize instructions form when data loads (including when selected building changes)
   useEffect(() => {
-    if (buildingData?.instructions) {
-      setInstructionsForm({
-        buildingAccess: buildingData.instructions.buildingAccess || "",
-        keysAndFob: buildingData.instructions.keysAndFob || "",
-        keysReturnPolicy: (buildingData.instructions as any).keysReturnPolicy || "",
-        roofAccess: buildingData.instructions.roofAccess || "",
-        specialRequests: buildingData.instructions.specialRequests || "",
-        buildingManagerName: buildingData.instructions.buildingManagerName || "",
-        buildingManagerPhone: buildingData.instructions.buildingManagerPhone || "",
-        conciergeNames: buildingData.instructions.conciergeNames || "",
-        conciergePhone: buildingData.instructions.conciergePhone || "",
-        conciergeHours: (buildingData.instructions as any).conciergeHours || "",
-        maintenanceName: buildingData.instructions.maintenanceName || "",
-        maintenancePhone: buildingData.instructions.maintenancePhone || "",
-        councilMemberUnits: (buildingData.instructions as any).councilMemberUnits || "",
-        tradeParkingInstructions: (buildingData.instructions as any).tradeParkingInstructions || "",
-        tradeParkingSpots: (buildingData.instructions as any).tradeParkingSpots?.toString() || "",
-        tradeWashroomLocation: (buildingData.instructions as any).tradeWashroomLocation || "",
-      });
-    }
-  }, [buildingData?.instructions]);
+    const instructions = buildingData?.instructions;
+    setInstructionsForm({
+      buildingAccess: instructions?.buildingAccess || "",
+      keysAndFob: instructions?.keysAndFob || "",
+      keysReturnPolicy: (instructions as any)?.keysReturnPolicy || "",
+      roofAccess: instructions?.roofAccess || "",
+      specialRequests: instructions?.specialRequests || "",
+      buildingManagerName: instructions?.buildingManagerName || "",
+      buildingManagerPhone: instructions?.buildingManagerPhone || "",
+      conciergeNames: instructions?.conciergeNames || "",
+      conciergePhone: instructions?.conciergePhone || "",
+      conciergeHours: (instructions as any)?.conciergeHours || "",
+      maintenanceName: instructions?.maintenanceName || "",
+      maintenancePhone: instructions?.maintenancePhone || "",
+      councilMemberUnits: (instructions as any)?.councilMemberUnits || "",
+      tradeParkingInstructions: (instructions as any)?.tradeParkingInstructions || "",
+      tradeParkingSpots: (instructions as any)?.tradeParkingSpots?.toString() || "",
+      tradeWashroomLocation: (instructions as any)?.tradeWashroomLocation || "",
+    });
+  }, [buildingData?.instructions, selectedBuildingId, perBuildingInstructions]);
 
   // Save building instructions mutation
   const saveInstructionsMutation = useMutation({
     mutationFn: async (data: typeof instructionsForm) => {
       if (!buildingData?.building?.id) throw new Error("Building not found");
-      const response = await apiRequest("POST", `/api/buildings/${buildingData.building.id}/instructions`, data);
+      // Include projectBuildingId for multi-building complexes
+      const payload = selectedBuildingId 
+        ? { ...data, projectBuildingId: selectedBuildingId }
+        : data;
+      const response = await apiRequest("POST", `/api/buildings/${buildingData.building.id}/instructions`, payload);
       return response.json();
     },
     onSuccess: () => {
@@ -343,6 +368,7 @@ export default function ProjectDetail() {
         description: t('projectDetail.buildingInstructions.savedDesc', 'Building instructions have been updated.'),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/buildings/by-strata", projectStrataPlan] });
+      queryClient.invalidateQueries({ queryKey: ["/api/buildings", buildingData?.building?.id, "instructions", selectedBuildingId] });
       setShowEditInstructionsDialog(false);
     },
     onError: (error: Error) => {
