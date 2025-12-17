@@ -9,6 +9,7 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { BackButton } from "@/components/BackButton";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { hasFinancialAccess, isManagement, hasPermission } from "@/lib/permissions";
+import { getTaxInfo, calculateTax, getTaxLabel, type TaxInfo } from "@shared/taxRates";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -349,6 +350,10 @@ export default function Quotes() {
   const [selectedPhotoFile, setSelectedPhotoFile] = useState<File | null>(null);
   const [editPhotoFile, setEditPhotoFile] = useState<File | null>(null);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  
+  // Tax information based on building address
+  const [currentTaxInfo, setCurrentTaxInfo] = useState<TaxInfo | null>(null);
+  const [editTaxInfo, setEditTaxInfo] = useState<TaxInfo | null>(null);
 
   // Building info form
   const buildingForm = useForm<BuildingInfoFormData>({
@@ -428,6 +433,27 @@ export default function Quotes() {
         };
       });
       
+      // Calculate totals and tax
+      const subtotal = services.reduce((sum, s) => sum + Number(s.totalCost || 0), 0);
+      let taxData: any = {};
+      
+      if (currentTaxInfo) {
+        const taxCalc = calculateTax(subtotal, currentTaxInfo);
+        taxData = {
+          taxRegion: currentTaxInfo.region,
+          taxCountry: currentTaxInfo.country,
+          taxType: currentTaxInfo.taxType,
+          gstRate: String(currentTaxInfo.gstRate),
+          pstRate: String(currentTaxInfo.pstRate),
+          hstRate: String(currentTaxInfo.hstRate),
+          gstAmount: String(taxCalc.gstAmount),
+          pstAmount: String(taxCalc.pstAmount),
+          hstAmount: String(taxCalc.hstAmount),
+          totalTax: String(taxCalc.totalTax),
+          grandTotal: String(taxCalc.grandTotal),
+        };
+      }
+      
       // Create quote with services in a single atomic request
       const quoteResponse = await apiRequest("POST", "/api/quotes", {
         buildingName: buildingInfo.buildingName,
@@ -439,6 +465,8 @@ export default function Quotes() {
         clientId: selectedClientId, // Save client reference for project conversion
         status: "open",
         services, // Include services array
+        totalAmount: String(subtotal),
+        ...taxData, // Include tax information
       });
       
       const { quote } = await quoteResponse.json();
@@ -587,9 +615,32 @@ export default function Quotes() {
         };
       });
       
+      // Calculate totals and tax for edit
+      const subtotal = services.reduce((sum, s) => sum + Number(s.totalCost || 0), 0);
+      let taxData: any = {};
+      
+      if (editTaxInfo) {
+        const taxCalc = calculateTax(subtotal, editTaxInfo);
+        taxData = {
+          taxRegion: editTaxInfo.region,
+          taxCountry: editTaxInfo.country,
+          taxType: editTaxInfo.taxType,
+          gstRate: String(editTaxInfo.gstRate),
+          pstRate: String(editTaxInfo.pstRate),
+          hstRate: String(editTaxInfo.hstRate),
+          gstAmount: String(taxCalc.gstAmount),
+          pstAmount: String(taxCalc.pstAmount),
+          hstAmount: String(taxCalc.hstAmount),
+          totalTax: String(taxCalc.totalTax),
+          grandTotal: String(taxCalc.grandTotal),
+        };
+      }
+      
       const payload = {
         ...data,
         services,
+        totalAmount: String(subtotal),
+        ...taxData, // Include tax information if available
       };
       
       const response = await apiRequest("PATCH", `/api/quotes/${selectedQuote.id}`, payload);
@@ -2016,17 +2067,72 @@ export default function Quotes() {
           {canViewFinancialData && (
             <Card className="rounded-2xl shadow-lg border border-border bg-primary/5">
               <CardContent className="p-8">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-xl font-semibold text-foreground mb-1">{t('quotes.quoteTotal', 'Quote Total')}</h3>
-                    <p className="text-muted-foreground">
-                      {selectedQuote.services.length} service{selectedQuote.services.length !== 1 ? 's' : ''}
-                    </p>
-                  </div>
-                  <div className="text-4xl font-bold text-primary">
-                    ${selectedQuote.services.reduce((sum, s) => sum + Number(s.totalCost || 0), 0).toFixed(2)}
-                  </div>
-                </div>
+                {(() => {
+                  const subtotal = selectedQuote.services.reduce((sum, s) => sum + Number(s.totalCost || 0), 0);
+                  const q = selectedQuote as any;
+                  const hasTax = q.taxRegion && q.taxType && q.taxType !== 'NONE';
+                  const totalTax = Number(q.totalTax || 0);
+                  const grandTotal = Number(q.grandTotal || 0) || subtotal + totalTax;
+                  
+                  return (
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-xl font-semibold text-foreground mb-1">{t('quotes.quoteTotal', 'Quote Total')}</h3>
+                        <p className="text-muted-foreground">
+                          {selectedQuote.services.length} service{selectedQuote.services.length !== 1 ? 's' : ''}
+                          {hasTax && ` (${q.taxRegion})`}
+                        </p>
+                      </div>
+                      <div className="text-right space-y-1">
+                        <div className="flex justify-end items-center gap-2">
+                          <span className="text-sm text-muted-foreground">Subtotal:</span>
+                          <span className="text-lg font-semibold">${subtotal.toFixed(2)}</span>
+                        </div>
+                        {hasTax && totalTax > 0 && (
+                          <>
+                            {q.taxType === 'HST' && Number(q.hstAmount) > 0 && (
+                              <div className="flex justify-end items-center gap-2">
+                                <span className="text-sm text-muted-foreground">HST ({Number(q.hstRate)}%):</span>
+                                <span className="text-lg font-semibold">${Number(q.hstAmount).toFixed(2)}</span>
+                              </div>
+                            )}
+                            {(q.taxType === 'GST' || q.taxType === 'GST+PST' || q.taxType === 'GST+QST') && (
+                              <>
+                                {Number(q.gstAmount) > 0 && (
+                                  <div className="flex justify-end items-center gap-2">
+                                    <span className="text-sm text-muted-foreground">GST ({Number(q.gstRate)}%):</span>
+                                    <span className="text-lg font-semibold">${Number(q.gstAmount).toFixed(2)}</span>
+                                  </div>
+                                )}
+                                {Number(q.pstAmount) > 0 && (
+                                  <div className="flex justify-end items-center gap-2">
+                                    <span className="text-sm text-muted-foreground">{q.taxType === 'GST+QST' ? 'QST' : 'PST'} ({Number(q.pstRate)}%):</span>
+                                    <span className="text-lg font-semibold">${Number(q.pstAmount).toFixed(2)}</span>
+                                  </div>
+                                )}
+                              </>
+                            )}
+                            {q.taxType === 'STATE' && Number(q.pstAmount) > 0 && (
+                              <div className="flex justify-end items-center gap-2">
+                                <span className="text-sm text-muted-foreground">Sales Tax ({Number(q.pstRate)}%):</span>
+                                <span className="text-lg font-semibold">${Number(q.pstAmount).toFixed(2)}</span>
+                              </div>
+                            )}
+                          </>
+                        )}
+                        <div className="flex justify-end items-center gap-2 pt-1 border-t border-border">
+                          <span className="text-sm font-medium text-foreground">Total:</span>
+                          <span className="text-4xl font-bold text-primary">
+                            ${hasTax ? grandTotal.toFixed(2) : subtotal.toFixed(2)}
+                          </span>
+                        </div>
+                        {!hasTax && (
+                          <p className="text-xs text-muted-foreground">No tax information available</p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })()}
               </CardContent>
             </Card>
           )}
@@ -2242,11 +2348,18 @@ export default function Quotes() {
                               data-testid="input-edit-building-address"
                               onSelect={(address) => {
                                 field.onChange(address.formatted);
+                                const taxInfo = getTaxInfo(address.state, address.country);
+                                setEditTaxInfo(taxInfo);
                               }}
                               onChange={(value) => field.onChange(value)}
                               onBlur={field.onBlur}
                             />
                           </FormControl>
+                          {editTaxInfo && (
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Tax Region: {editTaxInfo.regionName} ({getTaxLabel(editTaxInfo)})
+                            </p>
+                          )}
                           <FormMessage />
                         </FormItem>
                       )}
@@ -3027,11 +3140,18 @@ export default function Quotes() {
                             data-testid="input-building-address"
                             onSelect={(address) => {
                               field.onChange(address.formatted);
+                              const taxInfo = getTaxInfo(address.state, address.country);
+                              setCurrentTaxInfo(taxInfo);
                             }}
                             onChange={(value) => field.onChange(value)}
                             onBlur={field.onBlur}
                           />
                         </FormControl>
+                        {currentTaxInfo && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Tax Region: {currentTaxInfo.regionName} ({getTaxLabel(currentTaxInfo)})
+                          </p>
+                        )}
                         <FormMessage />
                       </FormItem>
                     )}
@@ -3277,10 +3397,57 @@ export default function Quotes() {
                   </div>
                   {canViewFinancialData && (
                     <div className="text-right">
-                      <p className="text-sm text-muted-foreground mb-1">Estimated Total</p>
-                      <p className="text-3xl font-bold text-primary">
-                        ${calculateQuoteTotal().toFixed(2)}
-                      </p>
+                      {(() => {
+                        const subtotal = calculateQuoteTotal();
+                        const taxCalc = currentTaxInfo ? calculateTax(subtotal, currentTaxInfo) : null;
+                        return (
+                          <div className="space-y-1">
+                            <div className="flex justify-end items-center gap-2">
+                              <span className="text-sm text-muted-foreground">Subtotal:</span>
+                              <span className="text-lg font-semibold">${subtotal.toFixed(2)}</span>
+                            </div>
+                            {taxCalc && currentTaxInfo && currentTaxInfo.totalRate > 0 && (
+                              <>
+                                {currentTaxInfo.taxType === 'HST' && (
+                                  <div className="flex justify-end items-center gap-2">
+                                    <span className="text-sm text-muted-foreground">HST ({currentTaxInfo.hstRate}%):</span>
+                                    <span className="text-lg font-semibold">${taxCalc.hstAmount.toFixed(2)}</span>
+                                  </div>
+                                )}
+                                {(currentTaxInfo.taxType === 'GST' || currentTaxInfo.taxType === 'GST+PST' || currentTaxInfo.taxType === 'GST+QST') && (
+                                  <>
+                                    <div className="flex justify-end items-center gap-2">
+                                      <span className="text-sm text-muted-foreground">GST ({currentTaxInfo.gstRate}%):</span>
+                                      <span className="text-lg font-semibold">${taxCalc.gstAmount.toFixed(2)}</span>
+                                    </div>
+                                    {currentTaxInfo.pstRate > 0 && (
+                                      <div className="flex justify-end items-center gap-2">
+                                        <span className="text-sm text-muted-foreground">{currentTaxInfo.taxType === 'GST+QST' ? 'QST' : 'PST'} ({currentTaxInfo.pstRate}%):</span>
+                                        <span className="text-lg font-semibold">${taxCalc.pstAmount.toFixed(2)}</span>
+                                      </div>
+                                    )}
+                                  </>
+                                )}
+                                {currentTaxInfo.taxType === 'STATE' && (
+                                  <div className="flex justify-end items-center gap-2">
+                                    <span className="text-sm text-muted-foreground">Sales Tax ({currentTaxInfo.pstRate}%):</span>
+                                    <span className="text-lg font-semibold">${taxCalc.pstAmount.toFixed(2)}</span>
+                                  </div>
+                                )}
+                              </>
+                            )}
+                            <div className="flex justify-end items-center gap-2 pt-1 border-t border-border">
+                              <span className="text-sm font-medium text-foreground">Total:</span>
+                              <span className="text-3xl font-bold text-primary">
+                                ${taxCalc ? taxCalc.grandTotal.toFixed(2) : subtotal.toFixed(2)}
+                              </span>
+                            </div>
+                            {!currentTaxInfo && (
+                              <p className="text-xs text-muted-foreground">Select building address for tax calculation</p>
+                            )}
+                          </div>
+                        );
+                      })()}
                     </div>
                   )}
                 </div>
