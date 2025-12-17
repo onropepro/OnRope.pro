@@ -46,6 +46,7 @@ import { DocumentUploader } from "@/components/DocumentUploader";
 import { RefreshButton } from "@/components/RefreshButton";
 import { CSRBadge } from "@/components/CSRBadge";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
+import { SubscriptionRenewalBadge } from "@/components/SubscriptionRenewalBadge";
 import { formatLocalDate, formatLocalDateLong, formatTimestampDate, formatTimestampDateShort, formatTimestampDateMedium, parseLocalDate, formatLocalDateMedium, formatDurationMs } from "@/lib/dateUtils";
 import { QRCodeSVG } from 'qrcode.react';
 import { trackLogout, trackWorkSessionStart, trackWorkSessionEnd, trackProjectCreated, trackClientAdded, trackBuildingAdded, trackEmployeeAdded } from "@/lib/analytics";
@@ -3646,6 +3647,13 @@ export default function Dashboard() {
             {/* License Expiry Warning - Inline in header */}
             {currentUser && (currentUser.role === 'company' || canManageEmployees(currentUser)) && employees.length > 0 && (
               <LicenseExpiryWarningBanner employees={employees} onReviewClick={() => handleTabChange("employees")} />
+            )}
+            {/* Subscription Renewal Countdown - Company owners only */}
+            {currentUser?.role === 'company' && (
+              <SubscriptionRenewalBadge 
+                subscriptionEndDate={currentUser.subscriptionEndDate} 
+                subscriptionStatus={currentUser.subscriptionStatus}
+              />
             )}
             {/* Install PWA Button */}
             <InstallPWAButton />
