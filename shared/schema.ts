@@ -1444,6 +1444,19 @@ export const quotes = pgTable("quotes", {
   // Calculated total amount for analytics (sum of all service costs)
   totalAmount: numeric("total_amount", { precision: 12, scale: 2 }).default('0'),
   
+  // Tax information based on building location
+  taxRegion: varchar("tax_region"), // Province/State code (e.g., 'BC', 'ON', 'CA', 'TX')
+  taxCountry: varchar("tax_country"), // 'CA' | 'US'
+  taxType: varchar("tax_type"), // 'GST' | 'GST+PST' | 'GST+QST' | 'HST' | 'STATE' | 'NONE'
+  gstRate: numeric("gst_rate", { precision: 5, scale: 3 }).default('0'), // GST rate percentage
+  pstRate: numeric("pst_rate", { precision: 5, scale: 3 }).default('0'), // PST/QST/State rate percentage
+  hstRate: numeric("hst_rate", { precision: 5, scale: 3 }).default('0'), // HST rate percentage
+  gstAmount: numeric("gst_amount", { precision: 12, scale: 2 }).default('0'), // Calculated GST amount
+  pstAmount: numeric("pst_amount", { precision: 12, scale: 2 }).default('0'), // Calculated PST/QST/State amount
+  hstAmount: numeric("hst_amount", { precision: 12, scale: 2 }).default('0'), // Calculated HST amount
+  totalTax: numeric("total_tax", { precision: 12, scale: 2 }).default('0'), // Total tax amount
+  grandTotal: numeric("grand_total", { precision: 12, scale: 2 }).default('0'), // Subtotal + Tax
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [
