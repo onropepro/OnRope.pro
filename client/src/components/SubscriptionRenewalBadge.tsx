@@ -34,24 +34,33 @@ export function SubscriptionRenewalBadge({ subscriptionEndDate, subscriptionStat
     return null;
   }
 
-  const endDateSource = subscriptionData?.currentPeriodEnd || subscriptionEndDate;
   const trialEndTimestamp = subscriptionData?.trialEnd;
   
   let daysRemaining: number | null = null;
   let endDate: Date | null = null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-  if (isTrialing && trialEndTimestamp) {
-    endDate = new Date(trialEndTimestamp * 1000);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    daysRemaining = differenceInDays(endDate, today);
-  } else if (endDateSource) {
-    endDate = typeof endDateSource === 'string' 
-      ? parseISO(endDateSource) 
-      : new Date(endDateSource);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    daysRemaining = differenceInDays(endDate, today);
+  if (isTrialing) {
+    // For trials, prefer Stripe's trialEnd, fallback to subscriptionEndDate
+    if (trialEndTimestamp) {
+      endDate = new Date(trialEndTimestamp * 1000);
+      daysRemaining = differenceInDays(endDate, today);
+    } else if (subscriptionEndDate) {
+      endDate = typeof subscriptionEndDate === 'string' 
+        ? parseISO(subscriptionEndDate) 
+        : new Date(subscriptionEndDate);
+      daysRemaining = differenceInDays(endDate, today);
+    }
+  } else {
+    // For active subscriptions, use currentPeriodEnd or subscriptionEndDate
+    const endDateSource = subscriptionData?.currentPeriodEnd || subscriptionEndDate;
+    if (endDateSource) {
+      endDate = typeof endDateSource === 'string' 
+        ? parseISO(endDateSource) 
+        : new Date(endDateSource);
+      daysRemaining = differenceInDays(endDate, today);
+    }
   }
 
   const isWarning = daysRemaining !== null && daysRemaining <= 5;
