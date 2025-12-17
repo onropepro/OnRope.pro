@@ -353,6 +353,40 @@ export async function handleWebhookEvent(
           }
         }
 
+        // Check if subscription transitioned from trialing to active and has pending white label
+        if (event.type === 'customer.subscription.updated' && subscription.status === 'active') {
+          try {
+            const user = await storage.getUserById(userId);
+            if (user?.whitelabelPendingBilling && !whitelabelBrandingActive) {
+              console.log(`[Webhook] Trial ended - adding pending white label branding to subscription for user ${userId}`);
+              
+              // Determine currency from subscription
+              const currency = subscription.currency.toLowerCase() as 'usd' | 'cad';
+              const addonPriceId = currency === 'usd' 
+                ? ADDON_CONFIG.white_label.priceIdUSD 
+                : ADDON_CONFIG.white_label.priceIdCAD;
+              
+              // Add white label to Stripe subscription
+              await stripe.subscriptionItems.create({
+                subscription: subscription.id,
+                price: addonPriceId,
+                proration_behavior: 'create_prorations',
+              });
+              
+              // Clear the pending flag and ensure branding stays active
+              await storage.updateUser(userId, {
+                whitelabelPendingBilling: false,
+              });
+              
+              whitelabelBrandingActive = true;
+              console.log(`[Webhook] White label branding added to subscription for user ${userId} after trial ended`);
+            }
+          } catch (pendingError) {
+            console.error(`[Webhook] Failed to add pending white label branding:`, pendingError);
+            // Don't fail the webhook if this fails
+          }
+        }
+
         // Update user subscription in database
         await updateUserSubscription({
           userId: userId,

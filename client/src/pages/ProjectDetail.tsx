@@ -565,8 +565,19 @@ export default function ProjectDetail() {
         setNewProgressValue(String(data.currentOverallProgress ?? 0));
         setShowProgressPrompt(true);
       } else {
-        // Show log hours prompt for all users to log their rope access hours if applicable
-        setShowLogHoursPrompt(true);
+        // Only show log hours prompt for rope access jobs (jobs that require elevation)
+        // Skip for ground-level jobs: in-suite dryer vent, parkade, and any job with requiresElevation = false
+        const isGroundLevelJob = project?.requiresElevation === false ||
+          project?.jobType === 'in_suite_dryer_vent_cleaning' ||
+          project?.jobType === 'parkade_pressure_cleaning' ||
+          project?.jobType === 'ground_window_cleaning';
+        
+        if (isGroundLevelJob) {
+          // Don't show hours prompt for ground-level jobs, just show success toast
+          toast({ title: t('projectDetail.toasts.sessionEnded', 'Work session ended'), description: t('projectDetail.toasts.greatWork', 'Great work today!') });
+        } else {
+          setShowLogHoursPrompt(true);
+        }
       }
     },
     onError: (error: Error) => {
@@ -687,8 +698,18 @@ export default function ProjectDetail() {
         });
       }
       
-      // Continue to log hours prompt
-      setShowLogHoursPrompt(true);
+      // Continue to log hours prompt only for rope access jobs
+      const isGroundLevelJob = project?.requiresElevation === false ||
+        project?.jobType === 'in_suite_dryer_vent_cleaning' ||
+        project?.jobType === 'parkade_pressure_cleaning' ||
+        project?.jobType === 'ground_window_cleaning';
+      
+      if (isGroundLevelJob) {
+        // Don't show hours prompt for ground-level jobs
+        toast({ title: t('projectDetail.toasts.sessionEnded', 'Work session ended'), description: t('projectDetail.toasts.greatWork', 'Great work today!') });
+      } else {
+        setShowLogHoursPrompt(true);
+      }
     },
     onError: (error: Error) => {
       toast({ title: t('projectDetail.toasts.error', 'Error'), description: error.message, variant: "destructive" });
@@ -1193,7 +1214,7 @@ export default function ProjectDetail() {
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
-              onClick={() => setLocation("/dashboard")}
+              onClick={() => setLocation("/dashboard?tab=projects")}
               className="h-12 gap-2"
               data-testid="button-back"
             >

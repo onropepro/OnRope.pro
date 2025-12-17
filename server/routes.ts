@@ -2039,6 +2039,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   /**
    * Add white label branding to subscription
    * POST /api/stripe/add-branding
+   * 
+   * During trial period: Enables white label for free, marks as pending billing
+   * After trial: Adds white label to Stripe subscription with proration
    */
   app.post("/api/stripe/add-branding", requireAuth, async (req: Request, res: Response) => {
     try {
@@ -2055,10 +2058,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "No active subscription found" });
       }
 
-      // White label branding is available to all OnRopePro subscribers
-
-      // Get current subscription to determine currency
+      // Get current subscription to determine status and currency
       const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
+      
+      // Check if user is in trial period
+      const isTrialing = subscription.status === 'trialing';
       
       // Use Stripe's subscription currency (authoritative source)
       const currency = subscription.currency.toLowerCase() as 'usd' | 'cad';
@@ -2074,47 +2078,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const addonConfig = ADDON_CONFIG.white_label;
       const addonPriceId = currency === 'usd' ? addonConfig.priceIdUSD : addonConfig.priceIdCAD;
 
-      console.log(`[Stripe] Adding white label branding to subscription ${user.stripeSubscriptionId}`);
+      console.log(`[Stripe] Adding white label branding to subscription ${user.stripeSubscriptionId} (trialing: ${isTrialing})`);
 
-      // Check if white label branding is already on the subscription
-      // Paginate through all subscription items to find white label
-      let hasWhiteLabel = false;
-      let startingAfter: string | undefined = undefined;
-      
-      do {
-        const itemsPage = await stripe.subscriptionItems.list({
-          subscription: user.stripeSubscriptionId,
-          limit: 100,
-          ...(startingAfter && { starting_after: startingAfter }),
+      if (isTrialing) {
+        // During trial: Enable white label for FREE, mark as pending billing
+        // When trial ends, the webhook will add it to the subscription
+        await storage.updateUser(user.id, {
+          whitelabelBrandingActive: true,
+          whitelabelPendingBilling: true, // Will be billed when trial ends
         });
-        
-        hasWhiteLabel = itemsPage.data.some(item => item.price.id === addonPriceId);
-        
-        if (hasWhiteLabel || !itemsPage.has_more) break;
-        
-        startingAfter = itemsPage.data[itemsPage.data.length - 1]?.id;
-      } while (true);
 
-      if (!hasWhiteLabel) {
-        // Add white label branding to subscription
-        await stripe.subscriptionItems.create({
-          subscription: user.stripeSubscriptionId,
-          price: addonPriceId,
-          proration_behavior: 'create_prorations',
+        console.log(`[Stripe] White label branding enabled for free during trial, pending billing after trial ends`);
+        res.json({
+          success: true,
+          message: "White label branding unlocked! Free during your trial period, will be added to your subscription when billing starts.",
+          whiteLabelEnabled: true,
+          freeTrialBenefit: true,
+        });
+      } else {
+        // After trial: Add to Stripe subscription with proration
+
+        // Check if white label branding is already on the subscription
+        let hasWhiteLabel = false;
+        let startingAfter: string | undefined = undefined;
+        
+        do {
+          const itemsPage = await stripe.subscriptionItems.list({
+            subscription: user.stripeSubscriptionId,
+            limit: 100,
+            ...(startingAfter && { starting_after: startingAfter }),
+          });
+          
+          hasWhiteLabel = itemsPage.data.some(item => item.price.id === addonPriceId);
+          
+          if (hasWhiteLabel || !itemsPage.has_more) break;
+          
+          startingAfter = itemsPage.data[itemsPage.data.length - 1]?.id;
+        } while (true);
+
+        if (!hasWhiteLabel) {
+          // Add white label branding to subscription
+          await stripe.subscriptionItems.create({
+            subscription: user.stripeSubscriptionId,
+            price: addonPriceId,
+            proration_behavior: 'create_prorations',
+          });
+        }
+
+        // Update user to enable white label in database
+        await storage.updateUser(user.id, {
+          whitelabelBrandingActive: true,
+          whitelabelPendingBilling: false, // Already billed
+        });
+
+        console.log(`[Stripe] White label branding ${hasWhiteLabel ? 'already active' : 'added successfully'}`);
+        res.json({
+          success: true,
+          message: "White label branding unlocked successfully",
+          whiteLabelEnabled: true,
         });
       }
-
-      // Update user to enable white label in database
-      await storage.updateUser(user.id, {
-        whitelabelBrandingActive: true,
-      });
-
-      console.log(`[Stripe] White label branding ${hasWhiteLabel ? 'already active' : 'added successfully'}`);
-      res.json({
-        success: true,
-        message: "White label branding unlocked successfully",
-        whiteLabelEnabled: true,
-      });
     } catch (error: any) {
       console.error('[Stripe] Add branding error:', error);
       res.status(500).json({ message: error.message || "Failed to add white label branding" });

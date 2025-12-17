@@ -14,6 +14,9 @@ interface PurchaseSeatsDialogProps {
   isTrialing?: boolean;
   seatsUsed?: number;
   baseSeatLimit?: number;
+  paidSeats?: number;
+  giftedSeats?: number;
+  hasWhitelabelBranding?: boolean;
 }
 
 export function PurchaseSeatsDialog({ 
@@ -23,7 +26,10 @@ export function PurchaseSeatsDialog({
   onPurchaseSuccess,
   isTrialing = false,
   seatsUsed = 0,
-  baseSeatLimit = 2
+  baseSeatLimit = 2,
+  paidSeats = 0,
+  giftedSeats = 0,
+  hasWhitelabelBranding = false
 }: PurchaseSeatsDialogProps) {
   const { toast } = useToast();
   const [quantity, setQuantity] = useState(1);
@@ -31,7 +37,18 @@ export function PurchaseSeatsDialog({
   const [isPurchasing, setIsPurchasing] = useState(false);
   
   const SEAT_PRICE = 34.95;
-  const totalPrice = (quantity * SEAT_PRICE).toFixed(2);
+  const BASE_SUBSCRIPTION = 99.00;
+  const WHITELABEL_PRICE = 49.95;
+  
+  // Cost of new seats being added
+  const newSeatsCost = quantity * SEAT_PRICE;
+  const totalPrice = newSeatsCost.toFixed(2);
+  
+  // Full new monthly total (current bill + new seats)
+  const currentPaidSeatsCost = paidSeats * SEAT_PRICE;
+  const whitelabelCost = hasWhitelabelBranding ? WHITELABEL_PRICE : 0;
+  const currentMonthlyTotal = BASE_SUBSCRIPTION + currentPaidSeatsCost + whitelabelCost;
+  const newMonthlyTotal = currentMonthlyTotal + newSeatsCost;
 
   const handlePurchase = async () => {
     setIsPurchasing(true);
@@ -87,43 +104,77 @@ export function PurchaseSeatsDialog({
             </DialogDescription>
           </DialogHeader>
           
-          {/* Trial Billing Warning */}
-          {isTrialing && (() => {
-            // Calculate billable seats: seats used minus the free base seats, plus the new seats being added
-            const currentBillableSeats = Math.max(0, seatsUsed - baseSeatLimit);
-            const newBillableSeats = currentBillableSeats + quantity;
-            
+          {/* Billing Summary - shows current bill + what's being added */}
+          {(() => {
             return (
-              <div className="p-4 bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-lg">
+              <div className={`p-4 rounded-lg border ${isTrialing ? 'bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800' : 'bg-muted/50 border-border'}`}>
                 <div className="flex items-start gap-3">
-                  <span className="material-icons text-amber-600 dark:text-amber-400 text-xl mt-0.5">warning</span>
+                  {isTrialing && (
+                    <span className="material-icons text-amber-600 dark:text-amber-400 text-xl mt-0.5">warning</span>
+                  )}
                   <div className="flex-1">
-                    <p className="font-semibold text-amber-900 dark:text-amber-100 mb-1">
-                      Free Trial - Billing Notice
+                    {isTrialing && (
+                      <p className="font-semibold text-amber-900 dark:text-amber-100 mb-1">
+                        Free Trial - Billing Notice
+                      </p>
+                    )}
+                    <p className={`text-sm mb-3 ${isTrialing ? 'text-amber-800 dark:text-amber-200' : 'text-muted-foreground'}`}>
+                      {isTrialing 
+                        ? <>You're currently on a <strong>30-day free trial</strong>. Here's what your monthly bill will be when your trial ends:</>
+                        : <>Here's your current monthly subscription and what it will be after adding seats:</>
+                      }
                     </p>
-                    <p className="text-sm text-amber-800 dark:text-amber-200 mb-3">
-                      You're currently on a <strong>30-day free trial</strong>. You have {baseSeatLimit} gifted seats. Each additional seat is billed at <strong>$34.95/month</strong> when your trial ends.
-                    </p>
-                    <div className="bg-white dark:bg-amber-900 rounded-md p-3 border border-amber-200 dark:border-amber-700">
-                      <div className="flex justify-between items-center text-sm mb-2">
-                        <span className="text-amber-700 dark:text-amber-300">Base subscription:</span>
-                        <span className="font-medium text-amber-900 dark:text-amber-100">$99.00/mo</span>
+                    <div className={`rounded-md p-3 border ${isTrialing ? 'bg-white dark:bg-amber-900 border-amber-200 dark:border-amber-700' : 'bg-background border-border'}`}>
+                      {/* Current Monthly Bill Section */}
+                      <p className={`text-xs font-semibold uppercase tracking-wide mb-2 ${isTrialing ? 'text-amber-600 dark:text-amber-400' : 'text-muted-foreground'}`}>
+                        Current Monthly Bill
+                      </p>
+                      <div className="flex justify-between items-center text-sm mb-1">
+                        <span className={isTrialing ? 'text-amber-700 dark:text-amber-300' : 'text-muted-foreground'}>Base subscription:</span>
+                        <span className={`font-medium ${isTrialing ? 'text-amber-900 dark:text-amber-100' : 'text-foreground'}`}>$99.00</span>
                       </div>
-                      <div className="flex justify-between items-center text-sm mb-2">
-                        <span className="text-amber-700 dark:text-amber-300">Gifted seats (free):</span>
-                        <span className="font-medium text-amber-900 dark:text-amber-100">{baseSeatLimit} seats</span>
+                      {giftedSeats > 0 && (
+                        <div className="flex justify-between items-center text-sm mb-1">
+                          <span className={isTrialing ? 'text-amber-700 dark:text-amber-300' : 'text-muted-foreground'}>Gifted seats (free):</span>
+                          <span className={`font-medium ${isTrialing ? 'text-amber-900 dark:text-amber-100' : 'text-foreground'}`}>{giftedSeats} seats</span>
+                        </div>
+                      )}
+                      {paidSeats > 0 && (
+                        <div className="flex justify-between items-center text-sm mb-1">
+                          <span className={isTrialing ? 'text-amber-700 dark:text-amber-300' : 'text-muted-foreground'}>Paid seats ({paidSeats}):</span>
+                          <span className={`font-medium ${isTrialing ? 'text-amber-900 dark:text-amber-100' : 'text-foreground'}`}>${currentPaidSeatsCost.toFixed(2)}</span>
+                        </div>
+                      )}
+                      {hasWhitelabelBranding && (
+                        <div className="flex justify-between items-center text-sm mb-1">
+                          <span className={isTrialing ? 'text-amber-700 dark:text-amber-300' : 'text-muted-foreground'}>White Label Branding:</span>
+                          <span className={`font-medium ${isTrialing ? 'text-amber-900 dark:text-amber-100' : 'text-foreground'}`}>${WHITELABEL_PRICE.toFixed(2)}</span>
+                        </div>
+                      )}
+                      <div className={`flex justify-between items-center text-sm pt-1 border-t mt-1 ${isTrialing ? 'border-amber-200 dark:border-amber-700' : 'border-border'}`}>
+                        <span className={`font-medium ${isTrialing ? 'text-amber-900 dark:text-amber-100' : 'text-foreground'}`}>Current total:</span>
+                        <span className={`font-semibold ${isTrialing ? 'text-amber-900 dark:text-amber-100' : 'text-foreground'}`}>${currentMonthlyTotal.toFixed(2)}/mo</span>
                       </div>
-                      <div className="flex justify-between items-center text-sm mb-2">
-                        <span className="text-amber-700 dark:text-amber-300">Additional paid seats after adding:</span>
-                        <span className="font-medium text-amber-900 dark:text-amber-100">
-                          {newBillableSeats} x $34.95 = ${(newBillableSeats * 34.95).toFixed(2)}/mo
-                        </span>
+                      
+                      {/* Adding Section */}
+                      <div className={`mt-3 pt-3 border-t ${isTrialing ? 'border-amber-200 dark:border-amber-700' : 'border-border'}`}>
+                        <p className={`text-xs font-semibold uppercase tracking-wide mb-2 ${isTrialing ? 'text-amber-600 dark:text-amber-400' : 'text-muted-foreground'}`}>
+                          Adding Now
+                        </p>
+                        <div className="flex justify-between items-center text-sm">
+                          <span className={isTrialing ? 'text-amber-700 dark:text-amber-300' : 'text-muted-foreground'}>New seats ({quantity}):</span>
+                          <span className={`font-medium text-primary`}>+${newSeatsCost.toFixed(2)}</span>
+                        </div>
                       </div>
-                      <div className="border-t border-amber-200 dark:border-amber-700 pt-2 mt-2">
+                      
+                      {/* New Total */}
+                      <div className={`border-t pt-2 mt-3 ${isTrialing ? 'border-amber-200 dark:border-amber-700' : 'border-border'}`}>
                         <div className="flex justify-between items-center">
-                          <span className="font-semibold text-amber-900 dark:text-amber-100">Projected monthly cost after trial:</span>
-                          <span className="font-bold text-lg text-amber-900 dark:text-amber-100">
-                            ${(99 + newBillableSeats * 34.95).toFixed(2)}/mo
+                          <span className={`font-semibold ${isTrialing ? 'text-amber-900 dark:text-amber-100' : 'text-foreground'}`}>
+                            {isTrialing ? 'Projected monthly cost after trial:' : 'New monthly total:'}
+                          </span>
+                          <span className={`font-bold text-lg ${isTrialing ? 'text-amber-900 dark:text-amber-100' : 'text-primary'}`}>
+                            ${newMonthlyTotal.toFixed(2)}/mo
                           </span>
                         </div>
                       </div>
@@ -175,8 +226,8 @@ export function PurchaseSeatsDialog({
                 </div>
               </div>
               <div className="border-t pt-3 flex items-center justify-between gap-2">
-                <p className="font-medium">Monthly Total</p>
-                <p className="font-bold text-xl text-primary">${totalPrice}/month</p>
+                <p className="font-medium">New Monthly Total</p>
+                <p className="font-bold text-xl text-primary">${newMonthlyTotal.toFixed(2)}/month</p>
               </div>
             </div>
             <p className="text-xs text-muted-foreground">
@@ -196,7 +247,7 @@ export function PurchaseSeatsDialog({
               data-testid="button-confirm-purchase-seats"
             >
               <span className="material-icons text-sm mr-1">shopping_cart</span>
-              Confirm Purchase - ${totalPrice}
+              Add {quantity} Seat{quantity > 1 ? 's' : ''} (+${totalPrice}/mo)
             </Button>
           </DialogFooter>
         </DialogContent>

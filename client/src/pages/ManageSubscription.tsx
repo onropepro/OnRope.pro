@@ -216,16 +216,31 @@ export default function ManageSubscription() {
 
   const addBrandingMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest("POST", "/api/stripe/add-whitelabel");
+      const response = await apiRequest("POST", "/api/stripe/add-branding");
+      return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       queryClient.invalidateQueries({ queryKey: ["/api/subscription/details"] });
-      toast({
-        title: "White Label Branding Added",
-        description: "White label branding has been added to your subscription.",
-      });
       setShowAddBrandingDialog(false);
+      
+      // Show different message based on whether it was a free trial activation
+      if (data.freeTrialBenefit) {
+        toast({
+          title: "White Label Branding Activated!",
+          description: "Free during your trial period. Billing starts when your trial ends.",
+        });
+      } else {
+        toast({
+          title: "White Label Branding Added",
+          description: "White label branding has been added to your subscription.",
+        });
+      }
+      
+      // Reload page after 1 second to ensure fresh data
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     },
     onError: (error: Error) => {
       toast({
@@ -829,8 +844,12 @@ export default function ManageSubscription() {
           <DialogHeader>
             <DialogTitle>Add White Label Branding</DialogTitle>
             <DialogDescription>
-              Add custom logo and brand colors to your platform for {currencySymbol}49/month.
-              This will be prorated for your current billing period.
+              <div className="space-y-3 pt-2">
+                <p>Add custom logo and brand colors to your platform for {currencySymbol}49/month.</p>
+                <p className="text-xs text-muted-foreground">
+                  If you're in your trial period, white label branding is free until your trial ends.
+                </p>
+              </div>
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2">
@@ -846,7 +865,7 @@ export default function ManageSubscription() {
               disabled={addBrandingMutation.isPending}
               data-testid="button-add-branding-confirm"
             >
-              {addBrandingMutation.isPending ? "Adding..." : "Add Branding"}
+              {addBrandingMutation.isPending ? "Adding..." : "Activate Branding"}
             </Button>
           </DialogFooter>
         </DialogContent>
