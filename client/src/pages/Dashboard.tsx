@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -651,52 +652,63 @@ function DeletedProjectsTab() {
               {Object.keys(groupedProjects[year]).sort((a, b) => b.localeCompare(a)).map(monthNum => {
                 const monthData = groupedProjects[year][monthNum];
                 return (
-                  <div key={monthNum} className="space-y-3 ml-4">
+                  <div key={monthNum} className="space-y-2 ml-4">
                     <h4 className="text-base font-semibold text-muted-foreground">{monthData.monthName}</h4>
-                    {Object.keys(monthData.days).sort((a, b) => b.localeCompare(a)).map(day => (
-                      <div key={day} className="space-y-2 ml-4">
-                        <h5 className="text-sm font-medium text-muted-foreground flex items-center gap-1">
-                          <span className="material-icons text-xs">event</span>
-                          {monthData.monthName} {parseInt(day)}, {year}
-                        </h5>
-                        {monthData.days[day].map((project: Project) => (
-                          <Card 
-                            key={project.id} 
-                            className="group shadow-md hover:shadow-lg transition-all duration-200 bg-gradient-to-br from-background to-destructive/5" 
-                            data-testid={`deleted-project-${project.id}`}
-                          >
-                            <CardContent className="p-4">
-                              <div className="flex items-start justify-between gap-4">
-                                <div className="flex-1 min-w-0">
-                                  <div className="text-base font-bold mb-0.5 truncate">{project.buildingName}</div>
-                                  <div className="text-sm text-muted-foreground mb-0.5">{project.strataPlanNumber}</div>
-                                  <div className="text-sm text-muted-foreground capitalize flex items-center gap-1">
-                                    <span className="material-icons text-sm text-destructive">delete</span>
-                                    {getJobTypeLabel(t, project.jobType)}
+                    {Object.keys(monthData.days).sort((a, b) => b.localeCompare(a)).map(day => {
+                      const dayProjects = monthData.days[day];
+                      return (
+                        <Collapsible key={day} defaultOpen={true} className="ml-4">
+                          <CollapsibleTrigger className="flex items-center gap-2 w-full text-left py-1 hover-elevate rounded-md px-2 -ml-2">
+                            <span className="material-icons text-xs transition-transform duration-200 group-data-[state=open]:rotate-90">chevron_right</span>
+                            <span className="material-icons text-xs text-muted-foreground">event</span>
+                            <span className="text-sm font-medium text-muted-foreground">
+                              {monthData.monthName} {parseInt(day)}, {year}
+                            </span>
+                            <Badge variant="secondary" className="ml-auto text-xs">
+                              {dayProjects.length}
+                            </Badge>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent className="space-y-2 mt-2">
+                            {dayProjects.map((project: Project) => (
+                              <Card 
+                                key={project.id} 
+                                className="group shadow-md hover:shadow-lg transition-all duration-200 bg-gradient-to-br from-background to-destructive/5" 
+                                data-testid={`deleted-project-${project.id}`}
+                              >
+                                <CardContent className="p-4">
+                                  <div className="flex items-start justify-between gap-4">
+                                    <div className="flex-1 min-w-0">
+                                      <div className="text-base font-bold mb-0.5 truncate">{project.buildingName}</div>
+                                      <div className="text-sm text-muted-foreground mb-0.5">{project.strataPlanNumber}</div>
+                                      <div className="text-sm text-muted-foreground capitalize flex items-center gap-1">
+                                        <span className="material-icons text-sm text-destructive">delete</span>
+                                        {getJobTypeLabel(t, project.jobType)}
+                                      </div>
+                                    </div>
+                                    <div className="flex flex-col gap-2 flex-shrink-0">
+                                      <Badge variant="destructive" className="flex items-center gap-1">
+                                        <span className="material-icons text-xs">delete</span>
+                                        {t('dashboard.deletedProjects.deleted', 'Deleted')}
+                                      </Badge>
+                                      <Button
+                                        size="sm"
+                                        variant="default"
+                                        onClick={() => restoreMutation.mutate(project.id)}
+                                        disabled={restoreMutation.isPending}
+                                        data-testid={`button-restore-${project.id}`}
+                                      >
+                                        <span className="material-icons text-sm mr-1">restore</span>
+                                        {t('dashboard.deletedProjects.restore', 'Restore')}
+                                      </Button>
+                                    </div>
                                   </div>
-                                </div>
-                                <div className="flex flex-col gap-2 flex-shrink-0">
-                                  <Badge variant="destructive" className="flex items-center gap-1">
-                                    <span className="material-icons text-xs">delete</span>
-                                    {t('dashboard.deletedProjects.deleted', 'Deleted')}
-                                  </Badge>
-                                  <Button
-                                    size="sm"
-                                    variant="default"
-                                    onClick={() => restoreMutation.mutate(project.id)}
-                                    disabled={restoreMutation.isPending}
-                                    data-testid={`button-restore-${project.id}`}
-                                  >
-                                    <span className="material-icons text-sm mr-1">restore</span>
-                                    {t('dashboard.deletedProjects.restore', 'Restore')}
-                                  </Button>
-                                </div>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
-                    ))}
+                                </CardContent>
+                              </Card>
+                            ))}
+                          </CollapsibleContent>
+                        </Collapsible>
+                      );
+                    })}
                   </div>
                 );
               })}
@@ -775,41 +787,52 @@ function CompletedProjectsTab() {
               {Object.keys(groupedProjects[year]).sort((a, b) => b.localeCompare(a)).map(monthNum => {
                 const monthData = groupedProjects[year][monthNum];
                 return (
-                  <div key={monthNum} className="space-y-3 ml-4">
+                  <div key={monthNum} className="space-y-2 ml-4">
                     <h4 className="text-base font-semibold text-muted-foreground">{monthData.monthName}</h4>
-                    {Object.keys(monthData.days).sort((a, b) => b.localeCompare(a)).map(day => (
-                      <div key={day} className="space-y-2 ml-4">
-                        <h5 className="text-sm font-medium text-muted-foreground flex items-center gap-1">
-                          <span className="material-icons text-xs">event</span>
-                          {monthData.monthName} {parseInt(day)}, {year}
-                        </h5>
-                        {monthData.days[day].map((project: Project) => (
-                          <Card 
-                            key={project.id} 
-                            className="group shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer bg-gradient-to-br from-background to-success/5" 
-                            data-testid={`completed-project-${project.id}`}
-                            onClick={() => setLocation(`/projects/${project.id}`)}
-                          >
-                            <CardContent className="p-4">
-                              <div className="flex items-start justify-between gap-4">
-                                <div className="flex-1 min-w-0">
-                                  <div className="text-base font-bold mb-0.5 truncate">{project.buildingName}</div>
-                                  <div className="text-sm text-muted-foreground mb-0.5">{project.strataPlanNumber}</div>
-                                  <div className="text-sm text-muted-foreground capitalize flex items-center gap-1">
-                                    <span className="material-icons text-sm text-success">check_circle</span>
-                                    {getJobTypeLabel(t, project.jobType)}
+                    {Object.keys(monthData.days).sort((a, b) => b.localeCompare(a)).map(day => {
+                      const dayProjects = monthData.days[day];
+                      return (
+                        <Collapsible key={day} defaultOpen={true} className="ml-4">
+                          <CollapsibleTrigger className="flex items-center gap-2 w-full text-left py-1 hover-elevate rounded-md px-2 -ml-2">
+                            <span className="material-icons text-xs transition-transform duration-200 group-data-[state=open]:rotate-90">chevron_right</span>
+                            <span className="material-icons text-xs text-muted-foreground">event</span>
+                            <span className="text-sm font-medium text-muted-foreground">
+                              {monthData.monthName} {parseInt(day)}, {year}
+                            </span>
+                            <Badge variant="secondary" className="ml-auto text-xs">
+                              {dayProjects.length}
+                            </Badge>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent className="space-y-2 mt-2">
+                            {dayProjects.map((project: Project) => (
+                              <Card 
+                                key={project.id} 
+                                className="group shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer bg-gradient-to-br from-background to-success/5" 
+                                data-testid={`completed-project-${project.id}`}
+                                onClick={() => setLocation(`/projects/${project.id}`)}
+                              >
+                                <CardContent className="p-4">
+                                  <div className="flex items-start justify-between gap-4">
+                                    <div className="flex-1 min-w-0">
+                                      <div className="text-base font-bold mb-0.5 truncate">{project.buildingName}</div>
+                                      <div className="text-sm text-muted-foreground mb-0.5">{project.strataPlanNumber}</div>
+                                      <div className="text-sm text-muted-foreground capitalize flex items-center gap-1">
+                                        <span className="material-icons text-sm text-success">check_circle</span>
+                                        {getJobTypeLabel(t, project.jobType)}
+                                      </div>
+                                    </div>
+                                    <Badge variant="outline" className="bg-success/10 text-success border-success/30 flex-shrink-0">
+                                      <span className="material-icons text-xs mr-1">check_circle</span>
+                                      {t('dashboard.projects.completed', 'Completed')}
+                                    </Badge>
                                   </div>
-                                </div>
-                                <Badge variant="outline" className="bg-success/10 text-success border-success/30 flex-shrink-0">
-                                  <span className="material-icons text-xs mr-1">check_circle</span>
-                                  {t('dashboard.projects.completed', 'Completed')}
-                                </Badge>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
-                    ))}
+                                </CardContent>
+                              </Card>
+                            ))}
+                          </CollapsibleContent>
+                        </Collapsible>
+                      );
+                    })}
                   </div>
                 );
               })}
