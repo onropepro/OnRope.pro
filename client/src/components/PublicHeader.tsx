@@ -3,15 +3,12 @@ import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
-<<<<<<< HEAD
-=======
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
->>>>>>> fad8522ff5f3c85d941ba0a5e375bc7a5c5b7101
 import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown, IdCard, HardHat, Search, Package, Calendar, DollarSign, Calculator, Palette, HelpCircle, MessageSquare, Globe } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
@@ -65,19 +62,11 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
   }, [showModulesMenu, showTechnicianMenu]);
 
   const navItems = [
-<<<<<<< HEAD
-    { id: "employer", label: "Employer", href: "/employer" },
-    { id: "technician", label: "Technician", href: "/technician-login" },
-    { id: "property-manager", label: "Property Manager", href: "/property-manager" },
-    { id: "resident", label: "Resident", href: "/resident" },
-    { id: "building-manager", label: "Building Manager", href: "/building-portal" },
-=======
     { id: "employer", label: t('navigation.employer', 'Employer'), href: "/employer" },
     { id: "technician", label: t('navigation.technician', 'Technician'), href: "/technician-login" },
     { id: "property-manager", label: t('navigation.propertyManager', 'Property Manager'), href: "/property-manager" },
-    { id: "resident", label: t('navigation.resident', 'Resident'), href: "/link" },
+    { id: "resident", label: t('navigation.resident', 'Resident'), href: "/resident" },
     { id: "building-manager", label: t('navigation.buildingManager', 'Building Manager'), href: "/building-portal" },
->>>>>>> fad8522ff5f3c85d941ba0a5e375bc7a5c5b7101
   ];
 
   return (
