@@ -6,7 +6,6 @@ import {
   ArrowRight, 
   Globe, 
   Shield,
-  Eye,
   Clock, 
   CheckCircle2,
   Users,
@@ -15,6 +14,10 @@ import {
   AlertTriangle,
   BookOpen,
   HelpCircle,
+  ArrowDown,
+  Timer,
+  History,
+  Sparkles,
 } from "lucide-react";
 import { Link } from "wouter";
 import { PublicHeader } from "@/components/PublicHeader";
@@ -38,12 +41,12 @@ export default function PropertyManagerLanding() {
             </Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              Know Your Vendors.<br />
-              <span className="text-green-100">Protect Your Buildings.</span>
+              Stop Being the Complaint Department.<br />
+              <span className="text-green-100">Start Being the Property Manager.</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-green-100 max-w-3xl mx-auto leading-relaxed">
-              Free access to vendor safety ratings, response time metrics, and compliance data for every rope access company working on your buildings. No cost. No catch. Just visibility.
+              When your vendors use OnRopePro, residents submit complaints directly to them. You stay informed without being the middleman. Free access to vendor safety ratings, response times, and complaint resolution data. No cost. No catch. Just freedom.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
@@ -71,20 +74,23 @@ export default function PropertyManagerLanding() {
         </div>
       </section>
 
-      {/* Opening Hook Section - Loss Aversion */}
+      {/* Opening Hook Section - Complaint Elimination */}
       <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto">
         <div className="space-y-6 text-lg leading-relaxed">
-          <p className="text-muted-foreground">
-            When a rope access technician falls, the first question isn't "Is everyone okay?"
+          <p className="text-xl font-medium text-foreground">
+            How many resident complaints did you relay to vendors last month?
           </p>
           <p className="text-muted-foreground">
-            It's "Did you verify this contractor's safety compliance before hiring them?"
+            Every streaky window, every scheduling question, every "when are they coming to my side of the building?" lands on your desk first. You forward it. You follow up. You relay the response. You're the middleman for every issue on every building you manage.
+          </p>
+          <p className="font-semibold text-foreground text-xl">
+            What if complaints went directly to your vendor instead?
           </p>
           <p className="text-muted-foreground">
-            If your answer is "I checked their insurance certificate" or worse, "I took their word for it," you're exposed.
+            When your vendors use OnRopePro, residents submit feedback straight to them. You see everything: what was reported, when it was viewed, how fast it was resolved. But you're not in the middle of it anymore.
           </p>
-          <p className="font-medium text-foreground">
-            The Property Manager Portal gives you documented evidence of vendor safety due diligence. Before something goes wrong.
+          <p className="font-medium text-foreground italic">
+            Oversight without involvement. That's the Property Manager Portal.
           </p>
         </div>
         
@@ -103,27 +109,33 @@ export default function PropertyManagerLanding() {
       {/* What You Get Section */}
       <section className="py-12 md:py-20 px-4 md:px-8 max-w-5xl mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-          Everything You Need to Know About Your Rope Access Vendors
+          Out of the Complaint Loop. Into the Know.
         </h2>
-        <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-          In One Place.
-        </p>
         
-        <div className="space-y-8">
-          {/* Feature 1: Vendor Safety Ratings */}
-          <Card className="overflow-hidden">
+        <div className="space-y-8 mt-12">
+          {/* Feature 1: Direct Complaints - THE BIG ONE */}
+          <Card className="overflow-hidden border-2" style={{borderColor: `${PM_COLOR}40`}}>
             <CardContent className="p-6 md:p-8">
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-lg flex items-center justify-center shrink-0" style={{backgroundColor: `${PM_COLOR}20`}}>
-                  <Shield className="w-6 h-6" style={{color: PM_COLOR}} />
+                <div className="w-12 h-12 rounded-lg flex items-center justify-center shrink-0" style={{backgroundColor: PM_COLOR}}>
+                  <MessageSquare className="w-6 h-6 text-white" />
                 </div>
-                <div className="space-y-3">
-                  <h3 className="text-xl font-semibold">Vendor Safety Ratings</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="text-xl font-semibold">Residents Complain Directly to Vendors. Not to You.</h3>
+                    <Badge variant="secondary" className="text-xs">The Big One</Badge>
+                  </div>
                   <p className="text-base text-muted-foreground">
-                    Every rope access company on OnRopePro has a Company Safety Rating (CSR) built from three compliance metrics: documentation completeness, toolbox meeting frequency, and harness inspection rates.
+                    When your vendors use OnRopePro, residents get access to a Resident Portal. They submit complaints with photos directly to the maintenance company. The vendor responds. The issue gets resolved.
                   </p>
                   <p className="text-base text-muted-foreground">
-                    You see exactly where each vendor stands. No guessing. No asking for reports they can fabricate.
+                    You're not in the middle of it. You're not the relay. You're not spending your Tuesday forwarding emails and making follow-up calls.
+                  </p>
+                  <p className="text-base text-muted-foreground">
+                    But you see everything. Every complaint. Every response. Every resolution. Complete visibility without being the middleman.
+                  </p>
+                  <p className="text-base font-medium text-foreground">
+                    For a property manager handling 50 buildings, this is the difference between drowning in complaint coordination and actually managing properties.
                   </p>
                 </div>
               </div>
@@ -135,22 +147,48 @@ export default function PropertyManagerLanding() {
             <CardContent className="p-6 md:p-8">
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-lg flex items-center justify-center shrink-0" style={{backgroundColor: `${PM_COLOR}20`}}>
-                  <Clock className="w-6 h-6" style={{color: PM_COLOR}} />
+                  <Timer className="w-6 h-6" style={{color: PM_COLOR}} />
                 </div>
-                <div className="space-y-3">
-                  <h3 className="text-xl font-semibold">Response Time Metrics</h3>
+                <div className="space-y-4">
+                  <h3 className="text-xl font-semibold">Response Time Metrics: The Accountability You've Been Missing</h3>
                   <p className="text-base text-muted-foreground">
-                    When you report a complaint, does your vendor actually fix it? Now you know.
+                    When residents complain directly to vendors, vendors can ignore them. Or they can respond in 24 hours. Now you know which.
                   </p>
                   <p className="text-base text-muted-foreground">
-                    See average resolution times and feedback response rates for every contractor. Hold vendors accountable with data, not arguments.
+                    The Property Manager Portal shows average resolution times and feedback response rates for every contractor. When you see a vendor taking 12 days to respond while another resolves issues in 2 days, you have data for your next contract conversation.
+                  </p>
+                  <p className="text-base text-muted-foreground italic">
+                    This is what Tommy (our co-founder, 15 years in rope access) says property managers care about most: "This will be a bigger factor than safety ratings. Are they actually responding to complaints?"
                   </p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Feature 3: My Vendors Dashboard */}
+          {/* Feature 3: Vendor Safety Ratings */}
+          <Card className="overflow-hidden">
+            <CardContent className="p-6 md:p-8">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-lg flex items-center justify-center shrink-0" style={{backgroundColor: `${PM_COLOR}20`}}>
+                  <Shield className="w-6 h-6" style={{color: PM_COLOR}} />
+                </div>
+                <div className="space-y-3">
+                  <h3 className="text-xl font-semibold">Vendor Safety Ratings: Know Before Something Goes Wrong</h3>
+                  <p className="text-base text-muted-foreground">
+                    Every rope access company on OnRopePro has a Company Safety Rating (CSR) built from three compliance metrics: documentation completeness, toolbox meeting frequency, and harness inspection rates.
+                  </p>
+                  <p className="text-base text-muted-foreground">
+                    You see exactly where each vendor stands. No guessing. No asking for reports they can fabricate.
+                  </p>
+                  <p className="text-base font-medium text-foreground">
+                    When an insurance adjuster asks "What did you know about this vendor's safety practices?", you have an answer.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Feature 4: My Vendors Dashboard */}
           <Card className="overflow-hidden">
             <CardContent className="p-6 md:p-8">
               <div className="flex items-start gap-4">
@@ -163,34 +201,34 @@ export default function PropertyManagerLanding() {
                     Managing 20 buildings with different contractors? Finding which company services which building shouldn't require digging through emails and contracts.
                   </p>
                   <p className="text-base text-muted-foreground">
-                    The My Vendors Dashboard shows every contracted rope access company, their safety scores, and which of your buildings they service. Thirty seconds instead of twenty minutes.
+                    The My Vendors Dashboard shows every contracted rope access company, their safety scores, their response times, and which of your buildings they service. Thirty seconds instead of twenty minutes.
                   </p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Feature 4: Feedback History */}
+          {/* Feature 5: Feedback History */}
           <Card className="overflow-hidden">
             <CardContent className="p-6 md:p-8">
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-lg flex items-center justify-center shrink-0" style={{backgroundColor: `${PM_COLOR}20`}}>
-                  <MessageSquare className="w-6 h-6" style={{color: PM_COLOR}} />
+                  <History className="w-6 h-6" style={{color: PM_COLOR}} />
                 </div>
                 <div className="space-y-3">
-                  <h3 className="text-xl font-semibold">Feedback History</h3>
+                  <h3 className="text-xl font-semibold">Feedback History Per Building</h3>
                   <p className="text-base text-muted-foreground">
-                    That resident who complained about streaky windows? Track whether your vendor responded, how long it took, and what they did.
+                    That resident who complained about streaky windows three times? Track the entire conversation. See when the vendor responded, what they said, how long resolution took.
                   </p>
                   <p className="text-base text-muted-foreground">
-                    Building-by-building complaint and resolution history gives you documentation when performance conversations get difficult.
+                    Building-by-building complaint and resolution history gives you documentation when performance conversations get difficult. Or when you're deciding whether to renew a contract.
                   </p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Feature 5: Anchor Inspection Upload */}
+          {/* Feature 6: Anchor Inspection Upload */}
           <Card className="overflow-hidden">
             <CardContent className="p-6 md:p-8">
               <div className="flex items-start gap-4">
@@ -214,16 +252,115 @@ export default function PropertyManagerLanding() {
 
       <Separator className="max-w-4xl mx-auto" />
 
+      {/* Complaint Flow Transformation Section */}
+      <section className="py-12 md:py-20 px-4 md:px-8 max-w-5xl mx-auto">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+          Before vs. After: Where Complaints Go
+        </h2>
+        
+        <div className="grid md:grid-cols-2 gap-8 mt-12">
+          {/* Before */}
+          <Card className="border-rose-200 dark:border-rose-800">
+            <CardContent className="p-6">
+              <h3 className="text-xl font-semibold mb-4 text-rose-600">Before OnRopePro</h3>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-rose-100 dark:bg-rose-900 flex items-center justify-center text-sm font-medium text-rose-600">1</div>
+                  <span className="text-sm">Resident notices issue</span>
+                </div>
+                <div className="flex justify-center"><ArrowDown className="w-4 h-4 text-rose-400" /></div>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-rose-100 dark:bg-rose-900 flex items-center justify-center text-sm font-medium text-rose-600">2</div>
+                  <span className="text-sm">Resident calls/emails Property Manager</span>
+                </div>
+                <div className="flex justify-center"><ArrowDown className="w-4 h-4 text-rose-400" /></div>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-rose-100 dark:bg-rose-900 flex items-center justify-center text-sm font-medium text-rose-600">3</div>
+                  <span className="text-sm">Property Manager forwards to Vendor</span>
+                </div>
+                <div className="flex justify-center"><ArrowDown className="w-4 h-4 text-rose-400" /></div>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-rose-100 dark:bg-rose-900 flex items-center justify-center text-sm font-medium text-rose-600">4</div>
+                  <span className="text-sm">(wait...)</span>
+                </div>
+                <div className="flex justify-center"><ArrowDown className="w-4 h-4 text-rose-400" /></div>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-rose-100 dark:bg-rose-900 flex items-center justify-center text-sm font-medium text-rose-600">5</div>
+                  <span className="text-sm">Vendor responds to Property Manager</span>
+                </div>
+                <div className="flex justify-center"><ArrowDown className="w-4 h-4 text-rose-400" /></div>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-rose-100 dark:bg-rose-900 flex items-center justify-center text-sm font-medium text-rose-600">6</div>
+                  <span className="text-sm">Property Manager relays to Resident</span>
+                </div>
+                <div className="flex justify-center"><ArrowDown className="w-4 h-4 text-rose-400" /></div>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-rose-100 dark:bg-rose-900 flex items-center justify-center text-sm font-medium text-rose-600">7</div>
+                  <span className="text-sm">Resident has follow-up question...</span>
+                </div>
+                <div className="flex justify-center"><ArrowDown className="w-4 h-4 text-rose-400" /></div>
+                <div className="text-sm text-rose-600 font-medium text-center">(repeat entire cycle)</div>
+              </div>
+              <p className="text-sm text-muted-foreground mt-4">
+                You're the relay. Every complaint, every update, every follow-up routes through your inbox. Multiply by 50 buildings. That's your week.
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* After */}
+          <Card className="border-2" style={{borderColor: PM_COLOR}}>
+            <CardContent className="p-6">
+              <h3 className="text-xl font-semibold mb-4" style={{color: PM_COLOR}}>With OnRopePro</h3>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium text-white" style={{backgroundColor: PM_COLOR}}>1</div>
+                  <span className="text-sm">Resident notices issue</span>
+                </div>
+                <div className="flex justify-center"><ArrowDown className="w-4 h-4" style={{color: PM_COLOR}} /></div>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium text-white" style={{backgroundColor: PM_COLOR}}>2</div>
+                  <span className="text-sm">Resident submits directly to Vendor (with photos)</span>
+                </div>
+                <div className="flex justify-center"><ArrowDown className="w-4 h-4" style={{color: PM_COLOR}} /></div>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium text-white" style={{backgroundColor: PM_COLOR}}>3</div>
+                  <span className="text-sm">Vendor responds directly to Resident</span>
+                </div>
+                <div className="flex justify-center"><ArrowDown className="w-4 h-4" style={{color: PM_COLOR}} /></div>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium text-white" style={{backgroundColor: PM_COLOR}}>
+                    <CheckCircle2 className="w-4 h-4" />
+                  </div>
+                  <span className="text-sm font-medium">Issue resolved</span>
+                </div>
+              </div>
+              
+              <div className="mt-6 p-4 rounded-lg" style={{backgroundColor: `${PM_COLOR}10`}}>
+                <p className="text-sm font-semibold mb-2" style={{color: PM_COLOR}}>Where are you in this flow?</p>
+                <p className="text-sm text-muted-foreground">
+                  Watching from your dashboard. You see every complaint that comes in, when it was viewed, how long resolution took. If a vendor is ignoring complaints, you'll know. If they're responding in 24 hours, you'll see that too.
+                </p>
+                <p className="text-sm font-medium text-foreground mt-2">
+                  But you're not in the middle of it. You're not the relay. You're not spending hours on complaint coordination.
+                </p>
+                <p className="text-sm font-semibold mt-2" style={{color: PM_COLOR}}>
+                  You're the property manager with oversight. Not the complaint department.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      <Separator className="max-w-4xl mx-auto" />
+
       {/* How It Works Section */}
       <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto" id="how-it-works">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
           Three Steps. Five Minutes. Free Forever.
         </h2>
-        <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-          Getting started takes less time than reading this page.
-        </p>
         
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-3 gap-8 mt-12">
           <div className="text-center space-y-4">
             <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto text-white text-2xl font-bold" style={{backgroundColor: PM_COLOR}}>
               1
@@ -248,14 +385,18 @@ export default function PropertyManagerLanding() {
             <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto text-white text-2xl font-bold" style={{backgroundColor: PM_COLOR}}>
               3
             </div>
-            <h3 className="text-xl font-semibold">See What You've Been Missing</h3>
+            <h3 className="text-xl font-semibold">Watch Your Workload Shrink</h3>
             <p className="text-base text-muted-foreground">
-              View safety ratings, response metrics, and compliance data for every vendor servicing your buildings. Compare contractors objectively. Make informed decisions.
+              View safety ratings, response metrics, and complaint resolution data for every vendor servicing your buildings. See complaints being handled without your involvement. Compare contractors objectively. Make informed decisions.
             </p>
           </div>
         </div>
 
-        <div className="mt-12 text-center">
+        <p className="text-center text-muted-foreground mt-8">
+          When residents in your buildings start using the Resident Portal, complaints stop routing through you. You just see the results.
+        </p>
+
+        <div className="mt-8 text-center">
           <Button size="lg" style={{backgroundColor: PM_COLOR}} className="text-white hover:opacity-90" asChild>
             <Link href="/register" data-testid="button-create-account-steps">
               Create Your Free Account
@@ -303,13 +444,10 @@ export default function PropertyManagerLanding() {
       {/* Risk Mitigation Section */}
       <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-          The Documentation You'll Wish You Had
+          The Documentation You'll Wish You Had. Before You Need It.
         </h2>
-        <p className="text-center text-muted-foreground text-lg mb-8 max-w-2xl mx-auto">
-          Before You Need It.
-        </p>
         
-        <Card className="border-2" style={{borderColor: `${PM_COLOR}40`}}>
+        <Card className="border-2 mt-8" style={{borderColor: `${PM_COLOR}40`}}>
           <CardContent className="p-6 md:p-8 space-y-6">
             <div className="flex items-start gap-4">
               <AlertTriangle className="w-8 h-8 shrink-0" style={{color: PM_COLOR}} />
@@ -337,24 +475,69 @@ export default function PropertyManagerLanding() {
 
       <Separator className="max-w-4xl mx-auto" />
 
-      {/* Vendor Accountability Section */}
+      {/* The Real Value: Your Time Back Section */}
       <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-          When Vendors Know You're Watching, Standards Rise
+          What Would You Do With 10 Extra Hours a Week?
         </h2>
         
         <div className="mt-8 space-y-6 text-lg leading-relaxed">
           <p className="text-muted-foreground">
-            An 86% safety rating versus a 23% safety rating tells a story.
+            Property managers managing 30+ buildings spend 8-15 hours weekly on complaint coordination alone. Forwarding emails. Following up with vendors. Relaying responses. Chasing updates.
           </p>
           <p className="text-muted-foreground">
-            When property managers can see these numbers, vendors can't hide behind vague assurances. The companies doing the work right finally have proof. The companies cutting corners get exposed.
+            When complaints go directly to vendors:
+          </p>
+          <p className="font-semibold text-foreground text-xl">
+            Those hours disappear from your workload.
           </p>
           <p className="text-muted-foreground">
-            Your visibility creates accountability. When vendors know their CSR affects their contracts, safety becomes a competitive advantage, not a cost center.
+            You still have full visibility. You still see response times. You still have documentation for board meetings and contract renewals. You just don't have to be the middleman anymore.
+          </p>
+          <p className="text-muted-foreground">
+            That's time back for lease renewals. For tenant relations. For the strategic work that actually grows your portfolio. For leaving at 5pm instead of 7pm.
           </p>
           <p className="font-medium text-foreground">
-            Better for technicians. Better for you. Better for everyone who lives and works in your buildings.
+            The Property Manager Portal doesn't just give you data. It gives you your time back.
+          </p>
+        </div>
+
+        <div className="mt-8 text-center">
+          <Button size="lg" style={{backgroundColor: PM_COLOR}} className="text-white hover:opacity-90" asChild>
+            <Link href="/register" data-testid="button-create-account-time">
+              Create Your Free Account
+              <ArrowRight className="ml-2 w-5 h-5" />
+            </Link>
+          </Button>
+        </div>
+      </section>
+
+      <Separator className="max-w-4xl mx-auto" />
+
+      {/* Vendor Accountability Section */}
+      <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+          When Vendors Know You're Watching, Everything Changes.
+        </h2>
+        
+        <div className="mt-8 space-y-6 text-lg leading-relaxed">
+          <p className="text-muted-foreground">
+            Here's what happens when you can see vendor response times:
+          </p>
+          <p className="text-muted-foreground">
+            The vendor who takes 12 days to respond to complaints knows you can see that. The vendor who resolves issues in 48 hours knows you can see that too.
+          </p>
+          <p className="text-muted-foreground">
+            An 86% safety rating versus a 23% safety rating tells a story. A 2-day average resolution time versus a 14-day average tells another.
+          </p>
+          <p className="text-muted-foreground">
+            When property managers can see these numbers, vendors can't hide behind vague assurances. The companies doing the work right finally have proof. The companies cutting corners or ignoring complaints get exposed.
+          </p>
+          <p className="text-muted-foreground">
+            Your visibility creates accountability. When vendors know their response times affect their contracts, responsiveness becomes a competitive advantage.
+          </p>
+          <p className="font-medium text-foreground">
+            Better for residents. Better for you. Better for everyone who lives and works in your buildings.
           </p>
         </div>
       </section>
@@ -374,8 +557,51 @@ export default function PropertyManagerLanding() {
                 <HelpCircle className="w-6 h-6 shrink-0" style={{color: PM_COLOR}} />
                 <div>
                   <h4 className="font-semibold text-foreground mb-2">"What if my vendors don't use OnRopePro?"</h4>
+                  <p className="text-base text-muted-foreground mb-2">
+                    Ask them about it. Vendors who prioritize safety and responsiveness want property managers to see their ratings and resolution times. If they resist transparency, that tells you something.
+                  </p>
                   <p className="text-base text-muted-foreground">
-                    Ask them about it. Vendors who prioritize safety want property managers to see their ratings. If they resist transparency, that tells you something.
+                    You can also tell them: "I'd like to stop being the complaint relay between residents and your company. OnRopePro lets residents submit directly to you, and I get visibility into response times."
+                  </p>
+                  <p className="text-base text-muted-foreground mt-2">
+                    Most vendors will see that as a benefit, not a burden.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-start gap-4">
+                <HelpCircle className="w-6 h-6 shrink-0" style={{color: PM_COLOR}} />
+                <div>
+                  <h4 className="font-semibold text-foreground mb-2">"What if residents keep complaining to me anyway?"</h4>
+                  <p className="text-base text-muted-foreground mb-2">
+                    Redirect them. "Submit your feedback through the Resident Portal. The vendor will see it immediately and respond directly. I can see everything you submit, but they'll respond faster if you go directly."
+                  </p>
+                  <p className="text-base text-muted-foreground">
+                    Most residents prefer direct access over waiting for you to relay messages. The system trains the behavior quickly.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-start gap-4">
+                <HelpCircle className="w-6 h-6 shrink-0" style={{color: PM_COLOR}} />
+                <div>
+                  <h4 className="font-semibold text-foreground mb-2">"I don't want to lose visibility into what's happening at my buildings."</h4>
+                  <p className="text-base text-muted-foreground mb-2">
+                    You won't. That's the point.
+                  </p>
+                  <p className="text-base text-muted-foreground mb-2">
+                    You see every complaint that comes in, when it was viewed, when it was resolved, what the vendor said. You have complete visibility into the entire conversation.
+                  </p>
+                  <p className="text-base text-muted-foreground">
+                    You just don't have to be IN the conversation anymore. Oversight without involvement.
                   </p>
                 </div>
               </div>
@@ -388,8 +614,11 @@ export default function PropertyManagerLanding() {
                 <HelpCircle className="w-6 h-6 shrink-0" style={{color: PM_COLOR}} />
                 <div>
                   <h4 className="font-semibold text-foreground mb-2">"I already track vendor certificates in spreadsheets."</h4>
-                  <p className="text-base text-muted-foreground">
+                  <p className="text-base text-muted-foreground mb-2">
                     Certificates confirm insurance exists. They don't tell you if workers are actually following safety protocols. CSR shows real-time compliance, not paperwork.
+                  </p>
+                  <p className="text-base text-muted-foreground">
+                    And spreadsheets don't route complaints directly to vendors. They don't show you response time metrics. They don't give you the data you need for contract decisions.
                   </p>
                 </div>
               </div>
@@ -403,7 +632,7 @@ export default function PropertyManagerLanding() {
                 <div>
                   <h4 className="font-semibold text-foreground mb-2">"This seems too good to be free."</h4>
                   <p className="text-base text-muted-foreground">
-                    Your vendors pay for the platform. Your access creates the visibility that makes their investment valuable. There's no catch because you're not the customer. You're the accountability mechanism.
+                    Your vendors pay for the platform. Your access creates the visibility that makes their investment valuable. There's no catch because you're not the customer. You're the accountability mechanism that makes the system work.
                   </p>
                 </div>
               </div>
@@ -416,8 +645,14 @@ export default function PropertyManagerLanding() {
                 <HelpCircle className="w-6 h-6 shrink-0" style={{color: PM_COLOR}} />
                 <div>
                   <h4 className="font-semibold text-foreground mb-2">"I need to check with my portfolio manager first."</h4>
+                  <p className="text-base text-muted-foreground mb-2">
+                    Show them this page. The ROI argument writes itself:
+                  </p>
                   <p className="text-base text-muted-foreground">
-                    Show them this page. The ROI argument writes itself: free access to data that protects against liability and improves vendor selection. No budget required.
+                    Free access. Complaint elimination. Vendor accountability data. Liability documentation. No budget required.
+                  </p>
+                  <p className="text-base text-muted-foreground mt-2">
+                    What's the counterargument?
                   </p>
                 </div>
               </div>
@@ -432,15 +667,24 @@ export default function PropertyManagerLanding() {
       <section className="py-16 md:py-24 px-4 md:px-8">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            See Your Vendors Differently.
+            Oversight Without Involvement. Visibility Without Burden.
           </h2>
           
           <div className="space-y-4 text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
             <p>
-              You already manage rope access contractors. You just can't see what they're actually doing.
+              You already manage rope access contractors. You're already handling complaints between residents and vendors. You're already wondering which vendors are actually safe.
             </p>
             <p>
-              The Property Manager Portal makes the invisible visible. Safety ratings. Response metrics. Compliance trends. Documentation for when you need it.
+              The Property Manager Portal changes all of it.
+            </p>
+            <p>
+              Complaints go directly to vendors. You see everything without being in the middle.
+            </p>
+            <p>
+              Safety ratings show real compliance. You know who to trust before something goes wrong.
+            </p>
+            <p>
+              Response times prove accountability. You have data for contract decisions.
             </p>
             <p className="font-medium text-foreground">
               Free. No credit card. No trial expiration.
@@ -458,8 +702,8 @@ export default function PropertyManagerLanding() {
               </Link>
             </Button>
             <Button size="lg" variant="outline" asChild>
-              <Link href="/contact" data-testid="button-ask-vendor">
-                Ask Your Vendor About OnRopePro
+              <Link href="/contact" data-testid="button-tell-vendor">
+                Tell Your Vendor About OnRopePro
                 <Users className="ml-2 w-5 h-5" />
               </Link>
             </Button>
