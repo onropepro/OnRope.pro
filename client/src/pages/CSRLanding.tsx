@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Link, useLocation } from "wouter";
 import { PublicHeader } from "@/components/PublicHeader";
+import { useTranslation } from "react-i18next";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import {
   Shield,
@@ -39,6 +40,7 @@ import {
 
 export default function CSRLanding() {
   const [, setLocation] = useLocation();
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
@@ -51,30 +53,30 @@ export default function CSRLanding() {
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
           <div className="text-center space-y-6 pt-16">
             <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-module-label">
-              Company Safety Rating Module
+              {t('modules.csr.hero.badge', 'Company Safety Rating Module')}
             </Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              Know exactly how safe<br />
-              your company is.<br />
-              <span className="text-blue-100">Prove it to anyone who asks.</span>
+              {t('modules.csr.hero.titleLine1', 'Know exactly how safe')}<br />
+              {t('modules.csr.hero.titleLine2', 'your company is.')}<br />
+              <span className="text-blue-100">{t('modules.csr.hero.titleLine3', 'Prove it to anyone who asks.')}</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              The Company Safety Rating transforms scattered paperwork and good intentions into a single, auditable number. Property managers see it when comparing vendors. Technicians see it when evaluating job offers.<br />
-              <strong>You see it when building a culture that protects your people and your business.</strong>
+              {t('modules.csr.hero.description', 'The Company Safety Rating transforms scattered paperwork and good intentions into a single, auditable number. Property managers see it when comparing vendors. Technicians see it when evaluating job offers.')}<br />
+              <strong>{t('modules.csr.hero.descriptionStrong', 'You see it when building a culture that protects your people and your business.')}</strong>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-hero-trial">
                 <Link href="/register">
-                  Start Your Free 60-Day Trial
+                  {t('modules.csr.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-hero-faq">
                 <Link href="#faqs">
-                  Find Answers
+                  {t('modules.csr.hero.ctaFaq', 'Find Answers')}
                   <BookOpen className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
@@ -98,19 +100,19 @@ export default function CSRLanding() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-emerald-600">87%</div>
-                  <div className="text-base text-muted-foreground mt-1">Average starting CSR</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.csr.stats.averageCsr', 'Average starting CSR')}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-sky-600">Real-time</div>
-                  <div className="text-base text-muted-foreground mt-1">Score updates</div>
+                  <div className="text-3xl md:text-4xl font-bold text-sky-600">{t('modules.csr.stats.realTimeValue', 'Real-time')}</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.csr.stats.scoreUpdates', 'Score updates')}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-violet-600">5 min</div>
-                  <div className="text-base text-muted-foreground mt-1">Audit preparation</div>
+                  <div className="text-3xl md:text-4xl font-bold text-violet-600">{t('modules.csr.stats.auditTimeValue', '5 min')}</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.csr.stats.auditPreparation', 'Audit preparation')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-amber-600">100%</div>
-                  <div className="text-base text-muted-foreground mt-1">Achievable compliance</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.csr.stats.achievableCompliance', 'Achievable compliance')}</div>
                 </div>
               </div>
             </CardContent>
@@ -124,23 +126,23 @@ export default function CSRLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
-            The Safety Problem Nobody Talks About
+            {t('modules.csr.problem.title', 'The Safety Problem Nobody Talks About')}
           </h2>
           
           <Card className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
             <CardContent className="p-6 md:p-8 space-y-4 text-muted-foreground">
               <p className="text-lg leading-relaxed font-medium text-foreground">
-                Every rope access company says they're safe. Every one of them.
+                {t('modules.csr.problem.intro', "Every rope access company says they're safe. Every one of them.")}
               </p>
               <p className="text-base">
-                But when WorkSafe shows up and asks for proof, most operators scramble through filing cabinets, truck glove boxes, and text message threads looking for documentation that may or may not exist. When a property manager asks which vendor is safer, they're comparing marketing claims, not evidence. When a technician decides whether to accept a job, they're gambling their life on an employer's word.
+                {t('modules.csr.problem.paragraph1', "But when WorkSafe shows up and asks for proof, most operators scramble through filing cabinets, truck glove boxes, and text message threads looking for documentation that may or may not exist. When a property manager asks which vendor is safer, they're comparing marketing claims, not evidence. When a technician decides whether to accept a job, they're gambling their life on an employer's word.")}
               </p>
               <p className="text-base font-medium text-foreground">
-                Safety without measurement is just hope. And hope is not a strategy when someone's hanging 40 stories up.
+                {t('modules.csr.problem.highlight', "Safety without measurement is just hope. And hope is not a strategy when someone's hanging 40 stories up.")}
               </p>
               <Separator className="my-6" />
               <p className="text-base">
-                OnRopePro's Company Safety Rating changes the conversation. Instead of "we're safe," you get a number: 87%. Instead of scattered forms, you get a single dashboard showing exactly where you stand and what needs attention. Instead of guessing, you know.
+                {t('modules.csr.problem.solution', 'OnRopePro\'s Company Safety Rating changes the conversation. Instead of "we\'re safe," you get a number: 87%. Instead of scattered forms, you get a single dashboard showing exactly where you stand and what needs attention. Instead of guessing, you know.')}
               </p>
             </CardContent>
           </Card>
@@ -153,10 +155,10 @@ export default function CSRLanding() {
       <section id="features" className="pt-8 md:pt-12 pb-16 md:pb-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            What the CSR Module Does
+            {t('modules.csr.features.title', 'What the CSR Module Does')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-3xl mx-auto">
-            A penalty-based compliance scoring system that measures safety posture in real time.
+            {t('modules.csr.features.subtitle', 'A penalty-based compliance scoring system that measures safety posture in real time.')}
           </p>
 
           <div className="grid md:grid-cols-3 gap-6">
@@ -167,28 +169,28 @@ export default function CSRLanding() {
                 <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center mb-3">
                   <Gauge className="w-6 h-6 text-emerald-600" />
                 </div>
-                <CardTitle className="text-xl">Automatic Score Calculation</CardTitle>
+                <CardTitle className="text-xl">{t('modules.csr.features.autoScore.title', 'Automatic Score Calculation')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-base text-muted-foreground">
-                <p className="font-medium text-foreground">The system tracks every safety document, every harness inspection, every toolbox meeting.</p>
-                <p>Your score updates automatically as compliance events occur across your operation. No manual entry. No spreadsheets. No remembering to update anything.</p>
-                <p className="font-medium text-foreground mt-4">What gets tracked:</p>
+                <p className="font-medium text-foreground">{t('modules.csr.features.autoScore.intro', 'The system tracks every safety document, every harness inspection, every toolbox meeting.')}</p>
+                <p>{t('modules.csr.features.autoScore.description', 'Your score updates automatically as compliance events occur across your operation. No manual entry. No spreadsheets. No remembering to update anything.')}</p>
+                <p className="font-medium text-foreground mt-4">{t('modules.csr.features.autoScore.tracked', 'What gets tracked:')}</p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Core company documents (COI, Health & Safety Manual, Company Policy)</span>
+                    <span>{t('modules.csr.features.autoScore.item1', 'Core company documents (COI, Health & Safety Manual, Company Policy)')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Project-level safety documentation (FLHA, RAP, Toolbox Meeting, Anchor Inspection)</span>
+                    <span>{t('modules.csr.features.autoScore.item2', 'Project-level safety documentation (FLHA, RAP, Toolbox Meeting, Anchor Inspection)')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Daily harness inspection completion rates</span>
+                    <span>{t('modules.csr.features.autoScore.item3', 'Daily harness inspection completion rates')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Employee acknowledgment status on all safety documents</span>
+                    <span>{t('modules.csr.features.autoScore.item4', 'Employee acknowledgment status on all safety documents')}</span>
                   </li>
                 </ul>
               </CardContent>
@@ -201,24 +203,24 @@ export default function CSRLanding() {
                 <div className="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-3">
                   <Eye className="w-6 h-6 text-blue-600" />
                 </div>
-                <CardTitle className="text-xl">Transparent Visibility</CardTitle>
+                <CardTitle className="text-xl">{t('modules.csr.features.visibility.title', 'Transparent Visibility')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-base text-muted-foreground">
-                <p className="font-medium text-foreground">Different stakeholders see appropriate levels of detail.</p>
-                <p>Property managers see your overall score and color-coded compliance badge. Company owners see full breakdowns with improvement recommendations. Technicians see enough to make informed decisions about employers.</p>
-                <p className="font-medium text-foreground mt-4">What each role sees:</p>
+                <p className="font-medium text-foreground">{t('modules.csr.features.visibility.intro', 'Different stakeholders see appropriate levels of detail.')}</p>
+                <p>{t('modules.csr.features.visibility.description', 'Property managers see your overall score and color-coded compliance badge. Company owners see full breakdowns with improvement recommendations. Technicians see enough to make informed decisions about employers.')}</p>
+                <p className="font-medium text-foreground mt-4">{t('modules.csr.features.visibility.roles', 'What each role sees:')}</p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <Users className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span><strong>Property Managers:</strong> Overall %, color badge, category breakdown</span>
+                    <span><strong>{t('modules.csr.features.visibility.pmLabel', 'Property Managers:')}</strong> {t('modules.csr.features.visibility.pmValue', 'Overall %, color badge, category breakdown')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Briefcase className="w-4 h-4 mt-0.5 text-blue-600 shrink-0" />
-                    <span><strong>Company Owners:</strong> Full dashboard, action items, improvement tips</span>
+                    <span><strong>{t('modules.csr.features.visibility.ownerLabel', 'Company Owners:')}</strong> {t('modules.csr.features.visibility.ownerValue', 'Full dashboard, action items, improvement tips')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <HardHat className="w-4 h-4 mt-0.5 text-amber-600 shrink-0" />
-                    <span><strong>Technicians:</strong> Company CSR when evaluating job offers</span>
+                    <span><strong>{t('modules.csr.features.visibility.techLabel', 'Technicians:')}</strong> {t('modules.csr.features.visibility.techValue', 'Company CSR when evaluating job offers')}</span>
                   </li>
                 </ul>
               </CardContent>
@@ -231,28 +233,28 @@ export default function CSRLanding() {
                 <div className="w-12 h-12 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center mb-3">
                   <AlertTriangle className="w-6 h-6 text-amber-600" />
                 </div>
-                <CardTitle className="text-xl">Penalty-Based Accountability</CardTitle>
+                <CardTitle className="text-xl">{t('modules.csr.features.penalty.title', 'Penalty-Based Accountability')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-base text-muted-foreground">
-                <p className="font-medium text-foreground">Start at 75%. Reach 100% by uploading three core documents.</p>
-                <p>From there, every compliance gap triggers a proportional penalty. Miss a harness inspection? Penalty. Toolbox meeting not completed? Penalty. Employee hasn't signed updated safety procedures? Penalty.</p>
-                <p className="font-medium text-foreground mt-4">What creates penalties:</p>
+                <p className="font-medium text-foreground">{t('modules.csr.features.penalty.intro', 'Start at 75%. Reach 100% by uploading three core documents.')}</p>
+                <p>{t('modules.csr.features.penalty.description', "From there, every compliance gap triggers a proportional penalty. Miss a harness inspection? Penalty. Toolbox meeting not completed? Penalty. Employee hasn't signed updated safety procedures? Penalty.")}</p>
+                <p className="font-medium text-foreground mt-4">{t('modules.csr.features.penalty.creates', 'What creates penalties:')}</p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-amber-600 shrink-0" />
-                    <span>Missing or expired company documentation (up to 25%)</span>
+                    <span>{t('modules.csr.features.penalty.item1', 'Missing or expired company documentation (up to 25%)')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-amber-600 shrink-0" />
-                    <span>Incomplete project documentation (up to 25%)</span>
+                    <span>{t('modules.csr.features.penalty.item2', 'Incomplete project documentation (up to 25%)')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-amber-600 shrink-0" />
-                    <span>Harness inspections not completed before work (up to 25%)</span>
+                    <span>{t('modules.csr.features.penalty.item3', 'Harness inspections not completed before work (up to 25%)')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-amber-600 shrink-0" />
-                    <span>Unsigned employee acknowledgments (up to 5%)</span>
+                    <span>{t('modules.csr.features.penalty.item4', 'Unsigned employee acknowledgments (up to 5%)')}</span>
                   </li>
                 </ul>
               </CardContent>

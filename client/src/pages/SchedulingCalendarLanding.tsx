@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -40,6 +41,7 @@ const PROBLEM_ACCORDION_ITEMS = [
 ];
 
 export default function SchedulingCalendarLanding() {
+  const { t } = useTranslation();
   const [openItems, setOpenItems] = useState<string[]>([]);
   const [faqOpenItems, setFaqOpenItems] = useState<string[]>([]);
   
@@ -60,34 +62,34 @@ export default function SchedulingCalendarLanding() {
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
           <div className="text-center space-y-6 pt-16">
             <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-module-label">
-              Scheduling & Calendar Module
+              {t('modules.scheduling.hero.badge', 'Scheduling & Calendar Module')}
             </Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              Stop Booking Dave in<br />
-              Two Places on Monday.<br />
-              <span className="text-blue-100">Zero 6am emergency calls.</span>
+              {t('modules.scheduling.hero.titleLine1', 'Stop Booking Dave in')}<br />
+              {t('modules.scheduling.hero.titleLine2', 'Two Places on Monday.')}<br />
+              <span className="text-blue-100">{t('modules.scheduling.hero.titleLine3', 'Zero 6am emergency calls.')}</span>
             </h1>
             
             <div className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed space-y-4">
               <p>
-                Automatic conflict detection prevents double-booking before it happens. Dual calendar views show every project and every technician at a glance. Time-off blocks scheduling automatically.
+                {t('modules.scheduling.hero.description', 'Automatic conflict detection prevents double-booking before it happens. Dual calendar views show every project and every technician at a glance. Time-off blocks scheduling automatically.')}
               </p>
               <p>
-                <strong>One system. Zero surprises.</strong>
+                <strong>{t('modules.scheduling.hero.tagline', 'One system. Zero surprises.')}</strong>
               </p>
             </div>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-hero-trial">
                 <Link href="/register">
-                  Start Your Free 60-Day Trial
+                  {t('modules.scheduling.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-hero-faqs">
                 <Link href="#faqs">
-                  Find Answers
+                  {t('modules.scheduling.hero.ctaFaqs', 'Find Answers')}
                   <BookOpen className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
@@ -110,20 +112,20 @@ export default function SchedulingCalendarLanding() {
             <CardContent className="p-8">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                 <div className="text-center" data-testid="stat-time-saved">
-                  <div className="text-3xl md:text-4xl font-bold text-blue-600">8+ hrs</div>
-                  <div className="text-base text-muted-foreground mt-1">Saved monthly on scheduling</div>
+                  <div className="text-3xl md:text-4xl font-bold text-blue-600">{t('modules.scheduling.stats.timeSavedValue', '8+ hrs')}</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.scheduling.stats.timeSavedLabel', 'Saved monthly on scheduling')}</div>
                 </div>
                 <div className="text-center" data-testid="stat-conflict-types">
-                  <div className="text-3xl md:text-4xl font-bold text-rose-600">3</div>
-                  <div className="text-base text-muted-foreground mt-1">Conflict types prevented</div>
+                  <div className="text-3xl md:text-4xl font-bold text-rose-600">{t('modules.scheduling.stats.conflictTypesValue', '3')}</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.scheduling.stats.conflictTypesLabel', 'Conflict types prevented')}</div>
                 </div>
                 <div className="text-center" data-testid="stat-leave-types">
-                  <div className="text-3xl md:text-4xl font-bold text-amber-600">10</div>
-                  <div className="text-base text-muted-foreground mt-1">Leave types supported</div>
+                  <div className="text-3xl md:text-4xl font-bold text-amber-600">{t('modules.scheduling.stats.leaveTypesValue', '10')}</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.scheduling.stats.leaveTypesLabel', 'Leave types supported')}</div>
                 </div>
                 <div className="text-center" data-testid="stat-calendar-views">
-                  <div className="text-3xl md:text-4xl font-bold text-emerald-600">2</div>
-                  <div className="text-base text-muted-foreground mt-1">Calendar views included</div>
+                  <div className="text-3xl md:text-4xl font-bold text-emerald-600">{t('modules.scheduling.stats.calendarViewsValue', '2')}</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.scheduling.stats.calendarViewsLabel', 'Calendar views included')}</div>
                 </div>
               </div>
             </CardContent>
@@ -137,22 +139,22 @@ export default function SchedulingCalendarLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
-            The Monday Morning Disaster Nobody Planned
+            {t('modules.scheduling.problem.title', 'The Monday Morning Disaster Nobody Planned')}
           </h2>
           
           <Card className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
             <CardContent className="p-6 md:p-8 space-y-4 text-muted-foreground">
               <p className="text-lg leading-relaxed font-medium text-foreground">
-                Friday afternoon. Golf tournament in an hour. You're throwing names right, left, and center to fill the spots for next week. Monday morning at 6am, your phone rings.
+                {t('modules.scheduling.problem.intro', "Friday afternoon. Golf tournament in an hour. You're throwing names right, left, and center to fill the spots for next week. Monday morning at 6am, your phone rings.")}
               </p>
               <p className="text-base">
-                Jack needs you to pull someone from one building, grab rope from the shop because it's not long enough for another building, and get a different tech to a third site with his gear. Your whole week is ruined before breakfast.
+                {t('modules.scheduling.problem.scenario', "Jack needs you to pull someone from one building, grab rope from the shop because it's not long enough for another building, and get a different tech to a third site with his gear. Your whole week is ruined before breakfast.")}
               </p>
               <p className="text-base">
-                This happens because your project lives in one place, your calendar lives in another, and crew assignments live in a text thread. You create the window washing project. Then you open Float and recreate it. Name the project. Block the dates. Assign employees. Tag a color. Project gets pushed five days? Update both systems. Or forget to update one. And then watch the dominoes fall.
+                {t('modules.scheduling.problem.cause', "This happens because your project lives in one place, your calendar lives in another, and crew assignments live in a text thread. You create the window washing project. Then you open Float and recreate it. Name the project. Block the dates. Assign employees. Tag a color. Project gets pushed five days? Update both systems. Or forget to update one. And then watch the dominoes fall.")}
               </p>
               <p className="text-base font-medium text-foreground">
-                OnRopePro connects your projects directly to your schedule. Create a project with dates and assigned crew. The calendar populates automatically. Change the project dates and the schedule updates. Try to assign someone who's already booked elsewhere and the system warns you before you create the conflict. No more "Oh shit, I forgot to schedule that" emergencies.
+                {t('modules.scheduling.problem.solution', 'OnRopePro connects your projects directly to your schedule. Create a project with dates and assigned crew. The calendar populates automatically. Change the project dates and the schedule updates. Try to assign someone who\'s already booked elsewhere and the system warns you before you create the conflict. No more "Oh shit, I forgot to schedule that" emergencies.')}
               </p>
             </CardContent>
           </Card>
@@ -165,10 +167,10 @@ export default function SchedulingCalendarLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            What This Module Does
+            {t('modules.scheduling.features.title', 'What This Module Does')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-            Visual scheduling with automatic conflict prevention, connected directly to your projects.
+            {t('modules.scheduling.features.subtitle', 'Visual scheduling with automatic conflict prevention, connected directly to your projects.')}
           </p>
           
           <div className="grid md:grid-cols-3 gap-6">
@@ -178,20 +180,20 @@ export default function SchedulingCalendarLanding() {
                   <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center">
                     <AlertTriangle className="w-5 h-5 text-rose-600" />
                   </div>
-                  <CardTitle className="text-lg">Automatic Conflict Detection</CardTitle>
+                  <CardTitle className="text-lg">{t('modules.scheduling.features.conflictDetection.title', 'Automatic Conflict Detection')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
                 <p className="text-base text-muted-foreground">
-                  The system checks three conditions before allowing any assignment: existing project assignments, approved time-off requests, and date overlaps. If any condition fails, you see a warning with full details before you can proceed.
+                  {t('modules.scheduling.features.conflictDetection.description', 'The system checks three conditions before allowing any assignment: existing project assignments, approved time-off requests, and date overlaps. If any condition fails, you see a warning with full details before you can proceed.')}
                 </p>
                 <div className="space-y-2 text-base text-muted-foreground">
-                  <p className="font-medium text-foreground">What gets prevented:</p>
+                  <p className="font-medium text-foreground">{t('modules.scheduling.features.conflictDetection.listTitle', 'What gets prevented:')}</p>
                   <ul className="list-disc list-inside space-y-1 ml-2">
-                    <li>Double-booking technicians on overlapping projects</li>
-                    <li>Scheduling during approved vacation</li>
-                    <li>Assigning crew to conflicting date ranges</li>
-                    <li>Friday afternoon mistakes becoming Monday disasters</li>
+                    <li>{t('modules.scheduling.features.conflictDetection.item1', 'Double-booking technicians on overlapping projects')}</li>
+                    <li>{t('modules.scheduling.features.conflictDetection.item2', 'Scheduling during approved vacation')}</li>
+                    <li>{t('modules.scheduling.features.conflictDetection.item3', 'Assigning crew to conflicting date ranges')}</li>
+                    <li>{t('modules.scheduling.features.conflictDetection.item4', 'Friday afternoon mistakes becoming Monday disasters')}</li>
                   </ul>
                 </div>
               </CardContent>
@@ -203,20 +205,20 @@ export default function SchedulingCalendarLanding() {
                   <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
                     <CalendarDays className="w-5 h-5 text-blue-600" />
                   </div>
-                  <CardTitle className="text-lg">Dual Calendar Views</CardTitle>
+                  <CardTitle className="text-lg">{t('modules.scheduling.features.dualCalendar.title', 'Dual Calendar Views')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
                 <p className="text-base text-muted-foreground">
-                  Two views working together give you complete visibility. Project Calendar shows all jobs on a timeline with color-coded blocks. Resource Timeline shows employee workloads by row so you can see who's available and who's overloaded at a glance.
+                  {t('modules.scheduling.features.dualCalendar.description', "Two views working together give you complete visibility. Project Calendar shows all jobs on a timeline with color-coded blocks. Resource Timeline shows employee workloads by row so you can see who's available and who's overloaded at a glance.")}
                 </p>
                 <div className="space-y-2 text-base text-muted-foreground">
-                  <p className="font-medium text-foreground">What you see:</p>
+                  <p className="font-medium text-foreground">{t('modules.scheduling.features.dualCalendar.listTitle', 'What you see:')}</p>
                   <ul className="list-disc list-inside space-y-1 ml-2">
-                    <li>All upcoming projects (even unassigned ones)</li>
-                    <li>Each employee's schedule on a single row</li>
-                    <li>Availability gaps between assignments</li>
-                    <li>Time-off displayed inline with work</li>
+                    <li>{t('modules.scheduling.features.dualCalendar.item1', 'All upcoming projects (even unassigned ones)')}</li>
+                    <li>{t('modules.scheduling.features.dualCalendar.item2', "Each employee's schedule on a single row")}</li>
+                    <li>{t('modules.scheduling.features.dualCalendar.item3', 'Availability gaps between assignments')}</li>
+                    <li>{t('modules.scheduling.features.dualCalendar.item4', 'Time-off displayed inline with work')}</li>
                   </ul>
                 </div>
               </CardContent>
@@ -228,20 +230,20 @@ export default function SchedulingCalendarLanding() {
                   <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center">
                     <Layers className="w-5 h-5 text-emerald-600" />
                   </div>
-                  <CardTitle className="text-lg">Project-Integrated Scheduling</CardTitle>
+                  <CardTitle className="text-lg">{t('modules.scheduling.features.projectIntegrated.title', 'Project-Integrated Scheduling')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
                 <p className="text-base text-muted-foreground">
-                  Create a project with date range and assigned employees. The schedule populates automatically. Change the project and the schedule updates. No duplicate data entry. No systems falling out of sync.
+                  {t('modules.scheduling.features.projectIntegrated.description', 'Create a project with date range and assigned employees. The schedule populates automatically. Change the project and the schedule updates. No duplicate data entry. No systems falling out of sync.')}
                 </p>
                 <div className="space-y-2 text-base text-muted-foreground">
-                  <p className="font-medium text-foreground">What stays connected:</p>
+                  <p className="font-medium text-foreground">{t('modules.scheduling.features.projectIntegrated.listTitle', 'What stays connected:')}</p>
                   <ul className="list-disc list-inside space-y-1 ml-2">
-                    <li>Project dates flow to calendar entries</li>
-                    <li>Employee assignments appear in both views</li>
-                    <li>Changes propagate automatically</li>
-                    <li>One source of truth for project and schedule</li>
+                    <li>{t('modules.scheduling.features.projectIntegrated.item1', 'Project dates flow to calendar entries')}</li>
+                    <li>{t('modules.scheduling.features.projectIntegrated.item2', 'Employee assignments appear in both views')}</li>
+                    <li>{t('modules.scheduling.features.projectIntegrated.item3', 'Changes propagate automatically')}</li>
+                    <li>{t('modules.scheduling.features.projectIntegrated.item4', 'One source of truth for project and schedule')}</li>
                   </ul>
                 </div>
               </CardContent>

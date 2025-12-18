@@ -5850,6 +5850,200 @@
         "subtitle": "Rejoignez les entreprises d'accès sur corde qui utilisent déjà OnRopePro pour protéger leurs opérations, réduire la charge administrative et assurer la conformité.",
         "button": "Commencez votre essai gratuit de 60 jours"
       }
+    },
+    "scheduling": {
+      "hero": {
+        "badge": "Module Planification et Calendrier",
+        "titleLine1": "Arrêtez de réserver Dave",
+        "titleLine2": "à deux endroits le lundi.",
+        "titleLine3": "Zéro appel d'urgence à 6h.",
+        "description": "La détection automatique des conflits empêche les doubles réservations avant qu'elles ne se produisent. Les vues calendrier doubles montrent chaque projet et chaque technicien en un coup d'œil. Les congés bloquent automatiquement la planification.",
+        "tagline": "Un seul système. Zéro surprise.",
+        "ctaTrial": "Commencez votre essai gratuit de 60 jours",
+        "ctaFaqs": "Trouver des réponses"
+      },
+      "stats": {
+        "timeSavedValue": "8+ heures",
+        "timeSavedLabel": "Économisées mensuellement sur la planification",
+        "conflictTypesValue": "3",
+        "conflictTypesLabel": "Types de conflits évités",
+        "leaveTypesValue": "10",
+        "leaveTypesLabel": "Types de congés pris en charge",
+        "calendarViewsValue": "2",
+        "calendarViewsLabel": "Vues calendrier incluses"
+      },
+      "problem": {
+        "title": "Le désastre du lundi matin que personne n'a prévu",
+        "intro": "Vendredi après-midi. Tournoi de golf dans une heure. Vous lancez des noms à droite, à gauche et au centre pour remplir les postes de la semaine prochaine. Lundi matin à 6h, votre téléphone sonne.",
+        "scenario": "Jacques a besoin que vous retiriez quelqu'un d'un bâtiment, que vous alliez chercher une corde à l'atelier parce qu'elle n'est pas assez longue pour un autre bâtiment, et que vous envoyiez un autre technicien sur un troisième site avec son équipement. Toute votre semaine est ruinée avant le petit-déjeuner.",
+        "cause": "Cela arrive parce que votre projet vit à un endroit, votre calendrier vit à un autre, et les affectations d'équipe vivent dans un fil de messages texte. Vous créez le projet de nettoyage de vitres. Puis vous ouvrez Float et le recréez. Nommez le projet. Bloquez les dates. Affectez les employés. Ajoutez une couleur. Le projet est repoussé de cinq jours? Mettez à jour les deux systèmes. Ou oubliez d'en mettre un à jour. Et regardez les dominos tomber.",
+        "solution": "OnRopePro connecte vos projets directement à votre calendrier. Créez un projet avec des dates et une équipe assignée. Le calendrier se remplit automatiquement. Changez les dates du projet et l'horaire se met à jour. Essayez d'assigner quelqu'un qui est déjà réservé ailleurs et le système vous avertit avant que vous ne créiez le conflit. Plus jamais de « Merde, j'ai oublié de planifier ça » urgences."
+      },
+      "features": {
+        "title": "Ce que fait ce module",
+        "subtitle": "Planification visuelle avec prévention automatique des conflits, connectée directement à vos projets.",
+        "conflictDetection": {
+          "title": "Détection automatique des conflits",
+          "description": "Le système vérifie trois conditions avant de permettre toute affectation : affectations de projet existantes, demandes de congés approuvées et chevauchements de dates. Si une condition échoue, vous voyez un avertissement avec tous les détails avant de pouvoir continuer.",
+          "listTitle": "Ce qui est évité :",
+          "item1": "Double réservation de techniciens sur des projets qui se chevauchent",
+          "item2": "Planification pendant des vacances approuvées",
+          "item3": "Affectation d'équipe à des plages de dates conflictuelles",
+          "item4": "Les erreurs du vendredi après-midi devenant des désastres du lundi"
+        },
+        "dualCalendar": {
+          "title": "Vues calendrier doubles",
+          "description": "Deux vues travaillant ensemble vous donnent une visibilité complète. Le calendrier de projet montre tous les travaux sur une chronologie avec des blocs codés par couleur. La chronologie des ressources montre les charges de travail des employés par ligne pour voir qui est disponible et qui est surchargé en un coup d'œil.",
+          "listTitle": "Ce que vous voyez :",
+          "item1": "Tous les projets à venir (même ceux non assignés)",
+          "item2": "L'horaire de chaque employé sur une seule ligne",
+          "item3": "Les écarts de disponibilité entre les affectations",
+          "item4": "Les congés affichés en ligne avec le travail"
+        },
+        "projectIntegrated": {
+          "title": "Planification intégrée aux projets",
+          "description": "Créez un projet avec une plage de dates et des employés assignés. L'horaire se remplit automatiquement. Changez le projet et l'horaire se met à jour. Pas de double saisie de données. Pas de systèmes désynchronisés.",
+          "listTitle": "Ce qui reste connecté :",
+          "item1": "Les dates de projet se propagent aux entrées du calendrier",
+          "item2": "Les affectations d'employés apparaissent dans les deux vues",
+          "item3": "Les changements se propagent automatiquement",
+          "item4": "Une seule source de vérité pour le projet et l'horaire"
+        }
+      }
+    },
+    "irataLogging": {
+      "hero": {
+        "badge": "Module de journalisation des tâches IRATA / SPRAT",
+        "title": "Votre carnet de bord ment",
+        "subtitle": "(Parce que vous ne l'avez pas mis à jour depuis six mois)",
+        "description": "OnRopePro capture vos heures d'accès sur corde le jour même où vous travaillez. Noms des bâtiments, types de tâches, durée. Tout est enregistré automatiquement lorsque vous terminez votre quart.",
+        "descriptionBold": "Remplir votre carnet de bord papier cesse d'être un devoir à la maison.",
+        "trialButton": "Commencez votre essai gratuit de 60 jours",
+        "faqButton": "Trouver des réponses"
+      },
+      "stats": {
+        "yours": {
+          "title": "Les vôtres",
+          "description": "Des heures qui ne disparaissent pas quand vous partez"
+        },
+        "accurate": {
+          "title": "Précis",
+          "description": "Enregistré pendant que vous vous en souvenez encore"
+        },
+        "ready": {
+          "title": "Prêt",
+          "description": "Preuve niveau 3 sur demande"
+        },
+        "portable": {
+          "title": "Portable",
+          "description": "Un profil, tous les employeurs"
+        }
+      },
+      "problem": {
+        "title": "Le problème de journalisation dont personne ne parle",
+        "intro": "Votre carnet de bord physique est un désordre.",
+        "paragraph1": "La dernière entrée remonte à des mois. Vous ne vous souvenez plus dans quels bâtiments vous avez travaillé, quelles tâches vous avez effectuées, ni combien d'heures vous avez réellement passées sur corde. Quand vous essayez enfin de rattraper, vous finissez par deviner. Ce transfert de corde était-il mardi ou mercredi? Avez-vous fait du gréement à la Tour B, ou juste de la descente?",
+        "paragraph2": "Voici la vérité inconfortable: quand vous apportez six mois d'entrées à votre niveau 3 pour signature, ils signent simplement. Ils n'étaient pas sur chaque chantier avec vous. Ils n'ont aucune idée si vous avez vraiment fait des transferts de corde le 15 mars. Mais ils signent quand même parce que c'est comme ça que ça a toujours été fait.",
+        "quote": "Un technicien l'a dit ainsi: « Ma dernière entrée date du 29 décembre 2023. Deux ans. Où ai-je travaillé l'année dernière? Je n'ai même plus accès à mes heures parce que je ne travaille plus là. Je n'ai pas de compte. Tout est parti maintenant. »",
+        "solution": "OnRopePro change cela. Vos heures sont enregistrées le jour même où vous travaillez. Noms des bâtiments, types de tâches, durée, tout est capturé lorsque vous terminez votre quart. Et parce que vos heures appartiennent à votre profil de technicien (pas à votre employeur), votre historique de carrière vous suit quand vous changez d'emploi."
+      },
+      "features": {
+        "title": "Ce que fait ce module",
+        "subtitle": "Le module de journalisation des tâches IRATA / SPRAT construit automatiquement votre portfolio de certification pendant que vous travaillez.",
+        "captureHours": {
+          "title": "Capturez les heures sans les devoirs",
+          "description1": "Lorsque vous terminez une session de travail, le système vous invite à catégoriser vos heures d'accès sur corde par type de tâche.",
+          "description2": "Plus besoin de reconstruire ce que vous avez fait il y a trois mois. Plus besoin de deviner quel bâtiment avait les transferts de corde.",
+          "listTitle": "Ce qui est capturé :",
+          "item1": "Date et durée de la session",
+          "item2": "Contexte du bâtiment et du projet",
+          "item3": "Types de tâches effectuées (20+ catégories)",
+          "item4": "Totaux cumulatifs par type de tâche"
+        },
+        "importHistory": {
+          "title": "Importez votre historique existant",
+          "description1": "Photographiez les pages de votre carnet de bord papier. Notre système OCR extrait automatiquement les dates, heures et données de tâches.",
+          "description2": "Ou entrez votre total de base manuellement si vous préférez.",
+          "listTitle": "Ce qui est suivi :",
+          "item1": "Heures de base des emplois précédents",
+          "item2": "Heures de formation des cours externes",
+          "item3": "Travail indépendant (pour les techniciens non connectés à un employeur)",
+          "item4": "Données historiques des pages de carnet scannées"
+        },
+        "trackProgress": {
+          "title": "Suivez votre progression vers la certification",
+          "description1": "Vos heures s'accumulent contre votre numéro de certification IRATA ou SPRAT.",
+          "description2": "Voyez exactement où vous en êtes pour votre prochaine évaluation de niveau.",
+          "listTitle": "Ce que vous voyez :",
+          "item1": "Total des heures de carrière accumulées",
+          "item2": "Répartition des heures par type de tâche",
+          "item3": "Répartition des heures par semaine, mois, année",
+          "item4": "Export PDF pour n'importe quelle plage de dates"
+        }
+      }
+    },
+    "csr": {
+      "hero": {
+        "badge": "Module de cote de sécurité de l'entreprise",
+        "titleLine1": "Sachez exactement à quel point",
+        "titleLine2": "votre entreprise est sécuritaire.",
+        "titleLine3": "Prouvez-le à quiconque le demande.",
+        "description": "La cote de sécurité de l'entreprise transforme la paperasse éparpillée et les bonnes intentions en un seul chiffre vérifiable. Les gestionnaires immobiliers la voient en comparant les fournisseurs. Les techniciens la voient en évaluant les offres d'emploi.",
+        "descriptionStrong": "Vous la voyez en construisant une culture qui protège vos employés et votre entreprise.",
+        "ctaTrial": "Commencez votre essai gratuit de 60 jours",
+        "ctaFaq": "Trouver des réponses"
+      },
+      "stats": {
+        "averageCsr": "CSE moyen de départ",
+        "realTimeValue": "Temps réel",
+        "scoreUpdates": "Mises à jour du score",
+        "auditTimeValue": "5 min",
+        "auditPreparation": "Préparation d'audit",
+        "achievableCompliance": "Conformité atteignable"
+      },
+      "problem": {
+        "title": "Le problème de sécurité dont personne ne parle",
+        "intro": "Chaque entreprise d'accès sur corde dit qu'elle est sécuritaire. Chacune d'entre elles.",
+        "paragraph1": "Mais quand WorkSafe se présente et demande des preuves, la plupart des opérateurs fouillent dans les classeurs, les boîtes à gants des camions et les fils de messages texte à la recherche de documentation qui peut ou non exister. Quand un gestionnaire immobilier demande quel fournisseur est le plus sécuritaire, il compare des arguments marketing, pas des preuves. Quand un technicien décide d'accepter un emploi, il mise sa vie sur la parole de l'employeur.",
+        "highlight": "La sécurité sans mesure n'est qu'un espoir. Et l'espoir n'est pas une stratégie quand quelqu'un est suspendu à 40 étages.",
+        "solution": "La cote de sécurité de l'entreprise d'OnRopePro change la conversation. Au lieu de « nous sommes sécuritaires », vous obtenez un chiffre : 87 %. Au lieu de formulaires éparpillés, vous obtenez un tableau de bord unique montrant exactement où vous en êtes et ce qui nécessite attention. Au lieu de deviner, vous savez."
+      },
+      "features": {
+        "title": "Ce que fait le module CSE",
+        "subtitle": "Un système de notation de conformité basé sur les pénalités qui mesure la posture de sécurité en temps réel.",
+        "autoScore": {
+          "title": "Calcul automatique du score",
+          "intro": "Le système suit chaque document de sécurité, chaque inspection de harnais, chaque réunion de boîte à outils.",
+          "description": "Votre score se met à jour automatiquement à mesure que les événements de conformité se produisent dans votre exploitation. Pas de saisie manuelle. Pas de tableurs. Pas besoin de se rappeler de mettre à jour quoi que ce soit.",
+          "tracked": "Ce qui est suivi :",
+          "item1": "Documents principaux de l'entreprise (COI, Manuel de santé et sécurité, Politique d'entreprise)",
+          "item2": "Documentation de sécurité au niveau du projet (ARAI, PAC, Réunion de boîte à outils, Inspection d'ancrage)",
+          "item3": "Taux de complétion des inspections quotidiennes de harnais",
+          "item4": "Statut de reconnaissance des employés sur tous les documents de sécurité"
+        },
+        "visibility": {
+          "title": "Visibilité transparente",
+          "intro": "Différentes parties prenantes voient des niveaux de détail appropriés.",
+          "description": "Les gestionnaires immobiliers voient votre score global et un badge de conformité codé par couleur. Les propriétaires d'entreprise voient des ventilations complètes avec des recommandations d'amélioration. Les techniciens voient suffisamment pour prendre des décisions éclairées sur les employeurs.",
+          "roles": "Ce que chaque rôle voit :",
+          "pmLabel": "Gestionnaires immobiliers :",
+          "pmValue": "% global, badge couleur, ventilation par catégorie",
+          "ownerLabel": "Propriétaires d'entreprise :",
+          "ownerValue": "Tableau de bord complet, éléments d'action, conseils d'amélioration",
+          "techLabel": "Techniciens :",
+          "techValue": "CSE de l'entreprise lors de l'évaluation des offres d'emploi"
+        },
+        "penalty": {
+          "title": "Responsabilité basée sur les pénalités",
+          "intro": "Commencez à 75 %. Atteignez 100 % en téléchargeant trois documents principaux.",
+          "description": "À partir de là, chaque lacune de conformité déclenche une pénalité proportionnelle. Inspection de harnais manquée ? Pénalité. Réunion de boîte à outils non complétée ? Pénalité. L'employé n'a pas signé les procédures de sécurité mises à jour ? Pénalité.",
+          "creates": "Ce qui crée des pénalités :",
+          "item1": "Documentation d'entreprise manquante ou expirée (jusqu'à 25 %)",
+          "item2": "Documentation de projet incomplète (jusqu'à 25 %)",
+          "item3": "Inspections de harnais non complétées avant le travail (jusqu'à 25 %)",
+          "item4": "Reconnaissances d'employés non signées (jusqu'à 5 %)"
+        }
+      }
     }
   }
 }

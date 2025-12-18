@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Link } from "wouter";
 import { PublicHeader } from "@/components/PublicHeader";
+import { useTranslation } from "react-i18next";
 import {
   CheckCircle2,
   ArrowRight,
@@ -33,6 +34,8 @@ import {
 } from "lucide-react";
 
 export default function IRATATaskLoggingLanding() {
+  const { t } = useTranslation();
+  
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
       <PublicHeader activeNav="modules" />
@@ -44,29 +47,29 @@ export default function IRATATaskLoggingLanding() {
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
           <div className="text-center space-y-6 pt-16">
             <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-module-label">
-              IRATA / SPRAT Task Logging Module
+              {t('modules.irataLogging.hero.badge', 'IRATA / SPRAT Task Logging Module')}
             </Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              Your Logbook Is Lying<br />
-              <span className="text-blue-100">(Because You Haven't Updated It<br />in Six Months)</span>
+              {t('modules.irataLogging.hero.title', 'Your Logbook Is Lying')}<br />
+              <span className="text-blue-100">{t('modules.irataLogging.hero.subtitle', "(Because You Haven't Updated It in Six Months)")}</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              OnRopePro captures your rope access hours the same day you work them. Building names, task types, duration. All logged automatically when you end your shift.<br />
-              <strong>Filling out your paper logbook stops being a homework assignment.</strong>
+              {t('modules.irataLogging.hero.description', 'OnRopePro captures your rope access hours the same day you work them. Building names, task types, duration. All logged automatically when you end your shift.')}<br />
+              <strong>{t('modules.irataLogging.hero.descriptionBold', 'Filling out your paper logbook stops being a homework assignment.')}</strong>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button size="lg" className="bg-white text-[#0B64A3]" asChild data-testid="button-hero-trial">
                 <Link href="/register">
-                  Start Your Free 60-Day Trial
+                  {t('modules.irataLogging.hero.trialButton', 'Start Your Free 60-Day Trial')}
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white" asChild data-testid="button-hero-faqs">
                 <Link href="#faqs">
-                  Find Answers
+                  {t('modules.irataLogging.hero.faqButton', 'Find Answers')}
                   <BookOpen className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
@@ -89,20 +92,20 @@ export default function IRATATaskLoggingLanding() {
             <CardContent className="p-8">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                 <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-foreground">Yours</div>
-                  <div className="text-sm text-muted-foreground mt-1">Hours that don't disappear when you quit</div>
+                  <div className="text-2xl md:text-3xl font-bold text-foreground">{t('modules.irataLogging.stats.yours.title', 'Yours')}</div>
+                  <div className="text-sm text-muted-foreground mt-1">{t('modules.irataLogging.stats.yours.description', "Hours that don't disappear when you quit")}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-foreground">Accurate</div>
-                  <div className="text-sm text-muted-foreground mt-1">Logged while you still remember</div>
+                  <div className="text-2xl md:text-3xl font-bold text-foreground">{t('modules.irataLogging.stats.accurate.title', 'Accurate')}</div>
+                  <div className="text-sm text-muted-foreground mt-1">{t('modules.irataLogging.stats.accurate.description', 'Logged while you still remember')}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-foreground">Ready</div>
-                  <div className="text-sm text-muted-foreground mt-1">Level 3 proof on demand</div>
+                  <div className="text-2xl md:text-3xl font-bold text-foreground">{t('modules.irataLogging.stats.ready.title', 'Ready')}</div>
+                  <div className="text-sm text-muted-foreground mt-1">{t('modules.irataLogging.stats.ready.description', 'Level 3 proof on demand')}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-foreground">Portable</div>
-                  <div className="text-sm text-muted-foreground mt-1">One profile, every employer</div>
+                  <div className="text-2xl md:text-3xl font-bold text-foreground">{t('modules.irataLogging.stats.portable.title', 'Portable')}</div>
+                  <div className="text-sm text-muted-foreground mt-1">{t('modules.irataLogging.stats.portable.description', 'One profile, every employer')}</div>
                 </div>
               </div>
             </CardContent>
@@ -116,26 +119,26 @@ export default function IRATATaskLoggingLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
-            The Logging Problem Nobody Talks About
+            {t('modules.irataLogging.problem.title', 'The Logging Problem Nobody Talks About')}
           </h2>
           
           <Card className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
             <CardContent className="p-6 md:p-8 space-y-4 text-muted-foreground">
               <p className="text-lg leading-relaxed font-medium text-foreground">
-                Your physical logbook is a mess.
+                {t('modules.irataLogging.problem.intro', 'Your physical logbook is a mess.')}
               </p>
               <p className="text-base">
-                The last entry was months ago. You can't remember which buildings you worked at, what tasks you performed, or how many hours you actually spent on rope. When you finally try to catch up, you end up guessing. Was that rope transfer on Tuesday or Wednesday? Did you do any rigging at Tower B, or just descending?
+                {t('modules.irataLogging.problem.paragraph1', "The last entry was months ago. You can't remember which buildings you worked at, what tasks you performed, or how many hours you actually spent on rope. When you finally try to catch up, you end up guessing. Was that rope transfer on Tuesday or Wednesday? Did you do any rigging at Tower B, or just descending?")}
               </p>
               <p className="text-base">
-                Here's the uncomfortable truth: when you bring six months of entries to your Level 3 for signing, they just sign. They weren't on every job with you. They have no idea if you actually did rope transfers on March 15th. But they sign anyway because that's how it's always been done.
+                {t('modules.irataLogging.problem.paragraph2', "Here's the uncomfortable truth: when you bring six months of entries to your Level 3 for signing, they just sign. They weren't on every job with you. They have no idea if you actually did rope transfers on March 15th. But they sign anyway because that's how it's always been done.")}
               </p>
               <p className="text-base italic">
-                One technician put it this way: "My last entry is December 29th, 2023. Two years. Where did I work in the past year? I don't even have access to my hours anymore because I don't work there. I don't have an account. It's all gone now."
+                {t('modules.irataLogging.problem.quote', 'One technician put it this way: "My last entry is December 29th, 2023. Two years. Where did I work in the past year? I don\'t even have access to my hours anymore because I don\'t work there. I don\'t have an account. It\'s all gone now."')}
               </p>
               <Separator className="my-6" />
               <p className="font-medium text-foreground text-lg">
-                OnRopePro changes this. Your hours log the same day you work them. Building names, task types, duration, all captured when you end your shift. And because your hours belong to your technician profile (not your employer), your career history follows you when you change jobs.
+                {t('modules.irataLogging.problem.solution', 'OnRopePro changes this. Your hours log the same day you work them. Building names, task types, duration, all captured when you end your shift. And because your hours belong to your technician profile (not your employer), your career history follows you when you change jobs.')}
               </p>
             </CardContent>
           </Card>
@@ -148,10 +151,10 @@ export default function IRATATaskLoggingLanding() {
       <section id="features" className="pt-8 md:pt-12 pb-16 md:pb-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            What This Module Does
+            {t('modules.irataLogging.features.title', 'What This Module Does')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-3xl mx-auto">
-            The IRATA / SPRAT Task Logging module builds your certification portfolio automatically as you work.
+            {t('modules.irataLogging.features.subtitle', 'The IRATA / SPRAT Task Logging module builds your certification portfolio automatically as you work.')}
           </p>
 
           <div className="grid md:grid-cols-3 gap-6">
@@ -162,28 +165,28 @@ export default function IRATATaskLoggingLanding() {
                 <div className="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-3">
                   <Clock className="w-6 h-6 text-blue-600" />
                 </div>
-                <CardTitle className="text-xl">Capture Hours Without the Homework</CardTitle>
+                <CardTitle className="text-xl">{t('modules.irataLogging.features.captureHours.title', 'Capture Hours Without the Homework')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-base text-muted-foreground">
-                <p className="font-medium text-foreground">When you end a work session, the system prompts you to categorize your rope access hours by task type.</p>
-                <p>No reconstructing what you did three months ago. No guessing which building had the rope transfers.</p>
-                <p className="font-medium text-foreground mt-4">What gets captured:</p>
+                <p className="font-medium text-foreground">{t('modules.irataLogging.features.captureHours.description1', 'When you end a work session, the system prompts you to categorize your rope access hours by task type.')}</p>
+                <p>{t('modules.irataLogging.features.captureHours.description2', 'No reconstructing what you did three months ago. No guessing which building had the rope transfers.')}</p>
+                <p className="font-medium text-foreground mt-4">{t('modules.irataLogging.features.captureHours.listTitle', 'What gets captured:')}</p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Session date and duration</span>
+                    <span>{t('modules.irataLogging.features.captureHours.item1', 'Session date and duration')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Building and project context</span>
+                    <span>{t('modules.irataLogging.features.captureHours.item2', 'Building and project context')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Task types performed (20+ categories)</span>
+                    <span>{t('modules.irataLogging.features.captureHours.item3', 'Task types performed (20+ categories)')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Cumulative totals by task type</span>
+                    <span>{t('modules.irataLogging.features.captureHours.item4', 'Cumulative totals by task type')}</span>
                   </li>
                 </ul>
               </CardContent>
@@ -196,28 +199,28 @@ export default function IRATATaskLoggingLanding() {
                 <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center mb-3">
                   <Scan className="w-6 h-6 text-emerald-600" />
                 </div>
-                <CardTitle className="text-xl">Import Your Existing History</CardTitle>
+                <CardTitle className="text-xl">{t('modules.irataLogging.features.importHistory.title', 'Import Your Existing History')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-base text-muted-foreground">
-                <p className="font-medium text-foreground">Photograph your paper logbook pages. Our OCR system extracts dates, hours, and task data automatically.</p>
-                <p>Or enter your baseline total manually if you prefer.</p>
-                <p className="font-medium text-foreground mt-4">What gets tracked:</p>
+                <p className="font-medium text-foreground">{t('modules.irataLogging.features.importHistory.description1', 'Photograph your paper logbook pages. Our OCR system extracts dates, hours, and task data automatically.')}</p>
+                <p>{t('modules.irataLogging.features.importHistory.description2', 'Or enter your baseline total manually if you prefer.')}</p>
+                <p className="font-medium text-foreground mt-4">{t('modules.irataLogging.features.importHistory.listTitle', 'What gets tracked:')}</p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Baseline hours from previous employment</span>
+                    <span>{t('modules.irataLogging.features.importHistory.item1', 'Baseline hours from previous employment')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Training hours from external courses</span>
+                    <span>{t('modules.irataLogging.features.importHistory.item2', 'Training hours from external courses')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Independent work (for techs not connected to an employer)</span>
+                    <span>{t('modules.irataLogging.features.importHistory.item3', 'Independent work (for techs not connected to an employer)')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Historical data from scanned logbook pages</span>
+                    <span>{t('modules.irataLogging.features.importHistory.item4', 'Historical data from scanned logbook pages')}</span>
                   </li>
                 </ul>
               </CardContent>
@@ -230,28 +233,28 @@ export default function IRATATaskLoggingLanding() {
                 <div className="w-12 h-12 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center mb-3">
                   <TrendingUp className="w-6 h-6 text-amber-600" />
                 </div>
-                <CardTitle className="text-xl">Track Progress Toward Certification</CardTitle>
+                <CardTitle className="text-xl">{t('modules.irataLogging.features.trackProgress.title', 'Track Progress Toward Certification')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-base text-muted-foreground">
-                <p className="font-medium text-foreground">Your hours accumulate against your IRATA or SPRAT certification number.</p>
-                <p>See exactly where you stand for your next level assessment.</p>
-                <p className="font-medium text-foreground mt-4">What you see:</p>
+                <p className="font-medium text-foreground">{t('modules.irataLogging.features.trackProgress.description1', 'Your hours accumulate against your IRATA or SPRAT certification number.')}</p>
+                <p>{t('modules.irataLogging.features.trackProgress.description2', 'See exactly where you stand for your next level assessment.')}</p>
+                <p className="font-medium text-foreground mt-4">{t('modules.irataLogging.features.trackProgress.listTitle', 'What you see:')}</p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Total accumulated career hours</span>
+                    <span>{t('modules.irataLogging.features.trackProgress.item1', 'Total accumulated career hours')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Hours breakdown by task type</span>
+                    <span>{t('modules.irataLogging.features.trackProgress.item2', 'Hours breakdown by task type')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Hours breakdown by week, month, year</span>
+                    <span>{t('modules.irataLogging.features.trackProgress.item3', 'Hours breakdown by week, month, year')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>PDF export for any date range</span>
+                    <span>{t('modules.irataLogging.features.trackProgress.item4', 'PDF export for any date range')}</span>
                   </li>
                 </ul>
               </CardContent>

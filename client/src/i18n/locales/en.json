@@ -5666,6 +5666,200 @@
         "subtitle": "Join rope access companies already using OnRopePro to protect their operations, reduce administrative burden, and ensure compliance.",
         "button": "Start Your Free 60-Day Trial"
       }
+    },
+    "scheduling": {
+      "hero": {
+        "badge": "Scheduling & Calendar Module",
+        "titleLine1": "Stop Booking Dave in",
+        "titleLine2": "Two Places on Monday.",
+        "titleLine3": "Zero 6am emergency calls.",
+        "description": "Automatic conflict detection prevents double-booking before it happens. Dual calendar views show every project and every technician at a glance. Time-off blocks scheduling automatically.",
+        "tagline": "One system. Zero surprises.",
+        "ctaTrial": "Start Your Free 60-Day Trial",
+        "ctaFaqs": "Find Answers"
+      },
+      "stats": {
+        "timeSavedValue": "8+ hrs",
+        "timeSavedLabel": "Saved monthly on scheduling",
+        "conflictTypesValue": "3",
+        "conflictTypesLabel": "Conflict types prevented",
+        "leaveTypesValue": "10",
+        "leaveTypesLabel": "Leave types supported",
+        "calendarViewsValue": "2",
+        "calendarViewsLabel": "Calendar views included"
+      },
+      "problem": {
+        "title": "The Monday Morning Disaster Nobody Planned",
+        "intro": "Friday afternoon. Golf tournament in an hour. You're throwing names right, left, and center to fill the spots for next week. Monday morning at 6am, your phone rings.",
+        "scenario": "Jack needs you to pull someone from one building, grab rope from the shop because it's not long enough for another building, and get a different tech to a third site with his gear. Your whole week is ruined before breakfast.",
+        "cause": "This happens because your project lives in one place, your calendar lives in another, and crew assignments live in a text thread. You create the window washing project. Then you open Float and recreate it. Name the project. Block the dates. Assign employees. Tag a color. Project gets pushed five days? Update both systems. Or forget to update one. And then watch the dominoes fall.",
+        "solution": "OnRopePro connects your projects directly to your schedule. Create a project with dates and assigned crew. The calendar populates automatically. Change the project dates and the schedule updates. Try to assign someone who's already booked elsewhere and the system warns you before you create the conflict. No more \"Oh shit, I forgot to schedule that\" emergencies."
+      },
+      "features": {
+        "title": "What This Module Does",
+        "subtitle": "Visual scheduling with automatic conflict prevention, connected directly to your projects.",
+        "conflictDetection": {
+          "title": "Automatic Conflict Detection",
+          "description": "The system checks three conditions before allowing any assignment: existing project assignments, approved time-off requests, and date overlaps. If any condition fails, you see a warning with full details before you can proceed.",
+          "listTitle": "What gets prevented:",
+          "item1": "Double-booking technicians on overlapping projects",
+          "item2": "Scheduling during approved vacation",
+          "item3": "Assigning crew to conflicting date ranges",
+          "item4": "Friday afternoon mistakes becoming Monday disasters"
+        },
+        "dualCalendar": {
+          "title": "Dual Calendar Views",
+          "description": "Two views working together give you complete visibility. Project Calendar shows all jobs on a timeline with color-coded blocks. Resource Timeline shows employee workloads by row so you can see who's available and who's overloaded at a glance.",
+          "listTitle": "What you see:",
+          "item1": "All upcoming projects (even unassigned ones)",
+          "item2": "Each employee's schedule on a single row",
+          "item3": "Availability gaps between assignments",
+          "item4": "Time-off displayed inline with work"
+        },
+        "projectIntegrated": {
+          "title": "Project-Integrated Scheduling",
+          "description": "Create a project with date range and assigned employees. The schedule populates automatically. Change the project and the schedule updates. No duplicate data entry. No systems falling out of sync.",
+          "listTitle": "What stays connected:",
+          "item1": "Project dates flow to calendar entries",
+          "item2": "Employee assignments appear in both views",
+          "item3": "Changes propagate automatically",
+          "item4": "One source of truth for project and schedule"
+        }
+      }
+    },
+    "irataLogging": {
+      "hero": {
+        "badge": "IRATA / SPRAT Task Logging Module",
+        "title": "Your Logbook Is Lying",
+        "subtitle": "(Because You Haven't Updated It in Six Months)",
+        "description": "OnRopePro captures your rope access hours the same day you work them. Building names, task types, duration. All logged automatically when you end your shift.",
+        "descriptionBold": "Filling out your paper logbook stops being a homework assignment.",
+        "trialButton": "Start Your Free 60-Day Trial",
+        "faqButton": "Find Answers"
+      },
+      "stats": {
+        "yours": {
+          "title": "Yours",
+          "description": "Hours that don't disappear when you quit"
+        },
+        "accurate": {
+          "title": "Accurate",
+          "description": "Logged while you still remember"
+        },
+        "ready": {
+          "title": "Ready",
+          "description": "Level 3 proof on demand"
+        },
+        "portable": {
+          "title": "Portable",
+          "description": "One profile, every employer"
+        }
+      },
+      "problem": {
+        "title": "The Logging Problem Nobody Talks About",
+        "intro": "Your physical logbook is a mess.",
+        "paragraph1": "The last entry was months ago. You can't remember which buildings you worked at, what tasks you performed, or how many hours you actually spent on rope. When you finally try to catch up, you end up guessing. Was that rope transfer on Tuesday or Wednesday? Did you do any rigging at Tower B, or just descending?",
+        "paragraph2": "Here's the uncomfortable truth: when you bring six months of entries to your Level 3 for signing, they just sign. They weren't on every job with you. They have no idea if you actually did rope transfers on March 15th. But they sign anyway because that's how it's always been done.",
+        "quote": "One technician put it this way: \"My last entry is December 29th, 2023. Two years. Where did I work in the past year? I don't even have access to my hours anymore because I don't work there. I don't have an account. It's all gone now.\"",
+        "solution": "OnRopePro changes this. Your hours log the same day you work them. Building names, task types, duration, all captured when you end your shift. And because your hours belong to your technician profile (not your employer), your career history follows you when you change jobs."
+      },
+      "features": {
+        "title": "What This Module Does",
+        "subtitle": "The IRATA / SPRAT Task Logging module builds your certification portfolio automatically as you work.",
+        "captureHours": {
+          "title": "Capture Hours Without the Homework",
+          "description1": "When you end a work session, the system prompts you to categorize your rope access hours by task type.",
+          "description2": "No reconstructing what you did three months ago. No guessing which building had the rope transfers.",
+          "listTitle": "What gets captured:",
+          "item1": "Session date and duration",
+          "item2": "Building and project context",
+          "item3": "Task types performed (20+ categories)",
+          "item4": "Cumulative totals by task type"
+        },
+        "importHistory": {
+          "title": "Import Your Existing History",
+          "description1": "Photograph your paper logbook pages. Our OCR system extracts dates, hours, and task data automatically.",
+          "description2": "Or enter your baseline total manually if you prefer.",
+          "listTitle": "What gets tracked:",
+          "item1": "Baseline hours from previous employment",
+          "item2": "Training hours from external courses",
+          "item3": "Independent work (for techs not connected to an employer)",
+          "item4": "Historical data from scanned logbook pages"
+        },
+        "trackProgress": {
+          "title": "Track Progress Toward Certification",
+          "description1": "Your hours accumulate against your IRATA or SPRAT certification number.",
+          "description2": "See exactly where you stand for your next level assessment.",
+          "listTitle": "What you see:",
+          "item1": "Total accumulated career hours",
+          "item2": "Hours breakdown by task type",
+          "item3": "Hours breakdown by week, month, year",
+          "item4": "PDF export for any date range"
+        }
+      }
+    },
+    "csr": {
+      "hero": {
+        "badge": "Company Safety Rating Module",
+        "titleLine1": "Know exactly how safe",
+        "titleLine2": "your company is.",
+        "titleLine3": "Prove it to anyone who asks.",
+        "description": "The Company Safety Rating transforms scattered paperwork and good intentions into a single, auditable number. Property managers see it when comparing vendors. Technicians see it when evaluating job offers.",
+        "descriptionStrong": "You see it when building a culture that protects your people and your business.",
+        "ctaTrial": "Start Your Free 60-Day Trial",
+        "ctaFaq": "Find Answers"
+      },
+      "stats": {
+        "averageCsr": "Average starting CSR",
+        "realTimeValue": "Real-time",
+        "scoreUpdates": "Score updates",
+        "auditTimeValue": "5 min",
+        "auditPreparation": "Audit preparation",
+        "achievableCompliance": "Achievable compliance"
+      },
+      "problem": {
+        "title": "The Safety Problem Nobody Talks About",
+        "intro": "Every rope access company says they're safe. Every one of them.",
+        "paragraph1": "But when WorkSafe shows up and asks for proof, most operators scramble through filing cabinets, truck glove boxes, and text message threads looking for documentation that may or may not exist. When a property manager asks which vendor is safer, they're comparing marketing claims, not evidence. When a technician decides whether to accept a job, they're gambling their life on an employer's word.",
+        "highlight": "Safety without measurement is just hope. And hope is not a strategy when someone's hanging 40 stories up.",
+        "solution": "OnRopePro's Company Safety Rating changes the conversation. Instead of \"we're safe,\" you get a number: 87%. Instead of scattered forms, you get a single dashboard showing exactly where you stand and what needs attention. Instead of guessing, you know."
+      },
+      "features": {
+        "title": "What the CSR Module Does",
+        "subtitle": "A penalty-based compliance scoring system that measures safety posture in real time.",
+        "autoScore": {
+          "title": "Automatic Score Calculation",
+          "intro": "The system tracks every safety document, every harness inspection, every toolbox meeting.",
+          "description": "Your score updates automatically as compliance events occur across your operation. No manual entry. No spreadsheets. No remembering to update anything.",
+          "tracked": "What gets tracked:",
+          "item1": "Core company documents (COI, Health & Safety Manual, Company Policy)",
+          "item2": "Project-level safety documentation (FLHA, RAP, Toolbox Meeting, Anchor Inspection)",
+          "item3": "Daily harness inspection completion rates",
+          "item4": "Employee acknowledgment status on all safety documents"
+        },
+        "visibility": {
+          "title": "Transparent Visibility",
+          "intro": "Different stakeholders see appropriate levels of detail.",
+          "description": "Property managers see your overall score and color-coded compliance badge. Company owners see full breakdowns with improvement recommendations. Technicians see enough to make informed decisions about employers.",
+          "roles": "What each role sees:",
+          "pmLabel": "Property Managers:",
+          "pmValue": "Overall %, color badge, category breakdown",
+          "ownerLabel": "Company Owners:",
+          "ownerValue": "Full dashboard, action items, improvement tips",
+          "techLabel": "Technicians:",
+          "techValue": "Company CSR when evaluating job offers"
+        },
+        "penalty": {
+          "title": "Penalty-Based Accountability",
+          "intro": "Start at 75%. Reach 100% by uploading three core documents.",
+          "description": "From there, every compliance gap triggers a proportional penalty. Miss a harness inspection? Penalty. Toolbox meeting not completed? Penalty. Employee hasn't signed updated safety procedures? Penalty.",
+          "creates": "What creates penalties:",
+          "item1": "Missing or expired company documentation (up to 25%)",
+          "item2": "Incomplete project documentation (up to 25%)",
+          "item3": "Harness inspections not completed before work (up to 25%)",
+          "item4": "Unsigned employee acknowledgments (up to 5%)"
+        }
+      }
     }
   }
 }
