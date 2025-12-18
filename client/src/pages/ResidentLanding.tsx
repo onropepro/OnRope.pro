@@ -27,13 +27,16 @@ import { Link } from "wouter";
 import { PublicHeader } from "@/components/PublicHeader";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
+// Official Resident color from stakeholder palette
+const RESIDENT_COLOR = "#86A59C";
+
 export default function ResidentLanding() {
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
       <PublicHeader />
       
-      {/* Hero Section - Following Module Landing Page Hero Template */}
-      <section className="relative text-white pb-[120px]" style={{backgroundImage: 'linear-gradient(135deg, #0B64A3 0%, #0369A1 100%)'}}>
+      {/* Hero Section - Following Module Landing Page Hero Template with Resident Mint Green */}
+      <section className="relative text-white pb-[120px]" style={{backgroundImage: 'linear-gradient(135deg, #86A59C 0%, #6B8A80 100%)'}}>
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMtNi42MjcgMC0xMiA1LjM3My0xMiAxMnM1LjM3MyAxMiAxMiAxMiAxMi01LjM3MyAxMi0xMi01LjM3My0xMi0xMi0xMnoiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLW9wYWNpdHk9Ii4xIiBzdHJva2Utd2lkdGg9IjIiLz48L2c+PC9zdmc+')] opacity-30"></div>
         
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
@@ -44,16 +47,16 @@ export default function ResidentLanding() {
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
               Know Your Feedback Was Received.<br />
-              <span className="text-blue-100">Track It Until It's Resolved.</span>
+              <span className="text-white/80">Track It Until It's Resolved.</span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl md:text-2xl text-white/80 max-w-3xl mx-auto leading-relaxed">
               Submit feedback with photos, see exactly when it was viewed, and track progress in real-time.<br />
               <strong>No more phone calls. No more guessing.</strong>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild>
+              <Button size="lg" className="bg-white hover:bg-gray-50" style={{color: RESIDENT_COLOR}} asChild>
                 <Link href="/register" data-testid="button-create-account-hero">
                   Create Your Account
                   <ArrowRight className="ml-2 w-5 h-5" />
@@ -84,7 +87,7 @@ export default function ResidentLanding() {
             <CardContent className="p-8">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-blue-600">24hr</div>
+                  <div className="text-3xl md:text-4xl font-bold" style={{color: RESIDENT_COLOR}}>24hr</div>
                   <div className="text-sm text-muted-foreground mt-1">Avg Response</div>
                 </div>
                 <div className="text-center">
@@ -96,7 +99,7 @@ export default function ResidentLanding() {
                   <div className="text-sm text-muted-foreground mt-1">Lost Complaints</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-rose-600">Real-Time</div>
+                  <div className="text-3xl md:text-4xl font-bold" style={{color: RESIDENT_COLOR}}>Real-Time</div>
                   <div className="text-sm text-muted-foreground mt-1">Updates</div>
                 </div>
               </div>
@@ -140,10 +143,10 @@ export default function ResidentLanding() {
         
         <div className="grid md:grid-cols-3 gap-6">
           <Card>
-            <CardHeader className="bg-rose-50 dark:bg-rose-950 border-b">
+            <CardHeader style={{backgroundColor: `${RESIDENT_COLOR}10`}} className="border-b">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center">
-                  <MapPin className="w-5 h-5 text-rose-600" />
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{backgroundColor: `${RESIDENT_COLOR}20`}}>
+                  <MapPin className="w-5 h-5" style={{color: RESIDENT_COLOR}} />
                 </div>
                 <CardTitle className="text-lg">Track Project Progress</CardTitle>
               </div>
@@ -156,19 +159,19 @@ export default function ResidentLanding() {
                 <p className="text-base font-medium text-foreground">What you see:</p>
                 <ul className="text-base text-muted-foreground space-y-1">
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-rose-600 mt-1 shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 mt-1 shrink-0" style={{color: RESIDENT_COLOR}} />
                     Which side of the building is being worked on now
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-rose-600 mt-1 shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 mt-1 shrink-0" style={{color: RESIDENT_COLOR}} />
                     Completion percentage for each elevation
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-rose-600 mt-1 shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 mt-1 shrink-0" style={{color: RESIDENT_COLOR}} />
                     Expected completion timeline
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-rose-600 mt-1 shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 mt-1 shrink-0" style={{color: RESIDENT_COLOR}} />
                     No more premature "you missed my window" calls
                   </li>
                 </ul>
@@ -177,10 +180,10 @@ export default function ResidentLanding() {
           </Card>
 
           <Card>
-            <CardHeader className="bg-rose-50 dark:bg-rose-950 border-b">
+            <CardHeader style={{backgroundColor: `${RESIDENT_COLOR}10`}} className="border-b">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center">
-                  <Camera className="w-5 h-5 text-rose-600" />
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{backgroundColor: `${RESIDENT_COLOR}20`}}>
+                  <Camera className="w-5 h-5" style={{color: RESIDENT_COLOR}} />
                 </div>
                 <CardTitle className="text-lg">Submit Feedback with Photos</CardTitle>
               </div>
@@ -193,19 +196,19 @@ export default function ResidentLanding() {
                 <p className="text-base font-medium text-foreground">What you can submit:</p>
                 <ul className="text-base text-muted-foreground space-y-1">
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-rose-600 mt-1 shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 mt-1 shrink-0" style={{color: RESIDENT_COLOR}} />
                     Streaks, spots, or missed areas
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-rose-600 mt-1 shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 mt-1 shrink-0" style={{color: RESIDENT_COLOR}} />
                     Damage concerns
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-rose-600 mt-1 shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 mt-1 shrink-0" style={{color: RESIDENT_COLOR}} />
                     Access issues (plants, furniture in the way)
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-rose-600 mt-1 shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 mt-1 shrink-0" style={{color: RESIDENT_COLOR}} />
                     Compliments for work well done
                   </li>
                 </ul>
@@ -214,10 +217,10 @@ export default function ResidentLanding() {
           </Card>
 
           <Card>
-            <CardHeader className="bg-rose-50 dark:bg-rose-950 border-b">
+            <CardHeader style={{backgroundColor: `${RESIDENT_COLOR}10`}} className="border-b">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center">
-                  <Eye className="w-5 h-5 text-rose-600" />
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{backgroundColor: `${RESIDENT_COLOR}20`}}>
+                  <Eye className="w-5 h-5" style={{color: RESIDENT_COLOR}} />
                 </div>
                 <CardTitle className="text-lg">Track Your Feedback Status</CardTitle>
               </div>
@@ -230,19 +233,19 @@ export default function ResidentLanding() {
                 <p className="text-base font-medium text-foreground">What you track:</p>
                 <ul className="text-base text-muted-foreground space-y-1">
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-rose-600 mt-1 shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 mt-1 shrink-0" style={{color: RESIDENT_COLOR}} />
                     Submission date and time
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-rose-600 mt-1 shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 mt-1 shrink-0" style={{color: RESIDENT_COLOR}} />
                     "Viewed" timestamp showing when the company saw it
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-rose-600 mt-1 shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 mt-1 shrink-0" style={{color: RESIDENT_COLOR}} />
                     Current status (New, Viewed, Closed)
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-rose-600 mt-1 shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 mt-1 shrink-0" style={{color: RESIDENT_COLOR}} />
                     Responses from the service team
                   </li>
                 </ul>
@@ -262,10 +265,10 @@ export default function ResidentLanding() {
         
         <div className="grid md:grid-cols-3 gap-8 mt-12">
           <div className="text-center space-y-4">
-            <div className="w-16 h-16 rounded-full bg-rose-100 dark:bg-rose-900 flex items-center justify-center mx-auto">
-              <UserPlus className="w-8 h-8 text-rose-600" />
+            <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto" style={{backgroundColor: `${RESIDENT_COLOR}20`}}>
+              <UserPlus className="w-8 h-8" style={{color: RESIDENT_COLOR}} />
             </div>
-            <div className="text-2xl font-bold text-rose-600">Step 1</div>
+            <div className="text-2xl font-bold" style={{color: RESIDENT_COLOR}}>Step 1</div>
             <h3 className="text-xl font-semibold">Create Your Account</h3>
             <p className="text-base text-muted-foreground">
               Sign up with your email, strata plan number, and unit number. This links your account to your specific building and unit. Takes about two minutes.
@@ -273,10 +276,10 @@ export default function ResidentLanding() {
           </div>
 
           <div className="text-center space-y-4">
-            <div className="w-16 h-16 rounded-full bg-rose-100 dark:bg-rose-900 flex items-center justify-center mx-auto">
-              <Building2 className="w-8 h-8 text-rose-600" />
+            <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto" style={{backgroundColor: `${RESIDENT_COLOR}20`}}>
+              <Building2 className="w-8 h-8" style={{color: RESIDENT_COLOR}} />
             </div>
-            <div className="text-2xl font-bold text-rose-600">Step 2</div>
+            <div className="text-2xl font-bold" style={{color: RESIDENT_COLOR}}>Step 2</div>
             <h3 className="text-xl font-semibold">Enter the Vendor Code</h3>
             <p className="text-base text-muted-foreground">
               Your building manager or property manager provides a vendor code. Enter it once in your profile to connect with the service company working on your building.
@@ -284,10 +287,10 @@ export default function ResidentLanding() {
           </div>
 
           <div className="text-center space-y-4">
-            <div className="w-16 h-16 rounded-full bg-rose-100 dark:bg-rose-900 flex items-center justify-center mx-auto">
-              <MessageCircle className="w-8 h-8 text-rose-600" />
+            <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto" style={{backgroundColor: `${RESIDENT_COLOR}20`}}>
+              <MessageCircle className="w-8 h-8" style={{color: RESIDENT_COLOR}} />
             </div>
-            <div className="text-2xl font-bold text-rose-600">Step 3</div>
+            <div className="text-2xl font-bold" style={{color: RESIDENT_COLOR}}>Step 3</div>
             <h3 className="text-xl font-semibold">See Projects and Submit Feedback</h3>
             <p className="text-base text-muted-foreground">
               Your dashboard shows active projects on your building. View progress. Submit feedback. Track responses. Everything in one place.
@@ -295,9 +298,9 @@ export default function ResidentLanding() {
           </div>
         </div>
 
-        <Card className="mt-8 bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
+        <Card className="mt-8 border" style={{backgroundColor: `${RESIDENT_COLOR}10`, borderColor: `${RESIDENT_COLOR}40`}}>
           <CardContent className="p-6">
-            <p className="text-base text-blue-900 dark:text-blue-100">
+            <p className="text-base" style={{color: RESIDENT_COLOR}}>
               <strong>Note:</strong> Your account stays with you. If you move to a different building, update your strata number and enter the new vendor's code. No need to start over.
             </p>
           </CardContent>
@@ -322,8 +325,8 @@ export default function ResidentLanding() {
                 <p>
                   You submitted feedback via email or phone. Days pass. No response. You follow up. They can't find it. You explain the whole thing again. Still nothing.
                 </p>
-                <div className="bg-rose-50 dark:bg-rose-950/50 rounded-lg p-4">
-                  <p className="text-base font-medium text-rose-900 dark:text-rose-100">
+                <div className="rounded-lg p-4" style={{backgroundColor: `${RESIDENT_COLOR}10`}}>
+                  <p className="text-base font-medium" style={{color: RESIDENT_COLOR}}>
                     With the Resident Portal, every submission is logged with a timestamp. You see the exact date and time the company opened your feedback. "I didn't see it" becomes impossible when you can prove they viewed it on Tuesday at 2:47 PM.
                   </p>
                 </div>
@@ -338,8 +341,8 @@ export default function ResidentLanding() {
                 <p>
                   Phone to property manager. Property manager to vendor. Vendor to technician. Somewhere along the way, "water stain on bedroom window" became "balcony glass issue." The tech arrives confused.
                 </p>
-                <div className="bg-rose-50 dark:bg-rose-950/50 rounded-lg p-4">
-                  <p className="text-base font-medium text-rose-900 dark:text-rose-100">
+                <div className="rounded-lg p-4" style={{backgroundColor: `${RESIDENT_COLOR}10`}}>
+                  <p className="text-base font-medium" style={{color: RESIDENT_COLOR}}>
                     Submit once through the portal. Your name, unit, phone, and description are captured. Attach photos. Done. The team sees exactly what you see. No telephone game.
                   </p>
                 </div>
@@ -354,8 +357,8 @@ export default function ResidentLanding() {
                 <p>
                   Crews are on the building. You can see them from the street. But are they on the north side or south? Did they finish your floor yesterday or is it scheduled for next week?
                 </p>
-                <div className="bg-rose-50 dark:bg-rose-950/50 rounded-lg p-4">
-                  <p className="text-base font-medium text-rose-900 dark:text-rose-100">
+                <div className="rounded-lg p-4" style={{backgroundColor: `${RESIDENT_COLOR}10`}}>
+                  <p className="text-base font-medium" style={{color: RESIDENT_COLOR}}>
                     The portal shows real-time progress by elevation. You know your side hasn't been touched yet. You wait. No wasted calls asking "are you done?"
                   </p>
                 </div>
@@ -370,8 +373,8 @@ export default function ResidentLanding() {
                 <p>
                   Feedback submitted. Response received. Issue marked closed. But nothing actually improved. Now what?
                 </p>
-                <div className="bg-rose-50 dark:bg-rose-950/50 rounded-lg p-4">
-                  <p className="text-base font-medium text-rose-900 dark:text-rose-100">
+                <div className="rounded-lg p-4" style={{backgroundColor: `${RESIDENT_COLOR}10`}}>
+                  <p className="text-base font-medium" style={{color: RESIDENT_COLOR}}>
                     You can see the status history and any responses from the team. If the issue persists after closure, contact your building manager with documented proof of what was communicated.
                   </p>
                 </div>
@@ -396,8 +399,8 @@ export default function ResidentLanding() {
           <Card>
             <CardContent className="p-6">
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
-                  <Clock className="w-5 h-5 text-rose-600" />
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={{backgroundColor: `${RESIDENT_COLOR}20`}}>
+                  <Clock className="w-5 h-5" style={{color: RESIDENT_COLOR}} />
                 </div>
                 <div className="space-y-2">
                   <h4 className="text-lg font-semibold text-foreground">Viewed Timestamp</h4>
@@ -410,8 +413,8 @@ export default function ResidentLanding() {
           <Card>
             <CardContent className="p-6">
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
-                  <Camera className="w-5 h-5 text-rose-600" />
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={{backgroundColor: `${RESIDENT_COLOR}20`}}>
+                  <Camera className="w-5 h-5" style={{color: RESIDENT_COLOR}} />
                 </div>
                 <div className="space-y-2">
                   <h4 className="text-lg font-semibold text-foreground">Photo Uploads</h4>
@@ -424,8 +427,8 @@ export default function ResidentLanding() {
           <Card>
             <CardContent className="p-6">
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
-                  <MapPin className="w-5 h-5 text-rose-600" />
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={{backgroundColor: `${RESIDENT_COLOR}20`}}>
+                  <MapPin className="w-5 h-5" style={{color: RESIDENT_COLOR}} />
                 </div>
                 <div className="space-y-2">
                   <h4 className="text-lg font-semibold text-foreground">Progress Tracking</h4>
@@ -438,8 +441,8 @@ export default function ResidentLanding() {
           <Card>
             <CardContent className="p-6">
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
-                  <Eye className="w-5 h-5 text-rose-600" />
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={{backgroundColor: `${RESIDENT_COLOR}20`}}>
+                  <Eye className="w-5 h-5" style={{color: RESIDENT_COLOR}} />
                 </div>
                 <div className="space-y-2">
                   <h4 className="text-lg font-semibold text-foreground">Status Badges</h4>
@@ -452,8 +455,8 @@ export default function ResidentLanding() {
           <Card>
             <CardContent className="p-6">
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
-                  <Home className="w-5 h-5 text-rose-600" />
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={{backgroundColor: `${RESIDENT_COLOR}20`}}>
+                  <Home className="w-5 h-5" style={{color: RESIDENT_COLOR}} />
                 </div>
                 <div className="space-y-2">
                   <h4 className="text-lg font-semibold text-foreground">Portable Account</h4>
@@ -466,8 +469,8 @@ export default function ResidentLanding() {
           <Card>
             <CardContent className="p-6">
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
-                  <Shield className="w-5 h-5 text-rose-600" />
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={{backgroundColor: `${RESIDENT_COLOR}20`}}>
+                  <Shield className="w-5 h-5" style={{color: RESIDENT_COLOR}} />
                 </div>
                 <div className="space-y-2">
                   <h4 className="text-lg font-semibold text-foreground">Privacy Protection</h4>
@@ -659,7 +662,7 @@ export default function ResidentLanding() {
         </div>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button size="lg" className="bg-[#0B64A3] hover:bg-[#0369A1] text-white" asChild>
+          <Button size="lg" className="text-white hover:opacity-90" style={{backgroundColor: RESIDENT_COLOR}} asChild>
             <Link href="/register" data-testid="button-create-account">
               Create Your Account
               <ArrowRight className="ml-2 w-5 h-5" />
@@ -668,7 +671,7 @@ export default function ResidentLanding() {
         </div>
         
         <p className="text-base text-muted-foreground mt-4">
-          Already have an account? <Link href="/login" className="text-[#0B64A3] hover:underline font-medium" data-testid="link-login">Log In</Link>
+          Already have an account? <Link href="/login" className="hover:underline font-medium" style={{color: RESIDENT_COLOR}} data-testid="link-login">Log In</Link>
         </p>
         <p className="text-base text-muted-foreground mt-2">
           Need the vendor code? Contact your building manager or property manager.
@@ -676,10 +679,10 @@ export default function ResidentLanding() {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-6 border-t">
+      <footer className="py-8 px-6" style={{backgroundColor: RESIDENT_COLOR}}>
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <img src={onRopeProLogo} alt="OnRopePro" className="h-10 object-contain" />
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-white/90">
             © 2024 OnRopePro. All rights reserved.
           </p>
         </div>
