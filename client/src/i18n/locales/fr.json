@@ -4857,6 +4857,35 @@
         "subtitle": "Téléchargez votre premier document et capturez les signatures des employés en moins de 5 minutes.",
         "subtitleLine2": "Accès complet. Pas de carte de crédit. Piste d'audit permanente dès le premier jour.",
         "trialButton": "Commencer votre essai de 60 jours"
+      },
+      "benefits": {
+        "title": "Qui beneficie de ce module",
+        "subtitle": "Gestion des documents pour toute votre operation.",
+        "employers": {
+          "title": "Pour les employeurs",
+          "benefit1": {
+            "title": "Documents toujours trouvables.",
+            "description": "Certificats d assurance, registres de reunions de securite, certifications de harnais. Tout en un seul endroit recherchable."
+          },
+          "benefit2": {
+            "title": "Pret pour l audit.",
+            "description": "Quand un auditeur demande six mois de dossiers, vous filtrez par date et exportez. En secondes, pas en heures."
+          }
+        },
+        "technicians": {
+          "title": "Pour les techniciens",
+          "benefit1": {
+            "title": "Vos documents voyagent avec vous.",
+            "description": "Certifications, formations, dossiers de securite. Tout dans votre profil, accessible a chaque employeur."
+          }
+        },
+        "buildingManagers": {
+          "title": "Pour les gestionnaires d immeubles",
+          "benefit1": {
+            "title": "Documentation du fournisseur a la demande.",
+            "description": "Besoin du certificat d assurance d un fournisseur? Des dossiers de reunions de securite? La documentation existe et s exporte proprement."
+          }
+        }
       }
     },
     "gearInventory": {
@@ -5121,6 +5150,28 @@
         "subtitle": "Commencez votre essai gratuit de 60 jours. Pas de carte de crédit requise. Accès complet à toutes les fonctionnalités.",
         "trialButton": "Commencer votre essai gratuit de 60 jours",
         "pricingButton": "Voir les tarifs"
+      },
+      "benefits": {
+        "title": "Qui beneficie de ce module",
+        "subtitle": "Suivi des equipements pour toute votre operation.",
+        "employers": {
+          "title": "Pour les employeurs",
+          "benefit1": {
+            "title": "Ne manquez jamais une date d inspection.",
+            "description": "Alertes automatiques quand les inspections d equipement sont dues. Planifiez la maintenance avant que ca ne devienne un probleme."
+          },
+          "benefit2": {
+            "title": "Dossiers prets pour l audit.",
+            "description": "Quand le regulateur demande l historique d inspection, les donnees existent et s exportent proprement."
+          }
+        },
+        "technicians": {
+          "title": "Pour les techniciens",
+          "benefit1": {
+            "title": "Sachez quand l equipement est du.",
+            "description": "Voyez les dates d inspection a venir. Signalez les problemes avant qu ils ne deviennent des problemes de securite."
+          }
+        }
       }
     },
     "whiteLabel": {
@@ -5151,6 +5202,41 @@
       "features": {
         "title": "Contrôle complet de la marque à chaque point de contact client",
         "subtitle": "L'image de marque personnalisée transforme OnRopePro d'un logiciel tiers en ce qui semble être votre plateforme de gestion propriétaire, créant une crédibilité professionnelle qui gagne des contrats et justifie des prix premium."
+      },
+      "benefits": {
+        "title": "Qui beneficie de ce module",
+        "subtitle": "Presence de marque personnalisee.",
+        "employers": {
+          "title": "Pour les employeurs",
+          "benefit1": {
+            "title": "Image de marque coherente.",
+            "description": "Les clients voient votre marque, pas la notre. Renforcez votre identite a chaque interaction."
+          },
+          "benefit2": {
+            "title": "Impression professionnelle.",
+            "description": "Une plateforme de marque communique l engagement envers la qualite et le professionnalisme."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Caracteristiques cles",
+        "feature1": {
+          "title": "Logo personnalise",
+          "description": "Votre logo apparait la ou les clients interagissent avec le systeme."
+        },
+        "feature2": {
+          "title": "Couleurs de marque",
+          "description": "Palette de couleurs personnalisee qui correspond a votre identite de marque."
+        },
+        "feature3": {
+          "title": "Communications de marque",
+          "description": "Les courriels et notifications affichent votre marque."
+        }
+      },
+      "cta": {
+        "title": "Pret a personnaliser votre marque?",
+        "subtitle": "Presentez votre marque professionnellement. Commencez votre essai gratuit de 60 jours.",
+        "trialButton": "Commencer votre essai gratuit de 60 jours"
       }
     },
     "safety": {
@@ -5184,6 +5270,183 @@
       "features": {
         "title": "Ce que fait ce module",
         "subtitle": "Une documentation de sécurité complète qui se crée d'elle-même grâce à l'utilisation quotidienne."
+      },
+      "benefits": {
+        "title": "Qui beneficie de ce module",
+        "subtitle": "Documentation de securite pour toute votre operation.",
+        "employers": {
+          "title": "Pour les employeurs (Proprietaires d entreprises)",
+          "benefit1": {
+            "title": "Dormez la nuit.",
+            "description": "Chaque inspection de harnais est enregistree. Chaque reunion de securite est documentee. Chaque signature est horodatee. Quand le regulateur se presente, vos dossiers sont prets."
+          },
+          "benefit2": {
+            "title": "Primes d assurance plus basses.",
+            "description": "Les assureurs veulent des preuves de culture de securite. Des registres de conformite coherents, des taux d incidents reduits et une documentation auditable peuvent reduire les primes de 10-15%."
+          },
+          "benefit3": {
+            "title": "Protection juridique defendable.",
+            "description": "Si quelqu un est blesse, la premiere question que pose un avocat est: Pouvez-vous prouver que vous avez effectue les inspections requises? Des enregistrements numeriques avec horodatages GPS sont votre meilleure defense."
+          }
+        },
+        "operations": {
+          "title": "Pour les gestionnaires d operations et superviseurs",
+          "benefit1": {
+            "title": "Surveillez la conformite en temps reel.",
+            "description": "Le tableau de bord affiche les inspections manquantes, les certifications expirant bientot et les reunions de securite en retard. Pas besoin de courir apres les formulaires papier ou de deviner."
+          },
+          "benefit2": {
+            "title": "Attrapez les problemes avant qu ils ne deviennent des crises.",
+            "description": "Les avertissements de 30 jours sur les certifications expirant vous donnent le temps de planifier le recyclage au lieu de retirer d urgence les techniciens des projets."
+          },
+          "benefit3": {
+            "title": "Exportez des rapports pour tout audit.",
+            "description": "Exigences de client, verification reglementaire, rapports internes. Selectionnez la plage de dates, filtrez par type et exportez."
+          }
+        },
+        "technicians": {
+          "title": "Pour les techniciens d acces sur corde",
+          "benefit1": {
+            "title": "Votre documentation vous suit.",
+            "description": "Inspections de harnais, participation aux reunions de securite et historique des certifications voyagent avec votre profil lorsque vous changez d employeur."
+          },
+          "benefit2": {
+            "title": "Prouvez votre culture de securite.",
+            "description": "Quand vous postulez chez un nouvel employeur, votre historique de conformite parle pour vous. L Evaluation de Securite de l Entreprise inclut les techniciens individuels."
+          },
+          "benefit3": {
+            "title": "Jamais de mauvaises surprises de certification.",
+            "description": "Le systeme vous avertit 60 jours avant l expiration de la certification. Planifiez les re-evaluations a l avance au lieu de vous precipiter a la derniere minute."
+          }
+        },
+        "buildingManagers": {
+          "title": "Pour les gestionnaires d immeubles / Gestionnaires de proprietes",
+          "benefit1": {
+            "title": "Verifiez la conformite du fournisseur avant le travail.",
+            "description": "L Evaluation de Securite de l Entreprise montre le statut de conformite d un fournisseur avant qu il ne mette les pieds sur votre propriete."
+          },
+          "benefit2": {
+            "title": "Documentation pour les exigences d assurance.",
+            "description": "Quand votre assureur demande la preuve de la formation a la securite des fournisseurs, les donnees existent et s exportent proprement."
+          },
+          "benefit3": {
+            "title": "Historique de rapports d incidents.",
+            "description": "Si un incident se produit sur votre propriete, les rapports detailles avec horodatages, photos et suivi des actions correctives fournissent la piste d audit."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Caracteristiques cles",
+        "subtitle": "Chaque caracteristique existe pour eliminer la distance entre les pratiques de securite et les dossiers de securite.",
+        "feature1": {
+          "title": "Inspections quotidiennes de harnais",
+          "description": "Les techniciens inspectent l equipement au debut de chaque journee de travail. Verifiee numeriquement. Horodatee. Liee au profil du technicien. Les harnais echoues sont signales, empechant le pointage jusqu a la resolution."
+        },
+        "feature2": {
+          "title": "Documentation des reunions de securite",
+          "description": "Contenu de la reunion enregistre avec signatures numeriques de tous les participants. Fournit 7 jours de couverture de conformite pour les participants de la reunion."
+        },
+        "feature3": {
+          "title": "Formulaires FLHA (Analyse des dangers de travail sur le terrain)",
+          "description": "Identifie les dangers specifiques au site avant le debut du travail. Capture les controles et les mesures d attenuation. Cree un enregistrement auditable de l evaluation des dangers par quart de travail."
+        },
+        "feature4": {
+          "title": "Rapports d incidents",
+          "description": "Documentation structuree des incidents avec classification par type, gravite et actions correctives. Photos, horodatages et champs de suivi inclus."
+        },
+        "feature5": {
+          "title": "Inventaire et certification d equipements",
+          "description": "Suivez chaque piece d equipement de l achat a la retraite. Dates d inspection, calendriers de maintenance, etiquettes de retraite. Alertes automatiques lorsque les intervalles de service approchent."
+        },
+        "feature6": {
+          "title": "Signatures numeriques avec piste d audit",
+          "description": "Chaque document de securite capture qui a signe, quand et ou. Les coordonnees GPS avec horodatage creent un enregistrement inviolable."
+        }
+      },
+      "results": {
+        "title": "Resultats mesurables",
+        "subtitle": "Ameliorations concretes que vous verrez des le premier jour.",
+        "result1": {
+          "title": "Pret pour l audit",
+          "description": "Quand le regulateur se presente, vos dossiers sont deja organises. Plus de fouille paniquee dans les classeurs. Recherchez par date, type de document ou employe, puis exportez."
+        },
+        "result2": {
+          "title": "Documentation de prevention des incidents",
+          "description": "Quand vous pouvez prouver des inspections quotidiennes de harnais, une couverture coherente des reunions de securite et des formulaires FLHA completes, les incidents deviennent defendables. Vous avez fait le travail."
+        },
+        "result3": {
+          "title": "Confiance du client",
+          "description": "Les gestionnaires de proprietes veulent des fournisseurs professionnels. Quand vous pouvez montrer des dossiers de securite organises, vous vous distinguez de la concurrence qui dit encore Nous avons les formulaires quelque part."
+        },
+        "result4": {
+          "title": "Culture de l equipe",
+          "description": "Quand la securite est documentee numeriquement au lieu de chassee sur papier, elle devient routiniere au lieu de penible. Les techniciens prennent l habitude. La conformite devient automatique."
+        }
+      },
+      "integration": {
+        "title": "Points d integration des modules",
+        "subtitle": "Le module Securite et Conformite se connecte a d autres modules OnRopePro pour creer un systeme de documentation complet.",
+        "module1": {
+          "title": "Sessions de travail et suivi du temps",
+          "description": "Les inspections de harnais doivent etre terminees avant que les techniciens puissent pointer. Les reunions de securite fournissent une couverture qui se verifie automatiquement au pointage."
+        },
+        "module2": {
+          "title": "Gestion des employes",
+          "description": "Les dates d expiration des certifications declenchent des avertissements automatiques. Les dossiers de conformite deviennent partie integrante du profil du technicien."
+        },
+        "module3": {
+          "title": "Inventaire d equipements",
+          "description": "Les calendriers d inspection des harnais se synchronisent avec la base de donnees d inventaire d equipements. La conformite des equipements et la conformite de securite sont connectees."
+        },
+        "module4": {
+          "title": "Gestion de projets",
+          "description": "Les formulaires FLHA sont lies a des projets specifiques. La documentation de securite devient partie integrante de l historique du projet."
+        },
+        "module5": {
+          "title": "Evaluation de Securite de l Entreprise",
+          "description": "Les donnees de conformite alimentent le calcul de l Evaluation de Securite de l Entreprise. Tout ce qui se passe ici affecte votre evaluation publique."
+        },
+        "module6": {
+          "title": "Analytique et rapports",
+          "description": "Les donnees de securite alimentent les analyses a l echelle de l entreprise. Tendances des incidents, taux de conformite et risques de certification tous visibles."
+        }
+      },
+      "impact": {
+        "title": "Arretez de craindre l auditeur",
+        "paragraph1": "En ce moment, quand quelqu un mentionne un audit ou une inspection, il y a un moment de panique. Vous savez que les dossiers existent quelque part. Vous n etes simplement pas sur de pouvoir les trouver.",
+        "paragraph2": "Ce stress est reel. Il vous tient eveille. Il vous rend defensif quand les clients posent des questions sur les procedures de securite. Il vous fait hesiter a developper parce que plus de sites signifie plus de documentation a gerer.",
+        "paragraph3": "OnRopePro elimine le chaos. Chaque inspection de harnais, chaque reunion de securite, chaque formulaire FLHA, chaque rapport d incident existe dans un seul systeme. Recherchable. Exportable. Defendable.",
+        "paragraph4": "Quand le regulateur se presente, vous ne cherchez pas dans le camion. Vous sortez votre telephone, ouvrez l application, filtrez par plage de dates et exportez. En trente secondes."
+      },
+      "faqs": {
+        "title": "Questions frequentes",
+        "subtitle": "Questions courantes sur le module Securite et Conformite.",
+        "faq1": {
+          "question": "Qu est-ce qui declenche une exigence d inspection de harnais?",
+          "answer": "Toute session de travail necessite une inspection de harnais quotidienne completee pour le meme jour calendaire avant le pointage. Le systeme verifie automatiquement."
+        },
+        "faq2": {
+          "question": "Comment les reunions de securite fournissent-elles une couverture de 7 jours?",
+          "answer": "Une reunion de securite terminee fournit 7 jours calendaires de couverture de conformite pour tous les participants. Apres 7 jours, ils doivent assister a une autre reunion pour maintenir la couverture."
+        },
+        "faq3": {
+          "question": "Les formulaires FLHA sont-ils requis pour chaque quart de travail?",
+          "answer": "Les formulaires FLHA sont specifiques au site et doivent etre completes pour chaque nouvel emplacement de travail ou lorsque les conditions changent de maniere significative. Ils ne sont pas requis pour continuer le travail sur le meme site avec les memes conditions."
+        },
+        "faq4": {
+          "question": "Qui peut voir les rapports d incidents?",
+          "answer": "Acces base sur les permissions. Les administrateurs d entreprise et le personnel de securite ont un acces complet. Les techniciens peuvent voir les incidents auxquels ils ont participe. Les gestionnaires de proprietes voient les incidents sur leurs proprietes."
+        },
+        "faq5": {
+          "question": "Combien de temps les dossiers de securite sont-ils conserves?",
+          "answer": "Indefiniment. Tous les dossiers de securite sont conserves pour toute la duree de vie du compte de l entreprise. Les exigences reglementaires varient selon la juridiction, mais nous conservons tout."
+        }
+      },
+      "cta": {
+        "title": "Pret a organiser vos dossiers de securite?",
+        "subtitle": "Rejoignez les entreprises d acces sur corde qui ont elimine les maux de tete de la documentation de securite. Commencez votre essai gratuit de 60 jours aujourd hui.",
+        "trialButton": "Commencer votre essai gratuit de 60 jours",
+        "docsButton": "Voir la documentation technique"
       }
     },
     "projects": {
@@ -5253,6 +5516,144 @@
           "item3": "Certificats d'Inspection d'Ancrages",
           "item4": "Photos de projet"
         }
+      },
+      "benefits": {
+        "title": "Qui beneficie de ce module",
+        "subtitle": "Organisation des projets pour toute votre operation.",
+        "employers": {
+          "title": "Pour les employeurs (Proprietaires d entreprises)",
+          "benefit1": {
+            "title": "Arretez de chercher les carnets.",
+            "description": "Chaque adresse de chantier, chaque contact client, chaque note de projet en un seul endroit. Recherchez par adresse, filtrez par statut, exportez quand vous en avez besoin."
+          },
+          "benefit2": {
+            "title": "Prouvez votre historique de travail.",
+            "description": "Quand un client demande des travaux anterieurs sur son batiment, vous avez les dossiers. Dates, portee, notes, tout lie."
+          },
+          "benefit3": {
+            "title": "Cotez avec precision.",
+            "description": "Les donnees de projet historiques montrent combien de temps les travaux similaires ont reellement pris. Votre prochaine cotisation est basee sur des donnees reelles, pas sur des suppositions."
+          }
+        },
+        "operations": {
+          "title": "Pour les gestionnaires d operations et superviseurs",
+          "benefit1": {
+            "title": "Voyez tout le travail en un coup d oeil.",
+            "description": "Le tableau de bord affiche tous les projets actifs avec statut, progres et techniciens assignes. Pas besoin de croiser plusieurs systemes."
+          },
+          "benefit2": {
+            "title": "Suivez le progres en temps reel.",
+            "description": "Les descentes par elevation, le pourcentage complete, les heures vs estimations. Voyez ou vont les travaux avant de depasser le budget."
+          },
+          "benefit3": {
+            "title": "Historique pour la planification.",
+            "description": "Quand vous planifiez le prochain batiment similaire, vous avez les donnees sur combien de temps le dernier a pris. Planifiez les ressources en consequence."
+          }
+        },
+        "technicians": {
+          "title": "Pour les techniciens d acces sur corde",
+          "benefit1": {
+            "title": "Sachez ou vous allez.",
+            "description": "Les details du projet incluent l adresse, les informations d acces, les notes et l historique. Pas de confusion sur quel batiment."
+          },
+          "benefit2": {
+            "title": "Votre travail est documente.",
+            "description": "Chaque session de travail que vous enregistrez est liee au projet. Votre contribution au travail est enregistree et attribuee."
+          },
+          "benefit3": {
+            "title": "Historique pour la progression de carriere.",
+            "description": "Les projets a grande echelle, les travaux complexes et l experience variee sont documentes. Votre experience prouvable grandit avec chaque chantier."
+          }
+        },
+        "buildingManagers": {
+          "title": "Pour les gestionnaires d immeubles / Gestionnaires de proprietes",
+          "benefit1": {
+            "title": "Historique de maintenance complet.",
+            "description": "Chaque travail sur votre batiment est enregistre. Dates, portee, fournisseur, notes. Votre historique de propriete organise."
+          },
+          "benefit2": {
+            "title": "Suivi du budget simplifie.",
+            "description": "Vous avez budget 200 heures de maintenance annuelle. L attribution de projet montre exactement combien d heures ont ete enregistrees contre votre batiment."
+          },
+          "benefit3": {
+            "title": "Documentation pour les besoins d assurance.",
+            "description": "Quand votre assureur demande l historique de maintenance, les donnees existent et s exportent proprement."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Caracteristiques cles",
+        "subtitle": "Chaque caracteristique existe pour garder votre travail organise et traçable.",
+        "feature1": {
+          "title": "Base de donnees de projets centralisee",
+          "description": "Chaque projet de la proposition a l achevement. Statut, progres, notes, documentation, tout lie."
+        },
+        "feature2": {
+          "title": "Gestion des clients",
+          "description": "Base de donnees de clients avec historique de contact. Sait quels batiments vous avez entretenus pour chaque client."
+        },
+        "feature3": {
+          "title": "Suivi du progres",
+          "description": "Suivez les descentes par elevation, le pourcentage complete, les heures vs estimations. Voyez ou vont les travaux."
+        },
+        "feature4": {
+          "title": "Documentation du projet",
+          "description": "Notes, photos, formulaires de securite, tout lie au projet. L historique complet dans un seul fichier."
+        },
+        "feature5": {
+          "title": "Capacites de recherche et de filtre",
+          "description": "Trouvez n importe quel projet par adresse, client, date ou statut. Plus de fouille dans les carnets."
+        },
+        "feature6": {
+          "title": "Exportation et rapports",
+          "description": "Exportez l historique du projet pour les clients, les assureurs ou les dossiers internes. PDF ou CSV."
+        }
+      },
+      "results": {
+        "title": "Resultats mesurables",
+        "subtitle": "Ameliorations concretes que vous verrez des le premier jour.",
+        "result1": {
+          "title": "Fin de la chasse au carnet",
+          "description": "Chaque detail de projet accessible depuis n importe quel appareil. Fini de se demander ou vous avez ecrit cette adresse."
+        },
+        "result2": {
+          "title": "Historique prouvable",
+          "description": "Quand les clients demandent des travaux anterieurs, vous avez les dossiers. Dates, portee, notes, tout exportable."
+        },
+        "result3": {
+          "title": "Precision des cotisations amelioree",
+          "description": "Les donnees historiques informent les nouvelles cotisations. Vous savez combien de temps les batiments similaires ont reellement pris."
+        },
+        "result4": {
+          "title": "Meilleure planification des ressources",
+          "description": "Voyez la charge de travail a travers les projets. Planifiez les techniciens en fonction de la capacite reelle, pas des suppositions."
+        }
+      },
+      "faqs": {
+        "title": "Questions frequentes",
+        "subtitle": "Questions courantes sur le module Gestion de projets.",
+        "faq1": {
+          "question": "Combien de projets puis-je gerer?",
+          "answer": "Illimite. Tous les plans incluent des projets illimites."
+        },
+        "faq2": {
+          "question": "Puis-je importer des projets existants?",
+          "answer": "Oui. L importation CSV disponible pour les donnees de projet historiques."
+        },
+        "faq3": {
+          "question": "Les clients peuvent-ils voir les details du projet?",
+          "answer": "Les gestionnaires de proprietes avec des comptes peuvent voir les projets sur leurs batiments. La visibilite des clients est controlee par les permissions."
+        },
+        "faq4": {
+          "question": "Comment le suivi du progres fonctionne-t-il?",
+          "answer": "Les techniciens enregistrent les descentes completees par elevation lors du pointage de sortie. Le systeme calcule le pourcentage complete base sur les totaux du projet."
+        }
+      },
+      "cta": {
+        "title": "Pret a organiser vos projets?",
+        "subtitle": "Rejoignez les entreprises d acces sur corde qui ont elimine le chaos des carnets. Commencez votre essai gratuit de 60 jours aujourd hui.",
+        "trialButton": "Commencer votre essai gratuit de 60 jours",
+        "docsButton": "Voir la documentation technique"
       }
     },
     "payroll": {
@@ -5545,6 +5946,140 @@
           "item3": "Répartition facturable vs non-facturable",
           "item4": "Rémunération à la pièce (si activée)"
         }
+      },
+      "benefits": {
+        "title": "Qui beneficie de ce module",
+        "subtitle": "Suivi du temps pour toute votre operation.",
+        "employers": {
+          "title": "Pour les employeurs (Proprietaires d entreprises)",
+          "benefit1": {
+            "title": "Sachez ou va le temps.",
+            "description": "Chaque session de travail est liee a un projet. Vous voyez quel batiment, quel type de travail, combien d heures. Essentiel pour le calcul des couts et la precision des cotisations futures."
+          },
+          "benefit2": {
+            "title": "Eliminez le mystere des depassements de budget.",
+            "description": "Quand un travail depasse le budget, vous savez pourquoi. Meteo, equipement, personnel, tout documente avec des raisons."
+          },
+          "benefit3": {
+            "title": "Paie prete a exporter.",
+            "description": "Les heures s ecoulent directement dans les calculs de paie. Temps regulier, heures supplementaires, travail a la piece. Tout calcule automatiquement."
+          }
+        },
+        "operations": {
+          "title": "Pour les gestionnaires d operations et superviseurs",
+          "benefit1": {
+            "title": "Voyez qui est sur place maintenant.",
+            "description": "Le suivi en temps reel montre quels techniciens ont pointe et ou. Pas besoin de deviner ou d appeler."
+          },
+          "benefit2": {
+            "title": "Attrapez les anomalies avant la paie.",
+            "description": "La verification GPS et l attribution de projet rendent les anomalies evidentes. Un technicien a pointe 8 heures au Batiment A mais etait programme au Batiment B? Vous le voyez immediatement."
+          },
+          "benefit3": {
+            "title": "Documentation des raisons de deficit.",
+            "description": "Quand les techniciens n atteignent pas les objectifs quotidiens, ils documentent pourquoi. Meteo, equipement, problemes de site. Enregistre, pas oublie."
+          }
+        },
+        "technicians": {
+          "title": "Pour les techniciens d acces sur corde",
+          "benefit1": {
+            "title": "Vos heures sont precises.",
+            "description": "La verification GPS capture votre temps reel sur site. Plus de divergences entre ce que vous avez enregistre et ce que le proprietaire a calcule."
+          },
+          "benefit2": {
+            "title": "Documentez votre production.",
+            "description": "Les descentes completees, les elevations travaillees, les defis rencontres. Votre contribution est enregistree."
+          },
+          "benefit3": {
+            "title": "Les heures supplementaires calculees correctement.",
+            "description": "Le systeme applique automatiquement les regles d heures supplementaires de votre entreprise. Declencheur quotidien a 8 heures, hebdomadaire a 40. Pas de calculs manuels."
+          }
+        },
+        "buildingManagers": {
+          "title": "Pour les gestionnaires d immeubles / Gestionnaires de proprietes",
+          "benefit1": {
+            "title": "Verification des heures de main-d oeuvre.",
+            "description": "Vous avez budget un certain nombre d heures. L attribution de projet montre exactement combien ont ete enregistrees contre votre batiment."
+          },
+          "benefit2": {
+            "title": "Dossiers prets pour l audit.",
+            "description": "Exigences d assurance, conformite ou revue interne? Les donnees de session de travail verifiees par GPS fournissent la documentation."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Caracteristiques cles",
+        "subtitle": "Chaque caracteristique existe pour eliminer l ecart entre le travail sur le terrain et les dossiers precis.",
+        "feature1": {
+          "title": "Pointage GPS verifie",
+          "description": "Les techniciens pointent depuis leur telephone. Le systeme capture l horodatage exact et les coordonnees GPS. Verification de presence sur site integree."
+        },
+        "feature2": {
+          "title": "Suivi des descentes par elevation",
+          "description": "A la fin de chaque jour, les techniciens enregistrent les descentes completees par elevation. Nord, Est, Sud, Ouest. Suivi du progres granulaire."
+        },
+        "feature3": {
+          "title": "Documentation des raisons de deficit",
+          "description": "Quand les techniciens sont en dessous des objectifs quotidiens, le systeme demande une raison. Meteo, equipement, problemes d equipe. Documente, pas oublie."
+        },
+        "feature4": {
+          "title": "Calcul automatique des heures supplementaires",
+          "description": "Configurez les regles une fois. Declencheur quotidien, declencheur hebdomadaire, multiplicateur. Le systeme applique automatiquement a chaque session."
+        },
+        "feature5": {
+          "title": "Suivi facturable vs non facturable",
+          "description": "Distinguez les heures client qui generent des revenus des couts operationnels. Deplacement, entretien d equipement, formation, retards meteo."
+        },
+        "feature6": {
+          "title": "Attribution de projet",
+          "description": "Chaque session de travail est liee a un projet specifique. Votre vue de paie montre quel batiment, quel type de travail, combien d heures."
+        }
+      },
+      "results": {
+        "title": "Resultats mesurables",
+        "subtitle": "Ameliorations concretes que vous verrez des le premier jour.",
+        "result1": {
+          "title": "Economie de temps de paie",
+          "description": "La methode manuelle stylo et calculatrice consomme 6-10 heures par periode de paie. OnRopePro le reduit a 30-45 minutes."
+        },
+        "result2": {
+          "title": "Reduction des erreurs",
+          "description": "Des systemes contradictoires (carnets, pointeuses, tableurs) creent des divergences. Une source unique de verite elimine les disputes de reconciliation."
+        },
+        "result3": {
+          "title": "Precision du calcul des couts",
+          "description": "Sans attribution de projet, vous ne savez pas pourquoi les travaux depassent le budget. Avec, vous voyez exactement ou sont allees les heures."
+        },
+        "result4": {
+          "title": "Proprete comptable",
+          "description": "Exportations propres signifient que chaque dollar est documente avant de quitter le systeme. Le temps de reconciliation du comptable diminue."
+        }
+      },
+      "faqs": {
+        "title": "Questions frequentes",
+        "subtitle": "Questions courantes sur le module Sessions de travail et Suivi du temps.",
+        "faq1": {
+          "question": "Comment fonctionne la verification GPS?",
+          "answer": "Quand les techniciens pointent, le systeme capture les coordonnees GPS de leur appareil. Cela verifie qu ils sont physiquement sur le site de travail."
+        },
+        "faq2": {
+          "question": "Les techniciens peuvent-ils modifier leurs sessions de travail?",
+          "answer": "Les techniciens peuvent ajouter des notes et des raisons de deficit. Les corrections de temps necessitent l approbation du superviseur avec piste d audit."
+        },
+        "faq3": {
+          "question": "Que se passe-t-il si le GPS est indisponible?",
+          "answer": "Le systeme permet le pointage avec une note sur l indisponibilite du GPS. Les superviseurs peuvent revoir et approuver ces sessions."
+        },
+        "faq4": {
+          "question": "Comment fonctionne le calcul des heures supplementaires?",
+          "answer": "Configurez les regles: declencheur quotidien, declencheur hebdomadaire, multiplicateur. Le systeme applique automatiquement a chaque session de travail."
+        }
+      },
+      "cta": {
+        "title": "Pret a suivre le temps avec precision?",
+        "subtitle": "Rejoignez les entreprises d acces sur corde qui ont elimine les mysteres du temps. Commencez votre essai gratuit de 60 jours aujourd hui.",
+        "trialButton": "Commencer votre essai gratuit de 60 jours",
+        "docsButton": "Voir la documentation technique"
       }
     },
     "employees": {
@@ -5819,6 +6354,33 @@
         "title": "Prêt à simplifier votre gestion de la main-d'œuvre ?",
         "subtitle": "Rejoignez les entreprises d'accès sur corde qui utilisent déjà OnRopePro pour protéger leurs opérations, réduire la charge administrative et assurer la conformité.",
         "button": "Commencez votre essai gratuit de 60 jours"
+      },
+      "benefits": {
+        "title": "Qui beneficie de ce module",
+        "subtitle": "Gestion des employes pour toute votre operation.",
+        "employers": {
+          "title": "Pour les employeurs",
+          "benefit1": {
+            "title": "Integration en 10 secondes.",
+            "description": "Entrez le numero IRATA du technicien, ils acceptent la connexion, toutes leurs informations se transferent. Zero papeleo redondant."
+          },
+          "benefit2": {
+            "title": "Alertes de certification automatiques.",
+            "description": "Le systeme vous avertit 30 jours avant l expiration. Vous avez le temps de planifier la recertification au lieu de retirer d urgence des techniciens."
+          }
+        },
+        "technicians": {
+          "title": "Pour les techniciens",
+          "benefit1": {
+            "title": "Votre identite vous suit.",
+            "description": "Changez d employeur sans recommencer le papeleo. Votre profil, vos certifications, votre historique voyagent avec vous."
+          }
+        }
+      },
+      "cta": {
+        "title": "Pret a simplifier la gestion des employes?",
+        "subtitle": "Eliminez le papeleo redondant. Commencez votre essai gratuit de 60 jours.",
+        "trialButton": "Commencer votre essai gratuit de 60 jours"
       }
     },
     "scheduling": {
@@ -5879,6 +6441,55 @@
           "item3": "Les changements se propagent automatiquement",
           "item4": "Une seule source de vérité pour le projet et l'horaire"
         }
+      },
+      "benefits": {
+        "title": "Qui beneficie de ce module",
+        "subtitle": "Clarte de la planification pour toute votre operation.",
+        "employers": {
+          "title": "Pour les employeurs",
+          "benefit1": {
+            "title": "Plus de surprises matinales.",
+            "description": "Tout le monde sait ou aller avant de quitter la maison. Les conflits de planification se decouvrent a l ecran, pas dans le stationnement."
+          },
+          "benefit2": {
+            "title": "Optimisation des ressources.",
+            "description": "Voyez la disponibilite des techniciens a travers les projets. Assignez en fonction de la capacite reelle, pas des suppositions."
+          }
+        },
+        "operations": {
+          "title": "Pour les gestionnaires d operations",
+          "benefit1": {
+            "title": "Vue calendrier complete.",
+            "description": "Tous les projets, tous les techniciens, tous les quarts en un seul endroit. Codage couleur rend les conflits evidents."
+          }
+        },
+        "technicians": {
+          "title": "Pour les techniciens",
+          "benefit1": {
+            "title": "Sachez votre horaire a l avance.",
+            "description": "Acces mobile a votre calendrier. Voyez les affectations avant de quitter la maison."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Caracteristiques cles",
+        "feature1": {
+          "title": "Vue calendrier visuelle",
+          "description": "Calendrier glisser-deposer avec codage couleur par projet et technicien."
+        },
+        "feature2": {
+          "title": "Detection des conflits",
+          "description": "Alertes automatiques quand les techniciens sont surreserves ou double-programmes."
+        },
+        "feature3": {
+          "title": "Acces mobile",
+          "description": "Les techniciens voient leur horaire sur n importe quel appareil."
+        }
+      },
+      "cta": {
+        "title": "Pret a organiser votre horaire?",
+        "subtitle": "Eliminez les conflits de planification. Commencez votre essai gratuit de 60 jours.",
+        "trialButton": "Commencer votre essai gratuit de 60 jours"
       }
     },
     "irataLogging": {
@@ -5950,6 +6561,48 @@
           "item3": "Répartition des heures par semaine, mois, année",
           "item4": "Export PDF pour n'importe quelle plage de dates"
         }
+      },
+      "benefits": {
+        "title": "Qui beneficie de ce module",
+        "subtitle": "Documentation des heures pour la progression de certification.",
+        "employers": {
+          "title": "Pour les employeurs",
+          "benefit1": {
+            "title": "Soutenez la progression des techniciens.",
+            "description": "Les heures se journalisent automatiquement pendant le travail. Les techniciens construisent leur documentation pour la recertification sans effort supplementaire."
+          }
+        },
+        "technicians": {
+          "title": "Pour les techniciens",
+          "benefit1": {
+            "title": "Documentation automatique des heures.",
+            "description": "Chaque session de travail contribue a vos exigences de certification IRATA. Aucune tenue de registres separee requise."
+          },
+          "benefit2": {
+            "title": "Exportation prete pour la recertification.",
+            "description": "Quand vient le moment de recertifier, exportez vos heures par type de tache dans le format requis par IRATA."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Caracteristiques cles",
+        "feature1": {
+          "title": "Journalisation automatique des heures",
+          "description": "Les sessions de travail sont categorisees par type de tache IRATA automatiquement."
+        },
+        "feature2": {
+          "title": "Suivi des types de taches",
+          "description": "Toutes les categories IRATA standard suivies: inspecter, nettoyer, installer, reparer, et plus."
+        },
+        "feature3": {
+          "title": "Exportation pour la certification",
+          "description": "Generez des rapports dans le format requis pour les demandes de recertification IRATA."
+        }
+      },
+      "cta": {
+        "title": "Pret a suivre vos heures IRATA?",
+        "subtitle": "Construisez votre documentation de certification automatiquement. Commencez votre essai gratuit de 60 jours.",
+        "trialButton": "Commencer votre essai gratuit de 60 jours"
       }
     },
     "csr": {
@@ -6013,6 +6666,48 @@
           "item3": "Inspections de harnais non complétées avant le travail (jusqu'à 25 %)",
           "item4": "Reconnaissances d'employés non signées (jusqu'à 5 %)"
         }
+      },
+      "benefits": {
+        "title": "Qui beneficie de ce module",
+        "subtitle": "Confiance de securite transparente pour tous les acteurs.",
+        "employers": {
+          "title": "Pour les employeurs",
+          "benefit1": {
+            "title": "Differenciez-vous des concurrents.",
+            "description": "Quand les gestionnaires de proprietes comparent les fournisseurs, votre Evaluation de Securite parle plus fort que les promesses."
+          },
+          "benefit2": {
+            "title": "Primes d assurance plus basses.",
+            "description": "Les dossiers de conformite documentes peuvent reduire les primes d assurance. Votre evaluation est une preuve de culture de securite."
+          }
+        },
+        "buildingManagers": {
+          "title": "Pour les gestionnaires d immeubles",
+          "benefit1": {
+            "title": "Verifiez les fournisseurs avant le travail.",
+            "description": "L Evaluation de Securite de l Entreprise montre le statut de conformite d un fournisseur avant qu il ne travaille sur votre propriete."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Caracteristiques cles",
+        "feature1": {
+          "title": "Calcul de l evaluation de securite",
+          "description": "Score agrege base sur les metriques de conformite a travers les modules."
+        },
+        "feature2": {
+          "title": "Visibilite publique",
+          "description": "Les gestionnaires de proprietes peuvent voir l evaluation lors de la selection des fournisseurs."
+        },
+        "feature3": {
+          "title": "Suivi de l amelioration",
+          "description": "Voyez comment vos actions de conformite affectent votre evaluation au fil du temps."
+        }
+      },
+      "cta": {
+        "title": "Pret a montrer votre culture de securite?",
+        "subtitle": "Construisez la confiance avec des metriques de securite transparentes. Commencez votre essai gratuit de 60 jours.",
+        "trialButton": "Commencer votre essai gratuit de 60 jours"
       }
     },
     "residentPortal": {
@@ -6070,6 +6765,48 @@
           "see3": "Dates de projet prévues",
           "see4": "Indicateurs de statut actif"
         }
+      },
+      "benefits": {
+        "title": "Qui beneficie de ce module",
+        "subtitle": "Communication directe avec les residents.",
+        "employers": {
+          "title": "Pour les employeurs",
+          "benefit1": {
+            "title": "Retour direct.",
+            "description": "Les residents signalent les problemes directement. Pas de jeu de telephone a travers les gestionnaires de proprietes."
+          },
+          "benefit2": {
+            "title": "Service client ameliore.",
+            "description": "Des temps de reponse plus rapides et des mises a jour de statut visibles renforcent la confiance des clients."
+          }
+        },
+        "buildingManagers": {
+          "title": "Pour les gestionnaires d immeubles",
+          "benefit1": {
+            "title": "Moins de plaintes a gerer.",
+            "description": "Les residents communiquent directement avec le fournisseur. Vous surveillez sans etre l intermediaire."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Caracteristiques cles",
+        "feature1": {
+          "title": "Soumission des commentaires des residents",
+          "description": "Les residents signalent les problemes avec preuves photographiques et details."
+        },
+        "feature2": {
+          "title": "Suivi du statut",
+          "description": "Les residents voient si leur probleme a ete vu, est en cours ou resolu."
+        },
+        "feature3": {
+          "title": "Communication directe",
+          "description": "Les fournisseurs repondent directement aux residents sans intermediaire."
+        }
+      },
+      "cta": {
+        "title": "Pret a vous connecter avec les residents?",
+        "subtitle": "Ameliorez la satisfaction client avec la communication directe. Commencez votre essai gratuit de 60 jours.",
+        "trialButton": "Commencer votre essai gratuit de 60 jours"
       }
     },
     "quoting": {
@@ -6129,6 +6866,48 @@
           "list3": "Taux de réussite et métriques de conversion",
           "list4": "Prévisions de revenus du pipeline"
         }
+      },
+      "benefits": {
+        "title": "Qui beneficie de ce module",
+        "subtitle": "Precision des cotisations pour toute votre operation.",
+        "employers": {
+          "title": "Pour les employeurs",
+          "benefit1": {
+            "title": "Cotisez avec confiance.",
+            "description": "Les donnees de projet historiques montrent combien de temps les travaux similaires ont pris. Votre prochaine cotisation inclut les heures dont vous avez reellement besoin."
+          },
+          "benefit2": {
+            "title": "Documents professionnels.",
+            "description": "Generez des cotisations soignees qui impressionnent les clients. Votre marque, votre format, vos termes."
+          }
+        },
+        "operations": {
+          "title": "Pour les gestionnaires d operations",
+          "benefit1": {
+            "title": "Base de donnees de cotisations.",
+            "description": "Toutes les cotisations dans un systeme recherchable. Suivez le statut, les suivis et les taux de conversion."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Caracteristiques cles",
+        "feature1": {
+          "title": "Generation de cotisations",
+          "description": "Creez des cotisations professionnelles avec les details du projet, le calcul des couts de main-d oeuvre et les termes."
+        },
+        "feature2": {
+          "title": "Cotisation basee sur les donnees historiques",
+          "description": "Utilisez les donnees de projets passes pour informer les nouvelles estimations."
+        },
+        "feature3": {
+          "title": "Suivi du statut",
+          "description": "Suivez les cotisations de la creation a l acceptation. Voyez les taux de conversion."
+        }
+      },
+      "cta": {
+        "title": "Pret a cotiser avec precision?",
+        "subtitle": "Eliminez les depassements de budget avec des cotisations basees sur les donnees. Commencez votre essai gratuit de 60 jours.",
+        "trialButton": "Commencer votre essai gratuit de 60 jours"
       }
     },
     "technicianPassport": {
@@ -6164,6 +6943,56 @@
       "features": {
         "title": "Ce que vous obtenez quand un technicien se connecte",
         "subtitle": "Chaque technicien avec un Passeport OnRopePro porte son identité professionnelle complète. Quand ils acceptent votre invitation, vous recevez :"
+      },
+      "benefits": {
+        "title": "Qui beneficie de ce module",
+        "subtitle": "Identite professionnelle portable.",
+        "technicians": {
+          "title": "Pour les techniciens",
+          "benefit1": {
+            "title": "Votre historique vous suit.",
+            "description": "Chaque changement d employeur ne signifie plus recommencer a zero. Votre experience, vos certifications, vos dossiers de securite voyagent avec vous."
+          },
+          "benefit2": {
+            "title": "Credentials verifiables.",
+            "description": "Les employeurs voient un historique prouvable, pas des affirmations. Votre reputation professionnelle se construit au fil du temps."
+          },
+          "benefit3": {
+            "title": "Integration instantanee.",
+            "description": "Le nouvel employeur entre votre numero IRATA, vous acceptez la connexion, et toutes vos informations se transferent. Zero papeleo redondant."
+          }
+        },
+        "employers": {
+          "title": "Pour les employeurs",
+          "benefit1": {
+            "title": "Recrutement verifie.",
+            "description": "Voyez l historique de travail reel d un technicien, les certifications et les dossiers de securite avant l embauche."
+          },
+          "benefit2": {
+            "title": "Integration en 10 secondes.",
+            "description": "Entrez leur numero IRATA, ils acceptent la connexion, tout se transfere. Plus de chasse au papeleo."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Caracteristiques cles",
+        "feature1": {
+          "title": "Profil professionnel portable",
+          "description": "Une identite qui suit le technicien a travers les employeurs."
+        },
+        "feature2": {
+          "title": "Historique de travail verifie",
+          "description": "Dossiers d emploi prouvables avec details du projet."
+        },
+        "feature3": {
+          "title": "Suivi des certifications",
+          "description": "Toutes les certifications avec dates d expiration en un seul endroit."
+        }
+      },
+      "cta": {
+        "title": "Pret a creer votre passeport?",
+        "subtitle": "Construisez votre identite professionnelle portable. Commencez gratuitement aujourd hui.",
+        "trialButton": "Creer un profil gratuit"
       }
     },
     "employerJobBoard": {
@@ -6239,6 +7068,41 @@
           "step3": "Le technicien reçoit une notification dans le portail",
           "step4": "La réponse revient à votre tableau de bord"
         }
+      },
+      "benefits": {
+        "title": "Qui beneficie de ce module",
+        "subtitle": "Recrutement de techniciens verifies.",
+        "employers": {
+          "title": "Pour les employeurs",
+          "benefit1": {
+            "title": "Accedez a des talents verifies.",
+            "description": "Parcourez les profils de techniciens avec des certifications et un historique de travail verifies. Pas de suppositions sur les qualifications."
+          },
+          "benefit2": {
+            "title": "Publiez des opportunites.",
+            "description": "Creez des offres d emploi que les techniciens qualifies voient. Atteignez des candidats qui cherchent activement."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Caracteristiques cles",
+        "feature1": {
+          "title": "Publication d offres d emploi",
+          "description": "Creez des offres avec details du poste, exigences et fourchette de salaire."
+        },
+        "feature2": {
+          "title": "Parcours des profils de techniciens",
+          "description": "Recherchez des techniciens qui ont opte pour la visibilite."
+        },
+        "feature3": {
+          "title": "Contact direct",
+          "description": "Connectez-vous directement avec les techniciens interesses."
+        }
+      },
+      "cta": {
+        "title": "Pret a trouver des techniciens?",
+        "subtitle": "Connectez-vous avec des professionnels d acces sur corde verifies. Commencez votre essai gratuit de 60 jours.",
+        "trialButton": "Commencer votre essai gratuit de 60 jours"
       }
     },
     "userAccess": {
@@ -6305,6 +7169,48 @@
           "photos": "Documentation photo",
           "responseTime": "Métriques de temps de réponse"
         }
+      },
+      "benefits": {
+        "title": "Qui beneficie de ce module",
+        "subtitle": "Controle d acces pour proteger votre entreprise.",
+        "employers": {
+          "title": "Pour les employeurs",
+          "benefit1": {
+            "title": "Protegez les donnees sensibles.",
+            "description": "Les informations financieres, les details des clients, les donnees de paie. Controlez exactement qui voit quoi."
+          },
+          "benefit2": {
+            "title": "Reduisez les risques.",
+            "description": "Quand les employes partent, ils partent avec seulement les connaissances auxquelles ils devaient avoir acces."
+          }
+        },
+        "operations": {
+          "title": "Pour les gestionnaires d operations",
+          "benefit1": {
+            "title": "Acces operationnel sans exposition financiere.",
+            "description": "Gerez les projets et les equipes sans voir les taux de remuneration ou les couts des clients."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Caracteristiques cles",
+        "feature1": {
+          "title": "Systeme base sur les roles",
+          "description": "44 permissions configurables a travers les types de roles."
+        },
+        "feature2": {
+          "title": "Zero par defaut",
+          "description": "Chaque role commence sans permissions. Vous ajoutez ce qui est necessaire."
+        },
+        "feature3": {
+          "title": "Piste d audit",
+          "description": "Suivez qui a accede a quoi et quand."
+        }
+      },
+      "cta": {
+        "title": "Pret a securiser votre acces?",
+        "subtitle": "Controlez exactement qui voit quoi. Commencez votre essai gratuit de 60 jours.",
+        "trialButton": "Commencer votre essai gratuit de 60 jours"
       }
     },
     "technicianJobBoard": {
@@ -6356,6 +7262,45 @@
           "description": "Activez la visibilité : les employeurs peuvent vous rechercher dans le navigateur de talents, voir vos qualifications et vous envoyer des offres d'emploi directes. Désactivez-la : vous êtes invisible aux recherches mais pouvez toujours parcourir et postuler aux emplois normalement.",
           "visibleLabel": "Ce que les employeurs voient quand vous êtes visible :"
         }
+      },
+      "benefits": {
+        "title": "Qui beneficie de ce module",
+        "subtitle": "Decouverte d opportunites pour les techniciens.",
+        "technicians": {
+          "title": "Pour les techniciens",
+          "benefit1": {
+            "title": "Voyez les opportunites actives.",
+            "description": "Parcourez les offres d emploi d entreprises verifiees. Postes a temps plein, contrats, travail saisonnier."
+          },
+          "benefit2": {
+            "title": "Laissez les employeurs vous trouver.",
+            "description": "Activez la visibilite du profil et les employeurs peuvent vous contacter directement."
+          },
+          "benefit3": {
+            "title": "Historique verifie.",
+            "description": "Votre passeport technicien parle pour vous. Les employeurs voient une experience prouvable."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Caracteristiques cles",
+        "feature1": {
+          "title": "Parcours des offres d emploi",
+          "description": "Voyez les opportunites actives avec details et exigences."
+        },
+        "feature2": {
+          "title": "Controle de visibilite du profil",
+          "description": "Choisissez quand votre profil est visible pour les employeurs."
+        },
+        "feature3": {
+          "title": "Contact direct",
+          "description": "Les employeurs interesses peuvent vous contacter directement."
+        }
+      },
+      "cta": {
+        "title": "Pret a trouver des opportunites?",
+        "subtitle": "Connectez-vous avec des employeurs a la recherche de vos competences. Creez votre profil gratuitement.",
+        "trialButton": "Creer un profil gratuit"
       }
     }
   }
