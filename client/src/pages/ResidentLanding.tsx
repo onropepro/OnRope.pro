@@ -1,59 +1,66 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { 
+  ArrowRight, 
+  Home, 
+  Camera, 
+  Eye, 
+  Clock, 
+  MapPin,
+  CheckCircle2,
+  Shield,
+  Zap,
+  MessageCircle,
+  Building2,
+  UserPlus,
+  BookOpen,
+} from "lucide-react";
 import { Link } from "wouter";
 import { PublicHeader } from "@/components/PublicHeader";
-import {
-  Home,
-  ArrowRight,
-  BookOpen,
-  Camera,
-  Eye,
-  Clock,
-  MessageCircle,
-  Globe,
-  CheckCircle2,
-  Building2,
-  Bell,
-  Users,
-  Zap
-} from "lucide-react";
+import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 export default function ResidentLanding() {
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
-      <PublicHeader activeNav="resident" />
+      <PublicHeader />
       
-      {/* Hero Section - Rose gradient for B2C Residents */}
-      <section className="relative text-white pb-[120px]" style={{backgroundImage: 'linear-gradient(135deg, #F43F5E 0%, #E11D48 100%)'}}>
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMtOS45NDEgMC0xOCA4LjA1OS0xOCAxOHM4LjA1OSAxOCAxOCAxOGM5Ljk0MSAwIDE4LTguMDU5IDE4LTE4cy04LjA1OS0xOC0xOC0xOHptMCAzMmMtNy43MzIgMC0xNC02LjI2OC0xNC0xNHM2LjI2OC0xNCAxNC0xNHMxNCA2LjI2OCAxNCAxNC02LjI2OCAxNC0xNCAxNHoiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wMykiLz48L2c+PC9zdmc+')] opacity-30"></div>
+      {/* Hero Section - Following Module Landing Page Hero Template */}
+      <section className="relative text-white pb-[120px]" style={{backgroundImage: 'linear-gradient(135deg, #0B64A3 0%, #0369A1 100%)'}}>
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMtNi42MjcgMC0xMiA1LjM3My0xMiAxMnM1LjM3MyAxMiAxMiAxMiAxMi01LjM3MyAxMi0xMi01LjM3My0xMi0xMi0xMnoiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLW9wYWNpdHk9Ii4xIiBzdHJva2Utd2lkdGg9IjIiLz48L2c+PC9zdmc+')] opacity-30"></div>
         
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
           <div className="text-center space-y-6 pt-16">
-            <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-resident-portal">
+            <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-resident-module">
               For Building Residents
             </Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              Complaints handled while<br />
-              <span className="text-rose-100">your crews are still on the ropes.</span>
+              Know Your Feedback Was Received.<br />
+              <span className="text-blue-100">Track It Until It's Resolved.</span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-rose-100 max-w-3xl mx-auto leading-relaxed">
-              Residents submit feedback with photos. Your team sees it in real-time. Issues get resolved before the van leaves the parking lot. No more phone tag. No more return visits. No more notebooks.
+            <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
+              Submit feedback with photos, see exactly when it was viewed, and track progress in real-time.<br />
+              <strong>No more phone calls. No more guessing.</strong>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" className="bg-white text-[#E11D48] hover:bg-rose-50" asChild data-testid="button-hero-access-portal">
-                <Link href="/link">
-                  Access Your Building Portal
+              <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild>
+                <Link href="/register" data-testid="button-create-account-hero">
+                  Create Your Account
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-hero-learn-more">
-                <Link href="#how-it-works">
+              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild>
+                <Link href="#how-it-works" data-testid="button-learn-how">
                   Learn How It Works
                   <BookOpen className="ml-2 w-5 h-5" />
                 </Link>
@@ -62,7 +69,7 @@ export default function ResidentLanding() {
           </div>
         </div>
         
-        {/* Wave separator */}
+        {/* Wave Separator */}
         <div className="absolute bottom-0 left-0 right-0 z-10">
           <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto block">
             <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" className="fill-white dark:fill-slate-950"/>
@@ -70,464 +77,611 @@ export default function ResidentLanding() {
         </div>
       </section>
 
-      <Separator className="my-8" />
-
-      {/* Problem Statement Section */}
-      <section className="py-16 md:py-20 px-4">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
-            The Complaint Problem Nobody Budgets For
-          </h2>
-          
-          <Card className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
-            <CardContent className="p-6 md:p-8 space-y-4 text-muted-foreground">
-              <p className="text-base leading-relaxed">
-                A resident in unit 1247 emails about streaks on her window. A week later, she calls the building manager. The building manager calls you. You check your notebook. Maybe the email got lost. Maybe it didn't. Now three people are spending time on something that might have been resolved in 10 minutes if anyone had known about it while the crew was still in the building.
-              </p>
-              <p className="text-base leading-relaxed">
-                That 10-minute fix? It becomes a half-day labor cost. Packing equipment, loading the van, driving across town, rigging ropes for one window, cleaning it, derigging, driving back. You've done the math. You know what those return visits cost.
-              </p>
-              <p className="text-base leading-relaxed">
-                And that's just one complaint. During busy season, multiply it by buildings, by units, by the residents who give up entirely and complain on social media instead.
-              </p>
-              <p className="text-lg leading-relaxed font-medium text-foreground">
-                OnRopePro's Resident Portal puts feedback in front of your team while crews are still on-site. Residents submit issues with photos. Your supervisor sees a notification. The technician already rigged on that elevation flips their rope and checks the window. Problem solved in minutes, not days.
-              </p>
+      {/* Stats Panel */}
+      <section className="relative bg-white dark:bg-slate-950 -mt-px overflow-visible">
+        <div className="max-w-3xl mx-auto px-4 pt-4 pb-12">
+          <Card className="shadow-xl border-0 relative z-20 -mt-20">
+            <CardContent className="p-8">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+                <div className="text-center">
+                  <div className="text-3xl md:text-4xl font-bold text-blue-600">24hr</div>
+                  <div className="text-sm text-muted-foreground mt-1">Avg Response</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl md:text-4xl font-bold text-emerald-600">100%</div>
+                  <div className="text-sm text-muted-foreground mt-1">Tracked</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl md:text-4xl font-bold text-amber-600">0</div>
+                  <div className="text-sm text-muted-foreground mt-1">Lost Complaints</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl md:text-4xl font-bold text-rose-600">Real-Time</div>
+                  <div className="text-sm text-muted-foreground mt-1">Updates</div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
       </section>
 
-      <Separator className="my-8" />
-
-      {/* What This Module Does Section */}
-      <section id="how-it-works" className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            What This Module Does
-          </h2>
-          <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-            Direct communication between residents and your company. Complete visibility for property managers. Zero phone tag.
+      {/* Problem Statement Section */}
+      <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-6">
+          Tired of Complaints That Go Nowhere?
+        </h2>
+        
+        <div className="space-y-4 text-base text-muted-foreground leading-relaxed">
+          <p>
+            You email the property manager about streaks on your window. A week passes. Nothing. You call. They say they forwarded it to the vendor. The vendor says they never got it.
           </p>
-          <p className="text-center text-muted-foreground text-base mb-12 max-w-3xl mx-auto">
-            The Resident Portal gives building residents a direct line to report issues, track project progress, and communicate with your team, all without involving property managers or building staff as middlemen.
+          <p>
+            Now three people are involved in tracking down one email that may or may not have been sent.
           </p>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Card 1: Resident Feedback System */}
-            <Card className="overflow-hidden">
-              <CardHeader className="bg-rose-50 dark:bg-rose-950 border-b">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center">
-                    <Camera className="w-5 h-5 text-rose-600" />
-                  </div>
-                  <CardTitle className="text-xl">Resident Feedback System</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="p-6 space-y-4">
-                <p className="text-base text-muted-foreground">
-                  Residents submit feedback once with their description and optional photo. Name, unit number, and phone auto-fill from their account. Your team sees it immediately in the project dashboard with a notification badge.
-                </p>
-                <div className="space-y-2 text-base">
-                  <p className="font-medium text-foreground">What gets captured:</p>
-                  <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                    <li>Description of issue with optional photo evidence</li>
-                    <li>Unit number and resident contact info (auto-filled)</li>
-                    <li>Timestamp of submission</li>
-                    <li>Timestamp of when your team first viewed it</li>
-                  </ul>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Card 2: Two-Way Communication */}
-            <Card className="overflow-hidden">
-              <CardHeader className="bg-rose-50 dark:bg-rose-950 border-b">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center">
-                    <MessageCircle className="w-5 h-5 text-rose-600" />
-                  </div>
-                  <CardTitle className="text-xl">Two-Way Communication</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="p-6 space-y-4">
-                <p className="text-base text-muted-foreground">
-                  Your staff respond through internal notes (private) or visible replies (resident sees). Residents can reply to visible messages. The complete conversation history stays attached to that feedback item forever.
-                </p>
-                <div className="space-y-2 text-base">
-                  <p className="font-medium text-foreground">What gets tracked:</p>
-                  <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                    <li>All messages between staff and resident</li>
-                    <li>Which messages are internal vs. visible</li>
-                    <li>Status changes (New, Viewed, Closed)</li>
-                    <li>Resolution timestamps for performance metrics</li>
-                  </ul>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Card 3: Project Progress Visibility */}
-            <Card className="overflow-hidden">
-              <CardHeader className="bg-rose-50 dark:bg-rose-950 border-b">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center">
-                    <Building2 className="w-5 h-5 text-rose-600" />
-                  </div>
-                  <CardTitle className="text-xl">Project Progress Visibility</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="p-6 space-y-4">
-                <p className="text-base text-muted-foreground">
-                  Residents view real-time project progress showing which elevation or side of the building is being worked on. They check status before calling to ask "when will you do my window?"
-                </p>
-                <div className="space-y-2 text-base">
-                  <p className="font-medium text-foreground">What residents see:</p>
-                  <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                    <li>Current elevation being worked (North, South, East, West)</li>
-                    <li>Overall completion percentage</li>
-                    <li>Scheduled project dates</li>
-                    <li>Active status indicators</li>
-                  </ul>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <p>
+            Meanwhile, you see crews working on the building but have no idea if they've reached your side yet. You call again. Turns out they finished your floor yesterday.
+          </p>
+          <p className="font-medium text-foreground">
+            The Resident Portal puts you in direct contact with the service company working on your building. Submit once. See when it was viewed. Track it through to resolution.
+          </p>
         </div>
       </section>
 
-      <Separator className="my-8" />
+      <Separator className="max-w-4xl mx-auto" />
 
-      {/* Benefits Section - For Building Residents */}
-      <section className="py-16 md:py-20 px-4">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            For Building Residents
-          </h2>
-          <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-            Every feature designed to make building maintenance communication simple and transparent.
-          </p>
-          
-          <div className="space-y-6">
-            <Card className="overflow-hidden">
-              <CardContent className="p-6 md:p-8 space-y-6">
-                <div className="space-y-3">
-                  <h4 className="text-lg font-semibold text-foreground flex items-center gap-2">
-                    <Bell className="w-5 h-5 text-rose-600" />
-                    Know your complaint was received and when it was seen.
-                  </h4>
-                  <p className="text-base text-muted-foreground">
-                    Every submission is logged with a timestamp. You see the exact date and time when the company first opened your feedback. No more wondering if your email got lost.
-                  </p>
+      {/* What You Can Do Section */}
+      <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+          Your Portal. Your Control.
+        </h2>
+        <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
+          The Resident Portal gives you direct access to project updates and a documented communication channel with the service team.
+        </p>
+        
+        <div className="grid md:grid-cols-3 gap-6">
+          <Card>
+            <CardHeader className="bg-rose-50 dark:bg-rose-950 border-b">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center">
+                  <MapPin className="w-5 h-5 text-rose-600" />
                 </div>
+                <CardTitle className="text-lg">Track Project Progress</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6 space-y-4">
+              <p className="text-base text-muted-foreground">
+                See exactly where crews are working and when they'll reach your side of the building. Real-time progress bars show which elevations are complete, so you know when to move plants off the balcony or prepare for window access.
+              </p>
+              <div className="space-y-2">
+                <p className="text-base font-medium text-foreground">What you see:</p>
+                <ul className="text-base text-muted-foreground space-y-1">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-rose-600 mt-1 shrink-0" />
+                    Which side of the building is being worked on now
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-rose-600 mt-1 shrink-0" />
+                    Completion percentage for each elevation
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-rose-600 mt-1 shrink-0" />
+                    Expected completion timeline
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-rose-600 mt-1 shrink-0" />
+                    No more premature "you missed my window" calls
+                  </li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
 
-                <div className="space-y-3">
-                  <h4 className="text-lg font-semibold text-foreground flex items-center gap-2">
-                    <Camera className="w-5 h-5 text-rose-600" />
-                    Submit once, with photos, and you're done.
-                  </h4>
-                  <p className="text-base text-muted-foreground">
-                    Describe your issue, attach a photo, submit. Your name, unit number, and phone auto-fill. No repeating yourself to the property manager, then the vendor, then the technician.
-                  </p>
+          <Card>
+            <CardHeader className="bg-rose-50 dark:bg-rose-950 border-b">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center">
+                  <Camera className="w-5 h-5 text-rose-600" />
                 </div>
+                <CardTitle className="text-lg">Submit Feedback with Photos</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6 space-y-4">
+              <p className="text-base text-muted-foreground">
+                Report issues, concerns, or compliments directly through the portal. Attach photos right from your phone. One submission captures your name, unit number, and the visual evidence needed for fast resolution.
+              </p>
+              <div className="space-y-2">
+                <p className="text-base font-medium text-foreground">What you can submit:</p>
+                <ul className="text-base text-muted-foreground space-y-1">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-rose-600 mt-1 shrink-0" />
+                    Streaks, spots, or missed areas
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-rose-600 mt-1 shrink-0" />
+                    Damage concerns
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-rose-600 mt-1 shrink-0" />
+                    Access issues (plants, furniture in the way)
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-rose-600 mt-1 shrink-0" />
+                    Compliments for work well done
+                  </li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
 
-                <div className="space-y-3">
-                  <h4 className="text-lg font-semibold text-foreground flex items-center gap-2">
-                    <Eye className="w-5 h-5 text-rose-600" />
-                    Check project progress before asking "are you done yet?"
-                  </h4>
-                  <p className="text-base text-muted-foreground">
-                    See which side of the building crews are working on. If they haven't reached the north side yet, you'll know before calling to complain about your north-facing window.
-                  </p>
+          <Card>
+            <CardHeader className="bg-rose-50 dark:bg-rose-950 border-b">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center">
+                  <Eye className="w-5 h-5 text-rose-600" />
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+                <CardTitle className="text-lg">Track Your Feedback Status</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6 space-y-4">
+              <p className="text-base text-muted-foreground">
+                Every submission is timestamped and tracked. See when the company first viewed your feedback. Watch the status change from New to Viewed to Closed. No more wondering if anyone saw it.
+              </p>
+              <div className="space-y-2">
+                <p className="text-base font-medium text-foreground">What you track:</p>
+                <ul className="text-base text-muted-foreground space-y-1">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-rose-600 mt-1 shrink-0" />
+                    Submission date and time
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-rose-600 mt-1 shrink-0" />
+                    "Viewed" timestamp showing when the company saw it
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-rose-600 mt-1 shrink-0" />
+                    Current status (New, Viewed, Closed)
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-rose-600 mt-1 shrink-0" />
+                    Responses from the service team
+                  </li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </section>
 
-      <Separator className="my-8" />
+      <Separator className="max-w-4xl mx-auto" />
 
-      {/* Problems Solved - For Residents */}
-      <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Problems Solved
-          </h2>
-          <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-            Real problems, solved by design.
-          </p>
+      {/* How It Works Section */}
+      <section id="how-it-works" className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+          Three Steps to Direct Communication
+        </h2>
+        
+        <div className="grid md:grid-cols-3 gap-8 mt-12">
+          <div className="text-center space-y-4">
+            <div className="w-16 h-16 rounded-full bg-rose-100 dark:bg-rose-900 flex items-center justify-center mx-auto">
+              <UserPlus className="w-8 h-8 text-rose-600" />
+            </div>
+            <div className="text-2xl font-bold text-rose-600">Step 1</div>
+            <h3 className="text-xl font-semibold">Create Your Account</h3>
+            <p className="text-base text-muted-foreground">
+              Sign up with your email, strata plan number, and unit number. This links your account to your specific building and unit. Takes about two minutes.
+            </p>
+          </div>
 
-          <div className="space-y-6">
-            <Card>
-              <CardContent className="p-6 space-y-4">
-                <h4 className="text-lg font-semibold text-foreground">"My complaints go into a black hole."</h4>
-                <p className="text-base text-muted-foreground">
-                  You email about streaks on your window. A week later, nothing. You call the building manager, who calls the vendor, who says they never received the email. Three people are now involved in tracking down one complaint that may or may not have been sent.
-                </p>
-                <div className="bg-rose-50 dark:bg-rose-950/50 rounded-lg p-4">
-                  <p className="text-base font-medium text-rose-900 dark:text-rose-100">
-                    Every feedback submission is logged with a timestamp. You see a "Viewed" status with the exact date and time when the company first opened your feedback. Complete transparency into status. No more uncertainty.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="text-center space-y-4">
+            <div className="w-16 h-16 rounded-full bg-rose-100 dark:bg-rose-900 flex items-center justify-center mx-auto">
+              <Building2 className="w-8 h-8 text-rose-600" />
+            </div>
+            <div className="text-2xl font-bold text-rose-600">Step 2</div>
+            <h3 className="text-xl font-semibold">Enter the Vendor Code</h3>
+            <p className="text-base text-muted-foreground">
+              Your building manager or property manager provides a vendor code. Enter it once in your profile to connect with the service company working on your building.
+            </p>
+          </div>
 
-            <Card>
-              <CardContent className="p-6 space-y-4">
-                <h4 className="text-lg font-semibold text-foreground">"I have to explain my issue three times."</h4>
-                <p className="text-base text-muted-foreground">
-                  You describe your problem over the phone, then repeat it to the property manager, then again to the vendor. Details get lost. "Can you send a photo?" adds another round of communication.
-                </p>
-                <div className="bg-rose-50 dark:bg-rose-950/50 rounded-lg p-4">
-                  <p className="text-base font-medium text-rose-900 dark:text-rose-100">
-                    You submit feedback once with description and optional photo. The form auto-fills your name, unit number, and phone from your account. One submission captures everything. No repeated explanations, no lost photos.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="text-center space-y-4">
+            <div className="w-16 h-16 rounded-full bg-rose-100 dark:bg-rose-900 flex items-center justify-center mx-auto">
+              <MessageCircle className="w-8 h-8 text-rose-600" />
+            </div>
+            <div className="text-2xl font-bold text-rose-600">Step 3</div>
+            <h3 className="text-xl font-semibold">See Projects and Submit Feedback</h3>
+            <p className="text-base text-muted-foreground">
+              Your dashboard shows active projects on your building. View progress. Submit feedback. Track responses. Everything in one place.
+            </p>
           </div>
         </div>
+
+        <Card className="mt-8 bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
+          <CardContent className="p-6">
+            <p className="text-base text-blue-900 dark:text-blue-100">
+              <strong>Note:</strong> Your account stays with you. If you move to a different building, update your strata number and enter the new vendor's code. No need to start over.
+            </p>
+          </CardContent>
+        </Card>
       </section>
 
-      <Separator className="my-8" />
+      <Separator className="max-w-4xl mx-auto" />
 
-      {/* Key Features Section */}
-      <section className="py-16 md:py-20 px-4">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Key Features
-          </h2>
-          <p className="text-center text-muted-foreground text-base mb-12 max-w-2xl mx-auto">
-            Every feature exists because Tommy tracked complaints in a notebook, sometimes on his hand while driving.
-          </p>
-          
-          <div className="grid md:grid-cols-2 gap-6">
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
-                    <Clock className="w-5 h-5 text-rose-600" />
-                  </div>
-                  <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Viewed Timestamp Visibility</h4>
-                    <p className="text-base text-muted-foreground">Residents see exactly when their feedback was first opened by your company. No more "I didn't see it" excuses. If someone on your team opened it, there's a timestamp proving it. This creates accountability without requiring any manual logging.</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
-                    <Camera className="w-5 h-5 text-rose-600" />
-                  </div>
-                  <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Photo Evidence Upload</h4>
-                    <p className="text-base text-muted-foreground">Residents attach photos directly to their feedback. No more email threads asking for documentation. When a resident reports a water stain, you have the photo immediately. When you investigate and find the dirt is on the inside, you document that finding.</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
-                    <MessageCircle className="w-5 h-5 text-rose-600" />
-                  </div>
-                  <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Internal Notes System</h4>
-                    <p className="text-base text-muted-foreground">Staff coordinate privately without exposing sensitive discussions to residents. Investigation notes, scheduling discussions, liability documentation. The yellow/red checkbox toggle makes it explicit when a reply will be visible to the resident, preventing accidental exposure.</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
-                    <Globe className="w-5 h-5 text-rose-600" />
-                  </div>
-                  <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Portable Resident Accounts</h4>
-                    <p className="text-base text-muted-foreground">When a resident moves from Toronto to Chicago, they keep their OnRopePro account. They update their Strata/LMS number and enter the new vendor's code. If their new building's vendor doesn't use OnRopePro, they notice. And they mention it.</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
-                    <Zap className="w-5 h-5 text-rose-600" />
-                  </div>
-                  <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Resolution Time Metrics</h4>
-                    <p className="text-base text-muted-foreground">The system calculates average response and resolution times automatically. Property managers see this data when evaluating vendors. Your resolution time becomes part of your competitive advantage, displayed alongside your Company Safety Rating.</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
-                    <Building2 className="w-5 h-5 text-rose-600" />
-                  </div>
-                  <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Real-Time Progress Tracking</h4>
-                    <p className="text-base text-muted-foreground">Residents view which elevation is being worked on and overall completion percentage. They self-serve status information instead of calling to ask. You stop answering "when will you do my window?" calls from residents whose side hasn't been reached yet.</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      <Separator className="my-8" />
-
-      {/* FAQs Section */}
-      <section id="faqs" className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Frequently Asked Questions
-          </h2>
-          <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-            Everything you need to know about using the Resident Portal.
-          </p>
-          
+      {/* Problems Solved Section */}
+      <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+          Real Problems. Real Solutions.
+        </h2>
+        
+        <div className="mt-8">
           <Accordion type="multiple" className="space-y-4">
-            <AccordionItem value="privacy" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
-              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-privacy">
-                Can residents see other residents' complaints?
+            <AccordionItem value="problem-1" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
+              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-problem-1">
+                "My complaint disappeared into a black hole."
               </AccordionTrigger>
-              <AccordionContent className="text-base text-muted-foreground pb-4">
-                No. Residents can only view and interact with their own feedback submissions. Privacy is protected by design.
+              <AccordionContent className="text-base text-muted-foreground pb-4 space-y-4">
+                <p>
+                  You submitted feedback via email or phone. Days pass. No response. You follow up. They can't find it. You explain the whole thing again. Still nothing.
+                </p>
+                <div className="bg-rose-50 dark:bg-rose-950/50 rounded-lg p-4">
+                  <p className="text-base font-medium text-rose-900 dark:text-rose-100">
+                    With the Resident Portal, every submission is logged with a timestamp. You see the exact date and time the company opened your feedback. "I didn't see it" becomes impossible when you can prove they viewed it on Tuesday at 2:47 PM.
+                  </p>
+                </div>
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="moving" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
-              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-moving">
-                What happens when a resident moves to a different building?
+            <AccordionItem value="problem-2" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
+              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-problem-2">
+                "I explained this three times already."
               </AccordionTrigger>
-              <AccordionContent className="text-base text-muted-foreground pb-4">
-                They update their Strata/LMS number in their profile and enter the new vendor's code. Their account is fully portable. If the new building's vendor uses OnRopePro, they see that vendor's projects. If not, they notice the gap.
+              <AccordionContent className="text-base text-muted-foreground pb-4 space-y-4">
+                <p>
+                  Phone to property manager. Property manager to vendor. Vendor to technician. Somewhere along the way, "water stain on bedroom window" became "balcony glass issue." The tech arrives confused.
+                </p>
+                <div className="bg-rose-50 dark:bg-rose-950/50 rounded-lg p-4">
+                  <p className="text-base font-medium text-rose-900 dark:text-rose-100">
+                    Submit once through the portal. Your name, unit, phone, and description are captured. Attach photos. Done. The team sees exactly what you see. No telephone game.
+                  </p>
+                </div>
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="reopen" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
-              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-reopen">
-                Can residents reopen closed feedback?
+            <AccordionItem value="problem-3" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
+              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-problem-3">
+                "I have no idea if they've done my window yet."
               </AccordionTrigger>
-              <AccordionContent className="text-base text-muted-foreground pb-4">
-                No. Only company staff can reopen closed feedback. If a resident believes the issue persists, they contact their property manager or building manager directly. This prevents endless back-and-forth on resolved issues.
+              <AccordionContent className="text-base text-muted-foreground pb-4 space-y-4">
+                <p>
+                  Crews are on the building. You can see them from the street. But are they on the north side or south? Did they finish your floor yesterday or is it scheduled for next week?
+                </p>
+                <div className="bg-rose-50 dark:bg-rose-950/50 rounded-lg p-4">
+                  <p className="text-base font-medium text-rose-900 dark:text-rose-100">
+                    The portal shows real-time progress by elevation. You know your side hasn't been touched yet. You wait. No wasted calls asking "are you done?"
+                  </p>
+                </div>
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="pm-respond" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
-              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-pm-respond">
-                Can property managers respond to resident feedback?
+            <AccordionItem value="problem-4" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
+              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-problem-4">
+                "They said they'd fix it but nothing changed."
               </AccordionTrigger>
-              <AccordionContent className="text-base text-muted-foreground pb-4">
-                No. Property managers can view all feedback and communication history but cannot respond. Only company staff communicate with residents through the system. This keeps property managers informed without requiring their involvement.
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="internal-notes" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
-              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-internal-notes">
-                What's the difference between internal notes and visible replies?
-              </AccordionTrigger>
-              <AccordionContent className="text-base text-muted-foreground pb-4">
-                Internal notes are private (staff only) for coordination, investigation findings, and sensitive discussions. Visible replies are seen by the resident for acknowledgment, status updates, and resolution communication. Staff must explicitly toggle a yellow/red checkbox to make a reply visible, preventing accidental exposure.
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="vendor-code" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
-              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-vendor-code">
-                How do residents get the vendor code?
-              </AccordionTrigger>
-              <AccordionContent className="text-base text-muted-foreground pb-4">
-                The code is posted on notices in the elevator during projects, provided by the building manager, or included in project communications. One code per company, used for all buildings that company services.
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="one-code" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
-              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-one-code">
-                Is there one code per building or one code per company?
-              </AccordionTrigger>
-              <AccordionContent className="text-base text-muted-foreground pb-4">
-                One code per company. All residents across all buildings serviced by that company use the same vendor code. The Strata/LMS number differentiates which building's projects they see.
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="feedback-window" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
-              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-feedback-window">
-                How long do residents have to submit feedback after a project completes?
-              </AccordionTrigger>
-              <AccordionContent className="text-base text-muted-foreground pb-4">
-                5 business days. This allows time for residents to notice issues while limiting the complaint window to a reasonable period.
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="unread" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
-              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-unread">
-                What happens if feedback sits unread?
-              </AccordionTrigger>
-              <AccordionContent className="text-base text-muted-foreground pb-4">
-                Notification badges show pending items in your dashboard. The "Viewed" timestamp is visible to the resident, so they know if no one has opened their feedback. This creates natural accountability.
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="internal-visibility" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
-              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-internal-visibility">
-                Do residents see when we add internal notes?
-              </AccordionTrigger>
-              <AccordionContent className="text-base text-muted-foreground pb-4">
-                No. Internal notes are completely invisible to residents. They only see visible replies and status changes.
+              <AccordionContent className="text-base text-muted-foreground pb-4 space-y-4">
+                <p>
+                  Feedback submitted. Response received. Issue marked closed. But nothing actually improved. Now what?
+                </p>
+                <div className="bg-rose-50 dark:bg-rose-950/50 rounded-lg p-4">
+                  <p className="text-base font-medium text-rose-900 dark:text-rose-100">
+                    You can see the status history and any responses from the team. If the issue persists after closure, contact your building manager with documented proof of what was communicated.
+                  </p>
+                </div>
               </AccordionContent>
             </AccordionItem>
           </Accordion>
         </div>
       </section>
 
-      <Separator className="my-8" />
+      <Separator className="max-w-4xl mx-auto" />
 
-      {/* Final CTA Section */}
-      <section className="py-16 md:py-20 px-4">
-        <div className="max-w-4xl mx-auto text-center space-y-8">
-          <h2 className="text-3xl md:text-4xl font-bold">
-            Ready to Access Your Building Portal?
+      {/* Key Features Section */}
+      <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+          Built for Clarity
+        </h2>
+        <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
+          Every feature exists to eliminate confusion and give you visibility into what's happening on your building.
+        </p>
+        
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
+                  <Clock className="w-5 h-5 text-rose-600" />
+                </div>
+                <div className="space-y-2">
+                  <h4 className="text-lg font-semibold text-foreground">Viewed Timestamp</h4>
+                  <p className="text-base text-muted-foreground">See the exact date and time when the company first opened your feedback. Accountability built in.</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
+                  <Camera className="w-5 h-5 text-rose-600" />
+                </div>
+                <div className="space-y-2">
+                  <h4 className="text-lg font-semibold text-foreground">Photo Uploads</h4>
+                  <p className="text-base text-muted-foreground">Attach photos directly from your phone when submitting feedback. Clear evidence speeds resolution.</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
+                  <MapPin className="w-5 h-5 text-rose-600" />
+                </div>
+                <div className="space-y-2">
+                  <h4 className="text-lg font-semibold text-foreground">Progress Tracking</h4>
+                  <p className="text-base text-muted-foreground">Real-time progress bars show which side of the building is complete. Know when work is approaching your unit.</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
+                  <Eye className="w-5 h-5 text-rose-600" />
+                </div>
+                <div className="space-y-2">
+                  <h4 className="text-lg font-semibold text-foreground">Status Badges</h4>
+                  <p className="text-base text-muted-foreground">New, Viewed, Closed. Always know where your feedback stands at a glance.</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
+                  <Home className="w-5 h-5 text-rose-600" />
+                </div>
+                <div className="space-y-2">
+                  <h4 className="text-lg font-semibold text-foreground">Portable Account</h4>
+                  <p className="text-base text-muted-foreground">Move to a new building? Update your strata number and enter the new vendor code. Your account follows you.</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
+                  <Shield className="w-5 h-5 text-rose-600" />
+                </div>
+                <div className="space-y-2">
+                  <h4 className="text-lg font-semibold text-foreground">Privacy Protection</h4>
+                  <p className="text-base text-muted-foreground">Your feedback is visible only to you and the service company. Other residents cannot see your submissions.</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      <Separator className="max-w-4xl mx-auto" />
+
+      {/* Measurable Results Section */}
+      <section className="py-12 md:py-20 px-4 md:px-8 bg-slate-50 dark:bg-slate-900">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+            What Changes With the Portal
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Get the vendor code from your building manager or look for notices in the elevator during projects.
-          </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-rose-600 hover:bg-rose-700 text-white" asChild data-testid="button-cta-access-portal">
-              <Link href="/link">
-                Access Your Building Portal
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Link>
-            </Button>
-            <Button size="lg" variant="outline" asChild data-testid="button-cta-learn-more">
-              <Link href="/changelog/resident-portal">
-                View Full Documentation
-                <BookOpen className="ml-2 w-5 h-5" />
-              </Link>
-            </Button>
+          <div className="grid md:grid-cols-2 gap-6 mt-12">
+            <Card className="bg-white dark:bg-slate-950">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0">
+                    <Zap className="w-6 h-6 text-emerald-600" />
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="text-lg font-semibold text-foreground">Faster Response</h4>
+                    <p className="text-base text-muted-foreground">Feedback submissions with photos receive initial response within 24 hours on average. No more waiting a week to find out if anyone received your complaint.</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white dark:bg-slate-950">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0">
+                    <Clock className="w-6 h-6 text-emerald-600" />
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="text-lg font-semibold text-foreground">Resolution Time</h4>
+                    <p className="text-base text-muted-foreground">Issues that previously took 3-5 days to resolve now close in 24 hours on average. Direct communication eliminates the middleman delay.</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white dark:bg-slate-950">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0">
+                    <CheckCircle2 className="w-6 h-6 text-emerald-600" />
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="text-lg font-semibold text-foreground">Zero Lost Complaints</h4>
+                    <p className="text-base text-muted-foreground">Every submission is logged, timestamped, and tracked. Nothing falls through the cracks.</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white dark:bg-slate-950">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0">
+                    <Eye className="w-6 h-6 text-emerald-600" />
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="text-lg font-semibold text-foreground">Self-Serve Updates</h4>
+                    <p className="text-base text-muted-foreground">Check project progress anytime without calling. Know when work will reach your side before you need to ask.</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
 
+      {/* FAQs Section */}
+      <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+          Frequently Asked Questions
+        </h2>
+        
+        <Accordion type="multiple" className="space-y-4">
+          <AccordionItem value="faq-1" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
+            <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-1">
+              How do I get the vendor code?
+            </AccordionTrigger>
+            <AccordionContent className="text-base text-muted-foreground pb-4">
+              Contact your building manager or property manager. They receive the vendor code from the service company and share it with residents.
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="faq-2" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
+            <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-2">
+              Can I access the portal from my phone?
+            </AccordionTrigger>
+            <AccordionContent className="text-base text-muted-foreground pb-4">
+              Yes. The portal works on any device with internet access: phone, tablet, or computer.
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="faq-3" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
+            <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-3">
+              What if I move to a different unit in the same building?
+            </AccordionTrigger>
+            <AccordionContent className="text-base text-muted-foreground pb-4">
+              Update your unit number in your account settings. Your strata plan number stays the same.
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="faq-4" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
+            <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-4">
+              What if I move to a different building?
+            </AccordionTrigger>
+            <AccordionContent className="text-base text-muted-foreground pb-4">
+              Update both your strata plan number and unit number. Enter the new vendor's code when you receive it from your new building manager.
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="faq-5" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
+            <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-5">
+              Can other residents see my feedback?
+            </AccordionTrigger>
+            <AccordionContent className="text-base text-muted-foreground pb-4">
+              No. You can only see feedback you submitted. Building managers and the service company can see all feedback for the building, but other residents cannot.
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="faq-6" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
+            <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-6">
+              What happens if my feedback is closed but the issue persists?
+            </AccordionTrigger>
+            <AccordionContent className="text-base text-muted-foreground pb-4">
+              Only the company can reopen closed feedback. If you believe an issue wasn't fully resolved, contact your building manager or property manager with documented proof from the portal.
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="faq-7" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
+            <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-7">
+              Can I submit positive feedback?
+            </AccordionTrigger>
+            <AccordionContent className="text-base text-muted-foreground pb-4">
+              Absolutely. The system accepts all types of input: concerns, compliments, questions, and suggestions.
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="faq-8" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
+            <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-8">
+              How long do I have to submit feedback after work is done?
+            </AccordionTrigger>
+            <AccordionContent className="text-base text-muted-foreground pb-4">
+              Residents have 5 business days after project completion to submit feedback. This window allows time to notice issues while keeping the complaint period reasonable.
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="faq-9" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
+            <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-9">
+              Is my data secure?
+            </AccordionTrigger>
+            <AccordionContent className="text-base text-muted-foreground pb-4">
+              Yes. Your account uses encrypted passwords and secure sessions. Your feedback is private and visible only to you and authorized personnel.
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </section>
+
+      <Separator className="max-w-4xl mx-auto" />
+
+      {/* Get Started Section */}
+      <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto text-center">
+        <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          Your Building Is Already Using This System
+        </h2>
+        
+        <div className="space-y-4 text-base text-muted-foreground max-w-2xl mx-auto mb-8">
+          <p>
+            Your building's service company chose OnRopePro to improve communication with residents like you. They want to hear from you directly, not through three layers of phone calls.
+          </p>
+          <p>
+            Creating an account takes two minutes. Once you enter the vendor code from your building manager, you'll see active projects and have direct access to submit feedback.
+          </p>
+          <p className="font-medium text-foreground">
+            No more wondering. No more waiting. No more repeating yourself.
+          </p>
+        </div>
+        
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button size="lg" className="bg-[#0B64A3] hover:bg-[#0369A1] text-white" asChild>
+            <Link href="/register" data-testid="button-create-account">
+              Create Your Account
+              <ArrowRight className="ml-2 w-5 h-5" />
+            </Link>
+          </Button>
+        </div>
+        
+        <p className="text-base text-muted-foreground mt-4">
+          Already have an account? <Link href="/login" className="text-[#0B64A3] hover:underline font-medium" data-testid="link-login">Log In</Link>
+        </p>
+        <p className="text-base text-muted-foreground mt-2">
+          Need the vendor code? Contact your building manager or property manager.
+        </p>
+      </section>
+
       {/* Footer */}
-      <footer className="bg-slate-100 dark:bg-slate-900 py-8 px-4 mt-8">
-        <div className="max-w-6xl mx-auto text-center text-muted-foreground text-base">
-          <p>OnRopePro Resident Portal</p>
+      <footer className="py-8 px-6 border-t">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          <img src={onRopeProLogo} alt="OnRopePro" className="h-10 object-contain" />
+          <p className="text-sm text-muted-foreground">
+            © 2024 OnRopePro. All rights reserved.
+          </p>
         </div>
       </footer>
     </div>

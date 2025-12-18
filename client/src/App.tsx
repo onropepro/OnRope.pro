@@ -134,7 +134,7 @@ function Router() {
       <Route path="/register" component={Register} />
       <Route path="/login" component={Login} />
       <Route path="/employer" component={Employer} />
-      <Route path="/for-residents" component={ResidentLanding} />
+      <Route path="/resident" component={ResidentLanding} />
       <Route path="/pricing" component={GetLicense} />
       <Route path="/get-license" component={GetLicense} />
       <Route path="/complete-registration" component={CompleteRegistration} />

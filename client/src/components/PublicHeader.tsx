@@ -51,7 +51,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
     { id: "employer", label: "Employer", href: "/employer" },
     { id: "technician", label: "Technician", href: "/technician-login" },
     { id: "property-manager", label: "Property Manager", href: "/property-manager" },
-    { id: "resident", label: "Resident", href: "/for-residents" },
+    { id: "resident", label: "Resident", href: "/resident" },
     { id: "building-manager", label: "Building Manager", href: "/building-portal" },
   ];
 
