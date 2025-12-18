@@ -4018,6 +4018,13 @@
       "description": "Toutes les opérations d'accès sur corde doivent être conformes au Code de pratique international IRATA / SPRAT / SPRAT pour l'accès sur corde industriel (TC-102ENG). Ce document décrit les exigences de sécurité obligatoires, les procédures techniques et les meilleures pratiques pour les travaux d'accès sur corde.",
       "downloadDocument": "Télécharger le document officiel ICOP",
       "viewInfo": "Voir les informations ICOP IRATA / SPRAT"
+    },
+    "selectEntireKit": "Sélectionner tout le kit",
+    "inspectAllItems": "Inspecter les {{count}} éléments en une fois",
+    "orSelectIndividual": "ou sélectionner des éléments individuels",
+    "kitMode": {
+      "title": "Mode d'inspection du kit",
+      "description": "Les {{count}} éléments seront inspectés ensemble"
     }
   },
   "incidentReport": {
