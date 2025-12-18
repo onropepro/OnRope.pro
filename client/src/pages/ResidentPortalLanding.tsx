@@ -271,10 +271,10 @@ export default function ResidentPortalLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Who Benefits From This Module
+            {t('modules.residentPortal.benefits.title', 'Who Benefits From This Module')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-            Five stakeholder types. Five different problems solved. One unified system.
+            {t('modules.residentPortal.benefits.subtitle', 'Five stakeholder types. Five different problems solved. One unified system.')}
           </p>
 
           <div className="space-y-8">
@@ -285,22 +285,22 @@ export default function ResidentPortalLanding() {
                   <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
                     <Briefcase className="w-5 h-5 text-blue-600" />
                   </div>
-                  <CardTitle className="text-xl">For Employers (Company Owners)</CardTitle>
+                  <CardTitle className="text-xl">{t('modules.residentPortal.benefits.employers.title', 'For Employers (Company Owners)')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-6 space-y-4">
                 <div className="grid md:grid-cols-3 gap-6">
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Eliminate return visits that cost half a day.</h4>
-                    <p className="text-base text-muted-foreground">When complaints come in a week after the job, you're sending someone back. Real-time feedback means issues get addressed while crews are still on-site. One prevented return visit per month pays for the entire system.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.residentPortal.benefits.employers.benefit1Title', 'Eliminate return visits that cost half a day.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.residentPortal.benefits.employers.benefit1Desc', 'When complaints come in a week after the job, you\'re sending someone back. Real-time feedback means issues get addressed while crews are still on-site. One prevented return visit per month pays for the entire system.')}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Win contracts by demonstrating operational excellence.</h4>
-                    <p className="text-base text-muted-foreground">When a property manager compares your bid against a competitor, show them your resolution time metrics. You handle feedback systematically. They rely on phone calls and emails. The choice becomes obvious.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.residentPortal.benefits.employers.benefit2Title', 'Win contracts by demonstrating operational excellence.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.residentPortal.benefits.employers.benefit2Desc', 'When a property manager compares your bid against a competitor, show them your resolution time metrics. You handle feedback systematically. They rely on phone calls and emails. The choice becomes obvious.')}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Stop drowning in complaint phone calls.</h4>
-                    <p className="text-base text-muted-foreground">Every complaint phone call interrupts work, requires documentation, and needs follow-up. The mental load of tracking dozens of open issues across multiple buildings disappears when the system organizes everything automatically.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.residentPortal.benefits.employers.benefit3Title', 'Stop drowning in complaint phone calls.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.residentPortal.benefits.employers.benefit3Desc', 'Every complaint phone call interrupts work, requires documentation, and needs follow-up. The mental load of tracking dozens of open issues across multiple buildings disappears when the system organizes everything automatically.')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -313,22 +313,22 @@ export default function ResidentPortalLanding() {
                   <div className="w-10 h-10 rounded-lg bg-sky-100 dark:bg-sky-900 flex items-center justify-center">
                     <ClipboardList className="w-5 h-5 text-sky-600" />
                   </div>
-                  <CardTitle className="text-xl">For Operations Managers</CardTitle>
+                  <CardTitle className="text-xl">{t('modules.residentPortal.benefits.operations.title', 'For Operations Managers')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-6 space-y-4">
                 <div className="grid md:grid-cols-3 gap-6">
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">See all open issues per building in one view.</h4>
-                    <p className="text-base text-muted-foreground">Five complaints come in for Building A on Monday, three more on Wednesday. Batch your deficiency visits efficiently because you can see what's open and where without reconstructing it from emails and voicemails.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.residentPortal.benefits.operations.benefit1Title', 'See all open issues per building in one view.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.residentPortal.benefits.operations.benefit1Desc', 'Five complaints come in for Building A on Monday, three more on Wednesday. Batch your deficiency visits efficiently because you can see what\'s open and where without reconstructing it from emails and voicemails.')}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Prove you did the work.</h4>
-                    <p className="text-base text-muted-foreground">A resident claims their window was never cleaned. Without documentation, you redo the work. With photo evidence, timestamps, and internal notes documenting investigation findings, you resolve disputes definitively.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.residentPortal.benefits.operations.benefit2Title', 'Prove you did the work.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.residentPortal.benefits.operations.benefit2Desc', 'A resident claims their window was never cleaned. Without documentation, you redo the work. With photo evidence, timestamps, and internal notes documenting investigation findings, you resolve disputes definitively.')}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Coordinate without exposing sensitive discussions.</h4>
-                    <p className="text-base text-muted-foreground">Internal notes let you write "check if this is from the previous contractor" or "dirt is on the inside, document for liability" without the resident seeing it. Clear toggle prevents accidental visibility.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.residentPortal.benefits.operations.benefit3Title', 'Coordinate without exposing sensitive discussions.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.residentPortal.benefits.operations.benefit3Desc', 'Internal notes let you write "check if this is from the previous contractor" or "dirt is on the inside, document for liability" without the resident seeing it. Clear toggle prevents accidental visibility.')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -341,18 +341,18 @@ export default function ResidentPortalLanding() {
                   <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center">
                     <HardHat className="w-5 h-5 text-amber-600" />
                   </div>
-                  <CardTitle className="text-xl">For Technicians</CardTitle>
+                  <CardTitle className="text-xl">{t('modules.residentPortal.benefits.technicians.title', 'For Technicians')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-6 space-y-4">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Get feedback while you're still on the building.</h4>
-                    <p className="text-base text-muted-foreground">You finish the west elevation on Tuesday. On Friday, a complaint comes in. Without the portal, you're context-switching back to a building you thought was complete. With real-time feedback, you address issues same-day while the work is fresh and equipment is deployed.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.residentPortal.benefits.technicians.benefit1Title', 'Get feedback while you\'re still on the building.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.residentPortal.benefits.technicians.benefit1Desc', 'You finish the west elevation on Tuesday. On Friday, a complaint comes in. Without the portal, you\'re context-switching back to a building you thought was complete. With real-time feedback, you address issues same-day while the work is fresh and equipment is deployed.')}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Stop getting blamed for things outside your control.</h4>
-                    <p className="text-base text-muted-foreground">The resident on the floor above watered their plants and dripped onto the window. Without documentation, you look incompetent. Internal notes let you document what actually happened, protecting your professional reputation.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.residentPortal.benefits.technicians.benefit2Title', 'Stop getting blamed for things outside your control.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.residentPortal.benefits.technicians.benefit2Desc', 'The resident on the floor above watered their plants and dripped onto the window. Without documentation, you look incompetent. Internal notes let you document what actually happened, protecting your professional reputation.')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -365,22 +365,22 @@ export default function ResidentPortalLanding() {
                   <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center">
                     <Users className="w-5 h-5 text-emerald-600" />
                   </div>
-                  <CardTitle className="text-xl">For Property Managers</CardTitle>
+                  <CardTitle className="text-xl">{t('modules.residentPortal.benefits.propertyManagers.title', 'For Property Managers')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-6 space-y-4">
                 <div className="grid md:grid-cols-3 gap-6">
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Get out of the middle.</h4>
-                    <p className="text-base text-muted-foreground">When residents have issues, they call you. You call the vendor. You wait. You call the resident back. The resident portal removes you from the communication loop while maintaining complete visibility into every conversation.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.residentPortal.benefits.propertyManagers.benefit1Title', 'Get out of the middle.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.residentPortal.benefits.propertyManagers.benefit1Desc', 'When residents have issues, they call you. You call the vendor. You wait. You call the resident back. The resident portal removes you from the communication loop while maintaining complete visibility into every conversation.')}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Evaluate vendor responsiveness with actual data.</h4>
-                    <p className="text-base text-muted-foreground">When contract renewal comes, you have objective metrics. Average response time. Resolution time. You make data-driven decisions instead of relying on gut feel and scattered complaints.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.residentPortal.benefits.propertyManagers.benefit2Title', 'Evaluate vendor responsiveness with actual data.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.residentPortal.benefits.propertyManagers.benefit2Desc', 'When contract renewal comes, you have objective metrics. Average response time. Resolution time. You make data-driven decisions instead of relying on gut feel and scattered complaints.')}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">See the full context when escalations happen.</h4>
-                    <p className="text-base text-muted-foreground">A resident insists their window wasn't cleaned. The vendor insists it was. When the resident escalates to you, view the complete feedback history including all messages, timestamps, and status changes.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.residentPortal.benefits.propertyManagers.benefit3Title', 'See the full context when escalations happen.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.residentPortal.benefits.propertyManagers.benefit3Desc', 'A resident insists their window wasn\'t cleaned. The vendor insists it was. When the resident escalates to you, view the complete feedback history including all messages, timestamps, and status changes.')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -393,22 +393,22 @@ export default function ResidentPortalLanding() {
                   <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center">
                     <Home className="w-5 h-5 text-rose-600" />
                   </div>
-                  <CardTitle className="text-xl">For Building Residents</CardTitle>
+                  <CardTitle className="text-xl">{t('modules.residentPortal.benefits.residents.title', 'For Building Residents')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-6 space-y-4">
                 <div className="grid md:grid-cols-3 gap-6">
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Know your complaint was received and when it was seen.</h4>
-                    <p className="text-base text-muted-foreground">Every submission is logged with a timestamp. You see the exact date and time when the company first opened your feedback. No more wondering if your email got lost.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.residentPortal.benefits.residents.benefit1Title', 'Know your complaint was received and when it was seen.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.residentPortal.benefits.residents.benefit1Desc', 'Every submission is logged with a timestamp. You see the exact date and time when the company first opened your feedback. No more wondering if your email got lost.')}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Submit once, with photos, and you're done.</h4>
-                    <p className="text-base text-muted-foreground">Describe your issue, attach a photo, submit. Your name, unit number, and phone auto-fill. No repeating yourself to the property manager, then the vendor, then the technician.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.residentPortal.benefits.residents.benefit2Title', 'Submit once, with photos, and you\'re done.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.residentPortal.benefits.residents.benefit2Desc', 'Describe your issue, attach a photo, submit. Your name, unit number, and phone auto-fill. No repeating yourself to the property manager, then the vendor, then the technician.')}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Check project progress before asking "are you done yet?"</h4>
-                    <p className="text-base text-muted-foreground">See which side of the building crews are working on. If they haven't reached the north side yet, you'll know before calling to complain about your north-facing window.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.residentPortal.benefits.residents.benefit3Title', 'Check project progress before asking "are you done yet?"')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.residentPortal.benefits.residents.benefit3Desc', 'See which side of the building crews are working on. If they haven\'t reached the north side yet, you\'ll know before calling to complain about your north-facing window.')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -424,10 +424,10 @@ export default function ResidentPortalLanding() {
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 flex items-center justify-center gap-2">
             <Sparkles className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-            Key Features
+            {t('modules.residentPortal.keyFeatures.title', 'Key Features')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-            Every feature exists because Tommy tracked complaints in a notebook, sometimes on his hand while driving.
+            {t('modules.residentPortal.keyFeatures.subtitle', 'Every feature exists because Tommy tracked complaints in a notebook, sometimes on his hand while driving.')}
           </p>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -438,9 +438,9 @@ export default function ResidentPortalLanding() {
                     <Eye className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Viewed Timestamp Visibility</h3>
+                    <h3 className="font-semibold">{t('modules.residentPortal.keyFeatures.viewedTimestamp.title', 'Viewed Timestamp Visibility')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      Residents see exactly when their feedback was first opened by your company. No more "I didn't see it" excuses. If someone on your team opened it, there's a timestamp proving it.
+                      {t('modules.residentPortal.keyFeatures.viewedTimestamp.description', 'Residents see exactly when their feedback was first opened by your company. No more "I didn\'t see it" excuses. If someone on your team opened it, there\'s a timestamp proving it.')}
                     </p>
                   </div>
                 </div>
@@ -454,9 +454,9 @@ export default function ResidentPortalLanding() {
                     <Camera className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Photo Evidence Upload</h3>
+                    <h3 className="font-semibold">{t('modules.residentPortal.keyFeatures.photoEvidence.title', 'Photo Evidence Upload')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      Residents attach photos directly to their feedback. No more email threads asking for documentation. When a resident reports a water stain, you have the photo immediately.
+                      {t('modules.residentPortal.keyFeatures.photoEvidence.description', 'Residents attach photos directly to their feedback. No more email threads asking for documentation. When a resident reports a water stain, you have the photo immediately.')}
                     </p>
                   </div>
                 </div>
@@ -470,9 +470,9 @@ export default function ResidentPortalLanding() {
                     <MessageCircle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Internal Notes System</h3>
+                    <h3 className="font-semibold">{t('modules.residentPortal.keyFeatures.internalNotes.title', 'Internal Notes System')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      Staff coordinate privately without exposing sensitive discussions to residents. The yellow/red checkbox toggle makes it explicit when a reply will be visible to the resident.
+                      {t('modules.residentPortal.keyFeatures.internalNotes.description', 'Staff coordinate privately without exposing sensitive discussions to residents. The yellow/red checkbox toggle makes it explicit when a reply will be visible to the resident.')}
                     </p>
                   </div>
                 </div>
@@ -486,9 +486,9 @@ export default function ResidentPortalLanding() {
                     <Globe className="w-5 h-5 text-violet-600 dark:text-violet-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Portable Resident Accounts</h3>
+                    <h3 className="font-semibold">{t('modules.residentPortal.keyFeatures.portableAccounts.title', 'Portable Resident Accounts')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      When a resident moves from Toronto to Chicago, they keep their OnRopePro account. They update their Strata/LMS number and enter the new vendor's code. If their new building's vendor doesn't use OnRopePro, they notice.
+                      {t('modules.residentPortal.keyFeatures.portableAccounts.description', 'When a resident moves from Toronto to Chicago, they keep their OnRopePro account. They update their Strata/LMS number and enter the new vendor\'s code. If their new building\'s vendor doesn\'t use OnRopePro, they notice.')}
                     </p>
                   </div>
                 </div>
@@ -502,9 +502,9 @@ export default function ResidentPortalLanding() {
                     <Clock className="w-5 h-5 text-rose-600 dark:text-rose-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Resolution Time Metrics</h3>
+                    <h3 className="font-semibold">{t('modules.residentPortal.keyFeatures.resolutionMetrics.title', 'Resolution Time Metrics')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      The system calculates average response and resolution times automatically. Property managers see this data when evaluating vendors. Your resolution time becomes part of your competitive advantage.
+                      {t('modules.residentPortal.keyFeatures.resolutionMetrics.description', 'The system calculates average response and resolution times automatically. Property managers see this data when evaluating vendors. Your resolution time becomes part of your competitive advantage.')}
                     </p>
                   </div>
                 </div>
@@ -518,9 +518,9 @@ export default function ResidentPortalLanding() {
                     <TrendingUp className="w-5 h-5 text-sky-600 dark:text-sky-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Real-Time Progress Tracking</h3>
+                    <h3 className="font-semibold">{t('modules.residentPortal.keyFeatures.progressTracking.title', 'Real-Time Progress Tracking')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      Residents view which elevation is being worked on and overall completion percentage. They self-serve status information instead of calling to ask "when will you do my window?"
+                      {t('modules.residentPortal.keyFeatures.progressTracking.description', 'Residents view which elevation is being worked on and overall completion percentage. They self-serve status information instead of calling to ask "when will you do my window?"')}
                     </p>
                   </div>
                 </div>
@@ -536,10 +536,10 @@ export default function ResidentPortalLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Measurable Results
+            {t('modules.residentPortal.results.title', 'Measurable Results')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-            Concrete savings you'll see from day one.
+            {t('modules.residentPortal.results.subtitle', 'Concrete savings you\'ll see from day one.')}
           </p>
 
           <div className="grid md:grid-cols-2 gap-6">
@@ -551,9 +551,9 @@ export default function ResidentPortalLanding() {
                     <DollarSign className="w-6 h-6 text-emerald-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg mb-2">Eliminated Return Visits</h3>
+                    <h3 className="font-semibold text-lg mb-2">{t('modules.residentPortal.results.returnVisits.title', 'Eliminated Return Visits')}</h3>
                     <p className="text-base text-muted-foreground">
-                      Average cost of a deficiency return visit: $200-400 (half-day labor + travel). Real-time feedback prevents 2-5 return visits per month. <strong className="text-foreground">Annual savings: $4,800-24,000.</strong>
+                      {t('modules.residentPortal.results.returnVisits.description', 'Average cost of a deficiency return visit: $200-400 (half-day labor + travel). Real-time feedback prevents 2-5 return visits per month.')}{' '}<strong className="text-foreground">{t('modules.residentPortal.results.returnVisits.savings', 'Annual savings: $4,800-24,000.')}</strong>
                     </p>
                   </div>
                 </div>
@@ -568,9 +568,9 @@ export default function ResidentPortalLanding() {
                     <Phone className="w-6 h-6 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg mb-2">Reduced Phone Time</h3>
+                    <h3 className="font-semibold text-lg mb-2">{t('modules.residentPortal.results.phoneTime.title', 'Reduced Phone Time')}</h3>
                     <p className="text-base text-muted-foreground">
-                      Average time per complaint phone call: 10-15 minutes. Average complaints per busy month: 50-100. <strong className="text-foreground">Monthly savings: $400-1,250 in recovered operations manager time.</strong>
+                      {t('modules.residentPortal.results.phoneTime.description', 'Average time per complaint phone call: 10-15 minutes. Average complaints per busy month: 50-100.')}{' '}<strong className="text-foreground">{t('modules.residentPortal.results.phoneTime.savings', 'Monthly savings: $400-1,250 in recovered operations manager time.')}</strong>
                     </p>
                   </div>
                 </div>
@@ -585,9 +585,9 @@ export default function ResidentPortalLanding() {
                     <Award className="w-6 h-6 text-amber-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg mb-2">Contract Retention</h3>
+                    <h3 className="font-semibold text-lg mb-2">{t('modules.residentPortal.results.retention.title', 'Contract Retention')}</h3>
                     <p className="text-base text-muted-foreground">
-                      Property managers choose vendors who reduce their workload. The Resident Portal demonstrably removes property managers from the complaint loop. Renewal conversations become easier when you've made their job simpler all year.
+                      {t('modules.residentPortal.results.retention.description', 'Property managers choose vendors who reduce their workload. The Resident Portal demonstrably removes property managers from the complaint loop. Renewal conversations become easier when you\'ve made their job simpler all year.')}
                     </p>
                   </div>
                 </div>
@@ -602,9 +602,9 @@ export default function ResidentPortalLanding() {
                     <Zap className="w-6 h-6 text-violet-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg mb-2">Competitive Differentiation</h3>
+                    <h3 className="font-semibold text-lg mb-2">{t('modules.residentPortal.results.differentiation.title', 'Competitive Differentiation')}</h3>
                     <p className="text-base text-muted-foreground">
-                      During bid presentations, demonstrating the resident portal and resolution time metrics separates your company from competitors managing complaints via phone and email. You show a system. They describe a process. Systems win.
+                      {t('modules.residentPortal.results.differentiation.description', 'During bid presentations, demonstrating the resident portal and resolution time metrics separates your company from competitors managing complaints via phone and email. You show a system. They describe a process. Systems win.')}
                     </p>
                   </div>
                 </div>
@@ -620,10 +620,10 @@ export default function ResidentPortalLanding() {
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Other Modules This Module Communicates With
+            {t('modules.residentPortal.integration.title', 'Other Modules This Module Communicates With')}
           </h2>
           <p className="text-center text-muted-foreground mb-12 max-w-3xl mx-auto">
-            The Resident Portal connects to other OnRopePro modules to create a unified operations system.
+            {t('modules.residentPortal.integration.subtitle', 'The Resident Portal connects to other OnRopePro modules to create a unified operations system.')}
           </p>
 
           <div className="grid md:grid-cols-2 gap-6">
@@ -634,9 +634,9 @@ export default function ResidentPortalLanding() {
                     <Briefcase className="w-5 h-5 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Project Management Module</h3>
+                    <h3 className="font-semibold">{t('modules.residentPortal.integration.projectManagement.title', 'Project Management Module')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      Feedback ties to specific projects. Residents see project progress including which elevation is being worked and completion percentage. When a project completes, residents have 5 business days to submit feedback.
+                      {t('modules.residentPortal.integration.projectManagement.description', 'Feedback ties to specific projects. Residents see project progress including which elevation is being worked and completion percentage. When a project completes, residents have 5 business days to submit feedback.')}
                     </p>
                   </div>
                 </div>
@@ -650,9 +650,9 @@ export default function ResidentPortalLanding() {
                     <Shield className="w-5 h-5 text-emerald-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Company Safety Rating (CSR) Module</h3>
+                    <h3 className="font-semibold">{t('modules.residentPortal.integration.csr.title', 'Company Safety Rating (CSR) Module')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      Resolution time metrics factor into your overall rating alongside safety data. Property managers see CSR and feedback metrics together when evaluating vendors. Responsive complaint handling improves your competitive positioning.
+                      {t('modules.residentPortal.integration.csr.description', 'Resolution time metrics factor into your overall rating alongside safety data. Property managers see CSR and feedback metrics together when evaluating vendors. Responsive complaint handling improves your competitive positioning.')}
                     </p>
                   </div>
                 </div>
@@ -666,9 +666,9 @@ export default function ResidentPortalLanding() {
                     <Palette className="w-5 h-5 text-violet-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">White-Label Branding Module</h3>
+                    <h3 className="font-semibold">{t('modules.residentPortal.integration.whiteLabel.title', 'White-Label Branding Module')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      The resident portal displays your company branding when the white-label module is active. Notices and communications show your company identity. Professional appearance for every resident interaction.
+                      {t('modules.residentPortal.integration.whiteLabel.description', 'The resident portal displays your company branding when the white-label module is active. Notices and communications show your company identity. Professional appearance for every resident interaction.')}
                     </p>
                   </div>
                 </div>
@@ -682,9 +682,9 @@ export default function ResidentPortalLanding() {
                     <Users className="w-5 h-5 text-amber-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Employee Management Module</h3>
+                    <h3 className="font-semibold">{t('modules.residentPortal.integration.employeeManagement.title', 'Employee Management Module')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      Staff are assigned permissions to respond to feedback. As the system evolves, performance could be tracked by response quality, creating accountability at the individual level.
+                      {t('modules.residentPortal.integration.employeeManagement.description', 'Staff are assigned permissions to respond to feedback. As the system evolves, performance could be tracked by response quality, creating accountability at the individual level.')}
                     </p>
                   </div>
                 </div>
@@ -700,26 +700,26 @@ export default function ResidentPortalLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
-            Stop Managing Complaints. Start Managing Growth.
+            {t('modules.residentPortal.impact.title', 'Stop Managing Complaints. Start Managing Growth.')}
           </h2>
           
           <Card className="border-slate-200 dark:border-slate-800">
             <CardContent className="p-6 md:p-8 space-y-4 text-muted-foreground">
               <p>
-                Right now, complaint management looks like this: A phone call interrupts your day. You grab whatever's handy to write it down. You promise to follow up. You add it to the mental list of things that need attention. Multiply that by 50 buildings during busy season and you're drowning in administrative work that produces nothing.
+                {t('modules.residentPortal.impact.paragraph1', 'Right now, complaint management looks like this: A phone call interrupts your day. You grab whatever\'s handy to write it down. You promise to follow up. You add it to the mental list of things that need attention. Multiply that by 50 buildings during busy season and you\'re drowning in administrative work that produces nothing.')}
               </p>
               <p>
-                The notebook Tommy used to track complaints still has pages with chicken scratch from phone calls taken while driving. The Google Form helped but created a new problem: sorting 30 submissions from 5 different buildings, then calling each resident individually. The complaint management "system" was whatever got written down that day.
+                {t('modules.residentPortal.impact.paragraph2', 'The notebook Tommy used to track complaints still has pages with chicken scratch from phone calls taken while driving. The Google Form helped but created a new problem: sorting 30 submissions from 5 different buildings, then calling each resident individually. The complaint management "system" was whatever got written down that day.')}
               </p>
               <Separator className="my-6" />
               <p className="font-medium text-foreground">
-                With the Resident Portal, feedback organizes itself.
+                {t('modules.residentPortal.impact.paragraph3', 'With the Resident Portal, feedback organizes itself.')}
               </p>
               <p>
-                By building. By project. With photos attached. With timestamps proving when it was seen. With resolution metrics calculating automatically. The chaos becomes a dashboard. The half-day return visits become same-day fixes. The phone calls become notifications you handle on your schedule.
+                {t('modules.residentPortal.impact.paragraph4', 'By building. By project. With photos attached. With timestamps proving when it was seen. With resolution metrics calculating automatically. The chaos becomes a dashboard. The half-day return visits become same-day fixes. The phone calls become notifications you handle on your schedule.')}
               </p>
               <p className="font-medium text-foreground text-lg">
-                What do you do with the hours you get back? Train your crews. Bid on new contracts. Take the call that actually grows your business. The complaint management that used to consume your operations manager's week becomes a check-the-dashboard morning routine.
+                {t('modules.residentPortal.impact.paragraph5', 'What do you do with the hours you get back? Train your crews. Bid on new contracts. Take the call that actually grows your business. The complaint management that used to consume your operations manager\'s week becomes a check-the-dashboard morning routine.')}
               </p>
             </CardContent>
           </Card>
@@ -732,100 +732,100 @@ export default function ResidentPortalLanding() {
       <section id="faqs" className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Frequently Asked Questions
+            {t('modules.residentPortal.faqs.title', 'Frequently Asked Questions')}
           </h2>
           <p className="text-center text-muted-foreground mb-12">
-            Common questions about the Resident Portal.
+            {t('modules.residentPortal.faqs.subtitle', 'Common questions about the Resident Portal.')}
           </p>
 
           <Accordion type="single" collapsible className="space-y-4">
             <AccordionItem value="faq-1" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4 text-left">
-                Can residents see other residents' complaints?
+                {t('modules.residentPortal.faqs.q1.question', 'Can residents see other residents\' complaints?')}
               </AccordionTrigger>
               <AccordionContent className="pb-4 text-muted-foreground">
-                No. Residents can only view and interact with their own feedback submissions. Privacy is protected by design.
+                {t('modules.residentPortal.faqs.q1.answer', 'No. Residents can only view and interact with their own feedback submissions. Privacy is protected by design.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-2" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4 text-left">
-                What happens when a resident moves to a different building?
+                {t('modules.residentPortal.faqs.q2.question', 'What happens when a resident moves to a different building?')}
               </AccordionTrigger>
               <AccordionContent className="pb-4 text-muted-foreground">
-                They update their Strata/LMS number in their profile and enter the new vendor's code. Their account is fully portable. If the new building's vendor uses OnRopePro, they see that vendor's projects. If not, they notice the gap.
+                {t('modules.residentPortal.faqs.q2.answer', 'They update their Strata/LMS number in their profile and enter the new vendor\'s code. Their account is fully portable. If the new building\'s vendor uses OnRopePro, they see that vendor\'s projects. If not, they notice the gap.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-3" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4 text-left">
-                Can residents reopen closed feedback?
+                {t('modules.residentPortal.faqs.q3.question', 'Can residents reopen closed feedback?')}
               </AccordionTrigger>
               <AccordionContent className="pb-4 text-muted-foreground">
-                No. Only company staff can reopen closed feedback. If a resident believes the issue persists, they contact their property manager or building manager directly. This prevents endless back-and-forth on resolved issues.
+                {t('modules.residentPortal.faqs.q3.answer', 'No. Only company staff can reopen closed feedback. If a resident believes the issue persists, they contact their property manager or building manager directly. This prevents endless back-and-forth on resolved issues.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-4" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4 text-left">
-                Can property managers respond to resident feedback?
+                {t('modules.residentPortal.faqs.q4.question', 'Can property managers respond to resident feedback?')}
               </AccordionTrigger>
               <AccordionContent className="pb-4 text-muted-foreground">
-                No. Property managers can view all feedback and communication history but cannot respond. Only company staff communicate with residents through the system. This keeps property managers informed without requiring their involvement.
+                {t('modules.residentPortal.faqs.q4.answer', 'No. Property managers can view all feedback and communication history but cannot respond. Only company staff communicate with residents through the system. This keeps property managers informed without requiring their involvement.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-5" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4 text-left">
-                What's the difference between internal notes and visible replies?
+                {t('modules.residentPortal.faqs.q5.question', 'What\'s the difference between internal notes and visible replies?')}
               </AccordionTrigger>
               <AccordionContent className="pb-4 text-muted-foreground">
-                Internal notes are private (staff only) for coordination, investigation findings, and sensitive discussions. Visible replies are seen by the resident for acknowledgment, status updates, and resolution communication. Staff must explicitly toggle a yellow/red checkbox to make a reply visible, preventing accidental exposure.
+                {t('modules.residentPortal.faqs.q5.answer', 'Internal notes are private (staff only) for coordination, investigation findings, and sensitive discussions. Visible replies are seen by the resident for acknowledgment, status updates, and resolution communication. Staff must explicitly toggle a yellow/red checkbox to make a reply visible, preventing accidental exposure.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-6" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4 text-left">
-                How do residents get the vendor code?
+                {t('modules.residentPortal.faqs.q6.question', 'How do residents get the vendor code?')}
               </AccordionTrigger>
               <AccordionContent className="pb-4 text-muted-foreground">
-                The code is posted on notices in the elevator during projects, provided by the building manager, or included in project communications. One code per company, used for all buildings that company services.
+                {t('modules.residentPortal.faqs.q6.answer', 'The code is posted on notices in the elevator during projects, provided by the building manager, or included in project communications. One code per company, used for all buildings that company services.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-7" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4 text-left">
-                Is there one code per building or one code per company?
+                {t('modules.residentPortal.faqs.q7.question', 'Is there one code per building or one code per company?')}
               </AccordionTrigger>
               <AccordionContent className="pb-4 text-muted-foreground">
-                One code per company. All residents across all buildings serviced by that company use the same vendor code. The Strata/LMS number differentiates which building's projects they see.
+                {t('modules.residentPortal.faqs.q7.answer', 'One code per company. All residents across all buildings serviced by that company use the same vendor code. The Strata/LMS number differentiates which building\'s projects they see.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-8" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4 text-left">
-                How long do residents have to submit feedback after a project completes?
+                {t('modules.residentPortal.faqs.q8.question', 'How long do residents have to submit feedback after a project completes?')}
               </AccordionTrigger>
               <AccordionContent className="pb-4 text-muted-foreground">
-                5 business days. This allows time for residents to notice issues while limiting the complaint window to a reasonable period.
+                {t('modules.residentPortal.faqs.q8.answer', '5 business days. This allows time for residents to notice issues while limiting the complaint window to a reasonable period.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-9" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4 text-left">
-                What happens if feedback sits unread?
+                {t('modules.residentPortal.faqs.q9.question', 'What happens if feedback sits unread?')}
               </AccordionTrigger>
               <AccordionContent className="pb-4 text-muted-foreground">
-                Notification badges show pending items in your dashboard. The "Viewed" timestamp is visible to the resident, so they know if no one has opened their feedback. This creates natural accountability.
+                {t('modules.residentPortal.faqs.q9.answer', 'Notification badges show pending items in your dashboard. The "Viewed" timestamp is visible to the resident, so they know if no one has opened their feedback. This creates natural accountability.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-10" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4 text-left">
-                Do residents see when we add internal notes?
+                {t('modules.residentPortal.faqs.q10.question', 'Do residents see when we add internal notes?')}
               </AccordionTrigger>
               <AccordionContent className="pb-4 text-muted-foreground">
-                No. Internal notes are completely invisible to residents. They only see visible replies and status changes.
+                {t('modules.residentPortal.faqs.q10.answer', 'No. Internal notes are completely invisible to residents. They only see visible replies and status changes.')}
               </AccordionContent>
             </AccordionItem>
           </Accordion>
@@ -836,22 +836,22 @@ export default function ResidentPortalLanding() {
       <section className="py-16 md:py-20 px-4 text-white" style={{backgroundImage: 'linear-gradient(135deg, #0B64A3 0%, #0369A1 100%)'}}>
         <div className="max-w-3xl mx-auto text-center space-y-6">
           <h2 className="text-3xl md:text-4xl font-bold">
-            Ready to Eliminate Return Visits?
+            {t('modules.residentPortal.cta.title', 'Ready to Eliminate Return Visits?')}
           </h2>
           <p className="text-lg text-blue-100">
-            Set up your resident portal in under 10 minutes.<br />
-            Full access. No credit card. One prevented return visit pays for months of the system.
+            {t('modules.residentPortal.cta.description', 'Set up your resident portal in under 10 minutes.')}<br />
+            {t('modules.residentPortal.cta.descriptionLine2', 'Full access. No credit card. One prevented return visit pays for months of the system.')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
             <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-cta-trial">
               <Link href="/register">
-                Start Your 60-Day Trial
+                {t('modules.residentPortal.cta.ctaTrial', 'Start Your 60-Day Trial')}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>
             <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-cta-guide">
               <Link href="/changelog/resident-portal">
-                Read the Guide
+                {t('modules.residentPortal.cta.ctaGuide', 'Read the Guide')}
                 <BookOpen className="ml-2 w-5 h-5" />
               </Link>
             </Button>
@@ -864,14 +864,14 @@ export default function ResidentPortalLanding() {
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <img src={onRopeProLogo} alt="OnRopePro" className="h-8 object-contain" />
-            <span className="text-sm text-muted-foreground">Management Software for Rope Access</span>
+            <span className="text-sm text-muted-foreground">{t('modules.residentPortal.footer.tagline', 'Management Software for Rope Access')}</span>
           </div>
           <div className="flex items-center gap-6 text-sm text-muted-foreground">
             <Link href="/privacy" className="hover:text-foreground transition-colors" data-testid="link-footer-privacy">
-              Privacy Policy
+              {t('modules.residentPortal.footer.privacy', 'Privacy Policy')}
             </Link>
             <Link href="/terms" className="hover:text-foreground transition-colors" data-testid="link-footer-terms">
-              Terms of Service
+              {t('modules.residentPortal.footer.terms', 'Terms of Service')}
             </Link>
           </div>
         </div>

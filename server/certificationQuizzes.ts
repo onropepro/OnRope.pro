@@ -307,18 +307,18 @@ const spratLevel3QuizB: QuizQuestion[] = [
 
 // Export all quizzes
 export const certificationQuizzes: CertificationQuiz[] = [
-  { quizType: "irata_level_1_a", title: "IRATA Level 1 - Quiz A", level: 1, certification: "irata", questions: irataLevel1QuizA },
-  { quizType: "irata_level_1_b", title: "IRATA Level 1 - Quiz B", level: 1, certification: "irata", questions: irataLevel1QuizB },
-  { quizType: "irata_level_2_a", title: "IRATA Level 2 - Quiz A", level: 2, certification: "irata", questions: irataLevel2QuizA },
-  { quizType: "irata_level_2_b", title: "IRATA Level 2 - Quiz B", level: 2, certification: "irata", questions: irataLevel2QuizB },
-  { quizType: "irata_level_3_a", title: "IRATA Level 3 - Quiz A", level: 3, certification: "irata", questions: irataLevel3QuizA },
-  { quizType: "irata_level_3_b", title: "IRATA Level 3 - Quiz B", level: 3, certification: "irata", questions: irataLevel3QuizB },
-  { quizType: "sprat_level_1_a", title: "SPRAT Level 1 - Quiz A", level: 1, certification: "sprat", questions: spratLevel1QuizA },
-  { quizType: "sprat_level_1_b", title: "SPRAT Level 1 - Quiz B", level: 1, certification: "sprat", questions: spratLevel1QuizB },
-  { quizType: "sprat_level_2_a", title: "SPRAT Level 2 - Quiz A", level: 2, certification: "sprat", questions: spratLevel2QuizA },
-  { quizType: "sprat_level_2_b", title: "SPRAT Level 2 - Quiz B", level: 2, certification: "sprat", questions: spratLevel2QuizB },
-  { quizType: "sprat_level_3_a", title: "SPRAT Level 3 - Quiz A", level: 3, certification: "sprat", questions: spratLevel3QuizA },
-  { quizType: "sprat_level_3_b", title: "SPRAT Level 3 - Quiz B", level: 3, certification: "sprat", questions: spratLevel3QuizB },
+  { quizType: "irata_level_1_a", title: "Rope Access Knowledge Quiz - Level 1 (Set A)", level: 1, certification: "irata", questions: irataLevel1QuizA },
+  { quizType: "irata_level_1_b", title: "Rope Access Knowledge Quiz - Level 1 (Set B)", level: 1, certification: "irata", questions: irataLevel1QuizB },
+  { quizType: "irata_level_2_a", title: "Rope Access Knowledge Quiz - Level 2 (Set A)", level: 2, certification: "irata", questions: irataLevel2QuizA },
+  { quizType: "irata_level_2_b", title: "Rope Access Knowledge Quiz - Level 2 (Set B)", level: 2, certification: "irata", questions: irataLevel2QuizB },
+  { quizType: "irata_level_3_a", title: "Rope Access Knowledge Quiz - Level 3 (Set A)", level: 3, certification: "irata", questions: irataLevel3QuizA },
+  { quizType: "irata_level_3_b", title: "Rope Access Knowledge Quiz - Level 3 (Set B)", level: 3, certification: "irata", questions: irataLevel3QuizB },
+  { quizType: "sprat_level_1_a", title: "Rope Access Knowledge Quiz - Level 1 (Set A)", level: 1, certification: "sprat", questions: spratLevel1QuizA },
+  { quizType: "sprat_level_1_b", title: "Rope Access Knowledge Quiz - Level 1 (Set B)", level: 1, certification: "sprat", questions: spratLevel1QuizB },
+  { quizType: "sprat_level_2_a", title: "Rope Access Knowledge Quiz - Level 2 (Set A)", level: 2, certification: "sprat", questions: spratLevel2QuizA },
+  { quizType: "sprat_level_2_b", title: "Rope Access Knowledge Quiz - Level 2 (Set B)", level: 2, certification: "sprat", questions: spratLevel2QuizB },
+  { quizType: "sprat_level_3_a", title: "Rope Access Knowledge Quiz - Level 3 (Set A)", level: 3, certification: "sprat", questions: spratLevel3QuizA },
+  { quizType: "sprat_level_3_b", title: "Rope Access Knowledge Quiz - Level 3 (Set B)", level: 3, certification: "sprat", questions: spratLevel3QuizB },
 ];
 
 // Helper function to get quizzes based on certification level

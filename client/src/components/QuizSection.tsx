@@ -292,11 +292,12 @@ export function QuizSection() {
         {certificationQuizzes.length > 0 && (
           <Card>
             <CardHeader>
+              <div className="text-xs text-muted-foreground mb-1">Aligned with IRATA & SPRAT training concepts</div>
               <CardTitle className="flex items-center gap-2">
                 <GraduationCap className="h-5 w-5 text-blue-600" />
-                Certification Practice Quizzes
+                Rope Access Knowledge Quizzes
               </CardTitle>
-              <CardDescription>Test your IRATA/SPRAT knowledge with practice quizzes</CardDescription>
+              <CardDescription>Test your rope access knowledge with practice quizzes</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid gap-4">
