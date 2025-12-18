@@ -319,6 +319,14 @@
       "technicianJobBoard": {
         "title": "Bolsa de Trabajo para Tecnicos",
         "description": "Busqueda de empleo, perfil de visibilidad"
+      },
+      "workSession": {
+        "title": "Sesion de Trabajo",
+        "description": "Seguimiento de entrada/salida con GPS"
+      },
+      "scheduling": {
+        "title": "Programacion",
+        "description": "Sistema de calendario y asignaciones"
       }
     },
     "dashboard": "Panel",
@@ -5095,19 +5103,27 @@
         "titleLine3": "Que tal si vieran la tuya?",
         "description": "Logotipo personalizado, colores y marca que hacen que la plataforma se vea como tuya.",
         "ctaTrial": "Comienza tu prueba gratuita de 60 dias",
-        "ctaFaq": "Encontrar respuestas"
+        "ctaFaq": "Encontrar respuestas",
+        "tagline": "Tu marca. Tu plataforma. Tu exito.",
+        "ctaFaqs": "Ver Preguntas Frecuentes"
       },
       "stats": {
         "brandCustomization": "Personalizacion de marca",
         "clientImpression": "Impresion del cliente",
         "professionalImage": "Imagen profesional",
-        "brandConsistency": "Consistencia de marca"
+        "brandConsistency": "Consistencia de marca",
+        "touchpoints": "Puntos de Contacto",
+        "winRate": "Tasa de Exito",
+        "adoption": "Adopcion",
+        "setup": "Configuracion"
       },
       "problem": {
         "title": "La marca que no es tuya",
         "paragraph1": "Cada correo electronico que tus clientes reciben dice OnRopePro. Cada portal que usan muestra nuestro logotipo.",
         "paragraph2": "Eso funciona para la mayoria de las empresas. Pero si has construido una marca que importa a tus clientes, quieres que la vean.",
-        "paragraph3": "La marca blanca pone tu logotipo, tus colores y tu nombre donde los clientes interactuan con el sistema."
+        "paragraph3": "La marca blanca pone tu logotipo, tus colores y tu nombre donde los clientes interactuan con el sistema.",
+        "intro": "Tus clientes ven software generico",
+        "solution": "Muestra tu marca profesional en cada interaccion"
       },
       "features": {
         "title": "Lo que hace este modulo",
@@ -5233,24 +5249,41 @@
         "titleLine3": "que nunca volveras a encontrar?",
         "description": "Cada edificio, cada cliente, cada trabajo en un solo lugar. Busca por direccion, filtra por estado, exporta cuando lo necesites.",
         "ctaTrial": "Comienza tu prueba gratuita de 60 dias",
-        "ctaFaq": "Encontrar respuestas"
+        "ctaFaq": "Encontrar respuestas",
+        "title": "Gestion de Proyectos",
+        "titleHighlight": "Simplificada",
+        "descriptionStrong": "seguimiento en tiempo real",
+        "ctaAnswers": "Obtener Respuestas"
       },
       "stats": {
         "projectsManaged": "Proyectos gestionados",
         "buildingsTracked": "Edificios rastreados",
         "clientsServed": "Clientes atendidos",
-        "searchableRecords": "Registros buscables"
+        "searchableRecords": "Registros buscables",
+        "elevations": "Elevaciones",
+        "payrollErrors": "Errores de Nomina",
+        "statusCalls": "Llamadas de Estado",
+        "quotePrep": "Prep de Cotizacion"
       },
       "problem": {
         "title": "El cuaderno que nunca encuentras",
         "paragraph1": "Cada operador tiene uno. Ese cuaderno con la direccion de cada trabajo, la informacion de contacto de cada cliente, las notas sobre problemas de acceso.",
         "paragraph2": "A veces esta en el camion. A veces esta en casa. A veces esta perdido en algun lugar entre los dos.",
         "paragraph3": "Luego un cliente llama preguntando sobre un trabajo del ano pasado. Sabes que lo hiciste. No puedes probar nada de eso.",
-        "paragraph4": "OnRopePro lo mantiene todo en un solo lugar. Accesible desde cualquier dispositivo. Buscable por direccion, cliente o fecha. Tu historial de trabajo, organizado."
+        "paragraph4": "OnRopePro lo mantiene todo en un solo lugar. Accesible desde cualquier dispositivo. Buscable por direccion, cliente o fecha. Tu historial de trabajo, organizado.",
+        "juggling": "Malabarismo con hojas de calculo",
+        "guessing": "Adivinando el progreso",
+        "maybe": "Quiza completado?",
+        "siteVisits": "Visitas al sitio innecesarias",
+        "performance": "Sin metricas de rendimiento",
+        "exhausted": "Agotado por el papeleo"
       },
       "solution": {
         "title": "Gestion de proyectos para trabajo en alturas",
-        "subtitle": "Diseñado alrededor de como realmente funcionan los trabajos de acceso con cuerdas."
+        "subtitle": "Diseñado alrededor de como realmente funcionan los trabajos de acceso con cuerdas.",
+        "changes": "Los cambios se sincronizan instantaneamente",
+        "linked": "Todo vinculado automaticamente",
+        "cognitive": "Carga cognitiva reducida"
       },
       "features": {
         "title": "Lo que hace este modulo",
@@ -5265,7 +5298,37 @@
         },
         "progressTracking": {
           "title": "Seguimiento de progreso",
-          "description": "Rastrea gotas por elevacion, porcentaje completado, horas vs estimaciones. Ve donde van los trabajos."
+          "description": "Rastrea gotas por elevacion, porcentaje completado, horas vs estimaciones. Ve donde van los trabajos.",
+          "adapts": "Se adapta al tipo de trabajo",
+          "form": "Formulario inteligente",
+          "tracked": "Todo rastreado automaticamente",
+          "item1": "Descensos para limpieza de ventanas",
+          "item2": "Suites para ventilacion de secadora",
+          "item3": "Puestos para limpieza de estacionamiento",
+          "item4": "Horas para pintura e inspeccion"
+        },
+        "description": "Gestiona todos tus proyectos en un solo lugar",
+        "calendar": {
+          "title": "Vista de Calendario",
+          "description": "Visualiza todos los proyectos en el calendario",
+          "item1": "Arrastra y suelta para reprogramar",
+          "item2": "Codificacion de colores por estado",
+          "item3": "Deteccion de conflictos",
+          "once": "Configura una vez",
+          "sync": "Sincroniza con todos los calendarios",
+          "automated": "Notificaciones automatizadas",
+          "item4": "Programacion por turnos"
+        },
+        "documentation": {
+          "title": "Documentacion",
+          "description": "Registros digitales completos",
+          "item1": "Exportacion PDF profesional",
+          "item2": "Fotos de antes y despues",
+          "item3": "Registro de auditorias",
+          "live": "Actualizaciones en vivo",
+          "insurance": "Listo para seguros",
+          "linked": "Vinculado a proyectos",
+          "item4": "Firmas digitales"
         }
       },
       "benefits": {
@@ -6332,7 +6395,8 @@
         "title": "Complaints handled while your crews",
         "titleHighlight": "are still on the ropes.",
         "descriptionBold": "No more phone tag. No more return visits. No more notebooks.",
-        "ctaFaqs": "Find Answers"
+        "ctaFaqs": "Find Answers",
+        "ctaDemo": "Ver Demo"
       },
       "stats": {
         "feedbackCollected": "Comentarios recolectados",
@@ -6342,7 +6406,13 @@
         "returnVisits": "Return visits prevented/mo",
         "phoneSaved": "Phone time saved/mo",
         "resolution": "Avg resolution time",
-        "visibility": "Visibility maintained"
+        "visibility": "Visibility maintained",
+        "satisfactionValue": "95%",
+        "satisfactionLabel": "Satisfaccion del Residente",
+        "responseValue": "24h",
+        "responseLabel": "Tiempo de Respuesta",
+        "transparencyValue": "100%",
+        "transparencyLabel": "Transparencia"
       },
       "problem": {
         "title": "Los comentarios que nunca recibes",
@@ -6536,19 +6606,43 @@
         "titleLine3": "Ahora lo es.",
         "description": "Credenciales verificables, historial de trabajo y documentacion de seguridad que te siguen entre empleadores.",
         "ctaTrial": "Comienza tu prueba gratuita de 60 dias",
-        "ctaFaq": "Encontrar respuestas"
+        "ctaFaq": "Encontrar respuestas",
+        "title": "Pasaporte de Tecnico",
+        "titleHighlight": "Digital",
+        "descriptionBold": "credenciales verificables",
+        "seeHow": "Ver Como Funciona",
+        "startTrial": "Iniciar Prueba"
       },
       "stats": {
         "credentialsTracked": "Credenciales rastreadas",
         "employersConnected": "Empleadores conectados",
         "workHistory": "Historial de trabajo",
-        "portableProfile": "Perfil portatil"
+        "portableProfile": "Perfil portatil",
+        "onboardingValue": "90%",
+        "onboardingLabel": "Reduccion en Incorporacion",
+        "complianceValue": "100%",
+        "complianceLabel": "Cumplimiento de Certificacion",
+        "paperworkValue": "0",
+        "paperworkLabel": "Papeleo Perdido",
+        "timeSavedValue": "4h",
+        "timeSavedLabel": "Ahorradas Por Semana"
       },
       "problem": {
         "title": "El historial que dejas atras",
         "paragraph1": "Cada vez que cambias de empleador, empiezas de cero. Tu historial de trabajo, tu documentacion de seguridad, tu experiencia, todo queda atras.",
         "paragraph2": "Tu nuevo empleador no tiene idea de lo que has hecho. Tu viejo empleador no te dara una referencia.",
-        "paragraph3": "El Pasaporte del Tecnico de OnRopePro crea un perfil portatil. Tu historial te sigue. Tus credenciales se verifican. Tu experiencia se documenta."
+        "paragraph3": "El Pasaporte del Tecnico de OnRopePro crea un perfil portatil. Tu historial te sigue. Tus credenciales se verifican. Tu experiencia se documenta.",
+        "scattered": "Credenciales dispersas",
+        "expired": "Certificaciones vencidas",
+        "manual": "Verificacion manual",
+        "compliance": "Riesgos de cumplimiento",
+        "intro": "El problema con la gestion de credenciales de tecnicos",
+        "paperworkStarts": "El papeleo comienza desde el dia uno",
+        "paperworkDetails": "Cada tecnico trae pilas de documentos",
+        "burnedTime": "Horas perdidas organizando papeles",
+        "redundancy": "Verificacion redundante cada proyecto",
+        "solution": "El Pasaporte de Tecnico digitaliza todo",
+        "conclusion": "Un perfil verificado, acceso instantaneo"
       },
       "features": {
         "title": "Lo que hace este modulo",
@@ -6595,6 +6689,11 @@
         "title": "Listo para crear tu pasaporte?",
         "subtitle": "Construye tu identidad profesional portatil. Comienza gratis hoy.",
         "trialButton": "Crear perfil gratis"
+      },
+      "solution": {
+        "centralized": "Todas las credenciales en un lugar",
+        "automated": "Alertas de vencimiento automaticas",
+        "verified": "Verificacion instantanea"
       }
     },
     "employerJobBoard": {
@@ -6827,29 +6926,65 @@
     },
     "technicianJobBoard": {
       "hero": {
-        "badge": "Bolsa de Trabajo para Tecnicos",
-        "titleLine1": "Hay trabajos disponibles.",
-        "titleLine2": "Los empleadores buscan.",
-        "titleLine3": "Hazte visible.",
-        "description": "Navega oportunidades de empleo y permite que los empleadores vean tu perfil verificado.",
-        "ctaTrial": "Crear perfil gratuito",
-        "ctaFaq": "Encontrar respuestas"
+        "title": "Bolsa de Trabajo para Tecnicos",
+        "subtitle": "Encuentra Tu Proximo Trabajo en Cuerdas",
+        "descriptionBold": "empleos verificados",
+        "ctaPrimary": "Explorar Trabajos",
+        "ctaSecondary": "Publicar un Trabajo",
+        "badge": "Bolsa de Trabajo",
+        "description": "Conectate con empleadores de acceso en cuerdas en todo el mundo"
       },
       "stats": {
-        "jobsAvailable": "Empleos disponibles",
-        "employersSearching": "Empleadores buscando",
-        "profileViews": "Vistas de perfil",
-        "connectionsMade": "Conexiones hechas"
+        "applicationTime": "Tiempo de Aplicacion",
+        "relevantListings": "Listados Relevantes",
+        "immediateValue": "Valor Inmediato",
+        "searchTime": "Tiempo de Busqueda",
+        "upfrontValue": "Valor Por Adelantado",
+        "interviewAlignment": "Alineacion de Entrevista"
       },
       "problem": {
-        "title": "Las oportunidades que te pierdes",
-        "paragraph1": "Hay empresas contratando. Simplemente no sabes cuales o donde.",
-        "paragraph2": "Te enteras de trabajos a traves del boca a boca, dias o semanas despues de que fueron publicados.",
-        "paragraph3": "La Bolsa de Trabajo de OnRopePro te muestra oportunidades activas de empresas verificadas. Opta por hacer tu perfil visible y deja que los empleadores te encuentren."
+        "intro": "El problema con la busqueda de trabajo tradicional",
+        "solutionTitle": "La Solucion de Bolsa de Trabajo",
+        "solutionParagraph1": "Conecta directamente con empleadores verificados de acceso en cuerdas",
+        "solutionParagraph2": "Tu perfil verificado se destaca ante los empleadores",
+        "title": "El Problema",
+        "paragraph1": "Los tecnicos pierden horas buscando en sitios de trabajo genericos",
+        "paragraph2": "Los empleadores luchan por encontrar candidatos calificados",
+        "paragraph3": "Desajuste de habilidades lleva a contrataciones costosas"
       },
       "features": {
-        "title": "Lo que hace este modulo",
-        "subtitle": "Busqueda de empleo y visibilidad de perfil para tecnicos de acceso con cuerdas."
+        "jobBrowser": {
+          "title": "Navegador de Trabajos",
+          "description": "Busca trabajos de acceso en cuerdas",
+          "item1": "Filtrar por ubicacion",
+          "item2": "Filtrar por nivel IRATA",
+          "item3": "Rango salarial transparente",
+          "item4": "Perfiles de empresa",
+          "headline": "Encuentra trabajos que coincidan con tus habilidades",
+          "filterLabel": "Filtros"
+        },
+        "oneClickApplications": {
+          "title": "Aplicaciones con Un Clic",
+          "description": "Aplica instantaneamente con tu perfil",
+          "item1": "Perfil pre-completado",
+          "item2": "Credenciales verificadas",
+          "item3": "Mensajeria directa",
+          "item4": "Seguimiento de aplicaciones",
+          "headline": "Aplica instantaneamente con tu perfil verificado",
+          "sentLabel": "Enviado"
+        },
+        "profileVisibility": {
+          "title": "Visibilidad de Perfil",
+          "description": "Deja que los empleadores te encuentren",
+          "item1": "Listado de perfil opcional",
+          "item2": "Controles de privacidad",
+          "item3": "Alertas de empleador",
+          "item4": "Estadisticas de vistas",
+          "headline": "Controla quien ve tu perfil",
+          "visibleLabel": "Visible"
+        },
+        "title": "Caracteristicas",
+        "subtitle": "Todo lo que necesitas para encontrar tu proximo trabajo"
       },
       "benefits": {
         "title": "Quien se beneficia de este modulo",
@@ -7078,8 +7213,12 @@
     "improved": "Mejorado",
     "fixed": "Corregido",
     "breaking": "Cambio Mayor",
-    "viewAll": "Ver Todas las Actualizaciones",
+    "viewAll": "Ver Todos los Cambios",
     "latestUpdates": "Ultimas Actualizaciones",
-    "previousVersions": "Versiones Anteriores"
+    "previousVersions": "Versiones Anteriores",
+    "newFeature": "Nueva Funcion",
+    "improvement": "Mejora",
+    "bugFix": "Correccion de Error",
+    "security": "Actualizacion de Seguridad"
   }
 }

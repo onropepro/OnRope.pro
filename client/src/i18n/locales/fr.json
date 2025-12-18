@@ -735,7 +735,10 @@
       "viewFeedback": "Voir les commentaires",
       "manageFeedback": "Gérer les commentaires",
       "viewAnalytics": "Voir les analyses",
-      "viewFinancialData": "Voir les données financières (Coûts de main-d'œuvre, Salaires)"
+      "viewFinancialData": "Voir les données financières (Coûts de main-d'œuvre, Salaires)",
+      "viewFullSchedule": "Voir le calendrier complet",
+      "viewOwnSchedule": "Voir son propre calendrier",
+      "editSchedule": "Modifier le calendrier"
     },
     "jobCategories": {
       "building_maintenance": "Entretien de bâtiment",
@@ -972,7 +975,13 @@
       },
       "phone": "Téléphone",
       "certifications": "Certifications",
-      "firstAid": "Premiers soins"
+      "firstAid": "Premiers soins",
+      "spratCertification": "Certification SPRAT",
+      "spratLevel": "Niveau SPRAT",
+      "spratLicenseNumber": "Numero de Licence SPRAT",
+      "spratIssuedDate": "Date d'Emission SPRAT",
+      "spratExpirationDate": "Date d'Expiration SPRAT",
+      "salaryDescriptionInvite": "Visible uniquement par le proprietaire de l'entreprise"
     },
     "invitations": {
       "newMemberTitle": "Nouveau membre de l'équipe!",
@@ -1214,7 +1223,8 @@
       "generateReports": "Générer des rapports",
       "manageClients": "Gérer les clients",
       "approveHours": "Approuver les heures",
-      "manageCompliance": "Gérer la conformité"
+      "manageCompliance": "Gérer la conformité",
+      "spratCertification": "Certification SPRAT"
     },
     "deleteEmployee": {
       "title": "Supprimer l'employé",
@@ -3038,7 +3048,8 @@
       "prioritySupport": "Support prioritaire",
       "customIntegrations": "Intégrations personnalisées",
       "processing": "Traitement en cours...",
-      "select": "Sélectionner {{name}}"
+      "select": "Sélectionner {{name}}",
+      "startTrial": "Commencer l'Essai"
     },
     "nextSteps": {
       "title": "Que se passe-t-il ensuite ?",
@@ -4142,7 +4153,8 @@
       "closed": "Fermé",
       "viewed": "Vu",
       "new": "Nouveau",
-      "feedbackPhoto": "Photo du commentaire"
+      "feedbackPhoto": "Photo du commentaire",
+      "feedbackCountSingular": "retour"
     },
     "jobComments": {
       "title": "Commentaires du projet",
@@ -7031,10 +7043,10 @@
     },
     "technicianJobBoard": {
       "hero": {
-        "badge": "Écosystème de tableau d'emplois",
+        "badge": "Bourse d'Emploi",
         "title": "Chaque emploi ici est en travail sur cordes.",
         "subtitle": "Chaque entreprise est réelle.",
-        "description": "Le tableau d'emplois d'OnRopePro est exclusivement dédié à l'entretien de bâtiments par travail sur cordes. Parcourez des emplois réels d'entreprises vérifiées. Postulez en 30 secondes.",
+        "description": "Connectez-vous avec des employeurs d'acces sur corde dans le monde entier",
         "descriptionBold": "Contrôlez qui voit votre profil.",
         "ctaPrimary": "Parcourir les emplois gratuitement",
         "ctaSecondary": "Trouver des réponses"
@@ -7048,35 +7060,35 @@
         "interviewAlignment": "Alignement d'entrevue"
       },
       "problem": {
-        "title": "Indeed pense que vous voulez être tuyauteur",
+        "title": "Le Probleme",
         "intro": "Vous cherchez « travail sur cordes » sur Indeed. Qu'obtenez-vous ?",
-        "paragraph1": "Des plateformes pétrolières offshore dans les Maritimes. Des emplois d'accès industriel dans les raffineries de l'Alberta. Des postes de tuyauteur qui mentionnent « corde » une fois dans la section sécurité. Des emplois de construction générale qui exigent « travail en hauteur ».",
-        "paragraph2": "Vous faites défiler pendant 20 minutes pour trouver 3 emplois qui pourraient vraiment être de l'entretien de bâtiments sur cordes. Peut-être.",
-        "paragraph3": "Ensuite, vous postulez. Téléversez votre CV. Remplissez le même formulaire pour la 50e fois. Tapez manuellement votre numéro IRATA parce qu'il n'y a pas de champ pour ça. Demandez-vous si l'entreprise a même vérifié votre certification.",
+        "paragraph1": "Les techniciens perdent des heures a chercher sur des sites d'emploi generiques",
+        "paragraph2": "Les employeurs peinent a trouver des candidats qualifies",
+        "paragraph3": "L'inadequation des competences entraine des embauches couteuses",
         "solutionTitle": "Le tableau d'emplois d'OnRopePro fonctionne différemment.",
         "solutionParagraph1": "Chaque emploi publié ici est de l'entretien de bâtiments sur cordes. Nettoyage de vitres. Calfeutrage. Lavage à pression. Nettoyage de gouttières. Peinture et revêtement. Inspection visuelle. Pas d'offshore. Pas de plateformes pétrolières. Pas de tuyauterie.",
         "solutionParagraph2": "Chaque entreprise qui publie est vérifiée. De vrais opérateurs de travail sur cordes qui font de l'entretien de bâtiments réel. Quand vous postulez, vos certifications, expérience et cote de sécurité accompagnent automatiquement votre candidature."
       },
       "features": {
-        "title": "Votre centre de carrière en travail sur cordes",
-        "subtitle": "Où chaque emploi correspond à vos compétences et chaque employeur comprend votre travail",
+        "title": "Fonctionnalites",
+        "subtitle": "Tout ce dont vous avez besoin pour trouver votre prochain emploi",
         "jobBrowser": {
           "title": "Navigateur d'emplois",
-          "headline": "Voyez uniquement les emplois d'entretien de bâtiments sur cordes.",
+          "headline": "Trouvez des emplois correspondant a vos competences",
           "description": "Filtrez par emplacement, type d'emploi et exigences de certification. Chaque offre affiche les détails de l'entreprise, la fourchette salariale (si fournie), les dates de début et la portée du projet. Chaque entreprise est vérifiée. Chaque emploi est pertinent.",
-          "filterLabel": "Ce que vous pouvez filtrer :"
+          "filterLabel": "Filtres"
         },
         "oneClickApplications": {
           "title": "Candidatures en un clic",
-          "headline": "Vos données de profil accompagnent votre candidature.",
+          "headline": "Postulez instantanement avec votre profil verifie",
           "description": "CV, certifications, numéros IRATA/SPRAT, années d'expérience, cote de sécurité. Tout est joint automatiquement. Postulez à un emploi en 30 secondes au lieu de ressaisir les mêmes informations pour la 100e fois.",
-          "sentLabel": "Ce qui est envoyé automatiquement :"
+          "sentLabel": "Envoye"
         },
         "profileVisibility": {
           "title": "Visibilité du profil",
-          "headline": "Contrôlez qui vous trouve.",
+          "headline": "Controlez qui voit votre profil",
           "description": "Activez la visibilité : les employeurs peuvent vous rechercher dans le navigateur de talents, voir vos qualifications et vous envoyer des offres d'emploi directes. Désactivez-la : vous êtes invisible aux recherches mais pouvez toujours parcourir et postuler aux emplois normalement.",
-          "visibleLabel": "Ce que les employeurs voient quand vous êtes visible :"
+          "visibleLabel": "Visible"
         }
       },
       "benefits": {
