@@ -1,165 +1,23 @@
 {
   "login": {
     "header": {
-      "signIn": "Sign In",
-      "getStarted": "Get Started"
+      "signIn": "Iniciar Sesion",
+      "getStarted": "Comenzar"
     },
-    "hero": {
-      "subtitle": "Building Maintenance Management Software",
-      "builtBy": "Built by a Level 3 IRATA / SPRAT Tech & Operations Manager",
-      "tagline": "Your competitors think they're organized.",
-      "taglineBold": "THEY'RE NOT",
-      "description": "You track every",
-      "descriptionEnd": ", from a single platform that actually speaks rope access.",
-      "getStartedFree": "Get Started Free",
-      "watchDemo": "Watch Demo"
-    },
-    "rotatingWords": {
-      "project": "project",
-      "safetyMeeting": "safety meeting",
-      "hourWorked": "hour worked",
-      "drop": "drop",
-      "residentFeedback": "resident feedback",
-      "pieceOfGear": "piece of gear",
-      "nonBillableHour": "non-billable hour",
-      "jobQuote": "job quote",
-      "safetyDocument": "safety document",
-      "hourScheduled": "drop",
-      "employeePerformance": "employee's performance level",
-      "jobProgress": "job's progress"
-    },
-    "painPoints": {
-      "title": "Your competitors think they're organized.",
-      "subtitle": "But in reality:",
-      "payrollErrors": "They're losing $40K/year to payroll errors they don't see.",
-      "adminTime": "They're spending 80 hours monthly on admin that should take 10.",
-      "underbidding": "They're underbidding 25% of jobs because they're guessing.",
-      "complaints": "They're juggling resident complaints between memory, emails, texts, phone calls, notes in a glovebox.",
-      "lawsuit": "They're one accident away from a lawsuit they can't defend because their safety documentation is (maybe) under the driver's front seat.",
-      "losingContracts": "They're losing contracts because they look like amateurs next to you.",
-      "conclusion": "Let them keep thinking they're organized."
-    },
-    "roiCalculator": {
-      "badge": "60-Second Assessment",
-      "title": "Calculate Your Hidden Costs In Less Than 60 Seconds",
-      "subtitle": "Most rope access companies waste $15,000-25,000 per year on scattered online SAAS tools, manual processes, hidden admin costs, and wasted time. Find out how much you could save.",
-      "cta": "Calculate My Savings"
-    },
-    "cta": {
-      "title": "Ready to Streamline Your Rope Access Operations?",
-      "subtitle": "Join rope access companies who've already ditched the spreadsheet chaos",
-      "startFreeTrial": "Start Free Trial",
-      "scheduleDemo": "Schedule Demo"
-    },
-    "features": {
-      "title": "Juggling 10 Different Tools Is Costing You More Than Time",
-      "subtitle": "Replace scattered systems with one platform built specifically for rope access companies managing techs across multiple buildings. Time tracking, safety compliance, project visibility, payroll precision, resident communication - all within one intelligent platform.",
-      "cards": {
-        "projects": {
-          "category": "Projects (Active & Past)",
-          "title": "4-Elevation Building Visualization",
-          "tagline": "Stop Guessing. Start Knowing.",
-          "description": "Track all four sides (N/E/S/W) of every project with visual progress bars. Know instantly: \"West elevation 68% done. North finished. East behind schedule.\" Finally, stop guessing. Your crew knows. Your client knows. You know."
-        },
-        "workSessions": {
-          "category": "Work Session & Hours Tracker",
-          "title": "4 Hours or 30 Minutes?",
-          "tagline": "That's How Long Payroll Takes. Your Choice.",
-          "description": "Clock in. Clock out. System calculates hours down to the second. 8h 15m worked on Tower One. 6h 42m on Tower Five. Zero disputes. Zero spreadsheets. Zero \"I swear I worked 9 hours.\" 87-93% time savings. Your competitor? Still using Excel."
-        },
-        "nonBillable": {
-          "category": "Non-Billable Hour Tracker",
-          "title": "$12,600 Fell Through The Cracks",
-          "tagline": "Travel Time. Setup Time. You Paid. Client Didn't.",
-          "description": "Paid for 45 hours. Billed for 32 hours. That's 13 hours donated. Every. Single. Week. Track travel time, equipment setup, weather delays separately. See your billable ratio: 68%. Target: 75%+. Stop the bleed. Your margins thank you."
-        },
-        "employees": {
-          "category": "Employees",
-          "title": "Team Management & Permissions",
-          "tagline": "Supervisors Log Drops. They Don't See Pay Rates.",
-          "description": "Financial data stays private. IRATA / SPRAT levels tracked. 100% payroll accuracy. Hourly rates configured. Zero awkward conversations. Give supervisors job tools, not salary spreadsheets."
-        },
-        "inventory": {
-          "category": "Inventory & Inspections",
-          "title": "Equipment & Safety Compliance",
-          "tagline": "You Export 6 Months of Harness Inspections in 4 Minutes. Building Manager Swoons.",
-          "description": "Track personal safety equipment with serial numbers, employee assignments, inspection dates, and automated retirement workflows for failed gear. Daily inspections. Instant exports. Zero panic."
-        },
-        "toolbox": {
-          "category": "Toolbox Meetings",
-          "title": "Safety Briefings & Documentation",
-          "tagline": "The Lawsuit You'll Win Because You Did the Meeting. And You Can Prove It.",
-          "description": "Digital safety forms, PDF rope access plans. Comprehensive safety documentation management. Every meeting logged. Every inspection recorded. Every piece of equipment tracked. The lawyer asks \"prove it.\" You hand them 400 pages. Case dismissed."
-        },
-        "payroll": {
-          "category": "Payroll",
-          "title": "Employee Hours & Compensation",
-          "tagline": "Dave Worked 87.5 Hours - Including Overtime. Paid $2,887.50. Export. Done.",
-          "description": "Select pay period. System aggregates all hours across all projects. Regular hours. Overtime hours. Hourly rates applied. Gross pay calculated. Export to QuickBooks. 30 minutes. Your competitor? Still using Excel for 4 hours. Still making $1,200 mistakes."
-        },
-        "quoting": {
-          "category": "Multi-Service Quoting",
-          "title": "One Quote, Every Service",
-          "tagline": "Window Cleaning + Dryer Vents + Parkade + In-Suite. One Price.",
-          "description": "Create comprehensive quotes combining window cleaning, dryer vents, parkade maintenance, and in-suite work with individual service pricing and photo documentation. Cross-sell without looking desperate. Professional. Complete. Done in 30 minutes."
-        },
-        "tracking": {
-          "category": "Active Worker Tracking",
-          "title": "Real-Time Field Visibility",
-          "tagline": "Dave's on Tower One. Has Been Since 7:32am. Working 4h 18m.",
-          "description": "Monitor active workers, billable/non-billable hours, and performance analytics with live dashboards. Color-coded status. Green = working. Yellow = break. Red = check on them. Answer clients instantly: \"Crew's on-site right now.\""
-        },
-        "safety": {
-          "category": "Safety Compliance",
-          "title": "Safety Compliance",
-          "description": "Digital safety forms, PDF rope access plans, and comprehensive safety documentation management."
-        },
-        "feedback": {
-          "category": "Feedback Management",
-          "title": "Centralized. Organized. Done.",
-          "tagline": "70% Fewer Calls. 24-Hour Resolution",
-          "description": "Mrs. Henderson adds a photo: \"Missed my window.\" She is replied to in 4 minutes: \"On it tomorrow, 9am.\" She stops calling the building manager. They stop calling you. Everyone stops calling. Residents self-serve. You respond same-day. Your competitor? Still using paper."
-        },
-        "residents": {
-          "category": "Resident Portal",
-          "title": "Building Resident Management",
-          "tagline": "The Contract Renewal Machine. 240 Residents Watch Progress. Submit Feedback. Stop Calling.",
-          "description": "240 residents watch progress on their phones. Submit feedback that gets addressed same-day. Tell their council \"these guys are professional.\" Your competitor? Still using paper. Contract renewal rate: 95%. Theirs: 60%. Math is simple."
-        },
-        "audit": {
-          "category": "IRATA / SPRAT & Insurance Audit Protection",
-          "title": "\"Show Me Your Inspection Logs\"",
-          "description": "Auditor asks for 6 months of harness inspections. You export PDF in 4 minutes. Every tech. Every day. Every piece of equipment. Building manager swoons."
-        },
-        "scheduling": {
-          "category": "Schedule Visibility",
-          "title": "Resource Scheduling & Calendar",
-          "tagline": "Sarah Is At Tower One Monday. Tower Three Tuesday. Confirmed.",
-          "description": "Visual calendar showing who's working where, when. Drag-and-drop scheduling. Conflict detection. Weather delay rescheduling. Client-facing calendar links. Answer \"when are you coming?\" with a link, not a phone call."
-        },
-        "clientDashboard": {
-          "category": "Client Dashboard Access",
-          "title": "Client Visibility Portal",
-          "tagline": "\"When Will You Be Done?\" Link. Click. See.",
-          "description": "Give property managers read-only access to their buildings. Progress bars. Photo documentation. Safety compliance scores. Schedule visibility. They stop calling to ask \"what's happening?\" because they can see it themselves."
-        }
-      }
-    },
-    "form": {
-      "title": "Welcome",
-      "subtitle": "Sign in to access your dashboard and manage operations",
-      "email": "Email",
-      "emailPlaceholder": "your@email.com",
-      "password": "Password",
-      "passwordPlaceholder": "Enter your password",
-      "signInButton": "Sign In",
-      "noAccount": "Don't have an account?",
-      "createAccount": "Create one",
-      "demoAccess": "Demo Access",
-      "superuserDemo": "Superuser Demo",
-      "ownerDemo": "Owner Demo",
-      "residentDemo": "Resident Demo",
-      "propertyManagerDemo": "Property Manager Demo"
+    "title": "Iniciar Sesion",
+    "subtitle": "Bienvenido de nuevo",
+    "email": "Correo electronico",
+    "password": "Contrasena",
+    "forgotPassword": "Olvidaste tu contrasena?",
+    "signInButton": "Iniciar Sesion",
+    "noAccount": "No tienes una cuenta?",
+    "signUp": "Registrarse",
+    "orContinueWith": "O continuar con",
+    "rememberMe": "Recuerdame",
+    "errors": {
+      "invalidCredentials": "Credenciales invalidas",
+      "emailRequired": "El correo electronico es requerido",
+      "passwordRequired": "La contrasena es requerida"
     }
   },
   "register": {
@@ -240,150 +98,131 @@
     "signIn": "Sign in"
   },
   "navigation": {
-    "dashboard": "Dashboard",
-    "projects": "Projects",
-    "employees": "Employees",
-    "clients": "Clients",
-    "schedule": "Schedule",
-    "timeClock": "Time Clock",
-    "documents": "Documents",
-    "inventory": "Inventory",
-    "reports": "Reports",
-    "analytics": "Analytics",
-    "settings": "Settings",
-    "profile": "Profile",
-    "help": "Help",
-    "support": "Support",
-    "notifications": "Notifications",
-    "messages": "Messages",
-    "calendar": "Calendar",
-    "quotes": "Quotes",
-    "billing": "Billing",
-    "subscriptions": "Subscriptions",
-    "propertyManager": "Property Manager",
-    "residentPortal": "Resident Portal",
-    "superuser": "SuperUser",
-    "changelog": "Changelog",
-    "safetyRating": "Safety Rating",
-    "employer": "Employer",
-    "technician": "Technician",
-    "resident": "Resident",
-    "buildingManager": "Building Manager",
+    "language": "Idioma",
+    "help": "Ayuda",
+    "employer": "Empleador",
+    "technician": "Tecnico",
+    "propertyManager": "Administrador de Propiedades",
+    "resident": "Residente",
+    "buildingManager": "Gerente del Edificio",
+    "pricing": "Precios",
+    "features": "Caracteristicas",
+    "about": "Acerca de",
+    "contact": "Contacto",
     "modules": {
       "safetyCompliance": {
-        "title": "Safety & Compliance",
-        "description": "Harness inspections, toolbox meetings, audit-ready exports"
-      },
-      "projectManagement": {
-        "title": "Project Management",
-        "description": "4-elevation tracking, real-time dashboards, crew scheduling"
-      },
-      "workSession": {
-        "title": "Work Session & Time Tracking",
-        "description": "GPS clock-in, drop tracking, automatic payroll aggregation"
-      },
-      "documentManagement": {
-        "title": "Document Management",
-        "description": "Digital signatures, immutable audit trails, compliance reporting"
+        "title": "Seguridad y Cumplimiento",
+        "description": "Inspecciones de arnes, reuniones de seguridad, seguimiento de certificaciones"
       },
       "userAccess": {
-        "title": "User Access & Authentication",
-        "description": "Granular permissions, role-based access, audit trails"
+        "title": "Acceso y Autenticacion de Usuarios",
+        "description": "Control de permisos, gestion de roles, inicio de sesion seguro"
       },
-      "csr": {
-        "title": "Company Safety Rating",
-        "description": "Penalty-based compliance scoring, real-time safety posture"
+      "projectManagement": {
+        "title": "Gestion de Proyectos",
+        "description": "Seguimiento de trabajos, progreso, gestion de clientes"
       },
-      "irataLogging": {
-        "title": "IRATA/SPRAT Task Logging",
-        "description": "Same-day hour logging, OCR import, career-portable records"
+      "workSessions": {
+        "title": "Sesiones de Trabajo y Seguimiento de Tiempo",
+        "description": "Registro de horas GPS, reportes de nomina"
       },
       "employeeManagement": {
-        "title": "Employee Management",
-        "description": "Portable identities, certification tracking, permissions"
+        "title": "Gestion de Empleados",
+        "description": "Incorporacion, certificaciones, perfiles"
       },
-      "technicianPassport": {
-        "title": "Technician Passport",
-        "description": "Portable work history, certifications, career-long records"
-      },
-      "employerJobBoard": {
-        "title": "Job Board Ecosystem",
-        "description": "Talent browser, unlimited postings, direct offers"
+      "documentManagement": {
+        "title": "Gestion de Documentos",
+        "description": "Almacenamiento de archivos, firmas, cumplimiento"
       },
       "gearInventory": {
-        "title": "Gear Inventory Management",
-        "description": "Equipment tracking, assignments, service life"
+        "title": "Inventario de Equipo",
+        "description": "Seguimiento de equipos, mantenimiento, inspecciones"
       },
-      "scheduling": {
-        "title": "Scheduling & Calendar",
-        "description": "Conflict detection, dual calendars, time-off management"
+      "schedulingCalendar": {
+        "title": "Programacion y Calendario",
+        "description": "Planificacion de equipos, asignaciones"
       },
       "payroll": {
-        "title": "Payroll & Financial",
-        "description": "Automated timesheets, overtime calculation, payroll exports"
+        "title": "Nomina y Finanzas",
+        "description": "Exportacion de hojas de tiempo, reportes de costos laborales"
+      },
+      "irataLogging": {
+        "title": "Registro de Tareas IRATA",
+        "description": "Seguimiento de certificaciones, logbook de trabajo"
+      },
+      "csr": {
+        "title": "Calificacion de Seguridad de la Empresa",
+        "description": "Metricas de cumplimiento, indicadores de rendimiento"
       },
       "quoting": {
-        "title": "Quoting & Sales Pipeline",
-        "description": "Service-specific quotes, financial privacy, visual pipeline"
-      },
-      "whiteLabel": {
-        "title": "White-Label Branding",
-        "description": "Your logo, colors, and brand across every touchpoint"
+        "title": "Cotizaciones y Ventas",
+        "description": "Generacion de cotizaciones, seguimiento de propuestas"
       },
       "residentPortal": {
-        "title": "Resident Portal",
-        "description": "Real-time feedback, two-way communication, photo evidence"
+        "title": "Portal de Residentes",
+        "description": "Comunicacion, comentarios, avisos de trabajo"
+      },
+      "whiteLabel": {
+        "title": "Marca Blanca",
+        "description": "Marca personalizada, logotipos de empresa"
+      },
+      "technicianPassport": {
+        "title": "Pasaporte del Tecnico",
+        "description": "Credenciales portatiles, historial de trabajo"
+      },
+      "employerJobBoard": {
+        "title": "Bolsa de Trabajo para Empleadores",
+        "description": "Publicacion de empleos, reclutamiento"
       },
       "technicianJobBoard": {
-        "title": "Job Board Ecosystem",
-        "description": "Browse jobs, apply instantly, control profile visibility"
+        "title": "Bolsa de Trabajo para Tecnicos",
+        "description": "Busqueda de empleo, perfil de visibilidad"
       }
-    },
-    "language": "Language"
+    }
   },
   "common": {
-    "loading": "Loading...",
+    "loading": "Cargando...",
     "generating": "Generating...",
-    "save": "Save",
-    "cancel": "Cancel",
-    "delete": "Delete",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
     "deleting": "Deleting...",
-    "edit": "Edit",
-    "add": "Add",
-    "create": "Create",
+    "edit": "Editar",
+    "add": "Agregar",
+    "create": "Crear",
     "createNew": "Create New",
     "update": "Update",
-    "submit": "Submit",
-    "confirm": "Confirm",
-    "close": "Close",
+    "submit": "Enviar",
+    "confirm": "Confirmar",
+    "close": "Cerrar",
     "continue": "Continue",
-    "back": "Back",
-    "next": "Next",
-    "previous": "Previous",
-    "search": "Search",
-    "filter": "Filter",
+    "back": "Atras",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "search": "Buscar",
+    "filter": "Filtrar",
     "clear": "Clear",
     "reset": "Reset",
-    "view": "View",
-    "download": "Download",
-    "upload": "Upload",
+    "view": "Ver",
+    "download": "Descargar",
+    "upload": "Subir",
     "preview": "Preview",
     "print": "Print",
-    "export": "Export",
-    "import": "Import",
+    "export": "Exportar",
+    "import": "Importar",
     "refresh": "Refresh",
-    "yes": "Yes",
+    "yes": "Si",
     "no": "No",
     "ok": "OK",
     "done": "Done",
-    "actions": "Actions",
-    "status": "Status",
+    "actions": "Acciones",
+    "status": "Estado",
     "details": "Details",
-    "description": "Description",
-    "notes": "Notes",
-    "date": "Date",
-    "time": "Time",
-    "name": "Name",
+    "description": "Descripcion",
+    "notes": "Notas",
+    "date": "Fecha",
+    "time": "Hora",
+    "name": "Nombre",
     "email": "Email",
     "phone": "Phone",
     "address": "Address",
@@ -391,8 +230,8 @@
     "province": "Province",
     "country": "Country",
     "postalCode": "Postal Code",
-    "required": "Required",
-    "optional": "Optional",
+    "required": "Requerido",
+    "optional": "Opcional",
     "all": "All",
     "none": "None",
     "select": "Select",
@@ -400,7 +239,7 @@
     "noResults": "No results found",
     "noData": "No data available",
     "error": "Error",
-    "success": "Success",
+    "success": "Exito",
     "warning": "Warning",
     "info": "Information",
     "active": "Active",
@@ -444,7 +283,7 @@
     "unknown": "Unknown",
     "employee": "Employee",
     "you": "You",
-    "remove": "Remove",
+    "remove": "Remover",
     "saving": "Saving...",
     "saveChanges": "Save Changes",
     "language": "Language",
@@ -476,7 +315,9 @@
     "invalidFile": "Invalid file",
     "selectPdfFile": "Please select a PDF file",
     "totalFloorsInBuilding": "Total floors in building",
-    "note": "Note"
+    "note": "Note",
+    "sort": "Ordenar",
+    "open": "Abrir"
   },
   "auth": {
     "welcomeBack": "Welcome Back",
@@ -4462,1739 +4303,758 @@
   "modules": {
     "documents": {
       "hero": {
-        "badge": "Document Management Module",
-        "title": "When the Auditor Shows Up,",
-        "subtitle": "Will You Be Scrambling or Ready?",
-        "description": "Every document. Every signature. Every timestamp. Searchable in seconds, not scattered across filing cabinets.",
-        "descriptionStrong": "Build compliance records that protect your business when it matters most.",
-        "ctaTrial": "Start Your Free 60-Day Trial",
-        "ctaFaqs": "Find Answers"
+        "badge": "Modulo de Gestion de Documentos",
+        "titleLine1": "Se te pide un certificado de seguro",
+        "titleLine2": "para un trabajo de la semana pasada.",
+        "titleLine3": "Donde esta?",
+        "description": "Todos los documentos de seguridad, certificados y registros de cumplimiento en un sistema buscable con firmas digitales.",
+        "ctaTrial": "Comienza tu prueba gratuita de 60 dias",
+        "ctaFaq": "Encontrar respuestas"
       },
       "stats": {
-        "auditPrep": "Audit prep, not hours",
-        "acknowledgment": "Acknowledgment visibility",
-        "neverValue": "Never",
-        "insurance": "Insurance lapses",
-        "permanentValue": "Permanent",
-        "tamperProof": "Tamper-proof records"
+        "documentsStored": "Documentos almacenados",
+        "signaturesCollected": "Firmas recolectadas",
+        "searchableRecords": "Registros buscables",
+        "auditReady": "Listo para auditoria"
       },
       "problem": {
-        "title": "The Compliance Gap Nobody Talks About",
-        "intro": "You handed your new hire the safety manual. He said \"yep, I read it\" and set it aside.",
-        "scenario": "Two weeks later, he causes damage during a window cleaning job because he used a technique from his old company. Now you're facing a claim, and \"he told me he read it\" is your entire defense.",
-        "reality": "Paper systems don't fail during normal operations. They fail during audits, lawsuits, and insurance investigations. The moment you need to prove compliance, you discover scattered files, missing signatures, and no way to verify who actually reviewed what.",
-        "solution": "OnRopePro treats document management as the foundation of your liability protection. Every acknowledgment is timestamped. Every signature is permanent. When WorkSafeBC asks for proof, you don't search. You generate a report."
+        "title": "El archivo que nunca encuentras",
+        "paragraph1": "Los certificados de seguro estan en el correo electronico. Los registros de reuniones de seguridad estan en una carpeta en el camion. Los certificados de arnes estan... en algun lugar.",
+        "paragraph2": "Cuando un administrador de propiedad pide prueba de seguro antes de que puedas comenzar, te apresuras. Cuando un auditor quiere seis meses de registros de reuniones de seguridad, excavas durante horas.",
+        "paragraph3": "OnRopePro mantiene todo en un solo lugar. Sube una vez. Busca cuando lo necesites. Exporta para cualquier solicitud."
       },
       "features": {
-        "title": "What This Module Does",
-        "subtitle": "Your complete document compliance infrastructure. Centralizes every safety manual, policy, procedure, and certificate with digital signatures that create defensible compliance records.",
-        "signature": {
-          "title": "Digital Signature Capture",
-          "description": "When employees review documents, they sign digitally with a captured timestamp. No more \"I didn't know\" excuses. The signature proves they saw the exact version you uploaded, on the exact date and time.",
-          "capturedLabel": "What gets captured:",
-          "item1": "Employee identity",
-          "item2": "Document version reviewed",
-          "item3": "Timestamp of acknowledgment",
-          "item4": "Permanent audit record"
-        },
-        "compliance": {
-          "title": "Compliance Status Tracking",
-          "description": "See exactly who has signed which documents, who has gaps, and who needs reminders. Dashboards show missing acknowledgments before they become audit findings.",
-          "trackedLabel": "What gets tracked:",
-          "item1": "Employee acknowledgment status per document",
-          "item2": "Missing signature alerts",
-          "item3": "New version notification requirements",
-          "item4": "Onboarding completion progress"
-        },
-        "audit": {
-          "title": "Instant Audit Response",
-          "description": "Generate compliance reports in seconds. When regulators, insurers, or attorneys ask for documentation, you provide professional reports instead of paper shuffling.",
-          "reportedLabel": "What gets reported:",
-          "item1": "Complete signature history by employee",
-          "item2": "Document version control",
-          "item3": "Acknowledgment timestamps",
-          "item4": "Exportable PDF and CSV formats"
-        }
-      },
-      "stakeholders": {
-        "title": "Who Benefits From This Module",
-        "subtitle": "Every stakeholder gets the document access and compliance visibility they need.",
-        "companyOwners": {
-          "title": "For Company Owners",
-          "problem1Title": "\"We Got Sued and I Can't Prove He Was Trained\"",
-          "problem1Desc": "Your technician damaged an anchor point. The building manager is claiming negligence. You know your guy was trained on proper anchoring, but the only proof is a sign-in sheet from a safety meeting 18 months ago, and you can't find it. Your lawyer says the case hinges on documentation you can't produce.",
-          "solution1": "Every document acknowledgment is timestamped and digitally signed. When legal questions arise, you generate a report showing exactly which procedures the employee reviewed and when. Your defense is a PDF, not a memory.",
-          "problem2Title": "\"Our Insurance Was Declined Because of Missing Docs\"",
-          "problem2Desc": "Your Certificate of Insurance expired three weeks ago. You didn't notice until the building manager blocked site access. You scramble to get renewed coverage, but the gap in insurance creates liability exposure you didn't know you had.",
-          "solution2": "Insurance document expiration tracking sends advance warnings. Dashboard alerts flag COI renewal deadlines before they become site access problems. You renew proactively instead of reactively."
-        },
-        "opsManagers": {
-          "title": "For Operations Managers",
-          "problem1Title": "\"I Have No Idea Who Has Actually Read Our Procedures\"",
-          "problem1Desc": "You have a safety manual. You're pretty sure most employees have seen it. When the auditor asks for proof that each employee acknowledged your fall protection procedures, you realize \"pretty sure\" isn't documentation. Your new hire three weeks ago never signed anything.",
-          "solution1": "Track acknowledgment status for every employee against every document. Instantly see who has signed which procedures and who has gaps. New hires cannot start work until they acknowledge all required documents.",
-          "problem2Title": "\"Updated Procedures Go Unacknowledged\"",
-          "problem2Desc": "You updated the toolbox meeting procedure last month. Some employees signed the new version, some haven't seen it yet, and you have no visibility into the gap. When the next audit happens, you discover 5 employees never acknowledged the updated procedure.",
-          "solution2": "Compliance status reporting shows exactly which employees have missing acknowledgments. Dashboard alerts highlight gaps before they become audit findings."
-        },
-        "buildingManagers": {
-          "title": "For Building Managers & Property Managers",
-          "problem1Title": "\"How Do I Know This Contractor Actually Trains Their People?\"",
-          "problem1Desc": "Any contractor can claim they have safety procedures. You have no way to verify whether employees actually review those procedures, or whether the contractor just has a dusty binder on a shelf somewhere. You're approving work based on promises, not evidence.",
-          "solution1": "Company Safety Rating (CSR) aggregates employee document acknowledgment rates into a visible score. You see ongoing engagement, not just claimed policies. High CSR means employees consistently acknowledge and review safety documentation."
-        },
-        "technicians": {
-          "title": "For Technicians",
-          "problem1Title": "\"I Don't Know What Procedures Apply Here\"",
-          "problem1Desc": "Every company has different procedures. Your previous employer did anchoring differently. You want to follow the rules, but you're not sure which version is current or whether you've seen everything you're supposed to see.",
-          "solution1": "Your document list clearly shows what requires your acknowledgment. Previously signed documents display the acknowledgment date. New versions trigger re-acknowledgment requirements. You always know where you stand."
-        }
-      },
-      "keyFeatures": {
-        "title": "Key Features",
-        "subtitle": "Every feature is built to create defensible compliance records that protect your business.",
-        "immutableAudit": {
-          "title": "Immutable Audit Trail",
-          "description": "Once signed, signature records cannot be deleted or modified. This creates permanent, tamper-proof compliance documentation for regulators, insurers, and legal defense."
-        },
-        "swpTemplates": {
-          "title": "15 Pre-Built SWP Templates",
-          "description": "Industry-standard Safe Work Procedure templates covering fall protection, anchor systems, rope techniques, and rescue procedures. Customize for your operations and generate professional PDFs."
-        },
-        "safetyTopics": {
-          "title": "10 Daily Safety Practice Topics",
-          "description": "Rotating safety discussion topics with employee acknowledgment tracking. Regular engagement demonstrates active safety culture and contributes to your CSR score."
-        },
-        "expirationTracking": {
-          "title": "Expiration Tracking",
-          "description": "Upload insurance certificates with expiration dates. The system provides advance warnings so you never get caught with lapsed coverage during a client request."
-        },
-        "roleBasedAccess": {
-          "title": "Role-Based Access",
-          "description": "Sensitive documents like Certificate of Insurance are restricted to Company Owner and Ops Manager roles. Technicians and supervisors see only what they need."
-        },
-        "csrIntegration": {
-          "title": "CSR Integration",
-          "description": "Employee document acknowledgment rates feed directly into your Company Safety Rating. Building managers can see your CSR, demonstrating your commitment to safety culture without exposing proprietary procedures."
-        }
-      },
-      "problemsSolved": {
-        "title": "Problems Solved",
-        "subtitle": "Real problems. Real solutions. Organized by who you are.",
-        "employers": {
-          "title": "For Employers"
-        },
-        "operations": {
-          "title": "For Operations Managers & Supervisors"
-        },
-        "buildingManagers": {
-          "title": "For Building Managers & Property Managers"
-        },
-        "technicians": {
-          "title": "For Technicians"
-        }
-      },
-      "measurableResults": {
-        "title": "Measurable Results",
-        "subtitle": "Concrete improvements you can measure from day one.",
-        "auditPrep": {
-          "title": "Audit Preparation Time",
-          "description": "Audit preparation time reduced from hours to minutes. Generate complete employee signature reports instantly instead of searching through filing cabinets and scattered paper forms."
-        },
-        "visibility": {
-          "title": "Compliance Visibility",
-          "description": "100% visibility into employee acknowledgment status. Dashboard shows exactly who has signed which documents and who has gaps, eliminating audit surprises and enabling proactive gap closure."
-        },
-        "insurance": {
-          "title": "Insurance Protection",
-          "description": "Never get caught with expired insurance coverage. Advance expiration warnings ensure proactive renewal so you never lose work from lapsed documentation."
-        },
-        "liability": {
-          "title": "Liability Defense",
-          "description": "Immutable signature records with timestamps create defensible compliance documentation. When incidents occur, you prove due diligence with permanent audit trail, not verbal assurances."
-        }
-      },
-      "moduleIntegration": {
-        "title": "Other Modules This Module Communicates With",
-        "subtitle": "Document Management integrates with other OnRopePro modules to create connected compliance infrastructure.",
-        "userAccess": {
-          "title": "User Access & Authentication",
-          "description": "Permissions control who can upload, view, and manage documents. Company owners have full access while technicians see only documents relevant to their role."
-        },
-        "safety": {
-          "title": "Safety & Compliance",
-          "description": "Safe Work Procedures integrate with harness inspections and toolbox meetings. Employee acknowledgment of safety documents feeds into the broader compliance picture."
-        },
-        "csr": {
-          "title": "Company Safety Rating (CSR)",
-          "description": "Document acknowledgment rates contribute directly to your CSR score. Building managers see your CSR without accessing your actual documents."
-        },
-        "employees": {
-          "title": "Employee Management",
-          "description": "Employee records link to document acknowledgment history. When you review an employee's profile, you see their complete compliance status."
-        },
-        "buildingManager": {
-          "title": "Building Manager Portal",
-          "description": "Building managers can view your CSR score, which reflects document acknowledgment engagement. They cannot see your actual documents or procedures."
-        }
-      },
-      "businessImpact": {
-        "title": "Stop Chasing Signatures. Start Building Defensible Compliance.",
-        "paragraph1": "Right now, your compliance exists in filing cabinets, desk drawers, and employee memories. You hope your technicians read the safety manual. You assume your Certificate of Insurance is current. You trust that everyone follows the same procedures they learned whenever they were last trained.",
-        "paragraph2": "When nothing goes wrong, this works fine. When something goes wrong, it doesn't.",
-        "paragraph3": "A WorkSafeBC auditor asks for proof that all employees reviewed your fall protection procedures. You spend an hour searching while technicians wait on standby. An insurance investigator requests documentation after an incident. You realize your COI expired three weeks ago. A lawsuit demands evidence that an employee was trained on the procedure they violated. You have nothing timestamped.",
-        "paragraph4": "Document Management turns scattered compliance into professional infrastructure. Every document is centralized. Every signature is timestamped. Every acknowledgment is permanent. When you need proof, you generate a report.",
-        "paragraph5": "Your technicians know which procedures apply to them. Your operations manager sees exactly who has gaps. Your auditors get instant answers. Your liability defense has documented evidence.",
-        "paragraph6": "You're not just storing files. You're building a compliance history that protects your business."
-      },
-      "faqs": {
-        "title": "Frequently Asked Questions",
-        "subtitle": "Common questions about document management and compliance.",
-        "faq1": {
-          "question": "Can I edit or delete a signed document acknowledgment?",
-          "answer": "No. Once a document acknowledgment is signed, the signature record is permanent and cannot be modified or deleted. This creates an immutable audit trail that protects both employers and employees. Regulators require tamper-proof documentation to verify compliance."
-        },
-        "faq2": {
-          "question": "What happens when I update a document?",
-          "answer": "When you upload a new version, the system creates a new document that requires fresh acknowledgments from all employees. Previous signatures remain associated with the previous version. This ensures employees always acknowledge the current procedure, not an outdated version."
-        },
-        "faq3": {
-          "question": "Who can see my Certificate of Insurance?",
-          "answer": "Only Company Owner and Ops Manager roles can view COI documents. Supervisors and Technicians cannot access these restricted financial documents. Insurance certificates contain sensitive financial information that should be limited to authorized personnel."
-        },
-        "faq4": {
-          "question": "How do Safe Work Practices affect my CSR?",
-          "answer": "Employee acknowledgment of daily safety practice topics contributes positively to your Company Safety Rating. Consistent engagement demonstrates an active safety culture. CSR rewards companies that don't just have safety documents but actively engage employees with safety topics."
-        },
-        "faq5": {
-          "question": "Can building managers see my documents?",
-          "answer": "Building managers cannot see your actual documents. They can see your CSR score, which reflects your overall safety compliance including document acknowledgment rates. This protects your proprietary procedures while giving building managers confidence in your safety practices."
-        },
-        "faq6": {
-          "question": "What file types are supported?",
-          "answer": "PDF, DOC, and DOCX files are supported for document uploads. File type validation ensures only appropriate formats are accepted."
-        },
-        "faq7": {
-          "question": "What happens if an employee leaves?",
-          "answer": "Their signature history remains in the system permanently. This maintains your audit trail even after employment ends. You can still prove that a former employee acknowledged specific procedures during their tenure."
-        },
-        "faq8": {
-          "question": "How does this integrate with onboarding?",
-          "answer": "New employees see all required documents highlighted for acknowledgment. Onboarding checklists can include document acknowledgment milestones. New hires cannot claim they missed required procedures because the system tracks completion status."
-        },
-        "faq9": {
-          "question": "Can employees sign from mobile devices?",
-          "answer": "Yes. Document review and digital signature capture work from any device. Technicians can acknowledge procedures from the field without returning to the office."
-        },
-        "faq10": {
-          "question": "What's included in compliance reports?",
-          "answer": "Reports show employee signature status by document, acknowledgment timestamps, missing signature alerts, and complete version history. Export as PDF for professional audit presentation or CSV for data analysis."
-        }
-      },
-      "cta": {
-        "title": "Ready to Build Defensible Compliance?",
-        "subtitle": "Upload your first document and capture employee signatures in under 5 minutes.",
-        "subtitleLine2": "Full access. No credit card. Permanent audit trail from day one.",
-        "trialButton": "Start Your 60-Day Trial"
+        "title": "Lo que hace este modulo",
+        "subtitle": "Almacenamiento centralizado de documentos con busqueda, firmas digitales y exportacion lista para cumplimiento."
       }
     },
     "gearInventory": {
       "hero": {
-        "badge": "Gear Inventory Module",
-        "titleLine1": "Where's That $400 Harness",
-        "titleLine2": "You Bought Last Year?",
-        "titleLine3": "You Should Know.",
-        "description": "Know exactly what equipment your company owns, who has it, and when it needs replacing. Real-time inventory tracking that builds itself as your team works.",
-        "descriptionStrong": "Equipment management built for rope access professionals who got tired of buying gear they already own.",
-        "ctaTrial": "Start Your Free 60-Day Trial",
-        "ctaFaqs": "Find Answers"
+        "badge": "Modulo de Inventario de Equipo",
+        "titleLine1": "Cuando fue la ultima vez",
+        "titleLine2": "que inspeccionaste ese arnes?",
+        "titleLine3": "Puedes probarlo?",
+        "description": "Rastrea cada pieza de equipo desde la compra hasta el retiro. Fechas de inspeccion, programas de mantenimiento, etiquetas de retiro, todo en un solo lugar.",
+        "ctaTrial": "Comienza tu prueba gratuita de 60 dias",
+        "ctaFaq": "Encontrar respuestas"
       },
       "stats": {
-        "availabilityValue": "4 sec",
-        "availabilityLabel": "Availability check",
-        "onboardingValue": "10 min",
-        "onboardingLabel": "Equipment onboarding",
-        "overallocationValue": "Zero",
-        "overallocationLabel": "Overallocation risk",
-        "recoveryValue": "$2-4K",
-        "recoveryLabel": "Annual recovery"
+        "equipmentTracked": "Equipos rastreados",
+        "inspectionsLogged": "Inspecciones registradas",
+        "expiryAlerts": "Alertas de vencimiento",
+        "complianceRate": "Tasa de cumplimiento"
       },
       "problem": {
-        "title": "The Equipment Black Hole",
-        "intro": "You bought 10 harnesses last year. Today, you can find 6.",
-        "paragraph1": "Are they in the shop? In someone's truck? Did that tech who quit last month take them home? You have no idea. So you order more. Another $2,400 gone.",
-        "paragraph2": "This happens constantly. Descenders vanish. Ropes disappear. Carabiners multiply and then evaporate. You know you own the equipment. You just can't prove who has it.",
-        "paragraph3": "Your spreadsheet was accurate three months ago. Now nobody updates it. When a client calls asking if you can staff a crew tomorrow, you spend 45 minutes calling around, checking the shop, texting employees. By the time you get an answer, you've wasted half your morning and you're still not certain.",
-        "solution": "OnRopePro replaces the guesswork with a real-time database. Equipment availability updates automatically when employees assign gear to themselves, when managers distribute equipment, and when items are returned. No manual data entry. No outdated information. One glance tells you what you own, who has it, and what's available."
+        "title": "El equipo que no puedes rastrear",
+        "paragraph1": "Sabes que compraste ese arnes hace tres años. Pero cuando exactamente? Y cuando fue la ultima inspeccion? Y cuando necesita ser retirado?",
+        "paragraph2": "Las etiquetas se desvanecen. Las hojas de calculo se desactualizan. La memoria falla.",
+        "paragraph3": "Cuando un auditor pide registros de inspeccion de equipos, necesitas respuestas, no suposiciones. OnRopePro rastrea cada pieza desde la compra hasta el retiro."
       },
       "features": {
-        "title": "What This Module Does",
-        "subtitle": "Complete equipment tracking from purchase to retirement using a slot-based availability model: Available = Quantity - Assigned.",
-        "database": {
-          "title": "Centralized Equipment Database",
-          "description": "Track every piece of equipment your company owns in one place. Add items with pre-loaded rope access brands and models (Petzl, CMC, Kong, ISC). Enter quantities, prices, serial numbers. See real-time availability instantly.",
-          "trackedLabel": "What gets tracked:",
-          "item1": "Equipment type, brand, model, quantity",
-          "item2": "Purchase price (financial permissions only)",
-          "item3": "Serial numbers (optional per item)",
-          "item4": "Date of manufacture and in-service dates"
-        },
-        "assignment": {
-          "title": "Assignment Management",
-          "description": "Know who has what at all times. Assign equipment to employees with complete tracking. Employees can self-assign from available inventory or managers can distribute gear directly.",
-          "managedLabel": "What gets managed:",
-          "item1": "Equipment assignments by employee",
-          "item2": "Serial number tracking per assignment",
-          "item3": "Assignment history with timestamps",
-          "item4": "Return and retirement workflows"
-        },
-        "visibility": {
-          "title": "Team Visibility",
-          "description": "See your entire company's gear distribution at a glance. The Team Gear view shows every employee and their assigned equipment. Verify crew readiness in seconds, not hours.",
-          "visibleLabel": "What gets visible:",
-          "item1": "Complete kit status per employee",
-          "item2": "Available inventory for new assignments",
-          "item3": "Equipment gaps before job starts",
-          "item4": "Service life status with color-coded indicators"
-        }
-      },
-      "stakeholders": {
-        "title": "Who Benefits From This Module",
-        "subtitle": "Every stakeholder gets the equipment visibility and accountability protection they need.",
-        "owners": {
-          "title": "For Rope Access Company Owners",
-          "benefit1Title": "Eliminate equipment loss.",
-          "benefit1Desc1": "Real-time tracking creates a digital paper trail proving who received what equipment and when. No more \"he said/she said\" disputes over missing harnesses.",
-          "benefit1Desc2": "Recover $2,000-4,000 annually in equipment you would have replaced.",
-          "benefit2Title": "Budget accurately for replacements.",
-          "benefit2Desc1": "Date of manufacture and in-service dates tracked per item. Color-coded service life indicators show equipment approaching replacement timelines.",
-          "benefit2Desc2": "Plan purchases months ahead instead of scrambling when gear fails inspections.",
-          "benefit3Title": "Answer \"do we have enough gear?\" in 4 seconds.",
-          "benefit3Desc": "Accept jobs confidently knowing exactly what equipment is available. Stop losing money on emergency rentals because you couldn't verify inventory in time."
-        },
-        "technicians": {
-          "title": "For Technicians",
-          "benefit1Title": "Build your kit in 10 minutes.",
-          "benefit1Desc1": "Browse available inventory, select what you need, assign it to yourself. No waiting for managers. No paperwork.",
-          "benefit1Desc2": "Your personal kit appears in your profile immediately.",
-          "benefit2Title": "Know your equipment is compliant.",
-          "benefit2Desc1": "In-service dates visible for every item in your kit. Complete inspections knowing your gear meets requirements.",
-          "benefit2Desc2": "No surprises during audits.",
-          "benefit3Title": "Self-service flexibility.",
-          "benefit3Desc1": "Need a backup descender for tomorrow's job? Check availability, grab it from inventory, assign it to yourself. Return it when you're done.",
-          "benefit3Desc2": "No phone calls, no approvals needed."
-        },
-        "buildingManagers": {
-          "title": "For Building Managers",
-          "benefit1Title": "Verify contractor equipment compliance.",
-          "benefit1Desc1": "Corporate Safety Record visibility through OnRopePro shows contractor equipment tracking and inspection status.",
-          "benefit1Desc2": "Due diligence documentation before work begins.",
-          "benefit2Title": "Reduce liability exposure.",
-          "benefit2Desc1": "If an incident occurs, you can demonstrate you verified contractor equipment protocols.",
-          "benefit2Desc2": "Professional vendors stand out from competitors through systematic tracking."
-        },
-        "propertyManagers": {
-          "title": "For Property Managers",
-          "benefit1Title": "Contractor qualification at a glance.",
-          "benefit1Desc1": "Equipment tracking status indicates which vendors operate professionally.",
-          "benefit1Desc2": "Make informed decisions about which contractors deserve preferred vendor status."
-        },
-        "residents": {
-          "title": "For Residents",
-          "benefit1Title": "Work performed with tracked, maintained equipment.",
-          "benefit1Desc1": "Technicians accessing your building use gear with documented service history and inspection records.",
-          "benefit1Desc2": "Transparent safety practices."
-        }
-      },
-      "keyFeatures": {
-        "title": "Key Features",
-        "subtitle": "Six capabilities that transform equipment chaos into organized accountability.",
-        "slotBased": {
-          "title": "Slot-Based Availability",
-          "desc1": "Available = Quantity - Assigned. This formula is absolute. Add 10 harnesses, assign 4 to employees, 6 remain available.",
-          "desc2": "Serial numbers are optional metadata, not gatekeepers. Track individual units when needed; skip serials when you don't."
-        },
-        "preloaded": {
-          "title": "Pre-Loaded Equipment Database",
-          "desc1": "Every rope access brand already loaded. Petzl, CMC, Kong, ISC, and more. Select equipment type, pick brand and model, enter quantity.",
-          "desc2": "No manual data entry for specifications. Compare this to typing everything from scratch in a spreadsheet."
-        },
-        "dualAssignment": {
-          "title": "Dual Assignment Paths",
-          "desc1": "Managers assign equipment to employees during onboarding or controlled distribution. Employees self-assign from available inventory as needed.",
-          "desc2": "Both methods create complete assignment records automatically."
-        },
-        "financial": {
-          "title": "Financial Protection",
-          "desc1": "Equipment prices visible only to users with financial permissions. Employees see quantities and assignments but not dollar values.",
-          "desc2": "Owners need it for budgeting and insurance. Employees don't need to know what their harness cost."
-        },
-        "serviceLife": {
-          "title": "Service Life Tracking",
-          "desc1": "Date of manufacture and in-service dates per assignment. Color-coded indicators (green, yellow, red) for hard gear (5-year guideline) and soft gear (10-year guideline).",
-          "desc2": "Data for decision-making without automatic retirement."
-        },
-        "atomicSerial": {
-          "title": "Atomic Serial Registration",
-          "desc1": "Enter new serial numbers during assignment. System validates, registers, and creates assignment in one operation.",
-          "desc2": "Add serials on the fly as equipment is distributed. Reduce administrative overhead while maintaining complete tracking."
-        }
-      },
-      "integration": {
-        "title": "Module Integration Points",
-        "subtitle": "Gear Inventory connects to six other OnRopePro modules, creating the accountability infrastructure for your entire operation.",
-        "safety": {
-          "title": "Safety & Compliance",
-          "item1": "Harness inspections require assigned equipment",
-          "item2": "Inspection records link to specific serial numbers"
-        },
-        "workSession": {
-          "title": "Work Session Management",
-          "item1": "Validates technicians have required gear assigned",
-          "item2": "Accountability built into the workflow"
-        },
-        "employee": {
-          "title": "Employee Management",
-          "item1": "Personal kits become part of technician profiles",
-          "item2": "Complete equipment assignment history"
-        },
-        "project": {
-          "title": "Project Management",
-          "item1": "Project requirements can specify equipment needs",
-          "item2": "Crew assignment considers available inventory"
-        },
-        "payroll": {
-          "title": "Payroll & Financials",
-          "item1": "Equipment values for insurance documentation",
-          "item2": "Replacement budgeting from service life data"
-        },
-        "access": {
-          "title": "User Access & Authentication",
-          "item1": "Four permission levels control inventory access",
-          "item2": "Granular control over who can see and distribute"
-        }
-      },
-      "businessImpact": {
-        "title": "Stop Counting Harnesses. Start Counting Profits.",
-        "subtitle": "Equipment management becomes something that happens, not something you do.",
-        "paragraph1": "Right now, you're spending hours every month on equipment that should manage itself. Hunting for gear. Verifying availability. Documenting assignments. Replacing equipment you probably still own somewhere.",
-        "paragraph2": "Your spreadsheet hasn't been updated in three months. Your techs take equipment without telling anyone. New hires get equipped with whatever you can find on short notice. And when gear goes missing, you eat the loss because you can't prove who had it.",
-        "paragraph3": "With OnRopePro's Gear Inventory module, your employees build their own kits. They assign equipment to themselves, do their inspections, log their work. Every assignment creates a record. Every return updates availability. The system builds itself because everyone doing their job automatically feeds data into it.",
-        "paragraph4": "You get complete visibility without the administrative burden. Know exactly what you own, where it is, and when it needs replacing. Accept jobs confidently. Budget accurately. Protect your investment."
-      },
-      "results": {
-        "time": {
-          "value": "45 min",
-          "label": "Saved per availability check"
-        },
-        "errors": {
-          "value": "Zero",
-          "label": "Overallocation errors"
-        },
-        "cost": {
-          "value": "$2-4K",
-          "label": "Annual cost recovery"
-        },
-        "audit": {
-          "value": "100%",
-          "label": "Audit-ready records"
-        }
-      },
-      "faqs": {
-        "title": "Frequently Asked Questions",
-        "expandAll": "Expand All",
-        "collapseAll": "Collapse All",
-        "q1": {
-          "question": "What if I have 10 harnesses but only registered 5 serial numbers?",
-          "answer1": "You still have 10 available slots. Serial numbers are optional metadata, not gatekeepers. The slot-based model counts quantity, not serial registrations.",
-          "answer2": "Add serials gradually as equipment is distributed."
-        },
-        "q2": {
-          "question": "Can two different items have the same serial number?",
-          "answer1": "Yes. Serial numbers must be unique within each gear item type, but a harness and a rope can both have serial \"HR-001.\" Different manufacturers use similar numbering schemes.",
-          "answer2": "The system prevents duplicates within an item type, which is what matters for tracking."
-        },
-        "q3": {
-          "question": "What happens when equipment expires?",
-          "answer1": "The system tracks in-service dates with color-coded indicators for review. Hard gear (5 years) and soft gear (10 years) guidelines are displayed.",
-          "answer2": "You decide when to retire based on inspections and manufacturer recommendations. OnRopePro provides data for decision-making; actual retirement decisions should involve qualified safety professionals."
-        },
-        "q4": {
-          "question": "Who can see equipment prices?",
-          "answer1": "Only users with financial permissions. Regular employees see quantities and assignments but not dollar values.",
-          "answer2": "Financial data is sensitive. Owners need it for budgeting and insurance. Employees don't need to know what their harness cost."
-        },
-        "q5": {
-          "question": "Can I delete a serial number that's assigned to someone?",
-          "answer1": "No. Return the gear assignment first, then delete or edit the serial. This prevents orphaned assignments pointing to non-existent serials.",
-          "answer2": "Data integrity is maintained by enforcing proper return workflow."
-        },
-        "q6": {
-          "question": "What if I need to reduce quantity below what's assigned?",
-          "answer1": "You cannot. If 5 items are assigned, you cannot reduce quantity below 5. Return some assignments first.",
-          "answer2": "This prevents negative availability and ensures the system always reflects physical reality."
-        },
-        "q7": {
-          "question": "Do employees need permission to assign gear to themselves?",
-          "answer1": "No. All employees can self-assign from available inventory and remove their own assignments. No special permission required.",
-          "answer2": "This reduces administrative burden while maintaining complete tracking."
-        },
-        "q8": {
-          "question": "How does equipment get added to inventory?",
-          "answer1": "Navigate to inventory, add item, select equipment type, pick brand and model from pre-loaded database, enter quantity.",
-          "answer2": "Optionally add serial numbers and assign to employees during the same workflow. One-time setup, then the system maintains itself."
-        },
-        "q9": {
-          "question": "What's the difference between 'Manage Inventory' and 'Assign Gear' permissions?",
-          "answer1": "Manage Inventory allows adding new gear items, editing quantities, and registering serial numbers. Assign Gear allows distributing equipment to other employees.",
-          "answer2": "Owners have both. Supervisors might have Assign Gear without Manage Inventory, depending on your workflow."
-        },
-        "q10": {
-          "question": "Can employees see what gear coworkers have?",
-          "answer1": "Only with View Team Gear permission. Otherwise, employees see only their own kit.",
-          "answer2": "Owners and supervisors typically have Team Gear visibility. Regular techs typically don't."
-        }
-      },
-      "cta": {
-        "title": "Ready to Know Where Your Equipment Is?",
-        "subtitle": "Start your free 60-day trial. No credit card required. Full access to all features.",
-        "trialButton": "Start Your Free 60-Day Trial",
-        "pricingButton": "View Pricing"
+        "title": "Lo que hace este modulo",
+        "subtitle": "Gestion completa de inventario de equipos diseñada para requisitos de cumplimiento de seguridad."
       }
     },
     "whiteLabel": {
       "hero": {
-        "badge": "White-Label Branding Module",
-        "titleLine1": "Stop Reminding Clients",
-        "titleLine2": "They Could Replace You",
-        "titleLine3": "Tomorrow.",
-        "description": "Transform OnRopePro into your company's proprietary platform. Custom branding that turns \"just another vendor\" into \"established partner with sophisticated systems.\"",
-        "tagline": "Your brand. Your system. Their trust.",
-        "ctaTrial": "Start Your Free 60-Day Trial",
-        "ctaFaqs": "Find Answers"
+        "badge": "Modulo de Marca Blanca",
+        "titleLine1": "Tus clientes ven",
+        "titleLine2": "la marca OnRopePro.",
+        "titleLine3": "Que tal si vieran la tuya?",
+        "description": "Logotipo personalizado, colores y marca que hacen que la plataforma se vea como tuya.",
+        "ctaTrial": "Comienza tu prueba gratuita de 60 dias",
+        "ctaFaq": "Encontrar respuestas"
       },
       "stats": {
-        "touchpoints": "Client touchpoints branded",
-        "winRate": "Contract win rate increase",
-        "adoption": "Employee adoption rate",
-        "setup": "Complete setup time"
+        "brandCustomization": "Personalizacion de marca",
+        "clientImpression": "Impresion del cliente",
+        "professionalImage": "Imagen profesional",
+        "brandConsistency": "Consistencia de marca"
       },
       "problem": {
-        "title": "The Professional Credibility Gap",
-        "intro": "Every time a property manager logs into your portal and sees OnRopePro's logo, you've told them something you didn't mean to say.",
-        "paragraph1": "You've told them you're using the same software as every other contractor bidding their buildings. You've told them they could switch providers without changing systems. You've told them you're interchangeable.",
-        "paragraph2": "Landmark Properties manages 47 buildings across downtown Vancouver. They use five different rope access contractors for window cleaning and building maintenance. All five contractors use OnRopePro. All five portals look identical. When Landmark's operations manager pulls up work orders, she can't tell which contractor she's reviewing until she reads the project details.",
-        "paragraph3": "Your competitors aren't just bidding against your price anymore. They're bidding against your entire operational appearance. The building maintenance company that lost the $180,000 Bentall Centre contract learned this the hard way. The property manager cited \"more professional systems\" as the deciding factor. The winning contractor used white-labeled software that looked like custom-built internal infrastructure.",
-        "solution": "OnRopePro's White Label Branding eliminates the generic software problem entirely. Your logo. Your colors. Your professional image, reinforced at every single touchpoint where clients, employees, and building managers interact with your systems."
+        "title": "La marca que no es tuya",
+        "paragraph1": "Cada correo electronico que tus clientes reciben dice OnRopePro. Cada portal que usan muestra nuestro logotipo.",
+        "paragraph2": "Eso funciona para la mayoria de las empresas. Pero si has construido una marca que importa a tus clientes, quieres que la vean.",
+        "paragraph3": "La marca blanca pone tu logotipo, tus colores y tu nombre donde los clientes interactuan con el sistema."
       },
       "features": {
-        "title": "Complete Brand Control Across Every Client Touchpoint",
-        "subtitle": "White Label Branding transforms OnRopePro from third-party software into what appears to be your proprietary management platform, creating professional credibility that wins contracts and justifies premium pricing."
+        "title": "Lo que hace este modulo",
+        "subtitle": "Marca personalizada para la interfaz orientada al cliente."
       }
     },
     "safety": {
       "hero": {
-        "badge": "Safety & Compliance Module",
-        "titleLine1": "{{authority}} just pulled",
-        "titleLine2": "into the parking lot.",
-        "titleLine3": "Are you ready?",
-        "descriptionLine1": "Daily harness inspections. Toolbox meetings.",
-        "descriptionLine2": "Equipment tracking. Digital signatures.",
-        "descriptionLine3": "All searchable. All exportable. All defensible.",
-        "ctaTrial": "Start Your Free 60-Day Trial",
-        "ctaKnowledgebase": "Find Answers"
+        "badge": "Modulo de Seguridad y Cumplimiento",
+        "titleLine1": "{{authority}} acaba de llegar",
+        "titleLine2": "al estacionamiento.",
+        "titleLine3": "Estas listo?",
+        "descriptionLine1": "Inspecciones diarias de arnes. Reuniones de seguridad.",
+        "descriptionLine2": "Seguimiento de equipos. Firmas digitales.",
+        "descriptionLine3": "Todo buscable. Todo exportable. Todo defendible.",
+        "ctaTrial": "Comienza tu prueba gratuita de 60 dias",
+        "ctaKnowledgebase": "Encontrar respuestas"
       },
       "stats": {
-        "missingForms": "Missing forms",
-        "failedAudits": "Failed audits",
-        "sleeplessNights": "Sleepless nights",
-        "searchableHistory": "Searchable history"
+        "missingForms": "Formularios faltantes",
+        "failedAudits": "Auditorias fallidas",
+        "sleeplessNights": "Noches sin dormir",
+        "searchableHistory": "Historial buscable"
       },
       "problem": {
-        "title": "The Scramble You Know Too Well",
-        "paragraph1": "Most rope access operators know exactly what happens when the auditor asks for six months of harness inspections.",
-        "paragraph2": "The truck gets searched. The binder gets dug out. Someone says \"I think Dave had that folder.\" Half the forms are missing. The ones you find have coffee stains and illegible handwriting.",
-        "paragraph3": "You pass the audit. Barely. And you promise yourself you'll get organized.",
-        "paragraph4": "Until next time, when the exact same scramble happens again.",
-        "paragraph5": "Meanwhile, your insurance carrier wants proof of your safety culture. Your property manager wants documentation before every job. And if someone gets hurt, the first question a lawyer asks is:",
-        "quote": "\"Can you prove you conducted the required inspections?\"",
-        "paragraph6": "Paper forms can't protect you. Filing cabinets can't protect you. The best technicians in the world can't protect you if there's no record of what they did."
+        "title": "La busqueda desesperada que conoces muy bien",
+        "paragraph1": "La mayoria de los operadores de acceso con cuerdas saben exactamente lo que pasa cuando el auditor pide seis meses de inspecciones de arnes.",
+        "paragraph2": "Se busca en el camion. Se saca la carpeta. Alguien dice \"Creo que Dave tenia esa carpeta.\" La mitad de los formularios faltan. Los que encuentras tienen manchas de cafe y letra ilegible.",
+        "paragraph3": "Pasas la auditoria. Apenas. Y te prometes organizarte.",
+        "paragraph4": "Hasta la proxima vez, cuando pasa exactamente la misma busqueda desesperada de nuevo.",
+        "paragraph5": "Mientras tanto, tu aseguradora quiere prueba de tu cultura de seguridad. Tu administrador de propiedades quiere documentacion antes de cada trabajo. Y si alguien se lastima, la primera pregunta que hace un abogado es:",
+        "quote": "\"Puedes probar que realizaste las inspecciones requeridas?\"",
+        "paragraph6": "Los formularios de papel no pueden protegerte. Los archivadores no pueden protegerte. Los mejores tecnicos del mundo no pueden protegerte si no hay registro de lo que hicieron."
       },
       "features": {
-        "title": "What This Module Does",
-        "subtitle": "Complete safety documentation that creates itself through daily use."
+        "title": "Lo que hace este modulo",
+        "subtitle": "Documentacion de seguridad completa que se crea sola a traves del uso diario."
       }
     },
     "projects": {
       "hero": {
-        "badge": "Project Management Module",
-        "title": "Stop Managing Projects",
-        "titleHighlight": "In Your Head",
-        "description": "Track every building, every elevation, every technician from one screen.",
-        "descriptionStrong": "Know exactly where every job stands without driving site to site or relying on yesterday's phone call.",
-        "ctaTrial": "Start Your Free 60-Day Trial",
-        "ctaAnswers": "Find Answers"
+        "badge": "Modulo de Gestion de Proyectos",
+        "titleLine1": "Cuantas paginas de tu cuaderno",
+        "titleLine2": "estan llenas de informacion",
+        "titleLine3": "que nunca volveras a encontrar?",
+        "description": "Cada edificio, cada cliente, cada trabajo en un solo lugar. Busca por direccion, filtra por estado, exporta cuando lo necesites.",
+        "ctaTrial": "Comienza tu prueba gratuita de 60 dias",
+        "ctaFaq": "Encontrar respuestas"
       },
       "stats": {
-        "elevations": "Elevations tracked independently",
-        "payrollErrors": "Payroll errors eliminated",
-        "statusCalls": "Fewer status calls from clients",
-        "quotePrep": "Faster quote preparation"
+        "projectsManaged": "Proyectos gestionados",
+        "buildingsTracked": "Edificios rastreados",
+        "clientsServed": "Clientes atendidos",
+        "searchableRecords": "Registros buscables"
       },
       "problem": {
-        "title": "The Reality",
-        "juggling": "You're juggling window washing at Tower A, caulking at Building B, anchor inspections at Complex C. A client calls asking for a status update.",
-        "guessing": "You're guessing.",
-        "maybe": "You think Tommy's finishing the north elevation today. Maybe. Sarah might have capacity next week. Probably. That 15-story quote you just sent? You pulled the timeline from memory because you couldn't find your notes from the similar job six months ago.",
-        "siteVisits": "Many times you've had to go from project to project and look at the guys on the rope and take notes of where they're at compared to where they were yesterday. Ten to fifteen hours a week just figuring out what's happening.",
-        "performance": "Then there's the performance problem nobody talks about. One guy on the cell phone half the day, does one drop. The other guy working his ass off. They were there the same amount of time. You know something's wrong. Without hard data, you can't have the conversation.",
-        "exhausted": "Your brain is your business. And it's exhausted."
+        "title": "El cuaderno que nunca encuentras",
+        "paragraph1": "Cada operador tiene uno. Ese cuaderno con la direccion de cada trabajo, la informacion de contacto de cada cliente, las notas sobre problemas de acceso.",
+        "paragraph2": "A veces esta en el camion. A veces esta en casa. A veces esta perdido en algun lugar entre los dos.",
+        "paragraph3": "Luego un cliente llama preguntando sobre un trabajo del ano pasado. Sabes que lo hiciste. No puedes probar nada de eso.",
+        "paragraph4": "OnRopePro lo mantiene todo en un solo lugar. Accesible desde cualquier dispositivo. Buscable por direccion, cliente o fecha. Tu historial de trabajo, organizado."
       },
       "solution": {
-        "changes": "OnRopePro changes the equation. Every project visible from one screen. Progress updates automatically as work sessions get logged. Per-employee performance tracked with objective data. The information is at your fingertips instead of scattered across your memory, your whiteboard, and six different text threads.",
-        "linked": "Everything is linked with everything. Create a project and it fills the schedule. Employees log work and it fills payroll. If you do one thing, it does something else for you somewhere else.",
-        "cognitive": "The system carries the cognitive load. Your mental bandwidth opens up for actually running the business."
+        "title": "Gestion de proyectos para trabajo en alturas",
+        "subtitle": "Diseñado alrededor de como realmente funcionan los trabajos de acceso con cuerdas."
       },
       "features": {
-        "title": "What This Module Does",
-        "subtitle": "The operational hub connecting scheduling, safety, and payroll",
-        "description": "Projects track individual building maintenance jobs with progress measured the way rope access actually works.",
+        "title": "Lo que hace este modulo",
+        "subtitle": "Seguimiento completo de proyectos diseñado para operaciones de acceso con cuerdas.",
+        "jobTracking": {
+          "title": "Seguimiento de trabajos",
+          "description": "Cada proyecto desde la propuesta hasta la finalizacion. Estado, progreso, notas, documentacion, todo vinculado."
+        },
+        "clientManagement": {
+          "title": "Gestion de clientes",
+          "description": "Base de datos de clientes con historial de contactos. Sabe que edificios has atendido para cada cliente."
+        },
         "progressTracking": {
-          "title": "Progress Tracking by Job Type",
-          "adapts": "The system adapts to your work, not the other way around.",
-          "description": "Drop-based tracking for window cleaning and building wash counts vertical passes per elevation. North, East, South, West tracked independently. Hours-based tracking for inspections and repairs captures time with manual completion percentage. Unit-based tracking for parkade cleaning and in-suite services counts individual stalls or suites completed.",
-          "form": "The form technicians see when ending a work session changes based on what they're working on. No forcing your operations into someone else's template.",
-          "tracked": "What gets tracked:",
-          "item1": "N/E/S/W elevations independently",
-          "item2": "Drops completed per session per direction",
-          "item3": "Hours worked with completion estimates",
-          "item4": "Units or stalls finished"
-        },
-        "calendar": {
-          "title": "Automatic Calendar Population",
-          "once": "Create a project once. The schedule fills itself.",
-          "description": "When you enter a date range and assign employees, calendar entries appear automatically. No more creating a project, then opening Google Calendar, then texting your supervisor, then updating the whiteboard. Same information, one entry, everywhere it needs to go.",
-          "sync": "Building gets pushed by a week? Click the project, change the date. It syncs everywhere. Conflict detection flags when someone is double-booked before it becomes an emergency.",
-          "automated": "What gets automated:",
-          "item1": "Multi-day project bars on company calendar",
-          "item2": "Employee assignments visible on their schedules",
-          "item3": "Color coding by job type",
-          "item4": "Conflict detection for double-booking"
-        },
-        "documentation": {
-          "title": "Linked Documentation",
-          "live": "Safety docs live with their projects. Not in email. Not in Google Drive. Not in a folder in the truck.",
-          "description": "Each project connects to its Rope Access Plan, Toolbox Meeting records, and Anchor Inspection Certificates. Property managers access compliance documents through their portal without emailing you. Auditors find everything in one place.",
-          "insurance": "When the insurance company asks for proof of your safety program, you're not digging. You're clicking.",
-          "linked": "What gets linked:",
-          "item1": "Rope Access Plans (RAP)",
-          "item2": "Toolbox Meeting records",
-          "item3": "Anchor Inspection Certificates",
-          "item4": "Project photos"
+          "title": "Seguimiento de progreso",
+          "description": "Rastrea gotas por elevacion, porcentaje completado, horas vs estimaciones. Ve donde van los trabajos."
         }
       }
     },
     "payroll": {
       "hero": {
-        "badge": "Payroll & Financial Module",
-        "titleLine1": "Stop Circling Numbers",
-        "titleLine2": "With a Pen",
-        "description": "Work sessions flow directly into payroll-ready timesheets. No paper. No calculator. No circling.",
-        "descriptionBold": "Export to QuickBooks, ADP, or Gusto in minutes.",
-        "trialButton": "Start Your Free 60-Day Trial",
-        "faqButton": "Find Answers"
+        "badge": "Modulo de Nomina y Finanzas",
+        "titleLine1": "Deja de encerrar numeros",
+        "titleLine2": "Con un boligrafo",
+        "description": "Las sesiones de trabajo fluyen directamente a hojas de tiempo listas para nomina. Sin papel. Sin calculadora. Sin encerrar.",
+        "descriptionBold": "Exporta a QuickBooks, ADP o Gusto en minutos.",
+        "trialButton": "Comienza tu prueba gratuita de 60 dias",
+        "faqButton": "Encontrar respuestas"
       },
       "stats": {
-        "timeEliminated": "Payroll time eliminated",
-        "annualValue": "Annual time value",
-        "hoursSaved": "Hours saved yearly",
-        "problemsSolved": "Problems solved"
+        "timeEliminated": "Tiempo de nomina eliminado",
+        "annualValue": "Valor anual del tiempo",
+        "hoursSaved": "Horas ahorradas al ano",
+        "problemsSolved": "Problemas resueltos"
       },
       "problem": {
-        "title": "The Payroll Problem Nobody Admits",
-        "line1": "You print timesheets. One employee's data spreads across four pages.",
-        "line2": "Twelve employees means 48 pages minimum. You lay them across your desk, circle hours with a pen, and grab a calculator.",
-        "line3": "Three hours later, you're still not done. And you've probably made a mistake you won't catch until the employee calls asking why they're short $130.",
-        "line4": "So you send a quick e-transfer. Problem solved for them. Problem created for your books. Your bookkeeper asks what that random payment was. Now you're explaining instead of running your company.",
-        "line5": "This chaos doesn't stay contained. When payroll is painful, you put it off. When you're consistently late, your team notices. A culture forms where deadlines are optional. That mindset bleeds into everything.",
-        "solution": "OnRopePro eliminates manual entry between field work and payroll. Every clock-in becomes payroll data automatically. GPS-verified. Project-attributed. Overtime-calculated. Ready to export."
+        "title": "El problema de nomina que nadie admite",
+        "line1": "Imprimes hojas de tiempo. Los datos de un empleado se extienden en cuatro paginas.",
+        "line2": "Doce empleados significa minimo 48 paginas. Las extiendes en tu escritorio, encierras horas con un boligrafo y tomas una calculadora.",
+        "line3": "Tres horas despues, aun no has terminado. Y probablemente cometiste un error que no descubriras hasta que el empleado llame preguntando por que le faltan $130.",
+        "line4": "Entonces envias una transferencia rapida. Problema resuelto para ellos. Problema creado para tus libros. Tu contador pregunta que fue ese pago aleatorio. Ahora estas explicando en lugar de dirigir tu empresa.",
+        "line5": "Este caos no se contiene. Cuando la nomina es dolorosa, la pospones. Cuando llegas tarde constantemente, tu equipo lo nota. Se forma una cultura donde los plazos son opcionales. Esa mentalidad se filtra en todo.",
+        "solution": "OnRopePro elimina la entrada manual entre el trabajo de campo y la nomina. Cada registro se convierte en datos de nomina automaticamente. Verificado por GPS. Atribuido al proyecto. Horas extras calculadas. Listo para exportar."
       },
       "features": {
-        "title": "From Clock-In to Payroll Export",
-        "subtitle": "The Payroll & Financial module transforms scattered work session data into organized, exportable timesheets without manual intervention."
+        "title": "Del registro a la exportacion de nomina",
+        "subtitle": "El modulo de Nomina y Finanzas transforma datos dispersos de sesiones de trabajo en hojas de tiempo organizadas y exportables sin intervencion manual."
       },
       "benefits": {
-        "title": "Who Benefits From This Module",
-        "subtitle": "Payroll clarity for everyone in your operation.",
+        "title": "Quien se beneficia de este modulo",
+        "subtitle": "Claridad de nomina para todos en tu operacion.",
         "employers": {
-          "title": "For Employers (Company Owners)",
+          "title": "Para empleadores (Propietarios de empresas)",
           "benefit1": {
-            "title": "Reclaim 5+ hours every pay period.",
-            "description": "The calculator and pen method costs you 6-10 hours per payroll run. OnRopePro aggregates everything automatically. Select the pay period. Review the totals. Export. Done in 30-45 minutes."
+            "title": "Recupera mas de 5 horas cada periodo de pago.",
+            "description": "El metodo de calculadora y boligrafo te cuesta 6-10 horas por proceso de nomina. OnRopePro agrega todo automaticamente. Selecciona el periodo de pago. Revisa los totales. Exporta. Listo en 30-45 minutos."
           },
           "benefit2": {
-            "title": "Stop the random e-transfer scramble.",
-            "description": "When timesheets are wrong, you fix it with quick payments that confuse your books. Accurate data from the start means no corrections. Your bookkeeper gets clean exports every time."
+            "title": "Detén el caos de transferencias aleatorias.",
+            "description": "Cuando las hojas de tiempo estan mal, lo corriges con pagos rapidos que confunden tus libros. Datos precisos desde el inicio significa cero correcciones. Tu contador recibe exportaciones limpias cada vez."
           },
           "benefit3": {
-            "title": "Quote jobs with confidence.",
-            "description": "You underbid that building by 60 hours because you couldn't see where time went. Project attribution shows exactly how long each job takes. Your next quote includes the hours you actually need."
+            "title": "Cotiza trabajos con confianza.",
+            "description": "Subcotizaste ese edificio por 60 horas porque no podias ver donde iba el tiempo. La atribucion de proyectos muestra exactamente cuanto tarda cada trabajo. Tu proxima cotizacion incluye las horas que realmente necesitas."
           }
         },
         "operations": {
-          "title": "For Operations Managers & Supervisors",
+          "title": "Para gerentes de operaciones y supervisores",
           "benefit1": {
-            "title": "Review without the paper shuffle.",
-            "description": "Your employees across multiple projects, multiple buildings, multiple shifts. The payroll view shows every work session organized by employee and pay period. Review and approve from one screen."
+            "title": "Revisa sin el desorden de papeles.",
+            "description": "Tus empleados en multiples proyectos, multiples edificios, multiples turnos. La vista de nomina muestra cada sesion de trabajo organizada por empleado y periodo de pago. Revisa y aprueba desde una sola pantalla."
           },
           "benefit2": {
-            "title": "Catch discrepancies before payday.",
-            "description": "GPS verification and project attribution make anomalies obvious. A technician logged 8 hours at Building A but was scheduled for Building B? You see it immediately."
+            "title": "Detecta discrepancias antes del dia de pago.",
+            "description": "La verificacion GPS y la atribucion de proyectos hacen evidentes las anomalias. Un tecnico registro 8 horas en el Edificio A pero estaba programado para el Edificio B? Lo ves inmediatamente."
           },
           "benefit3": {
-            "title": "Historical access for audits.",
-            "description": "Previous pay periods stay accessible. When someone questions hours from three months ago, you pull the data in seconds."
+            "title": "Acceso historico para auditorias.",
+            "description": "Los periodos de pago anteriores permanecen accesibles. Cuando alguien cuestiona horas de hace tres meses, obtienes los datos en segundos."
           }
         },
         "technicians": {
-          "title": "For Rope Access Technicians",
+          "title": "Para tecnicos de acceso con cuerdas",
           "benefit1": {
-            "title": "Your hours are accurate.",
-            "description": "GPS verification captures your actual time on site. No more discrepancies between what you logged and what the owner calculated."
+            "title": "Tus horas son precisas.",
+            "description": "La verificacion GPS captura tu tiempo real en el sitio. No mas discrepancias entre lo que registraste y lo que calculo el propietario."
           },
           "benefit2": {
-            "title": "See where your time goes.",
-            "description": "Every work session shows which project you were assigned to. Your 8-hour day might split across three buildings. The breakdown is clear."
+            "title": "Ve a donde va tu tiempo.",
+            "description": "Cada sesion de trabajo muestra a que proyecto fuiste asignado. Tu dia de 8 horas puede dividirse en tres edificios. El desglose es claro."
           },
           "benefit3": {
-            "title": "Overtime calculated correctly.",
-            "description": "The system applies your company's overtime rules automatically. Daily trigger at 8 hours, weekly trigger at 40, whatever the configuration. No manual math required."
+            "title": "Horas extras calculadas correctamente.",
+            "description": "El sistema aplica las reglas de horas extras de tu empresa automaticamente. Disparador diario a las 8 horas, semanal a las 40, cualquiera que sea la configuracion. Sin calculos manuales requeridos."
           }
         },
         "buildingManagers": {
-          "title": "For Building Managers / Property Managers",
+          "title": "Para gerentes de edificios / administradores de propiedades",
           "benefit1": {
-            "title": "Labor documentation on demand.",
-            "description": "Need to verify how many technician hours were spent on your building last quarter? The data exists and exports cleanly."
+            "title": "Documentacion laboral a demanda.",
+            "description": "Necesitas verificar cuantas horas de tecnicos se gastaron en tu edificio el ultimo trimestre? Los datos existen y se exportan limpiamente."
           },
           "benefit2": {
-            "title": "Budget validation simplified.",
-            "description": "You contracted for 200 hours of annual maintenance. The project attribution shows exactly how many hours have been logged against your building."
+            "title": "Validacion de presupuesto simplificada.",
+            "description": "Contrataste 200 horas de mantenimiento anual. La atribucion de proyectos muestra exactamente cuantas horas se han registrado contra tu edificio."
           },
           "benefit3": {
-            "title": "Audit-ready records.",
-            "description": "Insurance, compliance, or internal review requirements? Work session data with GPS verification provides the documentation trail."
+            "title": "Registros listos para auditoria.",
+            "description": "Requisitos de seguro, cumplimiento o revision interna? Los datos de sesiones de trabajo con verificacion GPS proporcionan la documentacion."
           }
         }
       },
       "keyFeatures": {
-        "title": "Key Features",
-        "subtitle": "Every feature exists to eliminate the gap between field work and payroll processing.",
+        "title": "Caracteristicas clave",
+        "subtitle": "Cada caracteristica existe para eliminar la brecha entre el trabajo de campo y el procesamiento de nomina.",
         "feature1": {
-          "title": "Pay Period Configuration",
-          "description": "Choose weekly, bi-weekly, semi-monthly, or monthly pay periods. The system auto-generates period boundaries. Work sessions group into the correct pay period automatically."
+          "title": "Configuracion de periodos de pago",
+          "description": "Elige periodos semanales, quincenales, semi-mensuales o mensuales. El sistema genera automaticamente los limites del periodo. Las sesiones de trabajo se agrupan en el periodo de pago correcto automaticamente."
         },
         "feature2": {
-          "title": "GPS-Verified Time Data",
-          "description": "Hours come from verified work sessions, not self-reported notebooks. Clock-in location confirms the technician was actually at the job site. Eliminates disputes."
+          "title": "Datos de tiempo verificados por GPS",
+          "description": "Las horas provienen de sesiones de trabajo verificadas, no de libretas autoreportadas. La ubicacion del registro confirma que el tecnico realmente estaba en el sitio. Elimina disputas."
         },
         "feature3": {
-          "title": "Configurable Overtime Rules",
-          "description": "Set daily triggers (default 8 hours), weekly triggers (default 40 hours), or custom thresholds. Multipliers adjust from 1.5x to 3x. Disable overtime entirely if needed."
+          "title": "Reglas de horas extras configurables",
+          "description": "Establece disparadores diarios (predeterminado 8 horas), disparadores semanales (predeterminado 40 horas) o umbrales personalizados. Los multiplicadores se ajustan de 1.5x a 3x. Desactiva las horas extras completamente si es necesario."
         },
         "feature4": {
-          "title": "Project Attribution",
-          "description": "Every work session links to a specific project. Your payroll view shows which building, which job type, how many hours. Essential for job costing and future bid accuracy."
+          "title": "Atribucion de proyectos",
+          "description": "Cada sesion de trabajo se vincula a un proyecto especifico. Tu vista de nomina muestra que edificio, que tipo de trabajo, cuantas horas. Esencial para el costeo de trabajos y la precision de futuras cotizaciones."
         },
         "feature5": {
-          "title": "Billable vs Non-Billable Tracking",
-          "description": "Distinguish revenue-generating client hours from operational costs. Travel, equipment maintenance, training, weather delays. Know your true labor cost."
+          "title": "Seguimiento facturable vs no facturable",
+          "description": "Distingue las horas de cliente que generan ingresos de los costos operativos. Viajes, mantenimiento de equipos, capacitacion, retrasos por clima. Conoce tu verdadero costo laboral."
         },
         "feature6": {
-          "title": "Export Capabilities",
-          "description": "CSV export for payroll software integration (QuickBooks, ADP, Gusto). PDF timesheet reports for records. Employee-level detail and project cost breakdowns available."
+          "title": "Capacidades de exportacion",
+          "description": "Exportacion CSV para integracion con software de nomina (QuickBooks, ADP, Gusto). Reportes PDF de hojas de tiempo para registros. Detalle a nivel de empleado y desgloses de costos de proyecto disponibles."
         }
       },
       "results": {
-        "title": "Measurable Results",
-        "subtitle": "Concrete improvements you'll see from day one.",
+        "title": "Resultados medibles",
+        "subtitle": "Mejoras concretas que veras desde el primer dia.",
         "result1": {
-          "title": "Time Savings",
-          "description": "The manual pen-and-calculator method consumes 6-10 hours per payroll run. OnRopePro reduces this to 30-45 minutes. For bi-weekly payroll, that's approximately 260 hours saved annually. Time that goes back into running your business."
+          "title": "Ahorro de tiempo",
+          "description": "El metodo manual de boligrafo y calculadora consume 6-10 horas por proceso de nomina. OnRopePro lo reduce a 30-45 minutos. Para nomina quincenal, eso es aproximadamente 260 horas ahorradas anualmente. Tiempo que vuelve a dirigir tu negocio."
         },
         "result2": {
-          "title": "Error Reduction",
-          "description": "Conflicting systems (notebooks, time clocks, spreadsheets) create discrepancies. Single-source-of-truth data eliminates reconciliation disputes. Corrections drop dramatically when the data is accurate from the start."
+          "title": "Reduccion de errores",
+          "description": "Sistemas conflictivos (libretas, relojes de tiempo, hojas de calculo) crean discrepancias. Datos de una sola fuente de verdad eliminan disputas de reconciliacion. Las correcciones caen dramaticamente cuando los datos son precisos desde el inicio."
         },
         "result3": {
-          "title": "Job Costing Accuracy",
-          "description": "Without project attribution, you don't know why jobs run over budget. With it, you see exactly where hours went. Operators report quoting accuracy improves because they're working from actual historical data instead of estimates."
+          "title": "Precision en costeo de trabajos",
+          "description": "Sin atribucion de proyectos, no sabes por que los trabajos exceden el presupuesto. Con ella, ves exactamente donde fueron las horas. Los operadores reportan que la precision de cotizaciones mejora porque trabajan con datos historicos reales en lugar de estimaciones."
         },
         "result4": {
-          "title": "Accounting Cleanliness",
-          "description": "Random correction payments create unexplained transactions. Clean exports mean every dollar is documented before it leaves the system. Bookkeeper reconciliation time drops."
+          "title": "Limpieza contable",
+          "description": "Los pagos de correccion aleatorios crean transacciones sin explicacion. Exportaciones limpias significan que cada dolar esta documentado antes de salir del sistema. El tiempo de reconciliacion del contador disminuye."
         }
       },
       "integration": {
-        "title": "Module Integration Points",
-        "subtitle": "The Payroll & Financial module connects with other OnRopePro modules to create a complete data pipeline from field work to payroll export.",
+        "title": "Puntos de integracion de modulos",
+        "subtitle": "El modulo de Nomina y Finanzas se conecta con otros modulos de OnRopePro para crear un pipeline de datos completo desde el trabajo de campo hasta la exportacion de nomina.",
         "module1": {
-          "title": "Work Sessions & Time Tracking",
-          "description": "Primary data source. Every clock-in and clock-out creates work session data that flows directly into payroll aggregation."
+          "title": "Sesiones de trabajo y seguimiento de tiempo",
+          "description": "Fuente de datos principal. Cada registro de entrada y salida crea datos de sesion de trabajo que fluyen directamente a la agregacion de nomina."
         },
         "module2": {
-          "title": "Employee Management",
-          "description": "Rate and role lookup. Hourly rate pulls from the employee profile at the time of the work session. Mid-project rate changes are handled correctly."
+          "title": "Gestion de empleados",
+          "description": "Busqueda de tarifa y rol. La tarifa por hora se obtiene del perfil del empleado en el momento de la sesion de trabajo. Los cambios de tarifa a mitad de proyecto se manejan correctamente."
         },
         "module3": {
-          "title": "Project Management",
-          "description": "Project attribution source. Work sessions link to projects, enabling labor cost tracking per building and per job type."
+          "title": "Gestion de proyectos",
+          "description": "Fuente de atribucion de proyectos. Las sesiones de trabajo se vinculan a proyectos, permitiendo el seguimiento de costos laborales por edificio y por tipo de trabajo."
         },
         "module4": {
-          "title": "Scheduling & Calendar",
-          "description": "Shift assignment context. Scheduled shifts provide expected hours for comparison with actual hours worked. Discrepancies become visible."
+          "title": "Programacion y calendario",
+          "description": "Contexto de asignacion de turnos. Los turnos programados proporcionan horas esperadas para comparacion con las horas realmente trabajadas. Las discrepancias se vuelven visibles."
         },
         "module5": {
-          "title": "Safety Compliance",
-          "description": "Work eligibility verification. Harness inspection and certification requirements verify before clock-in is allowed. Failed inspections block work sessions."
+          "title": "Cumplimiento de seguridad",
+          "description": "Verificacion de elegibilidad para trabajo. Los requisitos de inspeccion de arnes y certificacion verifican antes de que se permita el registro. Las inspecciones fallidas bloquean las sesiones de trabajo."
         },
         "module6": {
-          "title": "Analytics & Reporting",
-          "description": "Payroll data feeds into company-wide analytics. Labor costs, productivity metrics, and budget tracking all derive from the same source of truth."
+          "title": "Analitica e informes",
+          "description": "Los datos de nomina alimentan la analitica a nivel de empresa. Costos laborales, metricas de productividad y seguimiento de presupuesto derivan todos de la misma fuente de verdad."
         }
       },
       "impact": {
-        "title": "Stop Dreading Payday",
-        "paragraph1": "Payday shouldn't consume your afternoon. It shouldn't involve a calculator, a pen, and 48 pages of printouts spread across your desk. It definitely shouldn't result in random e-transfers that confuse your bookkeeper and corrections that take longer than the original processing.",
-        "paragraph2": "Right now, payroll is probably the most hated task on your calendar. You put it off. You run late. Your employees start budgeting around \"getting paid late.\" That culture of lateness bleeds into everything else.",
-        "paragraph3": "When payroll takes 30 minutes instead of 6 hours, you stop avoiding it. You run on time. Your team notices. The professional standards you set for payroll extend to project timelines, client communications, and safety documentation.",
-        "paragraph4": "You get back 260+ hours per year. That's six full work weeks. Time currently spent circling numbers that could go toward bidding new contracts, managing client relationships, or simply being present for the work you actually want to do."
+        "title": "Deja de temer el dia de pago",
+        "paragraph1": "El dia de pago no deberia consumir tu tarde. No deberia involucrar una calculadora, un boligrafo y 48 paginas de impresiones extendidas en tu escritorio. Definitivamente no deberia resultar en transferencias aleatorias que confunden a tu contador y correcciones que toman mas tiempo que el procesamiento original.",
+        "paragraph2": "Ahora mismo, la nomina es probablemente la tarea mas odiada en tu calendario. La pospones. Llegas tarde. Tus empleados empiezan a presupuestar alrededor de \"recibir pago tarde\". Esa cultura de tardanza se filtra en todo lo demas.",
+        "paragraph3": "Cuando la nomina toma 30 minutos en lugar de 6 horas, dejas de evitarla. Cumples a tiempo. Tu equipo lo nota. Los estandares profesionales que estableces para la nomina se extienden a plazos de proyectos, comunicaciones con clientes y documentacion de seguridad.",
+        "paragraph4": "Recuperas mas de 260 horas al ano. Eso son seis semanas de trabajo completas. Tiempo actualmente gastado encerrar numeros que podria ir hacia cotizar nuevos contratos, gestionar relaciones con clientes, o simplemente estar presente para el trabajo que realmente quieres hacer."
       },
       "faqs": {
-        "title": "Frequently Asked Questions",
-        "subtitle": "Common questions about the Payroll & Financial module.",
+        "title": "Preguntas frecuentes",
+        "subtitle": "Preguntas comunes sobre el modulo de Nomina y Finanzas.",
         "faq1": {
-          "question": "Does OnRopePro calculate my taxes and deductions?",
-          "answer": "No. OnRopePro prepares payroll-ready timesheet data for export. Actual payroll calculations (CPP, EI, tax withholding, Social Security, Medicare) happen in your payroll processing software (QuickBooks, ADP, Gusto, etc.). OnRopePro handles time aggregation and export, not tax compliance."
+          "question": "OnRopePro calcula mis impuestos y deducciones?",
+          "answer": "No. OnRopePro prepara datos de hojas de tiempo listos para nomina para exportar. Los calculos de nomina reales (CPP, EI, retencion de impuestos, Seguro Social, Medicare) se hacen en tu software de procesamiento de nomina (QuickBooks, ADP, Gusto, etc.). OnRopePro maneja la agregacion de tiempo y exportacion, no el cumplimiento fiscal."
         },
         "faq2": {
-          "question": "What pay period options are available?",
-          "answer": "Weekly, bi-weekly, semi-monthly, and monthly. The system generates period boundaries automatically based on your selection."
+          "question": "Que opciones de periodos de pago estan disponibles?",
+          "answer": "Semanal, quincenal, semi-mensual y mensual. El sistema genera los limites del periodo automaticamente basado en tu seleccion."
         },
         "faq3": {
-          "question": "How does overtime calculation work?",
-          "answer": "You configure the rules: daily trigger (default 8 hours), weekly trigger (default 40 hours), and multiplier (1.5x, 2x, etc.). The system applies these rules automatically to every work session. You can disable overtime entirely if your pay structure doesn't include it."
+          "question": "Como funciona el calculo de horas extras?",
+          "answer": "Configuras las reglas: disparador diario (predeterminado 8 horas), disparador semanal (predeterminado 40 horas) y multiplicador (1.5x, 2x, etc.). El sistema aplica estas reglas automaticamente a cada sesion de trabajo. Puedes desactivar las horas extras completamente si tu estructura de pago no las incluye."
         },
         "faq4": {
-          "question": "What format does the export use?",
-          "answer": "CSV for payroll software import. PDF for printable timesheet records. Both include employee-level detail and project attribution."
+          "question": "Que formato usa la exportacion?",
+          "answer": "CSV para importar a software de nomina. PDF para registros de hojas de tiempo imprimibles. Ambos incluyen detalle a nivel de empleado y atribucion de proyectos."
         },
         "faq5": {
-          "question": "Who can see payroll data?",
-          "answer": "Users with the canAccessFinancials permission. This is granted through the role-based permission system. Technicians see their own hours but not compensation rates or other employees' data."
+          "question": "Quien puede ver los datos de nomina?",
+          "answer": "Usuarios con el permiso canAccessFinancials. Esto se otorga a traves del sistema de permisos basado en roles. Los tecnicos ven sus propias horas pero no las tasas de compensacion ni los datos de otros empleados."
         },
         "faq6": {
-          "question": "What happens if a work session is missing or incorrect?",
-          "answer": "Supervisors with appropriate permissions can review and adjust work sessions before timesheet approval. All adjustments are logged with reasons for audit purposes."
+          "question": "Que pasa si falta una sesion de trabajo o es incorrecta?",
+          "answer": "Los supervisores con los permisos apropiados pueden revisar y ajustar sesiones de trabajo antes de la aprobacion de hojas de tiempo. Todos los ajustes se registran con razones para propositos de auditoria."
         },
         "faq7": {
-          "question": "Can I see historical pay periods?",
-          "answer": "Yes. Previous pay periods remain accessible. Filter by date range to pull data from any past period."
+          "question": "Puedo ver periodos de pago historicos?",
+          "answer": "Si. Los periodos de pago anteriores permanecen accesibles. Filtra por rango de fechas para obtener datos de cualquier periodo pasado."
         },
         "faq8": {
-          "question": "Does project attribution work if a technician works at multiple buildings in one day?",
-          "answer": "Yes. Each work session links to a specific project. If a technician clocks into Building A for 4 hours, then Building B for 4 hours, both sessions show separately with their respective project attribution."
+          "question": "La atribucion de proyectos funciona si un tecnico trabaja en multiples edificios en un dia?",
+          "answer": "Si. Cada sesion de trabajo se vincula a un proyecto especifico. Si un tecnico registra en el Edificio A por 4 horas, luego en el Edificio B por 4 horas, ambas sesiones aparecen separadamente con sus respectivas atribuciones de proyecto."
         },
         "faq9": {
-          "question": "What about non-billable time like travel between sites?",
-          "answer": "Non-billable work sessions track hours that cannot be charged to clients (travel, training, equipment maintenance, weather delays). The payroll view shows both billable and non-billable hours so you know your true labor cost."
+          "question": "Que pasa con el tiempo no facturable como viajes entre sitios?",
+          "answer": "Las sesiones de trabajo no facturables rastrean horas que no se pueden cobrar a clientes (viajes, capacitacion, mantenimiento de equipos, retrasos por clima). La vista de nomina muestra tanto horas facturables como no facturables para que conozcas tu verdadero costo laboral."
         },
         "faq10": {
-          "question": "Is there an approval workflow before export?",
-          "answer": "Yes. Timesheets can be reviewed and approved before export. Approved timesheets generate clean export files. The workflow prevents exporting data that hasn't been verified."
+          "question": "Hay un flujo de aprobacion antes de exportar?",
+          "answer": "Si. Las hojas de tiempo pueden ser revisadas y aprobadas antes de exportar. Las hojas de tiempo aprobadas generan archivos de exportacion limpios. El flujo previene exportar datos que no han sido verificados."
         }
       },
       "cta": {
-        "title": "Ready to Reclaim Your Time?",
-        "subtitle": "Join rope access companies who've eliminated the payroll headache. Start your free 60-day trial today.",
-        "trialButton": "Start Your Free 60-Day Trial",
-        "docsButton": "View Technical Documentation"
+        "title": "Listo para recuperar tu tiempo?",
+        "subtitle": "Unete a las empresas de acceso con cuerdas que han eliminado el dolor de cabeza de la nomina. Comienza tu prueba gratuita de 60 dias hoy.",
+        "trialButton": "Comienza tu prueba gratuita de 60 dias",
+        "docsButton": "Ver documentacion tecnica"
       }
     },
     "workSessions": {
       "hero": {
-        "badge": "Work Sessions & Time Tracking Module",
-        "titleLine1": "You were there all week.",
-        "titleLine2": "The building is only 20% done.",
-        "titleLine3": "What happened?",
-        "description1": "Monday was windy. Tuesday he left early. Wednesday there was a crane on the roof. Thursday Damien felt sick. By Friday, you're 20 hours over budget and you have no idea why.",
-        "description2": "OnRopePro's Work Session module captures everything. Clock in, clock out, drops completed, shortfall reasons documented.",
-        "description2Bold": "Real answers instead of scattered excuses.",
-        "ctaTrial": "Start Your Free 60-Day Trial",
-        "ctaFaq": "Find Answers"
+        "badge": "Modulo de Sesiones de Trabajo y Seguimiento de Tiempo",
+        "titleLine1": "Estuviste ahi toda la semana.",
+        "titleLine2": "El edificio esta solo al 20% completado.",
+        "titleLine3": "Que paso?",
+        "description1": "El lunes habia viento. El martes se fue temprano. El miercoles habia una grua en el techo. El jueves Damien se sintio mal. Para el viernes, estas 20 horas sobre el presupuesto y no tienes idea de por que.",
+        "description2": "El modulo de Sesiones de Trabajo de OnRopePro captura todo. Entrada, salida, gotas completadas, razones de deficit documentadas.",
+        "description2Bold": "Respuestas reales en lugar de excusas dispersas.",
+        "ctaTrial": "Comienza tu prueba gratuita de 60 dias",
+        "ctaFaq": "Encontrar respuestas"
       },
       "stats": {
         "payrollValue": "87-93%",
-        "payrollLabel": "Payroll time saved",
+        "payrollLabel": "Tiempo de nomina ahorrado",
         "errorsValue": "$3,600+",
-        "errorsLabel": "Annual errors eliminated",
+        "errorsLabel": "Errores anuales eliminados",
         "timeValue": "30 min",
-        "timeLabel": "Instead of 7 hours",
+        "timeLabel": "En lugar de 7 horas",
         "elevationsValue": "4",
-        "elevationsLabel": "Elevations tracked"
+        "elevationsLabel": "Elevaciones rastreadas"
       },
       "problem": {
-        "title": "The Conversation You Know Too Well",
-        "quote1": "\"I see you logged 45 hours. Last year one guy finished the same building in that time. You're not even halfway done. What happened?\"",
-        "quote2": "\"Monday, I think it was windy. And then I had to pull my rope, I think. Or was that Tuesday? Oh yeah, no, Tuesday because Monday I had to leave early because I had dinner with my mom and I told you, remember? Oh yeah, I remember you told me that. Then Tuesday was windy and then Wednesday there was another crane on the roof, so I had to move my rope a bunch of times. And what about Damien? He was there with you. Oh yeah, but he felt sick. He didn't work so much and he only did one drop on Thursday or Friday. I'm not sure. I was not really paying attention to what he was doing. I was too busy with my stuff.\"",
-        "paragraph1": "No clue what's going on. At the end of the building, you're just pissed off because you went 20 hours over budget and you don't really know why. You know it was weather. You know the guy wasn't feeling well some days. You don't really know. Move on. Next building.",
-        "paragraph2": "This is the system you're using. Memory. Excuses. Spreadsheets that don't connect to anything.",
-        "solution": "OnRopePro replaces the guesswork with data. Every clock-in timestamped. Every clock-out GPS-verified. Every drop logged by elevation. Every shortfall documented with a reason. Next year when you quote that building, you're not guessing. You're calculating."
+        "title": "La conversacion que conoces muy bien",
+        "quote1": "\"Veo que registraste 45 horas. El ano pasado un tipo termino el mismo edificio en ese tiempo. Ni siquiera estas a la mitad. Que paso?\"",
+        "quote2": "\"El lunes, creo que habia viento. Y luego tuve que jalar mi cuerda, creo. O fue el martes? Ah si, no, martes porque el lunes tuve que irme temprano porque tenia cena con mi mama y te dije, recuerdas? Ah si, recuerdo que me dijiste eso. Luego el martes habia viento y luego el miercoles habia otra grua en el techo, asi que tuve que mover mi cuerda varias veces. Y que paso con Damien? Estaba ahi contigo. Ah si, pero se sintio mal. No trabajo mucho y solo hizo una gota el jueves o viernes. No estoy seguro. Realmente no estaba prestando atencion a lo que el hacia. Estaba muy ocupado con mis cosas.\"",
+        "paragraph1": "Sin idea de que esta pasando. Al final del edificio, solo estas enojado porque te pasaste 20 horas del presupuesto y realmente no sabes por que. Sabes que fue el clima. Sabes que el tipo no se sintio bien algunos dias. Realmente no sabes. Sigue adelante. Siguiente edificio.",
+        "paragraph2": "Este es el sistema que estas usando. Memoria. Excusas. Hojas de calculo que no se conectan a nada.",
+        "solution": "OnRopePro reemplaza las suposiciones con datos. Cada entrada con marca de tiempo. Cada salida verificada por GPS. Cada gota registrada por elevacion. Cada deficit documentado con una razon. El proximo año cuando cotices ese edificio, no estas adivinando. Estas calculando."
       },
       "features": {
-        "title": "What This Module Does",
-        "subtitle": "Three capabilities. Zero chaos. Work sessions are the core time tracking mechanism that captures everything as it happens.",
+        "title": "Lo que hace este modulo",
+        "subtitle": "Tres capacidades. Cero caos. Las sesiones de trabajo son el mecanismo central de seguimiento de tiempo que captura todo mientras sucede.",
         "timeCapture": {
-          "title": "Precision Time Capture",
-          "description1": "Technicians clock in from their phone. The system captures the exact timestamp and GPS location.",
-          "description2": "No more \"I swear I was there by 8.\" The data speaks for itself.",
-          "listTitle": "What gets tracked:",
-          "item1": "Start time (to the second)",
-          "item2": "GPS coordinates at clock-in",
-          "item3": "Project association",
-          "item4": "Harness inspection verification"
+          "title": "Captura de tiempo precisa",
+          "description1": "Los tecnicos registran entrada desde su telefono. El sistema captura la marca de tiempo exacta y la ubicacion GPS.",
+          "description2": "No mas \"Juro que estaba ahi a las 8.\" Los datos hablan por si mismos.",
+          "listTitle": "Lo que se rastrea:",
+          "item1": "Hora de inicio (al segundo)",
+          "item2": "Coordenadas GPS al registrar entrada",
+          "item3": "Asociacion al proyecto",
+          "item4": "Verificacion de inspeccion de arnes"
         },
         "workOutput": {
-          "title": "Work Output Documentation",
-          "description1": "At end of day, technicians log drops completed by elevation. North, East, South, West.",
-          "description2": "Miss your daily target? The system prompts for a reason. Weather. Equipment. Crew issues. Documented, not forgotten.",
-          "listTitle": "What gets captured:",
-          "item1": "Drops completed per elevation",
-          "item2": "Percentage complete (for hours-based jobs)",
-          "item3": "Shortfall reasons (mandatory when below target)",
-          "item4": "Session photos and notes"
+          "title": "Documentacion de produccion de trabajo",
+          "description1": "Al final del dia, los tecnicos registran gotas completadas por elevacion. Norte, Este, Sur, Oeste.",
+          "description2": "No alcanzas tu meta diaria? El sistema pide una razon. Clima. Equipo. Problemas del equipo. Documentado, no olvidado.",
+          "listTitle": "Lo que se captura:",
+          "item1": "Gotas completadas por elevacion",
+          "item2": "Porcentaje completado (para trabajos basados en horas)",
+          "item3": "Razones de deficit (obligatorio cuando esta por debajo del objetivo)",
+          "item4": "Fotos y notas de la sesion"
         },
         "payroll": {
-          "title": "Automatic Payroll Aggregation",
-          "description1": "Hours flow directly into payroll calculations. Regular time, overtime, piece-work. All calculated.",
-          "description2": "Billable versus non-billable separated automatically. Export to QuickBooks, ADP, Paychex, Gusto.",
-          "listTitle": "What gets calculated:",
-          "item1": "Total hours by employee",
-          "item2": "Hours by project",
-          "item3": "Billable vs non-billable breakdown",
-          "item4": "Piece-work compensation (if enabled)"
+          "title": "Agregacion automatica de nomina",
+          "description1": "Las horas fluyen directamente a los calculos de nomina. Tiempo regular, horas extras, trabajo por pieza. Todo calculado.",
+          "description2": "Facturable vs no facturable separado automaticamente. Exporta a QuickBooks, ADP, Paychex, Gusto.",
+          "listTitle": "Lo que se calcula:",
+          "item1": "Total de horas por empleado",
+          "item2": "Horas por proyecto",
+          "item3": "Desglose facturable vs no facturable",
+          "item4": "Compensacion por pieza (si esta habilitada)"
         }
       }
     },
     "employees": {
       "hero": {
-        "badge": "Employee Management Module",
-        "titleLine1": "Your New Hire Filled Out This Paperwork",
-        "titleLine2": "Three Employers Ago.",
-        "titleLine3": "Why Are You Asking Again?",
-        "description": "Portable technician identities that can plug in to your company just by providing an IRATA or SPRAT number, automated certification alerts, and instant onboarding for an industry with a high turnover rate.",
-        "tagline": "Employee management built by rope access professionals who got tired of the same paperwork dance at every new job.",
-        "ctaTrial": "Start Your Free 60-Day Trial",
-        "ctaFaqs": "Find Answers"
+        "badge": "Modulo de Gestion de Empleados",
+        "titleLine1": "Tu nueva contratacion lleno este papeleo",
+        "titleLine2": "en tres empleadores anteriores.",
+        "titleLine3": "Por que pedirlo de nuevo?",
+        "description": "Identidades de tecnicos portatiles que pueden conectarse a tu empresa simplemente proporcionando un numero IRATA o SPRAT, alertas de certificacion automatizadas e incorporacion instantanea para una industria de alta rotacion.",
+        "tagline": "Gestion de empleados diseñada por profesionales de acceso con cuerdas cansados del mismo baile de papeleo en cada nuevo trabajo.",
+        "ctaTrial": "Comienza tu prueba gratuita de 60 dias",
+        "ctaFaqs": "Encontrar respuestas"
       },
       "stats": {
-        "onboardTimeValue": "10 sec",
-        "onboardTimeLabel": "Onboard existing users",
+        "onboardTimeValue": "10 seg",
+        "onboardTimeLabel": "Incorporar usuarios existentes",
         "permissionsValue": "44",
-        "permissionsLabel": "Configurable permissions",
-        "certWarningsValue": "30 days",
-        "certWarningsLabel": "Advance cert warnings",
-        "redundantPaperworkValue": "Zero",
-        "redundantPaperworkLabel": "Redundant paperwork"
+        "permissionsLabel": "Permisos configurables",
+        "certWarningsValue": "30 dias",
+        "certWarningsLabel": "Alertas anticipadas de certificacion",
+        "redundantPaperworkValue": "Cero",
+        "redundantPaperworkLabel": "Papeleo redundante"
       },
       "problemStatement": {
-        "title": "The Onboarding Problem Nobody Admits",
-        "paragraph1": "You email the new guy. \"Welcome to the team. Please send your IRATA cert, void check, emergency contact, driver's license, and fill out these forms.\"",
-        "paragraph2": "He sends half of it. You chase the rest. You manually enter everything into your systems. Three days later, he's finally in the schedule.",
-        "paragraph3": "Then he leaves for a competitor paying $2 more per hour. Eight weeks later, you hire him back. The whole dance starts again. Same guy. Same paperwork. Same wasted hours.",
-        "paragraph4": "Meanwhile, somewhere in a spreadsheet you haven't opened since February, someone's IRATA cert expired last month. WorkSafeBC hasn't shown up yet. But they will.",
-        "paragraph5": "OnRopePro treats technicians like what they are: mobile professionals whose complete professional identity should follow them wherever they work. Enter their IRATA number, they accept the connection, and every piece of information from their last three employers transfers instantly. One profile. Every employer. Zero redundant paperwork."
+        "title": "El problema de incorporacion que nadie admite",
+        "paragraph1": "Le envias un correo al nuevo. \"Bienvenido al equipo. Por favor envia tu certificacion IRATA, un cheque anulado, un contacto de emergencia, tu licencia de conducir y llena estos formularios.\"",
+        "paragraph2": "Envia la mitad. Persigues el resto. Ingresas todo manualmente en tus sistemas. Tres dias despues, finalmente esta en el horario.",
+        "paragraph3": "Luego se va a un competidor que paga $2 mas por hora. Ocho semanas despues, lo vuelves a contratar. El mismo baile comienza de nuevo. El mismo tipo. El mismo papeleo. Las mismas horas perdidas.",
+        "paragraph4": "Mientras tanto, en algun lugar en una hoja de calculo que no has abierto desde febrero, la certificacion IRATA de alguien expiro el mes pasado. WorkSafeBC no ha aparecido todavia. Pero lo hara.",
+        "paragraph5": "OnRopePro trata a los tecnicos como lo que son: profesionales moviles cuya identidad profesional completa deberia seguirlos a donde quiera que trabajen. Ingresa su numero IRATA, aceptan la conexion, y toda la informacion de sus tres ultimos empleadores se transfiere instantaneamente. Un perfil. Cada empleador. Cero papeleo redundante."
       },
       "features": {
-        "title": "What This Module Does",
-        "subtitle": "Complete workforce administration for rope access operations, from first-day onboarding to certification compliance to offboarding.",
+        "title": "Lo que hace este modulo",
+        "subtitle": "Administracion completa de fuerza laboral para operaciones de acceso con cuerdas, desde la incorporacion del primer dia hasta el cumplimiento de certificaciones hasta la salida.",
         "portableIdentities": {
-          "title": "Portable Professional Identities",
-          "description": "Every technician's IRATA or SPRAT certification number becomes their permanent identifier across the OnRopePro network. When they change employers (and they will), their profile travels with them.",
-          "listTitle": "What transfers automatically:",
-          "list1": "Personal and contact information",
-          "list2": "All certifications with expiration dates",
-          "list3": "Emergency contact details",
-          "list4": "Banking and payment information",
-          "list5": "Complete work history and project records"
+          "title": "Identidades profesionales portatiles",
+          "description": "El numero de certificacion IRATA o SPRAT de cada tecnico se convierte en su identificador permanente a traves de la red OnRopePro. Cuando cambian de empleador (y lo haran), su perfil viaja con ellos.",
+          "listTitle": "Lo que se transfiere automaticamente:",
+          "list1": "Informacion personal y de contacto",
+          "list2": "Todas las certificaciones con fechas de vencimiento",
+          "list3": "Informacion de contacto de emergencia",
+          "list4": "Informacion bancaria y de pago",
+          "list5": "Historial de trabajo y registros completos de proyectos"
         },
         "certificationCompliance": {
-          "title": "Certification Compliance Engine",
-          "description": "The system monitors IRATA, SPRAT, driver's licenses, and First Aid certifications. Visual indicators (green, amber, red) make expiring credentials impossible to miss. Automated 30-day warnings give you time to act before problems become crises.",
-          "listTitle": "What gets tracked:",
-          "list1": "IRATA certification levels and expiration",
-          "list2": "SPRAT certification status",
-          "list3": "Driver's license validity",
-          "list4": "First Aid and safety training dates"
+          "title": "Motor de cumplimiento de certificaciones",
+          "description": "El sistema monitorea certificaciones IRATA, SPRAT, licencias de conducir y certificaciones de primeros auxilios. Indicadores visuales (verde, ambar, rojo) hacen imposible pasar por alto las credenciales que expiran. Las advertencias automaticas de 30 dias te dan tiempo para actuar antes de que los problemas se conviertan en crisis.",
+          "listTitle": "Lo que se rastrea:",
+          "list1": "Niveles de certificacion IRATA y vencimiento",
+          "list2": "Estado de certificacion SPRAT",
+          "list3": "Validez de licencia de conducir",
+          "list4": "Fechas de primeros auxilios y capacitacion de seguridad"
         },
         "permissionControls": {
-          "title": "Granular Permission Controls",
-          "description": "All roles start with zero permissions except Company Owner. You configure exactly what each person can see and do. Separate operational access from financial visibility. Protect sensitive business data without formal demotions.",
-          "listTitle": "What you control:",
-          "list1": "Financial data visibility",
-          "list2": "Employee management capabilities",
-          "list3": "Project creation and viewing rights",
-          "list4": "Payroll access levels",
-          "list5": "Client information exposure"
+          "title": "Controles de permisos granulares",
+          "description": "Todos los roles comienzan con cero permisos excepto el propietario de la empresa. Configuras exactamente lo que cada persona puede ver y hacer. Separa el acceso operativo de la visibilidad financiera. Protege datos comerciales sensibles sin degradaciones formales.",
+          "listTitle": "Lo que controlas:",
+          "list1": "Visibilidad de datos financieros",
+          "list2": "Capacidades de gestion de empleados",
+          "list3": "Derechos de creacion y visualizacion de proyectos",
+          "list4": "Niveles de acceso a nomina",
+          "list5": "Exposicion de informacion de clientes"
         }
-      },
-      "stakeholders": {
-        "title": "Who Benefits From This Module",
-        "subtitle": "Every stakeholder gets the workforce visibility and compliance protection they need.",
-        "owners": {
-          "title": "For Rope Access Company Owners",
-          "benefit1Title": "Protect your operation from compliance disasters before they happen.",
-          "benefit1Desc": "One certification alert preventing a WorkSafeBC shutdown pays for your entire annual subscription. Beyond direct cost, you avoid project delays, client relationship damage, and liability lawsuits that can reach seven figures.",
-          "benefit2Title": "Reclaim hours lost to redundant administration.",
-          "benefit2Desc": "The email chase, the data entry, the follow-ups, the duplicate effort when someone comes back after leaving for another company. Existing OnRopePro users onboard in 10 seconds. New users fill out their information once on their own time.",
-          "benefit3Title": "Control access without creating HR conflicts.",
-          "benefit3Desc": "Suspicious your operations manager is talking to competitors? Modify their permissions in real-time without changing their title. Remove financial visibility while maintaining operational function. Document everything for potential legal proceedings."
-        },
-        "technicians": {
-          "title": "For Technicians",
-          "benefit1Title": "Fill out paperwork once in your career, not once per employer.",
-          "benefit1Desc": "Your profile follows you. When you join a new company, they enter your IRATA number, you accept, and you're done. No more emailing the same void check to every new employer.",
-          "benefit2Title": "Never get blindsided by an expired certification.",
-          "benefit2Desc": "See your own status. Get notified before expiration. Renew on your schedule instead of scrambling after you've already lost work eligibility.",
-          "benefit3Title": "Log in with your IRATA number.",
-          "benefit3Desc": "The credential that defines your profession becomes your universal identifier. One less password to remember."
-        },
-        "opsManagers": {
-          "title": "For Operations Managers",
-          "benefit1Title": "Know who's qualified for what at a glance.",
-          "benefit1Desc": "Scheduling a technical job that needs a Level 3? Filter by certification level. Assigning a company vehicle? Check license status instantly. Stop relying on memory for compliance-critical decisions.",
-          "benefit2Title": "Onboard new crew members without the email marathon.",
-          "benefit2Desc": "For techs already in OnRopePro, you're not creating records. You're connecting to profiles that already exist. For new users, the system handles the data collection."
-        },
-        "buildingManagers": {
-          "title": "For Building Managers",
-          "benefit1Title": "Verify technician qualifications before anyone touches your building.",
-          "benefit1Desc": "Current IRATA certifications. Valid safety training. Proper insurance documentation. Professional operators who can prove compliance on demand.",
-          "benefit2Title": "Work with companies that operate like professionals.",
-          "benefit2Desc": "Organized record-keeping. Documented safety protocols. The kind of operation that doesn't create liability exposure for your property."
-        },
-        "propertyManagers": {
-          "title": "For Property Managers",
-          "benefit1Title": "Confidence in your vendor's workforce management.",
-          "benefit1Desc": "When you need to justify your vendor selection to ownership or insurance, you can point to systematic compliance tracking and professional documentation.",
-          "benefit2Title": "Reduce your liability exposure through verified qualifications.",
-          "benefit2Desc": "Companies using OnRopePro can demonstrate current certifications for every technician on your properties."
-        }
-      },
-      "keyFeatures": {
-        "title": "Key Features",
-        "subtitle": "Every feature designed around how rope access companies actually operate, not how generic HR software thinks you should.",
-        "import": {
-          "title": "10-Second Employee Import",
-          "description": "Existing OnRopePro users plug in instantly. Enter their IRATA number, send a connection request, they accept, done. All personal information, certifications, emergency contacts, and banking details transfer automatically."
-        },
-        "roles": {
-          "title": "14 Roles with Custom Permissions",
-          "description": "Management positions and field positions with 44 individual permissions. Every role except Owner starts empty. You grant exactly what each person needs."
-        },
-        "certStatus": {
-          "title": "Visual Certification Status",
-          "description": "Green means valid. Amber means expiring within 60 days. Red means expired. No spreadsheet diving. No calendar reminders you might miss. Status is visible wherever you view employee information."
-        },
-        "driver": {
-          "title": "Driver Eligibility Tracking",
-          "description": "License expiration dates monitored alongside certifications. Same 30-day warning system. Same visual indicators. Critical for companies assigning technicians to company vehicles."
-        },
-        "safety": {
-          "title": "Integrated Safety Document Signing",
-          "description": "New employees automatically receive required company safety documents as part of onboarding. Signatures tracked. Compliance documented. No separate system or email chain required."
-        },
-        "softDelete": {
-          "title": "Soft Delete with Data Preservation",
-          "description": "Terminated employees lose system access immediately, but historical data remains for compliance and audit purposes. Work sessions, safety documents, equipment assignments, payroll history. All preserved."
-        }
-      },
-      "problemsSolved": {
-        "title": "Problems Solved",
-        "subtitle": "Real challenges faced by rope access companies, and how this module addresses each one.",
-        "owners": {
-          "title": "For Rope Access Company Owners",
-          "problem1Title": "\"I didn't know his cert was expired until WorkSafeBC showed up.\"",
-          "problem1Desc1": "You're running busy season. Jobs stacked, crews deployed across multiple sites. Tracking when every technician's IRATA expires? It falls through the cracks. You assume they're handling their own renewals. Then WorkSafeBC arrives for a site inspection.",
-          "problem1Desc2": "OnRopePro monitors every certification with automated 30-day warnings and visual status indicators. One alert preventing one shutdown justifies years of subscription costs.",
-          "problem2Title": "\"Onboarding takes hours of back-and-forth emails.\"",
-          "problem2Desc1": "Every new hire triggers the same dance. Email asking for info, wait, chase missing pieces, manually enter everything, email safety documents, wait for signatures, follow up again. Hours per employee.",
-          "problem2Desc2": "Two pathways eliminate this chaos. Existing OnRopePro user: enter IRATA number, they accept, done. 10 seconds. New user: they fill out their profile once on their own time. You just link them to your company.",
-          "problem3Title": "\"My operations manager might be talking to competitors.\"",
-          "problem3Desc1": "You've given them broad access because they need it to do their job. Now you're suspicious. You can't fire without proof. You can't run operations without someone in that role.",
-          "problem3Desc2": "Granular permissions let you modify access in real-time without changing titles. Remove financial visibility, hide client information, restrict to basic functions. No formal demotion. No HR complications. Immediate protection.",
-          "problem4Title": "\"One of my guys drove our truck for two months with an expired license.\"",
-          "problem4Desc1": "You check licenses at hiring. What happens six months later when they expire? You're not thinking about it. Neither are they. Then they're driving your vehicle without valid credentials.",
-          "problem4Desc2": "OnRopePro tracks driver's license expiration alongside certifications. Same 30-day warnings. Same visual indicators. Prevent one insurance claim denial or liability lawsuit and you've justified years of subscription."
-        },
-        "opsManagers": {
-          "title": "For Operations Managers",
-          "problem1Title": "\"I can't remember who's certified for what.\"",
-          "problem1Desc1": "You know Dave is Level 3 and pretty sure Mike is Level 2, but what about the new guys? When scheduling, you're doing mental gymnastics trying to remember who can lead, who needs supervision, who has working at heights training that's still valid.",
-          "problem1Desc2": "Filter by certification level, check license status, see first aid expiration. The information exists where you're already making scheduling decisions."
-        },
-        "technicians": {
-          "title": "For Technicians",
-          "problem1Title": "\"I have to fill out the same paperwork at every new employer.\"",
-          "problem1Desc1": "Rope access has insane turnover. You might work for three companies in one season. Each one wants the same information: IRATA cert, void check, emergency contact, driver's license. You've filled this out a dozen times.",
-          "problem1Desc2": "Create your OnRopePro profile once. When you join a new company, they enter your IRATA number, you accept, and everything transfers. Your certifications, contacts, banking info, work history. One profile, every employer.",
-          "problem2Title": "\"I never know if my certifications are about to expire.\"",
-          "problem2Desc1": "You're focused on the job, not calendar dates. Your IRATA lapses, your first aid expires, and suddenly you can't work until you get recertified. Lost income. Scrambling to schedule training.",
-          "problem2Desc2": "OnRopePro tracks your certification dates and alerts you before expiration. Proactive renewal instead of reactive scrambling."
-        }
-      },
-      "measurableResults": {
-        "title": "Measurable Results",
-        "subtitle": "Concrete improvements you can expect from implementing this module.",
-        "onboarding": {
-          "title": "Onboarding Time Reduction",
-          "description": "Existing OnRopePro users: 10 seconds. New users: 5-10 minutes versus hours of email exchanges. Eliminate 100% of back-and-forth data collection for existing accounts."
-        },
-        "compliance": {
-          "title": "Compliance Protection",
-          "description": "30-day advance warning on all tracked certifications. Visual status indicators visible across the platform. One certification alert preventing a WorkSafeBC shutdown justifies years of subscription cost."
-        },
-        "admin": {
-          "title": "Administrative Hours Reclaimed",
-          "description": "No more manual entry for returning employees. No separate systems for different data types. One login, one source of truth, one workflow that handles onboarding, compliance, and offboarding."
-        },
-        "permissions": {
-          "title": "Permission Precision",
-          "description": "44 individual permissions across 14 roles. Grant project creation without exposing compensation data. Provide operational access without financial visibility. Respond to trust concerns immediately without HR complications."
-        }
-      },
-      "integration": {
-        "title": "Modules This Module Connects With",
-        "subtitle": "Employee Management data flows throughout OnRopePro, enabling every other module to function with complete workforce context.",
-        "workSession": {
-          "title": "Work Session Tracking",
-          "description": "Employees appear in time tracking. Hourly rates determine labor cost calculations."
-        },
-        "payroll": {
-          "title": "Payroll",
-          "description": "Compensation feeds directly into payroll calculations. Rate changes mid-period handled automatically."
-        },
-        "projectManagement": {
-          "title": "Project Management",
-          "description": "Employees show up in project assignment lists. Certification levels visible when scheduling."
-        },
-        "safety": {
-          "title": "Safety & Compliance",
-          "description": "Safety document signing integrated into onboarding workflow. Compliance history maintained for audits."
-        },
-        "inventory": {
-          "title": "Inventory",
-          "description": "Equipment assignments connect to employee profiles. Track what gear each technician has."
-        },
-        "scheduling": {
-          "title": "Scheduling",
-          "description": "Available crew appears in calendar views. Certification filtering enables appropriate assignment."
-        }
-      },
-      "businessImprovement": {
-        "title": "Stop Managing Paperwork. Start Managing People.",
-        "para1": "Right now, you're spending hours on administrative tasks that don't move your business forward. Chasing down documents. Entering the same information multiple times. Manually checking calendars to see if certifications are still valid. Worrying about the compliance gap you might not even know exists.",
-        "para2": "Your operations manager asks if you can take a new project. You have to check six different places to figure out who's available, who's qualified, and whether anyone's cert is about to expire. By the time you have an answer, the opportunity might be gone.",
-        "para3": "Your best technician leaves for $2 more an hour somewhere else. Two months later, he wants to come back. You're thrilled to have him, but now you're doing the whole onboarding dance again. Same guy. Same paperwork. Like the last eight months never happened.",
-        "para4": "With Employee Management, technician profiles are portable. Certifications are monitored automatically. Permissions are configurable without HR complications. When someone joins your company, they're productive on day one. When someone leaves and returns, the connection takes 10 seconds.",
-        "para5": "You get back the hours you're currently spending on administration. You get protection from compliance failures you didn't know were coming. You get control over who sees what without creating workplace drama.",
-        "para6": "You stop managing paperwork and start managing what actually matters: your people, your projects, your business."
-      },
-      "faqs": {
-        "title": "Frequently Asked Questions",
-        "subtitle": "Common questions about the Employee Management module.",
-        "q1": {
-          "question": "Can technicians login with their IRATA number instead of email?",
-          "answer": "Yes. Technicians can log in using either their IRATA/SPRAT certification number or their email address. The certification number serves as a unique identifier across the platform."
-        },
-        "q2": {
-          "question": "What happens when I hire a tech who already has an OnRopePro account?",
-          "answer": "Enter their IRATA/SPRAT number, send a connection request, and once they accept, their full profile transfers to your company. You only configure their compensation rate. All other information is already complete. Time required: 10 seconds (excluding their acceptance)."
-        },
-        "q3": {
-          "question": "Are role permissions predefined or do I have to set them up?",
-          "answer": "All roles except Company Owner start with zero permissions. You must explicitly grant each permission the employee needs. This prevents accidental over-permission and allows precise matching of access to job requirements and trust level."
-        },
-        "q4": {
-          "question": "Does the system alert for driver's license expiration too?",
-          "answer": "Yes. Driver's license expiration dates are tracked and included in the same alert system as IRATA/SPRAT certifications. Visual indicators and notifications function identically."
-        },
-        "q5": {
-          "question": "What happens to data when an employee is terminated?",
-          "answer": "The employee loses system access immediately, but all historical data is preserved. Work sessions, safety documents, equipment assignments, and payroll history remain in the system for compliance and audit purposes. This is a soft delete, not a hard delete."
-        },
-        "q6": {
-          "question": "Can I use this for employees who aren't rope access technicians?",
-          "answer": "Yes. While certification tracking is designed for rope access (IRATA/SPRAT), the module supports roles like Labourer, Ground Crew, and general support staff who may not have rope access certifications. Leave certification fields empty for non-certified staff."
-        },
-        "q7": {
-          "question": "What if I suspect an employee is sharing information with competitors?",
-          "answer": "Modify their permissions immediately. Remove financial access, hide client information, restrict to basic functions. No formal demotion required. Changes take effect instantly. Access modifications are logged for potential legal proceedings."
-        },
-        "q8": {
-          "question": "Can employees see each other's pay rates?",
-          "answer": "Only if you grant them that specific permission. Financial visibility is separated from operational access. Your supervisor can create projects and check budgets without seeing what every technician earns."
-        },
-        "q9": {
-          "question": "What certifications are tracked?",
-          "answer": "IRATA level and expiration, SPRAT certification, driver's license validity, and First Aid certification. All display visual status indicators (green/amber/red) and trigger 30-day warning alerts before expiration."
-        },
-        "q10": {
-          "question": "How long does onboarding take for a completely new employee?",
-          "answer": "5-10 minutes for data entry, excluding the time the employee spends setting up their own account. New employees receive login credentials via email and can then complete their profile details (emergency contacts, banking information) on their own time."
-        }
-      },
-      "footerCta": {
-        "title": "Ready to Simplify Your Workforce Management?",
-        "subtitle": "Join rope access companies already using OnRopePro to protect their operations, reduce administrative burden, and ensure compliance.",
-        "button": "Start Your Free 60-Day Trial"
       }
     },
     "scheduling": {
       "hero": {
-        "badge": "Scheduling & Calendar Module",
-        "titleLine1": "Stop Booking Dave in",
-        "titleLine2": "Two Places on Monday.",
-        "titleLine3": "Zero 6am emergency calls.",
-        "description": "Automatic conflict detection prevents double-booking before it happens. Dual calendar views show every project and every technician at a glance. Time-off blocks scheduling automatically.",
-        "tagline": "One system. Zero surprises.",
-        "ctaTrial": "Start Your Free 60-Day Trial",
-        "ctaFaqs": "Find Answers"
+        "badge": "Modulo de Programacion y Calendario",
+        "titleLine1": "Tu equipo esta en el edificio equivocado.",
+        "titleLine2": "Nadie reviso el calendario.",
+        "titleLine3": "Ahora que?",
+        "description": "Programacion visual con seguimiento de asignaciones, deteccion de conflictos y calendarios accesibles desde movil.",
+        "ctaTrial": "Comienza tu prueba gratuita de 60 dias",
+        "ctaFaq": "Encontrar respuestas"
       },
       "stats": {
-        "timeSavedValue": "8+ hrs",
-        "timeSavedLabel": "Saved monthly on scheduling",
-        "conflictTypesValue": "3",
-        "conflictTypesLabel": "Conflict types prevented",
-        "leaveTypesValue": "10",
-        "leaveTypesLabel": "Leave types supported",
-        "calendarViewsValue": "2",
-        "calendarViewsLabel": "Calendar views included"
+        "conflictsAvoided": "Conflictos evitados",
+        "scheduleVisibility": "Visibilidad del horario",
+        "teamAssignments": "Asignaciones de equipo",
+        "mobileAccess": "Acceso movil"
       },
       "problem": {
-        "title": "The Monday Morning Disaster Nobody Planned",
-        "intro": "Friday afternoon. Golf tournament in an hour. You're throwing names right, left, and center to fill the spots for next week. Monday morning at 6am, your phone rings.",
-        "scenario": "Jack needs you to pull someone from one building, grab rope from the shop because it's not long enough for another building, and get a different tech to a third site with his gear. Your whole week is ruined before breakfast.",
-        "cause": "This happens because your project lives in one place, your calendar lives in another, and crew assignments live in a text thread. You create the window washing project. Then you open Float and recreate it. Name the project. Block the dates. Assign employees. Tag a color. Project gets pushed five days? Update both systems. Or forget to update one. And then watch the dominoes fall.",
-        "solution": "OnRopePro connects your projects directly to your schedule. Create a project with dates and assigned crew. The calendar populates automatically. Change the project dates and the schedule updates. Try to assign someone who's already booked elsewhere and the system warns you before you create the conflict. No more \"Oh shit, I forgot to schedule that\" emergencies."
+        "title": "El calendario que nadie revisa",
+        "paragraph1": "Tienes un calendario. En algun lugar. El problema es que nadie lo mira antes de salir por la manana.",
+        "paragraph2": "Los conflictos de programacion se descubren en el estacionamiento. Los cambios de ultima hora se comunican por mensajes de texto que se pierden.",
+        "paragraph3": "OnRopePro pone el calendario en el telefono de todos. Asignaciones claras. Actualizaciones en tiempo real. Sin excusas."
       },
       "features": {
-        "title": "What This Module Does",
-        "subtitle": "Visual scheduling with automatic conflict prevention, connected directly to your projects.",
-        "conflictDetection": {
-          "title": "Automatic Conflict Detection",
-          "description": "The system checks three conditions before allowing any assignment: existing project assignments, approved time-off requests, and date overlaps. If any condition fails, you see a warning with full details before you can proceed.",
-          "listTitle": "What gets prevented:",
-          "item1": "Double-booking technicians on overlapping projects",
-          "item2": "Scheduling during approved vacation",
-          "item3": "Assigning crew to conflicting date ranges",
-          "item4": "Friday afternoon mistakes becoming Monday disasters"
-        },
-        "dualCalendar": {
-          "title": "Dual Calendar Views",
-          "description": "Two views working together give you complete visibility. Project Calendar shows all jobs on a timeline with color-coded blocks. Resource Timeline shows employee workloads by row so you can see who's available and who's overloaded at a glance.",
-          "listTitle": "What you see:",
-          "item1": "All upcoming projects (even unassigned ones)",
-          "item2": "Each employee's schedule on a single row",
-          "item3": "Availability gaps between assignments",
-          "item4": "Time-off displayed inline with work"
-        },
-        "projectIntegrated": {
-          "title": "Project-Integrated Scheduling",
-          "description": "Create a project with date range and assigned employees. The schedule populates automatically. Change the project and the schedule updates. No duplicate data entry. No systems falling out of sync.",
-          "listTitle": "What stays connected:",
-          "item1": "Project dates flow to calendar entries",
-          "item2": "Employee assignments appear in both views",
-          "item3": "Changes propagate automatically",
-          "item4": "One source of truth for project and schedule"
-        }
+        "title": "Lo que hace este modulo",
+        "subtitle": "Programacion visual con asignaciones de equipo y deteccion de conflictos."
       }
     },
     "irataLogging": {
       "hero": {
-        "badge": "IRATA / SPRAT Task Logging Module",
-        "title": "Your Logbook Is Lying",
-        "subtitle": "(Because You Haven't Updated It in Six Months)",
-        "description": "OnRopePro captures your rope access hours the same day you work them. Building names, task types, duration. All logged automatically when you end your shift.",
-        "descriptionBold": "Filling out your paper logbook stops being a homework assignment.",
-        "trialButton": "Start Your Free 60-Day Trial",
-        "faqButton": "Find Answers"
+        "badge": "Modulo de Registro de Tareas IRATA",
+        "titleLine1": "Tu solicitud de recertificacion pregunta",
+        "titleLine2": "por 1,000 horas de experiencia.",
+        "titleLine3": "Puedes probarlas?",
+        "description": "Registro automatico de horas de trabajo por tipo de tarea. Exporta directamente para solicitudes de certificacion.",
+        "ctaTrial": "Comienza tu prueba gratuita de 60 dias",
+        "ctaFaq": "Encontrar respuestas"
       },
       "stats": {
-        "yours": {
-          "title": "Yours",
-          "description": "Hours that don't disappear when you quit"
-        },
-        "accurate": {
-          "title": "Accurate",
-          "description": "Logged while you still remember"
-        },
-        "ready": {
-          "title": "Ready",
-          "description": "Level 3 proof on demand"
-        },
-        "portable": {
-          "title": "Portable",
-          "description": "One profile, every employer"
-        }
+        "hoursLogged": "Horas registradas",
+        "taskTypesTracked": "Tipos de tareas rastreados",
+        "exportReady": "Listo para exportar",
+        "certificationSupport": "Soporte de certificacion"
       },
       "problem": {
-        "title": "The Logging Problem Nobody Talks About",
-        "intro": "Your physical logbook is a mess.",
-        "paragraph1": "The last entry was months ago. You can't remember which buildings you worked at, what tasks you performed, or how many hours you actually spent on rope. When you finally try to catch up, you end up guessing. Was that rope transfer on Tuesday or Wednesday? Did you do any rigging at Tower B, or just descending?",
-        "paragraph2": "Here's the uncomfortable truth: when you bring six months of entries to your Level 3 for signing, they just sign. They weren't on every job with you. They have no idea if you actually did rope transfers on March 15th. But they sign anyway because that's how it's always been done.",
-        "quote": "One technician put it this way: \"My last entry is December 29th, 2023. Two years. Where did I work in the past year? I don't even have access to my hours anymore because I don't work there. I don't have an account. It's all gone now.\"",
-        "solution": "OnRopePro changes this. Your hours log the same day you work them. Building names, task types, duration, all captured when you end your shift. And because your hours belong to your technician profile (not your employer), your career history follows you when you change jobs."
+        "title": "Las horas que no puedes probar",
+        "paragraph1": "IRATA quiere documentacion de tus horas de trabajo. Tipos de tareas, fechas, ubicaciones.",
+        "paragraph2": "Intentas reconstruir tres años de trabajo a partir de la memoria y hojas de tiempo descoloridas.",
+        "paragraph3": "OnRopePro registra automaticamente las horas a medida que trabajas. Cuando llega el momento de la recertificacion, exportas el reporte."
       },
       "features": {
-        "title": "What This Module Does",
-        "subtitle": "The IRATA / SPRAT Task Logging module builds your certification portfolio automatically as you work.",
-        "captureHours": {
-          "title": "Capture Hours Without the Homework",
-          "description1": "When you end a work session, the system prompts you to categorize your rope access hours by task type.",
-          "description2": "No reconstructing what you did three months ago. No guessing which building had the rope transfers.",
-          "listTitle": "What gets captured:",
-          "item1": "Session date and duration",
-          "item2": "Building and project context",
-          "item3": "Task types performed (20+ categories)",
-          "item4": "Cumulative totals by task type"
-        },
-        "importHistory": {
-          "title": "Import Your Existing History",
-          "description1": "Photograph your paper logbook pages. Our OCR system extracts dates, hours, and task data automatically.",
-          "description2": "Or enter your baseline total manually if you prefer.",
-          "listTitle": "What gets tracked:",
-          "item1": "Baseline hours from previous employment",
-          "item2": "Training hours from external courses",
-          "item3": "Independent work (for techs not connected to an employer)",
-          "item4": "Historical data from scanned logbook pages"
-        },
-        "trackProgress": {
-          "title": "Track Progress Toward Certification",
-          "description1": "Your hours accumulate against your IRATA or SPRAT certification number.",
-          "description2": "See exactly where you stand for your next level assessment.",
-          "listTitle": "What you see:",
-          "item1": "Total accumulated career hours",
-          "item2": "Hours breakdown by task type",
-          "item3": "Hours breakdown by week, month, year",
-          "item4": "PDF export for any date range"
-        }
+        "title": "Lo que hace este modulo",
+        "subtitle": "Registro automatico de horas de trabajo con soporte para exportacion de certificacion."
       }
     },
     "csr": {
       "hero": {
-        "badge": "Company Safety Rating Module",
-        "titleLine1": "Know exactly how safe",
-        "titleLine2": "your company is.",
-        "titleLine3": "Prove it to anyone who asks.",
-        "description": "The Company Safety Rating transforms scattered paperwork and good intentions into a single, auditable number. Property managers see it when comparing vendors. Technicians see it when evaluating job offers.",
-        "descriptionStrong": "You see it when building a culture that protects your people and your business.",
-        "ctaTrial": "Start Your Free 60-Day Trial",
-        "ctaFaq": "Find Answers"
+        "badge": "Calificacion de Seguridad de la Empresa",
+        "titleLine1": "Tu calificacion de seguridad",
+        "titleLine2": "esta visible para los administradores de propiedades.",
+        "titleLine3": "Que ven ellos?",
+        "description": "Metricas de cumplimiento de seguridad transparentes que demuestran tu compromiso con la operacion profesional.",
+        "ctaTrial": "Comienza tu prueba gratuita de 60 dias",
+        "ctaFaq": "Encontrar respuestas"
       },
       "stats": {
-        "averageCsr": "Average starting CSR",
-        "realTimeValue": "Real-time",
-        "scoreUpdates": "Score updates",
-        "auditTimeValue": "5 min",
-        "auditPreparation": "Audit preparation",
-        "achievableCompliance": "Achievable compliance"
+        "safetyScore": "Puntuacion de seguridad",
+        "complianceRate": "Tasa de cumplimiento",
+        "incidentsFree": "Libre de incidentes",
+        "auditReady": "Listo para auditoria"
       },
       "problem": {
-        "title": "The Safety Problem Nobody Talks About",
-        "intro": "Every rope access company says they're safe. Every one of them.",
-        "paragraph1": "But when WorkSafe shows up and asks for proof, most operators scramble through filing cabinets, truck glove boxes, and text message threads looking for documentation that may or may not exist. When a property manager asks which vendor is safer, they're comparing marketing claims, not evidence. When a technician decides whether to accept a job, they're gambling their life on an employer's word.",
-        "highlight": "Safety without measurement is just hope. And hope is not a strategy when someone's hanging 40 stories up.",
-        "solution": "OnRopePro's Company Safety Rating changes the conversation. Instead of \"we're safe,\" you get a number: 87%. Instead of scattered forms, you get a single dashboard showing exactly where you stand and what needs attention. Instead of guessing, you know."
+        "title": "La confianza que no puedes demostrar",
+        "paragraph1": "Sabes que tu empresa opera de forma segura. Pero cuando un nuevo cliente pregunta sobre tu historial de seguridad, que les muestras?",
+        "paragraph2": "Los administradores de propiedades quieren pruebas, no promesas.",
+        "paragraph3": "La Calificacion de Seguridad de la Empresa de OnRopePro agrega tus metricas de cumplimiento en una puntuacion que los clientes pueden ver."
       },
       "features": {
-        "title": "What the CSR Module Does",
-        "subtitle": "A penalty-based compliance scoring system that measures safety posture in real time.",
-        "autoScore": {
-          "title": "Automatic Score Calculation",
-          "intro": "The system tracks every safety document, every harness inspection, every toolbox meeting.",
-          "description": "Your score updates automatically as compliance events occur across your operation. No manual entry. No spreadsheets. No remembering to update anything.",
-          "tracked": "What gets tracked:",
-          "item1": "Core company documents (COI, Health & Safety Manual, Company Policy)",
-          "item2": "Project-level safety documentation (FLHA, RAP, Toolbox Meeting, Anchor Inspection)",
-          "item3": "Daily harness inspection completion rates",
-          "item4": "Employee acknowledgment status on all safety documents"
-        },
-        "visibility": {
-          "title": "Transparent Visibility",
-          "intro": "Different stakeholders see appropriate levels of detail.",
-          "description": "Property managers see your overall score and color-coded compliance badge. Company owners see full breakdowns with improvement recommendations. Technicians see enough to make informed decisions about employers.",
-          "roles": "What each role sees:",
-          "pmLabel": "Property Managers:",
-          "pmValue": "Overall %, color badge, category breakdown",
-          "ownerLabel": "Company Owners:",
-          "ownerValue": "Full dashboard, action items, improvement tips",
-          "techLabel": "Technicians:",
-          "techValue": "Company CSR when evaluating job offers"
-        },
-        "penalty": {
-          "title": "Penalty-Based Accountability",
-          "intro": "Start at 75%. Reach 100% by uploading three core documents.",
-          "description": "From there, every compliance gap triggers a proportional penalty. Miss a harness inspection? Penalty. Toolbox meeting not completed? Penalty. Employee hasn't signed updated safety procedures? Penalty.",
-          "creates": "What creates penalties:",
-          "item1": "Missing or expired company documentation (up to 25%)",
-          "item2": "Incomplete project documentation (up to 25%)",
-          "item3": "Harness inspections not completed before work (up to 25%)",
-          "item4": "Unsigned employee acknowledgments (up to 5%)"
-        }
+        "title": "Lo que hace este modulo",
+        "subtitle": "Metricas de seguridad transparentes que construyen confianza del cliente."
       }
     },
     "residentPortal": {
       "hero": {
-        "badge": "Resident Portal Module",
-        "title": "Complaints handled while your crews",
-        "titleHighlight": "are still on the ropes.",
-        "description": "Residents submit feedback with photos. Your team sees it in real-time. Issues get resolved before the van leaves the parking lot.",
-        "descriptionBold": "No more phone tag. No more return visits. No more notebooks.",
-        "ctaTrial": "Start Your Free 60-Day Trial",
-        "ctaFaqs": "Find Answers"
+        "badge": "Modulo de Portal de Residentes",
+        "titleLine1": "Los residentes tienen quejas.",
+        "titleLine2": "El administrador de la propiedad te las reenvía.",
+        "titleLine3": "Que tanto mas eficiente podria ser?",
+        "description": "Comunicacion directa con residentes del edificio. Comentarios, actualizaciones de estado y avisos de trabajo en un solo lugar.",
+        "ctaTrial": "Comienza tu prueba gratuita de 60 dias",
+        "ctaFaq": "Encontrar respuestas"
       },
       "stats": {
-        "returnVisits": "Return visits prevented/mo",
-        "phoneSaved": "Phone time saved/mo",
-        "resolution": "Avg resolution time",
-        "visibility": "Visibility maintained"
+        "feedbackCollected": "Comentarios recolectados",
+        "responseTime": "Tiempo de respuesta",
+        "residentSatisfaction": "Satisfaccion de residentes",
+        "issuesResolved": "Problemas resueltos"
       },
       "problem": {
-        "title": "The Complaint Problem Nobody Budgets For",
-        "scenario": "A resident in unit 1247 emails about streaks on her window. A week later, she calls the building manager. The building manager calls you. You check your notebook. Maybe the email got lost. Maybe it didn't.",
-        "waste": "Now three people are spending time on something that might have been resolved in 10 minutes if anyone had known about it while the crew was still in the building.",
-        "cost": "That 10-minute fix? It becomes a half-day labor cost.",
-        "returnVisit": "Packing equipment, loading the van, driving across town, rigging ropes for one window, cleaning it, derigging, driving back. You've done the math. You know what those return visits cost.",
-        "multiply": "And that's just one complaint. During busy season, multiply it by buildings, by units, by the residents who give up entirely and complain on social media instead.",
-        "solution": "OnRopePro's Resident Portal puts feedback in front of your team while crews are still on-site. Residents submit issues with photos. Your supervisor sees a notification. The technician already rigged on that elevation flips their rope and checks the window. Problem solved in minutes, not days."
+        "title": "Los comentarios que nunca recibes",
+        "paragraph1": "Un residente ve un problema. Le dicen al administrador del edificio. El administrador del edificio te envia un correo. Tu respondes. Ellos reenvian.",
+        "paragraph2": "Dias despues, el residente todavia esta esperando.",
+        "paragraph3": "El Portal de Residentes de OnRopePro permite comunicacion directa. Los residentes reportan problemas. Tu respondes directamente. Todos ahorran tiempo."
       },
       "features": {
-        "title": "What This Module Does",
-        "subtitle": "Direct communication between residents and your company. Complete visibility for property managers. Zero phone tag.",
-        "feedback": {
-          "title": "Resident Feedback System",
-          "description": "Residents submit feedback once with their description and optional photo. Name, unit number, and phone auto-fill from their account. Your team sees it immediately in the project dashboard with a notification badge.",
-          "capturedLabel": "What gets captured:",
-          "captured1": "Description of issue with optional photo evidence",
-          "captured2": "Unit number and resident contact info (auto-filled)",
-          "captured3": "Timestamp of submission",
-          "captured4": "Timestamp of when your team first viewed it"
-        },
-        "communication": {
-          "title": "Two-Way Communication",
-          "description": "Your staff respond through internal notes (private) or visible replies (resident sees). Residents can reply to visible messages. The complete conversation history stays attached to that feedback item forever.",
-          "trackedLabel": "What gets tracked:",
-          "tracked1": "All messages between staff and resident",
-          "tracked2": "Which messages are internal vs. visible",
-          "tracked3": "Status changes (New, Viewed, Closed)",
-          "tracked4": "Resolution timestamps for performance metrics"
-        },
-        "progress": {
-          "title": "Project Progress Visibility",
-          "description": "Residents view real-time project progress showing which elevation or side of the building is being worked on. They check status before calling to ask \"when will you do my window?\"",
-          "seeLabel": "What residents see:",
-          "see1": "Current elevation being worked (North, South, East, West)",
-          "see2": "Overall completion percentage",
-          "see3": "Scheduled project dates",
-          "see4": "Active status indicators"
-        }
+        "title": "Lo que hace este modulo",
+        "subtitle": "Comunicacion directa con residentes del edificio con seguimiento de comentarios."
       }
     },
     "quoting": {
       "hero": {
-        "badge": "Quoting & Sales Pipeline Module",
-        "title": "Stop Losing Quotes.",
-        "titleHighlight": "Start Closing Deals.",
-        "description": "Your technicians capture site details without seeing your pricing. You turn their data into accurate, professional quotes with automatic labor calculations.",
-        "descriptionBold": "No spreadsheets. No calculator errors. No pricing exposure.",
-        "ctaTrial": "Start Your Free 60-Day Trial",
-        "ctaFaqs": "Find Answers"
+        "badge": "Modulo de Cotizaciones y Ventas",
+        "titleLine1": "Otra cotizacion en una servilleta.",
+        "titleLine2": "Otro trabajo subvaluado.",
+        "titleLine3": "Otra leccion aprendida?",
+        "description": "Cotizaciones profesionales basadas en costos laborales reales de tus datos historicos.",
+        "ctaTrial": "Comienza tu prueba gratuita de 60 dias",
+        "ctaFaq": "Encontrar respuestas"
       },
       "stats": {
-        "quoteSpeed": "Faster quote creation",
-        "errorReduction": "Calculation errors eliminated",
-        "winRate": "Win rate improvement",
-        "pipelineStages": "Pipeline stages tracked"
+        "quotesGenerated": "Cotizaciones generadas",
+        "accuracyImprovement": "Mejora de precision",
+        "timeToQuote": "Tiempo para cotizar",
+        "conversionRate": "Tasa de conversion"
       },
       "problem": {
-        "title": "The Quoting Problem That's Bleeding You Dry",
-        "scenario": "You send your tech to assess a complex. Four towers, different elevations, mixed services.",
-        "notes": "He comes back with hand-scribbled notes on drop counts. You pull out your calculator, multiply hours by rates, add service fees, double-check the math.",
-        "mistake": "An hour later, you realize you forgot Tower C. Your quote is low by $2,400. You either eat the loss or look incompetent renegotiating.",
-        "competitor": "Meanwhile, your competitor sent their quote three hours ago. From their phone. With professional formatting. Your property manager already replied to them.",
-        "solution": "OnRopePro eliminates quote calculation errors, protects your pricing strategy from employee exposure, and turns site assessments into professional proposals while your tech is still on-site. Your pricing stays private. Your quotes stay accurate. Your closing rate stops hemorrhaging to faster competitors."
+        "title": "Las cotizaciones que siempre fallan",
+        "paragraph1": "Estimas 40 horas. El trabajo toma 60. Pierdes dinero de nuevo.",
+        "paragraph2": "Sin datos historicos, cada cotizacion es una suposicion educada. Y tus suposiciones siguen siendo demasiado optimistas.",
+        "paragraph3": "OnRopePro usa tus datos reales de proyectos para informar nuevas cotizaciones. Sabes cuanto tomaron realmente edificios similares."
       },
       "features": {
-        "title": "Quote Creation That Protects Your Numbers While Accelerating Your Sales",
-        "subtitle": "The Quoting & Sales Pipeline module creates service-specific quotes with automatic labor calculations while maintaining complete financial privacy through granular permission controls.",
-        "pricing": {
-          "title": "Service-Specific Pricing Models",
-          "headline": "Automatic calculations matched to how you actually price jobs.",
-          "description": "Window cleaning quotes calculate from drops per elevation and daily targets. Parkade quotes multiply stall counts by your per-stall rate.",
-          "listTitle": "What gets calculated automatically:",
-          "list1": "Window/building wash: hours from drops and targets",
-          "list2": "Parkade: stalls multiplied by per-stall rate",
-          "list3": "Dryer vent: unit count or hourly pricing",
-          "list4": "Painting: drop count by per-drop rate"
-        },
-        "privacy": {
-          "title": "Financial Privacy Controls",
-          "headline": "Your technicians gather site data without seeing what you charge.",
-          "description": "Financial Access permission determines who sees pricing information. Tech creates the quote, enters building details. You add rates later.",
-          "listTitle": "What stays protected:",
-          "list1": "Hourly rates by service type",
-          "list2": "Per-drop and per-stall pricing",
-          "list3": "Total quote values and margins",
-          "list4": "Historical pricing data"
-        },
-        "pipeline": {
-          "title": "Visual Sales Pipeline",
-          "headline": "Kanban board that shows exactly where every opportunity stands.",
-          "description": "Drag quotes from Draft to Submitted to Under Review to Negotiation to Won or Lost. Never lose track of potential contracts.",
-          "listTitle": "What gets tracked:",
-          "list1": "Current stage for every quote",
-          "list2": "Total opportunity value per stage",
-          "list3": "Win rates and conversion metrics",
-          "list4": "Revenue forecasts from pipeline"
-        }
+        "title": "Lo que hace este modulo",
+        "subtitle": "Cotizaciones profesionales basadas en datos de costos laborales reales."
       }
     },
     "technicianPassport": {
       "hero": {
-        "badge": "Technician Passport Module",
-        "title": "Your Next Hire Is",
-        "titleHighlight": "Already Onboarded.",
-        "description": "Technicians on OnRopePro carry verified credentials, complete work history, and banking details in one portable profile. When they connect to your company, you receive everything instantly.",
-        "descriptionBold": "No paperwork. No verification calls. No waiting.",
-        "seeHow": "See How It Works",
-        "startTrial": "Start Your Free Trial"
+        "badge": "Pasaporte del Tecnico",
+        "titleLine1": "Tu carrera es portatil.",
+        "titleLine2": "Tu historial profesional deberia serlo tambien.",
+        "titleLine3": "Ahora lo es.",
+        "description": "Credenciales verificables, historial de trabajo y documentacion de seguridad que te siguen entre empleadores.",
+        "ctaTrial": "Comienza tu prueba gratuita de 60 dias",
+        "ctaFaq": "Encontrar respuestas"
       },
       "stats": {
-        "onboardingValue": "10s",
-        "onboardingLabel": "Onboarding time",
-        "complianceValue": "100%",
-        "complianceLabel": "Compliance rate",
-        "paperworkValue": "Zero",
-        "paperworkLabel": "Paperwork to chase",
-        "timeSavedValue": "60+ min",
-        "timeSavedLabel": "Time saved per hire"
+        "credentialsTracked": "Credenciales rastreadas",
+        "employersConnected": "Empleadores conectados",
+        "workHistory": "Historial de trabajo",
+        "portableProfile": "Perfil portatil"
       },
       "problem": {
-        "title": "Hiring Shouldn't Take Longer Than the First Day of Work",
-        "intro": "You find a qualified tech. Level 2, First Aid, available immediately. Perfect.",
-        "paperworkStarts": "Then the paperwork starts.",
-        "paperworkDetails": "Email the onboarding forms. Wait for them to fill out banking details. Chase the certification copies. Verify with IRATA (eventually). Send safety documentation. Wait for signatures. File everything (somewhere). Hope nothing gets lost before the next audit.",
-        "burnedTime": "By the time they're officially \"onboarded,\" you've burned 60+ minutes of admin time. Multiply that by every hire, every season.",
-        "redundancy": "Meanwhile, that tech filled out the exact same forms for their last three employers. The same banking details. The same emergency contacts. The same certification copies.",
-        "solution": "OnRopePro eliminates the redundancy. Technicians create one profile that travels with them. When they connect to your company, their verified credentials, work history, and personal details transfer in 10 seconds.",
-        "conclusion": "Your job is running projects. Not chasing paperwork."
+        "title": "El historial que dejas atras",
+        "paragraph1": "Cada vez que cambias de empleador, empiezas de cero. Tu historial de trabajo, tu documentacion de seguridad, tu experiencia, todo queda atras.",
+        "paragraph2": "Tu nuevo empleador no tiene idea de lo que has hecho. Tu viejo empleador no te dara una referencia.",
+        "paragraph3": "El Pasaporte del Tecnico de OnRopePro crea un perfil portatil. Tu historial te sigue. Tus credenciales se verifican. Tu experiencia se documenta."
       },
       "features": {
-        "title": "What You Get When a Tech Connects",
-        "subtitle": "Every technician with an OnRopePro Passport carries their complete professional identity. When they accept your invitation, you receive:"
+        "title": "Lo que hace este modulo",
+        "subtitle": "Perfil profesional portatil para tecnicos de acceso con cuerdas."
       }
     },
     "employerJobBoard": {
       "hero": {
-        "badge": "Job Board Ecosystem",
-        "title": "Stop Paying $22 Per Application",
-        "subtitle": "From People Who've Never Touched a Rope.",
-        "description": "OnRopePro's Job Board is a closed ecosystem. Every employer verified. Every technician relevant. Post unlimited jobs.",
-        "descriptionBold": "Zero per-application fees.",
-        "ctaPrimary": "Start Posting Jobs Free",
-        "ctaSecondary": "Find Answers"
+        "badge": "Bolsa de Trabajo para Empleadores",
+        "titleLine1": "Necesitas tecnicos.",
+        "titleLine2": "Los tecnicos te necesitan.",
+        "titleLine3": "Conectemos.",
+        "description": "Publica oportunidades de empleo y conecta con tecnicos de acceso con cuerdas calificados.",
+        "ctaTrial": "Comienza tu prueba gratuita de 60 dias",
+        "ctaFaq": "Encontrar respuestas"
       },
       "stats": {
-        "filteringTime": {
-          "value": "0 hours",
-          "label": "Filtering Time"
-        },
-        "platformFees": {
-          "value": "$0",
-          "label": "Platform Fees"
-        },
-        "timeToHire": {
-          "value": "1-3 Days",
-          "label": "Time to Hire"
-        },
-        "interviews": {
-          "value": "2-3",
-          "label": "Interviews Needed"
-        }
+        "jobsPosted": "Empleos publicados",
+        "applicationsReceived": "Solicitudes recibidas",
+        "technicianReach": "Alcance de tecnicos",
+        "hiringSuccess": "Exito de contratacion"
       },
       "problemStatement": {
-        "title": "The Indeed Tax",
-        "paragraph1": "You post on Indeed. LinkedIn. Craigslist. Facebook. You get 50 applications. You open each one, hoping for a Level 2 with caulking experience.",
-        "paragraph2": "What you find: shop laborers, pipe fitters, offshore oil rig candidates, and 23 people who \"have always been interested in learning.\" Two hours of filtering. Two actual rope techs.",
-        "paragraph3": "Then Indeed hits you with the bill. $22 per application if you don't respond within 48 hours. A single posting costs you $300 before you've even scheduled an interview. Someone on your team has to log in every day just to click \"decline\" on resumes from car mechanics.",
-        "solutionTitle": "OnRopePro's Job Board works differently.",
-        "solutionText": "Every company here does rope access building maintenance. Every technician here is in the industry. When you post a job, 100% of applicants are relevant. No noise. No filtering. No $22 surprise fees."
+        "title": "El talento que no puedes encontrar",
+        "paragraph1": "Publicas en grupos de Facebook. Preguntas en tu red. Esperas que alguien conozca a alguien.",
+        "paragraph2": "Mientras tanto, hay tecnicos calificados buscando trabajo que nunca veran tu publicacion.",
+        "paragraph3": "La Bolsa de Trabajo de OnRopePro conecta empleadores con tecnicos verificados que buscan activamente oportunidades."
       },
       "features": {
-        "title": "Your Closed Garden Ecosystem",
-        "subtitle": "Where every applicant is a rope tech and every employer is verified",
-        "description": "The Job Board connects you with qualified rope access technicians across the platform. Post jobs, browse talent, and send direct offers to candidates who match your requirements.",
-        "talentBrowser": {
-          "title": "Talent Browser",
-          "description1": "Search the technician pool before you even post a job. Filter by location, certification level, experience, and expected pay rate.",
-          "description2": "See who's available, what they're looking for, and whether your budget matches their expectations before you spend time interviewing.",
-          "filterLabel": "What you can filter by:",
-          "filter1": "Location (city, region)",
-          "filter2": "IRATA/SPRAT certification level",
-          "filter3": "Years of experience",
-          "filter4": "Expected pay rate",
-          "filter5": "Safety rating score",
-          "filter6": "Specialties (caulking, window washing, etc.)"
-        },
-        "unlimitedPostings": {
-          "title": "Unlimited Job Postings",
-          "description1": "Post as many jobs as your operation requires. Full-time, part-time, contract, seasonal.",
-          "description2": "Six job types supported: window washing, caulking, pressure washing, gutter cleaning, painting and coating, visual inspection. No per-post fees. No per-application charges. No surprise invoices.",
-          "controlLabel": "What you control:",
-          "control1": "Job type and service scope",
-          "control2": "Location and site details",
-          "control3": "Required certifications",
-          "control4": "Pay range (optional but recommended)",
-          "control5": "Start date and duration"
-        },
-        "directOffers": {
-          "title": "Direct Job Offers",
-          "description1": "Found a perfect candidate in the Talent Browser? Send them an offer directly. Link it to one of your active job postings.",
-          "description2": "They get notified in their portal. Accept or decline with one tap. No email chains. No phone tag.",
-          "stepsLabel": "How it works:",
-          "step1": "Select candidate from search results",
-          "step2": "Choose which job posting to link",
-          "step3": "Technician receives in-portal notification",
-          "step4": "Response comes back to your dashboard"
-        }
+        "title": "Lo que hace este modulo",
+        "subtitle": "Reclutamiento de tecnicos de acceso con cuerdas a traves de una red verificada."
       }
     },
     "userAccess": {
       "hero": {
-        "badge": "User Access & Authentication Module",
-        "titleLine1": "Built for the moment you realize",
-        "titleLine2": "your new hire",
-        "titleLine3": "can see everyone's rates.",
-        "description": "Assign project creation, scheduling, and safety compliance to the people who need it. Keep hourly rates, labor costs, and profit margins visible only to you.",
-        "tagline": "One system. Clear boundaries. Zero compromises.",
-        "ctaTrial": "Start Your Free 60-Day Trial",
-        "ctaAnswers": "Find Answers"
+        "badge": "Acceso y Autenticacion de Usuarios",
+        "titleLine1": "Quien puede ver",
+        "titleLine2": "tus datos financieros?",
+        "titleLine3": "Lo sabes seguro?",
+        "description": "Permisos granulares basados en roles que te dan control exacto sobre quien ve que.",
+        "ctaTrial": "Comienza tu prueba gratuita de 60 dias",
+        "ctaFaq": "Encontrar respuestas"
       },
       "stats": {
-        "exposedPayRates": "Exposed pay rates",
-        "unauthorizedEdits": "Unauthorized edits",
-        "accessConflicts": "Access conflicts",
-        "controlMaintained": "Control maintained"
+        "permissionsConfigured": "Permisos configurados",
+        "rolesAvailable": "Roles disponibles",
+        "accessControl": "Control de acceso",
+        "securityLevel": "Nivel de seguridad"
       },
       "problem": {
-        "title": "The Access Problem Nobody Talks About",
-        "intro": "Construction software wasn't built for rope access.",
-        "supervisorAccess": "You add your supervisor to the system. Now they see everything. Pay rates. Profit margins. Which jobs lose money. Which technicians cost the most.",
-        "trust": "It's not about trust. Some information belongs at the owner level.",
-        "choice": "Most systems force a choice: do everything yourself and become the bottleneck, or give access and hope nobody looks where they shouldn't.",
-        "meanwhile": "Meanwhile, building managers drown in resident calls. Technicians text complaints to personal phones. Property managers piece together vendor performance from scattered emails.",
-        "frustrated": "Everyone's frustrated. Nobody has the full picture.",
-        "solution": "OnRopePro separates what people can do from what they can see. Five stakeholder types. One unified system. Every person sees exactly what they need. Nothing more."
+        "title": "Los permisos que nunca estableciste",
+        "paragraph1": "Tu gerente de operaciones puede ver cuanto pagan todos. Tu supervisor puede crear cotizaciones en tu nombre. Todo el mundo tiene acceso a todo porque nunca configuraste las restricciones.",
+        "paragraph2": "Un dia, alguien sale y sabes demasiado sobre tu negocio.",
+        "paragraph3": "OnRopePro comienza con cero permisos y construye hacia arriba. Cada persona ve exactamente lo que necesita y nada mas."
       },
       "features": {
-        "title": "Complete Access Control That Creates Itself Through Daily Use",
-        "subtitle": "Every login, every permission, every piece of feedback flows through a single system designed for how rope access actually works.",
-        "roleBasedPermissions": {
-          "title": "Role-Based Permission Architecture",
-          "intro": "Before any employee accesses the system, you define exactly what they see.",
-          "description": "44+ individual permissions across financial, operational, safety, and inventory categories. Your ops manager creates projects without seeing payroll. Your ground crew logs hours without accessing bids.",
-          "controlledLabel": "What gets controlled:",
-          "financial": "Financial data visibility (rates, costs, margins)",
-          "projects": "Project creation and modification rights",
-          "employees": "Employee management capabilities",
-          "safety": "Safety documentation access",
-          "inventory": "Inventory and equipment permissions"
-        },
-        "externalPortals": {
-          "title": "External Stakeholder Portals",
-          "intro": "Three separate portals for three different needs.",
-          "description": "Residents see their building's progress and submit feedback. Building managers see project details and response metrics. Property managers see portfolio-wide performance. No cross-contamination. No unauthorized access.",
-          "portalsLabel": "What each portal provides:",
-          "resident": "Resident",
-          "residentDesc": "Progress visibility, feedback submission, photo documentation",
-          "buildingManager": "Building Manager",
-          "buildingManagerDesc": "Full project details, feedback management, work history",
-          "propertyManager": "Property Manager",
-          "propertyManagerDesc": "Multi-building oversight, vendor performance metrics, exportable reports"
-        },
-        "feedbackSystem": {
-          "title": "Centralized Feedback System",
-          "intro": "Every resident complaint, compliment, and question flows into one dashboard.",
-          "description": "No more texts to personal phones. No more emails lost in inboxes. No more sticky notes in the lobby. Timestamped. Photographed. Tracked from open to resolved.",
-          "trackedLabel": "What gets tracked:",
-          "submission": "Submission timestamp",
-          "acknowledgment": "Acknowledgment timestamp",
-          "resolution": "Resolution timestamp",
-          "photos": "Photo documentation",
-          "responseTime": "Response time metrics"
-        }
+        "title": "Lo que hace este modulo",
+        "subtitle": "Control de acceso basado en roles con configuracion de permisos granulares."
       }
     },
     "technicianJobBoard": {
       "hero": {
-        "badge": "Job Board Ecosystem",
-        "title": "Every Job Here Is Rope Access.",
-        "subtitle": "Every Company Is Real.",
-        "description": "OnRopePro's Job Board is exclusively for rope access building maintenance. Browse real jobs from verified companies. Apply in 30 seconds.",
-        "descriptionBold": "Control who sees your profile.",
-        "ctaPrimary": "Browse Jobs Free",
-        "ctaSecondary": "Find Answers"
+        "badge": "Bolsa de Trabajo para Tecnicos",
+        "titleLine1": "Hay trabajos disponibles.",
+        "titleLine2": "Los empleadores buscan.",
+        "titleLine3": "Hazte visible.",
+        "description": "Navega oportunidades de empleo y permite que los empleadores vean tu perfil verificado.",
+        "ctaTrial": "Crear perfil gratuito",
+        "ctaFaq": "Encontrar respuestas"
       },
       "stats": {
-        "applicationTime": "Application Time",
-        "relevantListings": "Relevant Listings",
-        "immediateValue": "Immediate",
-        "searchTime": "Search Time",
-        "upfrontValue": "Upfront",
-        "interviewAlignment": "Interview Alignment"
+        "jobsAvailable": "Empleos disponibles",
+        "employersSearching": "Empleadores buscando",
+        "profileViews": "Vistas de perfil",
+        "connectionsMade": "Conexiones hechas"
       },
       "problem": {
-        "title": "Indeed Thinks You Want to Be a Pipe Fitter",
-        "intro": "You search \"rope access\" on Indeed. What do you get?",
-        "paragraph1": "Offshore oil platforms in the Maritimes. Industrial access jobs at Alberta refineries. Pipe fitter positions that mention \"rope\" once in the safety section. General construction gigs that require \"working at heights.\"",
-        "paragraph2": "You scroll for 20 minutes to find 3 jobs that might actually be rope access building maintenance. Maybe.",
-        "paragraph3": "Then you apply. Upload your resume. Fill out the same form for the 50th time. Manually type your IRATA number because there's no field for it. Wonder if the company even checked your certification.",
-        "solutionTitle": "OnRopePro's Job Board works differently.",
-        "solutionParagraph1": "Every job posted here is rope access building maintenance. Window washing. Caulking. Pressure washing. Gutter cleaning. Painting and coating. Visual inspection. No offshore. No oil rigs. No pipe fitting.",
-        "solutionParagraph2": "Every company posting is verified. Real rope access operators who do real building maintenance. When you apply, your certifications, experience, and safety rating go with your application automatically."
+        "title": "Las oportunidades que te pierdes",
+        "paragraph1": "Hay empresas contratando. Simplemente no sabes cuales o donde.",
+        "paragraph2": "Te enteras de trabajos a traves del boca a boca, dias o semanas despues de que fueron publicados.",
+        "paragraph3": "La Bolsa de Trabajo de OnRopePro te muestra oportunidades activas de empresas verificadas. Opta por hacer tu perfil visible y deja que los empleadores te encuentren."
       },
       "features": {
-        "title": "Your Rope Access Career Hub",
-        "subtitle": "Where every job matches your skills and every employer understands your work",
-        "jobBrowser": {
-          "title": "Job Browser",
-          "headline": "See only rope access building maintenance jobs.",
-          "description": "Filter by location, job type, and certification requirements. Each listing shows company details, pay range (when provided), start dates, and project scope. Every company is verified. Every job is relevant.",
-          "filterLabel": "What you can filter by:"
-        },
-        "oneClickApplications": {
-          "title": "One-Click Applications",
-          "headline": "Your profile data travels with your application.",
-          "description": "Resume, certifications, IRATA/SPRAT numbers, years of experience, safety rating. All attached automatically. Apply to a job in 30 seconds instead of re-entering the same information for the 100th time.",
-          "sentLabel": "What gets sent automatically:"
-        },
-        "profileVisibility": {
-          "title": "Profile Visibility Toggle",
-          "headline": "Control who finds you.",
-          "description": "Toggle visibility ON: employers can search for you in the Talent Browser, see your credentials, and send you direct job offers. Toggle it OFF: you're invisible to searches but can still browse and apply to jobs normally.",
-          "visibleLabel": "What employers see when you're visible:"
-        }
+        "title": "Lo que hace este modulo",
+        "subtitle": "Busqueda de empleo y visibilidad de perfil para tecnicos de acceso con cuerdas."
       }
     }
   }

@@ -3,7 +3,13 @@ import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
-import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown, IdCard, HardHat, Search, Package, Calendar, DollarSign, Calculator, Palette, HelpCircle, MessageSquare } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown, IdCard, HardHat, Search, Package, Calendar, DollarSign, Calculator, Palette, HelpCircle, MessageSquare, Globe } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 interface PublicHeaderProps {
@@ -19,16 +25,24 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileModulesExpanded, setMobileModulesExpanded] = useState(false);
   const [mobileTechnicianExpanded, setMobileTechnicianExpanded] = useState(false);
-  const [landingLanguage, setLandingLanguage] = useState<'en' | 'fr'>(() => {
-    return (i18n.language?.startsWith('fr') ? 'fr' : 'en');
+  const [currentLanguage, setCurrentLanguage] = useState<'en' | 'fr' | 'es'>(() => {
+    const lang = i18n.language;
+    if (lang?.startsWith('fr')) return 'fr';
+    if (lang?.startsWith('es')) return 'es';
+    return 'en';
   });
   const modulesMenuRef = useRef<HTMLDivElement>(null);
   const technicianMenuRef = useRef<HTMLDivElement>(null);
 
-  const toggleLandingLanguage = () => {
-    const newLang = landingLanguage === 'en' ? 'fr' : 'en';
-    setLandingLanguage(newLang);
-    i18n.changeLanguage(newLang);
+  const changeLanguage = (lang: 'en' | 'fr' | 'es') => {
+    setCurrentLanguage(lang);
+    i18n.changeLanguage(lang);
+  };
+
+  const languageLabels = {
+    en: 'English',
+    fr: 'Francais',
+    es: 'Espanol'
   };
 
   useEffect(() => {
@@ -70,14 +84,42 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
             <HelpCircle className="w-4 h-4 mr-1" />
             {t('navigation.help', 'Help')}
           </Button>
-          <Button 
-            variant="ghost"
-            size="sm"
-            onClick={toggleLandingLanguage}
-            data-testid="button-language-toggle"
-          >
-            {landingLanguage === 'en' ? 'FR' : 'EN'}
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="ghost"
+                size="sm"
+                data-testid="button-language-dropdown"
+              >
+                <Globe className="w-4 h-4 mr-1" />
+                {t('navigation.language', 'Language')}
+                <ChevronDown className="w-3 h-3 ml-1" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem 
+                onClick={() => changeLanguage('en')}
+                className={currentLanguage === 'en' ? 'bg-accent' : ''}
+                data-testid="menu-item-language-en"
+              >
+                English
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => changeLanguage('fr')}
+                className={currentLanguage === 'fr' ? 'bg-accent' : ''}
+                data-testid="menu-item-language-fr"
+              >
+                Francais
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => changeLanguage('es')}
+                className={currentLanguage === 'es' ? 'bg-accent' : ''}
+                data-testid="menu-item-language-es"
+              >
+                Espanol
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button 
             variant="ghost"
             size="sm"
