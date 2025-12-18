@@ -132,8 +132,76 @@ export const guideRegistry = [
 ];
 
 /**
- * Extract plain text content from a TSX Guide file
- * Parses JSX and extracts readable text, headings, and list items
+ * Developer-specific terms to filter out from help content
+ * These are not relevant to end users
+ */
+const DEVELOPER_FILTER_PATTERNS = [
+  /technical\s*notes?/gi,
+  /implementation\s*details?/gi,
+  /schema\./gi,
+  /database\s*table/gi,
+  /drizzle/gi,
+  /api\s*endpoint/gi,
+  /backend/gi,
+  /frontend/gi,
+  /componentn/gi,
+  /props?\s*:/gi,
+  /useState/gi,
+  /useEffect/gi,
+  /import\s+\{/gi,
+  /export\s+default/gi,
+  /className=/gi,
+  /data-testid/gi,
+  /===|!==|\?\?/g,
+];
+
+/**
+ * Check if a text block should be filtered out (developer-specific)
+ * Note: Short text is allowed for headings - use isHeadingContext=true for headings
+ */
+function shouldFilterContent(text: string, isHeadingContext: boolean = false): boolean {
+  const lowerText = text.toLowerCase();
+  
+  // Allow short text for headings (e.g., "FAQ", "Overview")
+  // Only filter very short non-heading text (< 5 chars)
+  if (!isHeadingContext && text.length < 5) return true;
+  
+  // Skip JSX/code patterns
+  if (text.includes('{') && text.includes('}')) return true;
+  if (text.includes('className')) return true;
+  if (text.includes('onClick')) return true;
+  if (text.includes('useState')) return true;
+  if (text.includes('import ')) return true;
+  if (text.includes('export ')) return true;
+  
+  // Skip developer-specific content
+  if (lowerText.includes('technical note')) return true;
+  if (lowerText.includes('implementation detail')) return true;
+  if (lowerText.includes('schema.')) return true;
+  if (lowerText.includes('database table')) return true;
+  if (lowerText.includes('api endpoint')) return true;
+  
+  return false;
+}
+
+/**
+ * Clean text by removing JSX artifacts and normalizing whitespace
+ */
+function cleanText(text: string): string {
+  return text
+    .replace(/\{[^}]*\}/g, '') // Remove JSX expressions
+    .replace(/className="[^"]*"/g, '') // Remove className
+    .replace(/\s+/g, ' ') // Normalize whitespace
+    .replace(/^\s+|\s+$/g, '') // Trim
+    .replace(/&quot;/g, '"')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>');
+}
+
+/**
+ * Extract structured Markdown content from a TSX Guide file
+ * Preserves sections, headings, lists, and filters developer content
  */
 export function extractContentFromTSX(filePath: string): { title: string; description: string; content: string } {
   try {
@@ -145,56 +213,145 @@ export function extractContentFromTSX(filePath: string): { title: string; descri
     }
     
     const fileContent = fs.readFileSync(absolutePath, 'utf-8');
+    const markdownParts: string[] = [];
     
-    // Extract text between JSX tags using regex patterns
-    const textContent: string[] = [];
+    // Extract page title from ChangelogGuideLayout
+    const layoutTitleMatch = fileContent.match(/title=["']([^"']+)["']/);
+    const pageTitle = layoutTitleMatch ? layoutTitleMatch[1].trim() : '';
     
-    // Extract content from common text patterns
-    const patterns = [
-      // Heading patterns like <h1>, <h2>, <CardTitle>
-      /<(?:h[1-6]|CardTitle)[^>]*>([^<]+)<\/(?:h[1-6]|CardTitle)>/gi,
-      // Paragraph and text patterns
-      /<(?:p|span|div|CardDescription)[^>]*>([^<]+)<\/(?:p|span|div|CardDescription)>/gi,
-      // List items
-      /<li[^>]*>([^<]+)<\/li>/gi,
-      // Direct string literals in JSX
-      />\s*([A-Z][^<]{20,}[.!?])\s*</g,
-    ];
+    // Extract section headings (h2 with text)
+    const h2Pattern = /<h2[^>]*>([^<]+)<\/h2>/gi;
+    const sectionHeadings: Array<{index: number; title: string}> = [];
+    let h2Match;
+    while ((h2Match = h2Pattern.exec(fileContent)) !== null) {
+      const title = cleanText(h2Match[1]);
+      if (title && !shouldFilterContent(title, true)) {
+        sectionHeadings.push({ index: h2Match.index, title });
+      }
+    }
     
-    for (const pattern of patterns) {
-      let match;
-      while ((match = pattern.exec(fileContent)) !== null) {
-        const text = match[1].trim();
-        if (text && text.length > 10 && !text.includes('{') && !text.includes('className')) {
-          textContent.push(text);
+    // Extract h3 headings
+    const h3Pattern = /<h3[^>]*>([^<]+)<\/h3>/gi;
+    let h3Match;
+    while ((h3Match = h3Pattern.exec(fileContent)) !== null) {
+      const title = cleanText(h3Match[1]);
+      if (title && !shouldFilterContent(title, true)) {
+        // Find which section this belongs to
+        let sectionTitle = '';
+        for (const section of sectionHeadings) {
+          if (section.index < h3Match.index) {
+            sectionTitle = section.title;
+          }
+        }
+        if (sectionTitle && !markdownParts.includes(`## ${sectionTitle}`)) {
+          markdownParts.push(`## ${sectionTitle}`);
+        }
+        markdownParts.push(`### ${title}`);
+      }
+    }
+    
+    // Extract introduction paragraph (first <p> in the file, typically the overview)
+    const introMatch = fileContent.match(/<p[^>]*className="[^"]*text-muted-foreground[^"]*leading-relaxed[^"]*"[^>]*>([^<]+)<\/p>/i);
+    if (introMatch) {
+      const introText = cleanText(introMatch[1]);
+      if (introText && introText.length > 50 && !shouldFilterContent(introText)) {
+        markdownParts.unshift(introText);
+      }
+    }
+    
+    // Extract key points from Cards with feature summaries
+    const cardPattern = /<Card[^>]*>[\s\S]*?<p[^>]*className="[^"]*font-medium[^"]*"[^>]*>([^<]+)<\/p>[\s\S]*?<p[^>]*className="[^"]*text-muted-foreground[^"]*"[^>]*>([^<]+)<\/p>[\s\S]*?<\/Card>/gi;
+    let cardMatch;
+    const features: string[] = [];
+    while ((cardMatch = cardPattern.exec(fileContent)) !== null) {
+      const featureTitle = cleanText(cardMatch[1]);
+      const featureDesc = cleanText(cardMatch[2]);
+      if (featureTitle && featureDesc && !shouldFilterContent(featureTitle, true) && !shouldFilterContent(featureDesc)) {
+        features.push(`- **${featureTitle}**: ${featureDesc}`);
+      }
+    }
+    if (features.length > 0) {
+      // Emit heading and list as separate entries so renderer handles them correctly
+      markdownParts.push('## Key Features');
+      markdownParts.push(features.join('\n'));
+    }
+    
+    // Extract Accordion content (problem/solution pairs)
+    const accordionPattern = /<AccordionTrigger[^>]*>[\s\S]*?<span[^>]*>([^<]+)<\/span>[\s\S]*?<\/AccordionTrigger>[\s\S]*?<AccordionContent[^>]*>([\s\S]*?)<\/AccordionContent>/gi;
+    let accordionMatch;
+    const problemsSolutions: string[] = [];
+    while ((accordionMatch = accordionPattern.exec(fileContent)) !== null) {
+      const questionText = cleanText(accordionMatch[1]);
+      const answerContent = accordionMatch[2];
+      
+      if (questionText && !shouldFilterContent(questionText)) {
+        // Extract paragraphs from accordion content
+        const paragraphs: string[] = [];
+        const pPattern = /<p[^>]*>([^<]+(?:<[^/][^>]*>[^<]*<\/[^>]+>[^<]*)*)<\/p>/gi;
+        let pMatch;
+        while ((pMatch = pPattern.exec(answerContent)) !== null) {
+          let text = pMatch[1];
+          // Extract text from nested spans
+          text = text.replace(/<span[^>]*>([^<]+)<\/span>/gi, '$1');
+          text = cleanText(text);
+          if (text && text.length > 30 && !shouldFilterContent(text)) {
+            paragraphs.push(text);
+          }
+        }
+        
+        if (paragraphs.length > 0) {
+          problemsSolutions.push(`**${questionText}**\n\n${paragraphs.join('\n\n')}`);
         }
       }
     }
+    if (problemsSolutions.length > 0) {
+      // Emit heading and content as separate entries
+      markdownParts.push('## Common Questions');
+      markdownParts.push(problemsSolutions.join('\n\n---\n\n'));
+    }
     
-    // Also extract text from template literals and string content
-    const stringLiteralPattern = /["`']([^`"']{30,})["`']/g;
-    let match;
-    while ((match = stringLiteralPattern.exec(fileContent)) !== null) {
-      const text = match[1].trim();
-      if (text && !text.includes('import') && !text.includes('className') && !text.includes('===')) {
-        textContent.push(text);
+    // Extract list items
+    const listPattern = /<li[^>]*>([^<]+)<\/li>/gi;
+    let listMatch;
+    const listItems: string[] = [];
+    while ((listMatch = listPattern.exec(fileContent)) !== null) {
+      const item = cleanText(listMatch[1]);
+      if (item && item.length > 10 && !shouldFilterContent(item)) {
+        listItems.push(`- ${item}`);
       }
     }
     
-    // Deduplicate and join
-    const uniqueContent = Array.from(new Set(textContent));
-    const content = uniqueContent.join('\n\n');
+    // Extract general paragraphs that aren't already captured
+    const pPattern = /<p[^>]*>([^<]{50,})<\/p>/gi;
+    let pMatch;
+    const paragraphs: string[] = [];
+    while ((pMatch = pPattern.exec(fileContent)) !== null) {
+      const text = cleanText(pMatch[1]);
+      if (text && text.length > 50 && !shouldFilterContent(text)) {
+        // Check if not already included
+        const alreadyIncluded = markdownParts.some(part => part.includes(text.substring(0, 50)));
+        if (!alreadyIncluded) {
+          paragraphs.push(text);
+        }
+      }
+    }
+    if (paragraphs.length > 0) {
+      markdownParts.push(paragraphs.join('\n\n'));
+    }
     
-    // Try to extract title from the file
-    const titleMatch = fileContent.match(/<h1[^>]*>([^<]+)<\/h1>/i) || 
-                       fileContent.match(/title[=:]?\s*["']([^"']+)["']/i);
-    const title = titleMatch ? titleMatch[1].trim() : '';
+    // Combine all markdown parts
+    const content = markdownParts.join('\n\n');
     
-    // Try to extract description
-    const descMatch = fileContent.match(/<(?:p|CardDescription)[^>]*>([^<]{50,200})<\//i);
-    const description = descMatch ? descMatch[1].trim() : content.substring(0, 200);
+    // Get description from intro or first 200 chars
+    const description = introMatch 
+      ? cleanText(introMatch[1]).substring(0, 200) 
+      : content.substring(0, 200);
     
-    return { title, description, content };
+    return { 
+      title: pageTitle, 
+      description, 
+      content: content || 'No content extracted.' 
+    };
   } catch (error: any) {
     console.error(`[RAG] Error extracting content from ${filePath}:`, error.message);
     return { title: '', description: '', content: '' };

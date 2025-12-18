@@ -142,12 +142,70 @@ export default function HelpArticle() {
           
           <Card>
             <CardContent className="pt-6">
-              <div className="prose dark:prose-invert max-w-none">
-                {article.content.split('\n\n').map((paragraph, index) => (
-                  <p key={index} className="mb-4 text-base leading-relaxed">
-                    {paragraph}
-                  </p>
-                ))}
+              <div className="prose dark:prose-invert max-w-none prose-headings:text-foreground prose-p:text-foreground/90 prose-strong:text-foreground prose-li:text-foreground/90">
+                {article.content.split('\n\n').map((block, index) => {
+                  const trimmedBlock = block.trim();
+                  
+                  // Render h2 headings
+                  if (trimmedBlock.startsWith('## ')) {
+                    return (
+                      <h2 key={index} className="text-xl font-semibold mt-8 mb-4 first:mt-0 border-b pb-2">
+                        {trimmedBlock.slice(3)}
+                      </h2>
+                    );
+                  }
+                  
+                  // Render h3 headings
+                  if (trimmedBlock.startsWith('### ')) {
+                    return (
+                      <h3 key={index} className="text-lg font-medium mt-6 mb-3">
+                        {trimmedBlock.slice(4)}
+                      </h3>
+                    );
+                  }
+                  
+                  // Render horizontal rules
+                  if (trimmedBlock === '---') {
+                    return <hr key={index} className="my-6 border-border" />;
+                  }
+                  
+                  // Render list items
+                  if (trimmedBlock.startsWith('- ')) {
+                    const items = trimmedBlock.split('\n').filter(line => line.startsWith('- '));
+                    return (
+                      <ul key={index} className="list-disc list-inside space-y-2 my-4">
+                        {items.map((item, i) => {
+                          const content = item.slice(2);
+                          // Handle bold text in list items
+                          const parts = content.split(/(\*\*[^*]+\*\*)/g);
+                          return (
+                            <li key={i} className="text-base">
+                              {parts.map((part, j) => {
+                                if (part.startsWith('**') && part.endsWith('**')) {
+                                  return <strong key={j}>{part.slice(2, -2)}</strong>;
+                                }
+                                return <span key={j}>{part}</span>;
+                              })}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    );
+                  }
+                  
+                  // Render paragraphs with bold text support
+                  const parts = trimmedBlock.split(/(\*\*[^*]+\*\*)/g);
+                  return (
+                    <p key={index} className="mb-4 text-base leading-relaxed">
+                      {parts.map((part, i) => {
+                        if (part.startsWith('**') && part.endsWith('**')) {
+                          return <strong key={i} className="font-semibold">{part.slice(2, -2)}</strong>;
+                        }
+                        return <span key={i}>{part}</span>;
+                      })}
+                    </p>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
