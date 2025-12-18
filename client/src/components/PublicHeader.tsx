@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
-import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown, IdCard, HardHat, Search, Package, Calendar, DollarSign, Calculator, Palette, HelpCircle, MessageSquare } from "lucide-react";
+import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown, IdCard, HardHat, Search, Package, Calendar, DollarSign, Calculator, Palette, HelpCircle, MessageSquare, Globe } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 interface PublicHeaderProps {
@@ -410,6 +410,22 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                           <div className="text-xs text-muted-foreground mt-0.5">Real-time feedback, two-way communication, photo evidence</div>
                         </div>
                       </button>
+                      <button
+                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                        onClick={() => {
+                          setLocation("/property-manager");
+                          setShowModulesMenu(false);
+                        }}
+                        data-testid="nav-property-manager-interface"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <Globe className="w-5 h-5 text-emerald-600" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-sm">Property Manager Interface</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">CSR visibility, response time tracking, due diligence documentation</div>
+                        </div>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -667,6 +683,17 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                   >
                     <MessageSquare className="w-5 h-5 text-rose-600" />
                     <span className="text-sm">Resident Portal</span>
+                  </button>
+                  <button
+                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
+                    onClick={() => {
+                      setLocation("/property-manager");
+                      setMobileMenuOpen(false);
+                    }}
+                    data-testid="nav-mobile-property-manager-interface"
+                  >
+                    <Globe className="w-5 h-5 text-emerald-600" />
+                    <span className="text-sm">Property Manager Interface</span>
                   </button>
                 </div>
               )}

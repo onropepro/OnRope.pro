@@ -93,6 +93,7 @@ import QuotingSalesLanding from "@/pages/QuotingSalesLanding";
 import WhiteLabelBrandingLanding from "@/pages/WhiteLabelBrandingLanding";
 import ResidentPortalLanding from "@/pages/ResidentPortalLanding";
 import ResidentLanding from "@/pages/ResidentLanding";
+import PropertyManagerLanding from "@/pages/PropertyManagerLanding";
 import JobBoardGuide from "@/pages/JobBoardGuide";
 import Pricing from "@/pages/Pricing";
 import ROICalculator from "@/pages/ROICalculator";
@@ -135,6 +136,7 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/employer" component={Employer} />
       <Route path="/resident" component={ResidentLanding} />
+      <Route path="/property-manager" component={PropertyManagerLanding} />
       <Route path="/pricing" component={GetLicense} />
       <Route path="/get-license" component={GetLicense} />
       <Route path="/complete-registration" component={CompleteRegistration} />
