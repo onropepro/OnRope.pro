@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
+import chokidar from "chokidar";
 import { pool } from "./db";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
@@ -8,6 +9,7 @@ import { runMigrations } from "./migrate";
 import { seedEquipmentCatalog } from "./seedEquipmentCatalog";
 import { wsHub } from "./websocket-hub";
 import { SESSION_SECRET, SESSION_COOKIE_NAME } from "./session-config";
+import { indexAllGuides } from "./services/ragService";
 
 const app = express();
 
@@ -134,4 +136,24 @@ app.use((req, res, next) => {
   }, () => {
     log(`serving on port ${port}`);
   });
+  
+  // Index Knowledge Base content on startup (non-blocking)
+  indexAllGuides().then(result => {
+    log(`[RAG] Knowledge base indexed: ${result.success} guides, ${result.failed} failed`);
+  }).catch(err => {
+    log(`[RAG] Knowledge base indexing error: ${err.message}`);
+  });
+  
+  // Watch for Guide file changes in development mode
+  if (app.get("env") === "development") {
+    const watcher = chokidar.watch('client/src/pages/*Guide.tsx', {
+      persistent: true,
+      ignoreInitial: true,
+    });
+    
+    watcher.on('change', async (filePath) => {
+      log(`[RAG] Detected change in ${filePath}, reindexing...`);
+      await indexAllGuides();
+    });
+  }
 })();

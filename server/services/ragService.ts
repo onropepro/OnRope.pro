@@ -1,17 +1,19 @@
 /**
  * RAG (Retrieval Augmented Generation) Service for Knowledge Base
  * 
- * Extracts content from Guide TSX files, generates embeddings,
- * and provides semantic search + AI chat functionality.
+ * Extracts content from Guide TSX files, stores articles in database,
+ * and provides text-based search + AI chat functionality.
+ * 
+ * Note: Embeddings are not used because Replit's Gemini integration doesn't support them.
+ * Text-based search provides good results for the knowledge base use case.
  */
 
 import * as fs from 'fs';
 import * as path from 'path';
-import * as cheerio from 'cheerio';
 import { db } from '../db';
-import { helpArticles, helpEmbeddings, type HelpArticle, type HelpEmbedding } from '@shared/schema';
-import { generateEmbedding, generateChatResponse } from '../gemini';
-import { eq, sql } from 'drizzle-orm';
+import { helpArticles, type HelpArticle } from '@shared/schema';
+import { generateChatResponse } from '../gemini';
+import { eq } from 'drizzle-orm';
 
 // Guide Registry - All modules to index
 export const guideRegistry = [
@@ -244,7 +246,9 @@ export function chunkContent(content: string, maxChunkSize: number = 1500, overl
 }
 
 /**
- * Index a single Guide file - extract content, generate embeddings, store in DB
+ * Index a single Guide file - extract content and store in DB
+ * Note: Embeddings are skipped because Replit's Gemini integration doesn't support them.
+ * Text-based search is used instead.
  */
 export async function indexGuideFile(guide: typeof guideRegistry[0]): Promise<boolean> {
   try {
@@ -260,8 +264,6 @@ export async function indexGuideFile(guide: typeof guideRegistry[0]): Promise<bo
     // Check if article already exists
     const existingArticle = await db.select().from(helpArticles).where(eq(helpArticles.slug, guide.slug)).limit(1);
     
-    let articleId: string;
-    
     if (existingArticle.length > 0) {
       // Update existing article
       await db.update(helpArticles)
@@ -275,13 +277,10 @@ export async function indexGuideFile(guide: typeof guideRegistry[0]): Promise<bo
         })
         .where(eq(helpArticles.slug, guide.slug));
       
-      articleId = existingArticle[0].id;
-      
-      // Delete old embeddings
-      await db.delete(helpEmbeddings).where(eq(helpEmbeddings.articleId, articleId));
+      console.log(`[RAG] Updated: ${guide.slug}`);
     } else {
       // Create new article
-      const [newArticle] = await db.insert(helpArticles)
+      await db.insert(helpArticles)
         .values({
           slug: guide.slug,
           title: title || guide.title,
@@ -290,29 +289,11 @@ export async function indexGuideFile(guide: typeof guideRegistry[0]): Promise<bo
           sourceFile: guide.sourceFile,
           content,
           stakeholders: guide.stakeholders,
-        })
-        .returning();
+        });
       
-      articleId = newArticle.id;
+      console.log(`[RAG] Created: ${guide.slug}`);
     }
     
-    // Chunk content and generate embeddings
-    const chunks = chunkContent(content);
-    console.log(`[RAG] Generated ${chunks.length} chunks for ${guide.slug}`);
-    
-    for (let i = 0; i < chunks.length; i++) {
-      const chunk = chunks[i];
-      const embedding = await generateEmbedding(chunk);
-      
-      await db.insert(helpEmbeddings).values({
-        articleId,
-        chunkIndex: i,
-        chunkText: chunk,
-        embedding,
-      });
-    }
-    
-    console.log(`[RAG] Successfully indexed ${guide.slug} with ${chunks.length} embeddings`);
     return true;
   } catch (error: any) {
     console.error(`[RAG] Error indexing ${guide.slug}:`, error.message);
@@ -339,64 +320,8 @@ export async function indexAllGuides(): Promise<{ success: number; failed: numbe
 }
 
 /**
- * Calculate cosine similarity between two vectors
- */
-function cosineSimilarity(a: number[], b: number[]): number {
-  if (a.length !== b.length) return 0;
-  
-  let dotProduct = 0;
-  let normA = 0;
-  let normB = 0;
-  
-  for (let i = 0; i < a.length; i++) {
-    dotProduct += a[i] * b[i];
-    normA += a[i] * a[i];
-    normB += b[i] * b[i];
-  }
-  
-  return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
-}
-
-/**
- * Search for relevant content using semantic similarity
- */
-export async function searchContent(query: string, limit: number = 5): Promise<Array<{
-  article: HelpArticle;
-  chunk: string;
-  similarity: number;
-}>> {
-  try {
-    // Generate embedding for query
-    const queryEmbedding = await generateEmbedding(query);
-    
-    // Get all embeddings and calculate similarity
-    const allEmbeddings = await db.select({
-      embedding: helpEmbeddings,
-      article: helpArticles,
-    })
-    .from(helpEmbeddings)
-    .innerJoin(helpArticles, eq(helpEmbeddings.articleId, helpArticles.id))
-    .where(eq(helpArticles.isPublished, true));
-    
-    // Calculate similarities
-    const results = allEmbeddings.map(({ embedding, article }) => ({
-      article,
-      chunk: embedding.chunkText,
-      similarity: cosineSimilarity(queryEmbedding, embedding.embedding as number[]),
-    }));
-    
-    // Sort by similarity and return top results
-    results.sort((a, b) => b.similarity - a.similarity);
-    
-    return results.slice(0, limit);
-  } catch (error: any) {
-    console.error('[RAG] Search error:', error.message);
-    return [];
-  }
-}
-
-/**
  * Query the RAG system - search for context and generate response
+ * Uses text-based search since Replit's Gemini integration doesn't support embeddings
  */
 export async function queryRAG(
   userMessage: string,
@@ -406,8 +331,8 @@ export async function queryRAG(
   sources: Array<{ title: string; slug: string }>;
 }> {
   try {
-    // Search for relevant content
-    const searchResults = await searchContent(userMessage, 5);
+    // Search for relevant articles using text-based search
+    const searchResults = await searchArticles(userMessage, 5);
     
     if (searchResults.length === 0) {
       return {
@@ -416,25 +341,23 @@ export async function queryRAG(
       };
     }
     
-    // Build context from search results
+    // Build context from search results - use first 2000 chars of each article
     const context = searchResults
-      .map(r => `[${r.article.title}]\n${r.chunk}`)
+      .map(article => `[${article.title}]\n${article.content?.substring(0, 2000) || article.description}`)
       .join('\n\n---\n\n');
     
-    // Generate response
+    // Generate response using Gemini chat
     const message = await generateChatResponse(userMessage, context, conversationHistory);
     
-    // Get unique sources
-    const sourcesMap = new Map<string, { title: string; slug: string }>();
-    for (const r of searchResults) {
-      if (r.similarity > 0.3 && !sourcesMap.has(r.article.slug)) {
-        sourcesMap.set(r.article.slug, { title: r.article.title, slug: r.article.slug });
-      }
-    }
+    // Return sources
+    const sources = searchResults.slice(0, 3).map(article => ({
+      title: article.title,
+      slug: article.slug,
+    }));
     
     return {
       message,
-      sources: Array.from(sourcesMap.values()).slice(0, 3),
+      sources,
     };
   } catch (error: any) {
     console.error('[RAG] Query error:', error.message);
@@ -476,4 +399,44 @@ export async function getArticlesForStakeholder(stakeholder: string): Promise<He
   return allArticles.filter(article => 
     article.stakeholders?.includes(stakeholder)
   );
+}
+
+/**
+ * Full-text search fallback when RAG/embeddings are unavailable
+ * Uses simple case-insensitive matching on title and content
+ */
+export async function searchArticles(query: string, limit: number = 10): Promise<HelpArticle[]> {
+  try {
+    const allArticles = await db.select().from(helpArticles).where(eq(helpArticles.isPublished, true));
+    
+    const lowerQuery = query.toLowerCase();
+    const words = lowerQuery.split(/\s+/).filter(w => w.length > 2);
+    
+    // Score articles by keyword matches
+    const scored = allArticles.map(article => {
+      let score = 0;
+      const titleLower = article.title.toLowerCase();
+      const contentLower = article.content?.toLowerCase() || '';
+      
+      for (const word of words) {
+        // Title matches are worth more
+        if (titleLower.includes(word)) score += 10;
+        // Content matches
+        const contentMatches = (contentLower.match(new RegExp(word, 'g')) || []).length;
+        score += Math.min(contentMatches, 5); // Cap at 5 matches per word
+      }
+      
+      return { article, score };
+    });
+    
+    // Filter and sort by score
+    return scored
+      .filter(s => s.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit)
+      .map(s => s.article);
+  } catch (error: any) {
+    console.error('[RAG] Search articles fallback error:', error.message);
+    return [];
+  }
 }
