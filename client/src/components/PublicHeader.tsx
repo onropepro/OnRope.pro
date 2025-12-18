@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
-import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown, IdCard, HardHat, Search, Package, Calendar, DollarSign, Calculator, Palette } from "lucide-react";
+import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown, IdCard, HardHat, Search, Package, Calendar, DollarSign, Calculator, Palette, HelpCircle } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 interface PublicHeaderProps {
@@ -61,6 +61,15 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
       <div className="bg-muted/50 border-b border-border/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-10 flex items-center justify-end gap-3">
           <InstallPWAButton />
+          <Button 
+            variant="ghost"
+            size="sm"
+            onClick={() => setLocation("/help")}
+            data-testid="button-help-header"
+          >
+            <HelpCircle className="w-4 h-4 mr-1" />
+            {t('navigation.help', 'Help')}
+          </Button>
           <Button 
             variant="ghost"
             size="sm"
