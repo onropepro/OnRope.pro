@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 import { PublicHeader } from "@/components/PublicHeader";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import {
@@ -45,6 +46,7 @@ const FAQ_ITEMS = [
 ];
 
 export default function TechnicianJobBoardLanding() {
+  const { t } = useTranslation();
   const [openItems, setOpenItems] = useState<string[]>([]);
   const [faqOpenItems, setFaqOpenItems] = useState<string[]>([]);
   const [applicationTime, setApplicationTime] = useState(0);
@@ -83,29 +85,29 @@ export default function TechnicianJobBoardLanding() {
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
           <div className="text-center space-y-6 pt-16">
             <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-module-label">
-              Job Board Ecosystem
+              {t('modules.technicianJobBoard.hero.badge', 'Job Board Ecosystem')}
             </Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              Every Job Here Is Rope Access.<br />
-              <span className="text-blue-100">Every Company Is Real.</span>
+              {t('modules.technicianJobBoard.hero.title', 'Every Job Here Is Rope Access.')}<br />
+              <span className="text-blue-100">{t('modules.technicianJobBoard.hero.subtitle', 'Every Company Is Real.')}</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              OnRopePro's Job Board is exclusively for rope access building maintenance. Browse real jobs from verified companies. Apply in 30 seconds.<br />
-              <strong>Control who sees your profile.</strong>
+              {t('modules.technicianJobBoard.hero.description', "OnRopePro's Job Board is exclusively for rope access building maintenance. Browse real jobs from verified companies. Apply in 30 seconds.")}<br />
+              <strong>{t('modules.technicianJobBoard.hero.descriptionBold', 'Control who sees your profile.')}</strong>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-hero-browse">
                 <Link href="/technician-login">
-                  Browse Jobs Free
+                  {t('modules.technicianJobBoard.hero.ctaPrimary', 'Browse Jobs Free')}
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-hero-answers">
                 <Link href="#faqs">
-                  Find Answers
+                  {t('modules.technicianJobBoard.hero.ctaSecondary', 'Find Answers')}
                   <BookOpen className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
@@ -129,19 +131,19 @@ export default function TechnicianJobBoardLanding() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-blue-600">{applicationTime}s</div>
-                  <div className="text-base text-muted-foreground mt-1">Application Time</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.technicianJobBoard.stats.applicationTime', 'Application Time')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-emerald-600">{relevantPercent}%</div>
-                  <div className="text-base text-muted-foreground mt-1">Relevant Listings</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.technicianJobBoard.stats.relevantListings', 'Relevant Listings')}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-amber-600">Immediate</div>
-                  <div className="text-base text-muted-foreground mt-1">Search Time</div>
+                  <div className="text-3xl md:text-4xl font-bold text-amber-600">{t('modules.technicianJobBoard.stats.immediateValue', 'Immediate')}</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.technicianJobBoard.stats.searchTime', 'Search Time')}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-violet-600">Upfront</div>
-                  <div className="text-base text-muted-foreground mt-1">Interview Alignment</div>
+                  <div className="text-3xl md:text-4xl font-bold text-violet-600">{t('modules.technicianJobBoard.stats.upfrontValue', 'Upfront')}</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.technicianJobBoard.stats.interviewAlignment', 'Interview Alignment')}</div>
                 </div>
               </div>
             </CardContent>
@@ -155,32 +157,32 @@ export default function TechnicianJobBoardLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
-            Indeed Thinks You Want to Be a Pipe Fitter
+            {t('modules.technicianJobBoard.problem.title', 'Indeed Thinks You Want to Be a Pipe Fitter')}
           </h2>
           
           <Card className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
             <CardContent className="p-6 md:p-8 space-y-4 text-muted-foreground">
               <p className="text-lg leading-relaxed font-medium text-foreground">
-                You search "rope access" on Indeed. What do you get?
+                {t('modules.technicianJobBoard.problem.intro', 'You search "rope access" on Indeed. What do you get?')}
               </p>
               <p>
-                Offshore oil platforms in the Maritimes. Industrial access jobs at Alberta refineries. Pipe fitter positions that mention "rope" once in the safety section. General construction gigs that require "working at heights."
+                {t('modules.technicianJobBoard.problem.paragraph1', 'Offshore oil platforms in the Maritimes. Industrial access jobs at Alberta refineries. Pipe fitter positions that mention "rope" once in the safety section. General construction gigs that require "working at heights."')}
               </p>
               <p>
-                You scroll for 20 minutes to find 3 jobs that might actually be rope access building maintenance. Maybe.
+                {t('modules.technicianJobBoard.problem.paragraph2', 'You scroll for 20 minutes to find 3 jobs that might actually be rope access building maintenance. Maybe.')}
               </p>
               <p>
-                Then you apply. Upload your resume. Fill out the same form for the 50th time. Manually type your IRATA number because there's no field for it. Wonder if the company even checked your certification.
+                {t('modules.technicianJobBoard.problem.paragraph3', "Then you apply. Upload your resume. Fill out the same form for the 50th time. Manually type your IRATA number because there's no field for it. Wonder if the company even checked your certification.")}
               </p>
               <Separator className="my-6" />
               <p className="font-medium text-foreground text-lg">
-                OnRopePro's Job Board works differently.
+                {t('modules.technicianJobBoard.problem.solutionTitle', "OnRopePro's Job Board works differently.")}
               </p>
               <p>
-                Every job posted here is rope access building maintenance. Window washing. Caulking. Pressure washing. Gutter cleaning. Painting and coating. Visual inspection. No offshore. No oil rigs. No pipe fitting.
+                {t('modules.technicianJobBoard.problem.solutionParagraph1', 'Every job posted here is rope access building maintenance. Window washing. Caulking. Pressure washing. Gutter cleaning. Painting and coating. Visual inspection. No offshore. No oil rigs. No pipe fitting.')}
               </p>
               <p>
-                Every company posting is verified. Real rope access operators who do real building maintenance. When you apply, your certifications, experience, and safety rating go with your application automatically.
+                {t('modules.technicianJobBoard.problem.solutionParagraph2', 'Every company posting is verified. Real rope access operators who do real building maintenance. When you apply, your certifications, experience, and safety rating go with your application automatically.')}
               </p>
             </CardContent>
           </Card>
@@ -193,10 +195,10 @@ export default function TechnicianJobBoardLanding() {
       <section id="features" className="pt-8 md:pt-12 pb-16 md:pb-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Your Rope Access Career Hub
+            {t('modules.technicianJobBoard.features.title', 'Your Rope Access Career Hub')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-3xl mx-auto">
-            Where every job matches your skills and every employer understands your work
+            {t('modules.technicianJobBoard.features.subtitle', 'Where every job matches your skills and every employer understands your work')}
           </p>
 
           <div className="grid md:grid-cols-3 gap-6">
@@ -207,12 +209,12 @@ export default function TechnicianJobBoardLanding() {
                 <div className="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-3">
                   <Search className="w-6 h-6 text-blue-600" />
                 </div>
-                <CardTitle className="text-xl">Job Browser</CardTitle>
+                <CardTitle className="text-xl">{t('modules.technicianJobBoard.features.jobBrowser.title', 'Job Browser')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-base text-muted-foreground">
-                <p className="font-medium text-foreground">See only rope access building maintenance jobs.</p>
-                <p>Filter by location, job type, and certification requirements. Each listing shows company details, pay range (when provided), start dates, and project scope. Every company is verified. Every job is relevant.</p>
-                <p className="font-medium text-foreground mt-4">What you can filter by:</p>
+                <p className="font-medium text-foreground">{t('modules.technicianJobBoard.features.jobBrowser.headline', 'See only rope access building maintenance jobs.')}</p>
+                <p>{t('modules.technicianJobBoard.features.jobBrowser.description', 'Filter by location, job type, and certification requirements. Each listing shows company details, pay range (when provided), start dates, and project scope. Every company is verified. Every job is relevant.')}</p>
+                <p className="font-medium text-foreground mt-4">{t('modules.technicianJobBoard.features.jobBrowser.filterLabel', 'What you can filter by:')}</p>
                 <ul className="space-y-1 ml-2">
                   <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Location (city, region)</li>
                   <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Job type (window washing, caulking, etc.)</li>
@@ -230,12 +232,12 @@ export default function TechnicianJobBoardLanding() {
                 <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center mb-3">
                   <Send className="w-6 h-6 text-emerald-600" />
                 </div>
-                <CardTitle className="text-xl">One-Click Applications</CardTitle>
+                <CardTitle className="text-xl">{t('modules.technicianJobBoard.features.oneClickApplications.title', 'One-Click Applications')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-base text-muted-foreground">
-                <p className="font-medium text-foreground">Your profile data travels with your application.</p>
-                <p>Resume, certifications, IRATA/SPRAT numbers, years of experience, safety rating. All attached automatically. Apply to a job in 30 seconds instead of re-entering the same information for the 100th time.</p>
-                <p className="font-medium text-foreground mt-4">What gets sent automatically:</p>
+                <p className="font-medium text-foreground">{t('modules.technicianJobBoard.features.oneClickApplications.headline', 'Your profile data travels with your application.')}</p>
+                <p>{t('modules.technicianJobBoard.features.oneClickApplications.description', 'Resume, certifications, IRATA/SPRAT numbers, years of experience, safety rating. All attached automatically. Apply to a job in 30 seconds instead of re-entering the same information for the 100th time.')}</p>
+                <p className="font-medium text-foreground mt-4">{t('modules.technicianJobBoard.features.oneClickApplications.sentLabel', 'What gets sent automatically:')}</p>
                 <ul className="space-y-1 ml-2">
                   <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Resume/CV (if uploaded)</li>
                   <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> IRATA/SPRAT certification details</li>
@@ -253,12 +255,12 @@ export default function TechnicianJobBoardLanding() {
                 <div className="w-12 h-12 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center mb-3">
                   <Eye className="w-6 h-6 text-amber-600" />
                 </div>
-                <CardTitle className="text-xl">Profile Visibility Toggle</CardTitle>
+                <CardTitle className="text-xl">{t('modules.technicianJobBoard.features.profileVisibility.title', 'Profile Visibility Toggle')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-base text-muted-foreground">
-                <p className="font-medium text-foreground">Control who finds you.</p>
-                <p>Toggle visibility ON: employers can search for you in the Talent Browser, see your credentials, and send you direct job offers. Toggle it OFF: you're invisible to searches but can still browse and apply to jobs normally.</p>
-                <p className="font-medium text-foreground mt-4">What employers see when you're visible:</p>
+                <p className="font-medium text-foreground">{t('modules.technicianJobBoard.features.profileVisibility.headline', 'Control who finds you.')}</p>
+                <p>{t('modules.technicianJobBoard.features.profileVisibility.description', "Toggle visibility ON: employers can search for you in the Talent Browser, see your credentials, and send you direct job offers. Toggle it OFF: you're invisible to searches but can still browse and apply to jobs normally.")}</p>
+                <p className="font-medium text-foreground mt-4">{t('modules.technicianJobBoard.features.profileVisibility.visibleLabel', "What employers see when you're visible:")}</p>
                 <ul className="space-y-1 ml-2">
                   <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Name and photo</li>
                   <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Certification levels and numbers</li>

@@ -3,6 +3,15 @@ import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
+<<<<<<< HEAD
+=======
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+>>>>>>> fad8522ff5f3c85d941ba0a5e375bc7a5c5b7101
 import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown, IdCard, HardHat, Search, Package, Calendar, DollarSign, Calculator, Palette, HelpCircle, MessageSquare, Globe } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
@@ -19,16 +28,24 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileModulesExpanded, setMobileModulesExpanded] = useState(false);
   const [mobileTechnicianExpanded, setMobileTechnicianExpanded] = useState(false);
-  const [landingLanguage, setLandingLanguage] = useState<'en' | 'fr'>(() => {
-    return (i18n.language?.startsWith('fr') ? 'fr' : 'en');
+  const [currentLanguage, setCurrentLanguage] = useState<'en' | 'fr' | 'es'>(() => {
+    const lang = i18n.language;
+    if (lang?.startsWith('fr')) return 'fr';
+    if (lang?.startsWith('es')) return 'es';
+    return 'en';
   });
   const modulesMenuRef = useRef<HTMLDivElement>(null);
   const technicianMenuRef = useRef<HTMLDivElement>(null);
 
-  const toggleLandingLanguage = () => {
-    const newLang = landingLanguage === 'en' ? 'fr' : 'en';
-    setLandingLanguage(newLang);
-    i18n.changeLanguage(newLang);
+  const changeLanguage = (lang: 'en' | 'fr' | 'es') => {
+    setCurrentLanguage(lang);
+    i18n.changeLanguage(lang);
+  };
+
+  const languageLabels = {
+    en: 'English',
+    fr: 'Francais',
+    es: 'Espanol'
   };
 
   useEffect(() => {
@@ -48,11 +65,19 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
   }, [showModulesMenu, showTechnicianMenu]);
 
   const navItems = [
+<<<<<<< HEAD
     { id: "employer", label: "Employer", href: "/employer" },
     { id: "technician", label: "Technician", href: "/technician-login" },
     { id: "property-manager", label: "Property Manager", href: "/property-manager" },
     { id: "resident", label: "Resident", href: "/resident" },
     { id: "building-manager", label: "Building Manager", href: "/building-portal" },
+=======
+    { id: "employer", label: t('navigation.employer', 'Employer'), href: "/employer" },
+    { id: "technician", label: t('navigation.technician', 'Technician'), href: "/technician-login" },
+    { id: "property-manager", label: t('navigation.propertyManager', 'Property Manager'), href: "/property-manager" },
+    { id: "resident", label: t('navigation.resident', 'Resident'), href: "/link" },
+    { id: "building-manager", label: t('navigation.buildingManager', 'Building Manager'), href: "/building-portal" },
+>>>>>>> fad8522ff5f3c85d941ba0a5e375bc7a5c5b7101
   ];
 
   return (
@@ -70,14 +95,42 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
             <HelpCircle className="w-4 h-4 mr-1" />
             {t('navigation.help', 'Help')}
           </Button>
-          <Button 
-            variant="ghost"
-            size="sm"
-            onClick={toggleLandingLanguage}
-            data-testid="button-language-toggle"
-          >
-            {landingLanguage === 'en' ? 'FR' : 'EN'}
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="ghost"
+                size="sm"
+                data-testid="button-language-dropdown"
+              >
+                <Globe className="w-4 h-4 mr-1" />
+                {t('navigation.language', 'Language')}
+                <ChevronDown className="w-3 h-3 ml-1" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem 
+                onClick={() => changeLanguage('en')}
+                className={currentLanguage === 'en' ? 'bg-accent' : ''}
+                data-testid="menu-item-language-en"
+              >
+                English
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => changeLanguage('fr')}
+                className={currentLanguage === 'fr' ? 'bg-accent' : ''}
+                data-testid="menu-item-language-fr"
+              >
+                Francais
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => changeLanguage('es')}
+                className={currentLanguage === 'es' ? 'bg-accent' : ''}
+                data-testid="menu-item-language-es"
+              >
+                Espanol
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button 
             variant="ghost"
             size="sm"
@@ -138,7 +191,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                 onClick={() => setLocation("/employer")}
                 data-testid="nav-employer"
               >
-                Employer
+                {t('navigation.employer', 'Employer')}
               </Button>
               {showModulesMenu && (
                 <div className="absolute top-full right-0 mt-1 bg-card border border-border rounded-xl shadow-xl p-4 w-[960px] z-50">
@@ -157,8 +210,8 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                           <Shield className="w-5 h-5 text-sky-600" />
                         </div>
                         <div>
-                          <div className="font-semibold text-sm">Safety & Compliance</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">Harness inspections, toolbox meetings, audit-ready exports</div>
+                          <div className="font-semibold text-sm">{t('navigation.modules.safetyCompliance.title', 'Safety & Compliance')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.safetyCompliance.description', 'Harness inspections, toolbox meetings, audit-ready exports')}</div>
                         </div>
                       </button>
                       <button
@@ -173,8 +226,8 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                           <Briefcase className="w-5 h-5 text-emerald-600" />
                         </div>
                         <div>
-                          <div className="font-semibold text-sm">Project Management</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">4-elevation tracking, real-time dashboards, crew scheduling</div>
+                          <div className="font-semibold text-sm">{t('navigation.modules.projectManagement.title', 'Project Management')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.projectManagement.description', '4-elevation tracking, real-time dashboards, crew scheduling')}</div>
                         </div>
                       </button>
                       <button
@@ -189,8 +242,8 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                           <Clock className="w-5 h-5 text-amber-600" />
                         </div>
                         <div>
-                          <div className="font-semibold text-sm">Work Session & Time Tracking</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">GPS clock-in, drop tracking, automatic payroll aggregation</div>
+                          <div className="font-semibold text-sm">{t('navigation.modules.workSession.title', 'Work Session & Time Tracking')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.workSession.description', 'GPS clock-in, drop tracking, automatic payroll aggregation')}</div>
                         </div>
                       </button>
                       <button
@@ -205,8 +258,8 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                           <FileText className="w-5 h-5 text-violet-600" />
                         </div>
                         <div>
-                          <div className="font-semibold text-sm">Document Management</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">Digital signatures, immutable audit trails, compliance reporting</div>
+                          <div className="font-semibold text-sm">{t('navigation.modules.documentManagement.title', 'Document Management')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.documentManagement.description', 'Digital signatures, immutable audit trails, compliance reporting')}</div>
                         </div>
                       </button>
                     </div>
@@ -224,8 +277,8 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                           <Lock className="w-5 h-5 text-blue-600" />
                         </div>
                         <div>
-                          <div className="font-semibold text-sm">User Access & Authentication</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">Granular permissions, role-based access, audit trails</div>
+                          <div className="font-semibold text-sm">{t('navigation.modules.userAccess.title', 'User Access & Authentication')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.userAccess.description', 'Granular permissions, role-based access, audit trails')}</div>
                         </div>
                       </button>
                       <button
@@ -240,8 +293,8 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                           <Gauge className="w-5 h-5 text-orange-600" />
                         </div>
                         <div>
-                          <div className="font-semibold text-sm">Company Safety Rating</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">Penalty-based compliance scoring, real-time safety posture</div>
+                          <div className="font-semibold text-sm">{t('navigation.modules.csr.title', 'Company Safety Rating')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.csr.description', 'Penalty-based compliance scoring, real-time safety posture')}</div>
                         </div>
                       </button>
                       <button
@@ -256,8 +309,8 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                           <ClipboardCheck className="w-5 h-5 text-cyan-600" />
                         </div>
                         <div>
-                          <div className="font-semibold text-sm">IRATA/SPRAT Task Logging</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">Same-day hour logging, OCR import, career-portable records</div>
+                          <div className="font-semibold text-sm">{t('navigation.modules.irataLogging.title', 'IRATA/SPRAT Task Logging')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.irataLogging.description', 'Same-day hour logging, OCR import, career-portable records')}</div>
                         </div>
                       </button>
                       <button
@@ -272,8 +325,8 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                           <Users className="w-5 h-5 text-blue-600" />
                         </div>
                         <div>
-                          <div className="font-semibold text-sm">Employee Management</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">Portable identities, certification tracking, permissions</div>
+                          <div className="font-semibold text-sm">{t('navigation.modules.employeeManagement.title', 'Employee Management')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.employeeManagement.description', 'Portable identities, certification tracking, permissions')}</div>
                         </div>
                       </button>
                     </div>
@@ -291,8 +344,8 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                           <IdCard className="w-5 h-5 text-amber-600" />
                         </div>
                         <div>
-                          <div className="font-semibold text-sm">Technician Passport</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">Portable work history, certifications, career-long records</div>
+                          <div className="font-semibold text-sm">{t('navigation.modules.technicianPassport.title', 'Technician Passport')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.technicianPassport.description', 'Portable work history, certifications, career-long records')}</div>
                         </div>
                       </button>
                       <button
@@ -307,8 +360,8 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                           <Search className="w-5 h-5 text-blue-600" />
                         </div>
                         <div>
-                          <div className="font-semibold text-sm">Job Board Ecosystem</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">Talent browser, unlimited postings, direct offers</div>
+                          <div className="font-semibold text-sm">{t('navigation.modules.employerJobBoard.title', 'Job Board Ecosystem')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.employerJobBoard.description', 'Talent browser, unlimited postings, direct offers')}</div>
                         </div>
                       </button>
                       <button
@@ -323,8 +376,8 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                           <Package className="w-5 h-5 text-teal-600" />
                         </div>
                         <div>
-                          <div className="font-semibold text-sm">Gear Inventory Management</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">Equipment tracking, assignments, service life</div>
+                          <div className="font-semibold text-sm">{t('navigation.modules.gearInventory.title', 'Gear Inventory Management')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.gearInventory.description', 'Equipment tracking, assignments, service life')}</div>
                         </div>
                       </button>
                       <button
@@ -339,8 +392,8 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                           <Calendar className="w-5 h-5 text-indigo-600" />
                         </div>
                         <div>
-                          <div className="font-semibold text-sm">Scheduling & Calendar</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">Conflict detection, dual calendars, time-off management</div>
+                          <div className="font-semibold text-sm">{t('navigation.modules.scheduling.title', 'Scheduling & Calendar')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.scheduling.description', 'Conflict detection, dual calendars, time-off management')}</div>
                         </div>
                       </button>
                     </div>
@@ -358,8 +411,8 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                           <DollarSign className="w-5 h-5 text-emerald-600" />
                         </div>
                         <div>
-                          <div className="font-semibold text-sm">Payroll & Financial</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">Automated timesheets, overtime calculation, payroll exports</div>
+                          <div className="font-semibold text-sm">{t('navigation.modules.payroll.title', 'Payroll & Financial')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.payroll.description', 'Automated timesheets, overtime calculation, payroll exports')}</div>
                         </div>
                       </button>
                       <button
@@ -374,8 +427,8 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                           <Calculator className="w-5 h-5 text-rose-600" />
                         </div>
                         <div>
-                          <div className="font-semibold text-sm">Quoting & Sales Pipeline</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">Service-specific quotes, financial privacy, visual pipeline</div>
+                          <div className="font-semibold text-sm">{t('navigation.modules.quoting.title', 'Quoting & Sales Pipeline')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.quoting.description', 'Service-specific quotes, financial privacy, visual pipeline')}</div>
                         </div>
                       </button>
                       <button
@@ -390,8 +443,8 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                           <Palette className="w-5 h-5 text-purple-600" />
                         </div>
                         <div>
-                          <div className="font-semibold text-sm">White-Label Branding</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">Your logo, colors, and brand across every touchpoint</div>
+                          <div className="font-semibold text-sm">{t('navigation.modules.whiteLabel.title', 'White-Label Branding')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.whiteLabel.description', 'Your logo, colors, and brand across every touchpoint')}</div>
                         </div>
                       </button>
                       <button
@@ -406,8 +459,8 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                           <MessageSquare className="w-5 h-5 text-rose-600" />
                         </div>
                         <div>
-                          <div className="font-semibold text-sm">Resident Portal</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">Real-time feedback, two-way communication, photo evidence</div>
+                          <div className="font-semibold text-sm">{t('navigation.modules.residentPortal.title', 'Resident Portal')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.residentPortal.description', 'Real-time feedback, two-way communication, photo evidence')}</div>
                         </div>
                       </button>
                       <button
@@ -445,7 +498,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                 onClick={() => setLocation("/technician-login")}
                 data-testid="nav-technician"
               >
-                Technician
+                {t('navigation.technician', 'Technician')}
               </Button>
               {showTechnicianMenu && (
                 <div className="absolute top-full left-0 mt-1 bg-card border border-border rounded-xl shadow-xl p-4 w-[320px] z-50">
@@ -462,8 +515,8 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                         <Search className="w-5 h-5 text-amber-600" />
                       </div>
                       <div>
-                        <div className="font-semibold text-sm">Job Board Ecosystem</div>
-                        <div className="text-xs text-muted-foreground mt-0.5">Browse jobs, apply instantly, control profile visibility</div>
+                        <div className="font-semibold text-sm">{t('navigation.modules.technicianJobBoard.title', 'Job Board Ecosystem')}</div>
+                        <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.technicianJobBoard.description', 'Browse jobs, apply instantly, control profile visibility')}</div>
                       </div>
                     </button>
                   </div>
@@ -502,7 +555,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                 onClick={() => setMobileModulesExpanded(!mobileModulesExpanded)}
                 data-testid="nav-mobile-employer"
               >
-                <span>Employer</span>
+                <span>{t('navigation.employer', 'Employer')}</span>
                 <ChevronDown className={`w-5 h-5 transition-transform ${mobileModulesExpanded ? "rotate-180" : ""}`} />
               </button>
               
@@ -517,7 +570,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                     data-testid="nav-mobile-safety-compliance"
                   >
                     <Shield className="w-5 h-5 text-sky-600" />
-                    <span className="text-sm">Safety & Compliance</span>
+                    <span className="text-sm">{t('navigation.modules.safetyCompliance.title', 'Safety & Compliance')}</span>
                   </button>
                   <button
                     className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
@@ -528,7 +581,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                     data-testid="nav-mobile-user-access"
                   >
                     <Lock className="w-5 h-5 text-blue-600" />
-                    <span className="text-sm">User Access & Authentication</span>
+                    <span className="text-sm">{t('navigation.modules.userAccess.title', 'User Access & Authentication')}</span>
                   </button>
                   <button
                     className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
@@ -539,7 +592,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                     data-testid="nav-mobile-project-management"
                   >
                     <Briefcase className="w-5 h-5 text-emerald-600" />
-                    <span className="text-sm">Project Management</span>
+                    <span className="text-sm">{t('navigation.modules.projectManagement.title', 'Project Management')}</span>
                   </button>
                   <button
                     className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
@@ -550,7 +603,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                     data-testid="nav-mobile-company-safety-rating"
                   >
                     <Gauge className="w-5 h-5 text-orange-600" />
-                    <span className="text-sm">Company Safety Rating</span>
+                    <span className="text-sm">{t('navigation.modules.csr.title', 'Company Safety Rating')}</span>
                   </button>
                   <button
                     className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
@@ -561,7 +614,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                     data-testid="nav-mobile-work-session"
                   >
                     <Clock className="w-5 h-5 text-amber-600" />
-                    <span className="text-sm">Work Session & Time Tracking</span>
+                    <span className="text-sm">{t('navigation.modules.workSession.title', 'Work Session & Time Tracking')}</span>
                   </button>
                   <button
                     className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
@@ -572,7 +625,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                     data-testid="nav-mobile-irata-logging"
                   >
                     <ClipboardCheck className="w-5 h-5 text-cyan-600" />
-                    <span className="text-sm">IRATA/SPRAT Task Logging</span>
+                    <span className="text-sm">{t('navigation.modules.irataLogging.title', 'IRATA/SPRAT Task Logging')}</span>
                   </button>
                   <button
                     className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
@@ -583,7 +636,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                     data-testid="nav-mobile-document-management"
                   >
                     <FileText className="w-5 h-5 text-violet-600" />
-                    <span className="text-sm">Document Management</span>
+                    <span className="text-sm">{t('navigation.modules.documentManagement.title', 'Document Management')}</span>
                   </button>
                   <button
                     className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
@@ -594,7 +647,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                     data-testid="nav-mobile-employee-management"
                   >
                     <Users className="w-5 h-5 text-blue-600" />
-                    <span className="text-sm">Employee Management</span>
+                    <span className="text-sm">{t('navigation.modules.employeeManagement.title', 'Employee Management')}</span>
                   </button>
                   <button
                     className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
@@ -605,7 +658,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                     data-testid="nav-mobile-technician-passport"
                   >
                     <IdCard className="w-5 h-5 text-amber-600" />
-                    <span className="text-sm">Technician Passport</span>
+                    <span className="text-sm">{t('navigation.modules.technicianPassport.title', 'Technician Passport')}</span>
                   </button>
                   <button
                     className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
@@ -616,7 +669,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                     data-testid="nav-mobile-employer-job-board"
                   >
                     <Search className="w-5 h-5 text-blue-600" />
-                    <span className="text-sm">Job Board Ecosystem</span>
+                    <span className="text-sm">{t('navigation.modules.employerJobBoard.title', 'Job Board Ecosystem')}</span>
                   </button>
                   <button
                     className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
@@ -627,7 +680,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                     data-testid="nav-mobile-gear-inventory"
                   >
                     <Package className="w-5 h-5 text-teal-600" />
-                    <span className="text-sm">Gear Inventory Management</span>
+                    <span className="text-sm">{t('navigation.modules.gearInventory.title', 'Gear Inventory Management')}</span>
                   </button>
                   <button
                     className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
@@ -638,7 +691,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                     data-testid="nav-mobile-scheduling-calendar"
                   >
                     <Calendar className="w-5 h-5 text-indigo-600" />
-                    <span className="text-sm">Scheduling & Calendar</span>
+                    <span className="text-sm">{t('navigation.modules.scheduling.title', 'Scheduling & Calendar')}</span>
                   </button>
                   <button
                     className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
@@ -649,7 +702,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                     data-testid="nav-mobile-payroll-financial"
                   >
                     <DollarSign className="w-5 h-5 text-emerald-600" />
-                    <span className="text-sm">Payroll & Financial</span>
+                    <span className="text-sm">{t('navigation.modules.payroll.title', 'Payroll & Financial')}</span>
                   </button>
                   <button
                     className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
@@ -660,7 +713,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                     data-testid="nav-mobile-quoting-sales-pipeline"
                   >
                     <Calculator className="w-5 h-5 text-rose-600" />
-                    <span className="text-sm">Quoting & Sales Pipeline</span>
+                    <span className="text-sm">{t('navigation.modules.quoting.title', 'Quoting & Sales Pipeline')}</span>
                   </button>
                   <button
                     className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
@@ -671,7 +724,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                     data-testid="nav-mobile-white-label-branding"
                   >
                     <Palette className="w-5 h-5 text-purple-600" />
-                    <span className="text-sm">White-Label Branding</span>
+                    <span className="text-sm">{t('navigation.modules.whiteLabel.title', 'White-Label Branding')}</span>
                   </button>
                   <button
                     className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
@@ -682,7 +735,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                     data-testid="nav-mobile-resident-portal"
                   >
                     <MessageSquare className="w-5 h-5 text-rose-600" />
-                    <span className="text-sm">Resident Portal</span>
+                    <span className="text-sm">{t('navigation.modules.residentPortal.title', 'Resident Portal')}</span>
                   </button>
                   <button
                     className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
@@ -710,7 +763,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                 onClick={() => setMobileTechnicianExpanded(!mobileTechnicianExpanded)}
                 data-testid="nav-mobile-technician"
               >
-                <span>Technician</span>
+                <span>{t('navigation.technician', 'Technician')}</span>
                 <ChevronDown className={`w-5 h-5 transition-transform ${mobileTechnicianExpanded ? "rotate-180" : ""}`} />
               </button>
               
@@ -725,7 +778,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                     data-testid="nav-mobile-technician-job-board"
                   >
                     <Search className="w-5 h-5 text-amber-600" />
-                    <span className="text-sm">Job Board Ecosystem</span>
+                    <span className="text-sm">{t('navigation.modules.technicianJobBoard.title', 'Job Board Ecosystem')}</span>
                   </button>
                 </div>
               )}

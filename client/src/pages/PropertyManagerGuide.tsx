@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+=======
+import { useTranslation } from "react-i18next";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+>>>>>>> fad8522ff5f3c85d941ba0a5e375bc7a5c5b7101
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";

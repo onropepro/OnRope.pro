@@ -274,10 +274,10 @@ export default function WorkSessionLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Who Benefits From This Module
+            {t('modules.workSessions.stakeholders.title', 'Who Benefits From This Module')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-            Five stakeholder types. Five different needs. One unified time tracking system.
+            {t('modules.workSessions.stakeholders.subtitle', 'Five stakeholder types. Five different needs. One unified time tracking system.')}
           </p>
 
           <div className="space-y-8">
@@ -288,22 +288,22 @@ export default function WorkSessionLanding() {
                   <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
                     <Briefcase className="w-5 h-5 text-blue-600" />
                   </div>
-                  <CardTitle className="text-xl">For Employers (Company Owners)</CardTitle>
+                  <CardTitle className="text-xl">{t('modules.workSessions.stakeholders.employers.title', 'For Employers (Company Owners)')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-6 space-y-4">
                 <div className="grid md:grid-cols-3 gap-6">
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Know exactly where your labor dollars go.</h4>
-                    <p className="text-base text-muted-foreground">Every work session links to a project. Every hour links to a technician. When a building goes over budget, you see exactly why. Weather delays on Tuesday. Equipment issues Wednesday. Crew shortage Friday.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.workSessions.stakeholders.employers.benefit1Title', 'Know exactly where your labor dollars go.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.stakeholders.employers.benefit1Desc', 'Every work session links to a project. Every hour links to a technician. When a building goes over budget, you see exactly why. Weather delays on Tuesday. Equipment issues Wednesday. Crew shortage Friday.')}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Eliminate payroll disputes permanently.</h4>
-                    <p className="text-base text-muted-foreground">Both you and your technician see the same timestamps. Same GPS locations. Same drop counts. When the data matches, disputes don't happen. When someone claims hours they didn't work, you have proof.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.workSessions.stakeholders.employers.benefit2Title', 'Eliminate payroll disputes permanently.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.stakeholders.employers.benefit2Desc', "Both you and your technician see the same timestamps. Same GPS locations. Same drop counts. When the data matches, disputes don't happen. When someone claims hours they didn't work, you have proof.")}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Quote future projects from actual data.</h4>
-                    <p className="text-base text-muted-foreground">Pull up last year's work sessions for that building. See exactly how many hours, which technicians, what productivity rates. Your next quote is based on history, not hope.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.workSessions.stakeholders.employers.benefit3Title', 'Quote future projects from actual data.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.stakeholders.employers.benefit3Desc', "Pull up last year's work sessions for that building. See exactly how many hours, which technicians, what productivity rates. Your next quote is based on history, not hope.")}</p>
                   </div>
                 </div>
               </CardContent>
@@ -316,22 +316,22 @@ export default function WorkSessionLanding() {
                   <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center">
                     <HardHat className="w-5 h-5 text-amber-600" />
                   </div>
-                  <CardTitle className="text-xl">For Technicians</CardTitle>
+                  <CardTitle className="text-xl">{t('modules.workSessions.stakeholders.technicians.title', 'For Technicians')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-6 space-y-4">
                 <div className="grid md:grid-cols-3 gap-6">
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Clock in, clock out, done.</h4>
-                    <p className="text-base text-muted-foreground">No timesheets to fill out. No texts to send. No forms to lose. Tap Start Day when you arrive. Tap End Day when you leave. Your hours submit themselves.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.workSessions.stakeholders.technicians.benefit1Title', 'Clock in, clock out, done.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.stakeholders.technicians.benefit1Desc', 'No timesheets to fill out. No texts to send. No forms to lose. Tap Start Day when you arrive. Tap End Day when you leave. Your hours submit themselves.')}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Your work history follows you.</h4>
-                    <p className="text-base text-muted-foreground">Every project, every building, every task logged and stored. When you apply for a new job or upgrade your IRATA level, you have detailed records. "178 rope transfers. 3,500 deviations. 2,000 drops." Documented facts.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.workSessions.stakeholders.technicians.benefit2Title', 'Your work history follows you.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.stakeholders.technicians.benefit2Desc', 'Every project, every building, every task logged and stored. When you apply for a new job or upgrade your IRATA level, you have detailed records. "178 rope transfers. 3,500 deviations. 2,000 drops." Documented facts.')}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Fair performance reviews based on data.</h4>
-                    <p className="text-base text-muted-foreground">Your dashboard shows drops per day, target achievement rate, trends over time. When performance conversations happen, you're discussing facts, not opinions.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.workSessions.stakeholders.technicians.benefit3Title', 'Fair performance reviews based on data.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.stakeholders.technicians.benefit3Desc', "Your dashboard shows drops per day, target achievement rate, trends over time. When performance conversations happen, you're discussing facts, not opinions.")}</p>
                   </div>
                 </div>
               </CardContent>
@@ -344,22 +344,22 @@ export default function WorkSessionLanding() {
                   <div className="w-10 h-10 rounded-lg bg-cyan-100 dark:bg-cyan-900 flex items-center justify-center">
                     <Users className="w-5 h-5 text-cyan-600" />
                   </div>
-                  <CardTitle className="text-xl">For Operations Managers</CardTitle>
+                  <CardTitle className="text-xl">{t('modules.workSessions.stakeholders.opsManagers.title', 'For Operations Managers')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-6 space-y-4">
                 <div className="grid md:grid-cols-3 gap-6">
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">See who's working where right now.</h4>
-                    <p className="text-base text-muted-foreground">Real-time dashboard shows every clocked-in technician. Which project. How long. Last activity. When a client calls asking if your crew is on site, you know the answer without making phone calls.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.workSessions.stakeholders.opsManagers.benefit1Title', "See who's working where right now.")}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.stakeholders.opsManagers.benefit1Desc', 'Real-time dashboard shows every clocked-in technician. Which project. How long. Last activity. When a client calls asking if your crew is on site, you know the answer without making phone calls.')}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Catch budget problems on Day 3, not Day 30.</h4>
-                    <p className="text-base text-muted-foreground">Labor costs calculate in real-time against project budgets. When a project starts trending over, you see it immediately. Reassign resources. Adjust timelines. Prevent surprises.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.workSessions.stakeholders.opsManagers.benefit2Title', 'Catch budget problems on Day 3, not Day 30.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.stakeholders.opsManagers.benefit2Desc', 'Labor costs calculate in real-time against project budgets. When a project starts trending over, you see it immediately. Reassign resources. Adjust timelines. Prevent surprises.')}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Document every deviation.</h4>
-                    <p className="text-base text-muted-foreground">Target missed? Reason captured. Weather delay? Logged. Equipment failure? Recorded. When you review project performance, you have context for every variance.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.workSessions.stakeholders.opsManagers.benefit3Title', 'Document every deviation.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.stakeholders.opsManagers.benefit3Desc', 'Target missed? Reason captured. Weather delay? Logged. Equipment failure? Recorded. When you review project performance, you have context for every variance.')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -372,18 +372,18 @@ export default function WorkSessionLanding() {
                   <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center">
                     <Building2 className="w-5 h-5 text-violet-600" />
                   </div>
-                  <CardTitle className="text-xl">For Building Managers</CardTitle>
+                  <CardTitle className="text-xl">{t('modules.workSessions.stakeholders.buildingManagers.title', 'For Building Managers')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-6 space-y-4">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Verify contractor attendance.</h4>
-                    <p className="text-base text-muted-foreground">Access your building's work session summaries through the portal. See when crews arrived, when they left, what they accomplished. No more competing stories about who was where.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.workSessions.stakeholders.buildingManagers.benefit1Title', 'Verify contractor attendance.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.stakeholders.buildingManagers.benefit1Desc', "Access your building's work session summaries through the portal. See when crews arrived, when they left, what they accomplished. No more competing stories about who was where.")}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Access compliance documentation instantly.</h4>
-                    <p className="text-base text-muted-foreground">Work sessions link to safety records. Harness inspections verified at clock-in. Toolbox meeting attendance tracked. Your audit folder stays current automatically.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.workSessions.stakeholders.buildingManagers.benefit2Title', 'Access compliance documentation instantly.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.stakeholders.buildingManagers.benefit2Desc', 'Work sessions link to safety records. Harness inspections verified at clock-in. Toolbox meeting attendance tracked. Your audit folder stays current automatically.')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -396,18 +396,18 @@ export default function WorkSessionLanding() {
                   <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center">
                     <Globe className="w-5 h-5 text-emerald-600" />
                   </div>
-                  <CardTitle className="text-xl">For Property Managers</CardTitle>
+                  <CardTitle className="text-xl">{t('modules.workSessions.stakeholders.propertyManagers.title', 'For Property Managers')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-6 space-y-4">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Track vendor performance across your portfolio.</h4>
-                    <p className="text-base text-muted-foreground">Every building, every contractor, every project. Work session data feeds into Compliance & Safety Ratings visible in your portal. Make renewal decisions based on documented performance.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.workSessions.stakeholders.propertyManagers.benefit1Title', 'Track vendor performance across your portfolio.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.stakeholders.propertyManagers.benefit1Desc', 'Every building, every contractor, every project. Work session data feeds into Compliance & Safety Ratings visible in your portal. Make renewal decisions based on documented performance.')}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Resolve disputes with verified data.</h4>
-                    <p className="text-base text-muted-foreground">Contractor says they were on site Tuesday through Friday. Your records show work sessions for Tuesday, Wednesday, and Friday only. Facts end arguments.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.workSessions.stakeholders.propertyManagers.benefit2Title', 'Resolve disputes with verified data.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.stakeholders.propertyManagers.benefit2Desc', 'Contractor says they were on site Tuesday through Friday. Your records show work sessions for Tuesday, Wednesday, and Friday only. Facts end arguments.')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -422,10 +422,10 @@ export default function WorkSessionLanding() {
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Key Features
+            {t('modules.workSessions.keyFeatures.title', 'Key Features')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-3xl mx-auto">
-            Everything you need to track field operations and process accurate payroll.
+            {t('modules.workSessions.keyFeatures.subtitle', 'Everything you need to track field operations and process accurate payroll.')}
           </p>
 
           <div className="grid md:grid-cols-2 gap-6">
@@ -437,8 +437,8 @@ export default function WorkSessionLanding() {
                     <Smartphone className="w-5 h-5 text-blue-600" />
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">One-Tap Clock In/Out</h4>
-                    <p className="text-base text-muted-foreground">Technicians start and end work sessions from their smartphone. Exact timestamps captured automatically. GPS location recorded. No timesheets, no texts, no paperwork.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.workSessions.keyFeatures.clockInOut.title', 'One-Tap Clock In/Out')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.keyFeatures.clockInOut.desc', 'Technicians start and end work sessions from their smartphone. Exact timestamps captured automatically. GPS location recorded. No timesheets, no texts, no paperwork.')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -452,8 +452,8 @@ export default function WorkSessionLanding() {
                     <Layers className="w-5 h-5 text-emerald-600" />
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">4-Elevation Drop Tracking</h4>
-                    <p className="text-base text-muted-foreground">Log drops completed by building side: North, East, South, West. Visual progress bars show exactly where work stands on each facade. Project completion percentage updates in real-time.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.workSessions.keyFeatures.dropTracking.title', '4-Elevation Drop Tracking')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.keyFeatures.dropTracking.desc', 'Log drops completed by building side: North, East, South, West. Visual progress bars show exactly where work stands on each facade. Project completion percentage updates in real-time.')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -467,8 +467,8 @@ export default function WorkSessionLanding() {
                     <MapPin className="w-5 h-5 text-violet-600" />
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">GPS Location Verification</h4>
-                    <p className="text-base text-muted-foreground">Location captured at clock-in and clock-out. Verifiable proof for client disputes, billing verification, and audit documentation. See the map coordinates for every session.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.workSessions.keyFeatures.gpsVerification.title', 'GPS Location Verification')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.keyFeatures.gpsVerification.desc', 'Location captured at clock-in and clock-out. Verifiable proof for client disputes, billing verification, and audit documentation. See the map coordinates for every session.')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -482,8 +482,8 @@ export default function WorkSessionLanding() {
                     <Target className="w-5 h-5 text-amber-600" />
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Daily Target Enforcement</h4>
-                    <p className="text-base text-muted-foreground">Set drop targets per project. System tracks whether technicians meet, exceed, or fall short. Miss the target? A reason is required. Weather, equipment, crew issues. Documented every time.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.workSessions.keyFeatures.targetEnforcement.title', 'Daily Target Enforcement')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.keyFeatures.targetEnforcement.desc', 'Set drop targets per project. System tracks whether technicians meet, exceed, or fall short. Miss the target? A reason is required. Weather, equipment, crew issues. Documented every time.')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -497,8 +497,8 @@ export default function WorkSessionLanding() {
                     <Calculator className="w-5 h-5 text-cyan-600" />
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Automatic Hour Aggregation</h4>
-                    <p className="text-base text-muted-foreground">Hours total themselves by employee, by project, by payroll period. No spreadsheet formulas. No manual calculations. No transcription errors. Ready for export in 30 seconds.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.workSessions.keyFeatures.hourAggregation.title', 'Automatic Hour Aggregation')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.keyFeatures.hourAggregation.desc', 'Hours total themselves by employee, by project, by payroll period. No spreadsheet formulas. No manual calculations. No transcription errors. Ready for export in 30 seconds.')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -512,8 +512,8 @@ export default function WorkSessionLanding() {
                     <DollarSign className="w-5 h-5 text-rose-600" />
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Billable vs Non-Billable Separation</h4>
-                    <p className="text-base text-muted-foreground">Project work tracked separately from travel, errands, training, and admin. Finally see your true billable ratio. Identify where non-productive hours are hiding.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.workSessions.keyFeatures.billableSeparation.title', 'Billable vs Non-Billable Separation')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.keyFeatures.billableSeparation.desc', 'Project work tracked separately from travel, errands, training, and admin. Finally see your true billable ratio. Identify where non-productive hours are hiding.')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -527,8 +527,8 @@ export default function WorkSessionLanding() {
                     <TrendingUp className="w-5 h-5 text-orange-600" />
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Piece-Work Calculation</h4>
-                    <p className="text-base text-muted-foreground">Pay per drop? Toggle piece-work mode per project. System calculates compensation based on drops completed. Works for hourly shops and commission shops alike.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.workSessions.keyFeatures.pieceWork.title', 'Piece-Work Calculation')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.keyFeatures.pieceWork.desc', 'Pay per drop? Toggle piece-work mode per project. System calculates compensation based on drops completed. Works for hourly shops and commission shops alike.')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -542,8 +542,8 @@ export default function WorkSessionLanding() {
                     <Edit3 className="w-5 h-5 text-indigo-600" />
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Manager Override with Audit Trail</h4>
-                    <p className="text-base text-muted-foreground">Authorized managers can edit completed sessions. Forgot to clock out? Clocked out at the wrong time? Corrections are logged with timestamp and reason. Full accountability.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.workSessions.keyFeatures.managerOverride.title', 'Manager Override with Audit Trail')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.keyFeatures.managerOverride.desc', 'Authorized managers can edit completed sessions. Forgot to clock out? Clocked out at the wrong time? Corrections are logged with timestamp and reason. Full accountability.')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -557,8 +557,8 @@ export default function WorkSessionLanding() {
                     <Shield className="w-5 h-5 text-teal-600" />
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Harness Inspection Integration</h4>
-                    <p className="text-base text-muted-foreground">When technicians click Start Day, they confirm harness inspection status. "Yes" without a matching inspection record creates a CSR penalty. Honest employees build trust. Dishonest answers are passively tracked.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.workSessions.keyFeatures.harnessInspection.title', 'Harness Inspection Integration')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.keyFeatures.harnessInspection.desc', 'When technicians click Start Day, they confirm harness inspection status. "Yes" without a matching inspection record creates a CSR penalty. Honest employees build trust. Dishonest answers are passively tracked.')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -572,8 +572,8 @@ export default function WorkSessionLanding() {
                     <Award className="w-5 h-5 text-sky-600" />
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">IRATA/SPRAT Hours Logging</h4>
-                    <p className="text-base text-muted-foreground">End-of-session prompt captures rope access activities: rigging, rope transfers, deviations, rescue practice. Technicians build detailed work history for certification logbook updates.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.workSessions.keyFeatures.irataLogging.title', 'IRATA/SPRAT Hours Logging')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.keyFeatures.irataLogging.desc', 'End-of-session prompt captures rope access activities: rigging, rope transfers, deviations, rescue practice. Technicians build detailed work history for certification logbook updates.')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -588,10 +588,10 @@ export default function WorkSessionLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Problems Solved
+            {t('modules.workSessions.problemsSolved.title', 'Problems Solved')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-3xl mx-auto">
-            Real problems from real rope access operations. Here's how OnRopePro eliminates them.
+            {t('modules.workSessions.problemsSolved.subtitle', "Real problems from real rope access operations. Here's how OnRopePro eliminates them.")}
           </p>
 
           <Accordion type="multiple" className="space-y-3">
@@ -602,26 +602,26 @@ export default function WorkSessionLanding() {
                   <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0">
                     <Briefcase className="w-4 h-4 text-blue-600" />
                   </div>
-                  <span className="font-semibold">For Employers</span>
+                  <span className="font-semibold">{t('modules.workSessions.problemsSolved.employers.title', 'For Employers')}</span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="pb-4 space-y-6">
                 <div className="space-y-3">
-                  <h4 className="font-semibold text-foreground">"I spend 4 to 8 hours on payroll every two weeks."</h4>
-                  <p className="text-muted-foreground">You're reconciling spreadsheets at 10 PM. Text messages from last Tuesday. A voicemail you half-remember. The scribbled note on your desk that might say "8" or might say "3." By midnight you've reconstructed something that's probably close.</p>
-                  <p className="text-muted-foreground">OnRopePro captures timestamps automatically. Hours aggregate by employee and project. Export your payroll data in 30 seconds. The 7 hours you used to spend? Gone.</p>
+                  <h4 className="font-semibold text-foreground">{t('modules.workSessions.problemsSolved.employers.problem1Title', '"I spend 4 to 8 hours on payroll every two weeks."')}</h4>
+                  <p className="text-muted-foreground">{t('modules.workSessions.problemsSolved.employers.problem1Desc1', 'You\'re reconciling spreadsheets at 10 PM. Text messages from last Tuesday. A voicemail you half-remember. The scribbled note on your desk that might say "8" or might say "3." By midnight you\'ve reconstructed something that\'s probably close.')}</p>
+                  <p className="text-muted-foreground">{t('modules.workSessions.problemsSolved.employers.problem1Desc2', 'OnRopePro captures timestamps automatically. Hours aggregate by employee and project. Export your payroll data in 30 seconds. The 7 hours you used to spend? Gone.')}</p>
                 </div>
                 <Separator />
                 <div className="space-y-3">
-                  <h4 className="font-semibold text-foreground">"My check is $140 short and I want to know why."</h4>
-                  <p className="text-muted-foreground">That phone call from your technician. Your stomach drops. You know he's probably right. You spend an hour digging through records, discover you miscounted his overtime, cut a makeup check, and watch another piece of trust evaporate.</p>
-                  <p className="text-muted-foreground">Both you and your technician see the same data. Same timestamps. Same totals. When the numbers match, disputes don't happen. When someone's wrong, the proof is immediate.</p>
+                  <h4 className="font-semibold text-foreground">{t('modules.workSessions.problemsSolved.employers.problem2Title', '"My check is $140 short and I want to know why."')}</h4>
+                  <p className="text-muted-foreground">{t('modules.workSessions.problemsSolved.employers.problem2Desc1', "That phone call from your technician. Your stomach drops. You know he's probably right. You spend an hour digging through records, discover you miscounted his overtime, cut a makeup check, and watch another piece of trust evaporate.")}</p>
+                  <p className="text-muted-foreground">{t('modules.workSessions.problemsSolved.employers.problem2Desc2', "Both you and your technician see the same data. Same timestamps. Same totals. When the numbers match, disputes don't happen. When someone's wrong, the proof is immediate.")}</p>
                 </div>
                 <Separator />
                 <div className="space-y-3">
-                  <h4 className="font-semibold text-foreground">"I don't know which projects are profitable until the job is done."</h4>
-                  <p className="text-muted-foreground">You finish a building and realize you're $2,000 over budget. Was it weather? Slow technicians? Equipment problems? By the time you piece it together, you've already underbid three similar projects.</p>
-                  <p className="text-muted-foreground">Labor costs calculate in real-time against your budget. You see cost per drop. Hours per elevation. Performance against daily targets. When a project starts going sideways, you know it on Day 3.</p>
+                  <h4 className="font-semibold text-foreground">{t('modules.workSessions.problemsSolved.employers.problem3Title', '"I don\'t know which projects are profitable until the job is done."')}</h4>
+                  <p className="text-muted-foreground">{t('modules.workSessions.problemsSolved.employers.problem3Desc1', "You finish a building and realize you're $2,000 over budget. Was it weather? Slow technicians? Equipment problems? By the time you piece it together, you've already underbid three similar projects.")}</p>
+                  <p className="text-muted-foreground">{t('modules.workSessions.problemsSolved.employers.problem3Desc2', 'Labor costs calculate in real-time against your budget. You see cost per drop. Hours per elevation. Performance against daily targets. When a project starts going sideways, you know it on Day 3.')}</p>
                 </div>
               </AccordionContent>
             </AccordionItem>
@@ -633,26 +633,26 @@ export default function WorkSessionLanding() {
                   <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0">
                     <HardHat className="w-4 h-4 text-amber-600" />
                   </div>
-                  <span className="font-semibold">For Technicians</span>
+                  <span className="font-semibold">{t('modules.workSessions.problemsSolved.technicians.title', 'For Technicians')}</span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="pb-4 space-y-6">
                 <div className="space-y-3">
-                  <h4 className="font-semibold text-foreground">"I fill out the same time info three different ways."</h4>
-                  <p className="text-muted-foreground">Text your hours to the office. Write them in your IRATA logbook. Fill out the company spreadsheet. Three systems that never sync. Three chances for errors. Three things to remember at the end of an exhausting day on rope.</p>
-                  <p className="text-muted-foreground">One tap to clock in. One tap to clock out. That single entry feeds payroll and stores the details you need for your logbook. Done.</p>
+                  <h4 className="font-semibold text-foreground">{t('modules.workSessions.problemsSolved.technicians.problem1Title', '"I fill out the same time info three different ways."')}</h4>
+                  <p className="text-muted-foreground">{t('modules.workSessions.problemsSolved.technicians.problem1Desc1', 'Text your hours to the office. Write them in your IRATA logbook. Fill out the company spreadsheet. Three systems that never sync. Three chances for errors. Three things to remember at the end of an exhausting day on rope.')}</p>
+                  <p className="text-muted-foreground">{t('modules.workSessions.problemsSolved.technicians.problem1Desc2', 'One tap to clock in. One tap to clock out. That single entry feeds payroll and stores the details you need for your logbook. Done.')}</p>
                 </div>
                 <Separator />
                 <div className="space-y-3">
-                  <h4 className="font-semibold text-foreground">"I can never remember what I did three weeks ago for my logbook."</h4>
-                  <p className="text-muted-foreground">Your IRATA logbook is supposed to be accurate. But when you're filling it out at the end of the month, you're guessing. Was it rope transfers on Tuesday or Wednesday? How many drops did you complete at the parkade?</p>
-                  <p className="text-muted-foreground">Every work session logs the details: building, tasks performed, hours, drops by elevation. When you update your physical logbook, you're copying verified data, not reconstructing memories.</p>
+                  <h4 className="font-semibold text-foreground">{t('modules.workSessions.problemsSolved.technicians.problem2Title', '"I can never remember what I did three weeks ago for my logbook."')}</h4>
+                  <p className="text-muted-foreground">{t('modules.workSessions.problemsSolved.technicians.problem2Desc1', "Your IRATA logbook is supposed to be accurate. But when you're filling it out at the end of the month, you're guessing. Was it rope transfers on Tuesday or Wednesday? How many drops did you complete at the parkade?")}</p>
+                  <p className="text-muted-foreground">{t('modules.workSessions.problemsSolved.technicians.problem2Desc2', "Every work session logs the details: building, tasks performed, hours, drops by elevation. When you update your physical logbook, you're copying verified data, not reconstructing memories.")}</p>
                 </div>
                 <Separator />
                 <div className="space-y-3">
-                  <h4 className="font-semibold text-foreground">"My supervisor says my performance is inconsistent but has no data to show me."</h4>
-                  <p className="text-muted-foreground">You felt like you worked hard. There's nothing to reference. The review becomes about perception, not performance.</p>
-                  <p className="text-muted-foreground">Your dashboard shows drops per day, target achievement rate, trends over time. "This month: 4.8 drops/day average, 86% target achievement. Last month: 4.1 drops/day, 72% achievement. You're improving."</p>
+                  <h4 className="font-semibold text-foreground">{t('modules.workSessions.problemsSolved.technicians.problem3Title', '"My supervisor says my performance is inconsistent but has no data to show me."')}</h4>
+                  <p className="text-muted-foreground">{t('modules.workSessions.problemsSolved.technicians.problem3Desc1', "You felt like you worked hard. There's nothing to reference. The review becomes about perception, not performance.")}</p>
+                  <p className="text-muted-foreground">{t('modules.workSessions.problemsSolved.technicians.problem3Desc2', 'Your dashboard shows drops per day, target achievement rate, trends over time. "This month: 4.8 drops/day average, 86% target achievement. Last month: 4.1 drops/day, 72% achievement. You\'re improving."')}</p>
                 </div>
               </AccordionContent>
             </AccordionItem>
@@ -664,20 +664,20 @@ export default function WorkSessionLanding() {
                   <div className="w-8 h-8 rounded-lg bg-cyan-100 dark:bg-cyan-900 flex items-center justify-center shrink-0">
                     <Users className="w-4 h-4 text-cyan-600" />
                   </div>
-                  <span className="font-semibold">For Operations Managers</span>
+                  <span className="font-semibold">{t('modules.workSessions.problemsSolved.opsManagers.title', 'For Operations Managers')}</span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="pb-4 space-y-6">
                 <div className="space-y-3">
-                  <h4 className="font-semibold text-foreground">"I don't know where my crew is or what they're doing."</h4>
-                  <p className="text-muted-foreground">You call Tommy. No answer. You call again. Nothing. Is he on rope? On break? Having an emergency? You have 12 technicians across 4 sites and zero visibility.</p>
-                  <p className="text-muted-foreground">Real-time dashboard shows every clocked-in technician. Which project. How long. Last activity. Answer client calls without making phone calls.</p>
+                  <h4 className="font-semibold text-foreground">{t('modules.workSessions.problemsSolved.opsManagers.problem1Title', '"I don\'t know where my crew is or what they\'re doing."')}</h4>
+                  <p className="text-muted-foreground">{t('modules.workSessions.problemsSolved.opsManagers.problem1Desc1', 'You call Tommy. No answer. You call again. Nothing. Is he on rope? On break? Having an emergency? You have 12 technicians across 4 sites and zero visibility.')}</p>
+                  <p className="text-muted-foreground">{t('modules.workSessions.problemsSolved.opsManagers.problem1Desc2', 'Real-time dashboard shows every clocked-in technician. Which project. How long. Last activity. Answer client calls without making phone calls.')}</p>
                 </div>
                 <Separator />
                 <div className="space-y-3">
-                  <h4 className="font-semibold text-foreground">"The project went 20 hours over budget and I don't know why."</h4>
-                  <p className="text-muted-foreground">End of project. You're way over. You know it was weather, a sick technician, some equipment issues. But you can't quantify any of it.</p>
-                  <p className="text-muted-foreground">Shortfall reasons are captured when technicians miss daily targets. Every deviation documented. When you review project performance, you see exactly what happened and why.</p>
+                  <h4 className="font-semibold text-foreground">{t('modules.workSessions.problemsSolved.opsManagers.problem2Title', '"The project went 20 hours over budget and I don\'t know why."')}</h4>
+                  <p className="text-muted-foreground">{t('modules.workSessions.problemsSolved.opsManagers.problem2Desc1', "End of project. You're way over. You know it was weather, a sick technician, some equipment issues. But you can't quantify any of it.")}</p>
+                  <p className="text-muted-foreground">{t('modules.workSessions.problemsSolved.opsManagers.problem2Desc2', 'Shortfall reasons are captured when technicians miss daily targets. Every deviation documented. When you review project performance, you see exactly what happened and why.')}</p>
                 </div>
               </AccordionContent>
             </AccordionItem>
@@ -689,14 +689,14 @@ export default function WorkSessionLanding() {
                   <div className="w-8 h-8 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center shrink-0">
                     <Building2 className="w-4 h-4 text-violet-600" />
                   </div>
-                  <span className="font-semibold">For Building Managers</span>
+                  <span className="font-semibold">{t('modules.workSessions.problemsSolved.buildingManagers.title', 'For Building Managers')}</span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="pb-4 space-y-6">
                 <div className="space-y-3">
-                  <h4 className="font-semibold text-foreground">"I can't verify if the rope access crew was actually on site."</h4>
-                  <p className="text-muted-foreground">You're paying for services. The contractor says their crew was there all week. Your residents say they only saw workers Tuesday and Thursday.</p>
-                  <p className="text-muted-foreground">GPS-verified clock-in and clock-out times visible in your portal. See when crews arrived, when they left, what they accomplished.</p>
+                  <h4 className="font-semibold text-foreground">{t('modules.workSessions.problemsSolved.buildingManagers.problem1Title', '"I can\'t verify if the rope access crew was actually on site."')}</h4>
+                  <p className="text-muted-foreground">{t('modules.workSessions.problemsSolved.buildingManagers.problem1Desc1', "You're paying for services. The contractor says their crew was there all week. Your residents say they only saw workers Tuesday and Thursday.")}</p>
+                  <p className="text-muted-foreground">{t('modules.workSessions.problemsSolved.buildingManagers.problem1Desc2', 'GPS-verified clock-in and clock-out times visible in your portal. See when crews arrived, when they left, what they accomplished.')}</p>
                 </div>
               </AccordionContent>
             </AccordionItem>
@@ -708,14 +708,14 @@ export default function WorkSessionLanding() {
                   <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0">
                     <Globe className="w-4 h-4 text-emerald-600" />
                   </div>
-                  <span className="font-semibold">For Property Managers</span>
+                  <span className="font-semibold">{t('modules.workSessions.problemsSolved.propertyManagers.title', 'For Property Managers')}</span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="pb-4 space-y-6">
                 <div className="space-y-3">
-                  <h4 className="font-semibold text-foreground">"I need proof of attendance for contractor invoices."</h4>
-                  <p className="text-muted-foreground">Contractor submits an invoice for 40 hours. Were they actually there? Your records are whatever the contractor told you.</p>
-                  <p className="text-muted-foreground">Work session summaries for your buildings available in your portal. Timestamps, locations, work completed. Verify invoices against documented attendance.</p>
+                  <h4 className="font-semibold text-foreground">{t('modules.workSessions.problemsSolved.propertyManagers.problem1Title', '"I need proof of attendance for contractor invoices."')}</h4>
+                  <p className="text-muted-foreground">{t('modules.workSessions.problemsSolved.propertyManagers.problem1Desc1', 'Contractor submits an invoice for 40 hours. Were they actually there? Your records are whatever the contractor told you.')}</p>
+                  <p className="text-muted-foreground">{t('modules.workSessions.problemsSolved.propertyManagers.problem1Desc2', 'Work session summaries for your buildings available in your portal. Timestamps, locations, work completed. Verify invoices against documented attendance.')}</p>
                 </div>
               </AccordionContent>
             </AccordionItem>
@@ -729,10 +729,10 @@ export default function WorkSessionLanding() {
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Measurable Results
+            {t('modules.workSessions.results.title', 'Measurable Results')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-3xl mx-auto">
-            Real numbers from real rope access operations.
+            {t('modules.workSessions.results.subtitle', 'Real numbers from real rope access operations.')}
           </p>
 
           <div className="grid md:grid-cols-2 gap-6">
@@ -745,8 +745,8 @@ export default function WorkSessionLanding() {
                     <Timer className="w-6 h-6 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-foreground mb-2">87-93% Payroll Time Reduction</h3>
-                    <p className="text-base text-muted-foreground">From 4-8 hours per payroll cycle to 30 minutes. That's 7+ hours recovered every two weeks. 182+ hours per year. The equivalent of an extra month of workdays.</p>
+                    <h3 className="text-2xl font-bold text-foreground mb-2">{t('modules.workSessions.results.payrollReduction.title', '87-93% Payroll Time Reduction')}</h3>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.results.payrollReduction.desc', "From 4-8 hours per payroll cycle to 30 minutes. That's 7+ hours recovered every two weeks. 182+ hours per year. The equivalent of an extra month of workdays.")}</p>
                   </div>
                 </div>
               </CardContent>
@@ -761,8 +761,8 @@ export default function WorkSessionLanding() {
                     <CheckCircle2 className="w-6 h-6 text-emerald-600" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-foreground mb-2">Zero Payroll Disputes</h3>
-                    <p className="text-base text-muted-foreground">Precise timestamps and GPS verification eliminate "he said/she said" conversations. When both parties see the same data, disputes don't happen.</p>
+                    <h3 className="text-2xl font-bold text-foreground mb-2">{t('modules.workSessions.results.zeroDisputes.title', 'Zero Payroll Disputes')}</h3>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.results.zeroDisputes.desc', 'Precise timestamps and GPS verification eliminate "he said/she said" conversations. When both parties see the same data, disputes don\'t happen.')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -777,8 +777,8 @@ export default function WorkSessionLanding() {
                     <TrendingUp className="w-6 h-6 text-amber-600" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-foreground mb-2">Real-Time Budget Visibility</h3>
-                    <p className="text-base text-muted-foreground">Labor costs accumulate as work happens, not after the job is done. Catch budget overruns on Day 3, not Day 30. Prevent the surprises that kill profitability.</p>
+                    <h3 className="text-2xl font-bold text-foreground mb-2">{t('modules.workSessions.results.budgetVisibility.title', 'Real-Time Budget Visibility')}</h3>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.results.budgetVisibility.desc', 'Labor costs accumulate as work happens, not after the job is done. Catch budget overruns on Day 3, not Day 30. Prevent the surprises that kill profitability.')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -793,8 +793,8 @@ export default function WorkSessionLanding() {
                     <Shield className="w-6 h-6 text-violet-600" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-foreground mb-2">Complete Accountability Trail</h3>
-                    <p className="text-base text-muted-foreground">Every clock-in, clock-out, and edit logged with timestamp. When the labor department asks questions or a client disputes an invoice, you have verifiable records.</p>
+                    <h3 className="text-2xl font-bold text-foreground mb-2">{t('modules.workSessions.results.accountability.title', 'Complete Accountability Trail')}</h3>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.results.accountability.desc', 'Every clock-in, clock-out, and edit logged with timestamp. When the labor department asks questions or a client disputes an invoice, you have verifiable records.')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -809,26 +809,26 @@ export default function WorkSessionLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Stop Reconstructing. Start Operating.
+            {t('modules.workSessions.improve.title', 'Stop Reconstructing. Start Operating.')}
           </h2>
           
           <Card className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
             <CardContent className="p-6 md:p-8 space-y-4 text-base text-muted-foreground">
               <p>
-                Right now, you're spending hours every payroll cycle piecing together what happened across your projects. Text messages. Memory. Spreadsheets that don't talk to each other. You're making educated guesses and hoping nobody catches the errors.
+                {t('modules.workSessions.improve.paragraph1', "Right now, you're spending hours every payroll cycle piecing together what happened across your projects. Text messages. Memory. Spreadsheets that don't talk to each other. You're making educated guesses and hoping nobody catches the errors.")}
               </p>
               <p>
-                Your technicians are logging hours in three different places. Texting the office. Writing in their logbooks. Filling out your forms. Same information, multiple systems, zero connection.
+                {t('modules.workSessions.improve.paragraph2', 'Your technicians are logging hours in three different places. Texting the office. Writing in their logbooks. Filling out your forms. Same information, multiple systems, zero connection.')}
               </p>
               <p>
-                Your operations managers are calling around to find out where people are. Your clients are asking if the crew showed up. Your projects are going over budget and you only find out when the job is done.
+                {t('modules.workSessions.improve.paragraph3', 'Your operations managers are calling around to find out where people are. Your clients are asking if the crew showed up. Your projects are going over budget and you only find out when the job is done.')}
               </p>
               <Separator className="my-6" />
               <p className="font-medium text-foreground text-lg">
-                With OnRopePro, your technicians clock in once. That single action captures their timestamp, verifies their location, confirms their harness inspection, and links their session to the right project. When they clock out, they log their output, document any shortfalls, and the data flows directly into payroll, performance analytics, and project progress.
+                {t('modules.workSessions.improve.solution1', 'With OnRopePro, your technicians clock in once. That single action captures their timestamp, verifies their location, confirms their harness inspection, and links their session to the right project. When they clock out, they log their output, document any shortfalls, and the data flows directly into payroll, performance analytics, and project progress.')}
               </p>
               <p className="font-medium text-foreground text-lg">
-                You stop reconstructing the past. You start managing in real-time.
+                {t('modules.workSessions.improve.solution2', 'You stop reconstructing the past. You start managing in real-time.')}
               </p>
             </CardContent>
           </Card>
@@ -841,10 +841,10 @@ export default function WorkSessionLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Module Integration Points
+            {t('modules.workSessions.integrations.title', 'Module Integration Points')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-3xl mx-auto">
-            Work session data flows into everything else. This is the heartbeat of OnRopePro.
+            {t('modules.workSessions.integrations.subtitle', 'Work session data flows into everything else. This is the heartbeat of OnRopePro.')}
           </p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -856,8 +856,8 @@ export default function WorkSessionLanding() {
                     <Building2 className="w-5 h-5 text-blue-600" />
                   </div>
                   <div>
-                    <h4 className="text-lg font-semibold text-foreground mb-2">Projects</h4>
-                    <p className="text-base text-muted-foreground">Work sessions automatically link to assigned projects. Hours and drops flow into project progress tracking. Budget monitoring updates in real-time as sessions close.</p>
+                    <h4 className="text-lg font-semibold text-foreground mb-2">{t('modules.workSessions.integrations.projects.title', 'Projects')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.integrations.projects.desc', 'Work sessions automatically link to assigned projects. Hours and drops flow into project progress tracking. Budget monitoring updates in real-time as sessions close.')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -871,8 +871,8 @@ export default function WorkSessionLanding() {
                     <DollarSign className="w-5 h-5 text-emerald-600" />
                   </div>
                   <div>
-                    <h4 className="text-lg font-semibold text-foreground mb-2">Payroll</h4>
-                    <p className="text-base text-muted-foreground">Work session data aggregates by payroll period. Employee hours, rates, and gross pay calculated automatically. Export-ready in seconds.</p>
+                    <h4 className="text-lg font-semibold text-foreground mb-2">{t('modules.workSessions.integrations.payroll.title', 'Payroll')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.integrations.payroll.desc', 'Work session data aggregates by payroll period. Employee hours, rates, and gross pay calculated automatically. Export-ready in seconds.')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -886,8 +886,8 @@ export default function WorkSessionLanding() {
                     <BarChart3 className="w-5 h-5 text-violet-600" />
                   </div>
                   <div>
-                    <h4 className="text-lg font-semibold text-foreground mb-2">Performance Analytics</h4>
-                    <p className="text-base text-muted-foreground">Work session performance feeds productivity dashboards. Target achievement, drops per day, trends over time. Objective data for performance conversations.</p>
+                    <h4 className="text-lg font-semibold text-foreground mb-2">{t('modules.workSessions.integrations.analytics.title', 'Performance Analytics')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.integrations.analytics.desc', 'Work session performance feeds productivity dashboards. Target achievement, drops per day, trends over time. Objective data for performance conversations.')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -901,8 +901,8 @@ export default function WorkSessionLanding() {
                     <Shield className="w-5 h-5 text-amber-600" />
                   </div>
                   <div>
-                    <h4 className="text-lg font-semibold text-foreground mb-2">Safety & Compliance</h4>
-                    <p className="text-base text-muted-foreground">Harness inspection verification triggers at session start. Work sessions link to toolbox meeting coverage. Attendance data factors into Company Safety Rating calculations.</p>
+                    <h4 className="text-lg font-semibold text-foreground mb-2">{t('modules.workSessions.integrations.safety.title', 'Safety & Compliance')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.integrations.safety.desc', 'Harness inspection verification triggers at session start. Work sessions link to toolbox meeting coverage. Attendance data factors into Company Safety Rating calculations.')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -916,8 +916,8 @@ export default function WorkSessionLanding() {
                     <Wrench className="w-5 h-5 text-cyan-600" />
                   </div>
                   <div>
-                    <h4 className="text-lg font-semibold text-foreground mb-2">Inventory & Inspections</h4>
-                    <p className="text-base text-muted-foreground">Daily harness checks prompt at clock-in. Session data verifies equipment was inspected before use. Inspection records link to the work performed.</p>
+                    <h4 className="text-lg font-semibold text-foreground mb-2">{t('modules.workSessions.integrations.inventory.title', 'Inventory & Inspections')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.integrations.inventory.desc', 'Daily harness checks prompt at clock-in. Session data verifies equipment was inspected before use. Inspection records link to the work performed.')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -931,8 +931,8 @@ export default function WorkSessionLanding() {
                     <Activity className="w-5 h-5 text-rose-600" />
                   </div>
                   <div>
-                    <h4 className="text-lg font-semibold text-foreground mb-2">Active Workers Dashboard</h4>
-                    <p className="text-base text-muted-foreground">Real-time display of clocked-in technicians across all projects. Status updates as sessions start and end. Know who's where without phone calls.</p>
+                    <h4 className="text-lg font-semibold text-foreground mb-2">{t('modules.workSessions.integrations.dashboard.title', 'Active Workers Dashboard')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.workSessions.integrations.dashboard.desc', "Real-time display of clocked-in technicians across all projects. Status updates as sessions start and end. Know who's where without phone calls.")}</p>
                   </div>
                 </div>
               </CardContent>
@@ -947,100 +947,100 @@ export default function WorkSessionLanding() {
       <section id="knowledgebase" className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Frequently Asked Questions
+            {t('modules.workSessions.faq.title', 'Frequently Asked Questions')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12">
-            Common questions about work session tracking and time management.
+            {t('modules.workSessions.faq.subtitle', 'Common questions about work session tracking and time management.')}
           </p>
 
           <Accordion type="single" collapsible className="space-y-4">
             <AccordionItem value="faq-1" className="bg-white dark:bg-slate-800 rounded-lg border px-6">
               <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-1">
-                How do technicians clock in and out?
+                {t('modules.workSessions.faq.q1', 'How do technicians clock in and out?')}
               </AccordionTrigger>
               <AccordionContent className="text-base text-muted-foreground pb-4">
-                They use the OnRopePro mobile app. Tap "Start Day" when arriving at site, select the project, confirm harness inspection status. Tap "End Day" when leaving, log drops by elevation, add notes if needed. Takes under 30 seconds.
+                {t('modules.workSessions.faq.a1', 'They use the OnRopePro mobile app. Tap "Start Day" when arriving at site, select the project, confirm harness inspection status. Tap "End Day" when leaving, log drops by elevation, add notes if needed. Takes under 30 seconds.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-2" className="bg-white dark:bg-slate-800 rounded-lg border px-6">
               <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-2">
-                What if someone forgets to clock out?
+                {t('modules.workSessions.faq.q2', 'What if someone forgets to clock out?')}
               </AccordionTrigger>
               <AccordionContent className="text-base text-muted-foreground pb-4">
-                Authorized managers can edit completed sessions. Adjust the end time, and the system recalculates hours and pay automatically. All edits are logged with timestamp and reason for accountability.
+                {t('modules.workSessions.faq.a2', 'Authorized managers can edit completed sessions. Adjust the end time, and the system recalculates hours and pay automatically. All edits are logged with timestamp and reason for accountability.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-3" className="bg-white dark:bg-slate-800 rounded-lg border px-6">
               <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-3">
-                Can technicians work on multiple projects in one day?
+                {t('modules.workSessions.faq.q3', 'Can technicians work on multiple projects in one day?')}
               </AccordionTrigger>
               <AccordionContent className="text-base text-muted-foreground pb-4">
-                Yes. End the session at the first project, start a new session at the next. Each project gets accurate hour attribution for billing and cost tracking.
+                {t('modules.workSessions.faq.a3', 'Yes. End the session at the first project, start a new session at the next. Each project gets accurate hour attribution for billing and cost tracking.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-4" className="bg-white dark:bg-slate-800 rounded-lg border px-6">
               <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-4">
-                What happens if GPS is disabled?
+                {t('modules.workSessions.faq.q4', 'What happens if GPS is disabled?')}
               </AccordionTrigger>
               <AccordionContent className="text-base text-muted-foreground pb-4">
-                Clock-in still works, but without location verification. The system records that GPS was unavailable. For companies requiring location proof, this creates a visible gap in attendance records.
+                {t('modules.workSessions.faq.a4', 'Clock-in still works, but without location verification. The system records that GPS was unavailable. For companies requiring location proof, this creates a visible gap in attendance records.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-5" className="bg-white dark:bg-slate-800 rounded-lg border px-6">
               <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-5">
-                How does the harness inspection prompt work?
+                {t('modules.workSessions.faq.q5', 'How does the harness inspection prompt work?')}
               </AccordionTrigger>
               <AccordionContent className="text-base text-muted-foreground pb-4">
-                When technicians click Start Day, they see three options: Yes (confirms inspection complete), No (redirects to inspection form), or Not Applicable (for ground tasks). Selecting "Yes" without a matching inspection record creates a CSR penalty visible to property managers.
+                {t('modules.workSessions.faq.a5', 'When technicians click Start Day, they see three options: Yes (confirms inspection complete), No (redirects to inspection form), or Not Applicable (for ground tasks). Selecting "Yes" without a matching inspection record creates a CSR penalty visible to property managers.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-6" className="bg-white dark:bg-slate-800 rounded-lg border px-6">
               <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-6">
-                Who can see work session data?
+                {t('modules.workSessions.faq.q6', 'Who can see work session data?')}
               </AccordionTrigger>
               <AccordionContent className="text-base text-muted-foreground pb-4">
-                Access is permission-based. Company owners and operations managers see all sessions. Supervisors see sessions for their assigned projects. Technicians see their own work history. Property managers see session summaries for their buildings.
+                {t('modules.workSessions.faq.a6', 'Access is permission-based. Company owners and operations managers see all sessions. Supervisors see sessions for their assigned projects. Technicians see their own work history. Property managers see session summaries for their buildings.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-7" className="bg-white dark:bg-slate-800 rounded-lg border px-6">
               <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-7">
-                Does this replace the IRATA logbook?
+                {t('modules.workSessions.faq.q7', 'Does this replace the IRATA logbook?')}
               </AccordionTrigger>
               <AccordionContent className="text-base text-muted-foreground pb-4">
-                Not yet. OnRopePro tracks detailed work session information that serves as professional memory. When updating your physical logbook, you reference stored data instead of guessing. We're pursuing IRATA and SPRAT recognition to eventually become an approved logging method.
+                {t('modules.workSessions.faq.a7', "Not yet. OnRopePro tracks detailed work session information that serves as professional memory. When updating your physical logbook, you reference stored data instead of guessing. We're pursuing IRATA and SPRAT recognition to eventually become an approved logging method.")}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-8" className="bg-white dark:bg-slate-800 rounded-lg border px-6">
               <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-8">
-                Can I export time data for my accountant?
+                {t('modules.workSessions.faq.q8', 'Can I export time data for my accountant?')}
               </AccordionTrigger>
               <AccordionContent className="text-base text-muted-foreground pb-4">
-                Yes. Hours aggregate by payroll period with CSV export. Works with QuickBooks, ADP, Paychex, Gusto, and any system that accepts standard time data.
+                {t('modules.workSessions.faq.a8', 'Yes. Hours aggregate by payroll period with CSV export. Works with QuickBooks, ADP, Paychex, Gusto, and any system that accepts standard time data.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-9" className="bg-white dark:bg-slate-800 rounded-lg border px-6">
               <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-9">
-                How does piece-work compensation work?
+                {t('modules.workSessions.faq.q9', 'How does piece-work compensation work?')}
               </AccordionTrigger>
               <AccordionContent className="text-base text-muted-foreground pb-4">
-                When creating a project, toggle piece-work mode and enter the rate per drop. When technicians end their session and log drops completed, the system calculates their compensation automatically and marks it as piece-work in payroll.
+                {t('modules.workSessions.faq.a9', 'When creating a project, toggle piece-work mode and enter the rate per drop. When technicians end their session and log drops completed, the system calculates their compensation automatically and marks it as piece-work in payroll.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-10" className="bg-white dark:bg-slate-800 rounded-lg border px-6">
               <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-10">
-                What's the difference between billable and non-billable sessions?
+                {t('modules.workSessions.faq.q10', "What's the difference between billable and non-billable sessions?")}
               </AccordionTrigger>
               <AccordionContent className="text-base text-muted-foreground pb-4">
-                Billable sessions are linked to client projects. Non-billable sessions cover travel, errands, equipment maintenance, training, and admin. The system tracks both separately so you can see your true billable ratio and identify where non-productive hours are accumulating.
+                {t('modules.workSessions.faq.a10', 'Billable sessions are linked to client projects. Non-billable sessions cover travel, errands, equipment maintenance, training, and admin. The system tracks both separately so you can see your true billable ratio and identify where non-productive hours are accumulating.')}
               </AccordionContent>
             </AccordionItem>
           </Accordion>
@@ -1052,35 +1052,35 @@ export default function WorkSessionLanding() {
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMtOS45NDEgMC0xOCA4LjA1OS0xOCAxOHM4LjA1OSAxOCAxOCAxOGM5Ljk0MSAwIDE4LTguMDU5IDE4LTE4cy04LjA1OS0xOC0xOC0xOHptMCAzMmMtNy43MzIgMC0xNC02LjI2OC0xNC0xNHM2LjI2OC0xNCAxNC0xNHMxNCA2LjI2OCAxNCAxNC02LjI2OCAxNC0xNCAxNHoiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wMykiLz48L2c+PC9zdmc+')] opacity-30"></div>
         <div className="relative max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Stop Guessing. Start Knowing.
+            {t('modules.workSessions.footerCta.title', 'Stop Guessing. Start Knowing.')}
           </h2>
           <p className="text-lg text-blue-100 mb-6 max-w-3xl mx-auto leading-relaxed">
-            Every payroll cycle, you're reconstructing the past from memory and messages. Every project review, you're piecing together what happened from scattered records. Every client call, you're hoping your crew is actually where they're supposed to be.
+            {t('modules.workSessions.footerCta.paragraph1', "Every payroll cycle, you're reconstructing the past from memory and messages. Every project review, you're piecing together what happened from scattered records. Every client call, you're hoping your crew is actually where they're supposed to be.")}
           </p>
           <p className="text-lg text-blue-100 mb-6 max-w-3xl mx-auto leading-relaxed">
-            OnRopePro captures the data as it happens. Timestamps. Locations. Output. Shortfall reasons. All of it. Automatically.
+            {t('modules.workSessions.footerCta.paragraph2', 'OnRopePro captures the data as it happens. Timestamps. Locations. Output. Shortfall reasons. All of it. Automatically.')}
           </p>
           <p className="text-lg font-medium text-white mb-8 max-w-3xl mx-auto">
-            No more 10 PM spreadsheet sessions. No more "my check is short" phone calls. No more budget surprises at project end.
+            {t('modules.workSessions.footerCta.paragraph3', 'No more 10 PM spreadsheet sessions. No more "my check is short" phone calls. No more budget surprises at project end.')}
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="bg-white text-[#0B64A3]" asChild data-testid="button-footer-trial">
               <Link href="/register">
-                Start Your Free 60-Day Trial
+                {t('modules.workSessions.footerCta.trialButton', 'Start Your Free 60-Day Trial')}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>
             <Button size="lg" variant="outline" className="border-white/40 text-white" asChild data-testid="button-footer-faq">
               <Link href="#knowledgebase">
-                Find Answers
+                {t('modules.workSessions.footerCta.faqButton', 'Find Answers')}
                 <BookOpen className="ml-2 w-5 h-5" />
               </Link>
             </Button>
           </div>
           
           <p className="text-sm text-blue-200 mt-6">
-            Free 60-day trial for Founding Members. No credit card required.
+            {t('modules.workSessions.footerCta.trialNote', 'Free 60-day trial for Founding Members. No credit card required.')}
           </p>
         </div>
       </section>

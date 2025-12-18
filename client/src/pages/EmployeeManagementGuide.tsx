@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import ChangelogGuideLayout from "@/components/ChangelogGuideLayout";
 import {

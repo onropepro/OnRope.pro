@@ -216,26 +216,26 @@ export default function SafetyComplianceLanding() {
                 <div className="w-12 h-12 rounded-lg bg-sky-100 dark:bg-sky-900 flex items-center justify-center mb-3">
                   <HardHat className="w-6 h-6 text-sky-600" />
                 </div>
-                <CardTitle className="text-xl">Every Harness Inspection. Every Day. No Exceptions.</CardTitle>
+                <CardTitle className="text-xl">{t('modules.safety.solutionCards.harness.title', 'Every Harness Inspection. Every Day. No Exceptions.')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm text-muted-foreground">
-                <p>Before any technician starts a work session, they complete a digital inspection on their phone.</p>
+                <p>{t('modules.safety.solutionCards.harness.description', 'Before any technician starts a work session, they complete a digital inspection on their phone.')}</p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Webbing, buckles, stitching, D-rings, labels checked</span>
+                    <span>{t('modules.safety.solutionCards.harness.bullet1', 'Webbing, buckles, stitching, D-rings, labels checked')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Pass/fail recorded for each item</span>
+                    <span>{t('modules.safety.solutionCards.harness.bullet2', 'Pass/fail recorded for each item')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Photos attached for wear or damage</span>
+                    <span>{t('modules.safety.solutionCards.harness.bullet3', 'Photos attached for wear or damage')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Failed equipment auto-flagged for retirement</span>
+                    <span>{t('modules.safety.solutionCards.harness.bullet4', 'Failed equipment auto-flagged for retirement')}</span>
                   </li>
                 </ul>
               </CardContent>
@@ -248,26 +248,26 @@ export default function SafetyComplianceLanding() {
                 <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center mb-3">
                   <Users className="w-6 h-6 text-emerald-600" />
                 </div>
-                <CardTitle className="text-xl">Toolbox Meetings That Actually Happened</CardTitle>
+                <CardTitle className="text-xl">{t('modules.safety.solutionCards.toolbox.title', 'Toolbox Meetings That Actually Happened')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm text-muted-foreground">
-                <p>Choose from 20+ rope access safety topics and document who attended.</p>
+                <p>{t('modules.safety.solutionCards.toolbox.description', 'Choose from 20+ rope access safety topics and document who attended.')}</p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Fall protection, rescue, anchors, weather</span>
+                    <span>{t('modules.safety.solutionCards.toolbox.bullet1', 'Fall protection, rescue, anchors, weather')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Digital signatures or checkbox confirmation</span>
+                    <span>{t('modules.safety.solutionCards.toolbox.bullet2', 'Digital signatures or checkbox confirmation')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Daily coverage tracked automatically</span>
+                    <span>{t('modules.safety.solutionCards.toolbox.bullet3', 'Daily coverage tracked automatically')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Never wonder if you're compliant</span>
+                    <span>{t('modules.safety.solutionCards.toolbox.bullet4', "Never wonder if you're compliant")}</span>
                   </li>
                 </ul>
               </CardContent>
@@ -280,26 +280,26 @@ export default function SafetyComplianceLanding() {
                 <div className="w-12 h-12 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center mb-3">
                   <Download className="w-6 h-6 text-violet-600" />
                 </div>
-                <CardTitle className="text-xl">Audit-Ready PDFs in Four Clicks</CardTitle>
+                <CardTitle className="text-xl">{t('modules.safety.solutionCards.audit.title', 'Audit-Ready PDFs in Four Clicks')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm text-muted-foreground">
-                <p>When the irata auditor calls, you don't panic. You search and export.</p>
+                <p>{t('modules.safety.solutionCards.audit.description', "When the irata auditor calls, you don't panic. You search and export.")}</p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Search by date, technician, or serial number</span>
+                    <span>{t('modules.safety.solutionCards.audit.bullet1', 'Search by date, technician, or serial number')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Professional PDFs with embedded signatures</span>
+                    <span>{t('modules.safety.solutionCards.audit.bullet2', 'Professional PDFs with embedded signatures')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Same PDFs for insurance and property managers</span>
+                    <span>{t('modules.safety.solutionCards.audit.bullet3', 'Same PDFs for insurance and property managers')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Legal protection if anything goes to court</span>
+                    <span>{t('modules.safety.solutionCards.audit.bullet4', 'Legal protection if anything goes to court')}</span>
                   </li>
                 </ul>
               </CardContent>
@@ -317,24 +317,24 @@ export default function SafetyComplianceLanding() {
                 <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center">
                   <UserX className="w-5 h-5 text-slate-600 dark:text-slate-400" />
                 </div>
-                <h2 className="text-2xl md:text-3xl font-bold">Not For Everyone</h2>
+                <h2 className="text-2xl md:text-3xl font-bold">{t('modules.safety.notForEveryone.title', 'Not For Everyone')}</h2>
               </div>
               
               <div className="space-y-4 text-muted-foreground">
                 <p className="text-lg font-medium text-foreground">
-                  This software isn't for every rope access company.
+                  {t('modules.safety.notForEveryone.subtitle', "This software isn't for every rope access company.")}
                 </p>
                 <p>
-                  If you're running crews without proper inspections, OnRopePro will expose that. If your toolbox meetings are fiction, the system will make that obvious. If equipment stays in rotation after it should have been retired, there will be a record.
+                  {t('modules.safety.notForEveryone.paragraph1', "If you're running crews without proper inspections, OnRopePro will expose that. If your toolbox meetings are fiction, the system will make that obvious. If equipment stays in rotation after it should have been retired, there will be a record.")}
                 </p>
                 <p className="font-medium text-foreground">
-                  The transparency is the point.
+                  {t('modules.safety.notForEveryone.paragraph2', 'The transparency is the point.')}
                 </p>
                 <p>
-                  OnRopePro is built for operators who actually care about keeping their technicians safe. Companies that want to prove they're doing things right. Companies that welcome audits because they know what the auditor will find.
+                  {t('modules.safety.notForEveryone.paragraph3', "OnRopePro is built for operators who actually care about keeping their technicians safe. Companies that want to prove they're doing things right. Companies that welcome audits because they know what the auditor will find.")}
                 </p>
                 <p className="text-foreground font-medium">
-                  If you'd rather not have visibility into your own safety compliance, keep using paper forms. They're much easier to lose.
+                  {t('modules.safety.notForEveryone.paragraph4', "If you'd rather not have visibility into your own safety compliance, keep using paper forms. They're much easier to lose.")}
                 </p>
               </div>
             </CardContent>
@@ -346,10 +346,10 @@ export default function SafetyComplianceLanding() {
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Who This Is For
+            {t('modules.safety.problemsSolved.title', 'Who This Is For')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-10 max-w-2xl mx-auto">
-            Real problems from operators just like you.
+            {t('modules.safety.problemsSolved.subtitle', 'Real problems from operators just like you.')}
           </p>
 
           <Accordion type="multiple" value={expandedProblems} onValueChange={setExpandedProblems} className="space-y-4">
@@ -357,14 +357,14 @@ export default function SafetyComplianceLanding() {
               <AccordionTrigger className="text-left" data-testid="accordion-organized">
                 <div className="flex items-center gap-3">
                   <Clock className="w-5 h-5 text-amber-600 shrink-0" />
-                  <span className="font-semibold">For the operator who's "been meaning to get organized"</span>
+                  <span className="font-semibold">{t('modules.safety.problemsSolved.organized.title', 'For the operator who\'s "been meaning to get organized"')}</span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="space-y-3 text-muted-foreground pb-4">
-                <p>You've said it for years. You'll fix the filing system. You'll buy better binders. You'll make everyone fill out the forms properly.</p>
-                <p>But the season starts, you're short-staffed, jobs stack up, and safety paperwork becomes "something we'll catch up on later."</p>
-                <p className="text-foreground font-medium">The problem isn't discipline. The problem is that paper systems require constant effort to maintain. Digital systems require one-time setup and then they just work.</p>
-                <p>Your techs complete inspections on their phones while waiting for the elevator. The records exist whether you're paying attention or not.</p>
+                <p>{t('modules.safety.problemsSolved.organized.p1', "You've said it for years. You'll fix the filing system. You'll buy better binders. You'll make everyone fill out the forms properly.")}</p>
+                <p>{t('modules.safety.problemsSolved.organized.p2', 'But the season starts, you\'re short-staffed, jobs stack up, and safety paperwork becomes "something we\'ll catch up on later."')}</p>
+                <p className="text-foreground font-medium">{t('modules.safety.problemsSolved.organized.p3', "The problem isn't discipline. The problem is that paper systems require constant effort to maintain. Digital systems require one-time setup and then they just work.")}</p>
+                <p>{t('modules.safety.problemsSolved.organized.p4', "Your techs complete inspections on their phones while waiting for the elevator. The records exist whether you're paying attention or not.")}</p>
               </AccordionContent>
             </AccordionItem>
 
@@ -372,13 +372,13 @@ export default function SafetyComplianceLanding() {
               <AccordionTrigger className="text-left" data-testid="accordion-audit">
                 <div className="flex items-center gap-3">
                   <ClipboardCheck className="w-5 h-5 text-sky-600 shrink-0" />
-                  <span className="font-semibold">For the operator who's been through an audit</span>
+                  <span className="font-semibold">{t('modules.safety.problemsSolved.audit.title', "For the operator who's been through an audit")}</span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="space-y-3 text-muted-foreground pb-4">
-                <p>You know the sick feeling when someone asks for documentation you're not 100% sure you have.</p>
-                <p>You've made promises to yourself about how next time will be different.</p>
-                <p className="text-foreground font-medium">Here's how next time actually becomes different: the records create themselves. Daily. Automatically. With timestamps and signatures that can't be disputed.</p>
+                <p>{t('modules.safety.problemsSolved.audit.p1', "You know the sick feeling when someone asks for documentation you're not 100% sure you have.")}</p>
+                <p>{t('modules.safety.problemsSolved.audit.p2', "You've made promises to yourself about how next time will be different.")}</p>
+                <p className="text-foreground font-medium">{t('modules.safety.problemsSolved.audit.p3', "Here's how next time actually becomes different: the records create themselves. Daily. Automatically. With timestamps and signatures that can't be disputed.")}</p>
               </AccordionContent>
             </AccordionItem>
 
@@ -386,14 +386,14 @@ export default function SafetyComplianceLanding() {
               <AccordionTrigger className="text-left" data-testid="accordion-liability">
                 <div className="flex items-center gap-3">
                   <Scale className="w-5 h-5 text-rose-600 shrink-0" />
-                  <span className="font-semibold">For the operator worried about liability</span>
+                  <span className="font-semibold">{t('modules.safety.problemsSolved.liability.title', 'For the operator worried about liability')}</span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="space-y-3 text-muted-foreground pb-4">
-                <p>Rope access work is dangerous. Everyone knows it. That's why irata and SPRAT exist. That's why inspections are mandatory.</p>
-                <p>But mandatory and documented are not the same thing.</p>
-                <p className="text-foreground font-medium">If a harness fails and someone gets hurt, the investigation starts with one question: can you prove you inspected it? Can you prove you trained your people? Can you prove you discussed the specific hazards of this specific job?</p>
-                <p>With paper forms, you're hoping the right pieces of paper exist and can be found. With digital records, you know exactly what exists because you can search for it.</p>
+                <p>{t('modules.safety.problemsSolved.liability.p1', "Rope access work is dangerous. Everyone knows it. That's why irata and SPRAT exist. That's why inspections are mandatory.")}</p>
+                <p>{t('modules.safety.problemsSolved.liability.p2', 'But mandatory and documented are not the same thing.')}</p>
+                <p className="text-foreground font-medium">{t('modules.safety.problemsSolved.liability.p3', "If a harness fails and someone gets hurt, the investigation starts with one question: can you prove you inspected it? Can you prove you trained your people? Can you prove you discussed the specific hazards of this specific job?")}</p>
+                <p>{t('modules.safety.problemsSolved.liability.p4', "With paper forms, you're hoping the right pieces of paper exist and can be found. With digital records, you know exactly what exists because you can search for it.")}</p>
               </AccordionContent>
             </AccordionItem>
           </Accordion>
@@ -405,10 +405,10 @@ export default function SafetyComplianceLanding() {
         <div>
           <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2 mb-6">
             <Sparkles className="w-5 h-5 text-sky-600 dark:text-sky-400" />
-            Key Features
+            {t('modules.safety.keyFeatures.title', 'Key Features')}
           </h2>
           <p className="text-muted-foreground leading-relaxed text-base mb-8">
-            Digital safety documentation that keeps your team safer and your business protected. From equipment tracking to compliance audits, everything in one integrated system.
+            {t('modules.safety.keyFeatures.subtitle', 'Digital safety documentation that keeps your team safer and your business protected. From equipment tracking to compliance audits, everything in one integrated system.')}
           </p>
           
           <div className="grid md:grid-cols-2 gap-4">
@@ -419,9 +419,9 @@ export default function SafetyComplianceLanding() {
                     <Smartphone className="w-5 h-5 text-sky-600 dark:text-sky-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Mobile-First Inspections</h3>
+                    <h3 className="font-semibold">{t('modules.safety.keyFeatures.mobileInspections.title', 'Mobile-First Inspections')}</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Technicians complete harness and equipment inspections on their phones. Guided checklists with photos and notes. Takes 2 minutes.
+                      {t('modules.safety.keyFeatures.mobileInspections.description', 'Technicians complete harness and equipment inspections on their phones. Guided checklists with photos and notes. Takes 2 minutes.')}
                     </p>
                   </div>
                 </div>
@@ -435,9 +435,9 @@ export default function SafetyComplianceLanding() {
                     <Users className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Toolbox Meeting Tracking</h3>
+                    <h3 className="font-semibold">{t('modules.safety.keyFeatures.toolboxTracking.title', 'Toolbox Meeting Tracking')}</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Run daily or weekly toolbox meetings. Topics from 20+ safety subjects. Technicians sign attendance digitally.
+                      {t('modules.safety.keyFeatures.toolboxTracking.description', 'Run daily or weekly toolbox meetings. Topics from 20+ safety subjects. Technicians sign attendance digitally.')}
                     </p>
                   </div>
                 </div>
@@ -451,9 +451,9 @@ export default function SafetyComplianceLanding() {
                     <RefreshCw className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Equipment Lifecycle Management</h3>
+                    <h3 className="font-semibold">{t('modules.safety.keyFeatures.equipmentLifecycle.title', 'Equipment Lifecycle Management')}</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Track purchase dates, service life, retirement dates. Failed equipment automatically flagged and removed from availability.
+                      {t('modules.safety.keyFeatures.equipmentLifecycle.description', 'Track purchase dates, service life, retirement dates. Failed equipment automatically flagged and removed from availability.')}
                     </p>
                   </div>
                 </div>
@@ -467,9 +467,9 @@ export default function SafetyComplianceLanding() {
                     <Download className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Audit-Ready PDFs</h3>
+                    <h3 className="font-semibold">{t('modules.safety.keyFeatures.auditPdfs.title', 'Audit-Ready PDFs')}</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Search by equipment, technician, date, or project. Export comprehensive reports instantly. Ready for insurance or irata audits.
+                      {t('modules.safety.keyFeatures.auditPdfs.description', 'Search by equipment, technician, date, or project. Export comprehensive reports instantly. Ready for insurance or irata audits.')}
                     </p>
                   </div>
                 </div>
@@ -483,9 +483,9 @@ export default function SafetyComplianceLanding() {
                     <AlertTriangle className="w-5 h-5 text-rose-600 dark:text-rose-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Automatic Flagging</h3>
+                    <h3 className="font-semibold">{t('modules.safety.keyFeatures.automaticFlagging.title', 'Automatic Flagging')}</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Equipment that fails inspection gets flagged immediately. Retirement workflows trigger automatically.
+                      {t('modules.safety.keyFeatures.automaticFlagging.description', 'Equipment that fails inspection gets flagged immediately. Retirement workflows trigger automatically.')}
                     </p>
                   </div>
                 </div>
@@ -499,9 +499,9 @@ export default function SafetyComplianceLanding() {
                     <Signature className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Digital Signatures</h3>
+                    <h3 className="font-semibold">{t('modules.safety.keyFeatures.digitalSignatures.title', 'Digital Signatures')}</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Every inspection and meeting includes timestamped digital signatures. Complete audit trail for compliance.
+                      {t('modules.safety.keyFeatures.digitalSignatures.description', 'Every inspection and meeting includes timestamped digital signatures. Complete audit trail for compliance.')}
                     </p>
                   </div>
                 </div>
@@ -517,42 +517,42 @@ export default function SafetyComplianceLanding() {
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Everything You Need
+            {t('modules.safety.everythingYouNeed.title', 'Everything You Need')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-            Complete safety documentation in one integrated system.
+            {t('modules.safety.everythingYouNeed.subtitle', 'Complete safety documentation in one integrated system.')}
           </p>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <FeatureCard
               icon={Package}
-              title="Equipment Inventory"
-              description="Track every harness, lanyard, descender, ascender, and rope. Serial numbers, manufacturers, purchase dates, service life remaining."
+              title={t('modules.safety.everythingYouNeed.equipmentInventory.title', 'Equipment Inventory')}
+              description={t('modules.safety.everythingYouNeed.equipmentInventory.description', 'Track every harness, lanyard, descender, ascender, and rope. Serial numbers, manufacturers, purchase dates, service life remaining.')}
             />
             <FeatureCard
               icon={ClipboardCheck}
-              title="Daily Inspection Checklists"
-              description="Digital forms guide technicians through every required check. Binary pass/fail for each item with notes and photos."
+              title={t('modules.safety.everythingYouNeed.dailyChecklists.title', 'Daily Inspection Checklists')}
+              description={t('modules.safety.everythingYouNeed.dailyChecklists.description', 'Digital forms guide technicians through every required check. Binary pass/fail for each item with notes and photos.')}
             />
             <FeatureCard
               icon={AlertTriangle}
-              title="Automatic Flagging"
-              description="Equipment that fails inspection gets flagged immediately. Retirement workflows trigger automatically."
+              title={t('modules.safety.everythingYouNeed.automaticFlagging.title', 'Automatic Flagging')}
+              description={t('modules.safety.everythingYouNeed.automaticFlagging.description', 'Equipment that fails inspection gets flagged immediately. Retirement workflows trigger automatically.')}
             />
             <FeatureCard
               icon={BookOpen}
-              title="20+ Safety Topics"
-              description="Fall protection, weather assessment, rescue procedures, anchor inspection, load calculations, and more."
+              title={t('modules.safety.everythingYouNeed.safetyTopics.title', '20+ Safety Topics')}
+              description={t('modules.safety.everythingYouNeed.safetyTopics.description', 'Fall protection, weather assessment, rescue procedures, anchor inspection, load calculations, and more.')}
             />
             <FeatureCard
               icon={Signature}
-              title="Digital Signatures"
-              description="Attendance at toolbox meetings verified with legally binding signatures. Timestamps captured automatically."
+              title={t('modules.safety.everythingYouNeed.digitalSignatures.title', 'Digital Signatures')}
+              description={t('modules.safety.everythingYouNeed.digitalSignatures.description', 'Attendance at toolbox meetings verified with legally binding signatures. Timestamps captured automatically.')}
             />
             <FeatureCard
               icon={Search}
-              title="Searchable History"
-              description="Find any inspection by date, technician, equipment serial number, or project. No more digging through boxes."
+              title={t('modules.safety.everythingYouNeed.searchableHistory.title', 'Searchable History')}
+              description={t('modules.safety.everythingYouNeed.searchableHistory.description', 'Find any inspection by date, technician, equipment serial number, or project. No more digging through boxes.')}
             />
           </div>
         </div>
@@ -562,7 +562,7 @@ export default function SafetyComplianceLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-            Measurable Results
+            {t('modules.safety.measurableResults.title', 'Measurable Results')}
           </h2>
 
           <div className="grid md:grid-cols-2 gap-6">
@@ -572,9 +572,9 @@ export default function SafetyComplianceLanding() {
                   <TrendingDown className="w-6 h-6 text-emerald-600" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg text-emerald-900 dark:text-emerald-100">Insurance Carriers Want Documentation</h3>
+                  <h3 className="font-bold text-lg text-emerald-900 dark:text-emerald-100">{t('modules.safety.measurableResults.insurance.title', 'Insurance Carriers Want Documentation')}</h3>
                   <p className="text-sm text-emerald-800 dark:text-emerald-200 mt-1">
-                    When your insurance carrier audits your safety program, they're looking for evidence of systematic risk management. Complete records demonstrate exactly that.
+                    {t('modules.safety.measurableResults.insurance.description', "When your insurance carrier audits your safety program, they're looking for evidence of systematic risk management. Complete records demonstrate exactly that.")}
                   </p>
                 </div>
               </CardContent>
@@ -586,9 +586,9 @@ export default function SafetyComplianceLanding() {
                   <Timer className="w-6 h-6 text-sky-600" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg text-sky-900 dark:text-sky-100">Audit Preparation: Days to Minutes</h3>
+                  <h3 className="font-bold text-lg text-sky-900 dark:text-sky-100">{t('modules.safety.measurableResults.auditPrep.title', 'Audit Preparation: Days to Minutes')}</h3>
                   <p className="text-sm text-sky-800 dark:text-sky-200 mt-1">
-                    The scramble before an irata audit used to take days. Now it takes minutes. Search. Export. Done.
+                    {t('modules.safety.measurableResults.auditPrep.description', 'The scramble before an irata audit used to take days. Now it takes minutes. Search. Export. Done.')}
                   </p>
                 </div>
               </CardContent>
@@ -600,9 +600,9 @@ export default function SafetyComplianceLanding() {
                   <Shield className="w-6 h-6 text-violet-600" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg text-violet-900 dark:text-violet-100">Liability Protection</h3>
+                  <h3 className="font-bold text-lg text-violet-900 dark:text-violet-100">{t('modules.safety.measurableResults.liability.title', 'Liability Protection')}</h3>
                   <p className="text-sm text-violet-800 dark:text-violet-200 mt-1">
-                    In accident investigations, documented proof of due diligence changes everything. Demonstrate exactly what happened.
+                    {t('modules.safety.measurableResults.liability.description', 'In accident investigations, documented proof of due diligence changes everything. Demonstrate exactly what happened.')}
                   </p>
                 </div>
               </CardContent>
@@ -614,9 +614,9 @@ export default function SafetyComplianceLanding() {
                   <Gauge className="w-6 h-6 text-amber-600" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg text-amber-900 dark:text-amber-100">Equipment ROI Tracking</h3>
+                  <h3 className="font-bold text-lg text-amber-900 dark:text-amber-100">{t('modules.safety.measurableResults.equipmentRoi.title', 'Equipment ROI Tracking')}</h3>
                   <p className="text-sm text-amber-800 dark:text-amber-200 mt-1">
-                    Know exactly how long each piece of equipment lasts in service. Predict replacement needs. Budget accurately.
+                    {t('modules.safety.measurableResults.equipmentRoi.description', 'Know exactly how long each piece of equipment lasts in service. Predict replacement needs. Budget accurately.')}
                   </p>
                 </div>
               </CardContent>
@@ -629,21 +629,21 @@ export default function SafetyComplianceLanding() {
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            What Operators Are Saying
+            {t('modules.safety.testimonials.title', 'What Operators Are Saying')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-            Real feedback from rope access companies using the Safety & Compliance module.
+            {t('modules.safety.testimonials.subtitle', 'Real feedback from rope access companies using the Safety & Compliance module.')}
           </p>
 
           <div className="grid md:grid-cols-3 gap-6">
             <TestimonialCard
-              quote="The first time an insurance auditor asked for our inspection records and I exported six months of documentation in thirty seconds, I knew we'd never go back to paper."
+              quote={t('modules.safety.testimonials.quote1', "The first time an insurance auditor asked for our inspection records and I exported six months of documentation in thirty seconds, I knew we'd never go back to paper.")}
             />
             <TestimonialCard
-              quote="I used to spend Sunday nights worrying about whether we'd covered our bases. Now I just check the dashboard. Everything's there or it isn't, and there's no ambiguity."
+              quote={t('modules.safety.testimonials.quote2', "I used to spend Sunday nights worrying about whether we'd covered our bases. Now I just check the dashboard. Everything's there or it isn't, and there's no ambiguity.")}
             />
             <TestimonialCard
-              quote="A property manager called asking for proof we'd done a toolbox meeting before working on their building. I sent the PDF while we were still on the phone. That's the kind of professionalism that keeps contracts."
+              quote={t('modules.safety.testimonials.quote3', "A property manager called asking for proof we'd done a toolbox meeting before working on their building. I sent the PDF while we were still on the phone. That's the kind of professionalism that keeps contracts.")}
             />
           </div>
         </div>
@@ -653,25 +653,25 @@ export default function SafetyComplianceLanding() {
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-            Common Questions
+            {t('modules.safety.commonQuestions.title', 'Common Questions')}
           </h2>
 
           <div className="space-y-6">
             <ObjectionCard
-              question="My techs hate paperwork."
-              answer="So do everyone's techs. That's why this works. Completing an inspection on a phone takes less than two minutes. It's faster than filling out a paper form, and they don't have to remember to bring the forms back to the office."
+              question={t('modules.safety.commonQuestions.q1.question', 'My techs hate paperwork.')}
+              answer={t('modules.safety.commonQuestions.q1.answer', "So do everyone's techs. That's why this works. Completing an inspection on a phone takes less than two minutes. It's faster than filling out a paper form, and they don't have to remember to bring the forms back to the office.")}
             />
             <ObjectionCard
-              question="We're too small to need software."
-              answer="The smaller you are, the more every audit matters. One failed irata audit. One insurance coverage gap. One lawsuit where you can't prove due diligence. The cost of any of those is more than years of software."
+              question={t('modules.safety.commonQuestions.q2.question', "We're too small to need software.")}
+              answer={t('modules.safety.commonQuestions.q2.answer', "The smaller you are, the more every audit matters. One failed irata audit. One insurance coverage gap. One lawsuit where you can't prove due diligence. The cost of any of those is more than years of software.")}
             />
             <ObjectionCard
-              question="Paper has worked fine so far."
-              answer="Has it? Or have you just been lucky? Every operator who lost their certification or lost a lawsuit thought paper was working fine right up until it wasn't."
+              question={t('modules.safety.commonQuestions.q3.question', 'Paper has worked fine so far.')}
+              answer={t('modules.safety.commonQuestions.q3.answer', "Has it? Or have you just been lucky? Every operator who lost their certification or lost a lawsuit thought paper was working fine right up until it wasn't.")}
             />
             <ObjectionCard
-              question="I don't have time to set this up."
-              answer="Initial setup takes an afternoon. Add your equipment. Add your techs. After that, the system maintains itself through daily use. The time you save over the next month pays back the setup time ten times over."
+              question={t('modules.safety.commonQuestions.q4.question', "I don't have time to set this up.")}
+              answer={t('modules.safety.commonQuestions.q4.answer', 'Initial setup takes an afternoon. Add your equipment. Add your techs. After that, the system maintains itself through daily use. The time you save over the next month pays back the setup time ten times over.')}
             />
           </div>
         </div>
@@ -681,23 +681,23 @@ export default function SafetyComplianceLanding() {
       <section className="py-20 md:py-28 px-4 bg-gradient-to-br from-sky-600 via-sky-700 to-blue-900 text-white">
         <div className="max-w-3xl mx-auto text-center space-y-6">
           <h2 className="text-3xl md:text-4xl font-bold">
-            Stop wondering if you're compliant.<br />
-            <span className="text-sky-200">Start knowing.</span>
+            {t('modules.safety.finalCta.title', "Stop wondering if you're compliant.")}<br />
+            <span className="text-sky-200">{t('modules.safety.finalCta.titleHighlight', 'Start knowing.')}</span>
           </h2>
           <p className="text-xl text-sky-100">
-            Every harness inspection. Every toolbox meeting. Every signature.
+            {t('modules.safety.finalCta.subtitle', 'Every harness inspection. Every toolbox meeting. Every signature.')}
             <br />
-            Searchable, exportable, and ready for whatever audit comes next.
+            {t('modules.safety.finalCta.subtitle2', 'Searchable, exportable, and ready for whatever audit comes next.')}
           </p>
           <div className="pt-4">
             <Button size="lg" className="bg-white text-sky-700 hover:bg-sky-50" asChild data-testid="button-final-cta">
               <Link href="/register">
-                Start Your Free Trial
+                {t('modules.safety.finalCta.button', 'Start Your Free Trial')}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>
             <p className="text-sm text-sky-200 mt-4">
-              Free 90-day trial for Founding Members. No credit card required.
+              {t('modules.safety.finalCta.disclaimer', 'Free 90-day trial for Founding Members. No credit card required.')}
             </p>
           </div>
         </div>
@@ -710,10 +710,10 @@ export default function SafetyComplianceLanding() {
             <CardContent className="p-4 text-sm text-amber-900 dark:text-amber-100">
               <p className="flex items-center gap-2 font-semibold mb-2">
                 <AlertTriangle className="w-4 h-4" />
-                Important: Safety Compliance Responsibility
+                {t('modules.safety.disclaimer.title', 'Important: Safety Compliance Responsibility')}
               </p>
               <p>
-                OnRopePro helps document safety procedures, but you remain fully responsible for workplace safety and regulatory compliance. This software does not replace qualified safety professionals, irata/SPRAT training, equipment inspections by certified inspectors, or adherence to all applicable OSHA/WorkSafeBC regulations.
+                {t('modules.safety.disclaimer.text', 'OnRopePro helps document safety procedures, but you remain fully responsible for workplace safety and regulatory compliance. This software does not replace qualified safety professionals, irata/SPRAT training, equipment inspections by certified inspectors, or adherence to all applicable OSHA/WorkSafeBC regulations.')}
               </p>
             </CardContent>
           </Card>

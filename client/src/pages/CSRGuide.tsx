@@ -41,6 +41,7 @@ import {
   CircleDot
 } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const ALL_PROBLEM_IDS = [
   "owner-1", "owner-2", "owner-3", "owner-4", "owner-5",

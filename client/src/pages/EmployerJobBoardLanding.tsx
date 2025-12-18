@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useState } from "react";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 import { PublicHeader } from "@/components/PublicHeader";
 import {
   Briefcase,
@@ -40,6 +41,7 @@ const ALL_ACCORDION_ITEMS = [
 ];
 
 export default function EmployerJobBoardLanding() {
+  const { t } = useTranslation();
   const [openItems, setOpenItems] = useState<string[]>([]);
 
   const allExpanded = openItems.length === ALL_ACCORDION_ITEMS.length;
@@ -59,29 +61,29 @@ export default function EmployerJobBoardLanding() {
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
           <div className="text-center space-y-6 pt-16">
             <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-module-label">
-              Job Board Ecosystem
+              {t('modules.employerJobBoard.hero.badge', 'Job Board Ecosystem')}
             </Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              Stop Paying $22 Per Application<br />
-              <span className="text-blue-100">From People Who've Never Touched a Rope.</span>
+              {t('modules.employerJobBoard.hero.title', 'Stop Paying $22 Per Application')}<br />
+              <span className="text-blue-100">{t('modules.employerJobBoard.hero.subtitle', "From People Who've Never Touched a Rope.")}</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              OnRopePro's Job Board is a closed ecosystem. Every employer verified. Every technician relevant. Post unlimited jobs.<br />
-              <strong>Zero per-application fees.</strong>
+              {t('modules.employerJobBoard.hero.description', "OnRopePro's Job Board is a closed ecosystem. Every employer verified. Every technician relevant. Post unlimited jobs.")}<br />
+              <strong>{t('modules.employerJobBoard.hero.descriptionBold', 'Zero per-application fees.')}</strong>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-hero-start">
                 <Link href="/register">
-                  Start Posting Jobs Free
+                  {t('modules.employerJobBoard.hero.ctaPrimary', 'Start Posting Jobs Free')}
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-hero-answers">
                 <Link href="#problems-solved">
-                  Find Answers
+                  {t('modules.employerJobBoard.hero.ctaSecondary', 'Find Answers')}
                   <BookOpen className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
@@ -104,20 +106,20 @@ export default function EmployerJobBoardLanding() {
             <CardContent className="p-8">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-emerald-600">0 hours</div>
-                  <div className="text-base text-muted-foreground mt-1">Filtering Time</div>
+                  <div className="text-3xl md:text-4xl font-bold text-emerald-600">{t('modules.employerJobBoard.stats.filteringTime.value', '0 hours')}</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.employerJobBoard.stats.filteringTime.label', 'Filtering Time')}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-blue-600">$0</div>
-                  <div className="text-base text-muted-foreground mt-1">Platform Fees</div>
+                  <div className="text-3xl md:text-4xl font-bold text-blue-600">{t('modules.employerJobBoard.stats.platformFees.value', '$0')}</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.employerJobBoard.stats.platformFees.label', 'Platform Fees')}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-amber-600">1-3 Days</div>
-                  <div className="text-base text-muted-foreground mt-1">Time to Hire</div>
+                  <div className="text-3xl md:text-4xl font-bold text-amber-600">{t('modules.employerJobBoard.stats.timeToHire.value', '1-3 Days')}</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.employerJobBoard.stats.timeToHire.label', 'Time to Hire')}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-violet-600">2-3</div>
-                  <div className="text-base text-muted-foreground mt-1">Interviews Needed</div>
+                  <div className="text-3xl md:text-4xl font-bold text-violet-600">{t('modules.employerJobBoard.stats.interviews.value', '2-3')}</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.employerJobBoard.stats.interviews.label', 'Interviews Needed')}</div>
                 </div>
               </div>
             </CardContent>
@@ -131,25 +133,25 @@ export default function EmployerJobBoardLanding() {
           <CardHeader>
             <CardTitle className="text-2xl md:text-3xl font-bold flex items-center gap-3">
               <DollarSign className="w-8 h-8 text-rose-500" />
-              The Indeed Tax
+              {t('modules.employerJobBoard.problemStatement.title', 'The Indeed Tax')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-base text-muted-foreground leading-relaxed">
-              You post on Indeed. LinkedIn. Craigslist. Facebook. You get 50 applications. You open each one, hoping for a Level 2 with caulking experience.
+              {t('modules.employerJobBoard.problemStatement.paragraph1', 'You post on Indeed. LinkedIn. Craigslist. Facebook. You get 50 applications. You open each one, hoping for a Level 2 with caulking experience.')}
             </p>
             <p className="text-base text-muted-foreground leading-relaxed">
-              What you find: shop laborers, pipe fitters, offshore oil rig candidates, and 23 people who "have always been interested in learning." Two hours of filtering. Two actual rope techs.
+              {t('modules.employerJobBoard.problemStatement.paragraph2', 'What you find: shop laborers, pipe fitters, offshore oil rig candidates, and 23 people who "have always been interested in learning." Two hours of filtering. Two actual rope techs.')}
             </p>
             <p className="text-base text-muted-foreground leading-relaxed">
-              Then Indeed hits you with the bill. $22 per application if you don't respond within 48 hours. A single posting costs you $300 before you've even scheduled an interview. Someone on your team has to log in every day just to click "decline" on resumes from car mechanics.
+              {t('modules.employerJobBoard.problemStatement.paragraph3', 'Then Indeed hits you with the bill. $22 per application if you don\'t respond within 48 hours. A single posting costs you $300 before you\'ve even scheduled an interview. Someone on your team has to log in every day just to click "decline" on resumes from car mechanics.')}
             </p>
             <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
               <p className="text-base font-medium text-foreground">
-                OnRopePro's Job Board works differently.
+                {t('modules.employerJobBoard.problemStatement.solutionTitle', "OnRopePro's Job Board works differently.")}
               </p>
               <p className="text-base text-muted-foreground leading-relaxed mt-2">
-                Every company here does rope access building maintenance. Every technician here is in the industry. When you post a job, 100% of applicants are relevant. No noise. No filtering. No $22 surprise fees.
+                {t('modules.employerJobBoard.problemStatement.solutionText', 'Every company here does rope access building maintenance. Every technician here is in the industry. When you post a job, 100% of applicants are relevant. No noise. No filtering. No $22 surprise fees.')}
               </p>
             </div>
           </CardContent>
@@ -161,14 +163,14 @@ export default function EmployerJobBoardLanding() {
       {/* What This Module Does */}
       <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Your Closed Garden Ecosystem</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">{t('modules.employerJobBoard.features.title', 'Your Closed Garden Ecosystem')}</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Where every applicant is a rope tech and every employer is verified
+            {t('modules.employerJobBoard.features.subtitle', 'Where every applicant is a rope tech and every employer is verified')}
           </p>
         </div>
 
         <p className="text-base text-muted-foreground text-center mb-12 max-w-3xl mx-auto">
-          The Job Board connects you with qualified rope access technicians across the platform. Post jobs, browse talent, and send direct offers to candidates who match your requirements.
+          {t('modules.employerJobBoard.features.description', 'The Job Board connects you with qualified rope access technicians across the platform. Post jobs, browse talent, and send direct offers to candidates who match your requirements.')}
         </p>
 
         <div className="grid md:grid-cols-3 gap-6">
@@ -179,41 +181,41 @@ export default function EmployerJobBoardLanding() {
               <div className="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-3">
                 <Search className="w-6 h-6 text-blue-600" />
               </div>
-              <CardTitle className="text-xl">Talent Browser</CardTitle>
+              <CardTitle className="text-xl">{t('modules.employerJobBoard.features.talentBrowser.title', 'Talent Browser')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-base text-muted-foreground">
-                Search the technician pool before you even post a job. Filter by location, certification level, experience, and expected pay rate.
+                {t('modules.employerJobBoard.features.talentBrowser.description1', 'Search the technician pool before you even post a job. Filter by location, certification level, experience, and expected pay rate.')}
               </p>
               <p className="text-base text-muted-foreground">
-                See who's available, what they're looking for, and whether your budget matches their expectations before you spend time interviewing.
+                {t('modules.employerJobBoard.features.talentBrowser.description2', "See who's available, what they're looking for, and whether your budget matches their expectations before you spend time interviewing.")}
               </p>
               <div className="pt-4 border-t">
-                <p className="text-sm font-medium text-foreground mb-2">What you can filter by:</p>
+                <p className="text-sm font-medium text-foreground mb-2">{t('modules.employerJobBoard.features.talentBrowser.filterLabel', 'What you can filter by:')}</p>
                 <ul className="space-y-1">
                   <li className="flex items-center gap-2 text-base text-muted-foreground">
                     <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-                    Location (city, region)
+                    {t('modules.employerJobBoard.features.talentBrowser.filter1', 'Location (city, region)')}
                   </li>
                   <li className="flex items-center gap-2 text-base text-muted-foreground">
                     <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-                    IRATA/SPRAT certification level
+                    {t('modules.employerJobBoard.features.talentBrowser.filter2', 'IRATA/SPRAT certification level')}
                   </li>
                   <li className="flex items-center gap-2 text-base text-muted-foreground">
                     <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-                    Years of experience
+                    {t('modules.employerJobBoard.features.talentBrowser.filter3', 'Years of experience')}
                   </li>
                   <li className="flex items-center gap-2 text-base text-muted-foreground">
                     <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-                    Expected pay rate
+                    {t('modules.employerJobBoard.features.talentBrowser.filter4', 'Expected pay rate')}
                   </li>
                   <li className="flex items-center gap-2 text-base text-muted-foreground">
                     <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-                    Safety rating score
+                    {t('modules.employerJobBoard.features.talentBrowser.filter5', 'Safety rating score')}
                   </li>
                   <li className="flex items-center gap-2 text-base text-muted-foreground">
                     <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-                    Specialties (caulking, window washing, etc.)
+                    {t('modules.employerJobBoard.features.talentBrowser.filter6', 'Specialties (caulking, window washing, etc.)')}
                   </li>
                 </ul>
               </div>
@@ -227,37 +229,37 @@ export default function EmployerJobBoardLanding() {
               <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center mb-3">
                 <FileText className="w-6 h-6 text-emerald-600" />
               </div>
-              <CardTitle className="text-xl">Unlimited Job Postings</CardTitle>
+              <CardTitle className="text-xl">{t('modules.employerJobBoard.features.unlimitedPostings.title', 'Unlimited Job Postings')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-base text-muted-foreground">
-                Post as many jobs as your operation requires. Full-time, part-time, contract, seasonal.
+                {t('modules.employerJobBoard.features.unlimitedPostings.description1', 'Post as many jobs as your operation requires. Full-time, part-time, contract, seasonal.')}
               </p>
               <p className="text-base text-muted-foreground">
-                Six job types supported: window washing, caulking, pressure washing, gutter cleaning, painting and coating, visual inspection. No per-post fees. No per-application charges. No surprise invoices.
+                {t('modules.employerJobBoard.features.unlimitedPostings.description2', 'Six job types supported: window washing, caulking, pressure washing, gutter cleaning, painting and coating, visual inspection. No per-post fees. No per-application charges. No surprise invoices.')}
               </p>
               <div className="pt-4 border-t">
-                <p className="text-sm font-medium text-foreground mb-2">What you control:</p>
+                <p className="text-sm font-medium text-foreground mb-2">{t('modules.employerJobBoard.features.unlimitedPostings.controlLabel', 'What you control:')}</p>
                 <ul className="space-y-1">
                   <li className="flex items-center gap-2 text-base text-muted-foreground">
                     <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-                    Job type and service scope
+                    {t('modules.employerJobBoard.features.unlimitedPostings.control1', 'Job type and service scope')}
                   </li>
                   <li className="flex items-center gap-2 text-base text-muted-foreground">
                     <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-                    Location and site details
+                    {t('modules.employerJobBoard.features.unlimitedPostings.control2', 'Location and site details')}
                   </li>
                   <li className="flex items-center gap-2 text-base text-muted-foreground">
                     <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-                    Required certifications
+                    {t('modules.employerJobBoard.features.unlimitedPostings.control3', 'Required certifications')}
                   </li>
                   <li className="flex items-center gap-2 text-base text-muted-foreground">
                     <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-                    Pay range (optional but recommended)
+                    {t('modules.employerJobBoard.features.unlimitedPostings.control4', 'Pay range (optional but recommended)')}
                   </li>
                   <li className="flex items-center gap-2 text-base text-muted-foreground">
                     <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-                    Start date and duration
+                    {t('modules.employerJobBoard.features.unlimitedPostings.control5', 'Start date and duration')}
                   </li>
                 </ul>
               </div>
@@ -271,41 +273,41 @@ export default function EmployerJobBoardLanding() {
               <div className="w-12 h-12 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center mb-3">
                 <Send className="w-6 h-6 text-violet-600" />
               </div>
-              <CardTitle className="text-xl">Direct Job Offers</CardTitle>
+              <CardTitle className="text-xl">{t('modules.employerJobBoard.features.directOffers.title', 'Direct Job Offers')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-base text-muted-foreground">
-                Found a perfect candidate in the Talent Browser? Send them an offer directly. Link it to one of your active job postings.
+                {t('modules.employerJobBoard.features.directOffers.description1', 'Found a perfect candidate in the Talent Browser? Send them an offer directly. Link it to one of your active job postings.')}
               </p>
               <p className="text-base text-muted-foreground">
-                They get notified in their portal. Accept or decline with one tap. No email chains. No phone tag.
+                {t('modules.employerJobBoard.features.directOffers.description2', 'They get notified in their portal. Accept or decline with one tap. No email chains. No phone tag.')}
               </p>
               <div className="pt-4 border-t">
-                <p className="text-sm font-medium text-foreground mb-2">How it works:</p>
+                <p className="text-sm font-medium text-foreground mb-2">{t('modules.employerJobBoard.features.directOffers.stepsLabel', 'How it works:')}</p>
                 <ul className="space-y-1">
                   <li className="flex items-center gap-2 text-base text-muted-foreground">
                     <div className="w-5 h-5 rounded-full bg-violet-100 dark:bg-violet-900 flex items-center justify-center flex-shrink-0">
                       <span className="text-xs font-medium text-violet-600">1</span>
                     </div>
-                    Select candidate from search results
+                    {t('modules.employerJobBoard.features.directOffers.step1', 'Select candidate from search results')}
                   </li>
                   <li className="flex items-center gap-2 text-base text-muted-foreground">
                     <div className="w-5 h-5 rounded-full bg-violet-100 dark:bg-violet-900 flex items-center justify-center flex-shrink-0">
                       <span className="text-xs font-medium text-violet-600">2</span>
                     </div>
-                    Choose which job posting to link
+                    {t('modules.employerJobBoard.features.directOffers.step2', 'Choose which job posting to link')}
                   </li>
                   <li className="flex items-center gap-2 text-base text-muted-foreground">
                     <div className="w-5 h-5 rounded-full bg-violet-100 dark:bg-violet-900 flex items-center justify-center flex-shrink-0">
                       <span className="text-xs font-medium text-violet-600">3</span>
                     </div>
-                    Technician receives in-portal notification
+                    {t('modules.employerJobBoard.features.directOffers.step3', 'Technician receives in-portal notification')}
                   </li>
                   <li className="flex items-center gap-2 text-base text-muted-foreground">
                     <div className="w-5 h-5 rounded-full bg-violet-100 dark:bg-violet-900 flex items-center justify-center flex-shrink-0">
                       <span className="text-xs font-medium text-violet-600">4</span>
                     </div>
-                    Response comes back to your dashboard
+                    {t('modules.employerJobBoard.features.directOffers.step4', 'Response comes back to your dashboard')}
                   </li>
                 </ul>
               </div>
