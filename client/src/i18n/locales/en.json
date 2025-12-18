@@ -3317,203 +3317,6 @@
     "hours": "hours",
     "minutes": "minutes"
   },
-  "safetyForms": {
-    "title": "Safety Forms",
-    "subtitle": "Select a safety form to complete or view records",
-    "toolboxMeeting": {
-      "title": "Toolbox Meeting",
-      "description": "Daily safety briefing and hazard assessment"
-    },
-    "flha": {
-      "title": "Field Level Hazard Assessment",
-      "description": "Comprehensive FLHA for rope access operations"
-    },
-    "harnessInspection": {
-      "title": "Harness Inspection",
-      "description": "Daily harness and PPE safety inspection"
-    },
-    "irataIcop": {
-      "title": "IRATA / SPRAT ICOP",
-      "description": "International Code of Practice (TC-102ENG)"
-    },
-    "incidentReport": {
-      "title": "Incident Report",
-      "description": "Document workplace incidents and injuries"
-    },
-    "methodStatement": {
-      "title": "Method Statement",
-      "description": "Safe work procedures and risk controls",
-      "form": {
-        "pageTitle": "Method Statement / Work Plan",
-        "pageSubtitle": "Document safe work procedures and risk controls",
-        "irataCompliant": "IRATA / SPRAT Compliant",
-        "basicInfo": {
-          "title": "Basic Information",
-          "projectOptional": "Project (Optional)",
-          "nonePlaceholder": "None - Job Type Only",
-          "dateCreated": "Date Created",
-          "preparedBy": "Prepared By",
-          "preparedByPlaceholder": "Your full name",
-          "jobType": "Job Type",
-          "jobTypePlaceholder": "Select job type",
-          "customJobTypes": "Custom Job Types",
-          "locationOptional": "Location (Optional)",
-          "locationPlaceholder": "Work site address (if applicable)"
-        },
-        "workDescription": {
-          "title": "Work Description",
-          "description": "Description of Work",
-          "descriptionPlaceholder": "Describe the work to be performed...",
-          "scopeAndLimitations": "Scope and Limitations",
-          "scopePlaceholder": "Define the scope of work and any limitations...",
-          "estimatedDuration": "Estimated Duration",
-          "durationPlaceholder": "e.g. 2 days, 5 hours",
-          "numberOfWorkers": "Number of Workers"
-        },
-        "hazardsAndControls": {
-          "title": "Hazards and Control Measures",
-          "hazardsIdentified": "Hazards Identified",
-          "hazardPlaceholder": "Describe hazard",
-          "controlMeasures": "Control Measures",
-          "controlPlaceholder": "Describe control measure",
-          "addHazard": "Add Hazard",
-          "addControl": "Add Control",
-          "addItem": "Add Item"
-        },
-        "equipmentAndPpe": {
-          "title": "Equipment and PPE",
-          "requiredEquipment": "Required Equipment",
-          "equipmentPlaceholder": "Equipment item",
-          "requiredPpe": "Required PPE",
-          "ppePlaceholder": "PPE item"
-        },
-        "emergency": {
-          "title": "Emergency Procedures",
-          "procedures": "Emergency Procedures",
-          "proceduresPlaceholder": "Outline emergency response procedures...",
-          "rescuePlan": "Rescue Plan",
-          "rescuePlanPlaceholder": "Describe rescue procedures and equipment...",
-          "contacts": "Emergency Contacts",
-          "contactsPlaceholder": "List emergency contact numbers and personnel..."
-        },
-        "workEnvironment": {
-          "title": "Work Environment",
-          "permitsRequired": "Permits Required",
-          "permitPlaceholder": "Permit type",
-          "weatherRestrictions": "Weather Restrictions",
-          "weatherPlaceholder": "Describe weather conditions that would stop work...",
-          "workingHeightRange": "Working Height Range",
-          "heightPlaceholder": "e.g. 10m - 50m",
-          "accessMethod": "Access Method",
-          "accessPlaceholder": "e.g. Rope descent, bosun's chair"
-        },
-        "competency": {
-          "title": "Competency and Communication",
-          "requirements": "Competency Requirements",
-          "competencyPlaceholder": "Required competency",
-          "irataLevel": "IRATA / SPRAT Level Required",
-          "irataPlaceholder": "Select IRATA / SPRAT level",
-          "level1": "Level 1",
-          "level2": "Level 2",
-          "level3": "Level 3",
-          "variesByTask": "Varies by task",
-          "communicationMethod": "Communication Method",
-          "communicationPlaceholder": "e.g. Two-way radio, hand signals",
-          "signalProtocol": "Signal Protocol",
-          "signalPlaceholder": "e.g. Standard IRATA / SPRAT signals",
-          "teamMembers": "Team Members",
-          "teamMemberPlaceholder": "Team member name"
-        },
-        "reviewAndApproval": {
-          "title": "Review and Approval",
-          "preparedBySignature": "Prepared By (Signature)",
-          "reviewedByName": "Reviewed By (Name)",
-          "reviewerPlaceholder": "Reviewer name",
-          "reviewDate": "Review Date",
-          "reviewerSignature": "Reviewer Signature",
-          "approvedByName": "Approved By (Name)",
-          "approverPlaceholder": "Approver name",
-          "approvalDate": "Approval Date",
-          "approverSignature": "Approver Signature",
-          "signed": "Signed"
-        },
-        "signatures": {
-          "addSignature": "Add Signature",
-          "addReviewerSignature": "Add Reviewer Signature",
-          "addApproverSignature": "Add Approver Signature",
-          "signBelow": "Sign below using your mouse or touchscreen",
-          "clear": "Clear",
-          "saveSignature": "Save Signature"
-        },
-        "buttons": {
-          "cancel": "Cancel",
-          "creating": "Creating...",
-          "createMethodStatement": "Create Method Statement",
-          "submit": "Submit",
-          "downloadPdf": "Download PDF"
-        },
-        "jobTypes": {
-          "windowCleaning": "Window Cleaning",
-          "dryerVentCleaning": "Dryer Vent Cleaning",
-          "buildingWash": "Building Wash",
-          "inSuiteDryerVent": "In-Suite Dryer Vent Cleaning",
-          "parkadePressureCleaning": "Parkade Pressure Cleaning",
-          "groundWindowCleaning": "Ground Window Cleaning",
-          "generalPressureWashing": "General Pressure Washing",
-          "other": "Other"
-        },
-        "toasts": {
-          "success": "Success",
-          "signatureAdded": "signature added",
-          "signatureRemoved": "Signature Removed",
-          "signatureCleared": "signature cleared",
-          "methodStatementCreated": "Method Statement created successfully",
-          "error": "Error",
-          "failedToCreate": "Failed to create Method Statement"
-        },
-        "pdf": {
-          "title": "METHOD STATEMENT",
-          "subtitle": "Safe Work Procedure & Risk Control Document",
-          "documentInfo": "Document Information",
-          "date": "Date",
-          "preparedBy": "Prepared By",
-          "jobType": "Job Type",
-          "location": "Location",
-          "notSpecified": "Not specified",
-          "workDescription": "Work Description",
-          "scopeDetails": "Scope and Limitations",
-          "duration": "Duration",
-          "workers": "Workers",
-          "hazards": "Hazards Identified",
-          "controls": "Control Measures",
-          "equipment": "Required Equipment",
-          "ppe": "Required PPE",
-          "emergency": "Emergency Procedures",
-          "rescuePlan": "Rescue Plan",
-          "emergencyContacts": "Emergency Contacts",
-          "workEnvironment": "Work Environment",
-          "permits": "Permits Required",
-          "weatherRestrictions": "Weather Restrictions",
-          "workingHeight": "Working Height",
-          "accessMethod": "Access Method",
-          "competency": "Competency Requirements",
-          "irataLevel": "IRATA / SPRAT Level",
-          "communication": "Communication",
-          "signals": "Signal Protocol",
-          "teamMembers": "Team Members",
-          "approval": "Review and Approval",
-          "reviewedBy": "Reviewed By",
-          "approvedBy": "Approved By",
-          "signature": "Signature",
-          "generatedAt": "Generated"
-        }
-      }
-    },
-    "compliance": {
-      "title": "Safety Compliance",
-      "description": "All safety forms are digitally recorded and can be exported as PDF documents for compliance and auditing purposes."
-    }
-  },
   "gearInventory": {
     "title": "Build my Kit",
     "pageTitle": "Gear Inventory",
@@ -3766,8 +3569,35 @@
     "proceedToSign": "Proceed to Sign"
   },
   "safetyForms": {
+    "title": "Safety Forms",
+    "subtitle": "Select a safety form to complete or view records",
+    "toolboxMeeting": {
+      "title": "Toolbox Meeting",
+      "description": "Daily safety briefing and hazard assessment"
+    },
+    "harnessInspection": {
+      "title": "Harness Inspection",
+      "description": "Daily harness and PPE safety inspection"
+    },
+    "irataIcop": {
+      "title": "IRATA / SPRAT ICOP",
+      "description": "International Code of Practice (TC-102ENG)"
+    },
+    "incidentReport": {
+      "title": "Incident Report",
+      "description": "Document workplace incidents and injuries"
+    },
+    "methodStatement": {
+      "title": "Method Statement",
+      "description": "Safe work procedures and risk controls"
+    },
+    "compliance": {
+      "title": "Safety Compliance",
+      "description": "All safety forms are digitally recorded and can be exported as PDF documents for compliance and audit purposes."
+    },
     "flha": {
       "title": "Field Level Hazard Assessment",
+      "description": "Comprehensive FLHA for rope access operations",
       "formTitle": "FLHA Form - Rope Access",
       "icopTitle": "IRATA / SPRAT International Code of Practice (ICOP)",
       "icopDescription": "All rope access operations must comply with the IRATA / SPRAT International Code of Practice for Industrial Rope Access (TC-102ENG). This document outlines mandatory safety requirements, technical procedures, and best practices for rope access work.",
