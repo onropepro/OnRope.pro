@@ -712,8 +712,8 @@ export default function PropertyManagerLanding() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t py-8 px-4">
-        <div className="max-w-4xl mx-auto text-center text-sm text-muted-foreground">
+      <footer className="py-8 px-4" style={{backgroundColor: PM_COLOR}}>
+        <div className="max-w-4xl mx-auto text-center text-sm text-white/90">
           <p>OnRopePro - The platform for professional rope access companies</p>
         </div>
       </footer>
