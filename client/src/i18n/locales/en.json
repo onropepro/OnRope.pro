@@ -437,7 +437,81 @@
     "residentPortal": "Resident Portal",
     "superuser": "SuperUser",
     "changelog": "Changelog",
-    "safetyRating": "Safety Rating"
+    "safetyRating": "Safety Rating",
+    "employer": "Employer",
+    "technician": "Technician",
+    "resident": "Resident",
+    "buildingManager": "Building Manager",
+    "modules": {
+      "safetyCompliance": {
+        "title": "Safety & Compliance",
+        "description": "Harness inspections, toolbox meetings, audit-ready exports"
+      },
+      "projectManagement": {
+        "title": "Project Management",
+        "description": "4-elevation tracking, real-time dashboards, crew scheduling"
+      },
+      "workSession": {
+        "title": "Work Session & Time Tracking",
+        "description": "GPS clock-in, drop tracking, automatic payroll aggregation"
+      },
+      "documentManagement": {
+        "title": "Document Management",
+        "description": "Digital signatures, immutable audit trails, compliance reporting"
+      },
+      "userAccess": {
+        "title": "User Access & Authentication",
+        "description": "Granular permissions, role-based access, audit trails"
+      },
+      "csr": {
+        "title": "Company Safety Rating",
+        "description": "Penalty-based compliance scoring, real-time safety posture"
+      },
+      "irataLogging": {
+        "title": "IRATA/SPRAT Task Logging",
+        "description": "Same-day hour logging, OCR import, career-portable records"
+      },
+      "employeeManagement": {
+        "title": "Employee Management",
+        "description": "Portable identities, certification tracking, permissions"
+      },
+      "technicianPassport": {
+        "title": "Technician Passport",
+        "description": "Portable work history, certifications, career-long records"
+      },
+      "employerJobBoard": {
+        "title": "Job Board Ecosystem",
+        "description": "Talent browser, unlimited postings, direct offers"
+      },
+      "gearInventory": {
+        "title": "Gear Inventory Management",
+        "description": "Equipment tracking, assignments, service life"
+      },
+      "scheduling": {
+        "title": "Scheduling & Calendar",
+        "description": "Conflict detection, dual calendars, time-off management"
+      },
+      "payroll": {
+        "title": "Payroll & Financial",
+        "description": "Automated timesheets, overtime calculation, payroll exports"
+      },
+      "quoting": {
+        "title": "Quoting & Sales Pipeline",
+        "description": "Service-specific quotes, financial privacy, visual pipeline"
+      },
+      "whiteLabel": {
+        "title": "White-Label Branding",
+        "description": "Your logo, colors, and brand across every touchpoint"
+      },
+      "residentPortal": {
+        "title": "Resident Portal",
+        "description": "Real-time feedback, two-way communication, photo evidence"
+      },
+      "technicianJobBoard": {
+        "title": "Job Board Ecosystem",
+        "description": "Browse jobs, apply instantly, control profile visibility"
+      }
+    }
   },
   "dashboard": {
     "title": "Dashboard",

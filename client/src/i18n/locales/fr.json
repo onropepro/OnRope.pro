@@ -437,7 +437,81 @@
     "residentPortal": "Portail résident",
     "superuser": "SuperUtilisateur",
     "changelog": "Journal des modifications",
-    "safetyRating": "Cote de sécurité"
+    "safetyRating": "Cote de sécurité",
+    "employer": "Employeur",
+    "technician": "Technicien",
+    "resident": "Résident",
+    "buildingManager": "Gestionnaire d'immeuble",
+    "modules": {
+      "safetyCompliance": {
+        "title": "Sécurité et conformité",
+        "description": "Inspections de harnais, réunions de sécurité, exports prêts pour audit"
+      },
+      "projectManagement": {
+        "title": "Gestion de projets",
+        "description": "Suivi à 4 élévations, tableaux de bord en temps réel, planification d'équipe"
+      },
+      "workSession": {
+        "title": "Sessions de travail et suivi du temps",
+        "description": "Pointage GPS, suivi des descentes, agrégation automatique de la paie"
+      },
+      "documentManagement": {
+        "title": "Gestion documentaire",
+        "description": "Signatures numériques, pistes d'audit immuables, rapports de conformité"
+      },
+      "userAccess": {
+        "title": "Accès utilisateur et authentification",
+        "description": "Permissions granulaires, accès basé sur les rôles, pistes d'audit"
+      },
+      "csr": {
+        "title": "Cote de sécurité entreprise",
+        "description": "Score de conformité basé sur les pénalités, posture de sécurité en temps réel"
+      },
+      "irataLogging": {
+        "title": "Journal des tâches IRATA/SPRAT",
+        "description": "Enregistrement d'heures le jour même, import OCR, historique portable"
+      },
+      "employeeManagement": {
+        "title": "Gestion des employés",
+        "description": "Identités portables, suivi des certifications, permissions"
+      },
+      "technicianPassport": {
+        "title": "Passeport technicien",
+        "description": "Historique de travail portable, certifications, dossiers de carrière"
+      },
+      "employerJobBoard": {
+        "title": "Écosystème d'offres d'emploi",
+        "description": "Navigateur de talents, publications illimitées, offres directes"
+      },
+      "gearInventory": {
+        "title": "Gestion de l'inventaire d'équipement",
+        "description": "Suivi d'équipement, assignations, durée de vie"
+      },
+      "scheduling": {
+        "title": "Planification et calendrier",
+        "description": "Détection de conflits, double calendrier, gestion des congés"
+      },
+      "payroll": {
+        "title": "Paie et finances",
+        "description": "Feuilles de temps automatisées, calcul des heures supplémentaires, exports de paie"
+      },
+      "quoting": {
+        "title": "Devis et pipeline de ventes",
+        "description": "Devis par service, confidentialité financière, pipeline visuel"
+      },
+      "whiteLabel": {
+        "title": "Marque blanche",
+        "description": "Votre logo, couleurs et marque sur chaque point de contact"
+      },
+      "residentPortal": {
+        "title": "Portail résident",
+        "description": "Retours en temps réel, communication bidirectionnelle, preuves photo"
+      },
+      "technicianJobBoard": {
+        "title": "Écosystème d'offres d'emploi",
+        "description": "Parcourir les offres, postuler instantanément, contrôler la visibilité du profil"
+      }
+    }
   },
   "dashboard": {
     "title": "Tableau de bord",
