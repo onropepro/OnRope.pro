@@ -93,7 +93,7 @@ export default function PropertyManagerInterfaceLanding() {
             </h1>
             
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              Compare vendor safety ratings, track complaint response times, and document your due diligence.<br />
+              Compare vendor safety ratings, track resident complaint response times, and document your due diligence.<br />
               <strong>All in one read-only dashboard designed specifically for property managers.</strong>
             </p>
             
