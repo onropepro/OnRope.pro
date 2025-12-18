@@ -92,6 +92,7 @@ import PayrollFinancialLanding from "@/pages/PayrollFinancialLanding";
 import QuotingSalesLanding from "@/pages/QuotingSalesLanding";
 import WhiteLabelBrandingLanding from "@/pages/WhiteLabelBrandingLanding";
 import ResidentPortalLanding from "@/pages/ResidentPortalLanding";
+import ResidentLanding from "@/pages/ResidentLanding";
 import JobBoardGuide from "@/pages/JobBoardGuide";
 import Pricing from "@/pages/Pricing";
 import ROICalculator from "@/pages/ROICalculator";
@@ -133,6 +134,7 @@ function Router() {
       <Route path="/register" component={Register} />
       <Route path="/login" component={Login} />
       <Route path="/employer" component={Employer} />
+      <Route path="/for-residents" component={ResidentLanding} />
       <Route path="/pricing" component={GetLicense} />
       <Route path="/get-license" component={GetLicense} />
       <Route path="/complete-registration" component={CompleteRegistration} />
