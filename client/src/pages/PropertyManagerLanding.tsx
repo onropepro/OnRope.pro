@@ -47,7 +47,7 @@ export default function PropertyManagerLanding() {
             </h1>
             
             <p className="text-xl md:text-2xl text-green-100 max-w-3xl mx-auto leading-relaxed">
-              When your vendors use OnRopePro, residents submit complaints directly to them. You stay informed without being the middleman. Free access to vendor safety ratings, response times, and complaint resolution data. No cost. No catch. Just freedom.
+              When your RopeAccess vendors use OnRopePro, residents submit complaints directly to them. You stay informed without being the middleman. Free access to vendor safety ratings, response times, and complaint resolution data. No cost. No catch. Just freedom.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
