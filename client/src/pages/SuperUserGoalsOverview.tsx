@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import SuperUserLayout from "@/components/SuperUserLayout";
 import { Progress } from "@/components/ui/progress";

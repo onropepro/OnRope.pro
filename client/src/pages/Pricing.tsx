@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { BackButton } from "@/components/BackButton";
 import { MainMenuButton } from "@/components/MainMenuButton";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -10,6 +11,7 @@ import { trackPricingPageView } from "@/lib/analytics";
 import ChangelogLayout from "@/components/ChangelogLayout";
 
 export default function Pricing() {
+  const { t } = useTranslation();
   // Track pricing page view on mount
   useEffect(() => {
     trackPricingPageView({ source: 'pricing_page' });
@@ -17,35 +19,35 @@ export default function Pricing() {
   const subscriptionPlan = {
     name: "OnRopePro",
     price: "$99",
-    period: "/month (USD/CAD)",
-    description: "Complete rope access management platform for your entire operation",
+    period: t('pricing.period', '/month (USD/CAD)'),
+    description: t('pricing.description', 'Complete rope access management platform for your entire operation'),
     features: [
-      { text: "Unlimited Projects", included: true },
-      { text: "Employee Management", included: true },
-      { text: "Advanced Scheduling", included: true },
-      { text: "Priority Support", included: true },
-      { text: "Inventory Tracking", included: true },
-      { text: "Safety Forms & Compliance", included: true },
-      { text: "CRM & Quotes Suite", included: true },
-      { text: "Advanced Analytics & Reports", included: true },
-      { text: "GPS Time Tracking", included: true },
-      { text: "Resident Portal", included: true },
+      { text: t('pricing.features.unlimitedProjects', 'Unlimited Projects'), included: true },
+      { text: t('pricing.features.employeeManagement', 'Employee Management'), included: true },
+      { text: t('pricing.features.advancedScheduling', 'Advanced Scheduling'), included: true },
+      { text: t('pricing.features.prioritySupport', 'Priority Support'), included: true },
+      { text: t('pricing.features.inventoryTracking', 'Inventory Tracking'), included: true },
+      { text: t('pricing.features.safetyForms', 'Safety Forms & Compliance'), included: true },
+      { text: t('pricing.features.crmQuotes', 'CRM & Quotes Suite'), included: true },
+      { text: t('pricing.features.analytics', 'Advanced Analytics & Reports'), included: true },
+      { text: t('pricing.features.gpsTracking', 'GPS Time Tracking'), included: true },
+      { text: t('pricing.features.residentPortal', 'Resident Portal'), included: true },
     ],
     highlighted: true
   };
 
   const addOns = [
     {
-      name: "Additional Seats",
+      name: t('pricing.addOns.additionalSeats.name', 'Additional Seats'),
       price: "$34.95",
-      period: "/month per seat",
-      description: "Add team members to your account. First seat included free during trial.",
+      period: t('pricing.addOns.additionalSeats.period', '/month per seat'),
+      description: t('pricing.addOns.additionalSeats.description', 'Add team members to your account. First seat included free during trial.'),
     },
     {
-      name: "White Label Branding",
+      name: t('pricing.addOns.whiteLabel.name', 'White Label Branding'),
       price: "$49",
-      period: "/month add-on",
-      description: "Customize the platform with your company branding and colors",
+      period: t('pricing.addOns.whiteLabel.period', '/month add-on'),
+      description: t('pricing.addOns.whiteLabel.description', 'Customize the platform with your company branding and colors'),
     }
   ];
 

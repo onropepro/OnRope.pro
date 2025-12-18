@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import ChangelogGuideLayout from "@/components/ChangelogGuideLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
