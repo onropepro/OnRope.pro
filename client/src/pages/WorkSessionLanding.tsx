@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Link } from "wouter";
 import { PublicHeader } from "@/components/PublicHeader";
+import { useTranslation } from "react-i18next";
 import {
   Clock,
   CheckCircle2,
@@ -35,6 +36,8 @@ import {
 } from "lucide-react";
 
 export default function WorkSessionLanding() {
+  const { t } = useTranslation();
+  
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
       <PublicHeader activeNav="modules" />
@@ -46,32 +49,32 @@ export default function WorkSessionLanding() {
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
           <div className="text-center space-y-6 pt-16">
             <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-module-label">
-              Work Sessions & Time Tracking Module
+              {t('modules.workSessions.hero.badge', 'Work Sessions & Time Tracking Module')}
             </Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              You were there all week.<br />
-              The building is only 20% done.<br />
-              <span className="text-blue-100">What happened?</span>
+              {t('modules.workSessions.hero.titleLine1', 'You were there all week.')}<br />
+              {t('modules.workSessions.hero.titleLine2', 'The building is only 20% done.')}<br />
+              <span className="text-blue-100">{t('modules.workSessions.hero.titleLine3', 'What happened?')}</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              Monday was windy. Tuesday he left early. Wednesday there was a crane on the roof. Thursday Damien felt sick. By Friday, you're 20 hours over budget and you have no idea why.
+              {t('modules.workSessions.hero.description1', "Monday was windy. Tuesday he left early. Wednesday there was a crane on the roof. Thursday Damien felt sick. By Friday, you're 20 hours over budget and you have no idea why.")}
             </p>
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              OnRopePro's Work Session module captures everything. Clock in, clock out, drops completed, shortfall reasons documented. <strong>Real answers instead of scattered excuses.</strong>
+              {t('modules.workSessions.hero.description2', "OnRopePro's Work Session module captures everything. Clock in, clock out, drops completed, shortfall reasons documented.")} <strong>{t('modules.workSessions.hero.description2Bold', 'Real answers instead of scattered excuses.')}</strong>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button size="lg" className="bg-white text-[#0B64A3]" asChild data-testid="button-hero-trial">
                 <Link href="/register">
-                  Start Your Free 60-Day Trial
+                  {t('modules.workSessions.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white" asChild data-testid="button-hero-faq">
                 <Link href="#knowledgebase">
-                  Find Answers
+                  {t('modules.workSessions.hero.ctaFaq', 'Find Answers')}
                   <BookOpen className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
@@ -94,20 +97,20 @@ export default function WorkSessionLanding() {
             <CardContent className="p-8">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-blue-600">87-93%</div>
-                  <div className="text-base text-muted-foreground mt-1">Payroll time saved</div>
+                  <div className="text-3xl md:text-4xl font-bold text-blue-600">{t('modules.workSessions.stats.payrollValue', '87-93%')}</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.workSessions.stats.payrollLabel', 'Payroll time saved')}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-emerald-600">$3,600+</div>
-                  <div className="text-base text-muted-foreground mt-1">Annual errors eliminated</div>
+                  <div className="text-3xl md:text-4xl font-bold text-emerald-600">{t('modules.workSessions.stats.errorsValue', '$3,600+')}</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.workSessions.stats.errorsLabel', 'Annual errors eliminated')}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-amber-600">30 min</div>
-                  <div className="text-base text-muted-foreground mt-1">Instead of 7 hours</div>
+                  <div className="text-3xl md:text-4xl font-bold text-amber-600">{t('modules.workSessions.stats.timeValue', '30 min')}</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.workSessions.stats.timeLabel', 'Instead of 7 hours')}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-violet-600">4</div>
-                  <div className="text-base text-muted-foreground mt-1">Elevations tracked</div>
+                  <div className="text-3xl md:text-4xl font-bold text-violet-600">{t('modules.workSessions.stats.elevationsValue', '4')}</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.workSessions.stats.elevationsLabel', 'Elevations tracked')}</div>
                 </div>
               </div>
             </CardContent>
@@ -121,26 +124,26 @@ export default function WorkSessionLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
-            The Conversation You Know Too Well
+            {t('modules.workSessions.problem.title', 'The Conversation You Know Too Well')}
           </h2>
           
           <Card className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
             <CardContent className="p-6 md:p-8 space-y-4 text-muted-foreground">
               <p className="text-lg leading-relaxed font-medium text-foreground italic">
-                "I see you logged 45 hours. Last year one guy finished the same building in that time. You're not even halfway done. What happened?"
+                {t('modules.workSessions.problem.quote1', '"I see you logged 45 hours. Last year one guy finished the same building in that time. You\'re not even halfway done. What happened?"')}
               </p>
               <p className="italic">
-                "Monday, I think it was windy. And then I had to pull my rope, I think. Or was that Tuesday? Oh yeah, no, Tuesday because Monday I had to leave early because I had dinner with my mom and I told you, remember? Oh yeah, I remember you told me that. Then Tuesday was windy and then Wednesday there was another crane on the roof, so I had to move my rope a bunch of times. And what about Damien? He was there with you. Oh yeah, but he felt sick. He didn't work so much and he only did one drop on Thursday or Friday. I'm not sure. I was not really paying attention to what he was doing. I was too busy with my stuff."
+                {t('modules.workSessions.problem.quote2', '"Monday, I think it was windy. And then I had to pull my rope, I think. Or was that Tuesday? Oh yeah, no, Tuesday because Monday I had to leave early because I had dinner with my mom and I told you, remember? Oh yeah, I remember you told me that. Then Tuesday was windy and then Wednesday there was another crane on the roof, so I had to move my rope a bunch of times. And what about Damien? He was there with you. Oh yeah, but he felt sick. He didn\'t work so much and he only did one drop on Thursday or Friday. I\'m not sure. I was not really paying attention to what he was doing. I was too busy with my stuff."')}
               </p>
               <p>
-                No clue what's going on. At the end of the building, you're just pissed off because you went 20 hours over budget and you don't really know why. You know it was weather. You know the guy wasn't feeling well some days. You don't really know. Move on. Next building.
+                {t('modules.workSessions.problem.paragraph1', "No clue what's going on. At the end of the building, you're just pissed off because you went 20 hours over budget and you don't really know why. You know it was weather. You know the guy wasn't feeling well some days. You don't really know. Move on. Next building.")}
               </p>
               <p className="font-medium text-foreground">
-                This is the system you're using. Memory. Excuses. Spreadsheets that don't connect to anything.
+                {t('modules.workSessions.problem.paragraph2', "This is the system you're using. Memory. Excuses. Spreadsheets that don't connect to anything.")}
               </p>
               <Separator className="my-6" />
               <p className="font-medium text-foreground text-lg">
-                OnRopePro replaces the guesswork with data. Every clock-in timestamped. Every clock-out GPS-verified. Every drop logged by elevation. Every shortfall documented with a reason. Next year when you quote that building, you're not guessing. You're calculating.
+                {t('modules.workSessions.problem.solution', "OnRopePro replaces the guesswork with data. Every clock-in timestamped. Every clock-out GPS-verified. Every drop logged by elevation. Every shortfall documented with a reason. Next year when you quote that building, you're not guessing. You're calculating.")}
               </p>
             </CardContent>
           </Card>
@@ -153,10 +156,10 @@ export default function WorkSessionLanding() {
       <section id="features" className="pt-8 md:pt-12 pb-16 md:pb-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            What This Module Does
+            {t('modules.workSessions.features.title', 'What This Module Does')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-3xl mx-auto">
-            Three capabilities. Zero chaos. Work sessions are the core time tracking mechanism that captures everything as it happens.
+            {t('modules.workSessions.features.subtitle', 'Three capabilities. Zero chaos. Work sessions are the core time tracking mechanism that captures everything as it happens.')}
           </p>
 
           <div className="grid md:grid-cols-3 gap-6">
@@ -167,28 +170,28 @@ export default function WorkSessionLanding() {
                 <div className="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-3">
                   <Clock className="w-6 h-6 text-blue-600" />
                 </div>
-                <CardTitle className="text-xl">Precision Time Capture</CardTitle>
+                <CardTitle className="text-xl">{t('modules.workSessions.features.timeCapture.title', 'Precision Time Capture')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-base text-muted-foreground">
-                <p className="font-medium text-foreground">Technicians clock in from their phone. The system captures the exact timestamp and GPS location.</p>
-                <p>No more "I swear I was there by 8." The data speaks for itself.</p>
-                <p className="font-medium text-foreground mt-4">What gets tracked:</p>
+                <p className="font-medium text-foreground">{t('modules.workSessions.features.timeCapture.description1', 'Technicians clock in from their phone. The system captures the exact timestamp and GPS location.')}</p>
+                <p>{t('modules.workSessions.features.timeCapture.description2', 'No more "I swear I was there by 8." The data speaks for itself.')}</p>
+                <p className="font-medium text-foreground mt-4">{t('modules.workSessions.features.timeCapture.listTitle', 'What gets tracked:')}</p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Start time (to the second)</span>
+                    <span>{t('modules.workSessions.features.timeCapture.item1', 'Start time (to the second)')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>GPS coordinates at clock-in</span>
+                    <span>{t('modules.workSessions.features.timeCapture.item2', 'GPS coordinates at clock-in')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Project association</span>
+                    <span>{t('modules.workSessions.features.timeCapture.item3', 'Project association')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Harness inspection verification</span>
+                    <span>{t('modules.workSessions.features.timeCapture.item4', 'Harness inspection verification')}</span>
                   </li>
                 </ul>
               </CardContent>
@@ -201,28 +204,28 @@ export default function WorkSessionLanding() {
                 <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center mb-3">
                   <ClipboardCheck className="w-6 h-6 text-emerald-600" />
                 </div>
-                <CardTitle className="text-xl">Work Output Documentation</CardTitle>
+                <CardTitle className="text-xl">{t('modules.workSessions.features.workOutput.title', 'Work Output Documentation')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-base text-muted-foreground">
-                <p className="font-medium text-foreground">At end of day, technicians log drops completed by elevation. North, East, South, West.</p>
-                <p>Miss your daily target? The system prompts for a reason. Weather. Equipment. Crew issues. Documented, not forgotten.</p>
-                <p className="font-medium text-foreground mt-4">What gets captured:</p>
+                <p className="font-medium text-foreground">{t('modules.workSessions.features.workOutput.description1', 'At end of day, technicians log drops completed by elevation. North, East, South, West.')}</p>
+                <p>{t('modules.workSessions.features.workOutput.description2', 'Miss your daily target? The system prompts for a reason. Weather. Equipment. Crew issues. Documented, not forgotten.')}</p>
+                <p className="font-medium text-foreground mt-4">{t('modules.workSessions.features.workOutput.listTitle', 'What gets captured:')}</p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Drops completed per elevation</span>
+                    <span>{t('modules.workSessions.features.workOutput.item1', 'Drops completed per elevation')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Percentage complete (for hours-based jobs)</span>
+                    <span>{t('modules.workSessions.features.workOutput.item2', 'Percentage complete (for hours-based jobs)')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Shortfall reasons (mandatory when below target)</span>
+                    <span>{t('modules.workSessions.features.workOutput.item3', 'Shortfall reasons (mandatory when below target)')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Session photos and notes</span>
+                    <span>{t('modules.workSessions.features.workOutput.item4', 'Session photos and notes')}</span>
                   </li>
                 </ul>
               </CardContent>
@@ -235,28 +238,28 @@ export default function WorkSessionLanding() {
                 <div className="w-12 h-12 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center mb-3">
                   <Calculator className="w-6 h-6 text-amber-600" />
                 </div>
-                <CardTitle className="text-xl">Automatic Payroll Aggregation</CardTitle>
+                <CardTitle className="text-xl">{t('modules.workSessions.features.payroll.title', 'Automatic Payroll Aggregation')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-base text-muted-foreground">
-                <p className="font-medium text-foreground">Hours flow directly into payroll calculations. Regular time, overtime, piece-work. All calculated.</p>
-                <p>Billable versus non-billable separated automatically. Export to QuickBooks, ADP, Paychex, Gusto.</p>
-                <p className="font-medium text-foreground mt-4">What gets calculated:</p>
+                <p className="font-medium text-foreground">{t('modules.workSessions.features.payroll.description1', 'Hours flow directly into payroll calculations. Regular time, overtime, piece-work. All calculated.')}</p>
+                <p>{t('modules.workSessions.features.payroll.description2', 'Billable versus non-billable separated automatically. Export to QuickBooks, ADP, Paychex, Gusto.')}</p>
+                <p className="font-medium text-foreground mt-4">{t('modules.workSessions.features.payroll.listTitle', 'What gets calculated:')}</p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Total hours by employee</span>
+                    <span>{t('modules.workSessions.features.payroll.item1', 'Total hours by employee')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Hours by project</span>
+                    <span>{t('modules.workSessions.features.payroll.item2', 'Hours by project')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Billable vs non-billable breakdown</span>
+                    <span>{t('modules.workSessions.features.payroll.item3', 'Billable vs non-billable breakdown')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Piece-work compensation (if enabled)</span>
+                    <span>{t('modules.workSessions.features.payroll.item4', 'Piece-work compensation (if enabled)')}</span>
                   </li>
                 </ul>
               </CardContent>

@@ -4878,6 +4878,108 @@
     }
   },
   "modules": {
+    "safety": {
+      "hero": {
+        "badge": "Module Sécurité & Conformité",
+        "titleLine1": "{{authority}} vient d'arriver",
+        "titleLine2": "sur le stationnement.",
+        "titleLine3": "Êtes-vous prêt?",
+        "descriptionLine1": "Inspections quotidiennes des harnais. Réunions de sécurité.",
+        "descriptionLine2": "Suivi d'équipement. Signatures numériques.",
+        "descriptionLine3": "Tout est consultable. Tout est exportable. Tout est défendable.",
+        "ctaTrial": "Commencez votre essai gratuit de 60 jours",
+        "ctaKnowledgebase": "Trouver des réponses"
+      },
+      "stats": {
+        "missingForms": "Formulaires manquants",
+        "failedAudits": "Audits échoués",
+        "sleeplessNights": "Nuits blanches",
+        "searchableHistory": "Historique consultable"
+      },
+      "problem": {
+        "title": "La panique que vous connaissez trop bien",
+        "paragraph1": "La plupart des opérateurs d'accès sur corde savent exactement ce qui se passe lorsque l'auditeur demande six mois d'inspections de harnais.",
+        "paragraph2": "On fouille le camion. On déterre le classeur. Quelqu'un dit « Je pense que Dave avait ce dossier. » La moitié des formulaires manquent. Ceux que vous trouvez ont des taches de café et une écriture illisible.",
+        "paragraph3": "Vous passez l'audit. De justesse. Et vous vous promettez de vous organiser.",
+        "paragraph4": "Jusqu'à la prochaine fois, quand exactement la même panique se reproduit.",
+        "paragraph5": "Pendant ce temps, votre assureur veut des preuves de votre culture de sécurité. Votre gestionnaire immobilier veut de la documentation avant chaque travail. Et si quelqu'un se blesse, la première question qu'un avocat pose est :",
+        "quote": "« Pouvez-vous prouver que vous avez effectué les inspections requises? »",
+        "paragraph6": "Les formulaires papier ne peuvent pas vous protéger. Les classeurs ne peuvent pas vous protéger. Les meilleurs techniciens du monde ne peuvent pas vous protéger s'il n'y a aucune trace de ce qu'ils ont fait."
+      },
+      "features": {
+        "title": "Ce que fait ce module",
+        "subtitle": "Une documentation de sécurité complète qui se crée d'elle-même grâce à l'utilisation quotidienne."
+      }
+    },
+    "projects": {
+      "hero": {
+        "badge": "Module Gestion de Projets",
+        "title": "Arrêtez de gérer vos projets",
+        "titleHighlight": "Dans votre tête",
+        "description": "Suivez chaque bâtiment, chaque élévation, chaque technicien depuis un seul écran.",
+        "descriptionStrong": "Sachez exactement où en est chaque travail sans vous déplacer de site en site ou vous fier à l'appel téléphonique d'hier.",
+        "ctaTrial": "Commencer votre essai gratuit de 60 jours",
+        "ctaAnswers": "Trouver des réponses"
+      },
+      "stats": {
+        "elevations": "Élévations suivies indépendamment",
+        "payrollErrors": "Erreurs de paie éliminées",
+        "statusCalls": "Moins d'appels de statut des clients",
+        "quotePrep": "Préparation des devis plus rapide"
+      },
+      "problem": {
+        "title": "La réalité",
+        "juggling": "Vous jonglez entre le lavage de vitres à la Tour A, le calfeutrage au Bâtiment B, les inspections d'ancrages au Complexe C. Un client appelle pour demander une mise à jour.",
+        "guessing": "Vous devinez.",
+        "maybe": "Vous pensez que Tommy finit l'élévation nord aujourd'hui. Peut-être. Sarah pourrait avoir de la disponibilité la semaine prochaine. Probablement. Ce devis de 15 étages que vous venez d'envoyer? Vous avez tiré le calendrier de mémoire parce que vous ne trouviez pas vos notes du travail similaire d'il y a six mois.",
+        "siteVisits": "Combien de fois avez-vous dû aller de projet en projet et regarder les gars sur la corde et prendre des notes sur leur avancement comparé à hier. Dix à quinze heures par semaine juste à comprendre ce qui se passe.",
+        "performance": "Ensuite, il y a le problème de performance dont personne ne parle. Un gars au téléphone la moitié de la journée, fait une descente. L'autre gars qui travaille comme un fou. Ils étaient là le même temps. Vous savez que quelque chose ne va pas. Sans données concrètes, vous ne pouvez pas avoir la conversation.",
+        "exhausted": "Votre cerveau est votre entreprise. Et il est épuisé."
+      },
+      "solution": {
+        "changes": "OnRopePro change l'équation. Chaque projet visible depuis un seul écran. Les mises à jour de progression se font automatiquement lorsque les sessions de travail sont enregistrées. La performance par employé est suivie avec des données objectives. L'information est à portée de main au lieu d'être éparpillée dans votre mémoire, votre tableau blanc et six fils de textos différents.",
+        "linked": "Tout est lié avec tout. Créez un projet et cela remplit le calendrier. Les employés enregistrent leur travail et cela remplit la paie. Si vous faites une chose, cela fait autre chose pour vous ailleurs.",
+        "cognitive": "Le système porte la charge cognitive. Votre bande passante mentale s'ouvre pour vraiment gérer l'entreprise."
+      },
+      "features": {
+        "title": "Ce que fait ce module",
+        "subtitle": "Le centre opérationnel connectant la planification, la sécurité et la paie",
+        "description": "Les projets suivent les travaux d'entretien de bâtiments individuels avec une progression mesurée comme l'accès sur corde fonctionne réellement.",
+        "progressTracking": {
+          "title": "Suivi de progression par type de travail",
+          "adapts": "Le système s'adapte à votre travail, pas l'inverse.",
+          "description": "Le suivi par descentes pour le lavage de vitres et le lavage de bâtiments compte les passages verticaux par élévation. Nord, Est, Sud, Ouest suivis indépendamment. Le suivi par heures pour les inspections et réparations capture le temps avec un pourcentage d'achèvement manuel. Le suivi par unités pour le nettoyage de parkings et les services en suite compte les places ou suites individuelles terminées.",
+          "form": "Le formulaire que les techniciens voient à la fin d'une session de travail change selon ce sur quoi ils travaillent. Pas de forcer vos opérations dans le modèle de quelqu'un d'autre.",
+          "tracked": "Ce qui est suivi :",
+          "item1": "Élévations N/E/S/O indépendamment",
+          "item2": "Descentes complétées par session par direction",
+          "item3": "Heures travaillées avec estimations d'achèvement",
+          "item4": "Unités ou places terminées"
+        },
+        "calendar": {
+          "title": "Remplissage automatique du calendrier",
+          "once": "Créez un projet une fois. Le calendrier se remplit tout seul.",
+          "description": "Lorsque vous entrez une plage de dates et assignez des employés, les entrées de calendrier apparaissent automatiquement. Plus besoin de créer un projet, puis d'ouvrir Google Calendar, puis d'envoyer un texto à votre superviseur, puis de mettre à jour le tableau blanc. Même information, une seule entrée, partout où elle doit aller.",
+          "sync": "Le bâtiment est reporté d'une semaine? Cliquez sur le projet, changez la date. Cela se synchronise partout. La détection de conflits signale quand quelqu'un est doublement réservé avant que cela ne devienne une urgence.",
+          "automated": "Ce qui est automatisé :",
+          "item1": "Barres de projet multi-jours sur le calendrier de l'entreprise",
+          "item2": "Assignations d'employés visibles sur leurs horaires",
+          "item3": "Codage couleur par type de travail",
+          "item4": "Détection de conflits pour les doubles réservations"
+        },
+        "documentation": {
+          "title": "Documentation liée",
+          "live": "Les documents de sécurité vivent avec leurs projets. Pas dans les courriels. Pas dans Google Drive. Pas dans un dossier dans le camion.",
+          "description": "Chaque projet est connecté à son Plan d'Accès sur Corde, ses comptes-rendus de Réunions Toolbox et ses Certificats d'Inspection d'Ancrages. Les gestionnaires immobiliers accèdent aux documents de conformité via leur portail sans vous envoyer de courriel. Les auditeurs trouvent tout au même endroit.",
+          "insurance": "Quand la compagnie d'assurance demande des preuves de votre programme de sécurité, vous ne cherchez pas. Vous cliquez.",
+          "linked": "Ce qui est lié :",
+          "item1": "Plans d'Accès sur Corde (RAP)",
+          "item2": "Comptes-rendus de Réunions Toolbox",
+          "item3": "Certificats d'Inspection d'Ancrages",
+          "item4": "Photos de projet"
+        }
+      }
+    },
     "payroll": {
       "hero": {
         "badge": "Module Paie & Finances",
@@ -4906,6 +5008,71 @@
       "features": {
         "title": "Du pointage à l'export de paie",
         "subtitle": "Le module Paie & Finances transforme les données de sessions de travail dispersées en feuilles de temps organisées et exportables sans intervention manuelle."
+      }
+    },
+    "workSessions": {
+      "hero": {
+        "badge": "Module Sessions de travail & Suivi du temps",
+        "titleLine1": "Vous étiez là toute la semaine.",
+        "titleLine2": "Le bâtiment n'est qu'à 20% terminé.",
+        "titleLine3": "Que s'est-il passé?",
+        "description1": "Lundi il ventait. Mardi il est parti tôt. Mercredi il y avait une grue sur le toit. Jeudi Damien ne se sentait pas bien. Vendredi, vous avez 20 heures de dépassement de budget et vous ne savez pas pourquoi.",
+        "description2": "Le module Sessions de travail d'OnRopePro capture tout. Pointage d'arrivée, pointage de départ, descentes complétées, raisons des écarts documentées.",
+        "description2Bold": "Des réponses réelles au lieu d'excuses dispersées.",
+        "ctaTrial": "Commencer votre essai gratuit de 60 jours",
+        "ctaFaq": "Trouver des réponses"
+      },
+      "stats": {
+        "payrollValue": "87-93%",
+        "payrollLabel": "Temps de paie économisé",
+        "errorsValue": "3 600$+",
+        "errorsLabel": "Erreurs annuelles éliminées",
+        "timeValue": "30 min",
+        "timeLabel": "Au lieu de 7 heures",
+        "elevationsValue": "4",
+        "elevationsLabel": "Élévations suivies"
+      },
+      "problem": {
+        "title": "La conversation que vous connaissez trop bien",
+        "quote1": "« Je vois que tu as inscrit 45 heures. L'année dernière, un gars a terminé le même bâtiment dans ce temps. Tu n'es même pas à la moitié. Que s'est-il passé? »",
+        "quote2": "« Lundi, je pense qu'il ventait. Et puis j'ai dû tirer ma corde, je pense. Ou c'était mardi? Ah oui, non, mardi parce que lundi j'ai dû partir tôt parce que j'avais un souper avec ma mère et je te l'avais dit, tu te rappelles? Ah oui, je me rappelle que tu m'avais dit ça. Puis mardi il ventait et puis mercredi il y avait une autre grue sur le toit, donc j'ai dû déplacer ma corde plusieurs fois. Et Damien? Il était là avec toi. Ah oui, mais il ne se sentait pas bien. Il n'a pas beaucoup travaillé et il a fait juste une descente jeudi ou vendredi. Je ne suis pas sûr. Je ne faisais pas vraiment attention à ce qu'il faisait. J'étais trop occupé avec mes affaires. »",
+        "paragraph1": "Aucune idée de ce qui se passe. À la fin du bâtiment, vous êtes juste frustré parce que vous avez dépassé le budget de 20 heures et vous ne savez pas vraiment pourquoi. Vous savez que c'était la météo. Vous savez que le gars ne se sentait pas bien certains jours. Vous ne savez pas vraiment. On passe au suivant.",
+        "paragraph2": "C'est le système que vous utilisez. La mémoire. Les excuses. Les tableurs qui ne sont connectés à rien.",
+        "solution": "OnRopePro remplace les suppositions par des données. Chaque pointage d'arrivée horodaté. Chaque pointage de départ vérifié par GPS. Chaque descente enregistrée par élévation. Chaque écart documenté avec une raison. L'année prochaine quand vous soumissionnez ce bâtiment, vous ne devinez plus. Vous calculez."
+      },
+      "features": {
+        "title": "Ce que fait ce module",
+        "subtitle": "Trois capacités. Zéro chaos. Les sessions de travail sont le mécanisme central de suivi du temps qui capture tout au moment où ça se passe.",
+        "timeCapture": {
+          "title": "Capture précise du temps",
+          "description1": "Les techniciens pointent depuis leur téléphone. Le système capture l'horodatage exact et la localisation GPS.",
+          "description2": "Plus de « Je jure que j'étais là à 8h. » Les données parlent d'elles-mêmes.",
+          "listTitle": "Ce qui est suivi :",
+          "item1": "Heure de début (à la seconde près)",
+          "item2": "Coordonnées GPS au pointage",
+          "item3": "Association au projet",
+          "item4": "Vérification d'inspection du harnais"
+        },
+        "workOutput": {
+          "title": "Documentation de la production",
+          "description1": "En fin de journée, les techniciens enregistrent les descentes complétées par élévation. Nord, Est, Sud, Ouest.",
+          "description2": "Vous manquez votre objectif quotidien? Le système demande une raison. Météo. Équipement. Problèmes d'équipe. Documenté, pas oublié.",
+          "listTitle": "Ce qui est capturé :",
+          "item1": "Descentes complétées par élévation",
+          "item2": "Pourcentage complété (pour les travaux basés sur les heures)",
+          "item3": "Raisons des écarts (obligatoire quand sous l'objectif)",
+          "item4": "Photos et notes de session"
+        },
+        "payroll": {
+          "title": "Agrégation automatique de la paie",
+          "description1": "Les heures alimentent directement les calculs de paie. Temps régulier, heures supplémentaires, travail à la pièce. Tout calculé.",
+          "description2": "Facturable vs non-facturable séparé automatiquement. Exportez vers QuickBooks, ADP, Paychex, Gusto.",
+          "listTitle": "Ce qui est calculé :",
+          "item1": "Total des heures par employé",
+          "item2": "Heures par projet",
+          "item3": "Répartition facturable vs non-facturable",
+          "item4": "Rémunération à la pièce (si activée)"
+        }
       }
     }
   }

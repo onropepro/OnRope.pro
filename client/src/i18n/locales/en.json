@@ -4694,6 +4694,108 @@
     }
   },
   "modules": {
+    "safety": {
+      "hero": {
+        "badge": "Safety & Compliance Module",
+        "titleLine1": "{{authority}} just pulled",
+        "titleLine2": "into the parking lot.",
+        "titleLine3": "Are you ready?",
+        "descriptionLine1": "Daily harness inspections. Toolbox meetings.",
+        "descriptionLine2": "Equipment tracking. Digital signatures.",
+        "descriptionLine3": "All searchable. All exportable. All defensible.",
+        "ctaTrial": "Start Your Free 60-Day Trial",
+        "ctaKnowledgebase": "Find Answers"
+      },
+      "stats": {
+        "missingForms": "Missing forms",
+        "failedAudits": "Failed audits",
+        "sleeplessNights": "Sleepless nights",
+        "searchableHistory": "Searchable history"
+      },
+      "problem": {
+        "title": "The Scramble You Know Too Well",
+        "paragraph1": "Most rope access operators know exactly what happens when the auditor asks for six months of harness inspections.",
+        "paragraph2": "The truck gets searched. The binder gets dug out. Someone says \"I think Dave had that folder.\" Half the forms are missing. The ones you find have coffee stains and illegible handwriting.",
+        "paragraph3": "You pass the audit. Barely. And you promise yourself you'll get organized.",
+        "paragraph4": "Until next time, when the exact same scramble happens again.",
+        "paragraph5": "Meanwhile, your insurance carrier wants proof of your safety culture. Your property manager wants documentation before every job. And if someone gets hurt, the first question a lawyer asks is:",
+        "quote": "\"Can you prove you conducted the required inspections?\"",
+        "paragraph6": "Paper forms can't protect you. Filing cabinets can't protect you. The best technicians in the world can't protect you if there's no record of what they did."
+      },
+      "features": {
+        "title": "What This Module Does",
+        "subtitle": "Complete safety documentation that creates itself through daily use."
+      }
+    },
+    "projects": {
+      "hero": {
+        "badge": "Project Management Module",
+        "title": "Stop Managing Projects",
+        "titleHighlight": "In Your Head",
+        "description": "Track every building, every elevation, every technician from one screen.",
+        "descriptionStrong": "Know exactly where every job stands without driving site to site or relying on yesterday's phone call.",
+        "ctaTrial": "Start Your Free 60-Day Trial",
+        "ctaAnswers": "Find Answers"
+      },
+      "stats": {
+        "elevations": "Elevations tracked independently",
+        "payrollErrors": "Payroll errors eliminated",
+        "statusCalls": "Fewer status calls from clients",
+        "quotePrep": "Faster quote preparation"
+      },
+      "problem": {
+        "title": "The Reality",
+        "juggling": "You're juggling window washing at Tower A, caulking at Building B, anchor inspections at Complex C. A client calls asking for a status update.",
+        "guessing": "You're guessing.",
+        "maybe": "You think Tommy's finishing the north elevation today. Maybe. Sarah might have capacity next week. Probably. That 15-story quote you just sent? You pulled the timeline from memory because you couldn't find your notes from the similar job six months ago.",
+        "siteVisits": "Many times you've had to go from project to project and look at the guys on the rope and take notes of where they're at compared to where they were yesterday. Ten to fifteen hours a week just figuring out what's happening.",
+        "performance": "Then there's the performance problem nobody talks about. One guy on the cell phone half the day, does one drop. The other guy working his ass off. They were there the same amount of time. You know something's wrong. Without hard data, you can't have the conversation.",
+        "exhausted": "Your brain is your business. And it's exhausted."
+      },
+      "solution": {
+        "changes": "OnRopePro changes the equation. Every project visible from one screen. Progress updates automatically as work sessions get logged. Per-employee performance tracked with objective data. The information is at your fingertips instead of scattered across your memory, your whiteboard, and six different text threads.",
+        "linked": "Everything is linked with everything. Create a project and it fills the schedule. Employees log work and it fills payroll. If you do one thing, it does something else for you somewhere else.",
+        "cognitive": "The system carries the cognitive load. Your mental bandwidth opens up for actually running the business."
+      },
+      "features": {
+        "title": "What This Module Does",
+        "subtitle": "The operational hub connecting scheduling, safety, and payroll",
+        "description": "Projects track individual building maintenance jobs with progress measured the way rope access actually works.",
+        "progressTracking": {
+          "title": "Progress Tracking by Job Type",
+          "adapts": "The system adapts to your work, not the other way around.",
+          "description": "Drop-based tracking for window cleaning and building wash counts vertical passes per elevation. North, East, South, West tracked independently. Hours-based tracking for inspections and repairs captures time with manual completion percentage. Unit-based tracking for parkade cleaning and in-suite services counts individual stalls or suites completed.",
+          "form": "The form technicians see when ending a work session changes based on what they're working on. No forcing your operations into someone else's template.",
+          "tracked": "What gets tracked:",
+          "item1": "N/E/S/W elevations independently",
+          "item2": "Drops completed per session per direction",
+          "item3": "Hours worked with completion estimates",
+          "item4": "Units or stalls finished"
+        },
+        "calendar": {
+          "title": "Automatic Calendar Population",
+          "once": "Create a project once. The schedule fills itself.",
+          "description": "When you enter a date range and assign employees, calendar entries appear automatically. No more creating a project, then opening Google Calendar, then texting your supervisor, then updating the whiteboard. Same information, one entry, everywhere it needs to go.",
+          "sync": "Building gets pushed by a week? Click the project, change the date. It syncs everywhere. Conflict detection flags when someone is double-booked before it becomes an emergency.",
+          "automated": "What gets automated:",
+          "item1": "Multi-day project bars on company calendar",
+          "item2": "Employee assignments visible on their schedules",
+          "item3": "Color coding by job type",
+          "item4": "Conflict detection for double-booking"
+        },
+        "documentation": {
+          "title": "Linked Documentation",
+          "live": "Safety docs live with their projects. Not in email. Not in Google Drive. Not in a folder in the truck.",
+          "description": "Each project connects to its Rope Access Plan, Toolbox Meeting records, and Anchor Inspection Certificates. Property managers access compliance documents through their portal without emailing you. Auditors find everything in one place.",
+          "insurance": "When the insurance company asks for proof of your safety program, you're not digging. You're clicking.",
+          "linked": "What gets linked:",
+          "item1": "Rope Access Plans (RAP)",
+          "item2": "Toolbox Meeting records",
+          "item3": "Anchor Inspection Certificates",
+          "item4": "Project photos"
+        }
+      }
+    },
     "payroll": {
       "hero": {
         "badge": "Payroll & Financial Module",
@@ -4722,6 +4824,71 @@
       "features": {
         "title": "From Clock-In to Payroll Export",
         "subtitle": "The Payroll & Financial module transforms scattered work session data into organized, exportable timesheets without manual intervention."
+      }
+    },
+    "workSessions": {
+      "hero": {
+        "badge": "Work Sessions & Time Tracking Module",
+        "titleLine1": "You were there all week.",
+        "titleLine2": "The building is only 20% done.",
+        "titleLine3": "What happened?",
+        "description1": "Monday was windy. Tuesday he left early. Wednesday there was a crane on the roof. Thursday Damien felt sick. By Friday, you're 20 hours over budget and you have no idea why.",
+        "description2": "OnRopePro's Work Session module captures everything. Clock in, clock out, drops completed, shortfall reasons documented.",
+        "description2Bold": "Real answers instead of scattered excuses.",
+        "ctaTrial": "Start Your Free 60-Day Trial",
+        "ctaFaq": "Find Answers"
+      },
+      "stats": {
+        "payrollValue": "87-93%",
+        "payrollLabel": "Payroll time saved",
+        "errorsValue": "$3,600+",
+        "errorsLabel": "Annual errors eliminated",
+        "timeValue": "30 min",
+        "timeLabel": "Instead of 7 hours",
+        "elevationsValue": "4",
+        "elevationsLabel": "Elevations tracked"
+      },
+      "problem": {
+        "title": "The Conversation You Know Too Well",
+        "quote1": "\"I see you logged 45 hours. Last year one guy finished the same building in that time. You're not even halfway done. What happened?\"",
+        "quote2": "\"Monday, I think it was windy. And then I had to pull my rope, I think. Or was that Tuesday? Oh yeah, no, Tuesday because Monday I had to leave early because I had dinner with my mom and I told you, remember? Oh yeah, I remember you told me that. Then Tuesday was windy and then Wednesday there was another crane on the roof, so I had to move my rope a bunch of times. And what about Damien? He was there with you. Oh yeah, but he felt sick. He didn't work so much and he only did one drop on Thursday or Friday. I'm not sure. I was not really paying attention to what he was doing. I was too busy with my stuff.\"",
+        "paragraph1": "No clue what's going on. At the end of the building, you're just pissed off because you went 20 hours over budget and you don't really know why. You know it was weather. You know the guy wasn't feeling well some days. You don't really know. Move on. Next building.",
+        "paragraph2": "This is the system you're using. Memory. Excuses. Spreadsheets that don't connect to anything.",
+        "solution": "OnRopePro replaces the guesswork with data. Every clock-in timestamped. Every clock-out GPS-verified. Every drop logged by elevation. Every shortfall documented with a reason. Next year when you quote that building, you're not guessing. You're calculating."
+      },
+      "features": {
+        "title": "What This Module Does",
+        "subtitle": "Three capabilities. Zero chaos. Work sessions are the core time tracking mechanism that captures everything as it happens.",
+        "timeCapture": {
+          "title": "Precision Time Capture",
+          "description1": "Technicians clock in from their phone. The system captures the exact timestamp and GPS location.",
+          "description2": "No more \"I swear I was there by 8.\" The data speaks for itself.",
+          "listTitle": "What gets tracked:",
+          "item1": "Start time (to the second)",
+          "item2": "GPS coordinates at clock-in",
+          "item3": "Project association",
+          "item4": "Harness inspection verification"
+        },
+        "workOutput": {
+          "title": "Work Output Documentation",
+          "description1": "At end of day, technicians log drops completed by elevation. North, East, South, West.",
+          "description2": "Miss your daily target? The system prompts for a reason. Weather. Equipment. Crew issues. Documented, not forgotten.",
+          "listTitle": "What gets captured:",
+          "item1": "Drops completed per elevation",
+          "item2": "Percentage complete (for hours-based jobs)",
+          "item3": "Shortfall reasons (mandatory when below target)",
+          "item4": "Session photos and notes"
+        },
+        "payroll": {
+          "title": "Automatic Payroll Aggregation",
+          "description1": "Hours flow directly into payroll calculations. Regular time, overtime, piece-work. All calculated.",
+          "description2": "Billable versus non-billable separated automatically. Export to QuickBooks, ADP, Paychex, Gusto.",
+          "listTitle": "What gets calculated:",
+          "item1": "Total hours by employee",
+          "item2": "Hours by project",
+          "item3": "Billable vs non-billable breakdown",
+          "item4": "Piece-work compensation (if enabled)"
+        }
       }
     }
   }

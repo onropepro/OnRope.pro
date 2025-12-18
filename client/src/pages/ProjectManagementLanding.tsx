@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { PublicHeader } from "@/components/PublicHeader";
 import ropeAccessSoftwareImg from "@assets/rope-access-software_1765481835892.jpg";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
@@ -46,6 +47,7 @@ const ALL_ACCORDION_ITEMS = [
 ];
 
 export default function ProjectManagementLanding() {
+  const { t } = useTranslation();
   const [expandedProblems, setExpandedProblems] = useState<string[]>([]);
   const [, setLocation] = useLocation();
   const allExpanded = expandedProblems.length === ALL_ACCORDION_ITEMS.length;
@@ -69,29 +71,29 @@ export default function ProjectManagementLanding() {
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
           <div className="text-center space-y-6 pt-16">
             <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-module-label">
-              Project Management Module
+              {t('modules.projects.hero.badge', 'Project Management Module')}
             </Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              Stop Managing Projects<br />
-              <span className="text-blue-100">In Your Head</span>
+              {t('modules.projects.hero.title', 'Stop Managing Projects')}<br />
+              <span className="text-blue-100">{t('modules.projects.hero.titleHighlight', 'In Your Head')}</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              Track every building, every elevation, every technician from one screen.<br />
-              <strong>Know exactly where every job stands without driving site to site or relying on yesterday's phone call.</strong>
+              {t('modules.projects.hero.description', 'Track every building, every elevation, every technician from one screen.')}<br />
+              <strong>{t('modules.projects.hero.descriptionStrong', "Know exactly where every job stands without driving site to site or relying on yesterday's phone call.")}</strong>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-cta-trial">
                 <Link href="/register">
-                  Start Your Free 60-Day Trial
+                  {t('modules.projects.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-cta-demo">
                 <Link href="#knowledgebase">
-                  Find Answers
+                  {t('modules.projects.hero.ctaAnswers', 'Find Answers')}
                   <BookOpen className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
@@ -115,19 +117,19 @@ export default function ProjectManagementLanding() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-sky-600">4</div>
-                  <div className="text-base text-muted-foreground mt-1">Elevations tracked independently</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.projects.stats.elevations', 'Elevations tracked independently')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-emerald-600">87-93%</div>
-                  <div className="text-base text-muted-foreground mt-1">Payroll errors eliminated</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.projects.stats.payrollErrors', 'Payroll errors eliminated')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-violet-600">60-70%</div>
-                  <div className="text-base text-muted-foreground mt-1">Fewer status calls from clients</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.projects.stats.statusCalls', 'Fewer status calls from clients')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-amber-600">75%</div>
-                  <div className="text-base text-muted-foreground mt-1">Faster quote preparation</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.projects.stats.quotePrep', 'Faster quote preparation')}</div>
                 </div>
               </div>
             </CardContent>
@@ -140,23 +142,23 @@ export default function ProjectManagementLanding() {
         <div className="space-y-6">
           <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950 rounded-2xl shadow-md">
             <CardHeader>
-              <CardTitle className="text-xl md:text-2xl text-amber-900 dark:text-amber-100">The Reality</CardTitle>
+              <CardTitle className="text-xl md:text-2xl text-amber-900 dark:text-amber-100">{t('modules.projects.problem.title', 'The Reality')}</CardTitle>
             </CardHeader>
             <CardContent className="text-amber-900 dark:text-amber-100 space-y-4">
-              <p>You're juggling window washing at Tower A, caulking at Building B, anchor inspections at Complex C. A client calls asking for a status update.</p>
-              <p className="font-medium">You're guessing.</p>
-              <p>You think Tommy's finishing the north elevation today. Maybe. Sarah might have capacity next week. Probably. That 15-story quote you just sent? You pulled the timeline from memory because you couldn't find your notes from the similar job six months ago.</p>
-              <p>Many times you've had to go from project to project and look at the guys on the rope and take notes of where they're at compared to where they were yesterday. Ten to fifteen hours a week just figuring out what's happening.</p>
-              <p>Then there's the performance problem nobody talks about. One guy on the cell phone half the day, does one drop. The other guy working his ass off. They were there the same amount of time. You know something's wrong. Without hard data, you can't have the conversation.</p>
-              <p className="font-medium">Your brain is your business. And it's exhausted.</p>
+              <p>{t('modules.projects.problem.juggling', "You're juggling window washing at Tower A, caulking at Building B, anchor inspections at Complex C. A client calls asking for a status update.")}</p>
+              <p className="font-medium">{t('modules.projects.problem.guessing', "You're guessing.")}</p>
+              <p>{t('modules.projects.problem.maybe', "You think Tommy's finishing the north elevation today. Maybe. Sarah might have capacity next week. Probably. That 15-story quote you just sent? You pulled the timeline from memory because you couldn't find your notes from the similar job six months ago.")}</p>
+              <p>{t('modules.projects.problem.siteVisits', "Many times you've had to go from project to project and look at the guys on the rope and take notes of where they're at compared to where they were yesterday. Ten to fifteen hours a week just figuring out what's happening.")}</p>
+              <p>{t('modules.projects.problem.performance', "Then there's the performance problem nobody talks about. One guy on the cell phone half the day, does one drop. The other guy working his ass off. They were there the same amount of time. You know something's wrong. Without hard data, you can't have the conversation.")}</p>
+              <p className="font-medium">{t('modules.projects.problem.exhausted', 'Your brain is your business. And it\'s exhausted.')}</p>
             </CardContent>
           </Card>
           
           <Card className="border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950 rounded-2xl shadow-md">
             <CardContent className="pt-6 text-emerald-900 dark:text-emerald-100 space-y-4">
-              <p>OnRopePro changes the equation. Every project visible from one screen. Progress updates automatically as work sessions get logged. Per-employee performance tracked with objective data. The information is at your fingertips instead of scattered across your memory, your whiteboard, and six different text threads.</p>
-              <p>Everything is linked with everything. Create a project and it fills the schedule. Employees log work and it fills payroll. If you do one thing, it does something else for you somewhere else.</p>
-              <p className="font-medium">The system carries the cognitive load. Your mental bandwidth opens up for actually running the business.</p>
+              <p>{t('modules.projects.solution.changes', 'OnRopePro changes the equation. Every project visible from one screen. Progress updates automatically as work sessions get logged. Per-employee performance tracked with objective data. The information is at your fingertips instead of scattered across your memory, your whiteboard, and six different text threads.')}</p>
+              <p>{t('modules.projects.solution.linked', 'Everything is linked with everything. Create a project and it fills the schedule. Employees log work and it fills payroll. If you do one thing, it does something else for you somewhere else.')}</p>
+              <p className="font-medium">{t('modules.projects.solution.cognitive', 'The system carries the cognitive load. Your mental bandwidth opens up for actually running the business.')}</p>
             </CardContent>
           </Card>
         </div>
@@ -167,12 +169,12 @@ export default function ProjectManagementLanding() {
       {/* What This Module Does Section */}
       <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto space-y-8">
         <div className="text-center space-y-4">
-          <h2 className="text-3xl md:text-4xl font-bold">What This Module Does</h2>
+          <h2 className="text-3xl md:text-4xl font-bold">{t('modules.projects.features.title', 'What This Module Does')}</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            The operational hub connecting scheduling, safety, and payroll
+            {t('modules.projects.features.subtitle', 'The operational hub connecting scheduling, safety, and payroll')}
           </p>
           <p className="text-muted-foreground max-w-3xl mx-auto">
-            Projects track individual building maintenance jobs with progress measured the way rope access actually works.
+            {t('modules.projects.features.description', 'Projects track individual building maintenance jobs with progress measured the way rope access actually works.')}
           </p>
         </div>
 
@@ -183,19 +185,19 @@ export default function ProjectManagementLanding() {
               <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center mb-3">
                 <Target className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
               </div>
-              <CardTitle className="text-lg">Progress Tracking by Job Type</CardTitle>
+              <CardTitle className="text-lg">{t('modules.projects.features.progressTracking.title', 'Progress Tracking by Job Type')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 text-base text-muted-foreground">
-              <p>The system adapts to your work, not the other way around.</p>
-              <p>Drop-based tracking for window cleaning and building wash counts vertical passes per elevation. North, East, South, West tracked independently. Hours-based tracking for inspections and repairs captures time with manual completion percentage. Unit-based tracking for parkade cleaning and in-suite services counts individual stalls or suites completed.</p>
-              <p>The form technicians see when ending a work session changes based on what they're working on. No forcing your operations into someone else's template.</p>
+              <p>{t('modules.projects.features.progressTracking.adapts', 'The system adapts to your work, not the other way around.')}</p>
+              <p>{t('modules.projects.features.progressTracking.description', 'Drop-based tracking for window cleaning and building wash counts vertical passes per elevation. North, East, South, West tracked independently. Hours-based tracking for inspections and repairs captures time with manual completion percentage. Unit-based tracking for parkade cleaning and in-suite services counts individual stalls or suites completed.')}</p>
+              <p>{t('modules.projects.features.progressTracking.form', "The form technicians see when ending a work session changes based on what they're working on. No forcing your operations into someone else's template.")}</p>
               <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
-                <p className="font-medium text-foreground mb-2">What gets tracked:</p>
+                <p className="font-medium text-foreground mb-2">{t('modules.projects.features.progressTracking.tracked', 'What gets tracked:')}</p>
                 <ul className="space-y-1">
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />N/E/S/W elevations independently</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />Drops completed per session per direction</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />Hours worked with completion estimates</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />Units or stalls finished</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />{t('modules.projects.features.progressTracking.item1', 'N/E/S/W elevations independently')}</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />{t('modules.projects.features.progressTracking.item2', 'Drops completed per session per direction')}</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />{t('modules.projects.features.progressTracking.item3', 'Hours worked with completion estimates')}</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />{t('modules.projects.features.progressTracking.item4', 'Units or stalls finished')}</li>
                 </ul>
               </div>
             </CardContent>
@@ -207,19 +209,19 @@ export default function ProjectManagementLanding() {
               <div className="w-12 h-12 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center mb-3">
                 <Calendar className="w-6 h-6 text-violet-600 dark:text-violet-400" />
               </div>
-              <CardTitle className="text-lg">Automatic Calendar Population</CardTitle>
+              <CardTitle className="text-lg">{t('modules.projects.features.calendar.title', 'Automatic Calendar Population')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 text-base text-muted-foreground">
-              <p>Create a project once. The schedule fills itself.</p>
-              <p>When you enter a date range and assign employees, calendar entries appear automatically. No more creating a project, then opening Google Calendar, then texting your supervisor, then updating the whiteboard. Same information, one entry, everywhere it needs to go.</p>
-              <p>Building gets pushed by a week? Click the project, change the date. It syncs everywhere. Conflict detection flags when someone is double-booked before it becomes an emergency.</p>
+              <p>{t('modules.projects.features.calendar.once', 'Create a project once. The schedule fills itself.')}</p>
+              <p>{t('modules.projects.features.calendar.description', 'When you enter a date range and assign employees, calendar entries appear automatically. No more creating a project, then opening Google Calendar, then texting your supervisor, then updating the whiteboard. Same information, one entry, everywhere it needs to go.')}</p>
+              <p>{t('modules.projects.features.calendar.sync', 'Building gets pushed by a week? Click the project, change the date. It syncs everywhere. Conflict detection flags when someone is double-booked before it becomes an emergency.')}</p>
               <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
-                <p className="font-medium text-foreground mb-2">What gets automated:</p>
+                <p className="font-medium text-foreground mb-2">{t('modules.projects.features.calendar.automated', 'What gets automated:')}</p>
                 <ul className="space-y-1">
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-violet-500 shrink-0" />Multi-day project bars on company calendar</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-violet-500 shrink-0" />Employee assignments visible on their schedules</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-violet-500 shrink-0" />Color coding by job type</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-violet-500 shrink-0" />Conflict detection for double-booking</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-violet-500 shrink-0" />{t('modules.projects.features.calendar.item1', 'Multi-day project bars on company calendar')}</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-violet-500 shrink-0" />{t('modules.projects.features.calendar.item2', 'Employee assignments visible on their schedules')}</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-violet-500 shrink-0" />{t('modules.projects.features.calendar.item3', 'Color coding by job type')}</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-violet-500 shrink-0" />{t('modules.projects.features.calendar.item4', 'Conflict detection for double-booking')}</li>
                 </ul>
               </div>
             </CardContent>
@@ -231,19 +233,19 @@ export default function ProjectManagementLanding() {
               <div className="w-12 h-12 rounded-lg bg-[#0B64A3]/10 dark:bg-[#0B64A3]/20 flex items-center justify-center mb-3">
                 <Shield className="w-6 h-6 text-[#0B64A3]" />
               </div>
-              <CardTitle className="text-lg">Linked Documentation</CardTitle>
+              <CardTitle className="text-lg">{t('modules.projects.features.documentation.title', 'Linked Documentation')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 text-base text-muted-foreground">
-              <p>Safety docs live with their projects. Not in email. Not in Google Drive. Not in a folder in the truck.</p>
-              <p>Each project connects to its Rope Access Plan, Toolbox Meeting records, and Anchor Inspection Certificates. Property managers access compliance documents through their portal without emailing you. Auditors find everything in one place.</p>
-              <p>When the insurance company asks for proof of your safety program, you're not digging. You're clicking.</p>
+              <p>{t('modules.projects.features.documentation.live', 'Safety docs live with their projects. Not in email. Not in Google Drive. Not in a folder in the truck.')}</p>
+              <p>{t('modules.projects.features.documentation.description', 'Each project connects to its Rope Access Plan, Toolbox Meeting records, and Anchor Inspection Certificates. Property managers access compliance documents through their portal without emailing you. Auditors find everything in one place.')}</p>
+              <p>{t('modules.projects.features.documentation.insurance', "When the insurance company asks for proof of your safety program, you're not digging. You're clicking.")}</p>
               <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
-                <p className="font-medium text-foreground mb-2">What gets linked:</p>
+                <p className="font-medium text-foreground mb-2">{t('modules.projects.features.documentation.linked', 'What gets linked:')}</p>
                 <ul className="space-y-1">
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-[#0B64A3] shrink-0" />Rope Access Plans (RAP)</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-[#0B64A3] shrink-0" />Toolbox Meeting records</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-[#0B64A3] shrink-0" />Anchor Inspection Certificates</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-[#0B64A3] shrink-0" />Project photos</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-[#0B64A3] shrink-0" />{t('modules.projects.features.documentation.item1', 'Rope Access Plans (RAP)')}</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-[#0B64A3] shrink-0" />{t('modules.projects.features.documentation.item2', 'Toolbox Meeting records')}</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-[#0B64A3] shrink-0" />{t('modules.projects.features.documentation.item3', 'Anchor Inspection Certificates')}</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-[#0B64A3] shrink-0" />{t('modules.projects.features.documentation.item4', 'Project photos')}</li>
                 </ul>
               </div>
             </CardContent>
