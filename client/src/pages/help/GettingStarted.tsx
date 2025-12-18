@@ -29,9 +29,9 @@ export default function GettingStarted() {
         </div>
       </div>
       
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold mb-4" data-testid="text-getting-started-title">
+      <div className="max-w-4xl mx-auto px-4 py-12">
+        <div>
+          <h1 className="text-4xl font-bold tracking-tight mb-4" data-testid="text-getting-started-title">
             Getting Started with OnRopePro
           </h1>
           <p className="text-lg text-muted-foreground mb-12">

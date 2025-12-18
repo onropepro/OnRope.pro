@@ -102,8 +102,8 @@ export default function HelpArticle() {
         </div>
       </div>
       
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <div>
           <div className="mb-8">
             <div className="flex items-center gap-2 mb-4 flex-wrap">
               <Badge variant="secondary">
@@ -116,7 +116,7 @@ export default function HelpArticle() {
               ))}
             </div>
             
-            <h1 className="text-3xl font-bold mb-4" data-testid="text-article-title">
+            <h1 className="text-4xl font-bold tracking-tight mb-4" data-testid="text-article-title">
               {article.title}
             </h1>
             
