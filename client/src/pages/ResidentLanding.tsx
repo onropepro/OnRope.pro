@@ -641,50 +641,53 @@ export default function ResidentLanding() {
         </Accordion>
       </section>
 
-      <Separator className="max-w-4xl mx-auto" />
-
-      {/* Get Started Section */}
-      <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto text-center">
-        <h2 className="text-3xl md:text-4xl font-bold mb-4">
-          Your Building Is Already Using This System
-        </h2>
-        
-        <div className="space-y-4 text-base text-muted-foreground max-w-2xl mx-auto mb-8">
-          <p>
-            Your building's service company chose OnRopePro to improve communication with residents like you. They want to hear from you directly, not through three layers of phone calls.
+      {/* CTA Section - Stakeholder Colored */}
+      <section className="py-16 md:py-20 px-4 text-white" style={{backgroundImage: `linear-gradient(135deg, ${RESIDENT_COLOR} 0%, #6B8A80 100%)`}}>
+        <div className="max-w-3xl mx-auto text-center space-y-6">
+          <h2 className="text-3xl md:text-4xl font-bold">
+            Your Building Is Already Using This System
+          </h2>
+          <p className="text-lg text-white/90">
+            Your building's service company chose OnRopePro to improve communication with residents like you.<br />
+            Creating an account takes two minutes. Once you enter the vendor code, you'll have direct access to submit feedback.
           </p>
-          <p>
-            Creating an account takes two minutes. Once you enter the vendor code from your building manager, you'll see active projects and have direct access to submit feedback.
-          </p>
-          <p className="font-medium text-foreground">
+          <p className="font-medium text-white">
             No more wondering. No more waiting. No more repeating yourself.
           </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+            <Button size="lg" className="bg-white hover:bg-gray-50" style={{color: RESIDENT_COLOR}} asChild>
+              <Link href="/register" data-testid="button-create-account">
+                Create Your Account
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Link>
+            </Button>
+            <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild>
+              <Link href="/login" data-testid="button-login-cta">
+                Log In
+              </Link>
+            </Button>
+          </div>
+          <p className="text-sm text-white/80 pt-2">
+            Need the vendor code? Contact your building manager or property manager.
+          </p>
         </div>
-        
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button size="lg" className="text-white hover:opacity-90" style={{backgroundColor: RESIDENT_COLOR}} asChild>
-            <Link href="/register" data-testid="button-create-account">
-              Create Your Account
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Link>
-          </Button>
-        </div>
-        
-        <p className="text-base text-muted-foreground mt-4">
-          Already have an account? <Link href="/login" className="hover:underline font-medium" style={{color: RESIDENT_COLOR}} data-testid="link-login">Log In</Link>
-        </p>
-        <p className="text-base text-muted-foreground mt-2">
-          Need the vendor code? Contact your building manager or property manager.
-        </p>
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-6" style={{backgroundColor: RESIDENT_COLOR}}>
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <img src={onRopeProLogo} alt="OnRopePro" className="h-10 object-contain" />
-          <p className="text-sm text-white/90">
-            © 2024 OnRopePro. All rights reserved.
-          </p>
+      <footer className="py-8 px-4 border-t">
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <img src={onRopeProLogo} alt="OnRopePro" className="h-8 object-contain" />
+            <span className="text-sm text-muted-foreground">Management Software for Rope Access</span>
+          </div>
+          <div className="flex items-center gap-6 text-sm text-muted-foreground">
+            <Link href="/privacy" className="hover:text-foreground transition-colors" data-testid="link-footer-privacy">
+              Privacy Policy
+            </Link>
+            <Link href="/terms" className="hover:text-foreground transition-colors" data-testid="link-footer-terms">
+              Terms of Service
+            </Link>
+          </div>
         </div>
       </footer>
     </div>

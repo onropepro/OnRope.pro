@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { Link } from "wouter";
 import { PublicHeader } from "@/components/PublicHeader";
+import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 const PM_COLOR = "#6E9075";
 const PM_GRADIENT = "linear-gradient(135deg, #6E9075 0%, #5A7A60 100%)";
@@ -661,60 +662,54 @@ export default function PropertyManagerLanding() {
         </div>
       </section>
 
-      <Separator className="max-w-4xl mx-auto" />
-
-      {/* Final CTA Section */}
-      <section className="py-16 md:py-24 px-4 md:px-8">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+      {/* CTA Section - Stakeholder Colored */}
+      <section className="py-16 md:py-20 px-4 text-white" style={{backgroundImage: `linear-gradient(135deg, ${PM_COLOR} 0%, #5A7A60 100%)`}}>
+        <div className="max-w-3xl mx-auto text-center space-y-6">
+          <h2 className="text-3xl md:text-4xl font-bold">
             Oversight Without Involvement. Visibility Without Burden.
           </h2>
-          
-          <div className="space-y-4 text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-            <p>
-              You already manage rope access contractors. You're already handling complaints between residents and vendors. You're already wondering which vendors are actually safe.
-            </p>
-            <p>
-              The Property Manager Portal changes all of it.
-            </p>
-            <p>
-              Complaints go directly to vendors. You see everything without being in the middle.
-            </p>
-            <p>
-              Safety ratings show real compliance. You know who to trust before something goes wrong.
-            </p>
-            <p>
-              Response times prove accountability. You have data for contract decisions.
-            </p>
-            <p className="font-medium text-foreground">
-              Free. No credit card. No trial expiration.
-            </p>
-            <p>
-              Just ask your vendor for a Property Manager Code and create your account.
-            </p>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" style={{backgroundColor: PM_COLOR}} className="text-white hover:opacity-90" asChild>
+          <p className="text-lg text-white/90">
+            Complaints go directly to vendors. You see everything without being in the middle.<br />
+            Safety ratings show real compliance. Response times prove accountability.
+          </p>
+          <p className="font-medium text-white">
+            Free. No credit card. No trial expiration.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+            <Button size="lg" className="bg-white hover:bg-gray-50" style={{color: PM_COLOR}} asChild>
               <Link href="/register" data-testid="button-create-account-final">
                 Create Your Free Account
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" asChild>
+            <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild>
               <Link href="/contact" data-testid="button-tell-vendor">
                 Tell Your Vendor About OnRopePro
                 <Users className="ml-2 w-5 h-5" />
               </Link>
             </Button>
           </div>
+          <p className="text-sm text-white/80 pt-2">
+            Just ask your vendor for a Property Manager Code and create your account.
+          </p>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-4" style={{backgroundColor: PM_COLOR}}>
-        <div className="max-w-4xl mx-auto text-center text-sm text-white/90">
-          <p>OnRopePro - The platform for professional rope access companies</p>
+      <footer className="py-8 px-4 border-t">
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <img src={onRopeProLogo} alt="OnRopePro" className="h-8 object-contain" />
+            <span className="text-sm text-muted-foreground">Management Software for Rope Access</span>
+          </div>
+          <div className="flex items-center gap-6 text-sm text-muted-foreground">
+            <Link href="/privacy" className="hover:text-foreground transition-colors" data-testid="link-footer-privacy">
+              Privacy Policy
+            </Link>
+            <Link href="/terms" className="hover:text-foreground transition-colors" data-testid="link-footer-terms">
+              Terms of Service
+            </Link>
+          </div>
         </div>
       </footer>
     </div>
