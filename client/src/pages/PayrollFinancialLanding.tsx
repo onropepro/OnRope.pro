@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { PublicHeader } from "@/components/PublicHeader";
 import {
   DollarSign,
@@ -32,6 +33,7 @@ import {
 } from "lucide-react";
 
 export default function PayrollFinancialLanding() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const [timeReduction, setTimeReduction] = useState(0);
   const [annualValue, setAnnualValue] = useState(0);
@@ -69,29 +71,29 @@ export default function PayrollFinancialLanding() {
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
           <div className="text-center space-y-6 pt-16">
             <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-module-label">
-              Payroll & Financial Module
+              {t('modules.payroll.hero.badge', 'Payroll & Financial Module')}
             </Badge>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              Stop Circling Numbers<br />
-              <span className="text-blue-100">With a Pen</span>
+              {t('modules.payroll.hero.titleLine1', 'Stop Circling Numbers')}<br />
+              <span className="text-blue-100">{t('modules.payroll.hero.titleLine2', 'With a Pen')}</span>
             </h1>
 
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              Work sessions flow directly into payroll-ready timesheets. No paper. No calculator. No circling.<br />
-              <strong>Export to QuickBooks, ADP, or Gusto in minutes.</strong>
+              {t('modules.payroll.hero.description', 'Work sessions flow directly into payroll-ready timesheets. No paper. No calculator. No circling.')}<br />
+              <strong>{t('modules.payroll.hero.descriptionBold', 'Export to QuickBooks, ADP, or Gusto in minutes.')}</strong>
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-hero-trial">
                 <Link href="/register">
-                  Start Your Free 60-Day Trial
+                  {t('modules.payroll.hero.trialButton', 'Start Your Free 60-Day Trial')}
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-hero-faqs">
                 <Link href="#faqs">
-                  Find Answers
+                  {t('modules.payroll.hero.faqButton', 'Find Answers')}
                   <BookOpen className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
@@ -115,19 +117,19 @@ export default function PayrollFinancialLanding() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-blue-600" data-testid="stat-time-reduction">{timeReduction}%</div>
-                  <div className="text-sm text-muted-foreground mt-1">Payroll time eliminated</div>
+                  <div className="text-sm text-muted-foreground mt-1">{t('modules.payroll.stats.timeEliminated', 'Payroll time eliminated')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-emerald-600" data-testid="stat-annual-value">${annualValue.toLocaleString()}</div>
-                  <div className="text-sm text-muted-foreground mt-1">Annual time value</div>
+                  <div className="text-sm text-muted-foreground mt-1">{t('modules.payroll.stats.annualValue', 'Annual time value')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-amber-600" data-testid="stat-hours-saved">{hoursSaved}</div>
-                  <div className="text-sm text-muted-foreground mt-1">Hours saved yearly</div>
+                  <div className="text-sm text-muted-foreground mt-1">{t('modules.payroll.stats.hoursSaved', 'Hours saved yearly')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-violet-600" data-testid="stat-problems-solved">{problemsSolved}+</div>
-                  <div className="text-sm text-muted-foreground mt-1">Problems solved</div>
+                  <div className="text-sm text-muted-foreground mt-1">{t('modules.payroll.stats.problemsSolved', 'Problems solved')}</div>
                 </div>
               </div>
             </CardContent>
@@ -141,29 +143,29 @@ export default function PayrollFinancialLanding() {
       <section className="py-16 md:py-20 px-4" data-testid="section-problem-statement">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
-            The Payroll Problem Nobody Admits
+            {t('modules.payroll.problem.title', 'The Payroll Problem Nobody Admits')}
           </h2>
 
           <Card className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
             <CardContent className="p-6 md:p-8 space-y-4 text-muted-foreground">
               <p className="text-lg leading-relaxed font-medium text-foreground">
-                You print timesheets. One employee's data spreads across four pages.
+                {t('modules.payroll.problem.line1', "You print timesheets. One employee's data spreads across four pages.")}
               </p>
               <p className="text-base">
-                Twelve employees means 48 pages minimum. You lay them across your desk, circle hours with a pen, and grab a calculator.
+                {t('modules.payroll.problem.line2', 'Twelve employees means 48 pages minimum. You lay them across your desk, circle hours with a pen, and grab a calculator.')}
               </p>
               <p className="text-base">
-                Three hours later, you're still not done. And you've probably made a mistake you won't catch until the employee calls asking why they're short $130.
+                {t('modules.payroll.problem.line3', "Three hours later, you're still not done. And you've probably made a mistake you won't catch until the employee calls asking why they're short $130.")}
               </p>
               <p className="text-base">
-                So you send a quick e-transfer. Problem solved for them. Problem created for your books. Your bookkeeper asks what that random payment was. Now you're explaining instead of running your company.
+                {t('modules.payroll.problem.line4', "So you send a quick e-transfer. Problem solved for them. Problem created for your books. Your bookkeeper asks what that random payment was. Now you're explaining instead of running your company.")}
               </p>
               <p className="text-base">
-                This chaos doesn't stay contained. When payroll is painful, you put it off. When you're consistently late, your team notices. A culture forms where deadlines are optional. That mindset bleeds into everything.
+                {t('modules.payroll.problem.line5', "This chaos doesn't stay contained. When payroll is painful, you put it off. When you're consistently late, your team notices. A culture forms where deadlines are optional. That mindset bleeds into everything.")}
               </p>
               <Separator className="my-6" />
               <p className="font-medium text-foreground text-lg">
-                OnRopePro eliminates manual entry between field work and payroll. Every clock-in becomes payroll data automatically. GPS-verified. Project-attributed. Overtime-calculated. Ready to export.
+                {t('modules.payroll.problem.solution', 'OnRopePro eliminates manual entry between field work and payroll. Every clock-in becomes payroll data automatically. GPS-verified. Project-attributed. Overtime-calculated. Ready to export.')}
               </p>
             </CardContent>
           </Card>
@@ -176,10 +178,10 @@ export default function PayrollFinancialLanding() {
       <section id="features" className="pt-8 md:pt-12 pb-16 md:pb-20 px-4 bg-slate-50 dark:bg-slate-900" data-testid="section-what-module-does">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            From Clock-In to Payroll Export
+            {t('modules.payroll.features.title', 'From Clock-In to Payroll Export')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-3xl mx-auto">
-            The Payroll & Financial module transforms scattered work session data into organized, exportable timesheets without manual intervention.
+            {t('modules.payroll.features.subtitle', 'The Payroll & Financial module transforms scattered work session data into organized, exportable timesheets without manual intervention.')}
           </p>
 
           <div className="grid md:grid-cols-3 gap-6">

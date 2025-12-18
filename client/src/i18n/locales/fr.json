@@ -4876,5 +4876,37 @@
       "submit": "Envoyer mon analyse",
       "disclaimer": "Nous respectons votre vie privée. Pas de spam, juste votre rapport d'économies personnalisé."
     }
+  },
+  "modules": {
+    "payroll": {
+      "hero": {
+        "badge": "Module Paie & Finances",
+        "titleLine1": "Arrêtez d'encercler des chiffres",
+        "titleLine2": "Avec un stylo",
+        "description": "Les sessions de travail alimentent directement les feuilles de temps prêtes pour la paie. Pas de papier. Pas de calculatrice. Pas d'encerclement.",
+        "descriptionBold": "Exportez vers QuickBooks, ADP ou Gusto en quelques minutes.",
+        "trialButton": "Commencer votre essai gratuit de 60 jours",
+        "faqButton": "Trouver des réponses"
+      },
+      "stats": {
+        "timeEliminated": "Temps de paie éliminé",
+        "annualValue": "Valeur annuelle du temps",
+        "hoursSaved": "Heures économisées par an",
+        "problemsSolved": "Problèmes résolus"
+      },
+      "problem": {
+        "title": "Le problème de paie que personne n'admet",
+        "line1": "Vous imprimez des feuilles de temps. Les données d'un employé s'étalent sur quatre pages.",
+        "line2": "Douze employés signifie 48 pages minimum. Vous les étalez sur votre bureau, encerclez les heures avec un stylo et prenez une calculatrice.",
+        "line3": "Trois heures plus tard, vous n'avez toujours pas terminé. Et vous avez probablement fait une erreur que vous ne découvrirez que lorsque l'employé appellera pour demander pourquoi il lui manque 130 $.",
+        "line4": "Alors vous envoyez un virement rapide. Problème résolu pour eux. Problème créé pour vos livres. Votre comptable demande ce qu'était ce paiement aléatoire. Maintenant vous expliquez au lieu de diriger votre entreprise.",
+        "line5": "Ce chaos ne reste pas contenu. Quand la paie est pénible, vous la repoussez. Quand vous êtes constamment en retard, votre équipe le remarque. Une culture se forme où les délais sont optionnels. Cette mentalité se répand partout.",
+        "solution": "OnRopePro élimine la saisie manuelle entre le travail terrain et la paie. Chaque pointage devient automatiquement des données de paie. Vérifié par GPS. Attribué au projet. Heures supplémentaires calculées. Prêt à exporter."
+      },
+      "features": {
+        "title": "Du pointage à l'export de paie",
+        "subtitle": "Le module Paie & Finances transforme les données de sessions de travail dispersées en feuilles de temps organisées et exportables sans intervention manuelle."
+      }
+    }
   }
 }

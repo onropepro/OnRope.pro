@@ -4692,5 +4692,37 @@
       "submit": "Send My Analysis",
       "disclaimer": "We respect your privacy. No spam, just your personalized savings report."
     }
+  },
+  "modules": {
+    "payroll": {
+      "hero": {
+        "badge": "Payroll & Financial Module",
+        "titleLine1": "Stop Circling Numbers",
+        "titleLine2": "With a Pen",
+        "description": "Work sessions flow directly into payroll-ready timesheets. No paper. No calculator. No circling.",
+        "descriptionBold": "Export to QuickBooks, ADP, or Gusto in minutes.",
+        "trialButton": "Start Your Free 60-Day Trial",
+        "faqButton": "Find Answers"
+      },
+      "stats": {
+        "timeEliminated": "Payroll time eliminated",
+        "annualValue": "Annual time value",
+        "hoursSaved": "Hours saved yearly",
+        "problemsSolved": "Problems solved"
+      },
+      "problem": {
+        "title": "The Payroll Problem Nobody Admits",
+        "line1": "You print timesheets. One employee's data spreads across four pages.",
+        "line2": "Twelve employees means 48 pages minimum. You lay them across your desk, circle hours with a pen, and grab a calculator.",
+        "line3": "Three hours later, you're still not done. And you've probably made a mistake you won't catch until the employee calls asking why they're short $130.",
+        "line4": "So you send a quick e-transfer. Problem solved for them. Problem created for your books. Your bookkeeper asks what that random payment was. Now you're explaining instead of running your company.",
+        "line5": "This chaos doesn't stay contained. When payroll is painful, you put it off. When you're consistently late, your team notices. A culture forms where deadlines are optional. That mindset bleeds into everything.",
+        "solution": "OnRopePro eliminates manual entry between field work and payroll. Every clock-in becomes payroll data automatically. GPS-verified. Project-attributed. Overtime-calculated. Ready to export."
+      },
+      "features": {
+        "title": "From Clock-In to Payroll Export",
+        "subtitle": "The Payroll & Financial module transforms scattered work session data into organized, exportable timesheets without manual intervention."
+      }
+    }
   }
 }
