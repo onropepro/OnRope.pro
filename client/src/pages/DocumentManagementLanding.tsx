@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,8 @@ import {
 } from "lucide-react";
 
 export default function DocumentManagementLanding() {
+  const { t } = useTranslation();
+  
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
       <PublicHeader activeNav="modules" />
@@ -46,29 +49,29 @@ export default function DocumentManagementLanding() {
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
           <div className="text-center space-y-6 pt-16">
             <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-module-label">
-              Document Management Module
+              {t('modules.documents.hero.badge', 'Document Management Module')}
             </Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              When the Auditor Shows Up,<br />
-              <span className="text-blue-100">Will You Be Scrambling or Ready?</span>
+              {t('modules.documents.hero.title', 'When the Auditor Shows Up,')}<br />
+              <span className="text-blue-100">{t('modules.documents.hero.subtitle', 'Will You Be Scrambling or Ready?')}</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              Every document. Every signature. Every timestamp. Searchable in seconds, not scattered across filing cabinets.<br />
-              <strong>Build compliance records that protect your business<br />when it matters most.</strong>
+              {t('modules.documents.hero.description', 'Every document. Every signature. Every timestamp. Searchable in seconds, not scattered across filing cabinets.')}<br />
+              <strong>{t('modules.documents.hero.descriptionStrong', 'Build compliance records that protect your business when it matters most.')}</strong>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-hero-trial">
                 <Link href="/register">
-                  Start Your Free 60-Day Trial
+                  {t('modules.documents.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-hero-faqs">
                 <Link href="#faqs">
-                  Find Answers
+                  {t('modules.documents.hero.ctaFaqs', 'Find Answers')}
                   <BookOpen className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
@@ -92,19 +95,19 @@ export default function DocumentManagementLanding() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-blue-600">&lt; 5 min</div>
-                  <div className="text-base text-muted-foreground mt-1">Audit prep, not hours</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.documents.stats.auditPrep', 'Audit prep, not hours')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-emerald-600">100%</div>
-                  <div className="text-base text-muted-foreground mt-1">Acknowledgment visibility</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.documents.stats.acknowledgment', 'Acknowledgment visibility')}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-amber-600">Never</div>
-                  <div className="text-base text-muted-foreground mt-1">Insurance lapses</div>
+                  <div className="text-3xl md:text-4xl font-bold text-amber-600">{t('modules.documents.stats.neverValue', 'Never')}</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.documents.stats.insurance', 'Insurance lapses')}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-violet-600">Permanent</div>
-                  <div className="text-base text-muted-foreground mt-1">Tamper-proof records</div>
+                  <div className="text-3xl md:text-4xl font-bold text-violet-600">{t('modules.documents.stats.permanentValue', 'Permanent')}</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.documents.stats.tamperProof', 'Tamper-proof records')}</div>
                 </div>
               </div>
             </CardContent>
@@ -118,22 +121,22 @@ export default function DocumentManagementLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
-            The Compliance Gap Nobody Talks About
+            {t('modules.documents.problem.title', 'The Compliance Gap Nobody Talks About')}
           </h2>
           
           <Card className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
             <CardContent className="p-6 md:p-8 space-y-4 text-muted-foreground">
               <p className="text-lg leading-relaxed font-medium text-foreground">
-                You handed your new hire the safety manual. He said "yep, I read it" and set it aside.
+                {t('modules.documents.problem.intro', 'You handed your new hire the safety manual. He said "yep, I read it" and set it aside.')}
               </p>
               <p className="text-base">
-                Two weeks later, he causes damage during a window cleaning job because he used a technique from his old company. Now you're facing a claim, and "he told me he read it" is your entire defense.
+                {t('modules.documents.problem.scenario', 'Two weeks later, he causes damage during a window cleaning job because he used a technique from his old company. Now you\'re facing a claim, and "he told me he read it" is your entire defense.')}
               </p>
               <p className="text-base">
-                Paper systems don't fail during normal operations. They fail during audits, lawsuits, and insurance investigations. The moment you need to prove compliance, you discover scattered files, missing signatures, and no way to verify who actually reviewed what.
+                {t('modules.documents.problem.reality', 'Paper systems don\'t fail during normal operations. They fail during audits, lawsuits, and insurance investigations. The moment you need to prove compliance, you discover scattered files, missing signatures, and no way to verify who actually reviewed what.')}
               </p>
               <p className="text-base font-medium text-foreground">
-                OnRopePro treats document management as the foundation of your liability protection. Every acknowledgment is timestamped. Every signature is permanent. When WorkSafeBC asks for proof, you don't search. You generate a report.
+                {t('modules.documents.problem.solution', 'OnRopePro treats document management as the foundation of your liability protection. Every acknowledgment is timestamped. Every signature is permanent. When WorkSafeBC asks for proof, you don\'t search. You generate a report.')}
               </p>
             </CardContent>
           </Card>
@@ -146,10 +149,10 @@ export default function DocumentManagementLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            What This Module Does
+            {t('modules.documents.features.title', 'What This Module Does')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-            Your complete document compliance infrastructure. Centralizes every safety manual, policy, procedure, and certificate with digital signatures that create defensible compliance records.
+            {t('modules.documents.features.subtitle', 'Your complete document compliance infrastructure. Centralizes every safety manual, policy, procedure, and certificate with digital signatures that create defensible compliance records.')}
           </p>
           
           <div className="grid md:grid-cols-3 gap-6">
@@ -159,20 +162,20 @@ export default function DocumentManagementLanding() {
                   <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
                     <PenTool className="w-5 h-5 text-blue-600" />
                   </div>
-                  <CardTitle className="text-lg">Digital Signature Capture</CardTitle>
+                  <CardTitle className="text-lg">{t('modules.documents.features.signature.title', 'Digital Signature Capture')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
                 <p className="text-base text-muted-foreground">
-                  When employees review documents, they sign digitally with a captured timestamp. No more "I didn't know" excuses. The signature proves they saw the exact version you uploaded, on the exact date and time.
+                  {t('modules.documents.features.signature.description', 'When employees review documents, they sign digitally with a captured timestamp. No more "I didn\'t know" excuses. The signature proves they saw the exact version you uploaded, on the exact date and time.')}
                 </p>
                 <div className="space-y-2 text-base text-muted-foreground">
-                  <p className="font-medium text-foreground">What gets captured:</p>
+                  <p className="font-medium text-foreground">{t('modules.documents.features.signature.capturedLabel', 'What gets captured:')}</p>
                   <ul className="list-disc list-inside space-y-1 ml-2">
-                    <li>Employee identity</li>
-                    <li>Document version reviewed</li>
-                    <li>Timestamp of acknowledgment</li>
-                    <li>Permanent audit record</li>
+                    <li>{t('modules.documents.features.signature.item1', 'Employee identity')}</li>
+                    <li>{t('modules.documents.features.signature.item2', 'Document version reviewed')}</li>
+                    <li>{t('modules.documents.features.signature.item3', 'Timestamp of acknowledgment')}</li>
+                    <li>{t('modules.documents.features.signature.item4', 'Permanent audit record')}</li>
                   </ul>
                 </div>
               </CardContent>
@@ -184,20 +187,20 @@ export default function DocumentManagementLanding() {
                   <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center">
                     <ClipboardList className="w-5 h-5 text-emerald-600" />
                   </div>
-                  <CardTitle className="text-lg">Compliance Status Tracking</CardTitle>
+                  <CardTitle className="text-lg">{t('modules.documents.features.compliance.title', 'Compliance Status Tracking')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
                 <p className="text-base text-muted-foreground">
-                  See exactly who has signed which documents, who has gaps, and who needs reminders. Dashboards show missing acknowledgments before they become audit findings.
+                  {t('modules.documents.features.compliance.description', 'See exactly who has signed which documents, who has gaps, and who needs reminders. Dashboards show missing acknowledgments before they become audit findings.')}
                 </p>
                 <div className="space-y-2 text-base text-muted-foreground">
-                  <p className="font-medium text-foreground">What gets tracked:</p>
+                  <p className="font-medium text-foreground">{t('modules.documents.features.compliance.trackedLabel', 'What gets tracked:')}</p>
                   <ul className="list-disc list-inside space-y-1 ml-2">
-                    <li>Employee acknowledgment status per document</li>
-                    <li>Missing signature alerts</li>
-                    <li>New version notification requirements</li>
-                    <li>Onboarding completion progress</li>
+                    <li>{t('modules.documents.features.compliance.item1', 'Employee acknowledgment status per document')}</li>
+                    <li>{t('modules.documents.features.compliance.item2', 'Missing signature alerts')}</li>
+                    <li>{t('modules.documents.features.compliance.item3', 'New version notification requirements')}</li>
+                    <li>{t('modules.documents.features.compliance.item4', 'Onboarding completion progress')}</li>
                   </ul>
                 </div>
               </CardContent>
@@ -209,20 +212,20 @@ export default function DocumentManagementLanding() {
                   <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center">
                     <FileCheck className="w-5 h-5 text-violet-600" />
                   </div>
-                  <CardTitle className="text-lg">Instant Audit Response</CardTitle>
+                  <CardTitle className="text-lg">{t('modules.documents.features.audit.title', 'Instant Audit Response')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
                 <p className="text-base text-muted-foreground">
-                  Generate compliance reports in seconds. When regulators, insurers, or attorneys ask for documentation, you provide professional reports instead of paper shuffling.
+                  {t('modules.documents.features.audit.description', 'Generate compliance reports in seconds. When regulators, insurers, or attorneys ask for documentation, you provide professional reports instead of paper shuffling.')}
                 </p>
                 <div className="space-y-2 text-base text-muted-foreground">
-                  <p className="font-medium text-foreground">What gets reported:</p>
+                  <p className="font-medium text-foreground">{t('modules.documents.features.audit.reportedLabel', 'What gets reported:')}</p>
                   <ul className="list-disc list-inside space-y-1 ml-2">
-                    <li>Complete signature history by employee</li>
-                    <li>Document version control</li>
-                    <li>Acknowledgment timestamps</li>
-                    <li>Exportable PDF and CSV formats</li>
+                    <li>{t('modules.documents.features.audit.item1', 'Complete signature history by employee')}</li>
+                    <li>{t('modules.documents.features.audit.item2', 'Document version control')}</li>
+                    <li>{t('modules.documents.features.audit.item3', 'Acknowledgment timestamps')}</li>
+                    <li>{t('modules.documents.features.audit.item4', 'Exportable PDF and CSV formats')}</li>
                   </ul>
                 </div>
               </CardContent>
@@ -237,10 +240,10 @@ export default function DocumentManagementLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Who Benefits From This Module
+            {t('modules.documents.stakeholders.title', 'Who Benefits From This Module')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-            Every stakeholder gets the document access and compliance visibility they need.
+            {t('modules.documents.stakeholders.subtitle', 'Every stakeholder gets the document access and compliance visibility they need.')}
           </p>
           
           <div className="space-y-8">
@@ -375,10 +378,10 @@ export default function DocumentManagementLanding() {
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Key Features
+            {t('modules.documents.keyFeatures.title', 'Key Features')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-            Every feature is built to create defensible compliance records that protect your business.
+            {t('modules.documents.keyFeatures.subtitle', 'Every feature is built to create defensible compliance records that protect your business.')}
           </p>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -389,9 +392,9 @@ export default function DocumentManagementLanding() {
                     <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Immutable Audit Trail</h3>
+                    <h3 className="font-semibold">{t('modules.documents.keyFeatures.immutableAudit.title', 'Immutable Audit Trail')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      Once signed, signature records cannot be deleted or modified. This creates permanent, tamper-proof compliance documentation for regulators, insurers, and legal defense.
+                      {t('modules.documents.keyFeatures.immutableAudit.description', 'Once signed, signature records cannot be deleted or modified. This creates permanent, tamper-proof compliance documentation for regulators, insurers, and legal defense.')}
                     </p>
                   </div>
                 </div>
@@ -405,9 +408,9 @@ export default function DocumentManagementLanding() {
                     <FileText className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">15 Pre-Built SWP Templates</h3>
+                    <h3 className="font-semibold">{t('modules.documents.keyFeatures.swpTemplates.title', '15 Pre-Built SWP Templates')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      Industry-standard Safe Work Procedure templates covering fall protection, anchor systems, rope techniques, and rescue procedures. Customize for your operations and generate professional PDFs.
+                      {t('modules.documents.keyFeatures.swpTemplates.description', 'Industry-standard Safe Work Procedure templates covering fall protection, anchor systems, rope techniques, and rescue procedures. Customize for your operations and generate professional PDFs.')}
                     </p>
                   </div>
                 </div>
@@ -421,9 +424,9 @@ export default function DocumentManagementLanding() {
                     <RefreshCw className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">10 Daily Safety Practice Topics</h3>
+                    <h3 className="font-semibold">{t('modules.documents.keyFeatures.safetyTopics.title', '10 Daily Safety Practice Topics')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      Rotating safety discussion topics with employee acknowledgment tracking. Regular engagement demonstrates active safety culture and contributes to your CSR score.
+                      {t('modules.documents.keyFeatures.safetyTopics.description', 'Rotating safety discussion topics with employee acknowledgment tracking. Regular engagement demonstrates active safety culture and contributes to your CSR score.')}
                     </p>
                   </div>
                 </div>
@@ -437,9 +440,9 @@ export default function DocumentManagementLanding() {
                     <Calendar className="w-5 h-5 text-rose-600 dark:text-rose-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Expiration Tracking</h3>
+                    <h3 className="font-semibold">{t('modules.documents.keyFeatures.expirationTracking.title', 'Expiration Tracking')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      Upload insurance certificates with expiration dates. The system provides advance warnings so you never get caught with lapsed coverage during a client request.
+                      {t('modules.documents.keyFeatures.expirationTracking.description', 'Upload insurance certificates with expiration dates. The system provides advance warnings so you never get caught with lapsed coverage during a client request.')}
                     </p>
                   </div>
                 </div>
@@ -453,9 +456,9 @@ export default function DocumentManagementLanding() {
                     <Lock className="w-5 h-5 text-violet-600 dark:text-violet-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Role-Based Access</h3>
+                    <h3 className="font-semibold">{t('modules.documents.keyFeatures.roleBasedAccess.title', 'Role-Based Access')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      Sensitive documents like Certificate of Insurance are restricted to Company Owner and Ops Manager roles. Technicians and supervisors see only what they need.
+                      {t('modules.documents.keyFeatures.roleBasedAccess.description', 'Sensitive documents like Certificate of Insurance are restricted to Company Owner and Ops Manager roles. Technicians and supervisors see only what they need.')}
                     </p>
                   </div>
                 </div>
@@ -469,9 +472,9 @@ export default function DocumentManagementLanding() {
                     <BarChart3 className="w-5 h-5 text-sky-600 dark:text-sky-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">CSR Integration</h3>
+                    <h3 className="font-semibold">{t('modules.documents.keyFeatures.csrIntegration.title', 'CSR Integration')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      Employee document acknowledgment rates feed directly into your Company Safety Rating. Building managers can see your CSR, demonstrating your commitment to safety culture without exposing proprietary procedures.
+                      {t('modules.documents.keyFeatures.csrIntegration.description', 'Employee document acknowledgment rates feed directly into your Company Safety Rating. Building managers can see your CSR, demonstrating your commitment to safety culture without exposing proprietary procedures.')}
                     </p>
                   </div>
                 </div>
@@ -487,10 +490,10 @@ export default function DocumentManagementLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Problems Solved
+            {t('modules.documents.problemsSolved.title', 'Problems Solved')}
           </h2>
           <p className="text-center text-muted-foreground mb-12">
-            Real problems. Real solutions. Organized by who you are.
+            {t('modules.documents.problemsSolved.subtitle', 'Real problems. Real solutions. Organized by who you are.')}
           </p>
 
           <Accordion type="multiple" className="space-y-4">
@@ -501,7 +504,7 @@ export default function DocumentManagementLanding() {
                   <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
                     <Briefcase className="w-5 h-5 text-blue-600" />
                   </div>
-                  <span className="text-lg font-semibold">For Employers</span>
+                  <span className="text-lg font-semibold">{t('modules.documents.problemsSolved.employers.title', 'For Employers')}</span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="pb-4 space-y-6">
@@ -550,7 +553,7 @@ export default function DocumentManagementLanding() {
                   <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center">
                     <UserCheck className="w-5 h-5 text-amber-600" />
                   </div>
-                  <span className="text-lg font-semibold">For Operations Managers & Supervisors</span>
+                  <span className="text-lg font-semibold">{t('modules.documents.problemsSolved.operations.title', 'For Operations Managers & Supervisors')}</span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="pb-4 space-y-6">
@@ -587,7 +590,7 @@ export default function DocumentManagementLanding() {
                   <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center">
                     <Building2 className="w-5 h-5 text-violet-600" />
                   </div>
-                  <span className="text-lg font-semibold">For Building Managers & Property Managers</span>
+                  <span className="text-lg font-semibold">{t('modules.documents.problemsSolved.buildingManagers.title', 'For Building Managers & Property Managers')}</span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="pb-4 space-y-6">
@@ -612,7 +615,7 @@ export default function DocumentManagementLanding() {
                   <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center">
                     <HardHat className="w-5 h-5 text-rose-600" />
                   </div>
-                  <span className="text-lg font-semibold">For Technicians</span>
+                  <span className="text-lg font-semibold">{t('modules.documents.problemsSolved.technicians.title', 'For Technicians')}</span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="pb-4 space-y-6">
@@ -639,10 +642,10 @@ export default function DocumentManagementLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Measurable Results
+            {t('modules.documents.measurableResults.title', 'Measurable Results')}
           </h2>
           <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
-            Concrete improvements you can measure from day one.
+            {t('modules.documents.measurableResults.subtitle', 'Concrete improvements you can measure from day one.')}
           </p>
 
           <div className="grid md:grid-cols-2 gap-6">
@@ -653,9 +656,9 @@ export default function DocumentManagementLanding() {
                     <Clock className="w-5 h-5 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg mb-2">Audit Preparation Time</h3>
+                    <h3 className="font-semibold text-lg mb-2">{t('modules.documents.measurableResults.auditPrep.title', 'Audit Preparation Time')}</h3>
                     <p className="text-base text-muted-foreground">
-                      Audit preparation time reduced from hours to minutes. Generate complete employee signature reports instantly instead of searching through filing cabinets and scattered paper forms.
+                      {t('modules.documents.measurableResults.auditPrep.description', 'Audit preparation time reduced from hours to minutes. Generate complete employee signature reports instantly instead of searching through filing cabinets and scattered paper forms.')}
                     </p>
                   </div>
                 </div>
@@ -669,9 +672,9 @@ export default function DocumentManagementLanding() {
                     <Eye className="w-5 h-5 text-emerald-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg mb-2">Compliance Visibility</h3>
+                    <h3 className="font-semibold text-lg mb-2">{t('modules.documents.measurableResults.visibility.title', 'Compliance Visibility')}</h3>
                     <p className="text-base text-muted-foreground">
-                      100% visibility into employee acknowledgment status. Dashboard shows exactly who has signed which documents and who has gaps, eliminating audit surprises and enabling proactive gap closure.
+                      {t('modules.documents.measurableResults.visibility.description', '100% visibility into employee acknowledgment status. Dashboard shows exactly who has signed which documents and who has gaps, eliminating audit surprises and enabling proactive gap closure.')}
                     </p>
                   </div>
                 </div>
@@ -685,9 +688,9 @@ export default function DocumentManagementLanding() {
                     <FileClock className="w-5 h-5 text-amber-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg mb-2">Insurance Protection</h3>
+                    <h3 className="font-semibold text-lg mb-2">{t('modules.documents.measurableResults.insurance.title', 'Insurance Protection')}</h3>
                     <p className="text-base text-muted-foreground">
-                      Never get caught with expired insurance coverage. Advance expiration warnings ensure proactive renewal so you never lose work from lapsed documentation.
+                      {t('modules.documents.measurableResults.insurance.description', 'Never get caught with expired insurance coverage. Advance expiration warnings ensure proactive renewal so you never lose work from lapsed documentation.')}
                     </p>
                   </div>
                 </div>
@@ -701,9 +704,9 @@ export default function DocumentManagementLanding() {
                     <ShieldCheck className="w-5 h-5 text-violet-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg mb-2">Liability Defense</h3>
+                    <h3 className="font-semibold text-lg mb-2">{t('modules.documents.measurableResults.liability.title', 'Liability Defense')}</h3>
                     <p className="text-base text-muted-foreground">
-                      Immutable signature records with timestamps create defensible compliance documentation. When incidents occur, you prove due diligence with permanent audit trail, not verbal assurances.
+                      {t('modules.documents.measurableResults.liability.description', 'Immutable signature records with timestamps create defensible compliance documentation. When incidents occur, you prove due diligence with permanent audit trail, not verbal assurances.')}
                     </p>
                   </div>
                 </div>
@@ -719,10 +722,10 @@ export default function DocumentManagementLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Other Modules This Module Communicates With
+            {t('modules.documents.moduleIntegration.title', 'Other Modules This Module Communicates With')}
           </h2>
           <p className="text-center text-muted-foreground mb-12 max-w-3xl mx-auto">
-            Document Management integrates with other OnRopePro modules to create connected compliance infrastructure.
+            {t('modules.documents.moduleIntegration.subtitle', 'Document Management integrates with other OnRopePro modules to create connected compliance infrastructure.')}
           </p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -733,9 +736,9 @@ export default function DocumentManagementLanding() {
                     <Lock className="w-5 h-5 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">User Access & Authentication</h3>
+                    <h3 className="font-semibold">{t('modules.documents.moduleIntegration.userAccess.title', 'User Access & Authentication')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      Permissions control who can upload, view, and manage documents. Company owners have full access while technicians see only documents relevant to their role.
+                      {t('modules.documents.moduleIntegration.userAccess.description', 'Permissions control who can upload, view, and manage documents. Company owners have full access while technicians see only documents relevant to their role.')}
                     </p>
                   </div>
                 </div>
@@ -749,9 +752,9 @@ export default function DocumentManagementLanding() {
                     <ShieldCheck className="w-5 h-5 text-emerald-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Safety & Compliance</h3>
+                    <h3 className="font-semibold">{t('modules.documents.moduleIntegration.safety.title', 'Safety & Compliance')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      Safe Work Procedures integrate with harness inspections and toolbox meetings. Employee acknowledgment of safety documents feeds into the broader compliance picture.
+                      {t('modules.documents.moduleIntegration.safety.description', 'Safe Work Procedures integrate with harness inspections and toolbox meetings. Employee acknowledgment of safety documents feeds into the broader compliance picture.')}
                     </p>
                   </div>
                 </div>
@@ -765,9 +768,9 @@ export default function DocumentManagementLanding() {
                     <BarChart3 className="w-5 h-5 text-amber-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Company Safety Rating (CSR)</h3>
+                    <h3 className="font-semibold">{t('modules.documents.moduleIntegration.csr.title', 'Company Safety Rating (CSR)')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      Document acknowledgment rates contribute directly to your CSR score. Building managers see your CSR without accessing your actual documents.
+                      {t('modules.documents.moduleIntegration.csr.description', 'Document acknowledgment rates contribute directly to your CSR score. Building managers see your CSR without accessing your actual documents.')}
                     </p>
                   </div>
                 </div>
@@ -781,9 +784,9 @@ export default function DocumentManagementLanding() {
                     <Users className="w-5 h-5 text-violet-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Employee Management</h3>
+                    <h3 className="font-semibold">{t('modules.documents.moduleIntegration.employees.title', 'Employee Management')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      Employee records link to document acknowledgment history. When you review an employee's profile, you see their complete compliance status.
+                      {t('modules.documents.moduleIntegration.employees.description', 'Employee records link to document acknowledgment history. When you review an employee\'s profile, you see their complete compliance status.')}
                     </p>
                   </div>
                 </div>
@@ -797,9 +800,9 @@ export default function DocumentManagementLanding() {
                     <Building2 className="w-5 h-5 text-sky-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Building Manager Portal</h3>
+                    <h3 className="font-semibold">{t('modules.documents.moduleIntegration.buildingManager.title', 'Building Manager Portal')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      Building managers can view your CSR score, which reflects document acknowledgment engagement. They cannot see your actual documents or procedures.
+                      {t('modules.documents.moduleIntegration.buildingManager.description', 'Building managers can view your CSR score, which reflects document acknowledgment engagement. They cannot see your actual documents or procedures.')}
                     </p>
                   </div>
                 </div>
@@ -815,29 +818,29 @@ export default function DocumentManagementLanding() {
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
-            Stop Chasing Signatures. Start Building Defensible Compliance.
+            {t('modules.documents.businessImpact.title', 'Stop Chasing Signatures. Start Building Defensible Compliance.')}
           </h2>
           
           <Card className="border-slate-200 dark:border-slate-800">
             <CardContent className="p-6 md:p-8 space-y-4 text-muted-foreground">
               <p className="text-base">
-                Right now, your compliance exists in filing cabinets, desk drawers, and employee memories. You hope your technicians read the safety manual. You assume your Certificate of Insurance is current. You trust that everyone follows the same procedures they learned whenever they were last trained.
+                {t('modules.documents.businessImpact.paragraph1', 'Right now, your compliance exists in filing cabinets, desk drawers, and employee memories. You hope your technicians read the safety manual. You assume your Certificate of Insurance is current. You trust that everyone follows the same procedures they learned whenever they were last trained.')}
               </p>
               <p className="text-base">
-                When nothing goes wrong, this works fine. When something goes wrong, it doesn't.
+                {t('modules.documents.businessImpact.paragraph2', 'When nothing goes wrong, this works fine. When something goes wrong, it doesn\'t.')}
               </p>
               <p className="text-base">
-                A WorkSafeBC auditor asks for proof that all employees reviewed your fall protection procedures. You spend an hour searching while technicians wait on standby. An insurance investigator requests documentation after an incident. You realize your COI expired three weeks ago. A lawsuit demands evidence that an employee was trained on the procedure they violated. You have nothing timestamped.
+                {t('modules.documents.businessImpact.paragraph3', 'A WorkSafeBC auditor asks for proof that all employees reviewed your fall protection procedures. You spend an hour searching while technicians wait on standby. An insurance investigator requests documentation after an incident. You realize your COI expired three weeks ago. A lawsuit demands evidence that an employee was trained on the procedure they violated. You have nothing timestamped.')}
               </p>
               <p className="font-medium text-foreground text-base">
-                Document Management turns scattered compliance into professional infrastructure. Every document is centralized. Every signature is timestamped. Every acknowledgment is permanent. When you need proof, you generate a report.
+                {t('modules.documents.businessImpact.paragraph4', 'Document Management turns scattered compliance into professional infrastructure. Every document is centralized. Every signature is timestamped. Every acknowledgment is permanent. When you need proof, you generate a report.')}
               </p>
               <Separator className="my-6" />
               <p className="text-base">
-                Your technicians know which procedures apply to them. Your operations manager sees exactly who has gaps. Your auditors get instant answers. Your liability defense has documented evidence.
+                {t('modules.documents.businessImpact.paragraph5', 'Your technicians know which procedures apply to them. Your operations manager sees exactly who has gaps. Your auditors get instant answers. Your liability defense has documented evidence.')}
               </p>
               <p className="font-medium text-foreground text-lg">
-                You're not just storing files. You're building a compliance history that protects your business.
+                {t('modules.documents.businessImpact.paragraph6', 'You\'re not just storing files. You\'re building a compliance history that protects your business.')}
               </p>
             </CardContent>
           </Card>
@@ -850,100 +853,100 @@ export default function DocumentManagementLanding() {
       <section id="faqs" className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Frequently Asked Questions
+            {t('modules.documents.faqs.title', 'Frequently Asked Questions')}
           </h2>
           <p className="text-center text-muted-foreground mb-12">
-            Common questions about document management and compliance.
+            {t('modules.documents.faqs.subtitle', 'Common questions about document management and compliance.')}
           </p>
 
           <Accordion type="single" collapsible className="space-y-4">
             <AccordionItem value="faq-1" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4 text-left">
-                Can I edit or delete a signed document acknowledgment?
+                {t('modules.documents.faqs.faq1.question', 'Can I edit or delete a signed document acknowledgment?')}
               </AccordionTrigger>
               <AccordionContent className="pb-4 text-muted-foreground text-base">
-                No. Once a document acknowledgment is signed, the signature record is permanent and cannot be modified or deleted. This creates an immutable audit trail that protects both employers and employees. Regulators require tamper-proof documentation to verify compliance.
+                {t('modules.documents.faqs.faq1.answer', 'No. Once a document acknowledgment is signed, the signature record is permanent and cannot be modified or deleted. This creates an immutable audit trail that protects both employers and employees. Regulators require tamper-proof documentation to verify compliance.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-2" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4 text-left">
-                What happens when I update a document?
+                {t('modules.documents.faqs.faq2.question', 'What happens when I update a document?')}
               </AccordionTrigger>
               <AccordionContent className="pb-4 text-muted-foreground text-base">
-                When you upload a new version, the system creates a new document that requires fresh acknowledgments from all employees. Previous signatures remain associated with the previous version. This ensures employees always acknowledge the current procedure, not an outdated version.
+                {t('modules.documents.faqs.faq2.answer', 'When you upload a new version, the system creates a new document that requires fresh acknowledgments from all employees. Previous signatures remain associated with the previous version. This ensures employees always acknowledge the current procedure, not an outdated version.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-3" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4 text-left">
-                Who can see my Certificate of Insurance?
+                {t('modules.documents.faqs.faq3.question', 'Who can see my Certificate of Insurance?')}
               </AccordionTrigger>
               <AccordionContent className="pb-4 text-muted-foreground text-base">
-                Only Company Owner and Ops Manager roles can view COI documents. Supervisors and Technicians cannot access these restricted financial documents. Insurance certificates contain sensitive financial information that should be limited to authorized personnel.
+                {t('modules.documents.faqs.faq3.answer', 'Only Company Owner and Ops Manager roles can view COI documents. Supervisors and Technicians cannot access these restricted financial documents. Insurance certificates contain sensitive financial information that should be limited to authorized personnel.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-4" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4 text-left">
-                How do Safe Work Practices affect my CSR?
+                {t('modules.documents.faqs.faq4.question', 'How do Safe Work Practices affect my CSR?')}
               </AccordionTrigger>
               <AccordionContent className="pb-4 text-muted-foreground text-base">
-                Employee acknowledgment of daily safety practice topics contributes positively to your Company Safety Rating. Consistent engagement demonstrates an active safety culture. CSR rewards companies that don't just have safety documents but actively engage employees with safety topics.
+                {t('modules.documents.faqs.faq4.answer', 'Employee acknowledgment of daily safety practice topics contributes positively to your Company Safety Rating. Consistent engagement demonstrates an active safety culture. CSR rewards companies that don\'t just have safety documents but actively engage employees with safety topics.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-5" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4 text-left">
-                Can building managers see my documents?
+                {t('modules.documents.faqs.faq5.question', 'Can building managers see my documents?')}
               </AccordionTrigger>
               <AccordionContent className="pb-4 text-muted-foreground text-base">
-                Building managers cannot see your actual documents. They can see your CSR score, which reflects your overall safety compliance including document acknowledgment rates. This protects your proprietary procedures while giving building managers confidence in your safety practices.
+                {t('modules.documents.faqs.faq5.answer', 'Building managers cannot see your actual documents. They can see your CSR score, which reflects your overall safety compliance including document acknowledgment rates. This protects your proprietary procedures while giving building managers confidence in your safety practices.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-6" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4 text-left">
-                What file types are supported?
+                {t('modules.documents.faqs.faq6.question', 'What file types are supported?')}
               </AccordionTrigger>
               <AccordionContent className="pb-4 text-muted-foreground text-base">
-                PDF, DOC, and DOCX files are supported for document uploads. File type validation ensures only appropriate formats are accepted.
+                {t('modules.documents.faqs.faq6.answer', 'PDF, DOC, and DOCX files are supported for document uploads. File type validation ensures only appropriate formats are accepted.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-7" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4 text-left">
-                What happens if an employee leaves?
+                {t('modules.documents.faqs.faq7.question', 'What happens if an employee leaves?')}
               </AccordionTrigger>
               <AccordionContent className="pb-4 text-muted-foreground text-base">
-                Their signature history remains in the system permanently. This maintains your audit trail even after employment ends. You can still prove that a former employee acknowledged specific procedures during their tenure.
+                {t('modules.documents.faqs.faq7.answer', 'Their signature history remains in the system permanently. This maintains your audit trail even after employment ends. You can still prove that a former employee acknowledged specific procedures during their tenure.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-8" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4 text-left">
-                How does this integrate with onboarding?
+                {t('modules.documents.faqs.faq8.question', 'How does this integrate with onboarding?')}
               </AccordionTrigger>
               <AccordionContent className="pb-4 text-muted-foreground text-base">
-                New employees see all required documents highlighted for acknowledgment. Onboarding checklists can include document acknowledgment milestones. New hires cannot claim they missed required procedures because the system tracks completion status.
+                {t('modules.documents.faqs.faq8.answer', 'New employees see all required documents highlighted for acknowledgment. Onboarding checklists can include document acknowledgment milestones. New hires cannot claim they missed required procedures because the system tracks completion status.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-9" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4 text-left">
-                Can employees sign from mobile devices?
+                {t('modules.documents.faqs.faq9.question', 'Can employees sign from mobile devices?')}
               </AccordionTrigger>
               <AccordionContent className="pb-4 text-muted-foreground text-base">
-                Yes. Document review and digital signature capture work from any device. Technicians can acknowledge procedures from the field without returning to the office.
+                {t('modules.documents.faqs.faq9.answer', 'Yes. Document review and digital signature capture work from any device. Technicians can acknowledge procedures from the field without returning to the office.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-10" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4 text-left">
-                What's included in compliance reports?
+                {t('modules.documents.faqs.faq10.question', 'What\'s included in compliance reports?')}
               </AccordionTrigger>
               <AccordionContent className="pb-4 text-muted-foreground text-base">
-                Reports show employee signature status by document, acknowledgment timestamps, missing signature alerts, and complete version history. Export as PDF for professional audit presentation or CSV for data analysis.
+                {t('modules.documents.faqs.faq10.answer', 'Reports show employee signature status by document, acknowledgment timestamps, missing signature alerts, and complete version history. Export as PDF for professional audit presentation or CSV for data analysis.')}
               </AccordionContent>
             </AccordionItem>
           </Accordion>
@@ -954,16 +957,16 @@ export default function DocumentManagementLanding() {
       <section className="py-16 md:py-20 px-4 text-white" style={{backgroundImage: 'linear-gradient(135deg, #0B64A3 0%, #0369A1 100%)'}}>
         <div className="max-w-3xl mx-auto text-center space-y-6">
           <h2 className="text-3xl md:text-4xl font-bold">
-            Ready to Build Defensible Compliance?
+            {t('modules.documents.cta.title', 'Ready to Build Defensible Compliance?')}
           </h2>
           <p className="text-lg text-blue-100">
-            Upload your first document and capture employee signatures in under 5 minutes.<br />
-            Full access. No credit card. Permanent audit trail from day one.
+            {t('modules.documents.cta.subtitle', 'Upload your first document and capture employee signatures in under 5 minutes.')}<br />
+            {t('modules.documents.cta.subtitleLine2', 'Full access. No credit card. Permanent audit trail from day one.')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
             <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-cta-trial">
               <Link href="/register">
-                Start Your 60-Day Trial
+                {t('modules.documents.cta.trialButton', 'Start Your 60-Day Trial')}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>
