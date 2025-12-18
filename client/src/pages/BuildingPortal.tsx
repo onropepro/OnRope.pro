@@ -100,6 +100,7 @@ interface PortalData {
 }
 
 export default function BuildingPortal() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [strataPlanNumber, setStrataPlanNumber] = useState("");
@@ -396,7 +397,7 @@ export default function BuildingPortal() {
       <div className="min-h-screen page-gradient flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Loading building portal...</p>
+          <p className="text-muted-foreground">{t('buildingPortal.loading', 'Loading building portal...')}</p>
         </div>
       </div>
     );

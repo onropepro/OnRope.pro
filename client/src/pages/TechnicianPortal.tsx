@@ -976,12 +976,25 @@ export default function TechnicianPortal() {
   const [isVerifying, setIsVerifying] = useState(false);
   const [specialtyCategory, setSpecialtyCategory] = useState<JobCategory | "">("");
   const [selectedSpecialtyJobType, setSelectedSpecialtyJobType] = useState<string>("");
-  const [language, setLanguage] = useState<Language>(() => {
-    const saved = localStorage.getItem('techPortalLanguage');
-    return (saved === 'fr' ? 'fr' : 'en') as Language;
-  });
   
-  const t = translations[language];
+  // Use central i18n system
+  const { t: i18nT, i18n } = useTranslation();
+  const language = i18n.language as Language;
+  
+  // Create adapter that provides same interface as local translations
+  // Falls back to local translations for any missing keys
+  const t = useMemo(() => {
+    const localT = translations[language] || translations.en;
+    return new Proxy(localT, {
+      get(target, prop: string) {
+        const i18nValue = i18nT(`technicianPortal.${prop}`, { defaultValue: '' });
+        if (i18nValue && i18nValue !== `technicianPortal.${prop}`) {
+          return i18nValue;
+        }
+        return target[prop as keyof typeof target] || prop;
+      }
+    });
+  }, [language, i18nT]);
   const profileSchema = useMemo(() => createProfileSchema(t), [t]);
   const [verificationResult, setVerificationResult] = useState<{
     success: boolean;

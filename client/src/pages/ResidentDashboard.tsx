@@ -38,6 +38,7 @@ const complaintSchema = z.object({
 type ComplaintFormData = z.infer<typeof complaintSchema>;
 
 export default function ResidentDashboard() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("building");
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
@@ -553,7 +554,7 @@ export default function ResidentDashboard() {
                     name="residentName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Your Name *</FormLabel>
+                        <FormLabel>{t('residentPortal.yourName', 'Your Name')} *</FormLabel>
                         <FormControl>
                           <Input {...field} data-testid="input-resident-name" className="h-12" />
                         </FormControl>
@@ -567,7 +568,7 @@ export default function ResidentDashboard() {
                     name="phoneNumber"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Phone Number *</FormLabel>
+                        <FormLabel>{t('residentPortal.phoneNumber', 'Phone Number')} *</FormLabel>
                         <FormControl>
                           <Input type="tel" {...field} data-testid="input-phone" className="h-12" />
                         </FormControl>
@@ -581,7 +582,7 @@ export default function ResidentDashboard() {
                     name="unitNumber"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Unit Number *</FormLabel>
+                        <FormLabel>{t('residentPortal.unitNumber', 'Unit Number')} *</FormLabel>
                         <FormControl>
                           <Input {...field} data-testid="input-unit" className="h-12" />
                         </FormControl>
@@ -599,7 +600,7 @@ export default function ResidentDashboard() {
                         <FormControl>
                           <Textarea 
                             {...field} 
-                            placeholder="Type your message here..."
+                            placeholder={t('residentPortal.typeMessage', 'Type your message here...')}
                             data-testid="input-message" 
                             className="min-h-32"
                           />
@@ -707,7 +708,7 @@ export default function ResidentDashboard() {
                     name="residentName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Your Name *</FormLabel>
+                        <FormLabel>{t('residentPortal.yourName', 'Your Name')} *</FormLabel>
                         <FormControl>
                           <Input {...field} data-testid="input-resident-name" className="h-12" />
                         </FormControl>
@@ -721,7 +722,7 @@ export default function ResidentDashboard() {
                     name="phoneNumber"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Phone Number *</FormLabel>
+                        <FormLabel>{t('residentPortal.phoneNumber', 'Phone Number')} *</FormLabel>
                         <FormControl>
                           <Input type="tel" {...field} data-testid="input-phone" className="h-12" />
                         </FormControl>
@@ -735,7 +736,7 @@ export default function ResidentDashboard() {
                     name="unitNumber"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Unit Number *</FormLabel>
+                        <FormLabel>{t('residentPortal.unitNumber', 'Unit Number')} *</FormLabel>
                         <FormControl>
                           <Input {...field} data-testid="input-unit" className="h-12" />
                         </FormControl>
@@ -754,7 +755,7 @@ export default function ResidentDashboard() {
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger data-testid="select-project" className="h-12">
-                                <SelectValue placeholder="Select the project this is about" />
+                                <SelectValue placeholder={t('residentPortal.selectProject', 'Select the project this is about')} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
@@ -780,7 +781,7 @@ export default function ResidentDashboard() {
                         <FormControl>
                           <Textarea 
                             {...field} 
-                            placeholder="Type your message here..."
+                            placeholder={t('residentPortal.typeMessage', 'Type your message here...')}
                             data-testid="input-message" 
                             className="min-h-32"
                           />
@@ -948,7 +949,7 @@ export default function ResidentDashboard() {
                   <label className="text-sm font-medium mb-2 block">Select Project to View</label>
                   <Select value={selectedProjectId || ''} onValueChange={setSelectedProjectId}>
                     <SelectTrigger className="h-12">
-                      <SelectValue placeholder="Select a project" />
+                      <SelectValue placeholder={t('residentPortal.selectAProject', 'Select a project')} />
                     </SelectTrigger>
                     <SelectContent>
                       {activeProjects.map((project: any) => (
@@ -1301,8 +1302,8 @@ export default function ResidentDashboard() {
           <TabsContent value="submit" className="mt-6">
             <div className="bg-card/60 backdrop-blur-sm rounded-2xl border border-border/50 shadow-xl p-6 sm:p-8">
               <div className="mb-6">
-                <h2 className="text-2xl font-bold mb-2">Submit Feedback</h2>
-                <p className="text-muted-foreground">Let us know if you have any concerns or questions about the work</p>
+                <h2 className="text-2xl font-bold mb-2">{t('residentPortal.submitFeedback')}</h2>
+                <p className="text-muted-foreground">{t('residentPortal.feedbackDescription', 'Let us know if you have any concerns or questions about the work')}</p>
               </div>
               
               <Form {...form}>
@@ -1312,7 +1313,7 @@ export default function ResidentDashboard() {
                       name="residentName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Your Name *</FormLabel>
+                          <FormLabel>{t('residentPortal.yourName', 'Your Name')} *</FormLabel>
                           <FormControl>
                             <Input {...field} data-testid="input-resident-name" className="h-12" />
                           </FormControl>
@@ -1326,7 +1327,7 @@ export default function ResidentDashboard() {
                       name="phoneNumber"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Phone Number *</FormLabel>
+                          <FormLabel>{t('residentPortal.phoneNumber', 'Phone Number')} *</FormLabel>
                           <FormControl>
                             <Input type="tel" {...field} data-testid="input-phone" className="h-12" />
                           </FormControl>
@@ -1340,7 +1341,7 @@ export default function ResidentDashboard() {
                       name="unitNumber"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Unit Number *</FormLabel>
+                          <FormLabel>{t('residentPortal.unitNumber', 'Unit Number')} *</FormLabel>
                           <FormControl>
                             <Input {...field} data-testid="input-unit" className="h-12" />
                           </FormControl>
@@ -1359,7 +1360,7 @@ export default function ResidentDashboard() {
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
                                 <SelectTrigger data-testid="select-project" className="h-12">
-                                  <SelectValue placeholder="Select the project this is about" />
+                                  <SelectValue placeholder={t('residentPortal.selectProject', 'Select the project this is about')} />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
