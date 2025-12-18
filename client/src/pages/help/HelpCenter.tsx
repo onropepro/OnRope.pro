@@ -16,6 +16,7 @@ import {
   BookOpen,
   ArrowRight,
   Loader2,
+  Home,
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -61,6 +62,14 @@ const stakeholderCards = [
     href: '/help/for-property-managers',
     icon: Users,
     color: 'bg-emerald-500',
+  },
+  {
+    id: 'resident',
+    title: 'For Residents',
+    description: 'Submit feedback and track issues at your building',
+    href: '/help/for-residents',
+    icon: Home,
+    color: 'bg-rose-500',
   },
 ];
 
