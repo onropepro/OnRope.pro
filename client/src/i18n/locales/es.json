@@ -4326,6 +4326,41 @@
       "features": {
         "title": "Lo que hace este modulo",
         "subtitle": "Almacenamiento centralizado de documentos con busqueda, firmas digitales y exportacion lista para cumplimiento."
+      },
+      "benefits": {
+        "title": "Quien se beneficia de este modulo",
+        "subtitle": "Gestion de documentos para toda tu operacion.",
+        "employers": {
+          "title": "Para empleadores",
+          "benefit1": {
+            "title": "Documentos siempre encontrables.",
+            "description": "Certificados de seguro, registros de reuniones de seguridad, certificaciones de arnes. Todo en un lugar buscable."
+          },
+          "benefit2": {
+            "title": "Listo para auditorias.",
+            "description": "Cuando un auditor pide seis meses de registros, filtras por fecha y exportas. En segundos, no horas."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Caracteristicas clave",
+        "feature1": {
+          "title": "Almacenamiento centralizado de documentos",
+          "description": "Todos los documentos de seguridad, certificados y registros de cumplimiento en un sistema buscable."
+        },
+        "feature2": {
+          "title": "Firmas digitales",
+          "description": "Captura quien firmo, cuando y donde. Coordenadas GPS con marca de tiempo."
+        },
+        "feature3": {
+          "title": "Exportacion lista para cumplimiento",
+          "description": "Exporta documentacion para clientes, aseguradoras o registros internos."
+        }
+      },
+      "cta": {
+        "title": "Listo para organizar tus documentos?",
+        "subtitle": "Elimina la busqueda de papeles. Comienza tu prueba gratuita de 60 dias.",
+        "trialButton": "Comienza tu prueba gratuita de 60 dias"
       }
     },
     "gearInventory": {
@@ -4353,6 +4388,41 @@
       "features": {
         "title": "Lo que hace este modulo",
         "subtitle": "Gestion completa de inventario de equipos diseñada para requisitos de cumplimiento de seguridad."
+      },
+      "benefits": {
+        "title": "Quien se beneficia de este modulo",
+        "subtitle": "Seguimiento de equipos para toda tu operacion.",
+        "employers": {
+          "title": "Para empleadores",
+          "benefit1": {
+            "title": "Nunca pierdas una fecha de inspeccion.",
+            "description": "Alertas automaticas cuando las inspecciones de equipos vencen. Planifica el mantenimiento antes de que se convierta en problema."
+          },
+          "benefit2": {
+            "title": "Registros listos para auditorias.",
+            "description": "Cuando el regulador pide historial de inspecciones, los datos existen y se exportan limpiamente."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Caracteristicas clave",
+        "feature1": {
+          "title": "Seguimiento de equipos",
+          "description": "Rastrea cada pieza de equipo desde la compra hasta el retiro."
+        },
+        "feature2": {
+          "title": "Programas de inspeccion",
+          "description": "Alertas automaticas cuando los intervalos de servicio se acercan."
+        },
+        "feature3": {
+          "title": "Etiquetas de retiro",
+          "description": "Marca equipos para retiro con historial documentado."
+        }
+      },
+      "cta": {
+        "title": "Listo para rastrear tu equipo?",
+        "subtitle": "Elimina los misterios de inspeccion. Comienza tu prueba gratuita de 60 dias.",
+        "trialButton": "Comienza tu prueba gratuita de 60 dias"
       }
     },
     "whiteLabel": {
@@ -4380,6 +4450,41 @@
       "features": {
         "title": "Lo que hace este modulo",
         "subtitle": "Marca personalizada para la interfaz orientada al cliente."
+      },
+      "benefits": {
+        "title": "Quien se beneficia de este modulo",
+        "subtitle": "Presencia de marca personalizada.",
+        "employers": {
+          "title": "Para empleadores",
+          "benefit1": {
+            "title": "Imagen de marca consistente.",
+            "description": "Los clientes ven tu marca, no la nuestra. Refuerza tu identidad en cada interaccion."
+          },
+          "benefit2": {
+            "title": "Impresion profesional.",
+            "description": "Una plataforma de marca comunica compromiso con la calidad y profesionalismo."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Caracteristicas clave",
+        "feature1": {
+          "title": "Logo personalizado",
+          "description": "Tu logo aparece donde los clientes interactuan con el sistema."
+        },
+        "feature2": {
+          "title": "Colores de marca",
+          "description": "Paleta de colores personalizada que coincide con tu identidad de marca."
+        },
+        "feature3": {
+          "title": "Comunicaciones de marca",
+          "description": "Los correos electronicos y notificaciones muestran tu marca."
+        }
+      },
+      "cta": {
+        "title": "Listo para personalizar tu marca?",
+        "subtitle": "Presenta tu marca profesionalmente. Comienza tu prueba gratuita de 60 dias.",
+        "trialButton": "Comienza tu prueba gratuita de 60 dias"
       }
     },
     "safety": {
@@ -4413,6 +4518,49 @@
       "features": {
         "title": "Lo que hace este modulo",
         "subtitle": "Documentacion de seguridad completa que se crea sola a traves del uso diario."
+      },
+      "benefits": {
+        "title": "Quien se beneficia de este modulo",
+        "subtitle": "Documentacion de seguridad para toda tu operacion.",
+        "employers": {
+          "title": "Para empleadores (Propietarios de empresas)",
+          "benefit1": {
+            "title": "Duerme tranquilo.",
+            "description": "Cada inspeccion de arnes esta registrada. Cada reunion de seguridad esta documentada. Cada firma tiene marca de tiempo. Cuando el regulador llegue, tus registros estan listos."
+          },
+          "benefit2": {
+            "title": "Primas de seguro mas bajas.",
+            "description": "Las aseguradoras quieren prueba de cultura de seguridad. Registros de cumplimiento consistentes, tasas de incidentes reducidas y documentacion auditable pueden reducir primas 10-15%."
+          }
+        },
+        "technicians": {
+          "title": "Para tecnicos de acceso con cuerdas",
+          "benefit1": {
+            "title": "Tu documentacion te sigue.",
+            "description": "Inspecciones de arnes, asistencia a reuniones de seguridad e historial de certificaciones viajan con tu perfil cuando cambias de empleador."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Caracteristicas clave",
+        "subtitle": "Cada caracteristica existe para eliminar la brecha entre practicas de seguridad y registros de seguridad.",
+        "feature1": {
+          "title": "Inspecciones diarias de arnes",
+          "description": "Los tecnicos inspeccionan equipos al inicio de cada dia de trabajo. Verificado digitalmente. Con marca de tiempo."
+        },
+        "feature2": {
+          "title": "Documentacion de reuniones de seguridad",
+          "description": "Contenido de reuniones grabado con firmas digitales de todos los participantes. Proporciona 7 dias de cobertura de cumplimiento."
+        },
+        "feature3": {
+          "title": "Formularios FLHA",
+          "description": "Identifica peligros especificos del sitio antes de que comience el trabajo. Captura controles y medidas de mitigacion."
+        }
+      },
+      "cta": {
+        "title": "Listo para organizar tus registros de seguridad?",
+        "subtitle": "Unete a las empresas de acceso con cuerdas que han eliminado el dolor de cabeza de la documentacion de seguridad.",
+        "trialButton": "Comienza tu prueba gratuita de 60 dias"
       }
     },
     "projects": {
@@ -4457,6 +4605,48 @@
           "title": "Seguimiento de progreso",
           "description": "Rastrea gotas por elevacion, porcentaje completado, horas vs estimaciones. Ve donde van los trabajos."
         }
+      },
+      "benefits": {
+        "title": "Quien se beneficia de este modulo",
+        "subtitle": "Organizacion de proyectos para toda tu operacion.",
+        "employers": {
+          "title": "Para empleadores",
+          "benefit1": {
+            "title": "Deja de buscar libretas.",
+            "description": "Cada direccion de trabajo, cada contacto de cliente, cada nota de proyecto en un solo lugar. Busca por direccion, filtra por estado, exporta cuando lo necesites."
+          },
+          "benefit2": {
+            "title": "Comprueba tu historial de trabajo.",
+            "description": "Cuando un cliente pregunta sobre trabajos anteriores en su edificio, tienes los registros. Fechas, alcance, notas, todo vinculado."
+          }
+        },
+        "technicians": {
+          "title": "Para tecnicos",
+          "benefit1": {
+            "title": "Sabe a donde vas.",
+            "description": "Los detalles del proyecto incluyen direccion, informacion de acceso, notas e historial. Sin confusion sobre cual edificio."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Caracteristicas clave",
+        "feature1": {
+          "title": "Base de datos de proyectos centralizada",
+          "description": "Cada proyecto desde la propuesta hasta la finalizacion. Estado, progreso, notas, documentacion."
+        },
+        "feature2": {
+          "title": "Gestion de clientes",
+          "description": "Base de datos de clientes con historial de contactos. Sabe que edificios has atendido para cada cliente."
+        },
+        "feature3": {
+          "title": "Seguimiento de progreso",
+          "description": "Rastrea gotas por elevacion, porcentaje completado, horas vs estimaciones."
+        }
+      },
+      "cta": {
+        "title": "Listo para organizar tus proyectos?",
+        "subtitle": "Elimina el caos de las libretas. Comienza tu prueba gratuita de 60 dias.",
+        "trialButton": "Comienza tu prueba gratuita de 60 dias"
       }
     },
     "payroll": {
@@ -4749,6 +4939,48 @@
           "item3": "Desglose facturable vs no facturable",
           "item4": "Compensacion por pieza (si esta habilitada)"
         }
+      },
+      "benefits": {
+        "title": "Quien se beneficia de este modulo",
+        "subtitle": "Seguimiento de tiempo para toda tu operacion.",
+        "employers": {
+          "title": "Para empleadores",
+          "benefit1": {
+            "title": "Sabe a donde va el tiempo.",
+            "description": "Cada sesion de trabajo se vincula a un proyecto. Ves que edificio, que tipo de trabajo, cuantas horas."
+          },
+          "benefit2": {
+            "title": "Elimina el misterio de los depassesamientos de presupuesto.",
+            "description": "Cuando un trabajo excede el presupuesto, sabes por que. Clima, equipo, personal, todo documentado con razones."
+          }
+        },
+        "technicians": {
+          "title": "Para tecnicos",
+          "benefit1": {
+            "title": "Tus horas son precisas.",
+            "description": "La verificacion GPS captura tu tiempo real en el sitio. Sin discrepancias entre lo que registraste y lo que calculo el propietario."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Caracteristicas clave",
+        "feature1": {
+          "title": "Registro verificado por GPS",
+          "description": "Los tecnicos registran desde su telefono. El sistema captura la marca de tiempo exacta y coordenadas GPS."
+        },
+        "feature2": {
+          "title": "Seguimiento de gotas por elevacion",
+          "description": "Al final de cada dia, los tecnicos registran gotas completadas por elevacion."
+        },
+        "feature3": {
+          "title": "Documentacion de razones de deficit",
+          "description": "Cuando los tecnicos estan por debajo de los objetivos diarios, el sistema pide una razon."
+        }
+      },
+      "cta": {
+        "title": "Listo para seguir el tiempo con precision?",
+        "subtitle": "Elimina los misterios del tiempo. Comienza tu prueba gratuita de 60 dias.",
+        "trialButton": "Comienza tu prueba gratuita de 60 dias"
       }
     },
     "employees": {
@@ -4812,6 +5044,48 @@
           "list4": "Niveles de acceso a nomina",
           "list5": "Exposicion de informacion de clientes"
         }
+      },
+      "benefits": {
+        "title": "Quien se beneficia de este modulo",
+        "subtitle": "Gestion de empleados para toda tu operacion.",
+        "employers": {
+          "title": "Para empleadores",
+          "benefit1": {
+            "title": "Incorporacion en 10 segundos.",
+            "description": "Ingresa el numero IRATA del tecnico, aceptan la conexion, toda su informacion se transfiere. Cero papeleo redundante."
+          },
+          "benefit2": {
+            "title": "Alertas automaticas de certificacion.",
+            "description": "El sistema te advierte 30 dias antes de la expiracion. Tienes tiempo de planificar la recertificacion en lugar de retirar tecnicos de emergencia."
+          }
+        },
+        "technicians": {
+          "title": "Para tecnicos",
+          "benefit1": {
+            "title": "Tu identidad te sigue.",
+            "description": "Cambia de empleador sin reiniciar el papeleo. Tu perfil, tus certificaciones, tu historial viajan contigo."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Caracteristicas clave",
+        "feature1": {
+          "title": "Identidades profesionales portatiles",
+          "description": "El numero de certificacion IRATA o SPRAT se convierte en el identificador permanente del tecnico."
+        },
+        "feature2": {
+          "title": "Motor de cumplimiento de certificaciones",
+          "description": "El sistema monitorea certificaciones IRATA, SPRAT, licencias de conducir y certificaciones de primeros auxilios."
+        },
+        "feature3": {
+          "title": "Controles de permisos granulares",
+          "description": "Todos los roles comienzan con cero permisos. Configuras exactamente lo que cada persona puede ver y hacer."
+        }
+      },
+      "cta": {
+        "title": "Listo para simplificar la gestion de empleados?",
+        "subtitle": "Elimina el papeleo redundante. Comienza tu prueba gratuita de 60 dias.",
+        "trialButton": "Comienza tu prueba gratuita de 60 dias"
       }
     },
     "scheduling": {
@@ -4839,6 +5113,37 @@
       "features": {
         "title": "Lo que hace este modulo",
         "subtitle": "Programacion visual con asignaciones de equipo y deteccion de conflictos."
+      },
+      "benefits": {
+        "title": "Quien se beneficia de este modulo",
+        "subtitle": "Claridad de programacion para toda tu operacion.",
+        "employers": {
+          "title": "Para empleadores",
+          "benefit1": {
+            "title": "Sin sorpresas matutinas.",
+            "description": "Todos saben a donde ir antes de salir de casa. Los conflictos de programacion se descubren en pantalla, no en el estacionamiento."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Caracteristicas clave",
+        "feature1": {
+          "title": "Vista de calendario visual",
+          "description": "Calendario arrastrar y soltar con codigo de colores por proyecto y tecnico."
+        },
+        "feature2": {
+          "title": "Deteccion de conflictos",
+          "description": "Alertas automaticas cuando los tecnicos estan sobrerreservados o con doble programacion."
+        },
+        "feature3": {
+          "title": "Acceso movil",
+          "description": "Los tecnicos ven su horario en cualquier dispositivo."
+        }
+      },
+      "cta": {
+        "title": "Listo para organizar tu horario?",
+        "subtitle": "Elimina los conflictos de programacion. Comienza tu prueba gratuita de 60 dias.",
+        "trialButton": "Comienza tu prueba gratuita de 60 dias"
       }
     },
     "irataLogging": {
@@ -4866,6 +5171,44 @@
       "features": {
         "title": "Lo que hace este modulo",
         "subtitle": "Registro automatico de horas de trabajo con soporte para exportacion de certificacion."
+      },
+      "benefits": {
+        "title": "Quien se beneficia de este modulo",
+        "subtitle": "Documentacion de horas para la progresion de certificacion.",
+        "employers": {
+          "title": "Para empleadores",
+          "benefit1": {
+            "title": "Apoya la progresion de los tecnicos.",
+            "description": "Las horas se registran automaticamente mientras trabajan. Los tecnicos construyen su documentacion para recertificacion sin esfuerzo adicional."
+          }
+        },
+        "technicians": {
+          "title": "Para tecnicos",
+          "benefit1": {
+            "title": "Documentacion automatica de horas.",
+            "description": "Cada sesion de trabajo contribuye a tus requisitos de certificacion IRATA. No se requiere tenedue de registros separada."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Caracteristicas clave",
+        "feature1": {
+          "title": "Registro automatico de horas",
+          "description": "Las sesiones de trabajo se categorizan por tipo de tarea IRATA automaticamente."
+        },
+        "feature2": {
+          "title": "Seguimiento de tipos de tareas",
+          "description": "Todas las categorias IRATA estandar rastreadas: inspeccionar, limpiar, instalar, reparar y mas."
+        },
+        "feature3": {
+          "title": "Exportacion para certificacion",
+          "description": "Genera reportes en el formato requerido para solicitudes de recertificacion IRATA."
+        }
+      },
+      "cta": {
+        "title": "Listo para rastrear tus horas IRATA?",
+        "subtitle": "Construye tu documentacion de certificacion automaticamente. Comienza tu prueba gratuita de 60 dias.",
+        "trialButton": "Comienza tu prueba gratuita de 60 dias"
       }
     },
     "csr": {
@@ -4893,6 +5236,44 @@
       "features": {
         "title": "Lo que hace este modulo",
         "subtitle": "Metricas de seguridad transparentes que construyen confianza del cliente."
+      },
+      "benefits": {
+        "title": "Quien se beneficia de este modulo",
+        "subtitle": "Confianza de seguridad transparente para todos los interesados.",
+        "employers": {
+          "title": "Para empleadores",
+          "benefit1": {
+            "title": "Diferenciarte de los competidores.",
+            "description": "Cuando los administradores de propiedades comparan proveedores, tu Calificacion de Seguridad habla mas fuerte que las promesas."
+          }
+        },
+        "buildingManagers": {
+          "title": "Para administradores de edificios",
+          "benefit1": {
+            "title": "Verifica proveedores antes del trabajo.",
+            "description": "La Calificacion de Seguridad de la Empresa muestra el estado de cumplimiento de un proveedor antes de que trabaje en tu propiedad."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Caracteristicas clave",
+        "feature1": {
+          "title": "Calculo de calificacion de seguridad",
+          "description": "Puntuacion agregada basada en metricas de cumplimiento a traves de modulos."
+        },
+        "feature2": {
+          "title": "Visibilidad publica",
+          "description": "Los administradores de propiedades pueden ver la calificacion al seleccionar proveedores."
+        },
+        "feature3": {
+          "title": "Seguimiento de mejoras",
+          "description": "Ve como tus acciones de cumplimiento afectan tu calificacion con el tiempo."
+        }
+      },
+      "cta": {
+        "title": "Listo para mostrar tu cultura de seguridad?",
+        "subtitle": "Construye confianza con metricas de seguridad transparentes. Comienza tu prueba gratuita de 60 dias.",
+        "trialButton": "Comienza tu prueba gratuita de 60 dias"
       }
     },
     "residentPortal": {
@@ -4920,6 +5301,41 @@
       "features": {
         "title": "Lo que hace este modulo",
         "subtitle": "Comunicacion directa con residentes del edificio con seguimiento de comentarios."
+      },
+      "benefits": {
+        "title": "Quien se beneficia de este modulo",
+        "subtitle": "Comunicacion directa con residentes.",
+        "employers": {
+          "title": "Para empleadores",
+          "benefit1": {
+            "title": "Retroalimentacion directa.",
+            "description": "Los residentes reportan problemas directamente. Sin juego de telefono a traves de administradores de propiedades."
+          },
+          "benefit2": {
+            "title": "Servicio al cliente mejorado.",
+            "description": "Tiempos de respuesta mas rapidos y actualizaciones de estado visibles construyen confianza del cliente."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Caracteristicas clave",
+        "feature1": {
+          "title": "Envio de comentarios de residentes",
+          "description": "Los residentes reportan problemas con evidencia fotografica y detalles."
+        },
+        "feature2": {
+          "title": "Seguimiento de estado",
+          "description": "Los residentes ven si su problema ha sido visto, esta en progreso o resuelto."
+        },
+        "feature3": {
+          "title": "Comunicacion directa",
+          "description": "Los proveedores responden directamente a los residentes sin intermediario."
+        }
+      },
+      "cta": {
+        "title": "Listo para conectar con los residentes?",
+        "subtitle": "Mejora la satisfaccion del cliente con comunicacion directa. Comienza tu prueba gratuita de 60 dias.",
+        "trialButton": "Comienza tu prueba gratuita de 60 dias"
       }
     },
     "quoting": {
@@ -4947,6 +5363,41 @@
       "features": {
         "title": "Lo que hace este modulo",
         "subtitle": "Cotizaciones profesionales basadas en datos de costos laborales reales."
+      },
+      "benefits": {
+        "title": "Quien se beneficia de este modulo",
+        "subtitle": "Precision de cotizaciones para toda tu operacion.",
+        "employers": {
+          "title": "Para empleadores",
+          "benefit1": {
+            "title": "Cotiza con confianza.",
+            "description": "Los datos de proyectos historicos muestran cuanto tardaron trabajos similares. Tu proxima cotizacion incluye las horas que realmente necesitas."
+          },
+          "benefit2": {
+            "title": "Documentos profesionales.",
+            "description": "Genera cotizaciones pulidas que impresionan a los clientes. Tu marca, tu formato, tus terminos."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Caracteristicas clave",
+        "feature1": {
+          "title": "Generacion de cotizaciones",
+          "description": "Crea cotizaciones profesionales con detalles del proyecto, calculo de costos de mano de obra y terminos."
+        },
+        "feature2": {
+          "title": "Cotizaciones basadas en datos historicos",
+          "description": "Usa datos de proyectos pasados para informar nuevas estimaciones."
+        },
+        "feature3": {
+          "title": "Seguimiento de estado",
+          "description": "Rastrea cotizaciones desde la creacion hasta la aceptacion. Ve tasas de conversion."
+        }
+      },
+      "cta": {
+        "title": "Listo para cotizar con precision?",
+        "subtitle": "Elimina los depassesamientos de presupuesto con cotizaciones basadas en datos. Comienza tu prueba gratuita de 60 dias.",
+        "trialButton": "Comienza tu prueba gratuita de 60 dias"
       }
     },
     "technicianPassport": {
@@ -4974,6 +5425,48 @@
       "features": {
         "title": "Lo que hace este modulo",
         "subtitle": "Perfil profesional portatil para tecnicos de acceso con cuerdas."
+      },
+      "benefits": {
+        "title": "Quien se beneficia de este modulo",
+        "subtitle": "Identidad profesional portatil.",
+        "technicians": {
+          "title": "Para tecnicos",
+          "benefit1": {
+            "title": "Tu historial te sigue.",
+            "description": "Cada cambio de empleador ya no significa empezar de cero. Tu experiencia, tus certificaciones, tus registros de seguridad viajan contigo."
+          },
+          "benefit2": {
+            "title": "Credenciales verificables.",
+            "description": "Los empleadores ven historial comprobable, no afirmaciones. Tu reputacion profesional se construye con el tiempo."
+          }
+        },
+        "employers": {
+          "title": "Para empleadores",
+          "benefit1": {
+            "title": "Contratacion verificada.",
+            "description": "Ve el historial de trabajo real, certificaciones y registros de seguridad de un tecnico antes de contratar."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Caracteristicas clave",
+        "feature1": {
+          "title": "Perfil profesional portatil",
+          "description": "Una identidad que sigue al tecnico a traves de empleadores."
+        },
+        "feature2": {
+          "title": "Historial de trabajo verificado",
+          "description": "Registros de empleo comprobables con detalles del proyecto."
+        },
+        "feature3": {
+          "title": "Seguimiento de certificaciones",
+          "description": "Todas las certificaciones con fechas de vencimiento en un solo lugar."
+        }
+      },
+      "cta": {
+        "title": "Listo para crear tu pasaporte?",
+        "subtitle": "Construye tu identidad profesional portatil. Comienza gratis hoy.",
+        "trialButton": "Crear perfil gratis"
       }
     },
     "employerJobBoard": {
@@ -5001,6 +5494,41 @@
       "features": {
         "title": "Lo que hace este modulo",
         "subtitle": "Reclutamiento de tecnicos de acceso con cuerdas a traves de una red verificada."
+      },
+      "benefits": {
+        "title": "Quien se beneficia de este modulo",
+        "subtitle": "Reclutamiento de tecnicos verificados.",
+        "employers": {
+          "title": "Para empleadores",
+          "benefit1": {
+            "title": "Accede a talento verificado.",
+            "description": "Navega perfiles de tecnicos con certificaciones e historial de trabajo verificados. Sin adivinar calificaciones."
+          },
+          "benefit2": {
+            "title": "Publica oportunidades.",
+            "description": "Crea publicaciones de empleo que ven tecnicos calificados. Llega a candidatos que buscan activamente."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Caracteristicas clave",
+        "feature1": {
+          "title": "Publicacion de empleos",
+          "description": "Crea publicaciones con detalles del puesto, requisitos y rango salarial."
+        },
+        "feature2": {
+          "title": "Navegar perfiles de tecnicos",
+          "description": "Busca tecnicos que han optado por visibilidad."
+        },
+        "feature3": {
+          "title": "Contacto directo",
+          "description": "Conecta directamente con tecnicos interesados."
+        }
+      },
+      "cta": {
+        "title": "Listo para encontrar tecnicos?",
+        "subtitle": "Conecta con profesionales de acceso con cuerdas verificados. Comienza tu prueba gratuita de 60 dias.",
+        "trialButton": "Comienza tu prueba gratuita de 60 dias"
       }
     },
     "userAccess": {
@@ -5028,6 +5556,41 @@
       "features": {
         "title": "Lo que hace este modulo",
         "subtitle": "Control de acceso basado en roles con configuracion de permisos granulares."
+      },
+      "benefits": {
+        "title": "Quien se beneficia de este modulo",
+        "subtitle": "Control de acceso para proteger tu negocio.",
+        "employers": {
+          "title": "Para empleadores",
+          "benefit1": {
+            "title": "Protege datos sensibles.",
+            "description": "Informacion financiera, detalles de clientes, datos de nomina. Controla exactamente quien ve que."
+          },
+          "benefit2": {
+            "title": "Reduce riesgos.",
+            "description": "Cuando los empleados se van, se van solo con el conocimiento al que debian tener acceso."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Caracteristicas clave",
+        "feature1": {
+          "title": "Sistema basado en roles",
+          "description": "44 permisos configurables a traves de tipos de roles."
+        },
+        "feature2": {
+          "title": "Cero por defecto",
+          "description": "Cada rol comienza sin permisos. Tu agregas lo necesario."
+        },
+        "feature3": {
+          "title": "Pista de auditoria",
+          "description": "Rastrea quien accedio a que y cuando."
+        }
+      },
+      "cta": {
+        "title": "Listo para asegurar tu acceso?",
+        "subtitle": "Controla exactamente quien ve que. Comienza tu prueba gratuita de 60 dias.",
+        "trialButton": "Comienza tu prueba gratuita de 60 dias"
       }
     },
     "technicianJobBoard": {
@@ -5055,6 +5618,41 @@
       "features": {
         "title": "Lo que hace este modulo",
         "subtitle": "Busqueda de empleo y visibilidad de perfil para tecnicos de acceso con cuerdas."
+      },
+      "benefits": {
+        "title": "Quien se beneficia de este modulo",
+        "subtitle": "Descubrimiento de oportunidades para tecnicos.",
+        "technicians": {
+          "title": "Para tecnicos",
+          "benefit1": {
+            "title": "Ve oportunidades activas.",
+            "description": "Navega publicaciones de empleo de empresas verificadas. Tiempo completo, contratos, trabajo estacional."
+          },
+          "benefit2": {
+            "title": "Deja que los empleadores te encuentren.",
+            "description": "Activa la visibilidad del perfil y los empleadores pueden contactarte directamente."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Caracteristicas clave",
+        "feature1": {
+          "title": "Navegacion de publicaciones de empleo",
+          "description": "Ve oportunidades activas con detalles y requisitos."
+        },
+        "feature2": {
+          "title": "Control de visibilidad del perfil",
+          "description": "Elige cuando tu perfil es visible para empleadores."
+        },
+        "feature3": {
+          "title": "Contacto directo",
+          "description": "Los empleadores interesados pueden contactarte directamente."
+        }
+      },
+      "cta": {
+        "title": "Listo para encontrar oportunidades?",
+        "subtitle": "Conecta con empleadores que buscan tus habilidades. Crea tu perfil gratis.",
+        "trialButton": "Crear perfil gratis"
       }
     }
   }
