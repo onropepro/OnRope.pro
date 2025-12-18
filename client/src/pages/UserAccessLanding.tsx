@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { PublicHeader } from "@/components/PublicHeader";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import {
@@ -42,6 +43,7 @@ import {
 } from "lucide-react";
 
 export default function UserAccessLanding() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const [count1, setCount1] = useState(0);
   const [count2, setCount2] = useState(0);
@@ -86,30 +88,30 @@ export default function UserAccessLanding() {
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
           <div className="text-center space-y-6 pt-16">
             <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-module-label">
-              User Access & Authentication Module
+              {t('modules.userAccess.hero.badge', 'User Access & Authentication Module')}
             </Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              Built for the moment you realize<br />
-              your new hire<br />
-              <span className="text-blue-100">can see everyone's rates.</span>
+              {t('modules.userAccess.hero.titleLine1', 'Built for the moment you realize')}<br />
+              {t('modules.userAccess.hero.titleLine2', 'your new hire')}<br />
+              <span className="text-blue-100">{t('modules.userAccess.hero.titleLine3', "can see everyone's rates.")}</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              Assign project creation, scheduling, and safety compliance to the people who need it. Keep hourly rates, labor costs, and profit margins visible only to you.<br />
-              <strong>One system. Clear boundaries. Zero compromises.</strong>
+              {t('modules.userAccess.hero.description', 'Assign project creation, scheduling, and safety compliance to the people who need it. Keep hourly rates, labor costs, and profit margins visible only to you.')}<br />
+              <strong>{t('modules.userAccess.hero.tagline', 'One system. Clear boundaries. Zero compromises.')}</strong>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-hero-trial">
                 <Link href="/register">
-                  Start Your Free 60-Day Trial
+                  {t('modules.userAccess.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-hero-demo">
                 <Link href="#faqs">
-                  Find Answers
+                  {t('modules.userAccess.hero.ctaAnswers', 'Find Answers')}
                   <BookOpen className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
@@ -133,15 +135,15 @@ export default function UserAccessLanding() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-blue-600">{count1}</div>
-                  <div className="text-base text-muted-foreground mt-1">Exposed pay rates</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.userAccess.stats.exposedPayRates', 'Exposed pay rates')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-rose-600">{count2}</div>
-                  <div className="text-base text-muted-foreground mt-1">Unauthorized edits</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.userAccess.stats.unauthorizedEdits', 'Unauthorized edits')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-amber-600">{count3}</div>
-                  <div className="text-base text-muted-foreground mt-1">Access conflicts</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.userAccess.stats.accessConflicts', 'Access conflicts')}</div>
                 </div>
                 <div className="text-center">
                   <div 
@@ -150,7 +152,7 @@ export default function UserAccessLanding() {
                   >
                     {controlPercentage}%
                   </div>
-                  <div className="text-base text-muted-foreground mt-1">Control maintained</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.userAccess.stats.controlMaintained', 'Control maintained')}</div>
                 </div>
               </div>
             </CardContent>
@@ -164,32 +166,32 @@ export default function UserAccessLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
-            The Access Problem Nobody Talks About
+            {t('modules.userAccess.problem.title', 'The Access Problem Nobody Talks About')}
           </h2>
           
           <Card className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
             <CardContent className="p-6 md:p-8 space-y-4 text-muted-foreground">
               <p className="text-lg leading-relaxed font-medium text-foreground">
-                Construction software wasn't built for rope access.
+                {t('modules.userAccess.problem.intro', "Construction software wasn't built for rope access.")}
               </p>
               <p>
-                You add your supervisor to the system. Now they see everything. Pay rates. Profit margins. Which jobs lose money. Which technicians cost the most.
+                {t('modules.userAccess.problem.supervisorAccess', 'You add your supervisor to the system. Now they see everything. Pay rates. Profit margins. Which jobs lose money. Which technicians cost the most.')}
               </p>
               <p>
-                It's not about trust. Some information belongs at the owner level.
+                {t('modules.userAccess.problem.trust', "It's not about trust. Some information belongs at the owner level.")}
               </p>
               <p>
-                Most systems force a choice: do everything yourself and become the bottleneck, or give access and hope nobody looks where they shouldn't.
+                {t('modules.userAccess.problem.choice', "Most systems force a choice: do everything yourself and become the bottleneck, or give access and hope nobody looks where they shouldn't.")}
               </p>
               <p>
-                Meanwhile, building managers drown in resident calls. Technicians text complaints to personal phones. Property managers piece together vendor performance from scattered emails.
+                {t('modules.userAccess.problem.meanwhile', 'Meanwhile, building managers drown in resident calls. Technicians text complaints to personal phones. Property managers piece together vendor performance from scattered emails.')}
               </p>
               <p className="font-medium text-foreground">
-                Everyone's frustrated. Nobody has the full picture.
+                {t('modules.userAccess.problem.frustrated', "Everyone's frustrated. Nobody has the full picture.")}
               </p>
               <Separator className="my-6" />
               <p className="font-medium text-foreground text-lg">
-                OnRopePro separates what people can do from what they can see. Five stakeholder types. One unified system. Every person sees exactly what they need. Nothing more.
+                {t('modules.userAccess.problem.solution', 'OnRopePro separates what people can do from what they can see. Five stakeholder types. One unified system. Every person sees exactly what they need. Nothing more.')}
               </p>
             </CardContent>
           </Card>
@@ -202,10 +204,10 @@ export default function UserAccessLanding() {
       <section id="features" className="pt-8 md:pt-12 pb-16 md:pb-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Complete Access Control That Creates Itself Through Daily Use
+            {t('modules.userAccess.features.title', 'Complete Access Control That Creates Itself Through Daily Use')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-3xl mx-auto">
-            Every login, every permission, every piece of feedback flows through a single system designed for how rope access actually works.
+            {t('modules.userAccess.features.subtitle', 'Every login, every permission, every piece of feedback flows through a single system designed for how rope access actually works.')}
           </p>
 
           <div className="grid md:grid-cols-3 gap-6">
@@ -216,32 +218,32 @@ export default function UserAccessLanding() {
                 <div className="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-3">
                   <Layers className="w-6 h-6 text-blue-600" />
                 </div>
-                <CardTitle className="text-xl">Role-Based Permission Architecture</CardTitle>
+                <CardTitle className="text-xl">{t('modules.userAccess.features.roleBasedPermissions.title', 'Role-Based Permission Architecture')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-base text-muted-foreground">
-                <p className="font-medium text-foreground">Before any employee accesses the system, you define exactly what they see.</p>
-                <p>44+ individual permissions across financial, operational, safety, and inventory categories. Your ops manager creates projects without seeing payroll. Your ground crew logs hours without accessing bids.</p>
-                <p className="font-medium text-foreground mt-4">What gets controlled:</p>
+                <p className="font-medium text-foreground">{t('modules.userAccess.features.roleBasedPermissions.intro', 'Before any employee accesses the system, you define exactly what they see.')}</p>
+                <p>{t('modules.userAccess.features.roleBasedPermissions.description', '44+ individual permissions across financial, operational, safety, and inventory categories. Your ops manager creates projects without seeing payroll. Your ground crew logs hours without accessing bids.')}</p>
+                <p className="font-medium text-foreground mt-4">{t('modules.userAccess.features.roleBasedPermissions.controlledLabel', 'What gets controlled:')}</p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Financial data visibility (rates, costs, margins)</span>
+                    <span>{t('modules.userAccess.features.roleBasedPermissions.financial', 'Financial data visibility (rates, costs, margins)')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Project creation and modification rights</span>
+                    <span>{t('modules.userAccess.features.roleBasedPermissions.projects', 'Project creation and modification rights')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Employee management capabilities</span>
+                    <span>{t('modules.userAccess.features.roleBasedPermissions.employees', 'Employee management capabilities')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Safety documentation access</span>
+                    <span>{t('modules.userAccess.features.roleBasedPermissions.safety', 'Safety documentation access')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Inventory and equipment permissions</span>
+                    <span>{t('modules.userAccess.features.roleBasedPermissions.inventory', 'Inventory and equipment permissions')}</span>
                   </li>
                 </ul>
               </CardContent>
@@ -254,24 +256,24 @@ export default function UserAccessLanding() {
                 <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center mb-3">
                   <Building2 className="w-6 h-6 text-emerald-600" />
                 </div>
-                <CardTitle className="text-xl">External Stakeholder Portals</CardTitle>
+                <CardTitle className="text-xl">{t('modules.userAccess.features.externalPortals.title', 'External Stakeholder Portals')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-base text-muted-foreground">
-                <p className="font-medium text-foreground">Three separate portals for three different needs.</p>
-                <p>Residents see their building's progress and submit feedback. Building managers see project details and response metrics. Property managers see portfolio-wide performance. No cross-contamination. No unauthorized access.</p>
-                <p className="font-medium text-foreground mt-4">What each portal provides:</p>
+                <p className="font-medium text-foreground">{t('modules.userAccess.features.externalPortals.intro', 'Three separate portals for three different needs.')}</p>
+                <p>{t('modules.userAccess.features.externalPortals.description', "Residents see their building's progress and submit feedback. Building managers see project details and response metrics. Property managers see portfolio-wide performance. No cross-contamination. No unauthorized access.")}</p>
+                <p className="font-medium text-foreground mt-4">{t('modules.userAccess.features.externalPortals.portalsLabel', 'What each portal provides:')}</p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <Home className="w-4 h-4 mt-0.5 text-violet-600 shrink-0" />
-                    <span><strong>Resident:</strong> Progress visibility, feedback submission, photo documentation</span>
+                    <span><strong>{t('modules.userAccess.features.externalPortals.resident', 'Resident')}:</strong> {t('modules.userAccess.features.externalPortals.residentDesc', 'Progress visibility, feedback submission, photo documentation')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Building2 className="w-4 h-4 mt-0.5 text-sky-600 shrink-0" />
-                    <span><strong>Building Manager:</strong> Full project details, feedback management, work history</span>
+                    <span><strong>{t('modules.userAccess.features.externalPortals.buildingManager', 'Building Manager')}:</strong> {t('modules.userAccess.features.externalPortals.buildingManagerDesc', 'Full project details, feedback management, work history')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Briefcase className="w-4 h-4 mt-0.5 text-blue-600 shrink-0" />
-                    <span><strong>Property Manager:</strong> Multi-building oversight, vendor performance metrics, exportable reports</span>
+                    <span><strong>{t('modules.userAccess.features.externalPortals.propertyManager', 'Property Manager')}:</strong> {t('modules.userAccess.features.externalPortals.propertyManagerDesc', 'Multi-building oversight, vendor performance metrics, exportable reports')}</span>
                   </li>
                 </ul>
               </CardContent>
@@ -284,32 +286,32 @@ export default function UserAccessLanding() {
                 <div className="w-12 h-12 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center mb-3">
                   <MessageSquare className="w-6 h-6 text-amber-600" />
                 </div>
-                <CardTitle className="text-xl">Centralized Feedback System</CardTitle>
+                <CardTitle className="text-xl">{t('modules.userAccess.features.feedbackSystem.title', 'Centralized Feedback System')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-base text-muted-foreground">
-                <p className="font-medium text-foreground">Every resident complaint, compliment, and question flows into one dashboard.</p>
-                <p>No more texts to personal phones. No more emails lost in inboxes. No more sticky notes in the lobby. Timestamped. Photographed. Tracked from open to resolved.</p>
-                <p className="font-medium text-foreground mt-4">What gets tracked:</p>
+                <p className="font-medium text-foreground">{t('modules.userAccess.features.feedbackSystem.intro', 'Every resident complaint, compliment, and question flows into one dashboard.')}</p>
+                <p>{t('modules.userAccess.features.feedbackSystem.description', 'No more texts to personal phones. No more emails lost in inboxes. No more sticky notes in the lobby. Timestamped. Photographed. Tracked from open to resolved.')}</p>
+                <p className="font-medium text-foreground mt-4">{t('modules.userAccess.features.feedbackSystem.trackedLabel', 'What gets tracked:')}</p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Submission timestamp</span>
+                    <span>{t('modules.userAccess.features.feedbackSystem.submission', 'Submission timestamp')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Acknowledgment timestamp</span>
+                    <span>{t('modules.userAccess.features.feedbackSystem.acknowledgment', 'Acknowledgment timestamp')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Resolution timestamp</span>
+                    <span>{t('modules.userAccess.features.feedbackSystem.resolution', 'Resolution timestamp')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Photo documentation</span>
+                    <span>{t('modules.userAccess.features.feedbackSystem.photos', 'Photo documentation')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Response time metrics</span>
+                    <span>{t('modules.userAccess.features.feedbackSystem.responseTime', 'Response time metrics')}</span>
                   </li>
                 </ul>
               </CardContent>

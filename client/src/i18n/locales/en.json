@@ -6006,6 +6006,233 @@
           "list4": "Revenue forecasts from pipeline"
         }
       }
+    },
+    "technicianPassport": {
+      "hero": {
+        "badge": "Technician Passport Module",
+        "title": "Your Next Hire Is",
+        "titleHighlight": "Already Onboarded.",
+        "description": "Technicians on OnRopePro carry verified credentials, complete work history, and banking details in one portable profile. When they connect to your company, you receive everything instantly.",
+        "descriptionBold": "No paperwork. No verification calls. No waiting.",
+        "seeHow": "See How It Works",
+        "startTrial": "Start Your Free Trial"
+      },
+      "stats": {
+        "onboardingValue": "10s",
+        "onboardingLabel": "Onboarding time",
+        "complianceValue": "100%",
+        "complianceLabel": "Compliance rate",
+        "paperworkValue": "Zero",
+        "paperworkLabel": "Paperwork to chase",
+        "timeSavedValue": "60+ min",
+        "timeSavedLabel": "Time saved per hire"
+      },
+      "problem": {
+        "title": "Hiring Shouldn't Take Longer Than the First Day of Work",
+        "intro": "You find a qualified tech. Level 2, First Aid, available immediately. Perfect.",
+        "paperworkStarts": "Then the paperwork starts.",
+        "paperworkDetails": "Email the onboarding forms. Wait for them to fill out banking details. Chase the certification copies. Verify with IRATA (eventually). Send safety documentation. Wait for signatures. File everything (somewhere). Hope nothing gets lost before the next audit.",
+        "burnedTime": "By the time they're officially \"onboarded,\" you've burned 60+ minutes of admin time. Multiply that by every hire, every season.",
+        "redundancy": "Meanwhile, that tech filled out the exact same forms for their last three employers. The same banking details. The same emergency contacts. The same certification copies.",
+        "solution": "OnRopePro eliminates the redundancy. Technicians create one profile that travels with them. When they connect to your company, their verified credentials, work history, and personal details transfer in 10 seconds.",
+        "conclusion": "Your job is running projects. Not chasing paperwork."
+      },
+      "features": {
+        "title": "What You Get When a Tech Connects",
+        "subtitle": "Every technician with an OnRopePro Passport carries their complete professional identity. When they accept your invitation, you receive:"
+      }
+    },
+    "employerJobBoard": {
+      "hero": {
+        "badge": "Job Board Ecosystem",
+        "title": "Stop Paying $22 Per Application",
+        "subtitle": "From People Who've Never Touched a Rope.",
+        "description": "OnRopePro's Job Board is a closed ecosystem. Every employer verified. Every technician relevant. Post unlimited jobs.",
+        "descriptionBold": "Zero per-application fees.",
+        "ctaPrimary": "Start Posting Jobs Free",
+        "ctaSecondary": "Find Answers"
+      },
+      "stats": {
+        "filteringTime": {
+          "value": "0 hours",
+          "label": "Filtering Time"
+        },
+        "platformFees": {
+          "value": "$0",
+          "label": "Platform Fees"
+        },
+        "timeToHire": {
+          "value": "1-3 Days",
+          "label": "Time to Hire"
+        },
+        "interviews": {
+          "value": "2-3",
+          "label": "Interviews Needed"
+        }
+      },
+      "problemStatement": {
+        "title": "The Indeed Tax",
+        "paragraph1": "You post on Indeed. LinkedIn. Craigslist. Facebook. You get 50 applications. You open each one, hoping for a Level 2 with caulking experience.",
+        "paragraph2": "What you find: shop laborers, pipe fitters, offshore oil rig candidates, and 23 people who \"have always been interested in learning.\" Two hours of filtering. Two actual rope techs.",
+        "paragraph3": "Then Indeed hits you with the bill. $22 per application if you don't respond within 48 hours. A single posting costs you $300 before you've even scheduled an interview. Someone on your team has to log in every day just to click \"decline\" on resumes from car mechanics.",
+        "solutionTitle": "OnRopePro's Job Board works differently.",
+        "solutionText": "Every company here does rope access building maintenance. Every technician here is in the industry. When you post a job, 100% of applicants are relevant. No noise. No filtering. No $22 surprise fees."
+      },
+      "features": {
+        "title": "Your Closed Garden Ecosystem",
+        "subtitle": "Where every applicant is a rope tech and every employer is verified",
+        "description": "The Job Board connects you with qualified rope access technicians across the platform. Post jobs, browse talent, and send direct offers to candidates who match your requirements.",
+        "talentBrowser": {
+          "title": "Talent Browser",
+          "description1": "Search the technician pool before you even post a job. Filter by location, certification level, experience, and expected pay rate.",
+          "description2": "See who's available, what they're looking for, and whether your budget matches their expectations before you spend time interviewing.",
+          "filterLabel": "What you can filter by:",
+          "filter1": "Location (city, region)",
+          "filter2": "IRATA/SPRAT certification level",
+          "filter3": "Years of experience",
+          "filter4": "Expected pay rate",
+          "filter5": "Safety rating score",
+          "filter6": "Specialties (caulking, window washing, etc.)"
+        },
+        "unlimitedPostings": {
+          "title": "Unlimited Job Postings",
+          "description1": "Post as many jobs as your operation requires. Full-time, part-time, contract, seasonal.",
+          "description2": "Six job types supported: window washing, caulking, pressure washing, gutter cleaning, painting and coating, visual inspection. No per-post fees. No per-application charges. No surprise invoices.",
+          "controlLabel": "What you control:",
+          "control1": "Job type and service scope",
+          "control2": "Location and site details",
+          "control3": "Required certifications",
+          "control4": "Pay range (optional but recommended)",
+          "control5": "Start date and duration"
+        },
+        "directOffers": {
+          "title": "Direct Job Offers",
+          "description1": "Found a perfect candidate in the Talent Browser? Send them an offer directly. Link it to one of your active job postings.",
+          "description2": "They get notified in their portal. Accept or decline with one tap. No email chains. No phone tag.",
+          "stepsLabel": "How it works:",
+          "step1": "Select candidate from search results",
+          "step2": "Choose which job posting to link",
+          "step3": "Technician receives in-portal notification",
+          "step4": "Response comes back to your dashboard"
+        }
+      }
+    },
+    "userAccess": {
+      "hero": {
+        "badge": "User Access & Authentication Module",
+        "titleLine1": "Built for the moment you realize",
+        "titleLine2": "your new hire",
+        "titleLine3": "can see everyone's rates.",
+        "description": "Assign project creation, scheduling, and safety compliance to the people who need it. Keep hourly rates, labor costs, and profit margins visible only to you.",
+        "tagline": "One system. Clear boundaries. Zero compromises.",
+        "ctaTrial": "Start Your Free 60-Day Trial",
+        "ctaAnswers": "Find Answers"
+      },
+      "stats": {
+        "exposedPayRates": "Exposed pay rates",
+        "unauthorizedEdits": "Unauthorized edits",
+        "accessConflicts": "Access conflicts",
+        "controlMaintained": "Control maintained"
+      },
+      "problem": {
+        "title": "The Access Problem Nobody Talks About",
+        "intro": "Construction software wasn't built for rope access.",
+        "supervisorAccess": "You add your supervisor to the system. Now they see everything. Pay rates. Profit margins. Which jobs lose money. Which technicians cost the most.",
+        "trust": "It's not about trust. Some information belongs at the owner level.",
+        "choice": "Most systems force a choice: do everything yourself and become the bottleneck, or give access and hope nobody looks where they shouldn't.",
+        "meanwhile": "Meanwhile, building managers drown in resident calls. Technicians text complaints to personal phones. Property managers piece together vendor performance from scattered emails.",
+        "frustrated": "Everyone's frustrated. Nobody has the full picture.",
+        "solution": "OnRopePro separates what people can do from what they can see. Five stakeholder types. One unified system. Every person sees exactly what they need. Nothing more."
+      },
+      "features": {
+        "title": "Complete Access Control That Creates Itself Through Daily Use",
+        "subtitle": "Every login, every permission, every piece of feedback flows through a single system designed for how rope access actually works.",
+        "roleBasedPermissions": {
+          "title": "Role-Based Permission Architecture",
+          "intro": "Before any employee accesses the system, you define exactly what they see.",
+          "description": "44+ individual permissions across financial, operational, safety, and inventory categories. Your ops manager creates projects without seeing payroll. Your ground crew logs hours without accessing bids.",
+          "controlledLabel": "What gets controlled:",
+          "financial": "Financial data visibility (rates, costs, margins)",
+          "projects": "Project creation and modification rights",
+          "employees": "Employee management capabilities",
+          "safety": "Safety documentation access",
+          "inventory": "Inventory and equipment permissions"
+        },
+        "externalPortals": {
+          "title": "External Stakeholder Portals",
+          "intro": "Three separate portals for three different needs.",
+          "description": "Residents see their building's progress and submit feedback. Building managers see project details and response metrics. Property managers see portfolio-wide performance. No cross-contamination. No unauthorized access.",
+          "portalsLabel": "What each portal provides:",
+          "resident": "Resident",
+          "residentDesc": "Progress visibility, feedback submission, photo documentation",
+          "buildingManager": "Building Manager",
+          "buildingManagerDesc": "Full project details, feedback management, work history",
+          "propertyManager": "Property Manager",
+          "propertyManagerDesc": "Multi-building oversight, vendor performance metrics, exportable reports"
+        },
+        "feedbackSystem": {
+          "title": "Centralized Feedback System",
+          "intro": "Every resident complaint, compliment, and question flows into one dashboard.",
+          "description": "No more texts to personal phones. No more emails lost in inboxes. No more sticky notes in the lobby. Timestamped. Photographed. Tracked from open to resolved.",
+          "trackedLabel": "What gets tracked:",
+          "submission": "Submission timestamp",
+          "acknowledgment": "Acknowledgment timestamp",
+          "resolution": "Resolution timestamp",
+          "photos": "Photo documentation",
+          "responseTime": "Response time metrics"
+        }
+      }
+    },
+    "technicianJobBoard": {
+      "hero": {
+        "badge": "Job Board Ecosystem",
+        "title": "Every Job Here Is Rope Access.",
+        "subtitle": "Every Company Is Real.",
+        "description": "OnRopePro's Job Board is exclusively for rope access building maintenance. Browse real jobs from verified companies. Apply in 30 seconds.",
+        "descriptionBold": "Control who sees your profile.",
+        "ctaPrimary": "Browse Jobs Free",
+        "ctaSecondary": "Find Answers"
+      },
+      "stats": {
+        "applicationTime": "Application Time",
+        "relevantListings": "Relevant Listings",
+        "immediateValue": "Immediate",
+        "searchTime": "Search Time",
+        "upfrontValue": "Upfront",
+        "interviewAlignment": "Interview Alignment"
+      },
+      "problem": {
+        "title": "Indeed Thinks You Want to Be a Pipe Fitter",
+        "intro": "You search \"rope access\" on Indeed. What do you get?",
+        "paragraph1": "Offshore oil platforms in the Maritimes. Industrial access jobs at Alberta refineries. Pipe fitter positions that mention \"rope\" once in the safety section. General construction gigs that require \"working at heights.\"",
+        "paragraph2": "You scroll for 20 minutes to find 3 jobs that might actually be rope access building maintenance. Maybe.",
+        "paragraph3": "Then you apply. Upload your resume. Fill out the same form for the 50th time. Manually type your IRATA number because there's no field for it. Wonder if the company even checked your certification.",
+        "solutionTitle": "OnRopePro's Job Board works differently.",
+        "solutionParagraph1": "Every job posted here is rope access building maintenance. Window washing. Caulking. Pressure washing. Gutter cleaning. Painting and coating. Visual inspection. No offshore. No oil rigs. No pipe fitting.",
+        "solutionParagraph2": "Every company posting is verified. Real rope access operators who do real building maintenance. When you apply, your certifications, experience, and safety rating go with your application automatically."
+      },
+      "features": {
+        "title": "Your Rope Access Career Hub",
+        "subtitle": "Where every job matches your skills and every employer understands your work",
+        "jobBrowser": {
+          "title": "Job Browser",
+          "headline": "See only rope access building maintenance jobs.",
+          "description": "Filter by location, job type, and certification requirements. Each listing shows company details, pay range (when provided), start dates, and project scope. Every company is verified. Every job is relevant.",
+          "filterLabel": "What you can filter by:"
+        },
+        "oneClickApplications": {
+          "title": "One-Click Applications",
+          "headline": "Your profile data travels with your application.",
+          "description": "Resume, certifications, IRATA/SPRAT numbers, years of experience, safety rating. All attached automatically. Apply to a job in 30 seconds instead of re-entering the same information for the 100th time.",
+          "sentLabel": "What gets sent automatically:"
+        },
+        "profileVisibility": {
+          "title": "Profile Visibility Toggle",
+          "headline": "Control who finds you.",
+          "description": "Toggle visibility ON: employers can search for you in the Talent Browser, see your credentials, and send you direct job offers. Toggle it OFF: you're invisible to searches but can still browse and apply to jobs normally.",
+          "visibleLabel": "What employers see when you're visible:"
+        }
+      }
     }
   }
 }

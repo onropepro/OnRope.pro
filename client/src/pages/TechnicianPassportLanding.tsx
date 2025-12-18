@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "wouter";
 import { PublicHeader } from "@/components/PublicHeader";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
@@ -36,6 +37,7 @@ import {
 } from "lucide-react";
 
 export default function TechnicianPassportLanding() {
+  const { t } = useTranslation();
   const [expandedOwnerProblems, setExpandedOwnerProblems] = useState<string[]>([]);
   const [expandedBMProblems, setExpandedBMProblems] = useState<string[]>([]);
   const [expandedFaqs, setExpandedFaqs] = useState<string[]>([]);
@@ -86,27 +88,27 @@ export default function TechnicianPassportLanding() {
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
           <div className="text-center space-y-6 pt-16">
             <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-module-label">
-              Technician Passport Module
+              {t('modules.technicianPassport.hero.badge', 'Technician Passport Module')}
             </Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              Your Next Hire Is<br />
-              <span className="text-blue-100">Already Onboarded.</span>
+              {t('modules.technicianPassport.hero.title', 'Your Next Hire Is')}<br />
+              <span className="text-blue-100">{t('modules.technicianPassport.hero.titleHighlight', 'Already Onboarded.')}</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              Technicians on OnRopePro carry verified credentials, complete work history, and banking details in one portable profile. When they connect to your company, you receive everything instantly.<br />
-              <strong>No paperwork. No verification calls. No waiting.</strong>
+              {t('modules.technicianPassport.hero.description', 'Technicians on OnRopePro carry verified credentials, complete work history, and banking details in one portable profile. When they connect to your company, you receive everything instantly.')}<br />
+              <strong>{t('modules.technicianPassport.hero.descriptionBold', 'No paperwork. No verification calls. No waiting.')}</strong>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" onClick={() => scrollToSection('problem')} data-testid="button-hero-see-how">
-                See How It Works
+                {t('modules.technicianPassport.hero.seeHow', 'See How It Works')}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-hero-trial">
                 <Link href="/employer">
-                  Start Your Free Trial
+                  {t('modules.technicianPassport.hero.startTrial', 'Start Your Free Trial')}
                   <Zap className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
@@ -129,20 +131,20 @@ export default function TechnicianPassportLanding() {
             <CardContent className="p-8">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-blue-600">10s</div>
-                  <div className="text-base text-muted-foreground mt-1">Onboarding time</div>
+                  <div className="text-3xl md:text-4xl font-bold text-blue-600">{t('modules.technicianPassport.stats.onboardingValue', '10s')}</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.technicianPassport.stats.onboardingLabel', 'Onboarding time')}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-emerald-600">100%</div>
-                  <div className="text-base text-muted-foreground mt-1">Compliance rate</div>
+                  <div className="text-3xl md:text-4xl font-bold text-emerald-600">{t('modules.technicianPassport.stats.complianceValue', '100%')}</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.technicianPassport.stats.complianceLabel', 'Compliance rate')}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-amber-600">Zero</div>
-                  <div className="text-base text-muted-foreground mt-1">Paperwork to chase</div>
+                  <div className="text-3xl md:text-4xl font-bold text-amber-600">{t('modules.technicianPassport.stats.paperworkValue', 'Zero')}</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.technicianPassport.stats.paperworkLabel', 'Paperwork to chase')}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-violet-600">60+ min</div>
-                  <div className="text-base text-muted-foreground mt-1">Time saved per hire</div>
+                  <div className="text-3xl md:text-4xl font-bold text-violet-600">{t('modules.technicianPassport.stats.timeSavedValue', '60+ min')}</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.technicianPassport.stats.timeSavedLabel', 'Time saved per hire')}</div>
                 </div>
               </div>
             </CardContent>
@@ -156,32 +158,32 @@ export default function TechnicianPassportLanding() {
       <section id="problem" className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
-            Hiring Shouldn't Take Longer Than the First Day of Work
+            {t('modules.technicianPassport.problem.title', "Hiring Shouldn't Take Longer Than the First Day of Work")}
           </h2>
           
           <Card className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
             <CardContent className="p-6 md:p-8 space-y-4 text-muted-foreground">
               <p className="text-lg leading-relaxed">
-                You find a qualified tech. Level 2, First Aid, available immediately. Perfect.
+                {t('modules.technicianPassport.problem.intro', 'You find a qualified tech. Level 2, First Aid, available immediately. Perfect.')}
               </p>
               <p className="text-base">
-                Then the paperwork starts.
+                {t('modules.technicianPassport.problem.paperworkStarts', 'Then the paperwork starts.')}
               </p>
               <p className="text-base">
-                Email the onboarding forms. Wait for them to fill out banking details. Chase the certification copies. Verify with IRATA (eventually). Send safety documentation. Wait for signatures. File everything (somewhere). Hope nothing gets lost before the next audit.
+                {t('modules.technicianPassport.problem.paperworkDetails', 'Email the onboarding forms. Wait for them to fill out banking details. Chase the certification copies. Verify with IRATA (eventually). Send safety documentation. Wait for signatures. File everything (somewhere). Hope nothing gets lost before the next audit.')}
               </p>
               <p className="text-base font-medium text-foreground">
-                By the time they're officially "onboarded," you've burned 60+ minutes of admin time. Multiply that by every hire, every season.
+                {t('modules.technicianPassport.problem.burnedTime', 'By the time they\'re officially "onboarded," you\'ve burned 60+ minutes of admin time. Multiply that by every hire, every season.')}
               </p>
               <p className="text-base">
-                Meanwhile, that tech filled out the exact same forms for their last three employers. The same banking details. The same emergency contacts. The same certification copies.
+                {t('modules.technicianPassport.problem.redundancy', 'Meanwhile, that tech filled out the exact same forms for their last three employers. The same banking details. The same emergency contacts. The same certification copies.')}
               </p>
               <Separator className="my-6" />
               <p className="font-medium text-foreground text-lg">
-                OnRopePro eliminates the redundancy. Technicians create one profile that travels with them. When they connect to your company, their verified credentials, work history, and personal details transfer in 10 seconds.
+                {t('modules.technicianPassport.problem.solution', 'OnRopePro eliminates the redundancy. Technicians create one profile that travels with them. When they connect to your company, their verified credentials, work history, and personal details transfer in 10 seconds.')}
               </p>
               <p className="font-medium text-foreground">
-                Your job is running projects. Not chasing paperwork.
+                {t('modules.technicianPassport.problem.conclusion', 'Your job is running projects. Not chasing paperwork.')}
               </p>
             </CardContent>
           </Card>
@@ -194,10 +196,10 @@ export default function TechnicianPassportLanding() {
       <section id="features" className="pt-8 md:pt-12 pb-16 md:pb-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            What You Get When a Tech Connects
+            {t('modules.technicianPassport.features.title', 'What You Get When a Tech Connects')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-3xl mx-auto">
-            Every technician with an OnRopePro Passport carries their complete professional identity. When they accept your invitation, you receive:
+            {t('modules.technicianPassport.features.subtitle', 'Every technician with an OnRopePro Passport carries their complete professional identity. When they accept your invitation, you receive:')}
           </p>
 
           <div className="grid md:grid-cols-3 gap-6">

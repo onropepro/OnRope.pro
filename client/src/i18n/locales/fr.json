@@ -6190,6 +6190,233 @@
           "list4": "Prévisions de revenus du pipeline"
         }
       }
+    },
+    "technicianPassport": {
+      "hero": {
+        "badge": "Module Passeport Technicien",
+        "title": "Votre prochaine embauche est",
+        "titleHighlight": "Déjà intégrée.",
+        "description": "Les techniciens sur OnRopePro possèdent des accréditations vérifiées, un historique de travail complet et des coordonnées bancaires dans un seul profil portable. Quand ils se connectent à votre entreprise, vous recevez tout instantanément.",
+        "descriptionBold": "Pas de paperasse. Pas d'appels de vérification. Pas d'attente.",
+        "seeHow": "Voir comment ça marche",
+        "startTrial": "Commencer votre essai gratuit"
+      },
+      "stats": {
+        "onboardingValue": "10s",
+        "onboardingLabel": "Temps d'intégration",
+        "complianceValue": "100%",
+        "complianceLabel": "Taux de conformité",
+        "paperworkValue": "Zéro",
+        "paperworkLabel": "Paperasse à poursuivre",
+        "timeSavedValue": "60+ min",
+        "timeSavedLabel": "Temps économisé par embauche"
+      },
+      "problem": {
+        "title": "L'embauche ne devrait pas prendre plus de temps que le premier jour de travail",
+        "intro": "Vous trouvez un technicien qualifié. Niveau 2, premiers soins, disponible immédiatement. Parfait.",
+        "paperworkStarts": "Puis la paperasse commence.",
+        "paperworkDetails": "Envoyer les formulaires d'intégration par courriel. Attendre qu'ils remplissent les coordonnées bancaires. Poursuivre les copies de certification. Vérifier avec IRATA (éventuellement). Envoyer la documentation de sécurité. Attendre les signatures. Classer tout (quelque part). Espérer que rien ne se perde avant le prochain audit.",
+        "burnedTime": "Le temps qu'ils soient officiellement « intégrés », vous avez brûlé 60+ minutes de temps administratif. Multipliez par chaque embauche, chaque saison.",
+        "redundancy": "Pendant ce temps, ce technicien a rempli exactement les mêmes formulaires pour ses trois derniers employeurs. Les mêmes coordonnées bancaires. Les mêmes contacts d'urgence. Les mêmes copies de certification.",
+        "solution": "OnRopePro élimine la redondance. Les techniciens créent un seul profil qui les accompagne. Quand ils se connectent à votre entreprise, leurs accréditations vérifiées, historique de travail et détails personnels sont transférés en 10 secondes.",
+        "conclusion": "Votre travail est de gérer des projets. Pas de poursuivre la paperasse."
+      },
+      "features": {
+        "title": "Ce que vous obtenez quand un technicien se connecte",
+        "subtitle": "Chaque technicien avec un Passeport OnRopePro porte son identité professionnelle complète. Quand ils acceptent votre invitation, vous recevez :"
+      }
+    },
+    "employerJobBoard": {
+      "hero": {
+        "badge": "Écosystème de tableau d'emplois",
+        "title": "Arrêtez de payer 22$ par candidature",
+        "subtitle": "De personnes qui n'ont jamais touché une corde.",
+        "description": "Le tableau d'emplois d'OnRopePro est un écosystème fermé. Chaque employeur vérifié. Chaque technicien pertinent. Publiez des emplois illimités.",
+        "descriptionBold": "Zéro frais par candidature.",
+        "ctaPrimary": "Commencer à publier gratuitement",
+        "ctaSecondary": "Trouver des réponses"
+      },
+      "stats": {
+        "filteringTime": {
+          "value": "0 heures",
+          "label": "Temps de filtrage"
+        },
+        "platformFees": {
+          "value": "0$",
+          "label": "Frais de plateforme"
+        },
+        "timeToHire": {
+          "value": "1-3 jours",
+          "label": "Délai d'embauche"
+        },
+        "interviews": {
+          "value": "2-3",
+          "label": "Entrevues nécessaires"
+        }
+      },
+      "problemStatement": {
+        "title": "La taxe Indeed",
+        "paragraph1": "Vous publiez sur Indeed. LinkedIn. Craigslist. Facebook. Vous recevez 50 candidatures. Vous ouvrez chacune d'elles, espérant trouver un niveau 2 avec expérience en calfeutrage.",
+        "paragraph2": "Ce que vous trouvez : des ouvriers d'atelier, des tuyauteurs, des candidats de plateformes pétrolières, et 23 personnes qui « ont toujours été intéressées à apprendre ». Deux heures de filtrage. Deux vrais techniciens sur corde.",
+        "paragraph3": "Puis Indeed vous envoie la facture. 22$ par candidature si vous ne répondez pas dans les 48 heures. Une seule publication vous coûte 300$ avant même d'avoir planifié une entrevue. Quelqu'un de votre équipe doit se connecter tous les jours juste pour cliquer « refuser » sur des CV de mécaniciens.",
+        "solutionTitle": "Le tableau d'emplois d'OnRopePro fonctionne différemment.",
+        "solutionText": "Chaque entreprise ici fait de l'entretien de bâtiments sur corde. Chaque technicien ici est dans l'industrie. Quand vous publiez un emploi, 100% des candidats sont pertinents. Pas de bruit. Pas de filtrage. Pas de frais surprises de 22$."
+      },
+      "features": {
+        "title": "Votre écosystème de jardin fermé",
+        "subtitle": "Où chaque candidat est un technicien sur corde et chaque employeur est vérifié",
+        "description": "Le tableau d'emplois vous connecte avec des techniciens d'accès sur corde qualifiés à travers la plateforme. Publiez des emplois, parcourez les talents et envoyez des offres directes aux candidats qui correspondent à vos exigences.",
+        "talentBrowser": {
+          "title": "Navigateur de talents",
+          "description1": "Recherchez dans le bassin de techniciens avant même de publier un emploi. Filtrez par emplacement, niveau de certification, expérience et taux de rémunération attendu.",
+          "description2": "Voyez qui est disponible, ce qu'ils recherchent et si votre budget correspond à leurs attentes avant de passer du temps en entrevue.",
+          "filterLabel": "Ce que vous pouvez filtrer :",
+          "filter1": "Emplacement (ville, région)",
+          "filter2": "Niveau de certification IRATA/SPRAT",
+          "filter3": "Années d'expérience",
+          "filter4": "Taux de rémunération attendu",
+          "filter5": "Score de sécurité",
+          "filter6": "Spécialités (calfeutrage, lavage de vitres, etc.)"
+        },
+        "unlimitedPostings": {
+          "title": "Publications d'emplois illimitées",
+          "description1": "Publiez autant d'emplois que votre opération le nécessite. Temps plein, temps partiel, contrat, saisonnier.",
+          "description2": "Six types d'emplois supportés : lavage de vitres, calfeutrage, lavage à pression, nettoyage de gouttières, peinture et revêtement, inspection visuelle. Pas de frais par publication. Pas de frais par candidature. Pas de factures surprises.",
+          "controlLabel": "Ce que vous contrôlez :",
+          "control1": "Type d'emploi et portée du service",
+          "control2": "Emplacement et détails du site",
+          "control3": "Certifications requises",
+          "control4": "Échelle salariale (optionnel mais recommandé)",
+          "control5": "Date de début et durée"
+        },
+        "directOffers": {
+          "title": "Offres d'emploi directes",
+          "description1": "Vous avez trouvé un candidat parfait dans le navigateur de talents ? Envoyez-lui une offre directement. Liez-la à l'une de vos publications d'emploi actives.",
+          "description2": "Ils reçoivent une notification dans leur portail. Accepter ou refuser d'un seul clic. Pas de chaînes de courriels. Pas de messages téléphoniques.",
+          "stepsLabel": "Comment ça fonctionne :",
+          "step1": "Sélectionnez un candidat dans les résultats de recherche",
+          "step2": "Choisissez quelle publication d'emploi lier",
+          "step3": "Le technicien reçoit une notification dans le portail",
+          "step4": "La réponse revient à votre tableau de bord"
+        }
+      }
+    },
+    "userAccess": {
+      "hero": {
+        "badge": "Module d'accès utilisateur et d'authentification",
+        "titleLine1": "Conçu pour le moment où vous réalisez",
+        "titleLine2": "que votre nouvel employé",
+        "titleLine3": "peut voir les taux de tout le monde.",
+        "description": "Attribuez la création de projets, la planification et la conformité sécuritaire aux personnes qui en ont besoin. Gardez les taux horaires, les coûts de main-d'œuvre et les marges bénéficiaires visibles uniquement pour vous.",
+        "tagline": "Un système. Des limites claires. Zéro compromis.",
+        "ctaTrial": "Commencez votre essai gratuit de 60 jours",
+        "ctaAnswers": "Trouver des réponses"
+      },
+      "stats": {
+        "exposedPayRates": "Taux de rémunération exposés",
+        "unauthorizedEdits": "Modifications non autorisées",
+        "accessConflicts": "Conflits d'accès",
+        "controlMaintained": "Contrôle maintenu"
+      },
+      "problem": {
+        "title": "Le problème d'accès dont personne ne parle",
+        "intro": "Les logiciels de construction n'ont pas été conçus pour les travaux sur cordes.",
+        "supervisorAccess": "Vous ajoutez votre superviseur au système. Maintenant, il voit tout. Les taux de rémunération. Les marges bénéficiaires. Quels travaux perdent de l'argent. Quels techniciens coûtent le plus cher.",
+        "trust": "Ce n'est pas une question de confiance. Certaines informations appartiennent au niveau du propriétaire.",
+        "choice": "La plupart des systèmes vous forcent à choisir : tout faire vous-même et devenir le goulot d'étranglement, ou donner l'accès et espérer que personne ne regarde là où il ne devrait pas.",
+        "meanwhile": "Pendant ce temps, les gestionnaires d'immeubles croulent sous les appels des résidents. Les techniciens envoient les plaintes par texto sur leurs téléphones personnels. Les gestionnaires immobiliers reconstituent la performance des fournisseurs à partir de courriels éparpillés.",
+        "frustrated": "Tout le monde est frustré. Personne n'a la vue d'ensemble.",
+        "solution": "OnRopePro sépare ce que les gens peuvent faire de ce qu'ils peuvent voir. Cinq types de parties prenantes. Un système unifié. Chaque personne voit exactement ce dont elle a besoin. Rien de plus."
+      },
+      "features": {
+        "title": "Contrôle d'accès complet qui se crée lui-même au quotidien",
+        "subtitle": "Chaque connexion, chaque permission, chaque commentaire passe par un système unique conçu pour le fonctionnement réel des travaux sur cordes.",
+        "roleBasedPermissions": {
+          "title": "Architecture de permissions basée sur les rôles",
+          "intro": "Avant qu'un employé accède au système, vous définissez exactement ce qu'il voit.",
+          "description": "Plus de 44 permissions individuelles réparties dans les catégories financières, opérationnelles, de sécurité et d'inventaire. Votre responsable des opérations crée des projets sans voir la paie. Votre équipe au sol enregistre les heures sans accéder aux soumissions.",
+          "controlledLabel": "Ce qui est contrôlé :",
+          "financial": "Visibilité des données financières (taux, coûts, marges)",
+          "projects": "Droits de création et modification de projets",
+          "employees": "Capacités de gestion des employés",
+          "safety": "Accès à la documentation de sécurité",
+          "inventory": "Permissions d'inventaire et d'équipement"
+        },
+        "externalPortals": {
+          "title": "Portails pour les parties prenantes externes",
+          "intro": "Trois portails distincts pour trois besoins différents.",
+          "description": "Les résidents voient la progression de leur immeuble et soumettent des commentaires. Les gestionnaires d'immeubles voient les détails du projet et les métriques de réponse. Les gestionnaires immobiliers voient la performance à l'échelle du portefeuille. Pas de contamination croisée. Pas d'accès non autorisé.",
+          "portalsLabel": "Ce que chaque portail fournit :",
+          "resident": "Résident",
+          "residentDesc": "Visibilité de la progression, soumission de commentaires, documentation photo",
+          "buildingManager": "Gestionnaire d'immeuble",
+          "buildingManagerDesc": "Détails complets du projet, gestion des commentaires, historique des travaux",
+          "propertyManager": "Gestionnaire immobilier",
+          "propertyManagerDesc": "Supervision multi-immeubles, métriques de performance des fournisseurs, rapports exportables"
+        },
+        "feedbackSystem": {
+          "title": "Système de commentaires centralisé",
+          "intro": "Chaque plainte, compliment et question des résidents arrive dans un seul tableau de bord.",
+          "description": "Plus de textos sur les téléphones personnels. Plus de courriels perdus dans les boîtes de réception. Plus de notes adhésives dans le hall. Horodaté. Photographié. Suivi de l'ouverture à la résolution.",
+          "trackedLabel": "Ce qui est suivi :",
+          "submission": "Horodatage de soumission",
+          "acknowledgment": "Horodatage d'accusé de réception",
+          "resolution": "Horodatage de résolution",
+          "photos": "Documentation photo",
+          "responseTime": "Métriques de temps de réponse"
+        }
+      }
+    },
+    "technicianJobBoard": {
+      "hero": {
+        "badge": "Écosystème de tableau d'emplois",
+        "title": "Chaque emploi ici est en travail sur cordes.",
+        "subtitle": "Chaque entreprise est réelle.",
+        "description": "Le tableau d'emplois d'OnRopePro est exclusivement dédié à l'entretien de bâtiments par travail sur cordes. Parcourez des emplois réels d'entreprises vérifiées. Postulez en 30 secondes.",
+        "descriptionBold": "Contrôlez qui voit votre profil.",
+        "ctaPrimary": "Parcourir les emplois gratuitement",
+        "ctaSecondary": "Trouver des réponses"
+      },
+      "stats": {
+        "applicationTime": "Temps de candidature",
+        "relevantListings": "Offres pertinentes",
+        "immediateValue": "Immédiat",
+        "searchTime": "Temps de recherche",
+        "upfrontValue": "Transparent",
+        "interviewAlignment": "Alignement d'entrevue"
+      },
+      "problem": {
+        "title": "Indeed pense que vous voulez être tuyauteur",
+        "intro": "Vous cherchez « travail sur cordes » sur Indeed. Qu'obtenez-vous ?",
+        "paragraph1": "Des plateformes pétrolières offshore dans les Maritimes. Des emplois d'accès industriel dans les raffineries de l'Alberta. Des postes de tuyauteur qui mentionnent « corde » une fois dans la section sécurité. Des emplois de construction générale qui exigent « travail en hauteur ».",
+        "paragraph2": "Vous faites défiler pendant 20 minutes pour trouver 3 emplois qui pourraient vraiment être de l'entretien de bâtiments sur cordes. Peut-être.",
+        "paragraph3": "Ensuite, vous postulez. Téléversez votre CV. Remplissez le même formulaire pour la 50e fois. Tapez manuellement votre numéro IRATA parce qu'il n'y a pas de champ pour ça. Demandez-vous si l'entreprise a même vérifié votre certification.",
+        "solutionTitle": "Le tableau d'emplois d'OnRopePro fonctionne différemment.",
+        "solutionParagraph1": "Chaque emploi publié ici est de l'entretien de bâtiments sur cordes. Nettoyage de vitres. Calfeutrage. Lavage à pression. Nettoyage de gouttières. Peinture et revêtement. Inspection visuelle. Pas d'offshore. Pas de plateformes pétrolières. Pas de tuyauterie.",
+        "solutionParagraph2": "Chaque entreprise qui publie est vérifiée. De vrais opérateurs de travail sur cordes qui font de l'entretien de bâtiments réel. Quand vous postulez, vos certifications, expérience et cote de sécurité accompagnent automatiquement votre candidature."
+      },
+      "features": {
+        "title": "Votre centre de carrière en travail sur cordes",
+        "subtitle": "Où chaque emploi correspond à vos compétences et chaque employeur comprend votre travail",
+        "jobBrowser": {
+          "title": "Navigateur d'emplois",
+          "headline": "Voyez uniquement les emplois d'entretien de bâtiments sur cordes.",
+          "description": "Filtrez par emplacement, type d'emploi et exigences de certification. Chaque offre affiche les détails de l'entreprise, la fourchette salariale (si fournie), les dates de début et la portée du projet. Chaque entreprise est vérifiée. Chaque emploi est pertinent.",
+          "filterLabel": "Ce que vous pouvez filtrer :"
+        },
+        "oneClickApplications": {
+          "title": "Candidatures en un clic",
+          "headline": "Vos données de profil accompagnent votre candidature.",
+          "description": "CV, certifications, numéros IRATA/SPRAT, années d'expérience, cote de sécurité. Tout est joint automatiquement. Postulez à un emploi en 30 secondes au lieu de ressaisir les mêmes informations pour la 100e fois.",
+          "sentLabel": "Ce qui est envoyé automatiquement :"
+        },
+        "profileVisibility": {
+          "title": "Visibilité du profil",
+          "headline": "Contrôlez qui vous trouve.",
+          "description": "Activez la visibilité : les employeurs peuvent vous rechercher dans le navigateur de talents, voir vos qualifications et vous envoyer des offres d'emploi directes. Désactivez-la : vous êtes invisible aux recherches mais pouvez toujours parcourir et postuler aux emplois normalement.",
+          "visibleLabel": "Ce que les employeurs voient quand vous êtes visible :"
+        }
+      }
     }
   }
 }
