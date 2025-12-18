@@ -200,6 +200,47 @@ function cleanText(text: string): string {
 }
 
 /**
+ * Check for dedicated markdown content file
+ * Returns content if file exists, null otherwise
+ */
+function getMarkdownContent(slug: string): { title: string; description: string; content: string } | null {
+  try {
+    const mdPath = path.resolve(process.cwd(), `server/help-content/${slug}.md`);
+    
+    if (!fs.existsSync(mdPath)) {
+      return null;
+    }
+    
+    const content = fs.readFileSync(mdPath, 'utf-8');
+    
+    // Extract title from first h1 heading
+    const titleMatch = content.match(/^#\s+(.+)$/m);
+    const title = titleMatch ? titleMatch[1].trim() : '';
+    
+    // Extract description from first paragraph after title
+    const lines = content.split('\n');
+    let description = '';
+    let foundTitle = false;
+    for (const line of lines) {
+      if (line.startsWith('# ')) {
+        foundTitle = true;
+        continue;
+      }
+      if (foundTitle && line.trim() && !line.startsWith('#')) {
+        description = line.trim().substring(0, 200);
+        break;
+      }
+    }
+    
+    console.log(`[RAG] Using dedicated markdown: ${slug}.md`);
+    return { title, description, content };
+  } catch (error: any) {
+    console.error(`[RAG] Error reading markdown for ${slug}:`, error.message);
+    return null;
+  }
+}
+
+/**
  * Extract structured Markdown content from a TSX Guide file
  * Preserves sections, headings, lists, and filters developer content
  */
@@ -411,7 +452,11 @@ export async function indexGuideFile(guide: typeof guideRegistry[0]): Promise<bo
   try {
     console.log(`[RAG] Indexing: ${guide.title}`);
     
-    const { title, description, content } = extractContentFromTSX(guide.sourceFile);
+    // Check for dedicated markdown content first
+    const markdownContent = getMarkdownContent(guide.slug);
+    
+    // Use markdown content if available, otherwise extract from TSX
+    const { title, description, content } = markdownContent || extractContentFromTSX(guide.sourceFile);
     
     if (!content || content.length < 50) {
       console.log(`[RAG] Skipping ${guide.slug} - insufficient content`);
