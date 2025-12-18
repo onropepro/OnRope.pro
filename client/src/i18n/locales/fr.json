@@ -4018,6 +4018,13 @@
       "description": "Toutes les opérations d'accès sur corde doivent être conformes au Code de pratique international IRATA / SPRAT / SPRAT pour l'accès sur corde industriel (TC-102ENG). Ce document décrit les exigences de sécurité obligatoires, les procédures techniques et les meilleures pratiques pour les travaux d'accès sur corde.",
       "downloadDocument": "Télécharger le document officiel ICOP",
       "viewInfo": "Voir les informations ICOP IRATA / SPRAT"
+    },
+    "selectEntireKit": "Sélectionner tout le kit",
+    "inspectAllItems": "Inspecter les {{count}} éléments en une fois",
+    "orSelectIndividual": "ou sélectionner des éléments individuels",
+    "kitMode": {
+      "title": "Mode d'inspection du kit",
+      "description": "Les {{count}} éléments seront inspectés ensemble"
     }
   },
   "incidentReport": {
@@ -4868,6 +4875,981 @@
       "placeholder": "votre@email.com",
       "submit": "Envoyer mon analyse",
       "disclaimer": "Nous respectons votre vie privée. Pas de spam, juste votre rapport d'économies personnalisé."
+    }
+  },
+  "modules": {
+    "documents": {
+      "hero": {
+        "badge": "Module Gestion de Documents",
+        "title": "Quand l'auditeur arrive,",
+        "subtitle": "Serez-vous en panique ou prêt?",
+        "description": "Chaque document. Chaque signature. Chaque horodatage. Recherchable en secondes, pas éparpillé dans des classeurs.",
+        "descriptionStrong": "Construisez des dossiers de conformité qui protègent votre entreprise quand cela compte le plus.",
+        "ctaTrial": "Commencer votre essai gratuit de 60 jours",
+        "ctaFaqs": "Trouver des réponses"
+      },
+      "stats": {
+        "auditPrep": "Préparation d'audit, pas des heures",
+        "acknowledgment": "Visibilité des accusés de réception",
+        "neverValue": "Jamais",
+        "insurance": "Échéances d'assurance",
+        "permanentValue": "Permanent",
+        "tamperProof": "Dossiers infalsifiables"
+      },
+      "problem": {
+        "title": "L'écart de conformité dont personne ne parle",
+        "intro": "Vous avez remis le manuel de sécurité à votre nouvelle recrue. Il a dit « oui, je l'ai lu » et l'a mis de côté.",
+        "scenario": "Deux semaines plus tard, il cause des dommages lors d'un travail de nettoyage de vitres parce qu'il a utilisé une technique de son ancienne entreprise. Maintenant vous faites face à une réclamation, et « il m'a dit qu'il l'avait lu » est votre seule défense.",
+        "reality": "Les systèmes papier n'échouent pas pendant les opérations normales. Ils échouent pendant les audits, les poursuites et les enquêtes d'assurance. Au moment où vous devez prouver la conformité, vous découvrez des fichiers éparpillés, des signatures manquantes et aucun moyen de vérifier qui a réellement examiné quoi.",
+        "solution": "OnRopePro traite la gestion documentaire comme le fondement de votre protection contre la responsabilité. Chaque accusé de réception est horodaté. Chaque signature est permanente. Quand WorkSafeBC demande des preuves, vous ne cherchez pas. Vous générez un rapport."
+      },
+      "features": {
+        "title": "Ce que fait ce module",
+        "subtitle": "Votre infrastructure complète de conformité documentaire. Centralise chaque manuel de sécurité, politique, procédure et certificat avec des signatures numériques qui créent des dossiers de conformité défendables.",
+        "signature": {
+          "title": "Capture de signature numérique",
+          "description": "Lorsque les employés examinent des documents, ils signent numériquement avec un horodatage capturé. Plus d'excuses « Je ne savais pas ». La signature prouve qu'ils ont vu la version exacte que vous avez téléchargée, à la date et l'heure exactes.",
+          "capturedLabel": "Ce qui est capturé :",
+          "item1": "Identité de l'employé",
+          "item2": "Version du document examinée",
+          "item3": "Horodatage de l'accusé de réception",
+          "item4": "Dossier d'audit permanent"
+        },
+        "compliance": {
+          "title": "Suivi du statut de conformité",
+          "description": "Voyez exactement qui a signé quels documents, qui a des lacunes et qui a besoin de rappels. Les tableaux de bord montrent les accusés de réception manquants avant qu'ils ne deviennent des constats d'audit.",
+          "trackedLabel": "Ce qui est suivi :",
+          "item1": "Statut d'accusé de réception de l'employé par document",
+          "item2": "Alertes de signatures manquantes",
+          "item3": "Exigences de notification de nouvelle version",
+          "item4": "Progression de l'intégration complète"
+        },
+        "audit": {
+          "title": "Réponse d'audit instantanée",
+          "description": "Générez des rapports de conformité en secondes. Quand les régulateurs, assureurs ou avocats demandent de la documentation, vous fournissez des rapports professionnels au lieu de fouiller dans les papiers.",
+          "reportedLabel": "Ce qui est rapporté :",
+          "item1": "Historique complet des signatures par employé",
+          "item2": "Contrôle de version des documents",
+          "item3": "Horodatages des accusés de réception",
+          "item4": "Formats PDF et CSV exportables"
+        }
+      },
+      "stakeholders": {
+        "title": "Qui bénéficie de ce module",
+        "subtitle": "Chaque partie prenante obtient l'accès aux documents et la visibilité de conformité dont elle a besoin.",
+        "companyOwners": {
+          "title": "Pour les propriétaires d'entreprise",
+          "problem1Title": "« On nous a poursuivis et je ne peux pas prouver qu'il était formé »",
+          "problem1Desc": "Votre technicien a endommagé un point d'ancrage. Le gestionnaire d'immeuble réclame négligence. Vous savez que votre gars était formé sur l'ancrage approprié, mais la seule preuve est une feuille de présence d'une réunion de sécurité il y a 18 mois, et vous ne la trouvez pas. Votre avocat dit que l'affaire repose sur une documentation que vous ne pouvez pas produire.",
+          "solution1": "Chaque accusé de réception de document est horodaté et signé numériquement. Quand des questions juridiques surviennent, vous générez un rapport montrant exactement quelles procédures l'employé a examinées et quand. Votre défense est un PDF, pas un souvenir.",
+          "problem2Title": "« Notre assurance a été refusée à cause de documents manquants »",
+          "problem2Desc": "Votre certificat d'assurance a expiré il y a trois semaines. Vous ne l'avez pas remarqué jusqu'à ce que le gestionnaire d'immeuble bloque l'accès au site. Vous vous précipitez pour obtenir une couverture renouvelée, mais le délai d'assurance crée une exposition à la responsabilité que vous ignoriez.",
+          "solution2": "Le suivi d'expiration des documents d'assurance envoie des avertissements à l'avance. Les alertes du tableau de bord signalent les échéances de renouvellement du certificat d'assurance avant qu'elles ne deviennent des problèmes d'accès au site. Vous renouvelez proactivement au lieu de réactivement."
+        },
+        "opsManagers": {
+          "title": "Pour les directeurs des opérations",
+          "problem1Title": "« Je n'ai aucune idée de qui a réellement lu nos procédures »",
+          "problem1Desc": "Vous avez un manuel de sécurité. Vous êtes assez sûr que la plupart des employés l'ont vu. Quand l'auditeur demande la preuve que chaque employé a accusé réception de vos procédures de protection contre les chutes, vous réalisez que « assez sûr » n'est pas de la documentation. Votre nouvelle recrue il y a trois semaines n'a rien signé.",
+          "solution1": "Suivez le statut d'accusé de réception pour chaque employé contre chaque document. Voyez instantanément qui a signé quelles procédures et qui a des lacunes. Les nouvelles recrues ne peuvent pas commencer à travailler tant qu'elles n'ont pas accusé réception de tous les documents requis.",
+          "problem2Title": "« Les procédures mises à jour ne sont pas accusées de réception »",
+          "problem2Desc": "Vous avez mis à jour la procédure de réunion toolbox le mois dernier. Certains employés ont signé la nouvelle version, certains ne l'ont pas encore vue, et vous n'avez aucune visibilité sur l'écart. Lors du prochain audit, vous découvrez que 5 employés n'ont jamais accusé réception de la procédure mise à jour.",
+          "solution2": "Le rapport de statut de conformité montre exactement quels employés ont des accusés de réception manquants. Les alertes du tableau de bord mettent en évidence les lacunes avant qu'elles ne deviennent des constats d'audit."
+        },
+        "buildingManagers": {
+          "title": "Pour les gestionnaires d'immeubles et de propriétés",
+          "problem1Title": "« Comment savoir si cet entrepreneur forme vraiment ses gens? »",
+          "problem1Desc": "N'importe quel entrepreneur peut prétendre avoir des procédures de sécurité. Vous n'avez aucun moyen de vérifier si les employés examinent réellement ces procédures, ou si l'entrepreneur a juste un classeur poussiéreux sur une étagère quelque part. Vous approuvez les travaux sur la base de promesses, pas de preuves.",
+          "solution1": "La Note de Sécurité de l'Entreprise (CSR) agrège les taux d'accusé de réception des documents des employés en un score visible. Vous voyez l'engagement continu, pas seulement les politiques déclarées. Un CSR élevé signifie que les employés accusent régulièrement réception et examinent la documentation de sécurité."
+        },
+        "technicians": {
+          "title": "Pour les techniciens",
+          "problem1Title": "« Je ne sais pas quelles procédures s'appliquent ici »",
+          "problem1Desc": "Chaque entreprise a des procédures différentes. Votre employeur précédent faisait l'ancrage différemment. Vous voulez suivre les règles, mais vous n'êtes pas sûr de quelle version est actuelle ou si vous avez vu tout ce que vous êtes censé voir.",
+          "solution1": "Votre liste de documents montre clairement ce qui nécessite votre accusé de réception. Les documents précédemment signés affichent la date d'accusé de réception. Les nouvelles versions déclenchent des exigences de ré-accusé de réception. Vous savez toujours où vous en êtes."
+        }
+      },
+      "keyFeatures": {
+        "title": "Fonctionnalités clés",
+        "subtitle": "Chaque fonctionnalité est conçue pour créer des dossiers de conformité défendables qui protègent votre entreprise.",
+        "immutableAudit": {
+          "title": "Piste d'audit immuable",
+          "description": "Une fois signés, les enregistrements de signature ne peuvent être supprimés ou modifiés. Cela crée une documentation de conformité permanente et infalsifiable pour les régulateurs, les assureurs et la défense juridique."
+        },
+        "swpTemplates": {
+          "title": "15 modèles PTS pré-construits",
+          "description": "Modèles de procédures de travail sécuritaires conformes aux normes de l'industrie couvrant la protection contre les chutes, les systèmes d'ancrage, les techniques de corde et les procédures de sauvetage. Personnalisez-les pour vos opérations et générez des PDF professionnels."
+        },
+        "safetyTopics": {
+          "title": "10 sujets quotidiens de pratiques de sécurité",
+          "description": "Sujets de discussion sur la sécurité en rotation avec suivi des accusés de réception des employés. L'engagement régulier démontre une culture de sécurité active et contribue à votre score CSR."
+        },
+        "expirationTracking": {
+          "title": "Suivi des expirations",
+          "description": "Téléchargez les certificats d'assurance avec leurs dates d'expiration. Le système fournit des avertissements à l'avance pour que vous ne soyez jamais pris avec une couverture périmée lors d'une demande client."
+        },
+        "roleBasedAccess": {
+          "title": "Accès basé sur les rôles",
+          "description": "Les documents sensibles comme le certificat d'assurance sont restreints aux rôles de propriétaire d'entreprise et de directeur des opérations. Les techniciens et superviseurs ne voient que ce dont ils ont besoin."
+        },
+        "csrIntegration": {
+          "title": "Intégration CSR",
+          "description": "Les taux d'accusé de réception des documents des employés alimentent directement votre Note de Sécurité de l'Entreprise. Les gestionnaires d'immeubles peuvent voir votre CSR, démontrant votre engagement envers la culture de sécurité sans exposer les procédures propriétaires."
+        }
+      },
+      "problemsSolved": {
+        "title": "Problèmes résolus",
+        "subtitle": "Vrais problèmes. Vraies solutions. Organisés selon qui vous êtes.",
+        "employers": {
+          "title": "Pour les employeurs"
+        },
+        "operations": {
+          "title": "Pour les directeurs des opérations et superviseurs"
+        },
+        "buildingManagers": {
+          "title": "Pour les gestionnaires d'immeubles et de propriétés"
+        },
+        "technicians": {
+          "title": "Pour les techniciens"
+        }
+      },
+      "measurableResults": {
+        "title": "Résultats mesurables",
+        "subtitle": "Améliorations concrètes que vous pouvez mesurer dès le premier jour.",
+        "auditPrep": {
+          "title": "Temps de préparation d'audit",
+          "description": "Temps de préparation d'audit réduit d'heures à minutes. Générez des rapports complets de signatures d'employés instantanément au lieu de chercher dans des classeurs et des formulaires papier éparpillés."
+        },
+        "visibility": {
+          "title": "Visibilité de la conformité",
+          "description": "Visibilité à 100% sur le statut d'accusé de réception des employés. Le tableau de bord montre exactement qui a signé quels documents et qui a des lacunes, éliminant les surprises d'audit et permettant une fermeture proactive des lacunes."
+        },
+        "insurance": {
+          "title": "Protection d'assurance",
+          "description": "Ne vous faites plus jamais prendre avec une couverture d'assurance expirée. Les avertissements d'expiration à l'avance assurent un renouvellement proactif pour que vous ne perdiez jamais de travail à cause de documentation périmée."
+        },
+        "liability": {
+          "title": "Défense de responsabilité",
+          "description": "Les enregistrements de signatures immuables avec horodatages créent une documentation de conformité défendable. Lorsque des incidents surviennent, vous prouvez la diligence raisonnable avec une piste d'audit permanente, pas des assurances verbales."
+        }
+      },
+      "moduleIntegration": {
+        "title": "Autres modules avec lesquels ce module communique",
+        "subtitle": "La Gestion de Documents s'intègre avec d'autres modules OnRopePro pour créer une infrastructure de conformité connectée.",
+        "userAccess": {
+          "title": "Accès utilisateur et authentification",
+          "description": "Les permissions contrôlent qui peut télécharger, visualiser et gérer les documents. Les propriétaires d'entreprise ont un accès complet tandis que les techniciens ne voient que les documents pertinents à leur rôle."
+        },
+        "safety": {
+          "title": "Sécurité et conformité",
+          "description": "Les procédures de travail sécuritaires s'intègrent avec les inspections de harnais et les réunions toolbox. L'accusé de réception des documents de sécurité par les employés alimente l'image de conformité globale."
+        },
+        "csr": {
+          "title": "Note de Sécurité de l'Entreprise (CSR)",
+          "description": "Les taux d'accusé de réception des documents contribuent directement à votre score CSR. Les gestionnaires d'immeubles voient votre CSR sans accéder à vos documents réels."
+        },
+        "employees": {
+          "title": "Gestion des employés",
+          "description": "Les dossiers des employés sont liés à l'historique des accusés de réception de documents. Lorsque vous examinez le profil d'un employé, vous voyez son statut de conformité complet."
+        },
+        "buildingManager": {
+          "title": "Portail gestionnaire d'immeuble",
+          "description": "Les gestionnaires d'immeubles peuvent voir votre score CSR, qui reflète l'engagement d'accusé de réception des documents. Ils ne peuvent pas voir vos documents ou procédures réels."
+        }
+      },
+      "businessImpact": {
+        "title": "Arrêtez de courir après les signatures. Commencez à construire une conformité défendable.",
+        "paragraph1": "En ce moment, votre conformité existe dans des classeurs, des tiroirs de bureau et les mémoires des employés. Vous espérez que vos techniciens lisent le manuel de sécurité. Vous supposez que votre certificat d'assurance est à jour. Vous faites confiance que tout le monde suit les mêmes procédures qu'ils ont apprises lors de leur dernière formation.",
+        "paragraph2": "Quand rien ne va mal, ça fonctionne. Quand quelque chose va mal, non.",
+        "paragraph3": "Un auditeur WorkSafeBC demande la preuve que tous les employés ont examiné vos procédures de protection contre les chutes. Vous passez une heure à chercher pendant que les techniciens attendent en attente. Un enquêteur d'assurance demande de la documentation après un incident. Vous réalisez que votre certificat d'assurance a expiré il y a trois semaines. Un procès exige des preuves qu'un employé a été formé sur la procédure qu'il a violée. Vous n'avez rien d'horodaté.",
+        "paragraph4": "La Gestion de Documents transforme la conformité éparpillée en infrastructure professionnelle. Chaque document est centralisé. Chaque signature est horodatée. Chaque accusé de réception est permanent. Quand vous avez besoin de preuves, vous générez un rapport.",
+        "paragraph5": "Vos techniciens savent quelles procédures s'appliquent à eux. Votre directeur des opérations voit exactement qui a des lacunes. Vos auditeurs obtiennent des réponses instantanées. Votre défense de responsabilité a des preuves documentées.",
+        "paragraph6": "Vous ne stockez pas juste des fichiers. Vous construisez un historique de conformité qui protège votre entreprise."
+      },
+      "faqs": {
+        "title": "Questions fréquemment posées",
+        "subtitle": "Questions courantes sur la gestion de documents et la conformité.",
+        "faq1": {
+          "question": "Puis-je modifier ou supprimer un accusé de réception de document signé?",
+          "answer": "Non. Une fois qu'un accusé de réception de document est signé, l'enregistrement de signature est permanent et ne peut pas être modifié ou supprimé. Cela crée une piste d'audit immuable qui protège à la fois les employeurs et les employés. Les régulateurs exigent une documentation infalsifiable pour vérifier la conformité."
+        },
+        "faq2": {
+          "question": "Que se passe-t-il quand je mets à jour un document?",
+          "answer": "Lorsque vous téléchargez une nouvelle version, le système crée un nouveau document qui nécessite de nouveaux accusés de réception de tous les employés. Les signatures précédentes restent associées à la version précédente. Cela garantit que les employés accusent toujours réception de la procédure actuelle, pas d'une version obsolète."
+        },
+        "faq3": {
+          "question": "Qui peut voir mon certificat d'assurance?",
+          "answer": "Seuls les rôles de propriétaire d'entreprise et de directeur des opérations peuvent voir les documents de certificat d'assurance. Les superviseurs et techniciens ne peuvent pas accéder à ces documents financiers restreints. Les certificats d'assurance contiennent des informations financières sensibles qui doivent être limitées au personnel autorisé."
+        },
+        "faq4": {
+          "question": "Comment les pratiques de travail sécuritaires affectent-elles mon CSR?",
+          "answer": "L'accusé de réception par les employés des sujets de pratiques de sécurité quotidiennes contribue positivement à votre Note de Sécurité de l'Entreprise. Un engagement constant démontre une culture de sécurité active. Le CSR récompense les entreprises qui n'ont pas seulement des documents de sécurité mais qui engagent activement les employés avec des sujets de sécurité."
+        },
+        "faq5": {
+          "question": "Les gestionnaires d'immeubles peuvent-ils voir mes documents?",
+          "answer": "Les gestionnaires d'immeubles ne peuvent pas voir vos documents réels. Ils peuvent voir votre score CSR, qui reflète votre conformité globale en matière de sécurité, y compris les taux d'accusé de réception des documents. Cela protège vos procédures propriétaires tout en donnant aux gestionnaires d'immeubles confiance dans vos pratiques de sécurité."
+        },
+        "faq6": {
+          "question": "Quels types de fichiers sont supportés?",
+          "answer": "Les fichiers PDF, DOC et DOCX sont supportés pour les téléchargements de documents. La validation du type de fichier garantit que seuls les formats appropriés sont acceptés."
+        },
+        "faq7": {
+          "question": "Que se passe-t-il si un employé part?",
+          "answer": "Son historique de signatures reste dans le système de façon permanente. Cela maintient votre piste d'audit même après la fin de l'emploi. Vous pouvez toujours prouver qu'un ancien employé a accusé réception de procédures spécifiques pendant son mandat."
+        },
+        "faq8": {
+          "question": "Comment cela s'intègre-t-il avec l'intégration?",
+          "answer": "Les nouveaux employés voient tous les documents requis mis en évidence pour accusé de réception. Les listes de contrôle d'intégration peuvent inclure des jalons d'accusé de réception de documents. Les nouvelles recrues ne peuvent pas prétendre avoir manqué les procédures requises parce que le système suit le statut d'achèvement."
+        },
+        "faq9": {
+          "question": "Les employés peuvent-ils signer depuis des appareils mobiles?",
+          "answer": "Oui. L'examen de documents et la capture de signature numérique fonctionnent depuis n'importe quel appareil. Les techniciens peuvent accusé réception des procédures sur le terrain sans retourner au bureau."
+        },
+        "faq10": {
+          "question": "Qu'est-ce qui est inclus dans les rapports de conformité?",
+          "answer": "Les rapports montrent le statut de signature des employés par document, les horodatages d'accusé de réception, les alertes de signatures manquantes et l'historique complet des versions. Exportez en PDF pour une présentation d'audit professionnelle ou en CSV pour l'analyse de données."
+        }
+      },
+      "cta": {
+        "title": "Prêt à construire une conformité défendable?",
+        "subtitle": "Téléchargez votre premier document et capturez les signatures des employés en moins de 5 minutes.",
+        "subtitleLine2": "Accès complet. Pas de carte de crédit. Piste d'audit permanente dès le premier jour.",
+        "trialButton": "Commencer votre essai de 60 jours"
+      }
+    },
+    "gearInventory": {
+      "hero": {
+        "badge": "Module Inventaire d'équipement",
+        "titleLine1": "Où est ce harnais à 400$",
+        "titleLine2": "que vous avez acheté l'an dernier?",
+        "titleLine3": "Vous devriez le savoir.",
+        "description": "Sachez exactement quel équipement votre entreprise possède, qui l'a, et quand il doit être remplacé. Suivi d'inventaire en temps réel qui se construit automatiquement pendant que votre équipe travaille.",
+        "descriptionStrong": "Gestion d'équipement conçue pour les professionnels de l'accès sur corde qui en ont assez d'acheter du matériel qu'ils possèdent déjà.",
+        "ctaTrial": "Commencer votre essai gratuit de 60 jours",
+        "ctaFaqs": "Trouver des réponses"
+      },
+      "stats": {
+        "availabilityValue": "4 sec",
+        "availabilityLabel": "Vérification de disponibilité",
+        "onboardingValue": "10 min",
+        "onboardingLabel": "Intégration d'équipement",
+        "overallocationValue": "Zéro",
+        "overallocationLabel": "Risque de surallocation",
+        "recoveryValue": "2-4K $",
+        "recoveryLabel": "Récupération annuelle"
+      },
+      "problem": {
+        "title": "Le trou noir de l'équipement",
+        "intro": "Vous avez acheté 10 harnais l'an dernier. Aujourd'hui, vous pouvez en trouver 6.",
+        "paragraph1": "Sont-ils dans l'atelier? Dans le camion de quelqu'un? Est-ce que ce technicien qui a démissionné le mois dernier les a emportés chez lui? Vous n'en avez aucune idée. Alors vous en commandez d'autres. Encore 2 400$ de perdus.",
+        "paragraph2": "Cela arrive constamment. Les descendeurs disparaissent. Les cordes s'évanouissent. Les mousquetons se multiplient puis s'évaporent. Vous savez que vous possédez l'équipement. Vous ne pouvez simplement pas prouver qui l'a.",
+        "paragraph3": "Votre tableur était exact il y a trois mois. Maintenant personne ne le met à jour. Quand un client appelle pour demander si vous pouvez mobiliser une équipe demain, vous passez 45 minutes à appeler, vérifier l'atelier, envoyer des textos aux employés. Le temps d'obtenir une réponse, vous avez perdu la moitié de votre matinée et vous n'êtes toujours pas certain.",
+        "solution": "OnRopePro remplace les suppositions par une base de données en temps réel. La disponibilité de l'équipement se met à jour automatiquement quand les employés s'assignent du matériel, quand les gestionnaires distribuent l'équipement et quand les articles sont retournés. Pas de saisie manuelle. Pas d'informations obsolètes. Un coup d'œil vous dit ce que vous possédez, qui l'a et ce qui est disponible."
+      },
+      "features": {
+        "title": "Ce que fait ce module",
+        "subtitle": "Suivi complet de l'équipement de l'achat à la mise hors service utilisant un modèle de disponibilité par créneaux : Disponible = Quantité - Assigné.",
+        "database": {
+          "title": "Base de données d'équipement centralisée",
+          "description": "Suivez chaque pièce d'équipement que votre entreprise possède en un seul endroit. Ajoutez des articles avec des marques et modèles d'accès sur corde préchargés (Petzl, CMC, Kong, ISC). Entrez les quantités, prix, numéros de série. Voyez la disponibilité en temps réel instantanément.",
+          "trackedLabel": "Ce qui est suivi :",
+          "item1": "Type d'équipement, marque, modèle, quantité",
+          "item2": "Prix d'achat (permissions financières uniquement)",
+          "item3": "Numéros de série (optionnel par article)",
+          "item4": "Date de fabrication et dates de mise en service"
+        },
+        "assignment": {
+          "title": "Gestion des assignations",
+          "description": "Sachez qui a quoi en tout temps. Assignez l'équipement aux employés avec un suivi complet. Les employés peuvent s'auto-assigner depuis l'inventaire disponible ou les gestionnaires peuvent distribuer le matériel directement.",
+          "managedLabel": "Ce qui est géré :",
+          "item1": "Assignations d'équipement par employé",
+          "item2": "Suivi des numéros de série par assignation",
+          "item3": "Historique des assignations avec horodatages",
+          "item4": "Flux de retour et de mise hors service"
+        },
+        "visibility": {
+          "title": "Visibilité d'équipe",
+          "description": "Voyez la distribution de tout l'équipement de votre entreprise en un coup d'œil. La vue Équipement d'équipe montre chaque employé et son équipement assigné. Vérifiez la préparation de l'équipe en secondes, pas en heures.",
+          "visibleLabel": "Ce qui est visible :",
+          "item1": "Statut complet du kit par employé",
+          "item2": "Inventaire disponible pour nouvelles assignations",
+          "item3": "Lacunes d'équipement avant le début du travail",
+          "item4": "Statut de durée de vie avec indicateurs colorés"
+        }
+      },
+      "stakeholders": {
+        "title": "Qui bénéficie de ce module",
+        "subtitle": "Chaque partie prenante obtient la visibilité d'équipement et la protection de responsabilité dont elle a besoin.",
+        "owners": {
+          "title": "Pour les propriétaires d'entreprises d'accès sur corde",
+          "benefit1Title": "Éliminez les pertes d'équipement.",
+          "benefit1Desc1": "Le suivi en temps réel crée une trace numérique prouvant qui a reçu quel équipement et quand. Plus de disputes « il a dit/elle a dit » sur les harnais manquants.",
+          "benefit1Desc2": "Récupérez 2 000-4 000$ annuellement en équipement que vous auriez remplacé.",
+          "benefit2Title": "Budgétisez précisément pour les remplacements.",
+          "benefit2Desc1": "Date de fabrication et dates de mise en service suivies par article. Indicateurs de durée de vie colorés montrant l'équipement approchant les délais de remplacement.",
+          "benefit2Desc2": "Planifiez les achats des mois à l'avance au lieu de vous précipiter quand le matériel échoue aux inspections.",
+          "benefit3Title": "Répondez à « avons-nous assez de matériel? » en 4 secondes.",
+          "benefit3Desc": "Acceptez les travaux en toute confiance sachant exactement quel équipement est disponible. Arrêtez de perdre de l'argent en locations d'urgence parce que vous ne pouviez pas vérifier l'inventaire à temps."
+        },
+        "technicians": {
+          "title": "Pour les techniciens",
+          "benefit1Title": "Construisez votre kit en 10 minutes.",
+          "benefit1Desc1": "Parcourez l'inventaire disponible, sélectionnez ce dont vous avez besoin, assignez-le vous-même. Pas d'attente des gestionnaires. Pas de paperasse.",
+          "benefit1Desc2": "Votre kit personnel apparaît dans votre profil immédiatement.",
+          "benefit2Title": "Sachez que votre équipement est conforme.",
+          "benefit2Desc1": "Dates de mise en service visibles pour chaque article de votre kit. Effectuez les inspections en sachant que votre matériel répond aux exigences.",
+          "benefit2Desc2": "Pas de surprises lors des audits.",
+          "benefit3Title": "Flexibilité en libre-service.",
+          "benefit3Desc1": "Besoin d'un descendeur de secours pour le travail de demain? Vérifiez la disponibilité, prenez-le dans l'inventaire, assignez-le vous-même. Retournez-le quand vous avez terminé.",
+          "benefit3Desc2": "Pas d'appels téléphoniques, pas d'approbations nécessaires."
+        },
+        "buildingManagers": {
+          "title": "Pour les gestionnaires d'immeubles",
+          "benefit1Title": "Vérifiez la conformité de l'équipement des entrepreneurs.",
+          "benefit1Desc1": "La visibilité du Dossier de Sécurité d'Entreprise via OnRopePro montre le suivi d'équipement et le statut d'inspection des entrepreneurs.",
+          "benefit1Desc2": "Documentation de diligence raisonnable avant le début des travaux.",
+          "benefit2Title": "Réduisez l'exposition à la responsabilité.",
+          "benefit2Desc1": "En cas d'incident, vous pouvez démontrer que vous avez vérifié les protocoles d'équipement des entrepreneurs.",
+          "benefit2Desc2": "Les fournisseurs professionnels se démarquent de la concurrence grâce au suivi systématique."
+        },
+        "propertyManagers": {
+          "title": "Pour les gestionnaires de propriétés",
+          "benefit1Title": "Qualification des entrepreneurs en un coup d'œil.",
+          "benefit1Desc1": "Le statut de suivi d'équipement indique quels fournisseurs opèrent professionnellement.",
+          "benefit1Desc2": "Prenez des décisions éclairées sur quels entrepreneurs méritent le statut de fournisseur privilégié."
+        },
+        "residents": {
+          "title": "Pour les résidents",
+          "benefit1Title": "Travaux effectués avec un équipement suivi et entretenu.",
+          "benefit1Desc1": "Les techniciens accédant à votre immeuble utilisent du matériel avec un historique de service et des dossiers d'inspection documentés.",
+          "benefit1Desc2": "Pratiques de sécurité transparentes."
+        }
+      },
+      "keyFeatures": {
+        "title": "Fonctionnalités clés",
+        "subtitle": "Six capacités qui transforment le chaos d'équipement en responsabilité organisée.",
+        "slotBased": {
+          "title": "Disponibilité par créneaux",
+          "desc1": "Disponible = Quantité - Assigné. Cette formule est absolue. Ajoutez 10 harnais, assignez-en 4 aux employés, 6 restent disponibles.",
+          "desc2": "Les numéros de série sont des métadonnées optionnelles, pas des gardiens. Suivez les unités individuelles quand c'est nécessaire; ignorez les numéros de série quand vous n'en avez pas besoin."
+        },
+        "preloaded": {
+          "title": "Base de données d'équipement préchargée",
+          "desc1": "Toutes les marques d'accès sur corde déjà chargées. Petzl, CMC, Kong, ISC, et plus. Sélectionnez le type d'équipement, choisissez la marque et le modèle, entrez la quantité.",
+          "desc2": "Pas de saisie manuelle pour les spécifications. Comparez cela à tout taper depuis zéro dans un tableur."
+        },
+        "dualAssignment": {
+          "title": "Double voie d'assignation",
+          "desc1": "Les gestionnaires assignent l'équipement aux employés lors de l'intégration ou de la distribution contrôlée. Les employés s'auto-assignent depuis l'inventaire disponible selon les besoins.",
+          "desc2": "Les deux méthodes créent des enregistrements d'assignation complets automatiquement."
+        },
+        "financial": {
+          "title": "Protection financière",
+          "desc1": "Prix des équipements visibles uniquement pour les utilisateurs avec permissions financières. Les employés voient les quantités et assignations mais pas les valeurs en dollars.",
+          "desc2": "Les propriétaires en ont besoin pour la budgétisation et l'assurance. Les employés n'ont pas besoin de savoir combien leur harnais a coûté."
+        },
+        "serviceLife": {
+          "title": "Suivi de la durée de vie",
+          "desc1": "Date de fabrication et dates de mise en service par assignation. Indicateurs colorés (vert, jaune, rouge) pour le matériel dur (5 ans) et le matériel souple (10 ans).",
+          "desc2": "Données pour la prise de décision sans mise hors service automatique."
+        },
+        "atomicSerial": {
+          "title": "Enregistrement atomique des numéros de série",
+          "desc1": "Entrez de nouveaux numéros de série pendant l'assignation. Le système valide, enregistre et crée l'assignation en une seule opération.",
+          "desc2": "Ajoutez des numéros de série à la volée pendant la distribution de l'équipement. Réduisez les frais administratifs tout en maintenant un suivi complet."
+        }
+      },
+      "integration": {
+        "title": "Points d'intégration des modules",
+        "subtitle": "L'Inventaire d'équipement se connecte à six autres modules OnRopePro, créant l'infrastructure de responsabilité pour toute votre opération.",
+        "safety": {
+          "title": "Sécurité & Conformité",
+          "item1": "Les inspections de harnais nécessitent un équipement assigné",
+          "item2": "Les dossiers d'inspection sont liés à des numéros de série spécifiques"
+        },
+        "workSession": {
+          "title": "Gestion des sessions de travail",
+          "item1": "Valide que les techniciens ont l'équipement requis assigné",
+          "item2": "Responsabilité intégrée dans le flux de travail"
+        },
+        "employee": {
+          "title": "Gestion des employés",
+          "item1": "Les kits personnels deviennent partie des profils de techniciens",
+          "item2": "Historique complet des assignations d'équipement"
+        },
+        "project": {
+          "title": "Gestion de projets",
+          "item1": "Les exigences du projet peuvent spécifier les besoins en équipement",
+          "item2": "L'assignation d'équipe considère l'inventaire disponible"
+        },
+        "payroll": {
+          "title": "Paie & Finances",
+          "item1": "Valeurs d'équipement pour la documentation d'assurance",
+          "item2": "Budgétisation des remplacements à partir des données de durée de vie"
+        },
+        "access": {
+          "title": "Accès utilisateur & Authentification",
+          "item1": "Quatre niveaux de permission contrôlent l'accès à l'inventaire",
+          "item2": "Contrôle granulaire sur qui peut voir et distribuer"
+        }
+      },
+      "businessImpact": {
+        "title": "Arrêtez de compter les harnais. Commencez à compter les profits.",
+        "subtitle": "La gestion d'équipement devient quelque chose qui se fait, pas quelque chose que vous faites.",
+        "paragraph1": "En ce moment, vous passez des heures chaque mois sur de l'équipement qui devrait se gérer tout seul. Chasser le matériel. Vérifier la disponibilité. Documenter les assignations. Remplacer de l'équipement que vous possédez probablement encore quelque part.",
+        "paragraph2": "Votre tableur n'a pas été mis à jour depuis trois mois. Vos techniciens prennent de l'équipement sans le dire. Les nouvelles recrues sont équipées avec ce que vous pouvez trouver au dernier moment. Et quand du matériel disparaît, vous absorbez la perte parce que vous ne pouvez pas prouver qui l'avait.",
+        "paragraph3": "Avec le module Inventaire d'équipement d'OnRopePro, vos employés construisent leurs propres kits. Ils s'assignent l'équipement, font leurs inspections, enregistrent leur travail. Chaque assignation crée un enregistrement. Chaque retour met à jour la disponibilité. Le système se construit lui-même parce que tout le monde faisant son travail alimente automatiquement les données.",
+        "paragraph4": "Vous obtenez une visibilité complète sans le fardeau administratif. Sachez exactement ce que vous possédez, où c'est, et quand ça doit être remplacé. Acceptez les travaux en confiance. Budgétisez avec précision. Protégez votre investissement."
+      },
+      "results": {
+        "time": {
+          "value": "45 min",
+          "label": "Économisées par vérification de disponibilité"
+        },
+        "errors": {
+          "value": "Zéro",
+          "label": "Erreurs de surallocation"
+        },
+        "cost": {
+          "value": "2-4K $",
+          "label": "Récupération annuelle des coûts"
+        },
+        "audit": {
+          "value": "100%",
+          "label": "Dossiers prêts pour l'audit"
+        }
+      },
+      "faqs": {
+        "title": "Foire aux questions",
+        "expandAll": "Tout développer",
+        "collapseAll": "Tout réduire",
+        "q1": {
+          "question": "Et si j'ai 10 harnais mais seulement 5 numéros de série enregistrés?",
+          "answer1": "Vous avez toujours 10 créneaux disponibles. Les numéros de série sont des métadonnées optionnelles, pas des gardiens. Le modèle par créneaux compte la quantité, pas les enregistrements de numéros de série.",
+          "answer2": "Ajoutez les numéros de série graduellement au fur et à mesure que l'équipement est distribué."
+        },
+        "q2": {
+          "question": "Deux articles différents peuvent-ils avoir le même numéro de série?",
+          "answer1": "Oui. Les numéros de série doivent être uniques au sein de chaque type d'équipement, mais un harnais et une corde peuvent tous deux avoir le numéro de série « HR-001 ». Différents fabricants utilisent des schémas de numérotation similaires.",
+          "answer2": "Le système empêche les doublons au sein d'un type d'article, ce qui compte pour le suivi."
+        },
+        "q3": {
+          "question": "Que se passe-t-il quand l'équipement expire?",
+          "answer1": "Le système suit les dates de mise en service avec des indicateurs colorés pour révision. Les directives de matériel dur (5 ans) et matériel souple (10 ans) sont affichées.",
+          "answer2": "Vous décidez quand mettre hors service selon les inspections et recommandations du fabricant. OnRopePro fournit des données pour la prise de décision; les décisions réelles de mise hors service devraient impliquer des professionnels de la sécurité qualifiés."
+        },
+        "q4": {
+          "question": "Qui peut voir les prix de l'équipement?",
+          "answer1": "Seulement les utilisateurs avec des permissions financières. Les employés réguliers voient les quantités et assignations mais pas les valeurs en dollars.",
+          "answer2": "Les données financières sont sensibles. Les propriétaires en ont besoin pour la budgétisation et l'assurance. Les employés n'ont pas besoin de savoir combien leur harnais a coûté."
+        },
+        "q5": {
+          "question": "Puis-je supprimer un numéro de série assigné à quelqu'un?",
+          "answer1": "Non. Retournez d'abord l'assignation d'équipement, puis supprimez ou modifiez le numéro de série. Cela empêche les assignations orphelines pointant vers des numéros de série inexistants.",
+          "answer2": "L'intégrité des données est maintenue en appliquant un flux de retour approprié."
+        },
+        "q6": {
+          "question": "Et si je dois réduire la quantité en dessous de ce qui est assigné?",
+          "answer1": "Vous ne pouvez pas. Si 5 articles sont assignés, vous ne pouvez pas réduire la quantité en dessous de 5. Retournez d'abord certaines assignations.",
+          "answer2": "Cela empêche la disponibilité négative et garantit que le système reflète toujours la réalité physique."
+        },
+        "q7": {
+          "question": "Les employés ont-ils besoin d'une permission pour s'assigner du matériel?",
+          "answer1": "Non. Tous les employés peuvent s'auto-assigner depuis l'inventaire disponible et retirer leurs propres assignations. Aucune permission spéciale requise.",
+          "answer2": "Cela réduit le fardeau administratif tout en maintenant un suivi complet."
+        },
+        "q8": {
+          "question": "Comment l'équipement est-il ajouté à l'inventaire?",
+          "answer1": "Naviguez vers l'inventaire, ajoutez un article, sélectionnez le type d'équipement, choisissez la marque et le modèle dans la base de données préchargée, entrez la quantité.",
+          "answer2": "Ajoutez optionnellement des numéros de série et assignez aux employés pendant le même flux de travail. Configuration unique, puis le système se maintient lui-même."
+        },
+        "q9": {
+          "question": "Quelle est la différence entre les permissions 'Gérer l'inventaire' et 'Assigner le matériel'?",
+          "answer1": "Gérer l'inventaire permet d'ajouter de nouveaux articles, modifier les quantités et enregistrer des numéros de série. Assigner le matériel permet de distribuer l'équipement à d'autres employés.",
+          "answer2": "Les propriétaires ont les deux. Les superviseurs peuvent avoir Assigner le matériel sans Gérer l'inventaire, selon votre flux de travail."
+        },
+        "q10": {
+          "question": "Les employés peuvent-ils voir quel matériel leurs collègues ont?",
+          "answer1": "Seulement avec la permission Voir l'équipement d'équipe. Sinon, les employés ne voient que leur propre kit.",
+          "answer2": "Les propriétaires et superviseurs ont généralement la visibilité sur l'équipement d'équipe. Les techniciens réguliers généralement pas."
+        }
+      },
+      "cta": {
+        "title": "Prêt à savoir où est votre équipement?",
+        "subtitle": "Commencez votre essai gratuit de 60 jours. Pas de carte de crédit requise. Accès complet à toutes les fonctionnalités.",
+        "trialButton": "Commencer votre essai gratuit de 60 jours",
+        "pricingButton": "Voir les tarifs"
+      }
+    },
+    "safety": {
+      "hero": {
+        "badge": "Module Sécurité & Conformité",
+        "titleLine1": "{{authority}} vient d'arriver",
+        "titleLine2": "sur le stationnement.",
+        "titleLine3": "Êtes-vous prêt?",
+        "descriptionLine1": "Inspections quotidiennes des harnais. Réunions de sécurité.",
+        "descriptionLine2": "Suivi d'équipement. Signatures numériques.",
+        "descriptionLine3": "Tout est consultable. Tout est exportable. Tout est défendable.",
+        "ctaTrial": "Commencez votre essai gratuit de 60 jours",
+        "ctaKnowledgebase": "Trouver des réponses"
+      },
+      "stats": {
+        "missingForms": "Formulaires manquants",
+        "failedAudits": "Audits échoués",
+        "sleeplessNights": "Nuits blanches",
+        "searchableHistory": "Historique consultable"
+      },
+      "problem": {
+        "title": "La panique que vous connaissez trop bien",
+        "paragraph1": "La plupart des opérateurs d'accès sur corde savent exactement ce qui se passe lorsque l'auditeur demande six mois d'inspections de harnais.",
+        "paragraph2": "On fouille le camion. On déterre le classeur. Quelqu'un dit « Je pense que Dave avait ce dossier. » La moitié des formulaires manquent. Ceux que vous trouvez ont des taches de café et une écriture illisible.",
+        "paragraph3": "Vous passez l'audit. De justesse. Et vous vous promettez de vous organiser.",
+        "paragraph4": "Jusqu'à la prochaine fois, quand exactement la même panique se reproduit.",
+        "paragraph5": "Pendant ce temps, votre assureur veut des preuves de votre culture de sécurité. Votre gestionnaire immobilier veut de la documentation avant chaque travail. Et si quelqu'un se blesse, la première question qu'un avocat pose est :",
+        "quote": "« Pouvez-vous prouver que vous avez effectué les inspections requises? »",
+        "paragraph6": "Les formulaires papier ne peuvent pas vous protéger. Les classeurs ne peuvent pas vous protéger. Les meilleurs techniciens du monde ne peuvent pas vous protéger s'il n'y a aucune trace de ce qu'ils ont fait."
+      },
+      "features": {
+        "title": "Ce que fait ce module",
+        "subtitle": "Une documentation de sécurité complète qui se crée d'elle-même grâce à l'utilisation quotidienne."
+      }
+    },
+    "projects": {
+      "hero": {
+        "badge": "Module Gestion de Projets",
+        "title": "Arrêtez de gérer vos projets",
+        "titleHighlight": "Dans votre tête",
+        "description": "Suivez chaque bâtiment, chaque élévation, chaque technicien depuis un seul écran.",
+        "descriptionStrong": "Sachez exactement où en est chaque travail sans vous déplacer de site en site ou vous fier à l'appel téléphonique d'hier.",
+        "ctaTrial": "Commencer votre essai gratuit de 60 jours",
+        "ctaAnswers": "Trouver des réponses"
+      },
+      "stats": {
+        "elevations": "Élévations suivies indépendamment",
+        "payrollErrors": "Erreurs de paie éliminées",
+        "statusCalls": "Moins d'appels de statut des clients",
+        "quotePrep": "Préparation des devis plus rapide"
+      },
+      "problem": {
+        "title": "La réalité",
+        "juggling": "Vous jonglez entre le lavage de vitres à la Tour A, le calfeutrage au Bâtiment B, les inspections d'ancrages au Complexe C. Un client appelle pour demander une mise à jour.",
+        "guessing": "Vous devinez.",
+        "maybe": "Vous pensez que Tommy finit l'élévation nord aujourd'hui. Peut-être. Sarah pourrait avoir de la disponibilité la semaine prochaine. Probablement. Ce devis de 15 étages que vous venez d'envoyer? Vous avez tiré le calendrier de mémoire parce que vous ne trouviez pas vos notes du travail similaire d'il y a six mois.",
+        "siteVisits": "Combien de fois avez-vous dû aller de projet en projet et regarder les gars sur la corde et prendre des notes sur leur avancement comparé à hier. Dix à quinze heures par semaine juste à comprendre ce qui se passe.",
+        "performance": "Ensuite, il y a le problème de performance dont personne ne parle. Un gars au téléphone la moitié de la journée, fait une descente. L'autre gars qui travaille comme un fou. Ils étaient là le même temps. Vous savez que quelque chose ne va pas. Sans données concrètes, vous ne pouvez pas avoir la conversation.",
+        "exhausted": "Votre cerveau est votre entreprise. Et il est épuisé."
+      },
+      "solution": {
+        "changes": "OnRopePro change l'équation. Chaque projet visible depuis un seul écran. Les mises à jour de progression se font automatiquement lorsque les sessions de travail sont enregistrées. La performance par employé est suivie avec des données objectives. L'information est à portée de main au lieu d'être éparpillée dans votre mémoire, votre tableau blanc et six fils de textos différents.",
+        "linked": "Tout est lié avec tout. Créez un projet et cela remplit le calendrier. Les employés enregistrent leur travail et cela remplit la paie. Si vous faites une chose, cela fait autre chose pour vous ailleurs.",
+        "cognitive": "Le système porte la charge cognitive. Votre bande passante mentale s'ouvre pour vraiment gérer l'entreprise."
+      },
+      "features": {
+        "title": "Ce que fait ce module",
+        "subtitle": "Le centre opérationnel connectant la planification, la sécurité et la paie",
+        "description": "Les projets suivent les travaux d'entretien de bâtiments individuels avec une progression mesurée comme l'accès sur corde fonctionne réellement.",
+        "progressTracking": {
+          "title": "Suivi de progression par type de travail",
+          "adapts": "Le système s'adapte à votre travail, pas l'inverse.",
+          "description": "Le suivi par descentes pour le lavage de vitres et le lavage de bâtiments compte les passages verticaux par élévation. Nord, Est, Sud, Ouest suivis indépendamment. Le suivi par heures pour les inspections et réparations capture le temps avec un pourcentage d'achèvement manuel. Le suivi par unités pour le nettoyage de parkings et les services en suite compte les places ou suites individuelles terminées.",
+          "form": "Le formulaire que les techniciens voient à la fin d'une session de travail change selon ce sur quoi ils travaillent. Pas de forcer vos opérations dans le modèle de quelqu'un d'autre.",
+          "tracked": "Ce qui est suivi :",
+          "item1": "Élévations N/E/S/O indépendamment",
+          "item2": "Descentes complétées par session par direction",
+          "item3": "Heures travaillées avec estimations d'achèvement",
+          "item4": "Unités ou places terminées"
+        },
+        "calendar": {
+          "title": "Remplissage automatique du calendrier",
+          "once": "Créez un projet une fois. Le calendrier se remplit tout seul.",
+          "description": "Lorsque vous entrez une plage de dates et assignez des employés, les entrées de calendrier apparaissent automatiquement. Plus besoin de créer un projet, puis d'ouvrir Google Calendar, puis d'envoyer un texto à votre superviseur, puis de mettre à jour le tableau blanc. Même information, une seule entrée, partout où elle doit aller.",
+          "sync": "Le bâtiment est reporté d'une semaine? Cliquez sur le projet, changez la date. Cela se synchronise partout. La détection de conflits signale quand quelqu'un est doublement réservé avant que cela ne devienne une urgence.",
+          "automated": "Ce qui est automatisé :",
+          "item1": "Barres de projet multi-jours sur le calendrier de l'entreprise",
+          "item2": "Assignations d'employés visibles sur leurs horaires",
+          "item3": "Codage couleur par type de travail",
+          "item4": "Détection de conflits pour les doubles réservations"
+        },
+        "documentation": {
+          "title": "Documentation liée",
+          "live": "Les documents de sécurité vivent avec leurs projets. Pas dans les courriels. Pas dans Google Drive. Pas dans un dossier dans le camion.",
+          "description": "Chaque projet est connecté à son Plan d'Accès sur Corde, ses comptes-rendus de Réunions Toolbox et ses Certificats d'Inspection d'Ancrages. Les gestionnaires immobiliers accèdent aux documents de conformité via leur portail sans vous envoyer de courriel. Les auditeurs trouvent tout au même endroit.",
+          "insurance": "Quand la compagnie d'assurance demande des preuves de votre programme de sécurité, vous ne cherchez pas. Vous cliquez.",
+          "linked": "Ce qui est lié :",
+          "item1": "Plans d'Accès sur Corde (RAP)",
+          "item2": "Comptes-rendus de Réunions Toolbox",
+          "item3": "Certificats d'Inspection d'Ancrages",
+          "item4": "Photos de projet"
+        }
+      }
+    },
+    "payroll": {
+      "hero": {
+        "badge": "Module Paie & Finances",
+        "titleLine1": "Arrêtez d'encercler des chiffres",
+        "titleLine2": "Avec un stylo",
+        "description": "Les sessions de travail alimentent directement les feuilles de temps prêtes pour la paie. Pas de papier. Pas de calculatrice. Pas d'encerclement.",
+        "descriptionBold": "Exportez vers QuickBooks, ADP ou Gusto en quelques minutes.",
+        "trialButton": "Commencer votre essai gratuit de 60 jours",
+        "faqButton": "Trouver des réponses"
+      },
+      "stats": {
+        "timeEliminated": "Temps de paie éliminé",
+        "annualValue": "Valeur annuelle du temps",
+        "hoursSaved": "Heures économisées par an",
+        "problemsSolved": "Problèmes résolus"
+      },
+      "problem": {
+        "title": "Le problème de paie que personne n'admet",
+        "line1": "Vous imprimez des feuilles de temps. Les données d'un employé s'étalent sur quatre pages.",
+        "line2": "Douze employés signifie 48 pages minimum. Vous les étalez sur votre bureau, encerclez les heures avec un stylo et prenez une calculatrice.",
+        "line3": "Trois heures plus tard, vous n'avez toujours pas terminé. Et vous avez probablement fait une erreur que vous ne découvrirez que lorsque l'employé appellera pour demander pourquoi il lui manque 130 $.",
+        "line4": "Alors vous envoyez un virement rapide. Problème résolu pour eux. Problème créé pour vos livres. Votre comptable demande ce qu'était ce paiement aléatoire. Maintenant vous expliquez au lieu de diriger votre entreprise.",
+        "line5": "Ce chaos ne reste pas contenu. Quand la paie est pénible, vous la repoussez. Quand vous êtes constamment en retard, votre équipe le remarque. Une culture se forme où les délais sont optionnels. Cette mentalité se répand partout.",
+        "solution": "OnRopePro élimine la saisie manuelle entre le travail terrain et la paie. Chaque pointage devient automatiquement des données de paie. Vérifié par GPS. Attribué au projet. Heures supplémentaires calculées. Prêt à exporter."
+      },
+      "features": {
+        "title": "Du pointage à l'export de paie",
+        "subtitle": "Le module Paie & Finances transforme les données de sessions de travail dispersées en feuilles de temps organisées et exportables sans intervention manuelle."
+      }
+    },
+    "workSessions": {
+      "hero": {
+        "badge": "Module Sessions de travail & Suivi du temps",
+        "titleLine1": "Vous étiez là toute la semaine.",
+        "titleLine2": "Le bâtiment n'est qu'à 20% terminé.",
+        "titleLine3": "Que s'est-il passé?",
+        "description1": "Lundi il ventait. Mardi il est parti tôt. Mercredi il y avait une grue sur le toit. Jeudi Damien ne se sentait pas bien. Vendredi, vous avez 20 heures de dépassement de budget et vous ne savez pas pourquoi.",
+        "description2": "Le module Sessions de travail d'OnRopePro capture tout. Pointage d'arrivée, pointage de départ, descentes complétées, raisons des écarts documentées.",
+        "description2Bold": "Des réponses réelles au lieu d'excuses dispersées.",
+        "ctaTrial": "Commencer votre essai gratuit de 60 jours",
+        "ctaFaq": "Trouver des réponses"
+      },
+      "stats": {
+        "payrollValue": "87-93%",
+        "payrollLabel": "Temps de paie économisé",
+        "errorsValue": "3 600$+",
+        "errorsLabel": "Erreurs annuelles éliminées",
+        "timeValue": "30 min",
+        "timeLabel": "Au lieu de 7 heures",
+        "elevationsValue": "4",
+        "elevationsLabel": "Élévations suivies"
+      },
+      "problem": {
+        "title": "La conversation que vous connaissez trop bien",
+        "quote1": "« Je vois que tu as inscrit 45 heures. L'année dernière, un gars a terminé le même bâtiment dans ce temps. Tu n'es même pas à la moitié. Que s'est-il passé? »",
+        "quote2": "« Lundi, je pense qu'il ventait. Et puis j'ai dû tirer ma corde, je pense. Ou c'était mardi? Ah oui, non, mardi parce que lundi j'ai dû partir tôt parce que j'avais un souper avec ma mère et je te l'avais dit, tu te rappelles? Ah oui, je me rappelle que tu m'avais dit ça. Puis mardi il ventait et puis mercredi il y avait une autre grue sur le toit, donc j'ai dû déplacer ma corde plusieurs fois. Et Damien? Il était là avec toi. Ah oui, mais il ne se sentait pas bien. Il n'a pas beaucoup travaillé et il a fait juste une descente jeudi ou vendredi. Je ne suis pas sûr. Je ne faisais pas vraiment attention à ce qu'il faisait. J'étais trop occupé avec mes affaires. »",
+        "paragraph1": "Aucune idée de ce qui se passe. À la fin du bâtiment, vous êtes juste frustré parce que vous avez dépassé le budget de 20 heures et vous ne savez pas vraiment pourquoi. Vous savez que c'était la météo. Vous savez que le gars ne se sentait pas bien certains jours. Vous ne savez pas vraiment. On passe au suivant.",
+        "paragraph2": "C'est le système que vous utilisez. La mémoire. Les excuses. Les tableurs qui ne sont connectés à rien.",
+        "solution": "OnRopePro remplace les suppositions par des données. Chaque pointage d'arrivée horodaté. Chaque pointage de départ vérifié par GPS. Chaque descente enregistrée par élévation. Chaque écart documenté avec une raison. L'année prochaine quand vous soumissionnez ce bâtiment, vous ne devinez plus. Vous calculez."
+      },
+      "features": {
+        "title": "Ce que fait ce module",
+        "subtitle": "Trois capacités. Zéro chaos. Les sessions de travail sont le mécanisme central de suivi du temps qui capture tout au moment où ça se passe.",
+        "timeCapture": {
+          "title": "Capture précise du temps",
+          "description1": "Les techniciens pointent depuis leur téléphone. Le système capture l'horodatage exact et la localisation GPS.",
+          "description2": "Plus de « Je jure que j'étais là à 8h. » Les données parlent d'elles-mêmes.",
+          "listTitle": "Ce qui est suivi :",
+          "item1": "Heure de début (à la seconde près)",
+          "item2": "Coordonnées GPS au pointage",
+          "item3": "Association au projet",
+          "item4": "Vérification d'inspection du harnais"
+        },
+        "workOutput": {
+          "title": "Documentation de la production",
+          "description1": "En fin de journée, les techniciens enregistrent les descentes complétées par élévation. Nord, Est, Sud, Ouest.",
+          "description2": "Vous manquez votre objectif quotidien? Le système demande une raison. Météo. Équipement. Problèmes d'équipe. Documenté, pas oublié.",
+          "listTitle": "Ce qui est capturé :",
+          "item1": "Descentes complétées par élévation",
+          "item2": "Pourcentage complété (pour les travaux basés sur les heures)",
+          "item3": "Raisons des écarts (obligatoire quand sous l'objectif)",
+          "item4": "Photos et notes de session"
+        },
+        "payroll": {
+          "title": "Agrégation automatique de la paie",
+          "description1": "Les heures alimentent directement les calculs de paie. Temps régulier, heures supplémentaires, travail à la pièce. Tout calculé.",
+          "description2": "Facturable vs non-facturable séparé automatiquement. Exportez vers QuickBooks, ADP, Paychex, Gusto.",
+          "listTitle": "Ce qui est calculé :",
+          "item1": "Total des heures par employé",
+          "item2": "Heures par projet",
+          "item3": "Répartition facturable vs non-facturable",
+          "item4": "Rémunération à la pièce (si activée)"
+        }
+      }
+    },
+    "employees": {
+      "hero": {
+        "badge": "Module Gestion des employés",
+        "titleLine1": "Votre nouvelle recrue a rempli cette paperasse",
+        "titleLine2": "Chez trois employeurs précédents.",
+        "titleLine3": "Pourquoi demander encore?",
+        "description": "Des identités de techniciens portables qui peuvent se connecter à votre entreprise simplement en fournissant un numéro IRATA ou SPRAT, des alertes de certification automatisées et une intégration instantanée pour une industrie à fort taux de roulement.",
+        "tagline": "Gestion des employés conçue par des professionnels de l'accès sur corde fatigués de la même danse de paperasse à chaque nouvel emploi.",
+        "ctaTrial": "Commencer votre essai gratuit de 60 jours",
+        "ctaFaqs": "Trouver des réponses"
+      },
+      "stats": {
+        "onboardTimeValue": "10 sec",
+        "onboardTimeLabel": "Intégrer les utilisateurs existants",
+        "permissionsValue": "44",
+        "permissionsLabel": "Permissions configurables",
+        "certWarningsValue": "30 jours",
+        "certWarningsLabel": "Alertes de certification anticipées",
+        "redundantPaperworkValue": "Zéro",
+        "redundantPaperworkLabel": "Paperasse redondante"
+      },
+      "problemStatement": {
+        "title": "Le problème d'intégration que personne n'admet",
+        "paragraph1": "Vous envoyez un courriel au nouveau. « Bienvenue dans l'équipe. Veuillez envoyer votre certification IRATA, un chèque annulé, un contact d'urgence, votre permis de conduire et remplir ces formulaires. »",
+        "paragraph2": "Il envoie la moitié. Vous courez après le reste. Vous entrez tout manuellement dans vos systèmes. Trois jours plus tard, il est enfin dans l'horaire.",
+        "paragraph3": "Puis il part chez un concurrent qui paie 2$ de plus l'heure. Huit semaines plus tard, vous le réembauchez. La même danse recommence. Même gars. Même paperasse. Mêmes heures perdues.",
+        "paragraph4": "Pendant ce temps, quelque part dans un tableur que vous n'avez pas ouvert depuis février, la certification IRATA de quelqu'un a expiré le mois dernier. WorkSafeBC ne s'est pas encore présenté. Mais ils viendront.",
+        "paragraph5": "OnRopePro traite les techniciens comme ce qu'ils sont : des professionnels mobiles dont l'identité professionnelle complète devrait les suivre partout où ils travaillent. Entrez leur numéro IRATA, ils acceptent la connexion, et toutes les informations de leurs trois derniers employeurs se transfèrent instantanément. Un profil. Chaque employeur. Zéro paperasse redondante."
+      },
+      "features": {
+        "title": "Ce que fait ce module",
+        "subtitle": "Administration complète de la main-d'œuvre pour les opérations d'accès sur corde, de l'intégration du premier jour à la conformité des certifications jusqu'au départ.",
+        "portableIdentities": {
+          "title": "Identités professionnelles portables",
+          "description": "Le numéro de certification IRATA ou SPRAT de chaque technicien devient son identifiant permanent à travers le réseau OnRopePro. Quand ils changent d'employeur (et ils le feront), leur profil voyage avec eux.",
+          "listTitle": "Ce qui se transfère automatiquement :",
+          "list1": "Informations personnelles et de contact",
+          "list2": "Toutes les certifications avec dates d'expiration",
+          "list3": "Coordonnées de contact d'urgence",
+          "list4": "Informations bancaires et de paiement",
+          "list5": "Historique de travail et dossiers de projets complets"
+        },
+        "certificationCompliance": {
+          "title": "Moteur de conformité des certifications",
+          "description": "Le système surveille les certifications IRATA, SPRAT, les permis de conduire et les certifications de premiers soins. Des indicateurs visuels (vert, ambre, rouge) rendent les accréditations expirantes impossibles à manquer. Les avertissements automatiques de 30 jours vous donnent le temps d'agir avant que les problèmes ne deviennent des crises.",
+          "listTitle": "Ce qui est suivi :",
+          "list1": "Niveaux de certification IRATA et expiration",
+          "list2": "Statut de certification SPRAT",
+          "list3": "Validité du permis de conduire",
+          "list4": "Dates de premiers soins et de formation à la sécurité"
+        },
+        "permissionControls": {
+          "title": "Contrôles de permissions granulaires",
+          "description": "Tous les rôles commencent avec zéro permission sauf le propriétaire de l'entreprise. Vous configurez exactement ce que chaque personne peut voir et faire. Séparez l'accès opérationnel de la visibilité financière. Protégez les données commerciales sensibles sans rétrogradations formelles.",
+          "listTitle": "Ce que vous contrôlez :",
+          "list1": "Visibilité des données financières",
+          "list2": "Capacités de gestion des employés",
+          "list3": "Droits de création et de visualisation de projets",
+          "list4": "Niveaux d'accès à la paie",
+          "list5": "Exposition des informations clients"
+        }
+      },
+      "stakeholders": {
+        "title": "Qui bénéficie de ce module",
+        "subtitle": "Chaque partie prenante obtient la visibilité sur la main-d'œuvre et la protection de conformité dont elle a besoin.",
+        "owners": {
+          "title": "Pour les propriétaires d'entreprises d'accès sur corde",
+          "benefit1Title": "Protégez votre opération contre les catastrophes de conformité avant qu'elles ne surviennent.",
+          "benefit1Desc": "Une seule alerte de certification empêchant un arrêt de WorkSafeBC paie votre abonnement annuel entier. Au-delà du coût direct, vous évitez les retards de projet, les dommages aux relations clients et les poursuites de responsabilité qui peuvent atteindre sept chiffres.",
+          "benefit2Title": "Récupérez les heures perdues en administration redondante.",
+          "benefit2Desc": "La chasse aux courriels, la saisie de données, les relances, l'effort en double quand quelqu'un revient après être parti pour une autre entreprise. Les utilisateurs OnRopePro existants s'intègrent en 10 secondes. Les nouveaux utilisateurs remplissent leurs informations une seule fois sur leur propre temps.",
+          "benefit3Title": "Contrôlez l'accès sans créer de conflits RH.",
+          "benefit3Desc": "Suspicieux que votre directeur des opérations parle aux concurrents ? Modifiez ses permissions en temps réel sans changer son titre. Supprimez la visibilité financière tout en maintenant la fonction opérationnelle. Documentez tout pour d'éventuelles procédures judiciaires."
+        },
+        "technicians": {
+          "title": "Pour les techniciens",
+          "benefit1Title": "Remplissez la paperasse une fois dans votre carrière, pas une fois par employeur.",
+          "benefit1Desc": "Votre profil vous suit. Quand vous rejoignez une nouvelle entreprise, ils entrent votre numéro IRATA, vous acceptez, et c'est terminé. Plus besoin d'envoyer le même chèque annulé à chaque nouvel employeur.",
+          "benefit2Title": "Ne soyez plus jamais surpris par une certification expirée.",
+          "benefit2Desc": "Voyez votre propre statut. Recevez des notifications avant l'expiration. Renouvelez selon votre calendrier au lieu de vous précipiter après avoir déjà perdu votre éligibilité au travail.",
+          "benefit3Title": "Connectez-vous avec votre numéro IRATA.",
+          "benefit3Desc": "L'accréditation qui définit votre profession devient votre identifiant universel. Un mot de passe de moins à retenir."
+        },
+        "opsManagers": {
+          "title": "Pour les directeurs des opérations",
+          "benefit1Title": "Sachez qui est qualifié pour quoi en un coup d'œil.",
+          "benefit1Desc": "Planifier un travail technique qui nécessite un niveau 3 ? Filtrez par niveau de certification. Attribuer un véhicule d'entreprise ? Vérifiez le statut du permis instantanément. Arrêtez de vous fier à la mémoire pour les décisions critiques de conformité.",
+          "benefit2Title": "Intégrez les nouveaux membres d'équipe sans le marathon de courriels.",
+          "benefit2Desc": "Pour les techniciens déjà dans OnRopePro, vous ne créez pas de dossiers. Vous vous connectez à des profils qui existent déjà. Pour les nouveaux utilisateurs, le système gère la collecte de données."
+        },
+        "buildingManagers": {
+          "title": "Pour les gestionnaires d'immeubles",
+          "benefit1Title": "Vérifiez les qualifications des techniciens avant que quiconque ne touche votre bâtiment.",
+          "benefit1Desc": "Certifications IRATA à jour. Formation de sécurité valide. Documentation d'assurance appropriée. Des opérateurs professionnels qui peuvent prouver leur conformité sur demande.",
+          "benefit2Title": "Travaillez avec des entreprises qui opèrent comme des professionnels.",
+          "benefit2Desc": "Tenue de dossiers organisée. Protocoles de sécurité documentés. Le type d'opération qui ne crée pas d'exposition à la responsabilité pour votre propriété."
+        },
+        "propertyManagers": {
+          "title": "Pour les gestionnaires immobiliers",
+          "benefit1Title": "Confiance dans la gestion de la main-d'œuvre de votre fournisseur.",
+          "benefit1Desc": "Quand vous devez justifier votre choix de fournisseur auprès des propriétaires ou de l'assurance, vous pouvez pointer vers un suivi systématique de la conformité et une documentation professionnelle.",
+          "benefit2Title": "Réduisez votre exposition à la responsabilité grâce aux qualifications vérifiées.",
+          "benefit2Desc": "Les entreprises utilisant OnRopePro peuvent démontrer les certifications à jour pour chaque technicien sur vos propriétés."
+        }
+      },
+      "keyFeatures": {
+        "title": "Fonctionnalités clés",
+        "subtitle": "Chaque fonctionnalité conçue autour de la façon dont les entreprises d'accès sur corde opèrent réellement, pas comme les logiciels RH génériques pensent que vous devriez.",
+        "import": {
+          "title": "Importation d'employé en 10 secondes",
+          "description": "Les utilisateurs OnRopePro existants se branchent instantanément. Entrez leur numéro IRATA, envoyez une demande de connexion, ils acceptent, terminé. Toutes les informations personnelles, certifications, contacts d'urgence et coordonnées bancaires sont transférés automatiquement."
+        },
+        "roles": {
+          "title": "14 rôles avec permissions personnalisées",
+          "description": "Postes de gestion et postes de terrain avec 44 permissions individuelles. Chaque rôle sauf Propriétaire commence vide. Vous accordez exactement ce dont chaque personne a besoin."
+        },
+        "certStatus": {
+          "title": "Statut de certification visuel",
+          "description": "Vert signifie valide. Ambre signifie expire dans 60 jours. Rouge signifie expiré. Pas de plongée dans les tableurs. Pas de rappels de calendrier que vous pourriez manquer. Le statut est visible partout où vous consultez les informations des employés."
+        },
+        "driver": {
+          "title": "Suivi de l'éligibilité à la conduite",
+          "description": "Les dates d'expiration des permis de conduire sont surveillées parallèlement aux certifications. Même système d'avertissement de 30 jours. Mêmes indicateurs visuels. Critique pour les entreprises attribuant des techniciens à des véhicules d'entreprise."
+        },
+        "safety": {
+          "title": "Signature intégrée des documents de sécurité",
+          "description": "Les nouveaux employés reçoivent automatiquement les documents de sécurité requis de l'entreprise dans le cadre de l'intégration. Signatures suivies. Conformité documentée. Aucun système séparé ou chaîne de courriels requis."
+        },
+        "softDelete": {
+          "title": "Suppression douce avec préservation des données",
+          "description": "Les employés licenciés perdent l'accès au système immédiatement, mais les données historiques sont conservées à des fins de conformité et d'audit. Sessions de travail, documents de sécurité, affectations d'équipement, historique de paie. Tout est préservé."
+        }
+      },
+      "problemsSolved": {
+        "title": "Problèmes résolus",
+        "subtitle": "Défis réels auxquels font face les entreprises d'accès sur corde, et comment ce module répond à chacun.",
+        "owners": {
+          "title": "Pour les propriétaires d'entreprises d'accès sur corde",
+          "problem1Title": "« Je ne savais pas que sa certification était expirée jusqu'à ce que WorkSafeBC se présente. »",
+          "problem1Desc1": "Vous êtes en pleine saison. Travaux empilés, équipes déployées sur plusieurs sites. Suivre quand la certification IRATA de chaque technicien expire ? Ça passe entre les mailles. Vous supposez qu'ils gèrent leurs propres renouvellements. Puis WorkSafeBC arrive pour une inspection de site.",
+          "problem1Desc2": "OnRopePro surveille chaque certification avec des avertissements automatiques de 30 jours et des indicateurs de statut visuels. Une alerte empêchant un arrêt justifie des années de coûts d'abonnement.",
+          "problem2Title": "« L'intégration prend des heures d'échanges de courriels. »",
+          "problem2Desc1": "Chaque nouvelle embauche déclenche la même danse. Courriel demandant des infos, attente, chasse aux pièces manquantes, entrée manuelle de tout, courriels de documents de sécurité, attente des signatures, relance à nouveau. Des heures par employé.",
+          "problem2Desc2": "Deux voies éliminent ce chaos. Utilisateur OnRopePro existant : entrez le numéro IRATA, ils acceptent, terminé. 10 secondes. Nouvel utilisateur : ils remplissent leur profil une fois sur leur propre temps. Vous les liez simplement à votre entreprise.",
+          "problem3Title": "« Mon directeur des opérations pourrait parler aux concurrents. »",
+          "problem3Desc1": "Vous lui avez donné un large accès parce qu'il en a besoin pour faire son travail. Maintenant vous êtes suspicieux. Vous ne pouvez pas licencier sans preuve. Vous ne pouvez pas gérer les opérations sans quelqu'un dans ce rôle.",
+          "problem3Desc2": "Les permissions granulaires vous permettent de modifier l'accès en temps réel sans changer les titres. Supprimez la visibilité financière, masquez les informations clients, restreignez aux fonctions de base. Pas de rétrogradation formelle. Pas de complications RH. Protection immédiate.",
+          "problem4Title": "« Un de mes gars a conduit notre camion pendant deux mois avec un permis expiré. »",
+          "problem4Desc1": "Vous vérifiez les permis à l'embauche. Que se passe-t-il six mois plus tard quand ils expirent ? Vous n'y pensez pas. Eux non plus. Puis ils conduisent votre véhicule sans accréditations valides.",
+          "problem4Desc2": "OnRopePro suit l'expiration des permis de conduire parallèlement aux certifications. Mêmes avertissements de 30 jours. Mêmes indicateurs visuels. Empêchez un refus de réclamation d'assurance ou une poursuite de responsabilité et vous avez justifié des années d'abonnement."
+        },
+        "opsManagers": {
+          "title": "Pour les directeurs des opérations",
+          "problem1Title": "« Je ne me souviens pas qui est certifié pour quoi. »",
+          "problem1Desc1": "Vous savez que Dave est niveau 3 et êtes assez sûr que Mike est niveau 2, mais qu'en est-il des nouveaux ? Lors de la planification, vous faites des acrobaties mentales pour vous rappeler qui peut diriger, qui a besoin de supervision, qui a une formation au travail en hauteur encore valide.",
+          "problem1Desc2": "Filtrez par niveau de certification, vérifiez le statut du permis, voyez l'expiration des premiers soins. L'information existe là où vous prenez déjà les décisions de planification."
+        },
+        "technicians": {
+          "title": "Pour les techniciens",
+          "problem1Title": "« Je dois remplir la même paperasse chez chaque nouvel employeur. »",
+          "problem1Desc1": "L'accès sur corde a un roulement de personnel fou. Vous pourriez travailler pour trois entreprises en une saison. Chacune veut les mêmes informations : certification IRATA, chèque annulé, contact d'urgence, permis de conduire. Vous avez rempli ça une douzaine de fois.",
+          "problem1Desc2": "Créez votre profil OnRopePro une fois. Quand vous rejoignez une nouvelle entreprise, ils entrent votre numéro IRATA, vous acceptez, et tout est transféré. Vos certifications, contacts, infos bancaires, historique de travail. Un profil, chaque employeur.",
+          "problem2Title": "« Je ne sais jamais si mes certifications sont sur le point d'expirer. »",
+          "problem2Desc1": "Vous êtes concentré sur le travail, pas sur les dates du calendrier. Votre IRATA expire, vos premiers soins expirent, et soudain vous ne pouvez plus travailler jusqu'à ce que vous soyez recertifié. Revenu perdu. Précipitation pour planifier la formation.",
+          "problem2Desc2": "OnRopePro suit vos dates de certification et vous alerte avant l'expiration. Renouvellement proactif au lieu de précipitation réactive."
+        }
+      },
+      "measurableResults": {
+        "title": "Résultats mesurables",
+        "subtitle": "Améliorations concrètes que vous pouvez attendre de l'implémentation de ce module.",
+        "onboarding": {
+          "title": "Réduction du temps d'intégration",
+          "description": "Utilisateurs OnRopePro existants : 10 secondes. Nouveaux utilisateurs : 5-10 minutes contre des heures d'échanges de courriels. Éliminez 100% des allers-retours de collecte de données pour les comptes existants."
+        },
+        "compliance": {
+          "title": "Protection de conformité",
+          "description": "Avertissement anticipé de 30 jours sur toutes les certifications suivies. Indicateurs de statut visuels visibles sur toute la plateforme. Une alerte de certification empêchant un arrêt de WorkSafeBC justifie des années de coût d'abonnement."
+        },
+        "admin": {
+          "title": "Heures administratives récupérées",
+          "description": "Plus de saisie manuelle pour les employés de retour. Plus de systèmes séparés pour différents types de données. Une connexion, une source de vérité, un flux de travail qui gère l'intégration, la conformité et le départ."
+        },
+        "permissions": {
+          "title": "Précision des permissions",
+          "description": "44 permissions individuelles sur 14 rôles. Accordez la création de projets sans exposer les données de rémunération. Fournissez un accès opérationnel sans visibilité financière. Répondez aux préoccupations de confiance immédiatement sans complications RH."
+        }
+      },
+      "integration": {
+        "title": "Modules avec lesquels ce module se connecte",
+        "subtitle": "Les données de gestion des employés circulent dans tout OnRopePro, permettant à chaque autre module de fonctionner avec un contexte complet de la main-d'œuvre.",
+        "workSession": {
+          "title": "Suivi des sessions de travail",
+          "description": "Les employés apparaissent dans le suivi du temps. Les taux horaires déterminent les calculs de coût de main-d'œuvre."
+        },
+        "payroll": {
+          "title": "Paie",
+          "description": "La rémunération alimente directement les calculs de paie. Les changements de taux en milieu de période sont gérés automatiquement."
+        },
+        "projectManagement": {
+          "title": "Gestion de projets",
+          "description": "Les employés apparaissent dans les listes d'affectation de projets. Les niveaux de certification sont visibles lors de la planification."
+        },
+        "safety": {
+          "title": "Sécurité et conformité",
+          "description": "La signature des documents de sécurité est intégrée au flux de travail d'intégration. L'historique de conformité est maintenu pour les audits."
+        },
+        "inventory": {
+          "title": "Inventaire",
+          "description": "Les affectations d'équipement se connectent aux profils des employés. Suivez quel équipement chaque technicien possède."
+        },
+        "scheduling": {
+          "title": "Planification",
+          "description": "L'équipe disponible apparaît dans les vues de calendrier. Le filtrage par certification permet une affectation appropriée."
+        }
+      },
+      "businessImprovement": {
+        "title": "Arrêtez de gérer la paperasse. Commencez à gérer les gens.",
+        "para1": "En ce moment, vous passez des heures sur des tâches administratives qui ne font pas avancer votre entreprise. Chasser des documents. Entrer les mêmes informations plusieurs fois. Vérifier manuellement les calendriers pour voir si les certifications sont encore valides. S'inquiéter du manque de conformité que vous pourriez même ignorer.",
+        "para2": "Votre directeur des opérations demande si vous pouvez prendre un nouveau projet. Vous devez vérifier six endroits différents pour déterminer qui est disponible, qui est qualifié, et si la certification de quelqu'un est sur le point d'expirer. Le temps que vous ayez une réponse, l'opportunité pourrait être partie.",
+        "para3": "Votre meilleur technicien part pour 2$ de plus l'heure ailleurs. Deux mois plus tard, il veut revenir. Vous êtes ravi de l'avoir, mais maintenant vous refaites toute la danse de l'intégration. Même gars. Même paperasse. Comme si les huit derniers mois ne s'étaient jamais produits.",
+        "para4": "Avec la gestion des employés, les profils des techniciens sont portables. Les certifications sont surveillées automatiquement. Les permissions sont configurables sans complications RH. Quand quelqu'un rejoint votre entreprise, il est productif dès le premier jour. Quand quelqu'un part et revient, la connexion prend 10 secondes.",
+        "para5": "Vous récupérez les heures que vous passez actuellement en administration. Vous obtenez une protection contre les échecs de conformité que vous ne saviez pas venir. Vous obtenez le contrôle sur qui voit quoi sans créer de drame au travail.",
+        "para6": "Vous arrêtez de gérer la paperasse et commencez à gérer ce qui compte vraiment : vos gens, vos projets, votre entreprise."
+      },
+      "faqs": {
+        "title": "Questions fréquemment posées",
+        "subtitle": "Questions courantes sur le module de gestion des employés.",
+        "q1": {
+          "question": "Les techniciens peuvent-ils se connecter avec leur numéro IRATA au lieu de leur courriel ?",
+          "answer": "Oui. Les techniciens peuvent se connecter en utilisant soit leur numéro de certification IRATA/SPRAT, soit leur adresse courriel. Le numéro de certification sert d'identifiant unique sur toute la plateforme."
+        },
+        "q2": {
+          "question": "Que se passe-t-il quand j'embauche un technicien qui a déjà un compte OnRopePro ?",
+          "answer": "Entrez leur numéro IRATA/SPRAT, envoyez une demande de connexion, et une fois qu'ils acceptent, leur profil complet est transféré à votre entreprise. Vous ne configurez que leur taux de rémunération. Toutes les autres informations sont déjà complètes. Temps requis : 10 secondes (excluant leur acceptation)."
+        },
+        "q3": {
+          "question": "Les permissions de rôle sont-elles prédéfinies ou dois-je les configurer ?",
+          "answer": "Tous les rôles sauf Propriétaire de l'entreprise commencent avec zéro permission. Vous devez explicitement accorder chaque permission dont l'employé a besoin. Cela empêche les sur-permissions accidentelles et permet une correspondance précise de l'accès aux exigences du poste et au niveau de confiance."
+        },
+        "q4": {
+          "question": "Le système alerte-t-il aussi pour l'expiration du permis de conduire ?",
+          "answer": "Oui. Les dates d'expiration des permis de conduire sont suivies et incluses dans le même système d'alerte que les certifications IRATA/SPRAT. Les indicateurs visuels et les notifications fonctionnent de manière identique."
+        },
+        "q5": {
+          "question": "Qu'arrive-t-il aux données quand un employé est licencié ?",
+          "answer": "L'employé perd l'accès au système immédiatement, mais toutes les données historiques sont préservées. Sessions de travail, documents de sécurité, affectations d'équipement et historique de paie restent dans le système à des fins de conformité et d'audit. C'est une suppression douce, pas une suppression définitive."
+        },
+        "q6": {
+          "question": "Puis-je utiliser ceci pour des employés qui ne sont pas des techniciens d'accès sur corde ?",
+          "answer": "Oui. Bien que le suivi des certifications soit conçu pour l'accès sur corde (IRATA/SPRAT), le module prend en charge des rôles comme Ouvrier, Équipe au sol, et personnel de soutien général qui n'ont peut-être pas de certifications d'accès sur corde. Laissez les champs de certification vides pour le personnel non certifié."
+        },
+        "q7": {
+          "question": "Que faire si je soupçonne qu'un employé partage des informations avec des concurrents ?",
+          "answer": "Modifiez ses permissions immédiatement. Supprimez l'accès financier, masquez les informations clients, restreignez aux fonctions de base. Aucune rétrogradation formelle requise. Les changements prennent effet instantanément. Les modifications d'accès sont enregistrées pour d'éventuelles procédures judiciaires."
+        },
+        "q8": {
+          "question": "Les employés peuvent-ils voir les taux de rémunération des autres ?",
+          "answer": "Seulement si vous leur accordez cette permission spécifique. La visibilité financière est séparée de l'accès opérationnel. Votre superviseur peut créer des projets et vérifier les budgets sans voir ce que chaque technicien gagne."
+        },
+        "q9": {
+          "question": "Quelles certifications sont suivies ?",
+          "answer": "Niveau et expiration IRATA, certification SPRAT, validité du permis de conduire, et certification premiers soins. Toutes affichent des indicateurs de statut visuels (vert/ambre/rouge) et déclenchent des alertes d'avertissement de 30 jours avant l'expiration."
+        },
+        "q10": {
+          "question": "Combien de temps prend l'intégration pour un employé complètement nouveau ?",
+          "answer": "5-10 minutes pour la saisie de données, excluant le temps que l'employé passe à configurer son propre compte. Les nouveaux employés reçoivent les identifiants de connexion par courriel et peuvent ensuite compléter les détails de leur profil (contacts d'urgence, informations bancaires) sur leur propre temps."
+        }
+      },
+      "footerCta": {
+        "title": "Prêt à simplifier votre gestion de la main-d'œuvre ?",
+        "subtitle": "Rejoignez les entreprises d'accès sur corde qui utilisent déjà OnRopePro pour protéger leurs opérations, réduire la charge administrative et assurer la conformité.",
+        "button": "Commencez votre essai gratuit de 60 jours"
+      }
     }
   }
 }

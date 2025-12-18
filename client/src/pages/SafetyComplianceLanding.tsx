@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { useSafetyAuthority } from "@/hooks/useSafetyAuthority";
 import { PublicHeader } from "@/components/PublicHeader";
 import {
@@ -42,6 +43,7 @@ import {
 } from "lucide-react";
 
 export default function SafetyComplianceLanding() {
+  const { t } = useTranslation();
   const [expandedProblems, setExpandedProblems] = useState<string[]>([]);
   const [, setLocation] = useLocation();
   const [count1, setCount1] = useState(0);
@@ -87,31 +89,31 @@ export default function SafetyComplianceLanding() {
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
           <div className="text-center space-y-6 pt-16">
             <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-module-label">
-              Safety & Compliance Module
+              {t('modules.safety.hero.badge', 'Safety & Compliance Module')}
             </Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              {authorityName} just pulled<br />
-              into the parking lot.<br />
-              <span className="text-blue-100">Are you ready?</span>
+              {t('modules.safety.hero.titleLine1', '{{authority}} just pulled', { authority: authorityName })}<br />
+              {t('modules.safety.hero.titleLine2', 'into the parking lot.')}<br />
+              <span className="text-blue-100">{t('modules.safety.hero.titleLine3', 'Are you ready?')}</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              Daily harness inspections. Toolbox meetings.<br />
-              Equipment tracking. Digital signatures.<br />
-              <strong>All searchable. All exportable. All defensible.</strong>
+              {t('modules.safety.hero.descriptionLine1', 'Daily harness inspections. Toolbox meetings.')}<br />
+              {t('modules.safety.hero.descriptionLine2', 'Equipment tracking. Digital signatures.')}<br />
+              <strong>{t('modules.safety.hero.descriptionLine3', 'All searchable. All exportable. All defensible.')}</strong>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-hero-trial">
                 <Link href="/register">
-                  Start Your Free 60-Day Trial
+                  {t('modules.safety.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-hero-knowledgebase">
                 <Link href="#knowledgebase">
-                  Find Answers
+                  {t('modules.safety.hero.ctaKnowledgebase', 'Find Answers')}
                   <BookOpen className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
@@ -135,15 +137,15 @@ export default function SafetyComplianceLanding() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-sky-600">{count1}</div>
-                  <div className="text-sm text-muted-foreground mt-1">Missing forms</div>
+                  <div className="text-sm text-muted-foreground mt-1">{t('modules.safety.stats.missingForms', 'Missing forms')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-emerald-600">{count2}</div>
-                  <div className="text-sm text-muted-foreground mt-1">Failed audits</div>
+                  <div className="text-sm text-muted-foreground mt-1">{t('modules.safety.stats.failedAudits', 'Failed audits')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-violet-600">{count3}</div>
-                  <div className="text-sm text-muted-foreground mt-1">Sleepless nights</div>
+                  <div className="text-sm text-muted-foreground mt-1">{t('modules.safety.stats.sleeplessNights', 'Sleepless nights')}</div>
                 </div>
                 <div className="text-center">
                   <div 
@@ -152,7 +154,7 @@ export default function SafetyComplianceLanding() {
                   >
                     {allZero ? '∞' : '8'}
                   </div>
-                  <div className="text-sm text-muted-foreground mt-1">Searchable history</div>
+                  <div className="text-sm text-muted-foreground mt-1">{t('modules.safety.stats.searchableHistory', 'Searchable history')}</div>
                 </div>
               </div>
             </CardContent>
@@ -164,32 +166,32 @@ export default function SafetyComplianceLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
-            The Scramble You Know Too Well
+            {t('modules.safety.problem.title', 'The Scramble You Know Too Well')}
           </h2>
           
           <Card className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
             <CardContent className="p-6 md:p-8 space-y-4 text-muted-foreground">
               <p className="text-lg leading-relaxed">
-                Most rope access operators know exactly what happens when the auditor asks for six months of harness inspections.
+                {t('modules.safety.problem.paragraph1', 'Most rope access operators know exactly what happens when the auditor asks for six months of harness inspections.')}
               </p>
               <p>
-                The truck gets searched. The binder gets dug out. Someone says "I think Dave had that folder." Half the forms are missing. The ones you find have coffee stains and illegible handwriting.
+                {t('modules.safety.problem.paragraph2', 'The truck gets searched. The binder gets dug out. Someone says "I think Dave had that folder." Half the forms are missing. The ones you find have coffee stains and illegible handwriting.')}
               </p>
               <p>
-                You pass the audit. Barely. And you promise yourself you'll get organized.
+                {t('modules.safety.problem.paragraph3', "You pass the audit. Barely. And you promise yourself you'll get organized.")}
               </p>
               <p className="font-medium text-foreground">
-                Until next time, when the exact same scramble happens again.
+                {t('modules.safety.problem.paragraph4', 'Until next time, when the exact same scramble happens again.')}
               </p>
               <Separator className="my-6" />
               <p>
-                Meanwhile, your insurance carrier wants proof of your safety culture. Your property manager wants documentation before every job. And if someone gets hurt, the first question a lawyer asks is:
+                {t('modules.safety.problem.paragraph5', 'Meanwhile, your insurance carrier wants proof of your safety culture. Your property manager wants documentation before every job. And if someone gets hurt, the first question a lawyer asks is:')}
               </p>
               <blockquote className="border-l-4 border-rose-500 pl-4 py-2 bg-rose-50 dark:bg-rose-950 rounded-r text-rose-900 dark:text-rose-100 font-medium">
-                "Can you prove you conducted the required inspections?"
+                {t('modules.safety.problem.quote', '"Can you prove you conducted the required inspections?"')}
               </blockquote>
               <p className="text-foreground font-medium">
-                Paper forms can't protect you. Filing cabinets can't protect you. The best technicians in the world can't protect you if there's no record of what they did.
+                {t('modules.safety.problem.paragraph6', "Paper forms can't protect you. Filing cabinets can't protect you. The best technicians in the world can't protect you if there's no record of what they did.")}
               </p>
             </CardContent>
           </Card>
@@ -200,10 +202,10 @@ export default function SafetyComplianceLanding() {
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            What This Module Does
+            {t('modules.safety.features.title', 'What This Module Does')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-            Complete safety documentation that creates itself through daily use.
+            {t('modules.safety.features.subtitle', 'Complete safety documentation that creates itself through daily use.')}
           </p>
 
           <div className="grid md:grid-cols-3 gap-6">
