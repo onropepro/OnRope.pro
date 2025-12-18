@@ -13,7 +13,6 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import HelpNav from '@/components/help/HelpNav';
 import HelpBreadcrumb from '@/components/help/HelpBreadcrumb';
-import { apiRequest } from '@/lib/queryClient';
 import { useQuery } from '@tanstack/react-query';
 
 interface FoundFeature {
@@ -52,10 +51,12 @@ export default function FeatureFinder() {
     setHasSearched(true);
     
     try {
-      const response = await apiRequest('POST', '/api/help/search', { query: searchTerm });
-      const data = await response.json() as { articles: Array<{ slug: string; title: string; description: string; category: string }> };
+      const response = await fetch(`/api/help/search?q=${encodeURIComponent(searchTerm)}`, { 
+        credentials: 'include' 
+      });
+      const data = await response.json() as { results: Array<{ slug: string; title: string; description: string; category: string }> };
       
-      const features: FoundFeature[] = (data.articles || []).map((article: { slug: string; title: string; description: string; category: string }, index: number) => ({
+      const features: FoundFeature[] = (data.results || []).map((article: { slug: string; title: string; description: string; category: string }, index: number) => ({
         slug: article.slug,
         title: article.title,
         description: article.description || 'Learn more about this feature',

@@ -148,9 +148,18 @@ ${context}
 ---
 Answer the user's question based on this context. Be friendly and professional.`;
 
+    // Build messages with system prompt as first user message (Replit Gemini proxy doesn't support systemInstruction)
     const messages = [
+      {
+        role: "user" as const,
+        parts: [{ text: systemPrompt }]
+      },
+      {
+        role: "model" as const,
+        parts: [{ text: "Understood. I'll help users with OnRopePro questions using the provided documentation context. How can I help you?" }]
+      },
       ...conversationHistory.map(msg => ({
-        role: msg.role as "user" | "model",
+        role: (msg.role === 'assistant' ? 'model' : 'user') as "user" | "model",
         parts: [{ text: msg.content }]
       })),
       {
@@ -161,7 +170,6 @@ Answer the user's question based on this context. Be friendly and professional.`
 
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
-      systemInstruction: systemPrompt,
       contents: messages,
     });
 

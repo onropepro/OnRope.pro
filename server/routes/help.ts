@@ -17,7 +17,7 @@ import {
 import { eq, desc, sql } from 'drizzle-orm';
 import {
   queryRAG,
-  searchContent,
+  searchArticles,
   getAllArticles,
   getArticleBySlug,
   getArticlesForStakeholder,
@@ -116,7 +116,7 @@ router.post('/chat', async (req: Request, res: Response) => {
 
 /**
  * GET /api/help/search
- * Search articles using semantic search
+ * Search articles using text-based search
  */
 router.get('/search', async (req: Request, res: Response) => {
   try {
@@ -126,32 +126,26 @@ router.get('/search', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Search query is required' });
     }
     
-    const results = await searchContent(q, 10);
+    const articles = await searchArticles(q, 10);
     
     // Track search for analytics
     await db.insert(helpSearches).values({
       query: q,
-      resultsCount: results.length,
+      resultsCount: articles.length,
       userType: userType as string,
       sessionId: req.sessionID || null,
     });
     
-    // Deduplicate by article
-    const uniqueArticles = new Map();
-    for (const result of results) {
-      if (!uniqueArticles.has(result.article.slug)) {
-        uniqueArticles.set(result.article.slug, {
-          ...result.article,
-          relevance: result.similarity,
-          excerpt: result.chunk.substring(0, 200) + '...',
-        });
-      }
-    }
+    // Format results with excerpts
+    const results = articles.map(article => ({
+      ...article,
+      excerpt: article.content?.substring(0, 200) + '...' || article.description,
+    }));
     
     res.json({
       query: q,
-      results: Array.from(uniqueArticles.values()),
-      total: uniqueArticles.size,
+      results,
+      total: articles.length,
     });
   } catch (error: any) {
     console.error('[Help Search] Error:', error);
