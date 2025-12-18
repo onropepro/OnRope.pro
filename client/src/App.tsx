@@ -94,6 +94,7 @@ import WhiteLabelBrandingLanding from "@/pages/WhiteLabelBrandingLanding";
 import ResidentPortalLanding from "@/pages/ResidentPortalLanding";
 import ResidentLanding from "@/pages/ResidentLanding";
 import PropertyManagerLanding from "@/pages/PropertyManagerLanding";
+import PropertyManagerInterfaceLanding from "@/pages/PropertyManagerInterfaceLanding";
 import JobBoardGuide from "@/pages/JobBoardGuide";
 import Pricing from "@/pages/Pricing";
 import ROICalculator from "@/pages/ROICalculator";
@@ -385,6 +386,7 @@ function Router() {
       <Route path="/modules/quoting-sales-pipeline" component={QuotingSalesLanding} />
       <Route path="/modules/white-label-branding" component={WhiteLabelBrandingLanding} />
       <Route path="/modules/resident-portal" component={ResidentPortalLanding} />
+      <Route path="/modules/property-manager-interface" component={PropertyManagerInterfaceLanding} />
       <Route path="/changelog/user-access" component={UserAccessGuide} />
       <Route path="/changelog/projects" component={ProjectsGuide} />
       <Route path="/changelog/time-tracking" component={TimeTrackingGuide} />

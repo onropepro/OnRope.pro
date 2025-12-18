@@ -455,7 +455,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                       <button
                         className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
                         onClick={() => {
-                          setLocation("/property-manager");
+                          setLocation("/modules/property-manager-interface");
                           setShowModulesMenu(false);
                         }}
                         data-testid="nav-property-manager-interface"
@@ -729,7 +729,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                   <button
                     className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
                     onClick={() => {
-                      setLocation("/property-manager");
+                      setLocation("/modules/property-manager-interface");
                       setMobileMenuOpen(false);
                     }}
                     data-testid="nav-mobile-property-manager-interface"
