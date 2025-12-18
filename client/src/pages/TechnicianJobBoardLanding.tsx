@@ -216,11 +216,11 @@ export default function TechnicianJobBoardLanding() {
                 <p>{t('modules.technicianJobBoard.features.jobBrowser.description', 'Filter by location, job type, and certification requirements. Each listing shows company details, pay range (when provided), start dates, and project scope. Every company is verified. Every job is relevant.')}</p>
                 <p className="font-medium text-foreground mt-4">{t('modules.technicianJobBoard.features.jobBrowser.filterLabel', 'What you can filter by:')}</p>
                 <ul className="space-y-1 ml-2">
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Location (city, region)</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Job type (window washing, caulking, etc.)</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Employment type (full-time, contract)</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Required certification level</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Pay range</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> {t('modules.technicianJobBoard.features.jobBrowser.filterLocation', 'Location (city, region)')}</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> {t('modules.technicianJobBoard.features.jobBrowser.filterJobType', 'Job type (window washing, caulking, etc.)')}</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> {t('modules.technicianJobBoard.features.jobBrowser.filterEmploymentType', 'Employment type (full-time, contract)')}</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> {t('modules.technicianJobBoard.features.jobBrowser.filterCertLevel', 'Required certification level')}</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> {t('modules.technicianJobBoard.features.jobBrowser.filterPayRange', 'Pay range')}</li>
                 </ul>
               </CardContent>
             </Card>
@@ -239,11 +239,11 @@ export default function TechnicianJobBoardLanding() {
                 <p>{t('modules.technicianJobBoard.features.oneClickApplications.description', 'Resume, certifications, IRATA/SPRAT numbers, years of experience, safety rating. All attached automatically. Apply to a job in 30 seconds instead of re-entering the same information for the 100th time.')}</p>
                 <p className="font-medium text-foreground mt-4">{t('modules.technicianJobBoard.features.oneClickApplications.sentLabel', 'What gets sent automatically:')}</p>
                 <ul className="space-y-1 ml-2">
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Resume/CV (if uploaded)</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> IRATA/SPRAT certification details</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Years of experience</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Safety rating score</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Your expected pay rate</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> {t('modules.technicianJobBoard.features.oneClickApplications.sentResume', 'Resume/CV (if uploaded)')}</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> {t('modules.technicianJobBoard.features.oneClickApplications.sentCert', 'IRATA/SPRAT certification details')}</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> {t('modules.technicianJobBoard.features.oneClickApplications.sentExperience', 'Years of experience')}</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> {t('modules.technicianJobBoard.features.oneClickApplications.sentSafetyRating', 'Safety rating score')}</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> {t('modules.technicianJobBoard.features.oneClickApplications.sentPayRate', 'Your expected pay rate')}</li>
                 </ul>
               </CardContent>
             </Card>
@@ -262,11 +262,11 @@ export default function TechnicianJobBoardLanding() {
                 <p>{t('modules.technicianJobBoard.features.profileVisibility.description', "Toggle visibility ON: employers can search for you in the Talent Browser, see your credentials, and send you direct job offers. Toggle it OFF: you're invisible to searches but can still browse and apply to jobs normally.")}</p>
                 <p className="font-medium text-foreground mt-4">{t('modules.technicianJobBoard.features.profileVisibility.visibleLabel', "What employers see when you're visible:")}</p>
                 <ul className="space-y-1 ml-2">
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Name and photo</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Certification levels and numbers</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Years of experience</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Safety rating</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Expected pay rate</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> {t('modules.technicianJobBoard.features.profileVisibility.visibleName', 'Name and photo')}</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> {t('modules.technicianJobBoard.features.profileVisibility.visibleCert', 'Certification levels and numbers')}</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> {t('modules.technicianJobBoard.features.profileVisibility.visibleExperience', 'Years of experience')}</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> {t('modules.technicianJobBoard.features.profileVisibility.visibleSafetyRating', 'Safety rating')}</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> {t('modules.technicianJobBoard.features.profileVisibility.visiblePayRate', 'Expected pay rate')}</li>
                 </ul>
               </CardContent>
             </Card>
@@ -280,10 +280,10 @@ export default function TechnicianJobBoardLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Who Benefits From This Module
+            {t('modules.technicianJobBoard.whoBenefits.title', 'Who Benefits From This Module')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-            A closed ecosystem where every participant gets exactly what they need
+            {t('modules.technicianJobBoard.whoBenefits.subtitle', 'A closed ecosystem where every participant gets exactly what they need')}
           </p>
 
           <div className="space-y-8">
@@ -294,26 +294,26 @@ export default function TechnicianJobBoardLanding() {
                   <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center">
                     <HardHat className="w-5 h-5 text-amber-600" />
                   </div>
-                  <CardTitle className="text-xl">For Technicians</CardTitle>
+                  <CardTitle className="text-xl">{t('modules.technicianJobBoard.whoBenefits.technicians.title', 'For Technicians')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-6 space-y-4">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Every job is rope access building maintenance</h4>
-                    <p className="text-base text-muted-foreground">No more scrolling past offshore rigs, pipe fitting positions, and "working at heights" construction gigs. Every posting here is from a verified rope access company doing building maintenance.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.technicianJobBoard.whoBenefits.technicians.benefit1Title', 'Every job is rope access building maintenance')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.technicianJobBoard.whoBenefits.technicians.benefit1Desc', 'No more scrolling past offshore rigs, pipe fitting positions, and "working at heights" construction gigs. Every posting here is from a verified rope access company doing building maintenance.')}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Apply once, your credentials follow everywhere</h4>
-                    <p className="text-base text-muted-foreground">Upload your resume, enter your IRATA number, set your expected pay rate. Every application you send includes this information automatically. No more typing the same details into 50 different forms.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.technicianJobBoard.whoBenefits.technicians.benefit2Title', 'Apply once, your credentials follow everywhere')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.technicianJobBoard.whoBenefits.technicians.benefit2Desc', 'Upload your resume, enter your IRATA number, set your expected pay rate. Every application you send includes this information automatically. No more typing the same details into 50 different forms.')}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">You control who sees you</h4>
-                    <p className="text-base text-muted-foreground">Toggle profile visibility on when you're actively looking. Toggle it off when you're not. If you're employed but casually browsing, keep it off. Employers can't find you unless you want them to.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.technicianJobBoard.whoBenefits.technicians.benefit3Title', 'You control who sees you')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.technicianJobBoard.whoBenefits.technicians.benefit3Desc', "Toggle profile visibility on when you're actively looking. Toggle it off when you're not. If you're employed but casually browsing, keep it off. Employers can't find you unless you want them to.")}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Know what they're paying before you apply</h4>
-                    <p className="text-base text-muted-foreground">Many employers list pay ranges on job postings. For those who don't, you can set your expected rate and let them decide if it matches their budget before they reach out.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.technicianJobBoard.whoBenefits.technicians.benefit4Title', 'Know what they\'re paying before you apply')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.technicianJobBoard.whoBenefits.technicians.benefit4Desc', "Many employers list pay ranges on job postings. For those who don't, you can set your expected rate and let them decide if it matches their budget before they reach out.")}</p>
                   </div>
                 </div>
               </CardContent>
@@ -326,14 +326,14 @@ export default function TechnicianJobBoardLanding() {
                   <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
                     <Briefcase className="w-5 h-5 text-blue-600" />
                   </div>
-                  <CardTitle className="text-xl">For Employers</CardTitle>
+                  <CardTitle className="text-xl">{t('modules.technicianJobBoard.whoBenefits.employers.title', 'For Employers')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-6 space-y-4">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Find technicians who match your requirements</h4>
-                    <p className="text-base text-muted-foreground">Search the Talent Browser by certification level, location, experience, and expected pay rate. See safety ratings before reaching out. Send offers directly to candidates who fit.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.technicianJobBoard.whoBenefits.employers.benefit1Title', 'Find technicians who match your requirements')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.technicianJobBoard.whoBenefits.employers.benefit1Desc', 'Search the Talent Browser by certification level, location, experience, and expected pay rate. See safety ratings before reaching out. Send offers directly to candidates who fit.')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -346,14 +346,14 @@ export default function TechnicianJobBoardLanding() {
                   <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center">
                     <Building2 className="w-5 h-5 text-violet-600" />
                   </div>
-                  <CardTitle className="text-xl">For Building Managers</CardTitle>
+                  <CardTitle className="text-xl">{t('modules.technicianJobBoard.whoBenefits.buildingManagers.title', 'For Building Managers')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-6 space-y-4">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Verify contractor hiring standards</h4>
-                    <p className="text-base text-muted-foreground">When contractors use OnRopePro, their technicians have documented credentials and safety ratings. You're not trusting their word. You're seeing verified data.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.technicianJobBoard.whoBenefits.buildingManagers.benefit1Title', 'Verify contractor hiring standards')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.technicianJobBoard.whoBenefits.buildingManagers.benefit1Desc', "When contractors use OnRopePro, their technicians have documented credentials and safety ratings. You're not trusting their word. You're seeing verified data.")}</p>
                   </div>
                 </div>
               </CardContent>
@@ -366,14 +366,14 @@ export default function TechnicianJobBoardLanding() {
                   <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center">
                     <Globe className="w-5 h-5 text-emerald-600" />
                   </div>
-                  <CardTitle className="text-xl">For Property Managers</CardTitle>
+                  <CardTitle className="text-xl">{t('modules.technicianJobBoard.whoBenefits.propertyManagers.title', 'For Property Managers')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-6 space-y-4">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Confidence in service provider quality</h4>
-                    <p className="text-base text-muted-foreground">The technicians doing work on your properties are part of a verified ecosystem. IRATA/SPRAT certifications are confirmed. Safety ratings are earned through real activity.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.technicianJobBoard.whoBenefits.propertyManagers.benefit1Title', 'Confidence in service provider quality')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.technicianJobBoard.whoBenefits.propertyManagers.benefit1Desc', 'The technicians doing work on your properties are part of a verified ecosystem. IRATA/SPRAT certifications are confirmed. Safety ratings are earned through real activity.')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -388,10 +388,10 @@ export default function TechnicianJobBoardLanding() {
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Key Features
+            {t('modules.technicianJobBoard.keyFeatures.title', 'Key Features')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-            The Job Board puts you in control of your career
+            {t('modules.technicianJobBoard.keyFeatures.subtitle', 'The Job Board puts you in control of your career')}
           </p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -400,11 +400,11 @@ export default function TechnicianJobBoardLanding() {
                 <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-2">
                   <Lock className="w-5 h-5 text-blue-600" />
                 </div>
-                <CardTitle className="text-lg">Closed Ecosystem</CardTitle>
+                <CardTitle className="text-lg">{t('modules.technicianJobBoard.keyFeatures.closedEcosystem.title', 'Closed Ecosystem')}</CardTitle>
               </CardHeader>
               <CardContent className="text-base text-muted-foreground">
-                <p>Only rope access building maintenance companies post here. No general contractors. No staffing agencies. No offshore platforms.</p>
-                <p className="mt-2">When you apply, you know the company does what you do.</p>
+                <p>{t('modules.technicianJobBoard.keyFeatures.closedEcosystem.desc1', 'Only rope access building maintenance companies post here. No general contractors. No staffing agencies. No offshore platforms.')}</p>
+                <p className="mt-2">{t('modules.technicianJobBoard.keyFeatures.closedEcosystem.desc2', 'When you apply, you know the company does what you do.')}</p>
               </CardContent>
             </Card>
 
@@ -413,11 +413,11 @@ export default function TechnicianJobBoardLanding() {
                 <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center mb-2">
                   <Zap className="w-5 h-5 text-emerald-600" />
                 </div>
-                <CardTitle className="text-lg">Instant Applications</CardTitle>
+                <CardTitle className="text-lg">{t('modules.technicianJobBoard.keyFeatures.instantApplications.title', 'Instant Applications')}</CardTitle>
               </CardHeader>
               <CardContent className="text-base text-muted-foreground">
-                <p>Your profile data, resume, certifications, and safety rating attach to every application.</p>
-                <p className="mt-2">One click to apply. No forms to fill. 30 seconds from browsing to applied.</p>
+                <p>{t('modules.technicianJobBoard.keyFeatures.instantApplications.desc1', 'Your profile data, resume, certifications, and safety rating attach to every application.')}</p>
+                <p className="mt-2">{t('modules.technicianJobBoard.keyFeatures.instantApplications.desc2', 'One click to apply. No forms to fill. 30 seconds from browsing to applied.')}</p>
               </CardContent>
             </Card>
 
@@ -426,11 +426,11 @@ export default function TechnicianJobBoardLanding() {
                 <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center mb-2">
                   <Send className="w-5 h-5 text-amber-600" />
                 </div>
-                <CardTitle className="text-lg">Direct Job Offers</CardTitle>
+                <CardTitle className="text-lg">{t('modules.technicianJobBoard.keyFeatures.directOffers.title', 'Direct Job Offers')}</CardTitle>
               </CardHeader>
               <CardContent className="text-base text-muted-foreground">
-                <p>When your profile visibility is on, employers can send you offers directly from the Talent Browser.</p>
-                <p className="mt-2">Accept or decline with one tap. No email chains. No phone tag.</p>
+                <p>{t('modules.technicianJobBoard.keyFeatures.directOffers.desc1', 'When your profile visibility is on, employers can send you offers directly from the Talent Browser.')}</p>
+                <p className="mt-2">{t('modules.technicianJobBoard.keyFeatures.directOffers.desc2', 'Accept or decline with one tap. No email chains. No phone tag.')}</p>
               </CardContent>
             </Card>
 
@@ -439,11 +439,11 @@ export default function TechnicianJobBoardLanding() {
                 <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center mb-2">
                   <DollarSign className="w-5 h-5 text-violet-600" />
                 </div>
-                <CardTitle className="text-lg">Expected Pay Rate</CardTitle>
+                <CardTitle className="text-lg">{t('modules.technicianJobBoard.keyFeatures.expectedPayRate.title', 'Expected Pay Rate')}</CardTitle>
               </CardHeader>
               <CardContent className="text-base text-muted-foreground">
-                <p>Set what you want to earn. Employers see this in the Talent Browser.</p>
-                <p className="mt-2">If someone can't meet your rate, they won't waste your time with an interview. Salary mismatches get filtered before they happen.</p>
+                <p>{t('modules.technicianJobBoard.keyFeatures.expectedPayRate.desc1', 'Set what you want to earn. Employers see this in the Talent Browser.')}</p>
+                <p className="mt-2">{t('modules.technicianJobBoard.keyFeatures.expectedPayRate.desc2', "If someone can't meet your rate, they won't waste your time with an interview. Salary mismatches get filtered before they happen.")}</p>
               </CardContent>
             </Card>
 
@@ -452,11 +452,11 @@ export default function TechnicianJobBoardLanding() {
                 <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center mb-2">
                   <Shield className="w-5 h-5 text-rose-600" />
                 </div>
-                <CardTitle className="text-lg">Safety Rating Display</CardTitle>
+                <CardTitle className="text-lg">{t('modules.technicianJobBoard.keyFeatures.safetyRating.title', 'Safety Rating Display')}</CardTitle>
               </CardHeader>
               <CardContent className="text-base text-muted-foreground">
-                <p>Your Individual Safety Rating (0-100) shows employers you take the work seriously.</p>
-                <p className="mt-2">Built from harness inspections, toolbox talks, safety quizzes. A high score is a competitive advantage.</p>
+                <p>{t('modules.technicianJobBoard.keyFeatures.safetyRating.desc1', 'Your Individual Safety Rating (0-100) shows employers you take the work seriously.')}</p>
+                <p className="mt-2">{t('modules.technicianJobBoard.keyFeatures.safetyRating.desc2', 'Built from harness inspections, toolbox talks, safety quizzes. A high score is a competitive advantage.')}</p>
               </CardContent>
             </Card>
 
@@ -465,11 +465,11 @@ export default function TechnicianJobBoardLanding() {
                 <div className="w-10 h-10 rounded-lg bg-cyan-100 dark:bg-cyan-900 flex items-center justify-center mb-2">
                   <BarChart3 className="w-5 h-5 text-cyan-600" />
                 </div>
-                <CardTitle className="text-lg">Application Status Tracking</CardTitle>
+                <CardTitle className="text-lg">{t('modules.technicianJobBoard.keyFeatures.statusTracking.title', 'Application Status Tracking')}</CardTitle>
               </CardHeader>
               <CardContent className="text-base text-muted-foreground">
-                <p>See where each application stands. Under review. Shortlisted. Offer extended. Declined.</p>
-                <p className="mt-2">No more "did they even see my resume?" uncertainty.</p>
+                <p>{t('modules.technicianJobBoard.keyFeatures.statusTracking.desc1', 'See where each application stands. Under review. Shortlisted. Offer extended. Declined.')}</p>
+                <p className="mt-2">{t('modules.technicianJobBoard.keyFeatures.statusTracking.desc2', 'No more "did they even see my resume?" uncertainty.')}</p>
               </CardContent>
             </Card>
           </div>
@@ -482,10 +482,10 @@ export default function TechnicianJobBoardLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between flex-wrap gap-4 mb-8">
-            <h2 className="text-3xl md:text-4xl font-bold">Problems Solved</h2>
+            <h2 className="text-3xl md:text-4xl font-bold">{t('modules.technicianJobBoard.problemsSolved.title', 'Problems Solved')}</h2>
             <Button onClick={toggleAll} variant="outline" data-testid="button-toggle-all-accordions">
               <ChevronsUpDown className="w-4 h-4 mr-2" />
-              {allExpanded ? "Collapse All" : "Expand All"}
+              {allExpanded ? t('modules.technicianJobBoard.problemsSolved.collapseAll', 'Collapse All') : t('modules.technicianJobBoard.problemsSolved.expandAll', 'Expand All')}
             </Button>
           </div>
 
@@ -493,55 +493,55 @@ export default function TechnicianJobBoardLanding() {
           <div className="space-y-6">
             <div className="flex items-center gap-3 pb-2 border-b">
               <HardHat className="w-5 h-5 text-amber-500" />
-              <h3 className="text-xl md:text-2xl font-semibold">For Technicians</h3>
+              <h3 className="text-xl md:text-2xl font-semibold">{t('modules.technicianJobBoard.problemsSolved.forTechnicians', 'For Technicians')}</h3>
             </div>
 
             <Accordion type="multiple" value={openItems} onValueChange={setOpenItems} className="space-y-3">
               <AccordionItem value="tech-1" className="border rounded-lg px-4 data-[state=open]:bg-white dark:data-[state=open]:bg-white/10">
                 <AccordionTrigger className="text-left font-medium" data-testid="accordion-tech-1">
-                  "I search 'rope access' on Indeed and get pipe fitter and offshore oil jobs."
+                  {t('modules.technicianJobBoard.problemsSolved.tech1.question', '"I search \'rope access\' on Indeed and get pipe fitter and offshore oil jobs."')}
                 </AccordionTrigger>
                 <AccordionContent className="space-y-4 text-muted-foreground pb-4">
-                  <p><span className="font-medium text-foreground">The Pain:</span> You want rope access building maintenance work. You search Indeed. Results: industrial access at refineries, offshore platforms, general construction that mentions "heights."</p>
-                  <p><span className="font-medium text-foreground">Real Example:</span> You scroll for 30 minutes to find 2-3 maybe-relevant postings. Most are offshore rigs or industrial sites, not buildings.</p>
-                  <p><span className="font-medium text-foreground">Solution:</span> OnRopePro's Job Board is exclusively for rope access building maintenance. Every job is window washing, caulking, pressure washing, gutter cleaning, painting, or visual inspection on buildings.</p>
-                  <p><span className="font-medium text-foreground">Benefit:</span> 100% relevant listings. Zero scrolling through irrelevant postings. Find what you're looking for immediately.</p>
+                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.thePain', 'The Pain:')}</span> {t('modules.technicianJobBoard.problemsSolved.tech1.pain', 'You want rope access building maintenance work. You search Indeed. Results: industrial access at refineries, offshore platforms, general construction that mentions "heights."')}</p>
+                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.realExample', 'Real Example:')}</span> {t('modules.technicianJobBoard.problemsSolved.tech1.example', 'You scroll for 30 minutes to find 2-3 maybe-relevant postings. Most are offshore rigs or industrial sites, not buildings.')}</p>
+                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.solution', 'Solution:')}</span> {t('modules.technicianJobBoard.problemsSolved.tech1.solution', "OnRopePro's Job Board is exclusively for rope access building maintenance. Every job is window washing, caulking, pressure washing, gutter cleaning, painting, or visual inspection on buildings.")}</p>
+                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.benefit', 'Benefit:')}</span> {t('modules.technicianJobBoard.problemsSolved.tech1.benefit', '100% relevant listings. Zero scrolling through irrelevant postings. Find what you\'re looking for immediately.')}</p>
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="tech-2" className="border rounded-lg px-4 data-[state=open]:bg-white dark:data-[state=open]:bg-white/10">
                 <AccordionTrigger className="text-left font-medium" data-testid="accordion-tech-2">
-                  "I apply to jobs and manually enter my IRATA number every single time."
+                  {t('modules.technicianJobBoard.problemsSolved.tech2.question', '"I apply to jobs and manually enter my IRATA number every single time."')}
                 </AccordionTrigger>
                 <AccordionContent className="space-y-4 text-muted-foreground pb-4">
-                  <p><span className="font-medium text-foreground">The Pain:</span> Indeed doesn't have a field for IRATA certification. Neither does LinkedIn. You upload your resume, then manually type your cert number into a notes field.</p>
-                  <p><span className="font-medium text-foreground">Real Example:</span> Sometimes you forget. Sometimes they don't even read it. You've typed your IRATA number into 50+ job applications this year.</p>
-                  <p><span className="font-medium text-foreground">Solution:</span> On OnRopePro, your IRATA/SPRAT certification is part of your profile. It attaches to every application automatically.</p>
-                  <p><span className="font-medium text-foreground">Benefit:</span> Employers see your cert level, your number, your expiration date. No manual entry. No forgotten information. Apply in 30 seconds instead of 15-20 minutes.</p>
+                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.thePain', 'The Pain:')}</span> {t('modules.technicianJobBoard.problemsSolved.tech2.pain', "Indeed doesn't have a field for IRATA certification. Neither does LinkedIn. You upload your resume, then manually type your cert number into a notes field.")}</p>
+                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.realExample', 'Real Example:')}</span> {t('modules.technicianJobBoard.problemsSolved.tech2.example', "Sometimes you forget. Sometimes they don't even read it. You've typed your IRATA number into 50+ job applications this year.")}</p>
+                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.solution', 'Solution:')}</span> {t('modules.technicianJobBoard.problemsSolved.tech2.solution', 'On OnRopePro, your IRATA/SPRAT certification is part of your profile. It attaches to every application automatically.')}</p>
+                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.benefit', 'Benefit:')}</span> {t('modules.technicianJobBoard.problemsSolved.tech2.benefit', 'Employers see your cert level, your number, your expiration date. No manual entry. No forgotten information. Apply in 30 seconds instead of 15-20 minutes.')}</p>
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="tech-3" className="border rounded-lg px-4 data-[state=open]:bg-white dark:data-[state=open]:bg-white/10">
                 <AccordionTrigger className="text-left font-medium" data-testid="accordion-tech-3">
-                  "I don't want my current employer to know I'm looking for work."
+                  {t('modules.technicianJobBoard.problemsSolved.tech3.question', '"I don\'t want my current employer to know I\'m looking for work."')}
                 </AccordionTrigger>
                 <AccordionContent className="space-y-4 text-muted-foreground pb-4">
-                  <p><span className="font-medium text-foreground">The Pain:</span> You're employed. It's fine. But you wouldn't mind seeing what else is out there. Problem: if you make yourself visible on a job board, your boss might find out.</p>
-                  <p><span className="font-medium text-foreground">Real Example:</span> You set your LinkedIn to "Open to Work" and your supervisor asks about it the next day. Awkward conversation ahead.</p>
-                  <p><span className="font-medium text-foreground">Solution:</span> Profile visibility is opt-in. Keep it toggled off: you can browse jobs, apply to postings, and stay invisible to the Talent Browser.</p>
-                  <p><span className="font-medium text-foreground">Benefit:</span> Your current employer can't stumble across your profile. Toggle it on only when you're ready to be found.</p>
+                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.thePain', 'The Pain:')}</span> {t('modules.technicianJobBoard.problemsSolved.tech3.pain', "You're employed. It's fine. But you wouldn't mind seeing what else is out there. Problem: if you make yourself visible on a job board, your boss might find out.")}</p>
+                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.realExample', 'Real Example:')}</span> {t('modules.technicianJobBoard.problemsSolved.tech3.example', 'You set your LinkedIn to "Open to Work" and your supervisor asks about it the next day. Awkward conversation ahead.')}</p>
+                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.solution', 'Solution:')}</span> {t('modules.technicianJobBoard.problemsSolved.tech3.solution', "Profile visibility is opt-in. Keep it toggled off: you can browse jobs, apply to postings, and stay invisible to the Talent Browser.")}</p>
+                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.benefit', 'Benefit:')}</span> {t('modules.technicianJobBoard.problemsSolved.tech3.benefit', "Your current employer can't stumble across your profile. Toggle it on only when you're ready to be found.")}</p>
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="tech-4" className="border rounded-lg px-4 data-[state=open]:bg-white dark:data-[state=open]:bg-white/10">
                 <AccordionTrigger className="text-left font-medium" data-testid="accordion-tech-4">
-                  "I spent an hour interviewing for a job that pays $15/hour less than I need."
+                  {t('modules.technicianJobBoard.problemsSolved.tech4.question', '"I spent an hour interviewing for a job that pays $15/hour less than I need."')}
                 </AccordionTrigger>
                 <AccordionContent className="space-y-4 text-muted-foreground pb-4">
-                  <p><span className="font-medium text-foreground">The Pain:</span> The listing didn't show pay. You applied, interviewed, got along great with the owner. Then they offered $45/hour. You need $60 to make the numbers work.</p>
-                  <p><span className="font-medium text-foreground">Real Example:</span> An hour of your time wasted. An hour of their time wasted. You're back to scrolling Indeed.</p>
-                  <p><span className="font-medium text-foreground">Solution:</span> Set your expected pay rate in your profile. Employers see it in the Talent Browser. If they can't meet your number, they won't reach out.</p>
-                  <p><span className="font-medium text-foreground">Benefit:</span> Compensation mismatches get filtered before the interview, not during. No more wasted interviews on jobs that can't meet your rate.</p>
+                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.thePain', 'The Pain:')}</span> {t('modules.technicianJobBoard.problemsSolved.tech4.pain', "The listing didn't show pay. You applied, interviewed, got along great with the owner. Then they offered $45/hour. You need $60 to make the numbers work.")}</p>
+                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.realExample', 'Real Example:')}</span> {t('modules.technicianJobBoard.problemsSolved.tech4.example', "An hour of your time wasted. An hour of their time wasted. You're back to scrolling Indeed.")}</p>
+                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.solution', 'Solution:')}</span> {t('modules.technicianJobBoard.problemsSolved.tech4.solution', "Set your expected pay rate in your profile. Employers see it in the Talent Browser. If they can't meet your number, they won't reach out.")}</p>
+                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.benefit', 'Benefit:')}</span> {t('modules.technicianJobBoard.problemsSolved.tech4.benefit', "Compensation mismatches get filtered before the interview, not during. No more wasted interviews on jobs that can't meet your rate.")}</p>
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
@@ -549,31 +549,31 @@ export default function TechnicianJobBoardLanding() {
             {/* For Currently Employed Technicians */}
             <div className="flex items-center gap-3 pb-2 border-b mt-12">
               <Briefcase className="w-5 h-5 text-blue-500" />
-              <h3 className="text-xl md:text-2xl font-semibold">For Currently Employed Technicians</h3>
+              <h3 className="text-xl md:text-2xl font-semibold">{t('modules.technicianJobBoard.problemsSolved.forEmployed', 'For Currently Employed Technicians')}</h3>
             </div>
 
             <Accordion type="multiple" value={openItems} onValueChange={setOpenItems} className="space-y-3">
               <AccordionItem value="employed-1" className="border rounded-lg px-4 data-[state=open]:bg-white dark:data-[state=open]:bg-white/10">
                 <AccordionTrigger className="text-left font-medium" data-testid="accordion-employed-1">
-                  "I want to know what's out there without broadcasting that I'm looking."
+                  {t('modules.technicianJobBoard.problemsSolved.employed1.question', '"I want to know what\'s out there without broadcasting that I\'m looking."')}
                 </AccordionTrigger>
                 <AccordionContent className="space-y-4 text-muted-foreground pb-4">
-                  <p><span className="font-medium text-foreground">The Pain:</span> You're not unhappy at your current job. But opportunities come and go. You'd like to see what companies are hiring without announcing to the industry that you're on the market.</p>
-                  <p><span className="font-medium text-foreground">Real Example:</span> You check LinkedIn's job section but worry that your activity is visible. Rope access is a small industry. Word gets around.</p>
-                  <p><span className="font-medium text-foreground">Solution:</span> Keep profile visibility off. Browse job postings anonymously. Apply selectively to positions that genuinely interest you.</p>
-                  <p><span className="font-medium text-foreground">Benefit:</span> No one knows you're looking unless you tell them. Stay informed about the market without risking your current position.</p>
+                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.thePain', 'The Pain:')}</span> {t('modules.technicianJobBoard.problemsSolved.employed1.pain', "You're not unhappy at your current job. But opportunities come and go. You'd like to see what companies are hiring without announcing to the industry that you're on the market.")}</p>
+                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.realExample', 'Real Example:')}</span> {t('modules.technicianJobBoard.problemsSolved.employed1.example', "You check LinkedIn's job section but worry that your activity is visible. Rope access is a small industry. Word gets around.")}</p>
+                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.solution', 'Solution:')}</span> {t('modules.technicianJobBoard.problemsSolved.employed1.solution', 'Keep profile visibility off. Browse job postings anonymously. Apply selectively to positions that genuinely interest you.')}</p>
+                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.benefit', 'Benefit:')}</span> {t('modules.technicianJobBoard.problemsSolved.employed1.benefit', 'No one knows you\'re looking unless you tell them. Stay informed about the market without risking your current position.')}</p>
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="employed-2" className="border rounded-lg px-4 data-[state=open]:bg-white dark:data-[state=open]:bg-white/10">
                 <AccordionTrigger className="text-left font-medium" data-testid="accordion-employed-2">
-                  "I have no way to build a reputation that follows me between employers."
+                  {t('modules.technicianJobBoard.problemsSolved.employed2.question', '"I have no way to build a reputation that follows me between employers."')}
                 </AccordionTrigger>
                 <AccordionContent className="space-y-4 text-muted-foreground pb-4">
-                  <p><span className="font-medium text-foreground">The Pain:</span> You've worked safely for five years. Never had an incident. Your current employer knows it. But when you apply to a new company, you start from zero.</p>
-                  <p><span className="font-medium text-foreground">Real Example:</span> No documented track record. Just your word. The new employer has no way to verify your safety history.</p>
-                  <p><span className="font-medium text-foreground">Solution:</span> Your Individual Safety Rating travels with you. Built from harness inspections, toolbox talks, near-miss reports, safety quizzes.</p>
-                  <p><span className="font-medium text-foreground">Benefit:</span> When you apply to a new job, employers see your score. Five years of safe work becomes a competitive advantage, not just a claim on your resume.</p>
+                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.thePain', 'The Pain:')}</span> {t('modules.technicianJobBoard.problemsSolved.employed2.pain', "You've worked safely for five years. Never had an incident. Your current employer knows it. But when you apply to a new company, you start from zero.")}</p>
+                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.realExample', 'Real Example:')}</span> {t('modules.technicianJobBoard.problemsSolved.employed2.example', 'No documented track record. Just your word. The new employer has no way to verify your safety history.')}</p>
+                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.solution', 'Solution:')}</span> {t('modules.technicianJobBoard.problemsSolved.employed2.solution', 'Your Individual Safety Rating travels with you. Built from harness inspections, toolbox talks, near-miss reports, safety quizzes.')}</p>
+                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.benefit', 'Benefit:')}</span> {t('modules.technicianJobBoard.problemsSolved.employed2.benefit', 'When you apply to a new job, employers see your score. Five years of safe work becomes a competitive advantage, not just a claim on your resume.')}</p>
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
@@ -587,10 +587,10 @@ export default function TechnicianJobBoardLanding() {
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Connected Modules
+            {t('modules.technicianJobBoard.connectedModules.title', 'Connected Modules')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-            The Job Board connects to your professional profile across the platform
+            {t('modules.technicianJobBoard.connectedModules.subtitle', 'The Job Board connects to your professional profile across the platform')}
           </p>
 
           <div className="grid md:grid-cols-2 gap-6">
@@ -600,12 +600,12 @@ export default function TechnicianJobBoardLanding() {
                   <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center">
                     <FileText className="w-5 h-5 text-violet-600" />
                   </div>
-                  <CardTitle className="text-lg">Document Vault</CardTitle>
+                  <CardTitle className="text-lg">{t('modules.technicianJobBoard.connectedModules.documentVault.title', 'Document Vault')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="text-base text-muted-foreground">
-                <p>Your certifications, resume, banking info, and emergency contacts are stored securely.</p>
-                <p className="mt-2">When you accept a job offer, share them with your new employer in one click. No hunting for void cheques.</p>
+                <p>{t('modules.technicianJobBoard.connectedModules.documentVault.desc1', 'Your certifications, resume, banking info, and emergency contacts are stored securely.')}</p>
+                <p className="mt-2">{t('modules.technicianJobBoard.connectedModules.documentVault.desc2', 'When you accept a job offer, share them with your new employer in one click. No hunting for void cheques.')}</p>
               </CardContent>
             </Card>
 
@@ -615,12 +615,12 @@ export default function TechnicianJobBoardLanding() {
                   <div className="w-10 h-10 rounded-lg bg-sky-100 dark:bg-sky-900 flex items-center justify-center">
                     <Shield className="w-5 h-5 text-sky-600" />
                   </div>
-                  <CardTitle className="text-lg">Safety & Compliance</CardTitle>
+                  <CardTitle className="text-lg">{t('modules.technicianJobBoard.connectedModules.safetyCompliance.title', 'Safety & Compliance')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="text-base text-muted-foreground">
-                <p>Your Individual Safety Rating builds from real activity: daily harness inspections, toolbox talk participation, safety quizzes.</p>
-                <p className="mt-2">Employers see a number you earned, not a number you claimed.</p>
+                <p>{t('modules.technicianJobBoard.connectedModules.safetyCompliance.desc1', 'Your Individual Safety Rating builds from real activity: daily harness inspections, toolbox talk participation, safety quizzes.')}</p>
+                <p className="mt-2">{t('modules.technicianJobBoard.connectedModules.safetyCompliance.desc2', 'Employers see a number you earned, not a number you claimed.')}</p>
               </CardContent>
             </Card>
 
@@ -630,12 +630,12 @@ export default function TechnicianJobBoardLanding() {
                   <div className="w-10 h-10 rounded-lg bg-cyan-100 dark:bg-cyan-900 flex items-center justify-center">
                     <ClipboardList className="w-5 h-5 text-cyan-600" />
                   </div>
-                  <CardTitle className="text-lg">Logbook</CardTitle>
+                  <CardTitle className="text-lg">{t('modules.technicianJobBoard.connectedModules.logbook.title', 'Logbook')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="text-base text-muted-foreground">
-                <p>Your work history, hours logged, buildings completed, and tasks performed.</p>
-                <p className="mt-2">Accepting a new job? Your track record travels with you.</p>
+                <p>{t('modules.technicianJobBoard.connectedModules.logbook.desc1', 'Your work history, hours logged, buildings completed, and tasks performed.')}</p>
+                <p className="mt-2">{t('modules.technicianJobBoard.connectedModules.logbook.desc2', 'Accepting a new job? Your track record travels with you.')}</p>
               </CardContent>
             </Card>
 
@@ -645,12 +645,12 @@ export default function TechnicianJobBoardLanding() {
                   <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
                     <Users className="w-5 h-5 text-blue-600" />
                   </div>
-                  <CardTitle className="text-lg">Employee Management</CardTitle>
+                  <CardTitle className="text-lg">{t('modules.technicianJobBoard.connectedModules.employeeManagement.title', 'Employee Management')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="text-base text-muted-foreground">
-                <p>When you accept an offer, your profile data flows to your new employer's system.</p>
-                <p className="mt-2">IRATA number, certifications, contact details. Day-one ready without the paperwork.</p>
+                <p>{t('modules.technicianJobBoard.connectedModules.employeeManagement.desc1', "When you accept an offer, your profile data flows to your new employer's system.")}</p>
+                <p className="mt-2">{t('modules.technicianJobBoard.connectedModules.employeeManagement.desc2', 'IRATA number, certifications, contact details. Day-one ready without the paperwork.')}</p>
               </CardContent>
             </Card>
           </div>
@@ -663,79 +663,79 @@ export default function TechnicianJobBoardLanding() {
       <section id="faqs" className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-            Frequently Asked Questions
+            {t('modules.technicianJobBoard.faqs.title', 'Frequently Asked Questions')}
           </h2>
 
           <Accordion type="multiple" value={faqOpenItems} onValueChange={setFaqOpenItems} className="space-y-3">
             <AccordionItem value="faq-1" className="border rounded-lg px-4">
               <AccordionTrigger className="text-left font-medium" data-testid="accordion-faq-1">
-                Do I need to pay to access the job board?
+                {t('modules.technicianJobBoard.faqs.faq1.question', 'Do I need to pay to access the job board?')}
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground pb-4">
-                Free tier accounts can browse job postings. Plus accounts get full job board access including profile visibility options and the ability to receive direct offers from employers.
+                {t('modules.technicianJobBoard.faqs.faq1.answer', 'Free tier accounts can browse job postings. Plus accounts get full job board access including profile visibility options and the ability to receive direct offers from employers.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-2" className="border rounded-lg px-4">
               <AccordionTrigger className="text-left font-medium" data-testid="accordion-faq-2">
-                Can my current employer see that I'm looking for work?
+                {t('modules.technicianJobBoard.faqs.faq2.question', 'Can my current employer see that I\'m looking for work?')}
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground pb-4">
-                Only if you toggle profile visibility on. Keep it off and you're invisible to the Talent Browser. You can still browse and apply to jobs without anyone knowing.
+                {t('modules.technicianJobBoard.faqs.faq2.answer', 'Only if you toggle profile visibility on. Keep it off and you\'re invisible to the Talent Browser. You can still browse and apply to jobs without anyone knowing.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-3" className="border rounded-lg px-4">
               <AccordionTrigger className="text-left font-medium" data-testid="accordion-faq-3">
-                What if I'm not employed right now?
+                {t('modules.technicianJobBoard.faqs.faq3.question', 'What if I\'m not employed right now?')}
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground pb-4">
-                You can still create an account, upload your certifications, and apply to jobs. Your safety rating will build once you're connected to an employer on the platform.
+                {t('modules.technicianJobBoard.faqs.faq3.answer', 'You can still create an account, upload your certifications, and apply to jobs. Your safety rating will build once you\'re connected to an employer on the platform.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-4" className="border rounded-lg px-4">
               <AccordionTrigger className="text-left font-medium" data-testid="accordion-faq-4">
-                How does the expected pay rate work?
+                {t('modules.technicianJobBoard.faqs.faq4.question', 'How does the expected pay rate work?')}
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground pb-4">
-                You set what you want to earn per hour. Employers see this when they browse the Talent Browser. If your rate is $55/hour and they're offering $40, they can choose not to reach out. Saves everyone time.
+                {t('modules.technicianJobBoard.faqs.faq4.answer', "You set what you want to earn per hour. Employers see this when they browse the Talent Browser. If your rate is $55/hour and they're offering $40, they can choose not to reach out. Saves everyone time.")}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-5" className="border rounded-lg px-4">
               <AccordionTrigger className="text-left font-medium" data-testid="accordion-faq-5">
-                What happens when I accept a job offer?
+                {t('modules.technicianJobBoard.faqs.faq5.question', 'What happens when I accept a job offer?')}
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground pb-4">
-                If the employer uses OnRopePro, onboarding is nearly instant. Your profile data flows to their system. They enter your pay rate and permissions. You're ready to work on day one without re-entering your information.
+                {t('modules.technicianJobBoard.faqs.faq5.answer', "If the employer uses OnRopePro, onboarding is nearly instant. Your profile data flows to their system. They enter your pay rate and permissions. You're ready to work on day one without re-entering your information.")}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-6" className="border rounded-lg px-4">
               <AccordionTrigger className="text-left font-medium" data-testid="accordion-faq-6">
-                What certifications do I need to use the job board?
+                {t('modules.technicianJobBoard.faqs.faq6.question', 'What certifications do I need to use the job board?')}
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground pb-4">
-                The job board is for rope access building maintenance professionals. Most employers will require IRATA or SPRAT certification. You can list your certification level and number in your profile.
+                {t('modules.technicianJobBoard.faqs.faq6.answer', 'The job board is for rope access building maintenance professionals. Most employers will require IRATA or SPRAT certification. You can list your certification level and number in your profile.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-7" className="border rounded-lg px-4">
               <AccordionTrigger className="text-left font-medium" data-testid="accordion-faq-7">
-                Can I apply to multiple jobs at the same time?
+                {t('modules.technicianJobBoard.faqs.faq7.question', 'Can I apply to multiple jobs at the same time?')}
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground pb-4">
-                Yes. Apply to as many jobs as interest you. Track each application's status from your dashboard.
+                {t('modules.technicianJobBoard.faqs.faq7.answer', "Yes. Apply to as many jobs as interest you. Track each application's status from your dashboard.")}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-8" className="border rounded-lg px-4">
               <AccordionTrigger className="text-left font-medium" data-testid="accordion-faq-8">
-                What if an employer sends me an offer but I'm not interested?
+                {t('modules.technicianJobBoard.faqs.faq8.question', 'What if an employer sends me an offer but I\'m not interested?')}
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground pb-4">
-                Decline it with one tap. The employer gets notified. No awkward phone calls required.
+                {t('modules.technicianJobBoard.faqs.faq8.answer', 'Decline it with one tap. The employer gets notified. No awkward phone calls required.')}
               </AccordionContent>
             </AccordionItem>
           </Accordion>
@@ -748,7 +748,7 @@ export default function TechnicianJobBoardLanding() {
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-            Access Requirements
+            {t('modules.technicianJobBoard.accessRequirements.title', 'Access Requirements')}
           </h2>
 
           <Card>
@@ -757,46 +757,46 @@ export default function TechnicianJobBoardLanding() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b bg-muted/50">
-                      <th className="text-left p-4 font-semibold">Feature</th>
-                      <th className="text-center p-4 font-semibold">Free Tier</th>
+                      <th className="text-left p-4 font-semibold">{t('modules.technicianJobBoard.accessRequirements.feature', 'Feature')}</th>
+                      <th className="text-center p-4 font-semibold">{t('modules.technicianJobBoard.accessRequirements.freeTier', 'Free Tier')}</th>
                       <th className="text-center p-4 font-semibold">
                         <span className="flex items-center justify-center gap-2">
                           <Star className="w-4 h-4 text-amber-500" />
-                          Plus Account
+                          {t('modules.technicianJobBoard.accessRequirements.plusAccount', 'Plus Account')}
                         </span>
                       </th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr className="border-b">
-                      <td className="p-4">Browse Job Postings</td>
+                      <td className="p-4">{t('modules.technicianJobBoard.accessRequirements.browseJobs', 'Browse Job Postings')}</td>
                       <td className="p-4 text-center"><CheckCircle2 className="w-5 h-5 text-emerald-600 mx-auto" /></td>
                       <td className="p-4 text-center"><CheckCircle2 className="w-5 h-5 text-emerald-600 mx-auto" /></td>
                     </tr>
                     <tr className="border-b">
-                      <td className="p-4">Apply to Jobs</td>
-                      <td className="p-4 text-center text-muted-foreground">Limited</td>
+                      <td className="p-4">{t('modules.technicianJobBoard.accessRequirements.applyToJobs', 'Apply to Jobs')}</td>
+                      <td className="p-4 text-center text-muted-foreground">{t('modules.technicianJobBoard.accessRequirements.limited', 'Limited')}</td>
                       <td className="p-4 text-center"><CheckCircle2 className="w-5 h-5 text-emerald-600 mx-auto" /></td>
                     </tr>
                     <tr className="border-b">
-                      <td className="p-4">Profile Visibility Toggle</td>
+                      <td className="p-4">{t('modules.technicianJobBoard.accessRequirements.profileVisibility', 'Profile Visibility Toggle')}</td>
                       <td className="p-4 text-center text-muted-foreground">-</td>
                       <td className="p-4 text-center"><CheckCircle2 className="w-5 h-5 text-emerald-600 mx-auto" /></td>
                     </tr>
                     <tr className="border-b">
-                      <td className="p-4">Receive Direct Offers</td>
+                      <td className="p-4">{t('modules.technicianJobBoard.accessRequirements.receiveOffers', 'Receive Direct Offers')}</td>
                       <td className="p-4 text-center text-muted-foreground">-</td>
                       <td className="p-4 text-center"><CheckCircle2 className="w-5 h-5 text-emerald-600 mx-auto" /></td>
                     </tr>
                     <tr className="border-b">
-                      <td className="p-4">Set Expected Pay Rate</td>
+                      <td className="p-4">{t('modules.technicianJobBoard.accessRequirements.setPayRate', 'Set Expected Pay Rate')}</td>
                       <td className="p-4 text-center text-muted-foreground">-</td>
                       <td className="p-4 text-center"><CheckCircle2 className="w-5 h-5 text-emerald-600 mx-auto" /></td>
                     </tr>
                     <tr>
-                      <td className="p-4">Safety Rating Display</td>
-                      <td className="p-4 text-center text-sm text-muted-foreground">Requires employer</td>
-                      <td className="p-4 text-center text-sm text-muted-foreground">Requires employer</td>
+                      <td className="p-4">{t('modules.technicianJobBoard.accessRequirements.safetyRatingDisplay', 'Safety Rating Display')}</td>
+                      <td className="p-4 text-center text-sm text-muted-foreground">{t('modules.technicianJobBoard.accessRequirements.requiresEmployer', 'Requires employer')}</td>
+                      <td className="p-4 text-center text-sm text-muted-foreground">{t('modules.technicianJobBoard.accessRequirements.requiresEmployer', 'Requires employer')}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -812,22 +812,22 @@ export default function TechnicianJobBoardLanding() {
       <section className="py-20 md:py-28 px-4" style={{backgroundImage: 'linear-gradient(135deg, #0B64A3 0%, #0369A1 100%)'}}>
         <div className="max-w-4xl mx-auto text-center text-white">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
-            Every Job Here Is Rope Access.<br />
-            <span className="text-blue-100">No Exceptions.</span>
+            {t('modules.technicianJobBoard.finalCta.title', 'Every Job Here Is Rope Access.')}<br />
+            <span className="text-blue-100">{t('modules.technicianJobBoard.finalCta.subtitle', 'No Exceptions.')}</span>
           </h2>
           <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Stop scrolling through pipe fitter listings and offshore rigs. OnRopePro's Job Board is built for techs who do rope access building maintenance. Browse jobs, apply in seconds, control who finds you.
+            {t('modules.technicianJobBoard.finalCta.description', "Stop scrolling through pipe fitter listings and offshore rigs. OnRopePro's Job Board is built for techs who do rope access building maintenance. Browse jobs, apply in seconds, control who finds you.")}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-cta-browse">
               <Link href="/technician-login">
-                Browse Jobs Free
+                {t('modules.technicianJobBoard.finalCta.browseJobs', 'Browse Jobs Free')}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>
             <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-cta-plus">
               <Link href="/technician-login">
-                Upgrade to Plus for Full Access
+                {t('modules.technicianJobBoard.finalCta.upgradePlus', 'Upgrade to Plus for Full Access')}
                 <Star className="ml-2 w-5 h-5" />
               </Link>
             </Button>
@@ -839,7 +839,7 @@ export default function TechnicianJobBoardLanding() {
       <footer className="py-8 px-4 bg-slate-900 text-slate-400">
         <div className="max-w-6xl mx-auto text-center">
           <img src={onRopeProLogo} alt="OnRopePro" className="h-8 mx-auto mb-4 opacity-60" />
-          <p className="text-sm">The platform built for rope access building maintenance.</p>
+          <p className="text-sm">{t('modules.technicianJobBoard.footer.tagline', 'The platform built for rope access building maintenance.')}</p>
         </div>
       </footer>
     </div>

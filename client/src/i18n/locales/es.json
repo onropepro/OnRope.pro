@@ -286,7 +286,244 @@
       },
       "payroll": {
         "title": "Nomina y Finanzas",
-        "description": "Exportacion de hojas de tiempo, reportes de costos laborales"
+        "description": "Exportacion de hojas de tiempo, reportes de costos laborales",
+        "hero": {
+          "badge": "Deja de odiar el dia de pago",
+          "title": "Preparacion de nomina que",
+          "titleHighlight": "realmente funciona",
+          "subtitle": "De sesiones de trabajo verificadas a hojas de tiempo listas para exportar. Horas extras calculadas. Costos de proyecto rastreados. Horas que coinciden con tu software contable al primer intento.",
+          "primaryCta": "Prueba gratuita de 60 dias",
+          "secondaryCta": "Ver como funciona"
+        },
+        "stats": {
+          "stat1": {
+            "value": "30min",
+            "label": "Tiempo tipico de preparacion de nomina",
+            "sublabel": "(antes 6-10 horas)"
+          },
+          "stat2": {
+            "value": "95%",
+            "label": "Reduccion en correcciones de nomina"
+          },
+          "stat3": {
+            "value": "260+",
+            "label": "Horas ahorradas anualmente",
+            "sublabel": "(6 semanas de trabajo)"
+          }
+        },
+        "problem": {
+          "title": "El problema de nomina del que nadie habla",
+          "subtitle": "Tus tarifas por hora son correctas. Tus horas de trabajo son correctas. Entonces, por que el dia de pago se siente como una negociacion de rehenes?",
+          "card1": {
+            "title": "El desorden del seguimiento de tiempo",
+            "description": "Tu tecnico registro 8 horas en su libreta. El reloj dice 7.5 horas. El GPS muestra que llego a las 7:45am. Cual numero pagas?"
+          },
+          "card2": {
+            "title": "El misterio de la asignacion",
+            "description": "Sarah trabajo en tres edificios ayer. Como divides sus 8 horas entre tres presupuestos de proyecto diferentes con precision? La mayoria de los duenos adivinan."
+          },
+          "card3": {
+            "title": "La confusion de horas extras",
+            "description": "Dave llego a 40 horas el jueves por la tarde. Trabajo el viernes. Las horas extras se activan diariamente o semanalmente? A 1.5x o 2x? Tu hoja de calculo no sabe."
+          }
+        },
+        "benefits": {
+          "title": "Quien se beneficia de datos de nomina adecuados",
+          "subtitle": "El modulo de Nomina atiende diferentes necesidades para cada rol en tu operacion de acceso con cuerdas.",
+          "owners": {
+            "title": "Para propietarios de empresas de acceso con cuerdas",
+            "benefit1": {
+              "title": "No mas transferencias aleatorias.",
+              "description": "\"Pense que le pague a Dave el viernes\" se convierte en un historial documentado y consultable. Cada pago es rastreado. Cada discrepancia tiene una razon adjunta."
+            },
+            "benefit2": {
+              "title": "Deja de subsidiar proyectos de clientes.",
+              "description": "Con atribucion de proyecto en cada hora, finalmente sabes cuales edificios son rentables. Ese \"buen cliente\" que paga a 60 dias podria en realidad estar costandote dinero."
+            },
+            "benefit3": {
+              "title": "Exportaciones de QuickBooks que funcionan.",
+              "description": "La exportacion CSV coincide con el formato de importacion de tu software de nomina. Sin reformateo. Sin reingreso manual. Sin errores de transcripcion."
+            }
+          },
+          "operations": {
+            "title": "Para gerentes de operaciones / supervisores",
+            "benefit1": {
+              "title": "Revision sin el papeleo.",
+              "description": "Tus empleados en multiples proyectos, multiples edificios, multiples turnos. La vista de nomina muestra cada sesion de trabajo organizada por empleado y periodo de pago. Revisa y aprueba desde una sola pantalla."
+            },
+            "benefit2": {
+              "title": "Detecta discrepancias antes del dia de pago.",
+              "description": "La verificacion GPS y la atribucion de proyecto hacen obvias las anomalias. Un tecnico registro 8 horas en el Edificio A pero estaba programado para el Edificio B? Lo ves inmediatamente."
+            },
+            "benefit3": {
+              "title": "Acceso historico para auditorias.",
+              "description": "Los periodos de pago anteriores permanecen accesibles. Cuando alguien cuestiona horas de hace tres meses, extraes los datos en segundos."
+            }
+          },
+          "technicians": {
+            "title": "Para tecnicos de acceso con cuerdas",
+            "benefit1": {
+              "title": "Tus horas son precisas.",
+              "description": "La verificacion GPS captura tu tiempo real en sitio. No mas discrepancias entre lo que registraste y lo que el propietario calculo."
+            },
+            "benefit2": {
+              "title": "Ve a donde va tu tiempo.",
+              "description": "Cada sesion de trabajo muestra a cual proyecto estabas asignado. Tu dia de 8 horas puede dividirse en tres edificios. El desglose es claro."
+            },
+            "benefit3": {
+              "title": "Horas extras calculadas correctamente.",
+              "description": "El sistema aplica automaticamente las reglas de horas extras de tu empresa. Activador diario a 8 horas, semanal a 40, cualquiera que sea la configuracion. No se requiere calculo manual."
+            }
+          },
+          "buildingManagers": {
+            "title": "Para administradores de edificios / administradores de propiedades",
+            "benefit1": {
+              "title": "Documentacion laboral bajo demanda.",
+              "description": "Necesitas verificar cuantas horas de tecnico se gastaron en tu edificio el ultimo trimestre? Los datos existen y se exportan limpiamente."
+            },
+            "benefit2": {
+              "title": "Validacion de presupuesto simplificada.",
+              "description": "Contrataste 200 horas de mantenimiento anual. La atribucion de proyecto muestra exactamente cuantas horas se han registrado contra tu edificio."
+            },
+            "benefit3": {
+              "title": "Registros listos para auditoria.",
+              "description": "Requisitos de seguro, cumplimiento o revision interna? Los datos de sesion de trabajo con verificacion GPS proporcionan el rastro de documentacion."
+            }
+          }
+        },
+        "keyFeatures": {
+          "title": "Caracteristicas clave",
+          "subtitle": "Cada caracteristica existe para eliminar la brecha entre el trabajo de campo y el procesamiento de nomina.",
+          "feature1": {
+            "title": "Configuracion de periodo de pago",
+            "description": "Elige periodos de pago semanales, quincenales, semi-mensuales o mensuales. El sistema genera automaticamente los limites de periodo. Las sesiones de trabajo se agrupan automaticamente en el periodo de pago correcto."
+          },
+          "feature2": {
+            "title": "Datos de tiempo verificados por GPS",
+            "description": "Las horas provienen de sesiones de trabajo verificadas, no de libretas auto-reportadas. La ubicacion de entrada confirma que el tecnico estaba realmente en el sitio de trabajo. Elimina disputas."
+          },
+          "feature3": {
+            "title": "Reglas de horas extras configurables",
+            "description": "Establece activadores diarios (8 horas por defecto), activadores semanales (40 horas por defecto) o umbrales personalizados. Los multiplicadores se ajustan de 1.5x a 3x. Deshabilita las horas extras por completo si es necesario."
+          },
+          "feature4": {
+            "title": "Atribucion de proyecto",
+            "description": "Cada sesion de trabajo se vincula a un proyecto especifico. Tu vista de nomina muestra cual edificio, que tipo de trabajo, cuantas horas. Esencial para el costeo de trabajos y la precision de futuras cotizaciones."
+          },
+          "feature5": {
+            "title": "Seguimiento facturable vs no facturable",
+            "description": "Distingue las horas de cliente generadoras de ingresos de los costos operativos. Viajes, mantenimiento de equipo, capacitacion, retrasos por clima. Conoce tu verdadero costo laboral."
+          },
+          "feature6": {
+            "title": "Capacidades de exportacion",
+            "description": "Exportacion CSV para integracion con software de nomina (QuickBooks, ADP, Gusto). Reportes de hojas de tiempo PDF para registros. Detalle a nivel de empleado y desgloses de costos de proyecto disponibles."
+          }
+        },
+        "results": {
+          "title": "Resultados medibles",
+          "subtitle": "Mejoras concretas que veras desde el primer dia.",
+          "result1": {
+            "title": "Ahorro de tiempo",
+            "description": "El metodo manual de lapiz y calculadora consume 6-10 horas por ciclo de nomina. OnRopePro reduce esto a 30-45 minutos. Para nomina quincenal, eso es aproximadamente 260 horas ahorradas anualmente. Tiempo que regresa a administrar tu negocio."
+          },
+          "result2": {
+            "title": "Reduccion de errores",
+            "description": "Los sistemas conflictivos (libretas, relojes, hojas de calculo) crean discrepancias. Los datos de fuente unica de verdad eliminan las disputas de conciliacion. Las correcciones caen dramaticamente cuando los datos son precisos desde el inicio."
+          },
+          "result3": {
+            "title": "Precision en costeo de trabajos",
+            "description": "Sin atribucion de proyecto, no sabes por que los trabajos exceden el presupuesto. Con ella, ves exactamente a donde fueron las horas. Los operadores reportan que la precision de las cotizaciones mejora porque trabajan con datos historicos reales en lugar de estimaciones."
+          },
+          "result4": {
+            "title": "Limpieza contable",
+            "description": "Los pagos de correccion aleatorios crean transacciones inexplicables. Exportaciones limpias significan que cada dolar esta documentado antes de salir del sistema. El tiempo de conciliacion del contador disminuye."
+          }
+        },
+        "integration": {
+          "title": "Puntos de integracion de modulos",
+          "subtitle": "El modulo de Nomina y Finanzas se conecta con otros modulos de OnRopePro para crear un pipeline de datos completo desde el trabajo de campo hasta la exportacion de nomina.",
+          "module1": {
+            "title": "Sesiones de trabajo y seguimiento de tiempo",
+            "description": "Fuente de datos principal. Cada entrada y salida crea datos de sesion de trabajo que fluyen directamente a la agregacion de nomina."
+          },
+          "module2": {
+            "title": "Gestion de empleados",
+            "description": "Busqueda de tarifa y rol. La tarifa por hora se extrae del perfil del empleado en el momento de la sesion de trabajo. Los cambios de tarifa a mitad de proyecto se manejan correctamente."
+          },
+          "module3": {
+            "title": "Gestion de proyectos",
+            "description": "Fuente de atribucion de proyecto. Las sesiones de trabajo se vinculan a proyectos, permitiendo el seguimiento de costos laborales por edificio y por tipo de trabajo."
+          },
+          "module4": {
+            "title": "Programacion y calendario",
+            "description": "Contexto de asignacion de turno. Los turnos programados proporcionan horas esperadas para comparacion con las horas realmente trabajadas. Las discrepancias se vuelven visibles."
+          },
+          "module5": {
+            "title": "Cumplimiento de seguridad",
+            "description": "Verificacion de elegibilidad de trabajo. Los requisitos de inspeccion de arnes y certificacion se verifican antes de que se permita la entrada. Las inspecciones fallidas bloquean las sesiones de trabajo."
+          },
+          "module6": {
+            "title": "Analiticas y reportes",
+            "description": "Los datos de nomina alimentan las analiticas de toda la empresa. Los costos laborales, metricas de productividad y seguimiento de presupuesto derivan de la misma fuente de verdad."
+          }
+        },
+        "impact": {
+          "title": "Deja de temer el dia de pago",
+          "paragraph1": "El dia de pago no deberia consumir tu tarde. No deberia involucrar una calculadora, un lapiz y 48 paginas de impresiones esparcidas por tu escritorio. Definitivamente no deberia resultar en transferencias aleatorias que confunden a tu contador y correcciones que toman mas tiempo que el procesamiento original.",
+          "paragraph2": "Ahora mismo, la nomina es probablemente la tarea mas odiada en tu calendario. La pospones. Llegas tarde. Tus empleados comienzan a presupuestar alrededor de \"que me paguen tarde\". Esa cultura de tardanza se filtra a todo lo demas.",
+          "paragraph3": "Cuando la nomina toma 30 minutos en lugar de 6 horas, dejas de evitarla. Cumples a tiempo. Tu equipo lo nota. Los estandares profesionales que estableces para la nomina se extienden a los plazos de proyecto, comunicaciones con clientes y documentacion de seguridad.",
+          "paragraph4": "Recuperas 260+ horas por ano. Son seis semanas de trabajo completas. Tiempo actualmente gastado encerrando numeros que podria ir hacia cotizar nuevos contratos, manejar relaciones con clientes, o simplemente estar presente para el trabajo que realmente quieres hacer."
+        },
+        "faqs": {
+          "title": "Preguntas frecuentes",
+          "subtitle": "Preguntas comunes sobre el modulo de Nomina y Finanzas.",
+          "faq1": {
+            "question": "OnRopePro calcula mis impuestos y deducciones?",
+            "answer": "No. OnRopePro prepara datos de hojas de tiempo listos para nomina para exportacion. Los calculos reales de nomina (CPP, EI, retencion de impuestos, Seguro Social, Medicare) ocurren en tu software de procesamiento de nomina (QuickBooks, ADP, Gusto, etc.). OnRopePro maneja la agregacion de tiempo y exportacion, no el cumplimiento fiscal."
+          },
+          "faq2": {
+            "question": "Que opciones de periodo de pago estan disponibles?",
+            "answer": "Semanal, quincenal, semi-mensual y mensual. El sistema genera automaticamente los limites de periodo basados en tu seleccion."
+          },
+          "faq3": {
+            "question": "Como funciona el calculo de horas extras?",
+            "answer": "Tu configuras las reglas: activador diario (8 horas por defecto), activador semanal (40 horas por defecto) y multiplicador (1.5x, 2x, etc.). El sistema aplica estas reglas automaticamente a cada sesion de trabajo. Puedes deshabilitar las horas extras por completo si tu estructura de pago no las incluye."
+          },
+          "faq4": {
+            "question": "Que formato usa la exportacion?",
+            "answer": "CSV para importacion a software de nomina. PDF para registros de hojas de tiempo imprimibles. Ambos incluyen detalle a nivel de empleado y atribucion de proyecto."
+          },
+          "faq5": {
+            "question": "Quien puede ver los datos de nomina?",
+            "answer": "Usuarios con el permiso canAccessFinancials. Esto se otorga a traves del sistema de permisos basado en roles. Los tecnicos ven sus propias horas pero no las tarifas de compensacion ni los datos de otros empleados."
+          },
+          "faq6": {
+            "question": "Que pasa si falta una sesion de trabajo o es incorrecta?",
+            "answer": "Los supervisores con permisos apropiados pueden revisar y ajustar las sesiones de trabajo antes de la aprobacion de hojas de tiempo. Todos los ajustes se registran con razones para propositos de auditoria."
+          },
+          "faq7": {
+            "question": "Puedo ver periodos de pago historicos?",
+            "answer": "Si. Los periodos de pago anteriores permanecen accesibles. Filtra por rango de fechas para extraer datos de cualquier periodo pasado."
+          },
+          "faq8": {
+            "question": "Funciona la atribucion de proyecto si un tecnico trabaja en multiples edificios en un dia?",
+            "answer": "Si. Cada sesion de trabajo se vincula a un proyecto especifico. Si un tecnico entra al Edificio A por 4 horas, luego al Edificio B por 4 horas, ambas sesiones aparecen separadamente con sus respectivas atribuciones de proyecto."
+          },
+          "faq9": {
+            "question": "Que pasa con el tiempo no facturable como viajes entre sitios?",
+            "answer": "Las sesiones de trabajo no facturables rastrean horas que no pueden cobrarse a clientes (viajes, capacitacion, mantenimiento de equipo, retrasos por clima). La vista de nomina muestra horas facturables y no facturables para que conozcas tu verdadero costo laboral."
+          },
+          "faq10": {
+            "question": "Hay un flujo de aprobacion antes de la exportacion?",
+            "answer": "Si. Las hojas de tiempo pueden revisarse y aprobarse antes de la exportacion. Las hojas de tiempo aprobadas generan archivos de exportacion limpios. El flujo previene exportar datos que no han sido verificados."
+          }
+        },
+        "cta": {
+          "title": "Listo para recuperar tu tiempo?",
+          "subtitle": "Unete a las empresas de acceso con cuerdas que han eliminado el dolor de cabeza de la nomina. Comienza tu prueba gratuita de 60 dias hoy.",
+          "trialButton": "Comienza tu prueba gratuita de 60 dias",
+          "docsButton": "Ver documentacion tecnica"
+        }
       },
       "irataLogging": {
         "title": "Registro de Tareas IRATA",
@@ -8156,18 +8393,18 @@
     },
     "employerJobBoard": {
       "hero": {
-        "badge": "Bolsa de Trabajo para Empleadores",
+        "badge": "Ecosistema de Bolsa de Trabajo",
         "titleLine1": "Necesitas tecnicos.",
         "titleLine2": "Los tecnicos te necesitan.",
         "titleLine3": "Conectemos.",
-        "description": "Publica oportunidades de empleo y conecta con tecnicos de acceso con cuerdas calificados.",
+        "description": "La bolsa de trabajo de OnRopePro es un ecosistema cerrado. Cada empleador verificado. Cada técnico relevante. Publica empleos ilimitados.",
         "ctaTrial": "Comienza tu prueba gratuita de 60 dias",
         "ctaFaq": "Encontrar respuestas",
-        "title": "Stop Paying $22 Per Application",
-        "subtitle": "From People Who've Never Touched a Rope.",
-        "descriptionBold": "Zero per-application fees.",
-        "ctaPrimary": "Start Posting Jobs Free",
-        "ctaSecondary": "Find Answers"
+        "title": "Deja de pagar $22 por solicitud",
+        "subtitle": "De personas que nunca han tocado una cuerda.",
+        "descriptionBold": "Cero tarifas por solicitud.",
+        "ctaPrimary": "Comienza a publicar empleos gratis",
+        "ctaSecondary": "Encontrar respuestas"
       },
       "stats": {
         "jobsPosted": "Empleos publicados",
@@ -8175,102 +8412,230 @@
         "technicianReach": "Alcance de tecnicos",
         "hiringSuccess": "Exito de contratacion",
         "filteringTime": {
-          "value": "0 hours",
-          "label": "Filtering Time"
+          "value": "0 horas",
+          "label": "Tiempo de filtrado"
         },
         "platformFees": {
           "value": "$0",
-          "label": "Platform Fees"
+          "label": "Tarifas de plataforma"
         },
         "timeToHire": {
-          "value": "1-3 Days",
-          "label": "Time to Hire"
+          "value": "1-3 días",
+          "label": "Tiempo para contratar"
         },
         "interviews": {
           "value": "2-3",
-          "label": "Interviews Needed"
+          "label": "Entrevistas necesarias"
         }
       },
       "problemStatement": {
-        "title": "El talento que no puedes encontrar",
-        "paragraph1": "Publicas en grupos de Facebook. Preguntas en tu red. Esperas que alguien conozca a alguien.",
-        "paragraph2": "Mientras tanto, hay tecnicos calificados buscando trabajo que nunca veran tu publicacion.",
-        "paragraph3": "La Bolsa de Trabajo de OnRopePro conecta empleadores con tecnicos verificados que buscan activamente oportunidades.",
-        "solutionTitle": "OnRopePro's Job Board works differently.",
-        "solutionText": "Every company here does rope access building maintenance. Every technician here is in the industry. When you post a job, 100% of applicants are relevant. No noise. No filtering. No $22 surprise fees."
+        "title": "El impuesto de Indeed",
+        "paragraph1": "Publicas en Indeed. LinkedIn. Craigslist. Facebook. Recibes 50 solicitudes. Abres cada una, esperando encontrar un nivel 2 con experiencia en calafateo.",
+        "paragraph2": "Lo que encuentras: trabajadores de taller, plomeros, candidatos de plataformas petroleras, y 23 personas que \"siempre han estado interesadas en aprender\". Dos horas de filtrado. Dos técnicos reales en cuerdas.",
+        "paragraph3": "Luego Indeed te envía la factura. $22 por solicitud si no respondes en 48 horas. Una sola publicación te cuesta $300 antes de que hayas programado una entrevista. Alguien de tu equipo tiene que iniciar sesión todos los días solo para hacer clic en \"rechazar\" en currículums de mecánicos.",
+        "solutionTitle": "La bolsa de trabajo de OnRopePro funciona diferente.",
+        "solutionText": "Cada empresa aquí hace mantenimiento de edificios con acceso de cuerdas. Cada técnico aquí está en la industria. Cuando publicas un empleo, el 100% de los solicitantes son relevantes. Sin ruido. Sin filtrado. Sin tarifas sorpresa de $22."
       },
       "features": {
-        "title": "Lo que hace este modulo",
-        "subtitle": "Reclutamiento de tecnicos de acceso con cuerdas a traves de una red verificada.",
-        "description": "The Job Board connects you with qualified rope access technicians across the platform. Post jobs, browse talent, and send direct offers to candidates who match your requirements.",
+        "title": "Tu ecosistema de jardín cerrado",
+        "subtitle": "Donde cada solicitante es un técnico en cuerdas y cada empleador está verificado",
+        "description": "La bolsa de trabajo te conecta con técnicos de acceso con cuerdas calificados en toda la plataforma. Publica empleos, navega talentos y envía ofertas directas a candidatos que coincidan con tus requisitos.",
         "talentBrowser": {
-          "title": "Talent Browser",
-          "description1": "Search the technician pool before you even post a job. Filter by location, certification level, experience, and expected pay rate.",
-          "description2": "See who's available, what they're looking for, and whether your budget matches their expectations before you spend time interviewing.",
-          "filterLabel": "What you can filter by:",
-          "filter1": "Location (city, region)",
-          "filter2": "IRATA/SPRAT certification level",
-          "filter3": "Years of experience",
-          "filter4": "Expected pay rate",
-          "filter5": "Safety rating score",
-          "filter6": "Specialties (caulking, window washing, etc.)"
+          "title": "Navegador de talentos",
+          "description1": "Busca en el grupo de técnicos antes de publicar un empleo. Filtra por ubicación, nivel de certificación, experiencia y tarifa esperada.",
+          "description2": "Ve quién está disponible, qué están buscando y si tu presupuesto coincide con sus expectativas antes de pasar tiempo en entrevistas.",
+          "filterLabel": "Lo que puedes filtrar:",
+          "filter1": "Ubicación (ciudad, región)",
+          "filter2": "Nivel de certificación IRATA/SPRAT",
+          "filter3": "Años de experiencia",
+          "filter4": "Tarifa esperada",
+          "filter5": "Puntuación de seguridad",
+          "filter6": "Especialidades (calafateo, lavado de ventanas, etc.)"
         },
         "unlimitedPostings": {
-          "title": "Unlimited Job Postings",
-          "description1": "Post as many jobs as your operation requires. Full-time, part-time, contract, seasonal.",
-          "description2": "Six job types supported: window washing, caulking, pressure washing, gutter cleaning, painting and coating, visual inspection. No per-post fees. No per-application charges. No surprise invoices.",
-          "controlLabel": "What you control:",
-          "control1": "Job type and service scope",
-          "control2": "Location and site details",
-          "control3": "Required certifications",
-          "control4": "Pay range (optional but recommended)",
-          "control5": "Start date and duration"
+          "title": "Publicaciones de empleo ilimitadas",
+          "description1": "Publica tantos empleos como tu operación requiera. Tiempo completo, medio tiempo, contrato, temporal.",
+          "description2": "Seis tipos de empleo soportados: lavado de ventanas, calafateo, lavado a presión, limpieza de canaletas, pintura y revestimiento, inspección visual. Sin tarifas por publicación. Sin cargos por solicitud. Sin facturas sorpresa.",
+          "controlLabel": "Lo que controlas:",
+          "control1": "Tipo de empleo y alcance del servicio",
+          "control2": "Ubicación y detalles del sitio",
+          "control3": "Certificaciones requeridas",
+          "control4": "Rango salarial (opcional pero recomendado)",
+          "control5": "Fecha de inicio y duración"
         },
         "directOffers": {
-          "title": "Direct Job Offers",
-          "description1": "Found a perfect candidate in the Talent Browser? Send them an offer directly. Link it to one of your active job postings.",
-          "description2": "They get notified in their portal. Accept or decline with one tap. No email chains. No phone tag.",
-          "stepsLabel": "How it works:",
-          "step1": "Select candidate from search results",
-          "step2": "Choose which job posting to link",
-          "step3": "Technician receives in-portal notification",
-          "step4": "Response comes back to your dashboard"
+          "title": "Ofertas de empleo directas",
+          "description1": "¿Encontraste un candidato perfecto en el navegador de talentos? Envíale una oferta directamente. Vincúlala a una de tus publicaciones de empleo activas.",
+          "description2": "Reciben una notificación en su portal. Aceptar o rechazar con un solo toque. Sin cadenas de correos. Sin etiqueta telefónica.",
+          "stepsLabel": "Cómo funciona:",
+          "step1": "Selecciona candidato de los resultados de búsqueda",
+          "step2": "Elige qué publicación de empleo vincular",
+          "step3": "El técnico recibe notificación en el portal",
+          "step4": "La respuesta regresa a tu panel"
         }
       },
-      "benefits": {
-        "title": "Quien se beneficia de este modulo",
-        "subtitle": "Reclutamiento de tecnicos verificados.",
+      "whoBenefits": {
+        "title": "Quién se beneficia de este módulo",
+        "subtitle": "Cada interesado en el proceso de contratación gana visibilidad y eficiencia",
         "employers": {
-          "title": "Para empleadores",
+          "title": "Para empleadores (dueños de empresas)",
           "benefit1": {
-            "title": "Accede a talento verificado.",
-            "description": "Navega perfiles de tecnicos con certificaciones e historial de trabajo verificados. Sin adivinar calificaciones."
+            "title": "Cero filtrado. Cada solicitante es un técnico en cuerdas.",
+            "description": "Publicas un empleo. Recibes solicitudes de personas que realmente trabajan en mantenimiento de edificios con cuerdas. No plomeros. No trabajadores offshore. No \"interesados en aprender\". Tu ratio de solicitante-a-entrevista mejora inmediatamente."
           },
           "benefit2": {
-            "title": "Publica oportunidades.",
-            "description": "Crea publicaciones de empleo que ven tecnicos calificados. Llega a candidatos que buscan activamente."
+            "title": "Conoce las expectativas salariales antes de contactar.",
+            "description": "Los técnicos establecen su tarifa esperada en su perfil. Cuando navegas talentos, ves su número antes de enviar una oferta. Si alguien no trabajará por menos de $60/hora y tu presupuesto es $45, lo sabes antes de perder una hora en una entrevista."
+          },
+          "benefit3": {
+            "title": "Incluido en tu suscripción.",
+            "description": "Publica empleos ilimitados. Recibe solicitudes ilimitadas. Indeed cobra $22 por solicitud si no respondes en 48 horas. OnRopePro cobra $0. Tu acceso a la bolsa de trabajo es parte de lo que ya pagas."
+          }
+        },
+        "operationsManagers": {
+          "title": "Para gerentes de operaciones",
+          "benefit1": {
+            "title": "Navega talentos antes de publicar.",
+            "description": "¿Necesitas un nivel 2 con experiencia en calafateo en el Lower Mainland? Busca en el navegador de talentos. Ve quién está disponible, revisa sus calificaciones de seguridad, revisa sus tarifas esperadas. Encuentra candidatos primero, luego crea la publicación de empleo para coincidir con lo que está disponible."
+          },
+          "benefit2": {
+            "title": "Las ofertas directas simplifican la contratación.",
+            "description": "¿Encontraste un candidato fuerte? Envíale una oferta vinculada a tu publicación de empleo. No más \"Te enviaré un correo con los detalles\". La oferta, las especificaciones del puesto y el botón de aceptar/rechazar están todos en un solo lugar."
+          }
+        },
+        "buildingManagers": {
+          "title": "Para administradores de edificios",
+          "benefit1": {
+            "title": "Verifica las prácticas de contratación de contratistas.",
+            "description": "Cuando tu contratista de acceso con cuerdas usa OnRopePro, sus técnicos tienen certificaciones IRATA/SPRAT documentadas y calificaciones de seguridad visibles. No solo confías en su palabra. Estás viendo credenciales verificadas vinculadas a historial de trabajo real."
+          }
+        },
+        "propertyManagers": {
+          "title": "Para administradores de propiedades",
+          "benefit1": {
+            "title": "Confianza en la calidad del contratista.",
+            "description": "Los contratistas que licitan en tu portafolio usan un sistema donde cada técnico está verificado. Cuando te dicen \"nuestro equipo está certificado y enfocado en seguridad\", puedes ver los datos que respaldan esa afirmación."
+          }
+        },
+        "technicians": {
+          "title": "Para técnicos",
+          "benefit1": {
+            "title": "Sé encontrado por empleadores que importan.",
+            "description": "Cuando activas la visibilidad de tu perfil, solo las empresas de acceso con cuerdas verificadas pueden verte. Sin reclutadores aleatorios. Sin spam. Las empresas que contratan activamente en tu especialidad pueden buscarte directamente y enviar ofertas a tu portal."
           }
         }
       },
       "keyFeatures": {
-        "title": "Caracteristicas clave",
-        "feature1": {
-          "title": "Publicacion de empleos",
-          "description": "Crea publicaciones con detalles del puesto, requisitos y rango salarial."
+        "title": "Características clave",
+        "subtitle": "El ecosistema de la bolsa de trabajo combina publicación, búsqueda y contratación en un sistema integrado",
+        "verifiedEcosystem": {
+          "title": "Ecosistema de empleadores verificados",
+          "description1": "Solo las empresas de mantenimiento de edificios con cuerdas publican aquí. Cada empleador es verificado cuando crea su cuenta. Sin panaderías, sin autolavados, sin industrias no relacionadas.",
+          "description2": "Cuando navegas las publicaciones de competidores, estás viendo tu mercado real."
         },
-        "feature2": {
-          "title": "Navegar perfiles de tecnicos",
-          "description": "Busca tecnicos que han optado por visibilidad."
+        "oneClickApplications": {
+          "title": "Solicitudes de un clic entrantes",
+          "description1": "Cuando los técnicos aplican, sus datos de perfil, currículum y certificaciones se adjuntan automáticamente. Ves todo lo que necesitas para evaluarlos en una sola vista.",
+          "description2": "Sin correos de \"por favor reenvía tu currículum\". Sin llamadas de \"¿puedes confirmar tu número IRATA?\"."
         },
-        "feature3": {
-          "title": "Contacto directo",
-          "description": "Conecta directamente con tecnicos interesados."
+        "payRateVisibility": {
+          "title": "Visibilidad de tarifa esperada",
+          "description1": "Ve lo que quieren los candidatos antes de contactarlos. Si tu presupuesto es $45/hora y quieren $60, lo sabes inmediatamente.",
+          "description2": "Deja de perder tiempo de entrevista en desajustes de compensación."
+        },
+        "safetyRating": {
+          "title": "Integración de calificación de seguridad",
+          "description1": "Cada técnico tiene una calificación de seguridad individual (0-100) construida a partir de inspecciones diarias de arnés, participación en reuniones de seguridad y completación de cuestionarios de seguridad.",
+          "description2": "Véalo en su perfil. Inclúyelo en tus decisiones de contratación."
+        },
+        "statusDashboard": {
+          "title": "Panel de estado de solicitudes",
+          "description1": "Rastrea cada solicitante en cada publicación. Ve quién está en revisión, a quién has contactado, a quién se le ha ofrecido, quién ha aceptado.",
+          "description2": "Sin hojas de cálculo. Sin perder candidatos entre las grietas."
+        },
+        "instantOnboarding": {
+          "title": "Conexión de incorporación instantánea",
+          "description1": "Cuando un técnico acepta tu oferta, sus datos de perfil fluyen a tu sistema de gestión de empleados. Número IRATA, certificaciones, datos bancarios (si se comparten), contactos de emergencia.",
+          "description2": "Listo desde el primer día sin el maratón de papeleo."
+        }
+      },
+      "problemsSolved": {
+        "title": "Problemas resueltos",
+        "collapseAll": "Contraer todo",
+        "expandAll": "Expandir todo",
+        "forEmployers": "Para empleadores",
+        "forOperationsManagers": "Para gerentes de operaciones",
+        "forBuildingManagers": "Para administradores de edificios",
+        "painLabel": "El dolor:",
+        "exampleLabel": "Ejemplo real:",
+        "solutionLabel": "Solución:",
+        "benefitLabel": "Beneficio:",
+        "employer1": {
+          "question": "\"Publico en Indeed y recibo 50 solicitantes. Solo 2 son técnicos reales en cuerdas.\"",
+          "pain": "Publicas en todos lados: Indeed, LinkedIn, Craigslist, Facebook. Las solicitudes llegan de personas que nunca han tocado un sistema de cuerdas.",
+          "example": "Trabajadores de taller, trabajadores de construcción general, candidatos offshore. Dos horas filtrando para encontrar dos currículums relevantes de cincuenta solicitudes.",
+          "solution": "La bolsa de trabajo de OnRopePro es un ecosistema cerrado. Cada técnico en la plataforma está en mantenimiento de edificios con cuerdas.",
+          "benefit": "Cuando publicas un empleo, el 100% de los solicitantes son relevantes. Sin filtrado requerido. Dos horas de tiempo perdido se convierten en cero."
+        },
+        "employer2": {
+          "question": "\"Indeed me cobra $22 por solicitud si no respondo en 48 horas.\"",
+          "pain": "Alguien tiene que iniciar sesión diariamente, abrir cada solicitud, rechazar o responder. Pierde unos días y los cargos se acumulan.",
+          "example": "Son $22 por cada solicitud sin abrir. Una sola publicación de empleo puede costar $300 en \"tarifas de compromiso\" antes de que hayas contratado a alguien.",
+          "solution": "OnRopePro incluye publicaciones y solicitudes ilimitadas en tu suscripción. Sin tarifas por solicitud. Sin cargos sorpresa.",
+          "benefit": "Sin obligación de inicio de sesión diario solo para evitar facturación. Publica libremente, revisa según tu horario, no pagues nada extra."
+        },
+        "employer3": {
+          "question": "\"Pasé una hora entrevistando a alguien que quiere $20/hora más que mi presupuesto.\"",
+          "pain": "La entrevista fue bien. Las referencias se verificaron. Estás listo para hacer una oferta. Luego preguntas sobre compensación.",
+          "example": "Quieren $60/hora. Tu presupuesto es $45. Una hora perdida para ambas partes porque las expectativas nunca estaban alineadas.",
+          "solution": "Los técnicos establecen su tarifa esperada en su perfil. La ves en el navegador de talentos antes de contactarlos.",
+          "benefit": "Los desajustes de compensación se filtran antes de la entrevista, no durante. Solo entrevista candidatos dentro de tu presupuesto."
+        },
+        "ops1": {
+          "question": "\"No sé si tenemos capacidad para tomar este nuevo contrato.\"",
+          "pain": "Un cliente llama con trabajo urgente. Crees que Tommy termina la Torre A el viernes, pero no estás seguro. ¿Sarah está de vacaciones?",
+          "example": "Rechazas el trabajo (ingresos perdidos) o te comprometes y esperas (riesgo de sobrecompromiso y fallo en la entrega).",
+          "solution": "La bolsa de trabajo se conecta con tus sistemas de programación y gestión de empleados. Cuando publicas un empleo y recibes solicitudes, puedes cruzar referencias con la disponibilidad del equipo.",
+          "benefit": "Sabe si tienes capacidad antes de comprometerte. Toma decisiones informadas sobre nuevos contratos basadas en datos reales."
+        },
+        "bm1": {
+          "question": "\"¿Cómo sé que este contratista contrata trabajadores calificados?\"",
+          "pain": "Contratas una empresa de acceso con cuerdas pero no tienes visibilidad de quiénes están enviando realmente a tu edificio.",
+          "example": "¿Estas personas están certificadas? ¿Tienen registros de seguridad? Estás confiando en la palabra del contratista sin forma de verificar.",
+          "solution": "Cuando los contratistas usan OnRopePro, sus técnicos tienen certificaciones IRATA/SPRAT verificadas y calificaciones de seguridad visibles.",
+          "benefit": "Puedes pedir documentación. Los datos existen en su sistema. La confianza está respaldada por registros verificables."
+        }
+      },
+      "connectedModules": {
+        "title": "Módulos conectados",
+        "subtitle": "La bolsa de trabajo no existe en aislamiento. Se conecta a los sistemas que ya usas.",
+        "employeeManagement": {
+          "title": "Gestión de empleados",
+          "description": "Cuando un técnico acepta tu oferta, sus datos de perfil fluyen a tu lista de empleados. Número IRATA, certificaciones, información de contacto. Comienza la incorporación inmediatamente."
+        },
+        "safetyCompliance": {
+          "title": "Seguridad y cumplimiento",
+          "description": "Las calificaciones de seguridad de los candidatos vienen de datos reales: inspecciones de arnés, reuniones de seguridad, cuestionarios de seguridad. La puntuación que ves es ganada, no auto-reportada."
+        },
+        "projectManagement": {
+          "title": "Gestión de proyectos",
+          "description": "¿Contratando para un proyecto específico? Ve qué posiciones necesitas llenar revisando tus proyectos activos. Dota apropiadamente basándote en carga de trabajo real."
+        },
+        "schedulingCalendar": {
+          "title": "Programación y calendario",
+          "description": "Cruza referencias de nuevas contrataciones contra la disponibilidad del equipo. Sabe cuándo tienes capacidad para traer a alguien y a qué proyectos se unirán."
         }
       },
       "cta": {
-        "title": "Listo para encontrar tecnicos?",
-        "subtitle": "Conecta con profesionales de acceso con cuerdas verificados. Comienza tu prueba gratuita de 60 dias.",
-        "trialButton": "Comienza tu prueba gratuita de 60 dias"
+        "title": "Tu tiempo de contratación llega a cero.",
+        "titleHighlight": "Tu pool de talentos se extiende a todos.",
+        "description1": "Ahora mismo, la contratación consume tu semana. Publicas en Indeed. Esperas solicitudes. Filtras currículums irrelevantes. Entrevistas a personas que quieren el doble de tu presupuesto. Pagas $22 por solicitud de plomeros.",
+        "description2": "Con la bolsa de trabajo de OnRopePro, tu próxima contratación ya está en el sistema. Busca en el navegador de talentos. Encuentra técnicos nivel 2 con experiencia en calafateo en tu región. Ve su calificación de seguridad, su tarifa esperada, sus certificaciones. Envía una oferta directamente.",
+        "ctaPrimary": "Comienza a publicar empleos gratis",
+        "ctaSecondary": "Saber más"
+      },
+      "footer": {
+        "text": "Parte de la plataforma OnRopePro para empresas de mantenimiento de edificios con acceso de cuerdas."
       }
     },
     "userAccess": {
@@ -8384,100 +8749,268 @@
     },
     "technicianJobBoard": {
       "hero": {
-        "title": "Bolsa de Trabajo para Tecnicos",
-        "subtitle": "Encuentra Tu Proximo Trabajo en Cuerdas",
-        "descriptionBold": "empleos verificados",
-        "ctaPrimary": "Explorar Trabajos",
-        "ctaSecondary": "Publicar un Trabajo",
-        "badge": "Bolsa de Trabajo",
-        "description": "Conectate con empleadores de acceso en cuerdas en todo el mundo"
+        "badge": "Ecosistema de Bolsa de Trabajo",
+        "title": "Cada trabajo aquí es acceso con cuerdas.",
+        "subtitle": "Cada empresa es real.",
+        "description": "La Bolsa de Trabajo de OnRopePro es exclusivamente para mantenimiento de edificios con acceso por cuerdas. Explora trabajos reales de empresas verificadas. Postula en 30 segundos.",
+        "descriptionBold": "Controla quién ve tu perfil.",
+        "ctaPrimary": "Explorar trabajos gratis",
+        "ctaSecondary": "Encontrar respuestas"
       },
       "stats": {
-        "applicationTime": "Tiempo de Aplicacion",
-        "relevantListings": "Listados Relevantes",
-        "immediateValue": "Valor Inmediato",
-        "searchTime": "Tiempo de Busqueda",
-        "upfrontValue": "Valor Por Adelantado",
-        "interviewAlignment": "Alineacion de Entrevista"
+        "applicationTime": "Tiempo de aplicación",
+        "relevantListings": "Listados relevantes",
+        "immediateValue": "Inmediato",
+        "searchTime": "Tiempo de búsqueda",
+        "upfrontValue": "Transparente",
+        "interviewAlignment": "Alineación de entrevista"
       },
       "problem": {
-        "intro": "El problema con la busqueda de trabajo tradicional",
-        "solutionTitle": "La Solucion de Bolsa de Trabajo",
-        "solutionParagraph1": "Conecta directamente con empleadores verificados de acceso en cuerdas",
-        "solutionParagraph2": "Tu perfil verificado se destaca ante los empleadores",
-        "title": "El Problema",
-        "paragraph1": "Los tecnicos pierden horas buscando en sitios de trabajo genericos",
-        "paragraph2": "Los empleadores luchan por encontrar candidatos calificados",
-        "paragraph3": "Desajuste de habilidades lleva a contrataciones costosas"
+        "title": "Indeed piensa que quieres ser plomero",
+        "intro": "Buscas \"acceso con cuerdas\" en Indeed. ¿Qué obtienes?",
+        "paragraph1": "Plataformas petroleras offshore en las Marítimas. Trabajos de acceso industrial en refinerías de Alberta. Puestos de plomería que mencionan \"cuerda\" una vez en la sección de seguridad. Trabajos de construcción general que requieren \"trabajo en alturas\".",
+        "paragraph2": "Desplazas durante 20 minutos para encontrar 3 trabajos que podrían ser de mantenimiento de edificios con cuerdas. Tal vez.",
+        "paragraph3": "Luego postulas. Subes tu CV. Llenas el mismo formulario por 50ª vez. Escribes manualmente tu número IRATA porque no hay campo para eso. Te preguntas si la empresa siquiera verificó tu certificación.",
+        "solutionTitle": "La Bolsa de Trabajo de OnRopePro funciona diferente.",
+        "solutionParagraph1": "Cada trabajo publicado aquí es mantenimiento de edificios con acceso por cuerdas. Limpieza de ventanas. Sellado. Lavado a presión. Limpieza de canaletas. Pintura y recubrimiento. Inspección visual. Sin offshore. Sin plataformas petroleras. Sin plomería.",
+        "solutionParagraph2": "Cada empresa que publica está verificada. Operadores reales de acceso con cuerdas que hacen mantenimiento real de edificios. Cuando postulas, tus certificaciones, experiencia y calificación de seguridad van con tu aplicación automáticamente."
       },
       "features": {
+        "title": "Tu centro de carrera en acceso con cuerdas",
+        "subtitle": "Donde cada trabajo coincide con tus habilidades y cada empleador entiende tu trabajo",
         "jobBrowser": {
-          "title": "Navegador de Trabajos",
-          "description": "Busca trabajos de acceso en cuerdas",
-          "item1": "Filtrar por ubicacion",
-          "item2": "Filtrar por nivel IRATA",
-          "item3": "Rango salarial transparente",
-          "item4": "Perfiles de empresa",
-          "headline": "Encuentra trabajos que coincidan con tus habilidades",
-          "filterLabel": "Filtros"
+          "title": "Navegador de trabajos",
+          "headline": "Ve solo trabajos de mantenimiento de edificios con cuerdas.",
+          "description": "Filtra por ubicación, tipo de trabajo y requisitos de certificación. Cada listado muestra detalles de la empresa, rango salarial (cuando se proporciona), fechas de inicio y alcance del proyecto. Cada empresa está verificada. Cada trabajo es relevante.",
+          "filterLabel": "Lo que puedes filtrar:",
+          "filterLocation": "Ubicación (ciudad, región)",
+          "filterJobType": "Tipo de trabajo (limpieza de ventanas, sellado, etc.)",
+          "filterEmploymentType": "Tipo de empleo (tiempo completo, contrato)",
+          "filterCertLevel": "Nivel de certificación requerido",
+          "filterPayRange": "Rango salarial"
         },
         "oneClickApplications": {
-          "title": "Aplicaciones con Un Clic",
-          "description": "Aplica instantaneamente con tu perfil",
-          "item1": "Perfil pre-completado",
-          "item2": "Credenciales verificadas",
-          "item3": "Mensajeria directa",
-          "item4": "Seguimiento de aplicaciones",
-          "headline": "Aplica instantaneamente con tu perfil verificado",
-          "sentLabel": "Enviado"
+          "title": "Aplicaciones con un clic",
+          "headline": "Tus datos de perfil viajan con tu aplicación.",
+          "description": "CV, certificaciones, números IRATA/SPRAT, años de experiencia, calificación de seguridad. Todo adjunto automáticamente. Postula a un trabajo en 30 segundos en lugar de volver a ingresar la misma información por 100ª vez.",
+          "sentLabel": "Lo que se envía automáticamente:",
+          "sentResume": "CV (si está subido)",
+          "sentCert": "Detalles de certificación IRATA/SPRAT",
+          "sentExperience": "Años de experiencia",
+          "sentSafetyRating": "Puntuación de calificación de seguridad",
+          "sentPayRate": "Tu tarifa por hora esperada"
         },
         "profileVisibility": {
-          "title": "Visibilidad de Perfil",
-          "description": "Deja que los empleadores te encuentren",
-          "item1": "Listado de perfil opcional",
-          "item2": "Controles de privacidad",
-          "item3": "Alertas de empleador",
-          "item4": "Estadisticas de vistas",
-          "headline": "Controla quien ve tu perfil",
-          "visibleLabel": "Visible"
-        },
-        "title": "Caracteristicas",
-        "subtitle": "Todo lo que necesitas para encontrar tu proximo trabajo"
+          "title": "Control de visibilidad del perfil",
+          "headline": "Controla quién te encuentra.",
+          "description": "Activa la visibilidad: los empleadores pueden buscarte en el navegador de talentos, ver tus credenciales y enviarte ofertas de trabajo directas. Desactívala: eres invisible a las búsquedas pero aún puedes explorar y postular a trabajos normalmente.",
+          "visibleLabel": "Lo que los empleadores ven cuando eres visible:",
+          "visibleName": "Nombre y foto",
+          "visibleCert": "Niveles y números de certificación",
+          "visibleExperience": "Años de experiencia",
+          "visibleSafetyRating": "Calificación de seguridad",
+          "visiblePayRate": "Tarifa por hora esperada"
+        }
       },
-      "benefits": {
-        "title": "Quien se beneficia de este modulo",
-        "subtitle": "Descubrimiento de oportunidades para tecnicos.",
+      "whoBenefits": {
+        "title": "Quién se beneficia de este módulo",
+        "subtitle": "Un ecosistema cerrado donde cada participante obtiene exactamente lo que necesita",
         "technicians": {
-          "title": "Para tecnicos",
-          "benefit1": {
-            "title": "Ve oportunidades activas.",
-            "description": "Navega publicaciones de empleo de empresas verificadas. Tiempo completo, contratos, trabajo estacional."
-          },
-          "benefit2": {
-            "title": "Deja que los empleadores te encuentren.",
-            "description": "Activa la visibilidad del perfil y los empleadores pueden contactarte directamente."
-          }
+          "title": "Para técnicos",
+          "benefit1Title": "Cada trabajo es mantenimiento de edificios con cuerdas",
+          "benefit1Desc": "Ya no más desplazarte por plataformas offshore, puestos de plomería y trabajos de construcción \"en alturas\". Cada publicación aquí es de una empresa verificada de acceso con cuerdas que hace mantenimiento de edificios.",
+          "benefit2Title": "Postula una vez, tus credenciales te siguen a todas partes",
+          "benefit2Desc": "Sube tu CV, ingresa tu número IRATA, establece tu tarifa por hora esperada. Cada aplicación que envías incluye esta información automáticamente. Ya no más escribir los mismos detalles en 50 formularios diferentes.",
+          "benefit3Title": "Tú controlas quién te ve",
+          "benefit3Desc": "Activa la visibilidad del perfil cuando estés buscando activamente. Desactívala cuando no. Si estás empleado pero navegando casualmente, mantenla desactivada. Los empleadores no pueden encontrarte a menos que tú quieras.",
+          "benefit4Title": "Sabe lo que pagan antes de postular",
+          "benefit4Desc": "Muchos empleadores listan rangos salariales en sus publicaciones. Para los que no, puedes establecer tu tarifa esperada y dejarlos decidir si coincide con su presupuesto antes de contactarte."
+        },
+        "employers": {
+          "title": "Para empleadores",
+          "benefit1Title": "Encuentra técnicos que coincidan con tus requisitos",
+          "benefit1Desc": "Busca en el navegador de talentos por nivel de certificación, ubicación, experiencia y tarifa por hora esperada. Ve calificaciones de seguridad antes de contactar. Envía ofertas directamente a candidatos que encajan."
+        },
+        "buildingManagers": {
+          "title": "Para administradores de edificios",
+          "benefit1Title": "Verifica los estándares de contratación de contratistas",
+          "benefit1Desc": "Cuando los contratistas usan OnRopePro, sus técnicos tienen credenciales y calificaciones de seguridad documentadas. No estás confiando en su palabra. Estás viendo datos verificados."
+        },
+        "propertyManagers": {
+          "title": "Para administradores de propiedades",
+          "benefit1Title": "Confianza en la calidad del proveedor de servicios",
+          "benefit1Desc": "Los técnicos que trabajan en tus propiedades son parte de un ecosistema verificado. Las certificaciones IRATA/SPRAT están confirmadas. Las calificaciones de seguridad se ganan a través de actividad real."
         }
       },
       "keyFeatures": {
-        "title": "Caracteristicas clave",
-        "feature1": {
-          "title": "Navegacion de publicaciones de empleo",
-          "description": "Ve oportunidades activas con detalles y requisitos."
+        "title": "Características clave",
+        "subtitle": "La Bolsa de Trabajo te pone en control de tu carrera",
+        "closedEcosystem": {
+          "title": "Ecosistema cerrado",
+          "desc1": "Solo empresas de mantenimiento de edificios con acceso por cuerdas publican aquí. Sin contratistas generales. Sin agencias de empleo. Sin plataformas offshore.",
+          "desc2": "Cuando postulas, sabes que la empresa hace lo que tú haces."
         },
-        "feature2": {
-          "title": "Control de visibilidad del perfil",
-          "description": "Elige cuando tu perfil es visible para empleadores."
+        "instantApplications": {
+          "title": "Aplicaciones instantáneas",
+          "desc1": "Tus datos de perfil, CV, certificaciones y calificación de seguridad se adjuntan a cada aplicación.",
+          "desc2": "Un clic para postular. Sin formularios que llenar. 30 segundos de navegar a postulado."
         },
-        "feature3": {
-          "title": "Contacto directo",
-          "description": "Los empleadores interesados pueden contactarte directamente."
+        "directOffers": {
+          "title": "Ofertas de trabajo directas",
+          "desc1": "Cuando tu visibilidad de perfil está activada, los empleadores pueden enviarte ofertas directamente desde el navegador de talentos.",
+          "desc2": "Acepta o rechaza con un toque. Sin cadenas de emails. Sin etiqueta telefónica."
+        },
+        "expectedPayRate": {
+          "title": "Tarifa por hora esperada",
+          "desc1": "Establece lo que quieres ganar. Los empleadores lo ven en el navegador de talentos.",
+          "desc2": "Si alguien no puede igualar tu tarifa, no perderán tu tiempo con una entrevista. Los desajustes salariales se filtran antes de que ocurran."
+        },
+        "safetyRating": {
+          "title": "Visualización de calificación de seguridad",
+          "desc1": "Tu calificación de seguridad individual (0-100) muestra a los empleadores que tomas el trabajo en serio.",
+          "desc2": "Construida a partir de inspecciones de arnés, charlas de seguridad, cuestionarios de seguridad. Una puntuación alta es una ventaja competitiva."
+        },
+        "statusTracking": {
+          "title": "Seguimiento del estado de aplicaciones",
+          "desc1": "Ve dónde está cada aplicación. En revisión. Preseleccionado. Oferta extendida. Rechazada.",
+          "desc2": "Ya no más incertidumbre de \"¿siquiera vieron mi CV?\"."
         }
       },
-      "cta": {
-        "title": "Listo para encontrar oportunidades?",
-        "subtitle": "Conecta con empleadores que buscan tus habilidades. Crea tu perfil gratis.",
-        "trialButton": "Crear perfil gratis"
+      "problemsSolved": {
+        "title": "Problemas resueltos",
+        "expandAll": "Expandir todo",
+        "collapseAll": "Colapsar todo",
+        "forTechnicians": "Para técnicos",
+        "forEmployed": "Para técnicos actualmente empleados",
+        "thePain": "El problema:",
+        "realExample": "Ejemplo real:",
+        "solution": "Solución:",
+        "benefit": "Beneficio:",
+        "tech1": {
+          "question": "\"Busco 'acceso con cuerdas' en Indeed y obtengo trabajos de plomería y petróleo offshore.\"",
+          "pain": "Quieres trabajo de mantenimiento de edificios con cuerdas. Buscas en Indeed. Resultados: acceso industrial en refinerías, plataformas offshore, construcción general que menciona \"alturas\".",
+          "example": "Desplazas durante 30 minutos para encontrar 2-3 publicaciones tal vez relevantes. La mayoría son plataformas offshore o sitios industriales, no edificios.",
+          "solution": "La Bolsa de Trabajo de OnRopePro es exclusivamente para mantenimiento de edificios con cuerdas. Cada trabajo es limpieza de ventanas, sellado, lavado a presión, limpieza de canaletas, pintura o inspección visual en edificios.",
+          "benefit": "100% de listados relevantes. Cero desplazamiento por publicaciones irrelevantes. Encuentra lo que buscas inmediatamente."
+        },
+        "tech2": {
+          "question": "\"Postulo a trabajos e ingreso mi número IRATA manualmente cada vez.\"",
+          "pain": "Indeed no tiene un campo para certificación IRATA. LinkedIn tampoco. Subes tu CV, luego escribes manualmente tu número de certificación en un campo de notas.",
+          "example": "A veces olvidas. A veces ni siquiera lo leen. Has escrito tu número IRATA en más de 50 aplicaciones de trabajo este año.",
+          "solution": "En OnRopePro, tu certificación IRATA/SPRAT es parte de tu perfil. Se adjunta a cada aplicación automáticamente.",
+          "benefit": "Los empleadores ven tu nivel de certificación, tu número, tu fecha de vencimiento. Sin entrada manual. Sin información olvidada. Postula en 30 segundos en lugar de 15-20 minutos."
+        },
+        "tech3": {
+          "question": "\"No quiero que mi empleador actual sepa que estoy buscando trabajo.\"",
+          "pain": "Estás empleado. Está bien. Pero no te importaría ver qué más hay. Problema: si te haces visible en una bolsa de trabajo, tu jefe podría enterarse.",
+          "example": "Pones tu LinkedIn en \"Abierto a oportunidades\" y tu supervisor te pregunta al día siguiente. Conversación incómoda por delante.",
+          "solution": "La visibilidad del perfil es opcional. Mantenla desactivada: puedes explorar trabajos, postular a publicaciones y permanecer invisible al navegador de talentos.",
+          "benefit": "Tu empleador actual no puede encontrar tu perfil. Actívala solo cuando estés listo para ser encontrado."
+        },
+        "tech4": {
+          "question": "\"Pasé una hora en una entrevista para un trabajo que paga $15/hora menos de lo que necesito.\"",
+          "pain": "La publicación no mostraba el salario. Postulaste, entrevistaste, te llevaste bien con el dueño. Luego ofrecieron $45/hora. Necesitas $60 para que los números funcionen.",
+          "example": "Una hora de tu tiempo perdida. Una hora de su tiempo perdida. Vuelves a desplazarte en Indeed.",
+          "solution": "Establece tu tarifa por hora esperada en tu perfil. Los empleadores la ven en el navegador de talentos. Si no pueden igualar tu número, no te contactarán.",
+          "benefit": "Los desajustes de compensación se filtran antes de la entrevista, no durante. Ya no más entrevistas perdidas en trabajos que no pueden igualar tu tarifa."
+        },
+        "employed1": {
+          "question": "\"Quiero saber qué hay afuera sin anunciar que estoy buscando.\"",
+          "pain": "No estás infeliz en tu trabajo actual. Pero las oportunidades van y vienen. Te gustaría ver qué empresas están contratando sin anunciar a la industria que estás en el mercado.",
+          "example": "Revisas la sección de empleos de LinkedIn pero te preocupa que tu actividad sea visible. El acceso con cuerdas es una industria pequeña. Los rumores corren.",
+          "solution": "Mantén la visibilidad del perfil desactivada. Explora publicaciones de trabajo anónimamente. Postula selectivamente a posiciones que genuinamente te interesen.",
+          "benefit": "Nadie sabe que estás buscando a menos que se los digas. Mantente informado del mercado sin arriesgar tu posición actual."
+        },
+        "employed2": {
+          "question": "\"No tengo forma de construir una reputación que me siga entre empleadores.\"",
+          "pain": "Has trabajado de forma segura durante cinco años. Nunca tuviste un incidente. Tu empleador actual lo sabe. Pero cuando postulas a una nueva empresa, empiezas de cero.",
+          "example": "Sin historial documentado. Solo tu palabra. El nuevo empleador no tiene forma de verificar tu historial de seguridad.",
+          "solution": "Tu calificación de seguridad individual viaja contigo. Construida a partir de inspecciones de arnés, charlas de seguridad, reportes de casi-incidentes, cuestionarios de seguridad.",
+          "benefit": "Cuando postulas a un nuevo trabajo, los empleadores ven tu puntuación. Cinco años de trabajo seguro se convierte en una ventaja competitiva, no solo una afirmación en tu CV."
+        }
+      },
+      "connectedModules": {
+        "title": "Módulos conectados",
+        "subtitle": "La Bolsa de Trabajo se conecta con tu perfil profesional a través de la plataforma",
+        "documentVault": {
+          "title": "Bóveda de documentos",
+          "desc1": "Tus certificaciones, CV, información bancaria y contactos de emergencia están almacenados de forma segura.",
+          "desc2": "Cuando aceptas una oferta de trabajo, compártelos con tu nuevo empleador con un clic. Sin buscar cheques anulados."
+        },
+        "safetyCompliance": {
+          "title": "Seguridad y cumplimiento",
+          "desc1": "Tu calificación de seguridad individual se construye a partir de actividad real: inspecciones diarias de arnés, participación en charlas de seguridad, cuestionarios de seguridad.",
+          "desc2": "Los empleadores ven un número que ganaste, no un número que declaraste."
+        },
+        "logbook": {
+          "title": "Bitácora",
+          "desc1": "Tu historial de trabajo, horas registradas, edificios completados y tareas realizadas.",
+          "desc2": "¿Aceptando un nuevo trabajo? Tu historial viaja contigo."
+        },
+        "employeeManagement": {
+          "title": "Gestión de empleados",
+          "desc1": "Cuando aceptas una oferta, tus datos de perfil fluyen al sistema de tu nuevo empleador.",
+          "desc2": "Número IRATA, certificaciones, detalles de contacto. Listo desde el primer día sin el papeleo."
+        }
+      },
+      "faqs": {
+        "title": "Preguntas frecuentes",
+        "faq1": {
+          "question": "¿Necesito pagar para acceder a la bolsa de trabajo?",
+          "answer": "Las cuentas gratuitas pueden explorar publicaciones de trabajo. Las cuentas Plus obtienen acceso completo a la bolsa de trabajo incluyendo opciones de visibilidad del perfil y la capacidad de recibir ofertas directas de empleadores."
+        },
+        "faq2": {
+          "question": "¿Mi empleador actual puede ver que estoy buscando trabajo?",
+          "answer": "Solo si activas la visibilidad del perfil. Mantenla desactivada y eres invisible al navegador de talentos. Aún puedes explorar y postular a trabajos sin que nadie lo sepa."
+        },
+        "faq3": {
+          "question": "¿Qué pasa si no estoy empleado ahora mismo?",
+          "answer": "Aún puedes crear una cuenta, subir tus certificaciones y postular a trabajos. Tu calificación de seguridad se construirá una vez que estés conectado a un empleador en la plataforma."
+        },
+        "faq4": {
+          "question": "¿Cómo funciona la tarifa por hora esperada?",
+          "answer": "Estableces lo que quieres ganar por hora. Los empleadores lo ven cuando exploran el navegador de talentos. Si tu tarifa es $55/hora y ellos ofrecen $40, pueden elegir no contactarte. Ahorra tiempo a todos."
+        },
+        "faq5": {
+          "question": "¿Qué pasa cuando acepto una oferta de trabajo?",
+          "answer": "Si el empleador usa OnRopePro, la incorporación es casi instantánea. Tus datos de perfil fluyen a su sistema. Ellos ingresan tu tarifa y permisos. Estás listo para trabajar desde el primer día sin volver a ingresar tu información."
+        },
+        "faq6": {
+          "question": "¿Qué certificaciones necesito para usar la bolsa de trabajo?",
+          "answer": "La bolsa de trabajo es para profesionales de mantenimiento de edificios con acceso por cuerdas. La mayoría de los empleadores requerirán certificación IRATA o SPRAT. Puedes listar tu nivel de certificación y número en tu perfil."
+        },
+        "faq7": {
+          "question": "¿Puedo postular a múltiples trabajos al mismo tiempo?",
+          "answer": "Sí. Postula a tantos trabajos como te interesen. Rastrea el estado de cada aplicación desde tu panel de control."
+        },
+        "faq8": {
+          "question": "¿Qué pasa si un empleador me envía una oferta pero no estoy interesado?",
+          "answer": "Recházala con un toque. El empleador es notificado. Sin llamadas telefónicas incómodas requeridas."
+        }
+      },
+      "accessRequirements": {
+        "title": "Requisitos de acceso",
+        "feature": "Característica",
+        "freeTier": "Nivel gratuito",
+        "plusAccount": "Cuenta Plus",
+        "browseJobs": "Explorar publicaciones de trabajo",
+        "applyToJobs": "Postular a trabajos",
+        "limited": "Limitado",
+        "profileVisibility": "Control de visibilidad del perfil",
+        "receiveOffers": "Recibir ofertas directas",
+        "setPayRate": "Establecer tarifa por hora esperada",
+        "safetyRatingDisplay": "Visualización de calificación de seguridad",
+        "requiresEmployer": "Requiere empleador"
+      },
+      "finalCta": {
+        "title": "Cada trabajo aquí es acceso con cuerdas.",
+        "subtitle": "Sin excepciones.",
+        "description": "Deja de desplazarte por listados de plomería y plataformas offshore. La Bolsa de Trabajo de OnRopePro está construida para técnicos que hacen mantenimiento de edificios con acceso por cuerdas. Explora trabajos, postula en segundos, controla quién te encuentra.",
+        "browseJobs": "Explorar trabajos gratis",
+        "upgradePlus": "Actualizar a Plus para acceso completo"
+      },
+      "footer": {
+        "tagline": "La plataforma construida para mantenimiento de edificios con acceso por cuerdas."
       }
     }
   },
@@ -11401,6 +11934,501 @@
         "tagline": "Software de Gestión para Acceso con Cuerdas",
         "privacyPolicy": "Política de Privacidad",
         "termsOfService": "Términos de Servicio"
+      }
+    },
+    "payroll": {
+      "hero": {
+        "badge": "Módulo de Nómina y Finanzas",
+        "titleLine1": "Deja de Encerrar Números",
+        "titleLine2": "Con un Bolígrafo",
+        "description": "Las sesiones de trabajo fluyen directamente a hojas de tiempo listas para nómina. Sin papel. Sin calculadora. Sin encerrar.",
+        "descriptionBold": "Exporta a QuickBooks, ADP o Gusto en minutos.",
+        "trialButton": "Comienza Tu Prueba Gratuita de 60 Días",
+        "faqButton": "Encuentra Respuestas"
+      },
+      "stats": {
+        "timeEliminated": "Tiempo de nómina eliminado",
+        "annualValue": "Valor anual del tiempo",
+        "hoursSaved": "Horas ahorradas al año",
+        "problemsSolved": "Problemas resueltos"
+      },
+      "problem": {
+        "title": "El Problema de Nómina Que Nadie Admite",
+        "line1": "Imprimes hojas de tiempo. Los datos de un empleado se extienden por cuatro páginas.",
+        "line2": "Doce empleados significa 48 páginas mínimo. Las extiendes por tu escritorio, encierras las horas con un bolígrafo y tomas una calculadora.",
+        "line3": "Tres horas después, aún no has terminado. Y probablemente cometiste un error que no detectarás hasta que el empleado llame preguntando por qué le faltan $130.",
+        "line4": "Entonces envías una transferencia rápida. Problema resuelto para ellos. Problema creado para tus libros. Tu contador pregunta qué fue ese pago aleatorio. Ahora estás explicando en lugar de dirigir tu empresa.",
+        "line5": "Este caos no se queda contenido. Cuando la nómina es dolorosa, la pospones. Cuando constantemente llegas tarde, tu equipo lo nota. Se forma una cultura donde los plazos son opcionales. Esa mentalidad se extiende a todo.",
+        "solution": "OnRopePro elimina la entrada manual entre el trabajo de campo y la nómina. Cada registro de entrada se convierte automáticamente en datos de nómina. Verificado por GPS. Atribuido al proyecto. Horas extra calculadas. Listo para exportar."
+      },
+      "features": {
+        "title": "Del Registro de Entrada a la Exportación de Nómina",
+        "subtitle": "El módulo de Nómina y Finanzas transforma datos dispersos de sesiones de trabajo en hojas de tiempo organizadas y exportables sin intervención manual.",
+        "card1": {
+          "title": "Agregación Automática",
+          "headline": "Cada registro de entrada verificado por GPS fluye directamente a las hojas de tiempo.",
+          "description": "El sistema calcula las horas, aplica las reglas de horas extra y agrupa todo por período de pago.",
+          "listTitle": "Lo que se automatiza:",
+          "item1": "Totales de horas regulares por empleado",
+          "item2": "Cálculo de horas extra (disparadores diarios y semanales)",
+          "item3": "Agrupación por período de pago (semanal, quincenal, bisemanal, mensual)",
+          "item4": "Atribución de proyecto por sesión de trabajo"
+        },
+        "card2": {
+          "title": "Visibilidad de Costos de Trabajo",
+          "headline": "Sabe exactamente cuántas horas fueron a cada edificio.",
+          "description": "Deja de cotizar bajo porque finalmente puedes ver a dónde va realmente el tiempo.",
+          "listTitle": "Lo que se rastrea:",
+          "item1": "Horas por proyecto por empleado",
+          "item2": "Desglose facturable vs no facturable",
+          "item3": "Totales de costos laborales por proyecto",
+          "item4": "Comparación histórica entre períodos de pago"
+        },
+        "card3": {
+          "title": "Salida Lista para Exportar",
+          "headline": "Genera archivos CSV para QuickBooks, ADP, Gusto o cualquier software de nómina.",
+          "description": "Informes PDF para registros. Sin re-escribir datos.",
+          "listTitle": "Lo que se exporta:",
+          "item1": "Hojas de tiempo empleado por empleado",
+          "item2": "Desgloses de costos por proyecto",
+          "item3": "Resúmenes de horas extra",
+          "item4": "Pistas de auditoría completas"
+        }
+      },
+      "benefits": {
+        "title": "Quién se Beneficia de Este Módulo",
+        "subtitle": "Claridad de nómina para todos en tu operación.",
+        "employers": {
+          "title": "Para Empleadores (Propietarios de Empresas)",
+          "benefit1": {
+            "title": "Recupera 5+ horas cada período de pago.",
+            "description": "El método de calculadora y bolígrafo te cuesta 6-10 horas por procesamiento de nómina. OnRopePro agrega todo automáticamente. Selecciona el período de pago. Revisa los totales. Exporta. Listo en 30-45 minutos."
+          },
+          "benefit2": {
+            "title": "Detén la carrera de transferencias aleatorias.",
+            "description": "Cuando las hojas de tiempo están mal, lo arreglas con pagos rápidos que confunden tus libros. Datos precisos desde el inicio significa sin correcciones. Tu contador recibe exportaciones limpias cada vez."
+          },
+          "benefit3": {
+            "title": "Cotiza trabajos con confianza.",
+            "description": "Subcotizaste ese edificio por 60 horas porque no podías ver a dónde iba el tiempo. La atribución de proyecto muestra exactamente cuánto tiempo toma cada trabajo. Tu próxima cotización incluye las horas que realmente necesitas."
+          }
+        },
+        "operations": {
+          "title": "Para Gerentes de Operaciones y Supervisores",
+          "benefit1": {
+            "title": "Revisa sin el revuelo de papeles.",
+            "description": "Tus empleados en múltiples proyectos, múltiples edificios, múltiples turnos. La vista de nómina muestra cada sesión de trabajo organizada por empleado y período de pago. Revisa y aprueba desde una pantalla."
+          },
+          "benefit2": {
+            "title": "Detecta discrepancias antes del día de pago.",
+            "description": "La verificación GPS y la atribución de proyecto hacen obvias las anomalías. ¿Un técnico registró 8 horas en el Edificio A pero estaba programado para el Edificio B? Lo ves inmediatamente."
+          },
+          "benefit3": {
+            "title": "Acceso histórico para auditorías.",
+            "description": "Los períodos de pago anteriores permanecen accesibles. Cuando alguien cuestiona horas de hace tres meses, recuperas los datos en segundos."
+          }
+        },
+        "technicians": {
+          "title": "Para Técnicos de Acceso con Cuerdas",
+          "benefit1": {
+            "title": "Tus horas son precisas.",
+            "description": "La verificación GPS captura tu tiempo real en sitio. No más discrepancias entre lo que registraste y lo que el propietario calculó."
+          },
+          "benefit2": {
+            "title": "Ve a dónde va tu tiempo.",
+            "description": "Cada sesión de trabajo muestra a qué proyecto fuiste asignado. Tu día de 8 horas puede dividirse entre tres edificios. El desglose es claro."
+          },
+          "benefit3": {
+            "title": "Horas extra calculadas correctamente.",
+            "description": "El sistema aplica automáticamente las reglas de horas extra de tu empresa. Disparador diario a 8 horas, disparador semanal a 40, cualquiera sea la configuración. No se requiere cálculo manual."
+          }
+        },
+        "buildingManagers": {
+          "title": "Para Administradores de Edificios / Administradores de Propiedades",
+          "benefit1": {
+            "title": "Documentación laboral a demanda.",
+            "description": "¿Necesitas verificar cuántas horas de técnicos se dedicaron a tu edificio el último trimestre? Los datos existen y se exportan limpiamente."
+          },
+          "benefit2": {
+            "title": "Validación de presupuesto simplificada.",
+            "description": "Contrataste 200 horas de mantenimiento anual. La atribución de proyecto muestra exactamente cuántas horas se han registrado contra tu edificio."
+          },
+          "benefit3": {
+            "title": "Registros listos para auditoría.",
+            "description": "¿Requisitos de seguros, cumplimiento o revisión interna? Los datos de sesión de trabajo con verificación GPS proporcionan la pista de documentación."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Características Clave",
+        "subtitle": "Cada característica existe para eliminar la brecha entre el trabajo de campo y el procesamiento de nómina.",
+        "feature1": {
+          "title": "Configuración de Período de Pago",
+          "description": "Elige períodos de pago semanales, quincenales, bisemanales o mensuales. El sistema genera automáticamente los límites de período. Las sesiones de trabajo se agrupan automáticamente en el período de pago correcto."
+        },
+        "feature2": {
+          "title": "Datos de Tiempo Verificados por GPS",
+          "description": "Las horas provienen de sesiones de trabajo verificadas, no de cuadernos auto-reportados. La ubicación de registro confirma que el técnico estaba realmente en el sitio de trabajo. Elimina disputas."
+        },
+        "feature3": {
+          "title": "Reglas de Horas Extra Configurables",
+          "description": "Establece disparadores diarios (predeterminado 8 horas), disparadores semanales (predeterminado 40 horas) o umbrales personalizados. Los multiplicadores se ajustan de 1.5x a 3x. Desactiva las horas extra por completo si es necesario."
+        },
+        "feature4": {
+          "title": "Atribución de Proyecto",
+          "description": "Cada sesión de trabajo se vincula a un proyecto específico. Tu vista de nómina muestra qué edificio, qué tipo de trabajo, cuántas horas. Esencial para costeo de trabajos y precisión de cotizaciones futuras."
+        },
+        "feature5": {
+          "title": "Seguimiento Facturable vs No Facturable",
+          "description": "Distingue las horas de cliente que generan ingresos de los costos operativos. Viajes, mantenimiento de equipo, capacitación, retrasos por clima. Conoce tu verdadero costo laboral."
+        },
+        "feature6": {
+          "title": "Capacidades de Exportación",
+          "description": "Exportación CSV para integración con software de nómina (QuickBooks, ADP, Gusto). Informes PDF de hojas de tiempo para registros. Detalle por empleado y desgloses de costos por proyecto disponibles."
+        }
+      },
+      "results": {
+        "title": "Resultados Medibles",
+        "subtitle": "Mejoras concretas que verás desde el primer día.",
+        "result1": {
+          "title": "Ahorro de Tiempo",
+          "description": "El método manual de bolígrafo-y-calculadora consume 6-10 horas por procesamiento de nómina. OnRopePro reduce esto a 30-45 minutos. Para nómina quincenal, son aproximadamente 260 horas ahorradas anualmente. Tiempo que vuelve a dirigir tu negocio."
+        },
+        "result2": {
+          "title": "Reducción de Errores",
+          "description": "Los sistemas conflictivos (cuadernos, relojes de tiempo, hojas de cálculo) crean discrepancias. Los datos de fuente única de verdad eliminan disputas de conciliación. Las correcciones caen dramáticamente cuando los datos son precisos desde el inicio."
+        },
+        "result3": {
+          "title": "Precisión de Costeo de Trabajos",
+          "description": "Sin atribución de proyecto, no sabes por qué los trabajos exceden el presupuesto. Con ella, ves exactamente a dónde fueron las horas. Los operadores reportan que la precisión de cotizaciones mejora porque trabajan con datos históricos reales en lugar de estimaciones."
+        },
+        "result4": {
+          "title": "Limpieza Contable",
+          "description": "Los pagos de corrección aleatorios crean transacciones inexplicadas. Las exportaciones limpias significan que cada dólar está documentado antes de salir del sistema. El tiempo de conciliación del contador disminuye."
+        }
+      },
+      "integration": {
+        "title": "Puntos de Integración de Módulos",
+        "subtitle": "El módulo de Nómina y Finanzas se conecta con otros módulos de OnRopePro para crear un pipeline de datos completo desde el trabajo de campo hasta la exportación de nómina.",
+        "module1": {
+          "title": "Sesiones de Trabajo y Seguimiento de Tiempo",
+          "description": "Fuente de datos principal. Cada registro de entrada y salida crea datos de sesión de trabajo que fluyen directamente a la agregación de nómina."
+        },
+        "module2": {
+          "title": "Gestión de Empleados",
+          "description": "Búsqueda de tarifas y roles. La tarifa por hora se extrae del perfil del empleado en el momento de la sesión de trabajo. Los cambios de tarifa a mitad de proyecto se manejan correctamente."
+        },
+        "module3": {
+          "title": "Gestión de Proyectos",
+          "description": "Fuente de atribución de proyecto. Las sesiones de trabajo se vinculan a proyectos, permitiendo el seguimiento de costos laborales por edificio y por tipo de trabajo."
+        },
+        "module4": {
+          "title": "Programación y Calendario",
+          "description": "Contexto de asignación de turnos. Los turnos programados proporcionan horas esperadas para comparación con las horas realmente trabajadas. Las discrepancias se vuelven visibles."
+        },
+        "module5": {
+          "title": "Cumplimiento de Seguridad",
+          "description": "Verificación de elegibilidad para trabajar. La inspección del arnés y los requisitos de certificación se verifican antes de que se permita el registro de entrada. Las inspecciones fallidas bloquean las sesiones de trabajo."
+        },
+        "module6": {
+          "title": "Analítica e Informes",
+          "description": "Los datos de nómina alimentan la analítica a nivel de empresa. Los costos laborales, métricas de productividad y seguimiento de presupuesto derivan todos de la misma fuente de verdad."
+        }
+      },
+      "impact": {
+        "title": "Deja de Temer el Día de Pago",
+        "paragraph1": "El día de pago no debería consumir tu tarde. No debería involucrar una calculadora, un bolígrafo y 48 páginas de impresiones esparcidas por tu escritorio. Definitivamente no debería resultar en transferencias aleatorias que confunden a tu contador y correcciones que toman más tiempo que el procesamiento original.",
+        "paragraph2": "Ahora mismo, la nómina es probablemente la tarea más odiada en tu calendario. La pospones. Llegas tarde. Tus empleados empiezan a presupuestar alrededor de \"recibir el pago tarde\". Esa cultura de tardanza se extiende a todo lo demás.",
+        "paragraph3": "Cuando la nómina toma 30 minutos en lugar de 6 horas, dejas de evitarla. Cumples a tiempo. Tu equipo lo nota. Los estándares profesionales que estableces para la nómina se extienden a los plazos de proyectos, comunicaciones con clientes y documentación de seguridad.",
+        "paragraph4": "Recuperas 260+ horas al año. Son seis semanas de trabajo completas. Tiempo actualmente gastado encerrando números que podría ir hacia cotizar nuevos contratos, gestionar relaciones con clientes, o simplemente estar presente para el trabajo que realmente quieres hacer."
+      },
+      "faqs": {
+        "title": "Preguntas Frecuentes",
+        "subtitle": "Preguntas comunes sobre el módulo de Nómina y Finanzas.",
+        "faq1": {
+          "question": "¿OnRopePro calcula mis impuestos y deducciones?",
+          "answer": "No. OnRopePro prepara datos de hojas de tiempo listos para nómina para exportación. Los cálculos reales de nómina (CPP, EI, retención de impuestos, Seguro Social, Medicare) ocurren en tu software de procesamiento de nómina (QuickBooks, ADP, Gusto, etc.). OnRopePro maneja la agregación de tiempo y exportación, no el cumplimiento fiscal."
+        },
+        "faq2": {
+          "question": "¿Qué opciones de período de pago están disponibles?",
+          "answer": "Semanal, quincenal, bisemanal y mensual. El sistema genera los límites del período automáticamente según tu selección."
+        },
+        "faq3": {
+          "question": "¿Cómo funciona el cálculo de horas extra?",
+          "answer": "Tú configuras las reglas: disparador diario (predeterminado 8 horas), disparador semanal (predeterminado 40 horas), y multiplicador (1.5x, 2x, etc.). El sistema aplica estas reglas automáticamente a cada sesión de trabajo. Puedes desactivar las horas extra por completo si tu estructura de pago no las incluye."
+        },
+        "faq4": {
+          "question": "¿Qué formato usa la exportación?",
+          "answer": "CSV para importación en software de nómina. PDF para registros imprimibles de hojas de tiempo. Ambos incluyen detalle por empleado y atribución de proyecto."
+        },
+        "faq5": {
+          "question": "¿Quién puede ver los datos de nómina?",
+          "answer": "Usuarios con el permiso canAccessFinancials. Este se otorga a través del sistema de permisos basado en roles. Los técnicos ven sus propias horas pero no las tarifas de compensación ni los datos de otros empleados."
+        },
+        "faq6": {
+          "question": "¿Qué pasa si una sesión de trabajo falta o es incorrecta?",
+          "answer": "Los supervisores con los permisos apropiados pueden revisar y ajustar las sesiones de trabajo antes de la aprobación de hojas de tiempo. Todos los ajustes se registran con razones para propósitos de auditoría."
+        },
+        "faq7": {
+          "question": "¿Puedo ver períodos de pago históricos?",
+          "answer": "Sí. Los períodos de pago anteriores permanecen accesibles. Filtra por rango de fechas para obtener datos de cualquier período pasado."
+        },
+        "faq8": {
+          "question": "¿Funciona la atribución de proyecto si un técnico trabaja en múltiples edificios en un día?",
+          "answer": "Sí. Cada sesión de trabajo se vincula a un proyecto específico. Si un técnico registra entrada en el Edificio A por 4 horas, luego en el Edificio B por 4 horas, ambas sesiones aparecen por separado con su respectiva atribución de proyecto."
+        },
+        "faq9": {
+          "question": "¿Qué pasa con el tiempo no facturable como viajes entre sitios?",
+          "answer": "Las sesiones de trabajo no facturables rastrean horas que no pueden cobrarse a los clientes (viajes, capacitación, mantenimiento de equipo, retrasos por clima). La vista de nómina muestra horas facturables y no facturables para que conozcas tu verdadero costo laboral."
+        },
+        "faq10": {
+          "question": "¿Hay un flujo de aprobación antes de exportar?",
+          "answer": "Sí. Las hojas de tiempo pueden revisarse y aprobarse antes de exportar. Las hojas de tiempo aprobadas generan archivos de exportación limpios. El flujo previene exportar datos que no han sido verificados."
+        }
+      },
+      "cta": {
+        "title": "¿Listo para Recuperar Tu Tiempo?",
+        "subtitle": "Únete a las empresas de acceso con cuerdas que han eliminado el dolor de cabeza de la nómina. Comienza tu prueba gratuita de 60 días hoy.",
+        "trialButton": "Comienza Tu Prueba Gratuita de 60 Días",
+        "docsButton": "Ver Documentación Técnica"
+      }
+    },
+    "employerJobBoard": {
+      "hero": {
+        "badge": "Ecosistema de Bolsa de Trabajo",
+        "title": "Deja de Pagar $22 Por Solicitud",
+        "subtitle": "De personas que nunca han tocado una cuerda.",
+        "description": "La bolsa de trabajo de OnRopePro es un ecosistema cerrado. Cada empleador verificado. Cada técnico relevante. Publica trabajos ilimitados.",
+        "descriptionBold": "Cero tarifas por solicitud.",
+        "ctaPrimary": "Empieza a Publicar Gratis",
+        "ctaSecondary": "Encontrar Respuestas"
+      },
+      "stats": {
+        "filteringTime": {
+          "value": "0 horas",
+          "label": "Tiempo de Filtrado"
+        },
+        "platformFees": {
+          "value": "$0",
+          "label": "Tarifas de Plataforma"
+        },
+        "timeToHire": {
+          "value": "1-3 Días",
+          "label": "Tiempo de Contratación"
+        },
+        "interviews": {
+          "value": "2-3",
+          "label": "Entrevistas Necesarias"
+        }
+      },
+      "problemStatement": {
+        "title": "El Impuesto Indeed",
+        "paragraph1": "Publicas en Indeed. LinkedIn. Craigslist. Facebook. Recibes 50 solicitudes. Abres cada una, esperando encontrar un Nivel 2 con experiencia en sellado.",
+        "paragraph2": "Lo que encuentras: trabajadores de taller, instaladores de tuberías, candidatos de plataformas petroleras, y 23 personas que \"siempre han estado interesadas en aprender\". Dos horas filtrando. Dos técnicos reales de acceso con cuerdas.",
+        "paragraph3": "Luego Indeed te envía la factura. $22 por solicitud si no respondes en 48 horas. Una sola publicación te cuesta $300 antes de haber programado una entrevista. Alguien de tu equipo tiene que iniciar sesión cada día solo para hacer clic en \"rechazar\" en currículums de mecánicos de autos.",
+        "solutionTitle": "La bolsa de trabajo de OnRopePro funciona diferente.",
+        "solutionText": "Cada empresa aquí hace mantenimiento de edificios con acceso con cuerdas. Cada técnico aquí está en la industria. Cuando publicas un trabajo, el 100% de los solicitantes son relevantes. Sin ruido. Sin filtrado. Sin sorpresas de tarifas de $22."
+      },
+      "features": {
+        "title": "Tu Ecosistema Cerrado",
+        "subtitle": "Donde cada solicitante es un técnico de cuerdas y cada empleador está verificado",
+        "description": "La bolsa de trabajo te conecta con técnicos de acceso con cuerdas calificados en toda la plataforma. Publica trabajos, explora talentos y envía ofertas directas a candidatos que cumplen tus requisitos.",
+        "talentBrowser": {
+          "title": "Explorador de Talentos",
+          "description1": "Busca en el grupo de técnicos antes de publicar un trabajo. Filtra por ubicación, nivel de certificación, experiencia y tarifa esperada.",
+          "description2": "Ve quién está disponible, qué buscan y si tu presupuesto coincide con sus expectativas antes de gastar tiempo en entrevistas.",
+          "filterLabel": "Lo que puedes filtrar:",
+          "filter1": "Ubicación (ciudad, región)",
+          "filter2": "Nivel de certificación IRATA/SPRAT",
+          "filter3": "Años de experiencia",
+          "filter4": "Tarifa por hora esperada",
+          "filter5": "Puntuación de seguridad",
+          "filter6": "Especialidades (sellado, lavado de ventanas, etc.)"
+        },
+        "unlimitedPostings": {
+          "title": "Publicaciones de Trabajo Ilimitadas",
+          "description1": "Publica tantos trabajos como tu operación requiera. Tiempo completo, medio tiempo, contrato, temporal.",
+          "description2": "Seis tipos de trabajo soportados: lavado de ventanas, sellado, lavado a presión, limpieza de canaletas, pintura y recubrimiento, inspección visual. Sin tarifas por publicación. Sin cargos por solicitud. Sin facturas sorpresa.",
+          "controlLabel": "Lo que controlas:",
+          "control1": "Tipo de trabajo y alcance del servicio",
+          "control2": "Ubicación y detalles del sitio",
+          "control3": "Certificaciones requeridas",
+          "control4": "Rango salarial (opcional pero recomendado)",
+          "control5": "Fecha de inicio y duración"
+        },
+        "directOffers": {
+          "title": "Ofertas de Trabajo Directas",
+          "description1": "¿Encontraste un candidato perfecto en el Explorador de Talentos? Envíale una oferta directamente. Vincúlala a una de tus publicaciones de trabajo activas.",
+          "description2": "Reciben notificación en su portal. Aceptar o rechazar con un solo clic. Sin cadenas de correos. Sin juego de teléfono.",
+          "stepsLabel": "Cómo funciona:",
+          "step1": "Selecciona candidato de los resultados de búsqueda",
+          "step2": "Elige qué publicación de trabajo vincular",
+          "step3": "El técnico recibe notificación en su portal",
+          "step4": "La respuesta vuelve a tu panel de control"
+        }
+      },
+      "whoBenefits": {
+        "title": "Quién Se Beneficia De Este Módulo",
+        "subtitle": "Cada parte interesada en el proceso de contratación gana visibilidad y eficiencia",
+        "employers": {
+          "title": "Para Empleadores (Dueños de Empresa)",
+          "benefit1": {
+            "title": "Cero filtrado. Cada solicitante es un técnico de cuerdas.",
+            "description": "Publicas un trabajo. Recibes solicitudes de personas que realmente trabajan en mantenimiento de edificios con acceso con cuerdas. No instaladores de tuberías. No trabajadores offshore. No \"interesados en aprender\". Tu ratio de solicitantes a entrevistas mejora inmediatamente."
+          },
+          "benefit2": {
+            "title": "Conoce las expectativas salariales antes de contactar.",
+            "description": "Los técnicos establecen su tarifa esperada en su perfil. Cuando exploras talentos, ves su número antes de enviar una oferta. Si alguien no trabaja por menos de $60/hora y tu presupuesto es $45, lo sabes antes de perder una hora en una entrevista."
+          },
+          "benefit3": {
+            "title": "Incluido en tu suscripción.",
+            "description": "Publica trabajos ilimitados. Recibe solicitudes ilimitadas. Indeed cobra $22 por solicitud si no respondes en 48 horas. OnRopePro cobra $0. Tu acceso a la bolsa de trabajo es parte de lo que ya pagas."
+          }
+        },
+        "operationsManagers": {
+          "title": "Para Gerentes de Operaciones",
+          "benefit1": {
+            "title": "Explora talentos antes de publicar.",
+            "description": "¿Necesitas un Nivel 2 con experiencia en sellado en la región? Busca en el Explorador de Talentos. Ve quién está disponible, revisa sus puntuaciones de seguridad, examina sus tarifas esperadas. Encuentra candidatos primero, luego crea la publicación de trabajo basándote en lo disponible."
+          },
+          "benefit2": {
+            "title": "Las ofertas directas agilizan la contratación.",
+            "description": "¿Encontraste un buen candidato? Envíale una oferta vinculada a tu publicación de trabajo. No más \"Te enviaré un correo con los detalles\". La oferta, las especificaciones del trabajo y el botón de aceptar/rechazar están todos en un solo lugar."
+          }
+        },
+        "buildingManagers": {
+          "title": "Para Gerentes de Edificios",
+          "benefit1": {
+            "title": "Verifica las prácticas de contratación del contratista.",
+            "description": "Cuando tu contratista de acceso con cuerdas usa OnRopePro, sus técnicos tienen certificaciones IRATA/SPRAT documentadas y puntuaciones de seguridad visibles. No solo confías en su palabra. Ves credenciales verificadas vinculadas a historial de trabajo real."
+          }
+        },
+        "propertyManagers": {
+          "title": "Para Administradores de Propiedades",
+          "benefit1": {
+            "title": "Confianza en la calidad del contratista.",
+            "description": "Los contratistas que ofertan en tu portafolio usan un sistema donde cada técnico está verificado. Cuando te dicen \"nuestro equipo está certificado y enfocado en seguridad\", puedes ver los datos que respaldan esa afirmación."
+          }
+        },
+        "technicians": {
+          "title": "Para Técnicos",
+          "benefit1": {
+            "title": "Sé encontrado por empleadores que importan.",
+            "description": "Cuando activas la visibilidad de tu perfil, solo empresas de acceso con cuerdas verificadas pueden verte. Sin reclutadores aleatorios. Sin spam. Las empresas que contratan activamente en tu especialidad pueden buscarte directamente y enviar ofertas a tu portal."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Características Clave",
+        "subtitle": "El ecosistema de bolsa de trabajo combina publicación, búsqueda y contratación en un sistema integrado",
+        "verifiedEcosystem": {
+          "title": "Ecosistema de Empleadores Verificados",
+          "description1": "Solo empresas de mantenimiento de edificios con acceso con cuerdas publican aquí. Cada empleador se verifica cuando crea una cuenta. Sin panaderías, sin lavados de autos, sin industrias no relacionadas.",
+          "description2": "Cuando exploras las publicaciones de competidores, estás viendo tu mercado real."
+        },
+        "oneClickApplications": {
+          "title": "Solicitudes de Un Clic",
+          "description1": "Cuando los técnicos aplican, sus datos de perfil, currículum y certificaciones se adjuntan automáticamente. Ves todo lo que necesitas para evaluarlos en una sola vista.",
+          "description2": "Sin correos de \"por favor reenvía tu currículum\". Sin llamadas de \"puedes confirmar tu número IRATA\"."
+        },
+        "payRateVisibility": {
+          "title": "Visibilidad de Tarifa Esperada",
+          "description1": "Ve lo que los candidatos quieren antes de contactarlos. Si tu presupuesto es $45/hora y quieren $60, lo sabes inmediatamente.",
+          "description2": "Deja de perder tiempo en entrevistas por desacuerdos de compensación."
+        },
+        "safetyRating": {
+          "title": "Integración de Puntuación de Seguridad",
+          "description1": "Cada técnico tiene una Puntuación de Seguridad Individual (0-100) construida a partir de inspecciones diarias de arnés, participación en charlas de seguridad y cuestionarios de seguridad completados.",
+          "description2": "Véela en su perfil. Considérala en tus decisiones de contratación."
+        },
+        "statusDashboard": {
+          "title": "Panel de Estado de Solicitudes",
+          "description1": "Rastrea cada solicitante en cada publicación. Ve quién está en revisión, a quién contactaste, a quién se le ofreció, quién aceptó.",
+          "description2": "Sin hojas de cálculo. Sin perder candidatos entre las grietas."
+        },
+        "instantOnboarding": {
+          "title": "Conexión de Incorporación Instantánea",
+          "description1": "Cuando un técnico acepta tu oferta, sus datos de perfil fluyen a tu sistema de gestión de empleados. Número IRATA, certificaciones, datos bancarios (si se comparten), contactos de emergencia.",
+          "description2": "Listo desde el día uno sin maratón de papeleo."
+        }
+      },
+      "problemsSolved": {
+        "title": "Problemas Resueltos",
+        "expandAll": "Expandir Todo",
+        "collapseAll": "Colapsar Todo",
+        "forEmployers": "Para Empleadores",
+        "forOperationsManagers": "Para Gerentes de Operaciones",
+        "forBuildingManagers": "Para Gerentes de Edificios",
+        "painLabel": "El Dolor:",
+        "exampleLabel": "Ejemplo Real:",
+        "solutionLabel": "Solución:",
+        "benefitLabel": "Beneficio:",
+        "employer1": {
+          "question": "\"Publico en Indeed y recibo 50 solicitantes. Solo 2 son técnicos de cuerdas reales.\"",
+          "pain": "Publicas en todas partes: Indeed, LinkedIn, Craigslist, Facebook. Las solicitudes llegan de personas que nunca han tocado un sistema de cuerdas.",
+          "example": "Trabajadores de taller, trabajadores de construcción general, candidatos offshore. Dos horas filtrando para encontrar dos currículums relevantes de cincuenta solicitudes.",
+          "solution": "La bolsa de trabajo de OnRopePro es un ecosistema cerrado. Cada técnico en la plataforma está en mantenimiento de edificios con acceso con cuerdas.",
+          "benefit": "Cuando publicas un trabajo, el 100% de los solicitantes son relevantes. No se requiere filtrado. Dos horas de tiempo perdido se convierten en cero."
+        },
+        "employer2": {
+          "question": "\"Indeed me cobra $22 por solicitud si no respondo en 48 horas.\"",
+          "pain": "Alguien tiene que iniciar sesión diariamente, abrir cada solicitud, rechazar o responder. Pierde algunos días y los cargos se acumulan.",
+          "example": "Son $22 por cada solicitud sin abrir. Una sola publicación de trabajo puede costar $300 en \"tarifas de compromiso\" antes de haber contratado a alguien.",
+          "solution": "OnRopePro incluye publicaciones y solicitudes ilimitadas en tu suscripción. Sin tarifas por solicitud. Sin cargos sorpresa.",
+          "benefit": "Sin obligación de iniciar sesión diariamente solo para evitar facturación. Publica libremente, revisa según tu horario, no pagues nada extra."
+        },
+        "employer3": {
+          "question": "\"Pasé una hora entrevistando a alguien que quiere $20/hora más que mi presupuesto.\"",
+          "pain": "La entrevista fue bien. Las referencias fueron verificadas. Estás listo para hacer una oferta. Luego preguntas sobre compensación.",
+          "example": "Quieren $60/hora. Tu presupuesto es $45. Una hora perdida para ambas partes porque las expectativas nunca estuvieron alineadas.",
+          "solution": "Los técnicos establecen su tarifa esperada en su perfil. La ves en el Explorador de Talentos antes de contactar.",
+          "benefit": "Los desacuerdos de compensación se filtran antes de la entrevista, no durante. Solo entrevista candidatos dentro de tu presupuesto."
+        },
+        "ops1": {
+          "question": "\"No sé si tenemos capacidad para tomar este nuevo contrato.\"",
+          "pain": "Un cliente llama con trabajo urgente. Crees que Tommy termina la Torre A el viernes, pero no estás seguro. ¿Sarah está de vacaciones?",
+          "example": "Rechazas el trabajo (ingresos perdidos) o te comprometes y esperas (riesgo de sobrecompromiso y falla en entrega).",
+          "solution": "La bolsa de trabajo se conecta a tus sistemas de programación y gestión de empleados. Cuando publicas un trabajo y recibes solicitudes, puedes cruzar referencias con la disponibilidad del equipo.",
+          "benefit": "Sabe si tienes capacidad antes de comprometerte. Toma decisiones informadas sobre nuevos contratos basándote en datos reales."
+        },
+        "bm1": {
+          "question": "\"¿Cómo sé si este contratista contrata trabajadores calificados?\"",
+          "pain": "Contratas una empresa de acceso con cuerdas pero no tienes visibilidad de quién realmente están enviando a tu edificio.",
+          "example": "¿Están certificadas estas personas? ¿Tienen registros de seguridad? Confías en la palabra del contratista sin forma de verificar.",
+          "solution": "Cuando los contratistas usan OnRopePro, sus técnicos tienen certificaciones IRATA/SPRAT verificadas y puntuaciones de seguridad visibles.",
+          "benefit": "Puedes pedir documentación. Los datos existen en su sistema. La confianza está respaldada por registros verificables."
+        }
+      },
+      "connectedModules": {
+        "title": "Módulos Conectados",
+        "subtitle": "La bolsa de trabajo no existe aislada. Se conecta a los sistemas que ya usas.",
+        "employeeManagement": {
+          "title": "Gestión de Empleados",
+          "description": "Cuando un técnico acepta tu oferta, sus datos de perfil fluyen a tu lista de empleados. Número IRATA, certificaciones, información de contacto. Comienza la incorporación inmediatamente."
+        },
+        "safetyCompliance": {
+          "title": "Seguridad y Cumplimiento",
+          "description": "Las puntuaciones de seguridad de los candidatos vienen de datos reales: inspecciones de arnés, charlas de seguridad, cuestionarios de seguridad. La puntuación que ves es ganada, no auto-reportada."
+        },
+        "projectManagement": {
+          "title": "Gestión de Proyectos",
+          "description": "¿Contratando para un proyecto específico? Ve qué posiciones necesitas llenar revisando tus proyectos activos. Personal apropiadamente basándote en carga de trabajo real."
+        },
+        "schedulingCalendar": {
+          "title": "Programación y Calendario",
+          "description": "Cruza referencias de nuevas contrataciones contra la disponibilidad del equipo. Sabe cuándo tienes capacidad para traer a alguien y a qué proyectos se unirán."
+        }
+      },
+      "cta": {
+        "title": "Tu Tiempo de Contratación Llega a Cero.",
+        "titleHighlight": "Tu Grupo de Talentos Se Extiende a Todos.",
+        "description1": "Ahora mismo, la contratación consume tu semana. Publicas en Indeed. Esperas solicitudes. Filtras currículums irrelevantes. Entrevistas personas que quieren el doble de tu presupuesto. Pagas $22 por solicitud de instaladores de tuberías.",
+        "description2": "Con la bolsa de trabajo de OnRopePro, tu próxima contratación ya está en el sistema. Busca en el Explorador de Talentos. Encuentra técnicos Nivel 2 con experiencia en sellado en tu región. Ve su puntuación de seguridad, su tarifa esperada, sus certificaciones. Envía una oferta directamente.",
+        "ctaPrimary": "Empieza a Publicar Gratis",
+        "ctaSecondary": "Aprender Más"
+      },
+      "footer": {
+        "text": "Parte de la plataforma OnRopePro para empresas de mantenimiento de edificios con acceso con cuerdas."
       }
     }
   }

@@ -320,7 +320,244 @@
       },
       "payroll": {
         "title": "Payroll & Financial",
-        "description": "Automated timesheets, overtime calculation, payroll exports"
+        "description": "Automated timesheets, overtime calculation, payroll exports",
+        "hero": {
+          "badge": "Stop Hating Payday",
+          "title": "Payroll Preparation That",
+          "titleHighlight": "Actually Works",
+          "subtitle": "From verified work sessions to export-ready timesheets. Overtime calculated. Project costs tracked. Hours that match your accounting software on the first try.",
+          "primaryCta": "Start Free 60-Day Trial",
+          "secondaryCta": "See How It Works"
+        },
+        "stats": {
+          "stat1": {
+            "value": "30min",
+            "label": "Typical payroll prep time",
+            "sublabel": "(was 6-10 hours)"
+          },
+          "stat2": {
+            "value": "95%",
+            "label": "Reduction in payroll corrections"
+          },
+          "stat3": {
+            "value": "260+",
+            "label": "Hours saved annually",
+            "sublabel": "(6 work weeks)"
+          }
+        },
+        "problem": {
+          "title": "The Payroll Problem Nobody Talks About",
+          "subtitle": "Your hourly rates are correct. Your work hours are correct. So why does payday feel like a hostage negotiation?",
+          "card1": {
+            "title": "The Time Tracking Mess",
+            "description": "Your tech logged 8 hours in their notebook. The time clock says 7.5 hours. GPS shows they arrived at 7:45am. Which number do you pay?"
+          },
+          "card2": {
+            "title": "The Allocation Mystery",
+            "description": "Sarah worked three buildings yesterday. How do you split her 8 hours across three different project budgets accurately? Most owners guess."
+          },
+          "card3": {
+            "title": "The Overtime Confusion",
+            "description": "Dave hit 40 hours on Thursday afternoon. He worked Friday. Does overtime trigger daily or weekly? At 1.5x or 2x? Your spreadsheet doesn't know."
+          }
+        },
+        "benefits": {
+          "title": "Who Benefits from Proper Payroll Data",
+          "subtitle": "The Payroll module serves different needs for each role in your rope access operation.",
+          "owners": {
+            "title": "For Rope Access Company Owners",
+            "benefit1": {
+              "title": "No more random e-transfers.",
+              "description": "\"I thought I paid Dave on Friday\" becomes a searchable, documented history. Every payment is tracked. Every discrepancy has a reason attached."
+            },
+            "benefit2": {
+              "title": "Stop subsidizing client projects.",
+              "description": "With project attribution on every hour, you finally know which buildings are profitable. That \"good client\" paying net-60 might actually be costing you money."
+            },
+            "benefit3": {
+              "title": "QuickBooks exports that work.",
+              "description": "The CSV export matches your payroll software's import format. No reformatting. No manual re-entry. No transcription errors."
+            }
+          },
+          "operations": {
+            "title": "For Operations Managers / Supervisors",
+            "benefit1": {
+              "title": "Review without the paper shuffle.",
+              "description": "Your employees across multiple projects, multiple buildings, multiple shifts. The payroll view shows every work session organized by employee and pay period. Review and approve from one screen."
+            },
+            "benefit2": {
+              "title": "Catch discrepancies before payday.",
+              "description": "GPS verification and project attribution make anomalies obvious. A technician logged 8 hours at Building A but was scheduled for Building B? You see it immediately."
+            },
+            "benefit3": {
+              "title": "Historical access for audits.",
+              "description": "Previous pay periods stay accessible. When someone questions hours from three months ago, you pull the data in seconds."
+            }
+          },
+          "technicians": {
+            "title": "For Rope Access Technicians",
+            "benefit1": {
+              "title": "Your hours are accurate.",
+              "description": "GPS verification captures your actual time on site. No more discrepancies between what you logged and what the owner calculated."
+            },
+            "benefit2": {
+              "title": "See where your time goes.",
+              "description": "Every work session shows which project you were assigned to. Your 8-hour day might split across three buildings. The breakdown is clear."
+            },
+            "benefit3": {
+              "title": "Overtime calculated correctly.",
+              "description": "The system applies your company's overtime rules automatically. Daily trigger at 8 hours, weekly trigger at 40, whatever the configuration. No manual math required."
+            }
+          },
+          "buildingManagers": {
+            "title": "For Building Managers / Property Managers",
+            "benefit1": {
+              "title": "Labor documentation on demand.",
+              "description": "Need to verify how many technician hours were spent on your building last quarter? The data exists and exports cleanly."
+            },
+            "benefit2": {
+              "title": "Budget validation simplified.",
+              "description": "You contracted for 200 hours of annual maintenance. The project attribution shows exactly how many hours have been logged against your building."
+            },
+            "benefit3": {
+              "title": "Audit-ready records.",
+              "description": "Insurance, compliance, or internal review requirements? Work session data with GPS verification provides the documentation trail."
+            }
+          }
+        },
+        "keyFeatures": {
+          "title": "Key Features",
+          "subtitle": "Every feature exists to eliminate the gap between field work and payroll processing.",
+          "feature1": {
+            "title": "Pay Period Configuration",
+            "description": "Choose weekly, bi-weekly, semi-monthly, or monthly pay periods. The system auto-generates period boundaries. Work sessions group into the correct pay period automatically."
+          },
+          "feature2": {
+            "title": "GPS-Verified Time Data",
+            "description": "Hours come from verified work sessions, not self-reported notebooks. Clock-in location confirms the technician was actually at the job site. Eliminates disputes."
+          },
+          "feature3": {
+            "title": "Configurable Overtime Rules",
+            "description": "Set daily triggers (default 8 hours), weekly triggers (default 40 hours), or custom thresholds. Multipliers adjust from 1.5x to 3x. Disable overtime entirely if needed."
+          },
+          "feature4": {
+            "title": "Project Attribution",
+            "description": "Every work session links to a specific project. Your payroll view shows which building, which job type, how many hours. Essential for job costing and future bid accuracy."
+          },
+          "feature5": {
+            "title": "Billable vs Non-Billable Tracking",
+            "description": "Distinguish revenue-generating client hours from operational costs. Travel, equipment maintenance, training, weather delays. Know your true labor cost."
+          },
+          "feature6": {
+            "title": "Export Capabilities",
+            "description": "CSV export for payroll software integration (QuickBooks, ADP, Gusto). PDF timesheet reports for records. Employee-level detail and project cost breakdowns available."
+          }
+        },
+        "results": {
+          "title": "Measurable Results",
+          "subtitle": "Concrete improvements you'll see from day one.",
+          "result1": {
+            "title": "Time Savings",
+            "description": "The manual pen-and-calculator method consumes 6-10 hours per payroll run. OnRopePro reduces this to 30-45 minutes. For bi-weekly payroll, that's approximately 260 hours saved annually. Time that goes back into running your business."
+          },
+          "result2": {
+            "title": "Error Reduction",
+            "description": "Conflicting systems (notebooks, time clocks, spreadsheets) create discrepancies. Single-source-of-truth data eliminates reconciliation disputes. Corrections drop dramatically when the data is accurate from the start."
+          },
+          "result3": {
+            "title": "Job Costing Accuracy",
+            "description": "Without project attribution, you don't know why jobs run over budget. With it, you see exactly where hours went. Operators report quoting accuracy improves because they're working from actual historical data instead of estimates."
+          },
+          "result4": {
+            "title": "Accounting Cleanliness",
+            "description": "Random correction payments create unexplained transactions. Clean exports mean every dollar is documented before it leaves the system. Bookkeeper reconciliation time drops."
+          }
+        },
+        "integration": {
+          "title": "Module Integration Points",
+          "subtitle": "The Payroll & Financial module connects with other OnRopePro modules to create a complete data pipeline from field work to payroll export.",
+          "module1": {
+            "title": "Work Sessions & Time Tracking",
+            "description": "Primary data source. Every clock-in and clock-out creates work session data that flows directly into payroll aggregation."
+          },
+          "module2": {
+            "title": "Employee Management",
+            "description": "Rate and role lookup. Hourly rate pulls from the employee profile at the time of the work session. Mid-project rate changes are handled correctly."
+          },
+          "module3": {
+            "title": "Project Management",
+            "description": "Project attribution source. Work sessions link to projects, enabling labor cost tracking per building and per job type."
+          },
+          "module4": {
+            "title": "Scheduling & Calendar",
+            "description": "Shift assignment context. Scheduled shifts provide expected hours for comparison with actual hours worked. Discrepancies become visible."
+          },
+          "module5": {
+            "title": "Safety Compliance",
+            "description": "Work eligibility verification. Harness inspection and certification requirements verify before clock-in is allowed. Failed inspections block work sessions."
+          },
+          "module6": {
+            "title": "Analytics & Reporting",
+            "description": "Payroll data feeds into company-wide analytics. Labor costs, productivity metrics, and budget tracking all derive from the same source of truth."
+          }
+        },
+        "impact": {
+          "title": "Stop Dreading Payday",
+          "paragraph1": "Payday shouldn't consume your afternoon. It shouldn't involve a calculator, a pen, and 48 pages of printouts spread across your desk. It definitely shouldn't result in random e-transfers that confuse your bookkeeper and corrections that take longer than the original processing.",
+          "paragraph2": "Right now, payroll is probably the most hated task on your calendar. You put it off. You run late. Your employees start budgeting around \"getting paid late.\" That culture of lateness bleeds into everything else.",
+          "paragraph3": "When payroll takes 30 minutes instead of 6 hours, you stop avoiding it. You run on time. Your team notices. The professional standards you set for payroll extend to project timelines, client communications, and safety documentation.",
+          "paragraph4": "You get back 260+ hours per year. That's six full work weeks. Time currently spent circling numbers that could go toward bidding new contracts, managing client relationships, or simply being present for the work you actually want to do."
+        },
+        "faqs": {
+          "title": "Frequently Asked Questions",
+          "subtitle": "Common questions about the Payroll & Financial module.",
+          "faq1": {
+            "question": "Does OnRopePro calculate my taxes and deductions?",
+            "answer": "No. OnRopePro prepares payroll-ready timesheet data for export. Actual payroll calculations (CPP, EI, tax withholding, Social Security, Medicare) happen in your payroll processing software (QuickBooks, ADP, Gusto, etc.). OnRopePro handles time aggregation and export, not tax compliance."
+          },
+          "faq2": {
+            "question": "What pay period options are available?",
+            "answer": "Weekly, bi-weekly, semi-monthly, and monthly. The system generates period boundaries automatically based on your selection."
+          },
+          "faq3": {
+            "question": "How does overtime calculation work?",
+            "answer": "You configure the rules: daily trigger (default 8 hours), weekly trigger (default 40 hours), and multiplier (1.5x, 2x, etc.). The system applies these rules automatically to every work session. You can disable overtime entirely if your pay structure doesn't include it."
+          },
+          "faq4": {
+            "question": "What format does the export use?",
+            "answer": "CSV for payroll software import. PDF for printable timesheet records. Both include employee-level detail and project attribution."
+          },
+          "faq5": {
+            "question": "Who can see payroll data?",
+            "answer": "Users with the canAccessFinancials permission. This is granted through the role-based permission system. Technicians see their own hours but not compensation rates or other employees' data."
+          },
+          "faq6": {
+            "question": "What happens if a work session is missing or incorrect?",
+            "answer": "Supervisors with appropriate permissions can review and adjust work sessions before timesheet approval. All adjustments are logged with reasons for audit purposes."
+          },
+          "faq7": {
+            "question": "Can I see historical pay periods?",
+            "answer": "Yes. Previous pay periods remain accessible. Filter by date range to pull data from any past period."
+          },
+          "faq8": {
+            "question": "Does project attribution work if a technician works at multiple buildings in one day?",
+            "answer": "Yes. Each work session links to a specific project. If a technician clocks into Building A for 4 hours, then Building B for 4 hours, both sessions show separately with their respective project attribution."
+          },
+          "faq9": {
+            "question": "What about non-billable time like travel between sites?",
+            "answer": "Non-billable work sessions track hours that cannot be charged to clients (travel, training, equipment maintenance, weather delays). The payroll view shows both billable and non-billable hours so you know your true labor cost."
+          },
+          "faq10": {
+            "question": "Is there an approval workflow before export?",
+            "answer": "Yes. Timesheets can be reviewed and approved before export. Approved timesheets generate clean export files. The workflow prevents exporting data that hasn't been verified."
+          }
+        },
+        "cta": {
+          "title": "Ready to Reclaim Your Time?",
+          "subtitle": "Join rope access companies who've eliminated the payroll headache. Start your free 60-day trial today.",
+          "trialButton": "Start Your Free 60-Day Trial",
+          "docsButton": "View Technical Documentation"
+        }
       },
       "quoting": {
         "title": "Quoting & Sales Pipeline",
@@ -7748,6 +7985,169 @@
           "step3": "Technician receives in-portal notification",
           "step4": "Response comes back to your dashboard"
         }
+      },
+      "whoBenefits": {
+        "title": "Who Benefits From This Module",
+        "subtitle": "Every stakeholder in the hiring process gains visibility and efficiency",
+        "employers": {
+          "title": "For Employers (Company Owners)",
+          "benefit1": {
+            "title": "Zero filtering. Every applicant is a rope tech.",
+            "description": "You post a job. You receive applications from people who actually work in rope access building maintenance. Not pipe fitters. Not offshore workers. Not \"interested in learning.\" Your applicant-to-interview ratio improves immediately."
+          },
+          "benefit2": {
+            "title": "Know salary expectations before you reach out.",
+            "description": "Technicians set their expected pay rate in their profile. When you browse talent, you see their number before sending an offer. If someone won't work under $60/hour and your budget is $45, you know before wasting an hour on an interview."
+          },
+          "benefit3": {
+            "title": "Included in your subscription.",
+            "description": "Post unlimited jobs. Receive unlimited applications. Indeed charges $22 per application if you don't respond in 48 hours. OnRopePro charges $0. Your job board access is part of what you already pay for."
+          }
+        },
+        "operationsManagers": {
+          "title": "For Operations Managers",
+          "benefit1": {
+            "title": "Browse talent before you post.",
+            "description": "Need a Level 2 with caulking experience in the Lower Mainland? Search the Talent Browser. See who's available, check their safety ratings, review their expected rates. Find candidates first, then create the job posting to match what's available."
+          },
+          "benefit2": {
+            "title": "Direct offers streamline hiring.",
+            "description": "Find a strong candidate? Send them an offer linked to your job posting. No more \"I'll send you an email with the details.\" The offer, the job specs, and the accept/decline button are all in one place."
+          }
+        },
+        "buildingManagers": {
+          "title": "For Building Managers",
+          "benefit1": {
+            "title": "Verify contractor hiring practices.",
+            "description": "When your rope access contractor uses OnRopePro, their technicians have documented IRATA/SPRAT certifications and visible safety ratings. You're not just trusting their word. You're seeing verified credentials tied to real work history."
+          }
+        },
+        "propertyManagers": {
+          "title": "For Property Managers",
+          "benefit1": {
+            "title": "Confidence in contractor quality.",
+            "description": "The contractors bidding on your portfolio use a system where every technician is verified. When they tell you \"our team is certified and safety-focused,\" you can see the data backing that claim."
+          }
+        },
+        "technicians": {
+          "title": "For Technicians",
+          "benefit1": {
+            "title": "Get found by employers who matter.",
+            "description": "When you turn on profile visibility, only verified rope access companies can see you. No random recruiters. No spam. Companies actively hiring in your specialty can search for you directly and send offers to your portal."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Key Features",
+        "subtitle": "The Job Board ecosystem combines posting, searching, and hiring into one integrated system",
+        "verifiedEcosystem": {
+          "title": "Verified Employer Ecosystem",
+          "description1": "Only rope access building maintenance companies post here. Every employer is verified when they create an account. No bakeries, no car washes, no unrelated industries.",
+          "description2": "When you browse competitors' postings, you're seeing your actual market."
+        },
+        "oneClickApplications": {
+          "title": "One-Click Applications Inbound",
+          "description1": "When technicians apply, their profile data, resume, and certifications auto-attach. You see everything you need to evaluate them in one view.",
+          "description2": "No \"please resend your resume\" emails. No \"can you confirm your IRATA number\" phone calls."
+        },
+        "payRateVisibility": {
+          "title": "Expected Pay Rate Visibility",
+          "description1": "See what candidates want before you engage. If your budget is $45/hour and they want $60, you know immediately.",
+          "description2": "Stop wasting interview time on compensation mismatches."
+        },
+        "safetyRating": {
+          "title": "Safety Rating Integration",
+          "description1": "Every technician has an Individual Safety Rating (0-100) built from daily harness inspections, toolbox talk participation, and safety quiz completions.",
+          "description2": "See it in their profile. Factor it into your hiring decisions."
+        },
+        "statusDashboard": {
+          "title": "Application Status Dashboard",
+          "description1": "Track every applicant across every posting. See who's under review, who you've contacted, who's been offered, who's accepted.",
+          "description2": "No spreadsheets. No losing candidates between the cracks."
+        },
+        "instantOnboarding": {
+          "title": "Instant Onboarding Connection",
+          "description1": "When a technician accepts your offer, their profile data flows into your employee management system. IRATA number, certifications, banking details (if shared), emergency contacts.",
+          "description2": "Day-one ready without the paperwork marathon."
+        }
+      },
+      "problemsSolved": {
+        "title": "Problems Solved",
+        "collapseAll": "Collapse All",
+        "expandAll": "Expand All",
+        "forEmployers": "For Employers",
+        "forOperationsManagers": "For Operations Managers",
+        "forBuildingManagers": "For Building Managers",
+        "painLabel": "The Pain:",
+        "exampleLabel": "Real Example:",
+        "solutionLabel": "Solution:",
+        "benefitLabel": "Benefit:",
+        "employer1": {
+          "question": "\"I post on Indeed and get 50 applicants. Only 2 are actual rope techs.\"",
+          "pain": "You post everywhere: Indeed, LinkedIn, Craigslist, Facebook. Applications flood in from people who've never touched a rope system.",
+          "example": "Shop laborers, general construction workers, offshore candidates. Two hours filtering to find two relevant resumes out of fifty applications.",
+          "solution": "OnRopePro's Job Board is a closed ecosystem. Every technician on the platform is in rope access building maintenance.",
+          "benefit": "When you post a job, 100% of applicants are relevant. No filtering required. Two hours of wasted time becomes zero."
+        },
+        "employer2": {
+          "question": "\"Indeed charges me $22 per application if I don't respond in 48 hours.\"",
+          "pain": "Someone has to log in daily, open every application, decline or respond. Miss a few days and the charges pile up.",
+          "example": "That's $22 times every unopened application. A single job posting can cost $300 in \"engagement fees\" before you've hired anyone.",
+          "solution": "OnRopePro includes unlimited postings and applications in your subscription. No per-application fees. No surprise charges.",
+          "benefit": "No daily login obligation just to avoid billing. Post freely, review on your schedule, pay nothing extra."
+        },
+        "employer3": {
+          "question": "\"I spent an hour interviewing someone who wants $20/hour more than my budget.\"",
+          "pain": "The interview went well. References checked out. You're ready to make an offer. Then you ask about compensation.",
+          "example": "They want $60/hour. Your budget is $45. An hour wasted for both parties because expectations were never aligned.",
+          "solution": "Technicians set expected pay rate in their profile. You see it in the Talent Browser before reaching out.",
+          "benefit": "Compensation mismatches get filtered before the interview, not during. Only interview candidates within your budget."
+        },
+        "ops1": {
+          "question": "\"I don't know if we have capacity to take this new contract.\"",
+          "pain": "A client calls with urgent work. You think Tommy finishes Tower A on Friday, but you're not certain. Is Sarah on vacation?",
+          "example": "You either decline the work (lost revenue) or commit and hope (risk of overcommitting and failing to deliver).",
+          "solution": "The Job Board connects to your scheduling and employee management systems. When you post a job and receive applications, you can cross-reference against crew availability.",
+          "benefit": "Know if you have capacity before you commit. Make informed decisions about new contracts based on real data."
+        },
+        "bm1": {
+          "question": "\"How do I know this contractor hires qualified workers?\"",
+          "pain": "You hire a rope access company but have no visibility into who they're actually sending to your building.",
+          "example": "Are these people certified? Do they have safety records? You're trusting the contractor's word with no way to verify.",
+          "solution": "When contractors use OnRopePro, their technicians have verified IRATA/SPRAT certifications and visible safety ratings.",
+          "benefit": "You can ask for documentation. The data exists in their system. Trust is backed by verifiable records."
+        }
+      },
+      "connectedModules": {
+        "title": "Connected Modules",
+        "subtitle": "The Job Board doesn't exist in isolation. It connects to the systems you already use.",
+        "employeeManagement": {
+          "title": "Employee Management",
+          "description": "When a technician accepts your offer, their profile data flows into your employee roster. IRATA number, certifications, contact information. Start onboarding immediately."
+        },
+        "safetyCompliance": {
+          "title": "Safety & Compliance",
+          "description": "Candidate safety ratings come from real data: harness inspections, toolbox talks, safety quizzes. The score you see is earned, not self-reported."
+        },
+        "projectManagement": {
+          "title": "Project Management",
+          "description": "Hiring for a specific project? See which positions you need to fill by checking your active projects. Staff appropriately based on real workload."
+        },
+        "schedulingCalendar": {
+          "title": "Scheduling & Calendar",
+          "description": "Cross-reference new hires against crew availability. Know when you have capacity to bring someone on and which projects they'll join."
+        }
+      },
+      "cta": {
+        "title": "Your Hiring Time Goes to Zero.",
+        "titleHighlight": "Your Talent Pool Goes to Everyone.",
+        "description1": "Right now, hiring eats your week. You post on Indeed. You wait for applications. You filter through irrelevant resumes. You interview people who want double your budget. You pay $22 per application from pipe fitters.",
+        "description2": "With OnRopePro's Job Board, your next hire is already in the system. Search the Talent Browser. Find Level 2 techs with caulking experience in your region. See their safety rating, their expected rate, their certifications. Send an offer directly.",
+        "ctaPrimary": "Start Posting Jobs Free",
+        "ctaSecondary": "Learn More"
+      },
+      "footer": {
+        "text": "Part of the OnRopePro platform for rope access building maintenance companies."
       }
     },
     "userAccess": {
@@ -8143,20 +8543,235 @@
           "title": "Job Browser",
           "headline": "See only rope access building maintenance jobs.",
           "description": "Filter by location, job type, and certification requirements. Each listing shows company details, pay range (when provided), start dates, and project scope. Every company is verified. Every job is relevant.",
-          "filterLabel": "What you can filter by:"
+          "filterLabel": "What you can filter by:",
+          "filterLocation": "Location (city, region)",
+          "filterJobType": "Job type (window washing, caulking, etc.)",
+          "filterEmploymentType": "Employment type (full-time, contract)",
+          "filterCertLevel": "Required certification level",
+          "filterPayRange": "Pay range"
         },
         "oneClickApplications": {
           "title": "One-Click Applications",
           "headline": "Your profile data travels with your application.",
           "description": "Resume, certifications, IRATA/SPRAT numbers, years of experience, safety rating. All attached automatically. Apply to a job in 30 seconds instead of re-entering the same information for the 100th time.",
-          "sentLabel": "What gets sent automatically:"
+          "sentLabel": "What gets sent automatically:",
+          "sentResume": "Resume/CV (if uploaded)",
+          "sentCert": "IRATA/SPRAT certification details",
+          "sentExperience": "Years of experience",
+          "sentSafetyRating": "Safety rating score",
+          "sentPayRate": "Your expected pay rate"
         },
         "profileVisibility": {
           "title": "Profile Visibility Toggle",
           "headline": "Control who finds you.",
           "description": "Toggle visibility ON: employers can search for you in the Talent Browser, see your credentials, and send you direct job offers. Toggle it OFF: you're invisible to searches but can still browse and apply to jobs normally.",
-          "visibleLabel": "What employers see when you're visible:"
+          "visibleLabel": "What employers see when you're visible:",
+          "visibleName": "Name and photo",
+          "visibleCert": "Certification levels and numbers",
+          "visibleExperience": "Years of experience",
+          "visibleSafetyRating": "Safety rating",
+          "visiblePayRate": "Expected pay rate"
         }
+      },
+      "whoBenefits": {
+        "title": "Who Benefits From This Module",
+        "subtitle": "A closed ecosystem where every participant gets exactly what they need",
+        "technicians": {
+          "title": "For Technicians",
+          "benefit1Title": "Every job is rope access building maintenance",
+          "benefit1Desc": "No more scrolling past offshore rigs, pipe fitting positions, and \"working at heights\" construction gigs. Every posting here is from a verified rope access company doing building maintenance.",
+          "benefit2Title": "Apply once, your credentials follow everywhere",
+          "benefit2Desc": "Upload your resume, enter your IRATA number, set your expected pay rate. Every application you send includes this information automatically. No more typing the same details into 50 different forms.",
+          "benefit3Title": "You control who sees you",
+          "benefit3Desc": "Toggle profile visibility on when you're actively looking. Toggle it off when you're not. If you're employed but casually browsing, keep it off. Employers can't find you unless you want them to.",
+          "benefit4Title": "Know what they're paying before you apply",
+          "benefit4Desc": "Many employers list pay ranges on job postings. For those who don't, you can set your expected rate and let them decide if it matches their budget before they reach out."
+        },
+        "employers": {
+          "title": "For Employers",
+          "benefit1Title": "Find technicians who match your requirements",
+          "benefit1Desc": "Search the Talent Browser by certification level, location, experience, and expected pay rate. See safety ratings before reaching out. Send offers directly to candidates who fit."
+        },
+        "buildingManagers": {
+          "title": "For Building Managers",
+          "benefit1Title": "Verify contractor hiring standards",
+          "benefit1Desc": "When contractors use OnRopePro, their technicians have documented credentials and safety ratings. You're not trusting their word. You're seeing verified data."
+        },
+        "propertyManagers": {
+          "title": "For Property Managers",
+          "benefit1Title": "Confidence in service provider quality",
+          "benefit1Desc": "The technicians doing work on your properties are part of a verified ecosystem. IRATA/SPRAT certifications are confirmed. Safety ratings are earned through real activity."
+        }
+      },
+      "keyFeatures": {
+        "title": "Key Features",
+        "subtitle": "The Job Board puts you in control of your career",
+        "closedEcosystem": {
+          "title": "Closed Ecosystem",
+          "desc1": "Only rope access building maintenance companies post here. No general contractors. No staffing agencies. No offshore platforms.",
+          "desc2": "When you apply, you know the company does what you do."
+        },
+        "instantApplications": {
+          "title": "Instant Applications",
+          "desc1": "Your profile data, resume, certifications, and safety rating attach to every application.",
+          "desc2": "One click to apply. No forms to fill. 30 seconds from browsing to applied."
+        },
+        "directOffers": {
+          "title": "Direct Job Offers",
+          "desc1": "When your profile visibility is on, employers can send you offers directly from the Talent Browser.",
+          "desc2": "Accept or decline with one tap. No email chains. No phone tag."
+        },
+        "expectedPayRate": {
+          "title": "Expected Pay Rate",
+          "desc1": "Set what you want to earn. Employers see this in the Talent Browser.",
+          "desc2": "If someone can't meet your rate, they won't waste your time with an interview. Salary mismatches get filtered before they happen."
+        },
+        "safetyRating": {
+          "title": "Safety Rating Display",
+          "desc1": "Your Individual Safety Rating (0-100) shows employers you take the work seriously.",
+          "desc2": "Built from harness inspections, toolbox talks, safety quizzes. A high score is a competitive advantage."
+        },
+        "statusTracking": {
+          "title": "Application Status Tracking",
+          "desc1": "See where each application stands. Under review. Shortlisted. Offer extended. Declined.",
+          "desc2": "No more \"did they even see my resume?\" uncertainty."
+        }
+      },
+      "problemsSolved": {
+        "title": "Problems Solved",
+        "expandAll": "Expand All",
+        "collapseAll": "Collapse All",
+        "forTechnicians": "For Technicians",
+        "forEmployed": "For Currently Employed Technicians",
+        "thePain": "The Pain:",
+        "realExample": "Real Example:",
+        "solution": "Solution:",
+        "benefit": "Benefit:",
+        "tech1": {
+          "question": "\"I search 'rope access' on Indeed and get pipe fitter and offshore oil jobs.\"",
+          "pain": "You want rope access building maintenance work. You search Indeed. Results: industrial access at refineries, offshore platforms, general construction that mentions \"heights.\"",
+          "example": "You scroll for 30 minutes to find 2-3 maybe-relevant postings. Most are offshore rigs or industrial sites, not buildings.",
+          "solution": "OnRopePro's Job Board is exclusively for rope access building maintenance. Every job is window washing, caulking, pressure washing, gutter cleaning, painting, or visual inspection on buildings.",
+          "benefit": "100% relevant listings. Zero scrolling through irrelevant postings. Find what you're looking for immediately."
+        },
+        "tech2": {
+          "question": "\"I apply to jobs and manually enter my IRATA number every single time.\"",
+          "pain": "Indeed doesn't have a field for IRATA certification. Neither does LinkedIn. You upload your resume, then manually type your cert number into a notes field.",
+          "example": "Sometimes you forget. Sometimes they don't even read it. You've typed your IRATA number into 50+ job applications this year.",
+          "solution": "On OnRopePro, your IRATA/SPRAT certification is part of your profile. It attaches to every application automatically.",
+          "benefit": "Employers see your cert level, your number, your expiration date. No manual entry. No forgotten information. Apply in 30 seconds instead of 15-20 minutes."
+        },
+        "tech3": {
+          "question": "\"I don't want my current employer to know I'm looking for work.\"",
+          "pain": "You're employed. It's fine. But you wouldn't mind seeing what else is out there. Problem: if you make yourself visible on a job board, your boss might find out.",
+          "example": "You set your LinkedIn to \"Open to Work\" and your supervisor asks about it the next day. Awkward conversation ahead.",
+          "solution": "Profile visibility is opt-in. Keep it toggled off: you can browse jobs, apply to postings, and stay invisible to the Talent Browser.",
+          "benefit": "Your current employer can't stumble across your profile. Toggle it on only when you're ready to be found."
+        },
+        "tech4": {
+          "question": "\"I spent an hour interviewing for a job that pays $15/hour less than I need.\"",
+          "pain": "The listing didn't show pay. You applied, interviewed, got along great with the owner. Then they offered $45/hour. You need $60 to make the numbers work.",
+          "example": "An hour of your time wasted. An hour of their time wasted. You're back to scrolling Indeed.",
+          "solution": "Set your expected pay rate in your profile. Employers see it in the Talent Browser. If they can't meet your number, they won't reach out.",
+          "benefit": "Compensation mismatches get filtered before the interview, not during. No more wasted interviews on jobs that can't meet your rate."
+        },
+        "employed1": {
+          "question": "\"I want to know what's out there without broadcasting that I'm looking.\"",
+          "pain": "You're not unhappy at your current job. But opportunities come and go. You'd like to see what companies are hiring without announcing to the industry that you're on the market.",
+          "example": "You check LinkedIn's job section but worry that your activity is visible. Rope access is a small industry. Word gets around.",
+          "solution": "Keep profile visibility off. Browse job postings anonymously. Apply selectively to positions that genuinely interest you.",
+          "benefit": "No one knows you're looking unless you tell them. Stay informed about the market without risking your current position."
+        },
+        "employed2": {
+          "question": "\"I have no way to build a reputation that follows me between employers.\"",
+          "pain": "You've worked safely for five years. Never had an incident. Your current employer knows it. But when you apply to a new company, you start from zero.",
+          "example": "No documented track record. Just your word. The new employer has no way to verify your safety history.",
+          "solution": "Your Individual Safety Rating travels with you. Built from harness inspections, toolbox talks, near-miss reports, safety quizzes.",
+          "benefit": "When you apply to a new job, employers see your score. Five years of safe work becomes a competitive advantage, not just a claim on your resume."
+        }
+      },
+      "connectedModules": {
+        "title": "Connected Modules",
+        "subtitle": "The Job Board connects to your professional profile across the platform",
+        "documentVault": {
+          "title": "Document Vault",
+          "desc1": "Your certifications, resume, banking info, and emergency contacts are stored securely.",
+          "desc2": "When you accept a job offer, share them with your new employer in one click. No hunting for void cheques."
+        },
+        "safetyCompliance": {
+          "title": "Safety & Compliance",
+          "desc1": "Your Individual Safety Rating builds from real activity: daily harness inspections, toolbox talk participation, safety quizzes.",
+          "desc2": "Employers see a number you earned, not a number you claimed."
+        },
+        "logbook": {
+          "title": "Logbook",
+          "desc1": "Your work history, hours logged, buildings completed, and tasks performed.",
+          "desc2": "Accepting a new job? Your track record travels with you."
+        },
+        "employeeManagement": {
+          "title": "Employee Management",
+          "desc1": "When you accept an offer, your profile data flows to your new employer's system.",
+          "desc2": "IRATA number, certifications, contact details. Day-one ready without the paperwork."
+        }
+      },
+      "faqs": {
+        "title": "Frequently Asked Questions",
+        "faq1": {
+          "question": "Do I need to pay to access the job board?",
+          "answer": "Free tier accounts can browse job postings. Plus accounts get full job board access including profile visibility options and the ability to receive direct offers from employers."
+        },
+        "faq2": {
+          "question": "Can my current employer see that I'm looking for work?",
+          "answer": "Only if you toggle profile visibility on. Keep it off and you're invisible to the Talent Browser. You can still browse and apply to jobs without anyone knowing."
+        },
+        "faq3": {
+          "question": "What if I'm not employed right now?",
+          "answer": "You can still create an account, upload your certifications, and apply to jobs. Your safety rating will build once you're connected to an employer on the platform."
+        },
+        "faq4": {
+          "question": "How does the expected pay rate work?",
+          "answer": "You set what you want to earn per hour. Employers see this when they browse the Talent Browser. If your rate is $55/hour and they're offering $40, they can choose not to reach out. Saves everyone time."
+        },
+        "faq5": {
+          "question": "What happens when I accept a job offer?",
+          "answer": "If the employer uses OnRopePro, onboarding is nearly instant. Your profile data flows to their system. They enter your pay rate and permissions. You're ready to work on day one without re-entering your information."
+        },
+        "faq6": {
+          "question": "What certifications do I need to use the job board?",
+          "answer": "The job board is for rope access building maintenance professionals. Most employers will require IRATA or SPRAT certification. You can list your certification level and number in your profile."
+        },
+        "faq7": {
+          "question": "Can I apply to multiple jobs at the same time?",
+          "answer": "Yes. Apply to as many jobs as interest you. Track each application's status from your dashboard."
+        },
+        "faq8": {
+          "question": "What if an employer sends me an offer but I'm not interested?",
+          "answer": "Decline it with one tap. The employer gets notified. No awkward phone calls required."
+        }
+      },
+      "accessRequirements": {
+        "title": "Access Requirements",
+        "feature": "Feature",
+        "freeTier": "Free Tier",
+        "plusAccount": "Plus Account",
+        "browseJobs": "Browse Job Postings",
+        "applyToJobs": "Apply to Jobs",
+        "limited": "Limited",
+        "profileVisibility": "Profile Visibility Toggle",
+        "receiveOffers": "Receive Direct Offers",
+        "setPayRate": "Set Expected Pay Rate",
+        "safetyRatingDisplay": "Safety Rating Display",
+        "requiresEmployer": "Requires employer"
+      },
+      "finalCta": {
+        "title": "Every Job Here Is Rope Access.",
+        "subtitle": "No Exceptions.",
+        "description": "Stop scrolling through pipe fitter listings and offshore rigs. OnRopePro's Job Board is built for techs who do rope access building maintenance. Browse jobs, apply in seconds, control who finds you.",
+        "browseJobs": "Browse Jobs Free",
+        "upgradePlus": "Upgrade to Plus for Full Access"
+      },
+      "footer": {
+        "tagline": "The platform built for rope access building maintenance."
       }
     }
   },
@@ -11076,6 +11691,501 @@
         "tagline": "Management Software for Rope Access",
         "privacyPolicy": "Privacy Policy",
         "termsOfService": "Terms of Service"
+      }
+    },
+    "payroll": {
+      "hero": {
+        "badge": "Payroll & Financial Module",
+        "titleLine1": "Stop Circling Numbers",
+        "titleLine2": "With a Pen",
+        "description": "Work sessions flow directly into payroll-ready timesheets. No paper. No calculator. No circling.",
+        "descriptionBold": "Export to QuickBooks, ADP, or Gusto in minutes.",
+        "trialButton": "Start Your Free 60-Day Trial",
+        "faqButton": "Find Answers"
+      },
+      "stats": {
+        "timeEliminated": "Payroll time eliminated",
+        "annualValue": "Annual time value",
+        "hoursSaved": "Hours saved yearly",
+        "problemsSolved": "Problems solved"
+      },
+      "problem": {
+        "title": "The Payroll Problem Nobody Admits",
+        "line1": "You print timesheets. One employee's data spreads across four pages.",
+        "line2": "Twelve employees means 48 pages minimum. You lay them across your desk, circle hours with a pen, and grab a calculator.",
+        "line3": "Three hours later, you're still not done. And you've probably made a mistake you won't catch until the employee calls asking why they're short $130.",
+        "line4": "So you send a quick e-transfer. Problem solved for them. Problem created for your books. Your bookkeeper asks what that random payment was. Now you're explaining instead of running your company.",
+        "line5": "This chaos doesn't stay contained. When payroll is painful, you put it off. When you're consistently late, your team notices. A culture forms where deadlines are optional. That mindset bleeds into everything.",
+        "solution": "OnRopePro eliminates manual entry between field work and payroll. Every clock-in becomes payroll data automatically. GPS-verified. Project-attributed. Overtime-calculated. Ready to export."
+      },
+      "features": {
+        "title": "From Clock-In to Payroll Export",
+        "subtitle": "The Payroll & Financial module transforms scattered work session data into organized, exportable timesheets without manual intervention.",
+        "card1": {
+          "title": "Automatic Aggregation",
+          "headline": "Every GPS-verified clock-in flows directly into timesheets.",
+          "description": "The system calculates hours, applies overtime rules, and groups everything by pay period.",
+          "listTitle": "What gets automated:",
+          "item1": "Regular hour totals by employee",
+          "item2": "Overtime calculation (daily and weekly triggers)",
+          "item3": "Pay period grouping (weekly, bi-weekly, semi-monthly, monthly)",
+          "item4": "Project attribution per work session"
+        },
+        "card2": {
+          "title": "Job Costing Visibility",
+          "headline": "Know exactly how many hours went to each building.",
+          "description": "Stop underbidding jobs because you can finally see where time actually goes.",
+          "listTitle": "What gets tracked:",
+          "item1": "Hours per project per employee",
+          "item2": "Billable vs non-billable breakdown",
+          "item3": "Project labor cost totals",
+          "item4": "Historical comparison across pay periods"
+        },
+        "card3": {
+          "title": "Export-Ready Output",
+          "headline": "Generate CSV files for QuickBooks, ADP, Gusto, or any payroll software.",
+          "description": "PDF reports for records. No re-keying data.",
+          "listTitle": "What gets exported:",
+          "item1": "Employee-by-employee timesheets",
+          "item2": "Project cost breakdowns",
+          "item3": "Overtime summaries",
+          "item4": "Complete audit trails"
+        }
+      },
+      "benefits": {
+        "title": "Who Benefits From This Module",
+        "subtitle": "Payroll clarity for everyone in your operation.",
+        "employers": {
+          "title": "For Employers (Company Owners)",
+          "benefit1": {
+            "title": "Reclaim 5+ hours every pay period.",
+            "description": "The calculator and pen method costs you 6-10 hours per payroll run. OnRopePro aggregates everything automatically. Select the pay period. Review the totals. Export. Done in 30-45 minutes."
+          },
+          "benefit2": {
+            "title": "Stop the random e-transfer scramble.",
+            "description": "When timesheets are wrong, you fix it with quick payments that confuse your books. Accurate data from the start means no corrections. Your bookkeeper gets clean exports every time."
+          },
+          "benefit3": {
+            "title": "Quote jobs with confidence.",
+            "description": "You underbid that building by 60 hours because you couldn't see where time went. Project attribution shows exactly how long each job takes. Your next quote includes the hours you actually need."
+          }
+        },
+        "operations": {
+          "title": "For Operations Managers & Supervisors",
+          "benefit1": {
+            "title": "Review without the paper shuffle.",
+            "description": "Your employees across multiple projects, multiple buildings, multiple shifts. The payroll view shows every work session organized by employee and pay period. Review and approve from one screen."
+          },
+          "benefit2": {
+            "title": "Catch discrepancies before payday.",
+            "description": "GPS verification and project attribution make anomalies obvious. A technician logged 8 hours at Building A but was scheduled for Building B? You see it immediately."
+          },
+          "benefit3": {
+            "title": "Historical access for audits.",
+            "description": "Previous pay periods stay accessible. When someone questions hours from three months ago, you pull the data in seconds."
+          }
+        },
+        "technicians": {
+          "title": "For Rope Access Technicians",
+          "benefit1": {
+            "title": "Your hours are accurate.",
+            "description": "GPS verification captures your actual time on site. No more discrepancies between what you logged and what the owner calculated."
+          },
+          "benefit2": {
+            "title": "See where your time goes.",
+            "description": "Every work session shows which project you were assigned to. Your 8-hour day might split across three buildings. The breakdown is clear."
+          },
+          "benefit3": {
+            "title": "Overtime calculated correctly.",
+            "description": "The system applies your company's overtime rules automatically. Daily trigger at 8 hours, weekly trigger at 40, whatever the configuration. No manual math required."
+          }
+        },
+        "buildingManagers": {
+          "title": "For Building Managers / Property Managers",
+          "benefit1": {
+            "title": "Labor documentation on demand.",
+            "description": "Need to verify how many technician hours were spent on your building last quarter? The data exists and exports cleanly."
+          },
+          "benefit2": {
+            "title": "Budget validation simplified.",
+            "description": "You contracted for 200 hours of annual maintenance. The project attribution shows exactly how many hours have been logged against your building."
+          },
+          "benefit3": {
+            "title": "Audit-ready records.",
+            "description": "Insurance, compliance, or internal review requirements? Work session data with GPS verification provides the documentation trail."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Key Features",
+        "subtitle": "Every feature exists to eliminate the gap between field work and payroll processing.",
+        "feature1": {
+          "title": "Pay Period Configuration",
+          "description": "Choose weekly, bi-weekly, semi-monthly, or monthly pay periods. The system auto-generates period boundaries. Work sessions group into the correct pay period automatically."
+        },
+        "feature2": {
+          "title": "GPS-Verified Time Data",
+          "description": "Hours come from verified work sessions, not self-reported notebooks. Clock-in location confirms the technician was actually at the job site. Eliminates disputes."
+        },
+        "feature3": {
+          "title": "Configurable Overtime Rules",
+          "description": "Set daily triggers (default 8 hours), weekly triggers (default 40 hours), or custom thresholds. Multipliers adjust from 1.5x to 3x. Disable overtime entirely if needed."
+        },
+        "feature4": {
+          "title": "Project Attribution",
+          "description": "Every work session links to a specific project. Your payroll view shows which building, which job type, how many hours. Essential for job costing and future bid accuracy."
+        },
+        "feature5": {
+          "title": "Billable vs Non-Billable Tracking",
+          "description": "Distinguish revenue-generating client hours from operational costs. Travel, equipment maintenance, training, weather delays. Know your true labor cost."
+        },
+        "feature6": {
+          "title": "Export Capabilities",
+          "description": "CSV export for payroll software integration (QuickBooks, ADP, Gusto). PDF timesheet reports for records. Employee-level detail and project cost breakdowns available."
+        }
+      },
+      "results": {
+        "title": "Measurable Results",
+        "subtitle": "Concrete improvements you'll see from day one.",
+        "result1": {
+          "title": "Time Savings",
+          "description": "The manual pen-and-calculator method consumes 6-10 hours per payroll run. OnRopePro reduces this to 30-45 minutes. For bi-weekly payroll, that's approximately 260 hours saved annually. Time that goes back into running your business."
+        },
+        "result2": {
+          "title": "Error Reduction",
+          "description": "Conflicting systems (notebooks, time clocks, spreadsheets) create discrepancies. Single-source-of-truth data eliminates reconciliation disputes. Corrections drop dramatically when the data is accurate from the start."
+        },
+        "result3": {
+          "title": "Job Costing Accuracy",
+          "description": "Without project attribution, you don't know why jobs run over budget. With it, you see exactly where hours went. Operators report quoting accuracy improves because they're working from actual historical data instead of estimates."
+        },
+        "result4": {
+          "title": "Accounting Cleanliness",
+          "description": "Random correction payments create unexplained transactions. Clean exports mean every dollar is documented before it leaves the system. Bookkeeper reconciliation time drops."
+        }
+      },
+      "integration": {
+        "title": "Module Integration Points",
+        "subtitle": "The Payroll & Financial module connects with other OnRopePro modules to create a complete data pipeline from field work to payroll export.",
+        "module1": {
+          "title": "Work Sessions & Time Tracking",
+          "description": "Primary data source. Every clock-in and clock-out creates work session data that flows directly into payroll aggregation."
+        },
+        "module2": {
+          "title": "Employee Management",
+          "description": "Rate and role lookup. Hourly rate pulls from the employee profile at the time of the work session. Mid-project rate changes are handled correctly."
+        },
+        "module3": {
+          "title": "Project Management",
+          "description": "Project attribution source. Work sessions link to projects, enabling labor cost tracking per building and per job type."
+        },
+        "module4": {
+          "title": "Scheduling & Calendar",
+          "description": "Shift assignment context. Scheduled shifts provide expected hours for comparison with actual hours worked. Discrepancies become visible."
+        },
+        "module5": {
+          "title": "Safety Compliance",
+          "description": "Work eligibility verification. Harness inspection and certification requirements verify before clock-in is allowed. Failed inspections block work sessions."
+        },
+        "module6": {
+          "title": "Analytics & Reporting",
+          "description": "Payroll data feeds into company-wide analytics. Labor costs, productivity metrics, and budget tracking all derive from the same source of truth."
+        }
+      },
+      "impact": {
+        "title": "Stop Dreading Payday",
+        "paragraph1": "Payday shouldn't consume your afternoon. It shouldn't involve a calculator, a pen, and 48 pages of printouts spread across your desk. It definitely shouldn't result in random e-transfers that confuse your bookkeeper and corrections that take longer than the original processing.",
+        "paragraph2": "Right now, payroll is probably the most hated task on your calendar. You put it off. You run late. Your employees start budgeting around \"getting paid late.\" That culture of lateness bleeds into everything else.",
+        "paragraph3": "When payroll takes 30 minutes instead of 6 hours, you stop avoiding it. You run on time. Your team notices. The professional standards you set for payroll extend to project timelines, client communications, and safety documentation.",
+        "paragraph4": "You get back 260+ hours per year. That's six full work weeks. Time currently spent circling numbers that could go toward bidding new contracts, managing client relationships, or simply being present for the work you actually want to do."
+      },
+      "faqs": {
+        "title": "Frequently Asked Questions",
+        "subtitle": "Common questions about the Payroll & Financial module.",
+        "faq1": {
+          "question": "Does OnRopePro calculate my taxes and deductions?",
+          "answer": "No. OnRopePro prepares payroll-ready timesheet data for export. Actual payroll calculations (CPP, EI, tax withholding, Social Security, Medicare) happen in your payroll processing software (QuickBooks, ADP, Gusto, etc.). OnRopePro handles time aggregation and export, not tax compliance."
+        },
+        "faq2": {
+          "question": "What pay period options are available?",
+          "answer": "Weekly, bi-weekly, semi-monthly, and monthly. The system generates period boundaries automatically based on your selection."
+        },
+        "faq3": {
+          "question": "How does overtime calculation work?",
+          "answer": "You configure the rules: daily trigger (default 8 hours), weekly trigger (default 40 hours), and multiplier (1.5x, 2x, etc.). The system applies these rules automatically to every work session. You can disable overtime entirely if your pay structure doesn't include it."
+        },
+        "faq4": {
+          "question": "What format does the export use?",
+          "answer": "CSV for payroll software import. PDF for printable timesheet records. Both include employee-level detail and project attribution."
+        },
+        "faq5": {
+          "question": "Who can see payroll data?",
+          "answer": "Users with the canAccessFinancials permission. This is granted through the role-based permission system. Technicians see their own hours but not compensation rates or other employees' data."
+        },
+        "faq6": {
+          "question": "What happens if a work session is missing or incorrect?",
+          "answer": "Supervisors with appropriate permissions can review and adjust work sessions before timesheet approval. All adjustments are logged with reasons for audit purposes."
+        },
+        "faq7": {
+          "question": "Can I see historical pay periods?",
+          "answer": "Yes. Previous pay periods remain accessible. Filter by date range to pull data from any past period."
+        },
+        "faq8": {
+          "question": "Does project attribution work if a technician works at multiple buildings in one day?",
+          "answer": "Yes. Each work session links to a specific project. If a technician clocks into Building A for 4 hours, then Building B for 4 hours, both sessions show separately with their respective project attribution."
+        },
+        "faq9": {
+          "question": "What about non-billable time like travel between sites?",
+          "answer": "Non-billable work sessions track hours that cannot be charged to clients (travel, training, equipment maintenance, weather delays). The payroll view shows both billable and non-billable hours so you know your true labor cost."
+        },
+        "faq10": {
+          "question": "Is there an approval workflow before export?",
+          "answer": "Yes. Timesheets can be reviewed and approved before export. Approved timesheets generate clean export files. The workflow prevents exporting data that hasn't been verified."
+        }
+      },
+      "cta": {
+        "title": "Ready to Reclaim Your Time?",
+        "subtitle": "Join rope access companies who've eliminated the payroll headache. Start your free 60-day trial today.",
+        "trialButton": "Start Your Free 60-Day Trial",
+        "docsButton": "View Technical Documentation"
+      }
+    },
+    "employerJobBoard": {
+      "hero": {
+        "badge": "Job Board Ecosystem",
+        "title": "Stop Paying $22 Per Application",
+        "subtitle": "From People Who've Never Touched a Rope.",
+        "description": "OnRopePro's Job Board is a closed ecosystem. Every employer verified. Every technician relevant. Post unlimited jobs.",
+        "descriptionBold": "Zero per-application fees.",
+        "ctaPrimary": "Start Posting Jobs Free",
+        "ctaSecondary": "Find Answers"
+      },
+      "stats": {
+        "filteringTime": {
+          "value": "0 hours",
+          "label": "Filtering Time"
+        },
+        "platformFees": {
+          "value": "$0",
+          "label": "Platform Fees"
+        },
+        "timeToHire": {
+          "value": "1-3 Days",
+          "label": "Time to Hire"
+        },
+        "interviews": {
+          "value": "2-3",
+          "label": "Interviews Needed"
+        }
+      },
+      "problemStatement": {
+        "title": "The Indeed Tax",
+        "paragraph1": "You post on Indeed. LinkedIn. Craigslist. Facebook. You get 50 applications. You open each one, hoping for a Level 2 with caulking experience.",
+        "paragraph2": "What you find: shop laborers, pipe fitters, offshore oil rig candidates, and 23 people who \"have always been interested in learning.\" Two hours of filtering. Two actual rope techs.",
+        "paragraph3": "Then Indeed hits you with the bill. $22 per application if you don't respond within 48 hours. A single posting costs you $300 before you've even scheduled an interview. Someone on your team has to log in every day just to click \"decline\" on resumes from car mechanics.",
+        "solutionTitle": "OnRopePro's Job Board works differently.",
+        "solutionText": "Every company here does rope access building maintenance. Every technician here is in the industry. When you post a job, 100% of applicants are relevant. No noise. No filtering. No $22 surprise fees."
+      },
+      "features": {
+        "title": "Your Closed Garden Ecosystem",
+        "subtitle": "Where every applicant is a rope tech and every employer is verified",
+        "description": "The Job Board connects you with qualified rope access technicians across the platform. Post jobs, browse talent, and send direct offers to candidates who match your requirements.",
+        "talentBrowser": {
+          "title": "Talent Browser",
+          "description1": "Search the technician pool before you even post a job. Filter by location, certification level, experience, and expected pay rate.",
+          "description2": "See who's available, what they're looking for, and whether your budget matches their expectations before you spend time interviewing.",
+          "filterLabel": "What you can filter by:",
+          "filter1": "Location (city, region)",
+          "filter2": "IRATA/SPRAT certification level",
+          "filter3": "Years of experience",
+          "filter4": "Expected pay rate",
+          "filter5": "Safety rating score",
+          "filter6": "Specialties (caulking, window washing, etc.)"
+        },
+        "unlimitedPostings": {
+          "title": "Unlimited Job Postings",
+          "description1": "Post as many jobs as your operation requires. Full-time, part-time, contract, seasonal.",
+          "description2": "Six job types supported: window washing, caulking, pressure washing, gutter cleaning, painting and coating, visual inspection. No per-post fees. No per-application charges. No surprise invoices.",
+          "controlLabel": "What you control:",
+          "control1": "Job type and service scope",
+          "control2": "Location and site details",
+          "control3": "Required certifications",
+          "control4": "Pay range (optional but recommended)",
+          "control5": "Start date and duration"
+        },
+        "directOffers": {
+          "title": "Direct Job Offers",
+          "description1": "Found a perfect candidate in the Talent Browser? Send them an offer directly. Link it to one of your active job postings.",
+          "description2": "They get notified in their portal. Accept or decline with one tap. No email chains. No phone tag.",
+          "stepsLabel": "How it works:",
+          "step1": "Select candidate from search results",
+          "step2": "Choose which job posting to link",
+          "step3": "Technician receives in-portal notification",
+          "step4": "Response comes back to your dashboard"
+        }
+      },
+      "whoBenefits": {
+        "title": "Who Benefits From This Module",
+        "subtitle": "Every stakeholder in the hiring process gains visibility and efficiency",
+        "employers": {
+          "title": "For Employers (Company Owners)",
+          "benefit1": {
+            "title": "Zero filtering. Every applicant is a rope tech.",
+            "description": "You post a job. You receive applications from people who actually work in rope access building maintenance. Not pipe fitters. Not offshore workers. Not \"interested in learning.\" Your applicant-to-interview ratio improves immediately."
+          },
+          "benefit2": {
+            "title": "Know salary expectations before you reach out.",
+            "description": "Technicians set their expected pay rate in their profile. When you browse talent, you see their number before sending an offer. If someone won't work under $60/hour and your budget is $45, you know before wasting an hour on an interview."
+          },
+          "benefit3": {
+            "title": "Included in your subscription.",
+            "description": "Post unlimited jobs. Receive unlimited applications. Indeed charges $22 per application if you don't respond in 48 hours. OnRopePro charges $0. Your job board access is part of what you already pay for."
+          }
+        },
+        "operationsManagers": {
+          "title": "For Operations Managers",
+          "benefit1": {
+            "title": "Browse talent before you post.",
+            "description": "Need a Level 2 with caulking experience in the Lower Mainland? Search the Talent Browser. See who's available, check their safety ratings, review their expected rates. Find candidates first, then create the job posting to match what's available."
+          },
+          "benefit2": {
+            "title": "Direct offers streamline hiring.",
+            "description": "Find a strong candidate? Send them an offer linked to your job posting. No more \"I'll send you an email with the details.\" The offer, the job specs, and the accept/decline button are all in one place."
+          }
+        },
+        "buildingManagers": {
+          "title": "For Building Managers",
+          "benefit1": {
+            "title": "Verify contractor hiring practices.",
+            "description": "When your rope access contractor uses OnRopePro, their technicians have documented IRATA/SPRAT certifications and visible safety ratings. You're not just trusting their word. You're seeing verified credentials tied to real work history."
+          }
+        },
+        "propertyManagers": {
+          "title": "For Property Managers",
+          "benefit1": {
+            "title": "Confidence in contractor quality.",
+            "description": "The contractors bidding on your portfolio use a system where every technician is verified. When they tell you \"our team is certified and safety-focused,\" you can see the data backing that claim."
+          }
+        },
+        "technicians": {
+          "title": "For Technicians",
+          "benefit1": {
+            "title": "Get found by employers who matter.",
+            "description": "When you turn on profile visibility, only verified rope access companies can see you. No random recruiters. No spam. Companies actively hiring in your specialty can search for you directly and send offers to your portal."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Key Features",
+        "subtitle": "The Job Board ecosystem combines posting, searching, and hiring into one integrated system",
+        "verifiedEcosystem": {
+          "title": "Verified Employer Ecosystem",
+          "description1": "Only rope access building maintenance companies post here. Every employer is verified when they create an account. No bakeries, no car washes, no unrelated industries.",
+          "description2": "When you browse competitors' postings, you're seeing your actual market."
+        },
+        "oneClickApplications": {
+          "title": "One-Click Applications Inbound",
+          "description1": "When technicians apply, their profile data, resume, and certifications auto-attach. You see everything you need to evaluate them in one view.",
+          "description2": "No \"please resend your resume\" emails. No \"can you confirm your IRATA number\" phone calls."
+        },
+        "payRateVisibility": {
+          "title": "Expected Pay Rate Visibility",
+          "description1": "See what candidates want before you engage. If your budget is $45/hour and they want $60, you know immediately.",
+          "description2": "Stop wasting interview time on compensation mismatches."
+        },
+        "safetyRating": {
+          "title": "Safety Rating Integration",
+          "description1": "Every technician has an Individual Safety Rating (0-100) built from daily harness inspections, toolbox talk participation, and safety quiz completions.",
+          "description2": "See it in their profile. Factor it into your hiring decisions."
+        },
+        "statusDashboard": {
+          "title": "Application Status Dashboard",
+          "description1": "Track every applicant across every posting. See who's under review, who you've contacted, who's been offered, who's accepted.",
+          "description2": "No spreadsheets. No losing candidates between the cracks."
+        },
+        "instantOnboarding": {
+          "title": "Instant Onboarding Connection",
+          "description1": "When a technician accepts your offer, their profile data flows into your employee management system. IRATA number, certifications, banking details (if shared), emergency contacts.",
+          "description2": "Day-one ready without the paperwork marathon."
+        }
+      },
+      "problemsSolved": {
+        "title": "Problems Solved",
+        "expandAll": "Expand All",
+        "collapseAll": "Collapse All",
+        "forEmployers": "For Employers",
+        "forOperationsManagers": "For Operations Managers",
+        "forBuildingManagers": "For Building Managers",
+        "painLabel": "The Pain:",
+        "exampleLabel": "Real Example:",
+        "solutionLabel": "Solution:",
+        "benefitLabel": "Benefit:",
+        "employer1": {
+          "question": "\"I post on Indeed and get 50 applicants. Only 2 are actual rope techs.\"",
+          "pain": "You post everywhere: Indeed, LinkedIn, Craigslist, Facebook. Applications flood in from people who've never touched a rope system.",
+          "example": "Shop laborers, general construction workers, offshore candidates. Two hours filtering to find two relevant resumes out of fifty applications.",
+          "solution": "OnRopePro's Job Board is a closed ecosystem. Every technician on the platform is in rope access building maintenance.",
+          "benefit": "When you post a job, 100% of applicants are relevant. No filtering required. Two hours of wasted time becomes zero."
+        },
+        "employer2": {
+          "question": "\"Indeed charges me $22 per application if I don't respond in 48 hours.\"",
+          "pain": "Someone has to log in daily, open every application, decline or respond. Miss a few days and the charges pile up.",
+          "example": "That's $22 times every unopened application. A single job posting can cost $300 in \"engagement fees\" before you've hired anyone.",
+          "solution": "OnRopePro includes unlimited postings and applications in your subscription. No per-application fees. No surprise charges.",
+          "benefit": "No daily login obligation just to avoid billing. Post freely, review on your schedule, pay nothing extra."
+        },
+        "employer3": {
+          "question": "\"I spent an hour interviewing someone who wants $20/hour more than my budget.\"",
+          "pain": "The interview went well. References checked out. You're ready to make an offer. Then you ask about compensation.",
+          "example": "They want $60/hour. Your budget is $45. An hour wasted for both parties because expectations were never aligned.",
+          "solution": "Technicians set expected pay rate in their profile. You see it in the Talent Browser before reaching out.",
+          "benefit": "Compensation mismatches get filtered before the interview, not during. Only interview candidates within your budget."
+        },
+        "ops1": {
+          "question": "\"I don't know if we have capacity to take this new contract.\"",
+          "pain": "A client calls with urgent work. You think Tommy finishes Tower A on Friday, but you're not certain. Is Sarah on vacation?",
+          "example": "You either decline the work (lost revenue) or commit and hope (risk of overcommitting and failing to deliver).",
+          "solution": "The Job Board connects to your scheduling and employee management systems. When you post a job and receive applications, you can cross-reference against crew availability.",
+          "benefit": "Know if you have capacity before you commit. Make informed decisions about new contracts based on real data."
+        },
+        "bm1": {
+          "question": "\"How do I know this contractor hires qualified workers?\"",
+          "pain": "You hire a rope access company but have no visibility into who they're actually sending to your building.",
+          "example": "Are these people certified? Do they have safety records? You're trusting the contractor's word with no way to verify.",
+          "solution": "When contractors use OnRopePro, their technicians have verified IRATA/SPRAT certifications and visible safety ratings.",
+          "benefit": "You can ask for documentation. The data exists in their system. Trust is backed by verifiable records."
+        }
+      },
+      "connectedModules": {
+        "title": "Connected Modules",
+        "subtitle": "The Job Board doesn't exist in isolation. It connects to the systems you already use.",
+        "employeeManagement": {
+          "title": "Employee Management",
+          "description": "When a technician accepts your offer, their profile data flows into your employee roster. IRATA number, certifications, contact information. Start onboarding immediately."
+        },
+        "safetyCompliance": {
+          "title": "Safety & Compliance",
+          "description": "Candidate safety ratings come from real data: harness inspections, toolbox talks, safety quizzes. The score you see is earned, not self-reported."
+        },
+        "projectManagement": {
+          "title": "Project Management",
+          "description": "Hiring for a specific project? See which positions you need to fill by checking your active projects. Staff appropriately based on real workload."
+        },
+        "schedulingCalendar": {
+          "title": "Scheduling & Calendar",
+          "description": "Cross-reference new hires against crew availability. Know when you have capacity to bring someone on and which projects they'll join."
+        }
+      },
+      "cta": {
+        "title": "Your Hiring Time Goes to Zero.",
+        "titleHighlight": "Your Talent Pool Goes to Everyone.",
+        "description1": "Right now, hiring eats your week. You post on Indeed. You wait for applications. You filter through irrelevant resumes. You interview people who want double your budget. You pay $22 per application from pipe fitters.",
+        "description2": "With OnRopePro's Job Board, your next hire is already in the system. Search the Talent Browser. Find Level 2 techs with caulking experience in your region. See their safety rating, their expected rate, their certifications. Send an offer directly.",
+        "ctaPrimary": "Start Posting Jobs Free",
+        "ctaSecondary": "Learn More"
+      },
+      "footer": {
+        "text": "Part of the OnRopePro platform for rope access building maintenance companies."
       }
     }
   }
