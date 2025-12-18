@@ -3,6 +3,8 @@
 ## Resources
 
 - **Brand Palette Visual:** `attached_assets/OnRopePro-Brand-Palette.pdf` — High-resolution color swatches and hex values for all primary, accent, and surface colors
+- **Official Stakeholder Colors:** `attached_assets/OnRope.Pro_-_Official_colours_of_all_stakeholders_1766080018346.pdf` — Complete 10-color palette including all stakeholder-specific brand colors
+- **Color Variations Reference:** `attached_assets/OnRope.Pro_Official_Colour_Variations_1766080072011.pdf` — Extended variations for UI states and gradients
 
 ## Design Approach
 
@@ -11,7 +13,7 @@
 
 ## Color Palette
 
-**Primary System:**
+**Primary System (Core Brand - 7 Colors):**
 - Navy Dark: #0F1629 (dark backgrounds, depth)
 - Navy Blue: #193A63 (secondary backgrounds, subtle contrast)
 - Ocean Blue: #0B64A3 (primary actions, links, active states)
@@ -20,7 +22,22 @@
 - Light Gray: #F3F3F3 (page backgrounds, light surfaces)
 - Rust Brown: #AB4521 (call-to-action buttons, emphasis)
 
-**Accent Palette:**
+**Stakeholder Colors (Audience-Specific Branding - 4 Colors):**
+- Property Manager: #6E9075 (sage green - for PM landing pages, cards, accents)
+- Resident: #86A59C (mint green - for resident portal, feedback, cards)
+- Building Manager: #B89685 (warm taupe - for BM landing pages, cards)
+- Technician: #AB4521 (rust brown - same as CTA, for technician portal/cards)
+
+**Usage by Audience:**
+| Audience | Primary Color | Hero Gradient | Card Accents |
+|----------|---------------|---------------|--------------|
+| Employers (Main Site) | #0B64A3 | `#0B64A3 → #0369A1` | Ocean Blue |
+| Property Managers | #6E9075 | `#6E9075 → #5A7A60` | Sage Green |
+| Residents | #86A59C | `#86A59C → #6B8A80` | Mint Green |
+| Building Managers | #B89685 | `#B89685 → #9A7B6C` | Warm Taupe |
+| Technicians | #AB4521 | `#AB4521 → #8B371A` | Rust Brown |
+
+**Accent Palette (Status & Feedback):**
 - Emerald: #10B981 (success, completed tasks)
 - Amber: #F59E0B (warnings, in-progress)
 - Rose: #F43F5E (urgent, critical alerts)
@@ -38,7 +55,9 @@
 - Accent: linear-gradient(135deg, #0369A1 0%, #0B64A3 100%)
 - Subtle: linear-gradient(180deg, #F3F3F3 0%, #FFFFFF 100%)
 
-## Typography (Inter via Google Fonts)
+## Typography (Outfit via Tailwind Config)
+
+**Primary Font:** Outfit (configured in `tailwind.config.ts` as `sans: ["Outfit", "system-ui", "sans-serif"]`)
 
 **Aligned with Tailwind CSS default scale for consistency:**
 
@@ -410,13 +429,30 @@ Body text on module pages must be at least `text-base` (16px). Never use `text-s
 
 **Stakeholder Color Assignments:**
 
-| Stakeholder | Header BG | Icon BG | Icon | Icon Color |
-|-------------|-----------|---------|------|------------|
-| Employers | `bg-blue-50` | `bg-blue-100` | Briefcase | `text-blue-600` |
-| Technicians | `bg-amber-50` | `bg-amber-100` | Wrench or HardHat | `text-amber-600` |
-| Building Managers | `bg-violet-50` | `bg-violet-100` | Building2 | `text-violet-600` |
-| Property Managers | `bg-emerald-50` | `bg-emerald-100` | Globe or Users | `text-emerald-600` |
-| Residents | `bg-rose-50` | `bg-rose-100` | Home | `text-rose-600` |
+Use official brand hex colors for stakeholder-specific UI elements. These colors apply to landing pages, card headers, icons, and accent elements.
+
+| Stakeholder | Hex | Header BG | Icon BG | Icon | Icon Color |
+|-------------|-----|-----------|---------|------|------------|
+| Employers | #0B64A3 | `bg-blue-50` | `bg-blue-100` | Briefcase | `text-blue-600` |
+| Property Managers | #6E9075 | `bg-[#6E9075]/10` | `bg-[#6E9075]/20` | Globe or Users | `text-[#6E9075]` |
+| Residents | #86A59C | `bg-[#86A59C]/10` | `bg-[#86A59C]/20` | Home | `text-[#86A59C]` |
+| Building Managers | #B89685 | `bg-[#B89685]/10` | `bg-[#B89685]/20` | Building2 | `text-[#B89685]` |
+| Technicians | #AB4521 | `bg-[#AB4521]/10` | `bg-[#AB4521]/20` | Wrench or HardHat | `text-[#AB4521]` |
+
+**Stakeholder Hero Gradients:**
+```css
+/* Property Manager Landing */
+background: linear-gradient(135deg, #6E9075 0%, #5A7A60 100%);
+
+/* Resident Landing */
+background: linear-gradient(135deg, #86A59C 0%, #6B8A80 100%);
+
+/* Building Manager Landing */
+background: linear-gradient(135deg, #B89685 0%, #9A7B6C 100%);
+
+/* Technician Landing */
+background: linear-gradient(135deg, #AB4521 0%, #8B371A 100%);
+```
 
 **Grid Column Guidelines:**
 - 4 benefits: Use `md:grid-cols-2 lg:grid-cols-4`
