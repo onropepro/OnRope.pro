@@ -16,6 +16,7 @@ User is systematically auditing all safety & compliance guide documentation for 
 **Completed Audits:**
 - ✅ **IRATALoggingGuide.tsx** - FIXED: Updated to reflect all 20 canonical IRATA_TASK_TYPES from schema.ts (removed 9 invented types, added 8 missing types)
 - ✅ **FLHA Forms** - VERIFIED: Fully implemented in code (database table, backend routes, frontend form, documentation accurate)
+- ✅ **ResidentPortalGuide.tsx** - REBUILT: Complete page rebuild from SSOT document. Fixed 7 critical inaccuracies: (1) Golden Rule now correctly shows "Vendor Code + Strata/LMS = Access" not building codes, (2) ONE vendor code per company not per building, (3) Removed non-existent Photo Gallery viewing feature, (4) Removed false "resident can reopen" claim, (5) Fixed PM access to read-only not no-access, (6) Removed non-existent /link?code= URL, (7) Added explicit "What Does NOT Exist" card. Added 14 stakeholder-segmented Problems Solved accordions, Portable Accounts network effect section, Access Permissions Matrix, Quantified Business Impact metrics, and 5-question FAQ.
 
 **In Progress / Pending:**
 - ⚠️ **7-Day Toolbox Meeting Coverage Window** (SafetyGuide.tsx, lines 233-278) - NOT IMPLEMENTED: Will update later with correct implementation details when toolbox meeting coverage logic is finalized.
@@ -42,7 +43,7 @@ The platform is built with a React 18 frontend (TypeScript, Wouter for routing),
 *   **Smart Gear Inventory System:** When adding gear to inventory, users can select from a pre-populated list of industry-standard equipment (starting with descenders). Selecting "Other" allows adding custom gear that gets permanently saved to a shared database (`equipment_catalog` table) for all companies to use. Pre-populated descenders include popular models from Petzl (I'D S, I'D L, RIG, Maestro), CMC (Clutch, MPD), Rock Exotica (Totem, Akimbo), Skylotec (Deus, Sirius), ISC, Kong, and more.
 *   **Document Review & Signature System:** Employees review and digitally sign company documents with audit trails.
 *   **Company Safety Rating (CSR):** A penalty-based compliance rating system viewable by property managers.
-*   **Resident Portal & Communication:** Complaint management with two-way communication, photo galleries, and notifications, secured by unique resident codes.
+*   **Resident Portal & Communication:** Two-way feedback system connecting building residents directly with service providers. Residents submit issues with photo evidence, track status (New/Viewed/Closed), and communicate with vendors. Uses single vendor code per company + Strata/LMS number for access. Features include viewed timestamps, internal notes vs. visible replies, and portable accounts for network growth. Property managers can view feedback read-only for oversight.
 *   **Property Manager Interface:** A dedicated "My Vendors" dashboard for property managers to view vendor summaries and read-only company information.
 *   **White Label Branding System:** Subscription-gated feature for customizing the platform with custom logos and brand colors.
 *   **Financial Controls & Quoting:** Quote generation with labor cost calculations and tax computation, protected by permissions.
