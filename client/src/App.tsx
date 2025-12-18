@@ -99,6 +99,7 @@ import HelpSearch from "@/pages/help/HelpSearch";
 import HelpArticle from "@/pages/help/HelpArticle";
 import GettingStarted from "@/pages/help/GettingStarted";
 import HelpROICalculator from "@/pages/help/tools/ROICalculator";
+import FeatureFinder from "@/pages/help/FeatureFinder";
 import ForCompanyOwners from "@/pages/help/stakeholders/ForCompanyOwners";
 import ForTechnicians from "@/pages/help/stakeholders/ForTechnicians";
 import ForBuildingManagers from "@/pages/help/stakeholders/ForBuildingManagers";
@@ -405,6 +406,7 @@ function Router() {
       <Route path="/help/modules/:slug" component={HelpArticle} />
       <Route path="/help/getting-started" component={GettingStarted} />
       <Route path="/help/tools/roi-calculator" component={HelpROICalculator} />
+      <Route path="/help/tools/feature-finder" component={FeatureFinder} />
       <Route path="/help/for-company-owners" component={ForCompanyOwners} />
       <Route path="/help/for-technicians" component={ForTechnicians} />
       <Route path="/help/for-building-managers" component={ForBuildingManagers} />
