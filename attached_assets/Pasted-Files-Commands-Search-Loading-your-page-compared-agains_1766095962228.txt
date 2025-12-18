@@ -1,0 +1,102 @@
+Files
+Commands
+Search
+Loading your page…
+
+compared against
+OnRope.pro
+You have uncommitted changes. Please commit them before pulling.
+OnRope.pro has active coders (@onropepro). Merging may disrupt ongoing work.
+Changed Files
+
+Uncommitted Changes
+Screenshot_2025-12-18_at_2.08.18_PM_1766095699142.png
+attached_assets
+Added
+Committed Changes
+OnRopePro-Brand-Palette.pdf
+attached_assets
+OnRope.Pro_-_Official_colours_of_all_stakeholders_1766080018346.pdf
+attached_assets
+Copy
+Palette_Colour_Variations_1765476660712.pdf
+attached_assets
+OnRope.Pro_Official_Colour_Variations_1766080072011.pdf
+attached_assets
+Copy
+OnRopePro-Brand-Palette.pdf
+attached_assets
+OnRopePro-Colour-Variations_1766079103641.pdf
+attached_assets
+Copy
+resident-portal-landing-page-copy-v1_1766025164267.md
+attached_assets
+resident-portal-landing-page-copy-v1_1766038043716.md
+attached_assets
+Copy
+ForCompanyOwners.tsx
+client/src/pages/help/stakeholders
+ForResidents.tsx
+client/src/pages/help/stakeholders
+Copy
+DESIGN_GUIDELINES_1765265770986.md
+attached_assets
+Deleted
+Module_Property_Manager_Interface_SSOT_v2_1766038941925.md
+attached_assets
+Added
+Screenshot_2025-12-18_at_11.22.43_AM_1766085767283.png
+attached_assets
+Added
+Screenshot_2025-12-18_at_11.36.42_AM_1766086605379.png
+attached_assets
+Added
+Screenshot_2025-12-18_at_11.37.11_AM_1766086634148.png
+attached_assets
+Added
+Screenshot_2025-12-18_at_11.38.37_AM_1766086721648.png
+attached_assets
+Added
+Screenshot_2025-12-18_at_2.00.27_PM_1766095229374.png
+attached_assets
+Added
+Screenshot_2025-12-18_at_2.07.49_PM_1766095671367.png
+attached_assets
+Added
+property-manager-interface-landing-page-copy-v1_1766041141980.md
+attached_assets
+Added
+property-manager-landing-page-copy-v2_1766084877275.md
+attached_assets
+Added
+property-manager-landing-page-copy_1766083354458.md
+attached_assets
+Added
+resident-portal-landing-page-copy-v1_(1)_1766040295648.md
+attached_assets
+Added
+resident-portal-landing-page-copy-v1_(1)_1766040390140.md
+attached_assets
+Added
+App.tsx
+client/src
+Modified
+PublicHeader.tsx
+client/src/components
+Modified
+PropertyManagerGuide.tsx
+client/src/pages
+Modified
+PropertyManagerLanding.tsx
+client/src/pages
+Added
+ResidentLanding.tsx
+client/src/pages
+Added
+HelpCenter.tsx
+client/src/pages/help
+Modified
+design_guidelines.md
+Modified
+Unsupported state: your index is currently locked. This can happen if multiple git processes are running operations at the same time.
+Please resolve the issue by ending those git operations. If you are sure you do not have git operations running, you can delete your .git/index.lock file.
