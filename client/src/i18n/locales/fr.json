@@ -5614,6 +5614,203 @@
       "features": {
         "title": "Du pointage à l'export de paie",
         "subtitle": "Le module Paie & Finances transforme les données de sessions de travail dispersées en feuilles de temps organisées et exportables sans intervention manuelle."
+      },
+      "benefits": {
+        "title": "Qui bénéficie de ce module",
+        "subtitle": "La clarté de la paie pour tous dans votre entreprise.",
+        "employers": {
+          "title": "Pour les employeurs (propriétaires d'entreprise)",
+          "benefit1": {
+            "title": "Récupérez plus de 5 heures à chaque période de paie.",
+            "description": "La méthode calculatrice et stylo vous coûte 6 à 10 heures par traitement de paie. OnRopePro agrège tout automatiquement. Sélectionnez la période de paie. Révisez les totaux. Exportez. Terminé en 30-45 minutes."
+          },
+          "benefit2": {
+            "title": "Arrêtez les virements aléatoires frénétiques.",
+            "description": "Quand les feuilles de temps sont erronées, vous corrigez avec des paiements rapides qui embrouillent vos livres. Des données précises dès le départ signifie aucune correction. Votre comptable reçoit des exports propres à chaque fois."
+          },
+          "benefit3": {
+            "title": "Soumissionnez avec confiance.",
+            "description": "Vous avez sous-évalué ce bâtiment de 60 heures parce que vous ne pouviez pas voir où le temps passait. L'attribution aux projets montre exactement combien de temps prend chaque travail. Votre prochaine soumission inclut les heures dont vous avez vraiment besoin."
+          }
+        },
+        "operations": {
+          "title": "Pour les directeurs des opérations et superviseurs",
+          "benefit1": {
+            "title": "Révisez sans le chaos de papiers.",
+            "description": "Vos employés sur plusieurs projets, plusieurs bâtiments, plusieurs quarts. La vue de paie montre chaque session de travail organisée par employé et période de paie. Révisez et approuvez depuis un seul écran."
+          },
+          "benefit2": {
+            "title": "Détectez les écarts avant le jour de paie.",
+            "description": "La vérification GPS et l'attribution aux projets rendent les anomalies évidentes. Un technicien a inscrit 8 heures au Bâtiment A mais était prévu au Bâtiment B? Vous le voyez immédiatement."
+          },
+          "benefit3": {
+            "title": "Accès historique pour les audits.",
+            "description": "Les périodes de paie précédentes restent accessibles. Quand quelqu'un questionne des heures d'il y a trois mois, vous sortez les données en secondes."
+          }
+        },
+        "technicians": {
+          "title": "Pour les techniciens d'accès sur corde",
+          "benefit1": {
+            "title": "Vos heures sont exactes.",
+            "description": "La vérification GPS capture votre temps réel sur site. Plus d'écarts entre ce que vous avez inscrit et ce que le propriétaire a calculé."
+          },
+          "benefit2": {
+            "title": "Voyez où va votre temps.",
+            "description": "Chaque session de travail montre à quel projet vous étiez assigné. Votre journée de 8 heures peut se répartir sur trois bâtiments. La répartition est claire."
+          },
+          "benefit3": {
+            "title": "Heures supplémentaires calculées correctement.",
+            "description": "Le système applique automatiquement les règles d'heures supplémentaires de votre entreprise. Déclenchement journalier à 8 heures, hebdomadaire à 40, quelle que soit la configuration. Aucun calcul manuel requis."
+          }
+        },
+        "buildingManagers": {
+          "title": "Pour les gestionnaires d'immeubles / gestionnaires immobiliers",
+          "benefit1": {
+            "title": "Documentation de main-d'œuvre sur demande.",
+            "description": "Besoin de vérifier combien d'heures de techniciens ont été passées sur votre bâtiment le trimestre dernier? Les données existent et s'exportent proprement."
+          },
+          "benefit2": {
+            "title": "Validation budgétaire simplifiée.",
+            "description": "Vous avez contracté 200 heures de maintenance annuelle. L'attribution aux projets montre exactement combien d'heures ont été inscrites contre votre bâtiment."
+          },
+          "benefit3": {
+            "title": "Dossiers prêts pour audit.",
+            "description": "Exigences d'assurance, de conformité ou de revue interne? Les données de sessions de travail avec vérification GPS fournissent la trace documentaire."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Fonctionnalités clés",
+        "subtitle": "Chaque fonctionnalité existe pour éliminer l'écart entre le travail terrain et le traitement de la paie.",
+        "feature1": {
+          "title": "Configuration des périodes de paie",
+          "description": "Choisissez des périodes hebdomadaires, bimensuelles, semi-mensuelles ou mensuelles. Le système génère automatiquement les limites de période. Les sessions de travail se regroupent automatiquement dans la bonne période de paie."
+        },
+        "feature2": {
+          "title": "Données de temps vérifiées par GPS",
+          "description": "Les heures viennent de sessions de travail vérifiées, pas de carnets auto-déclarés. L'emplacement de pointage confirme que le technicien était vraiment sur le site. Élimine les litiges."
+        },
+        "feature3": {
+          "title": "Règles d'heures supplémentaires configurables",
+          "description": "Définissez les déclenchements journaliers (défaut 8 heures), hebdomadaires (défaut 40 heures) ou des seuils personnalisés. Les multiplicateurs s'ajustent de 1,5x à 3x. Désactivez complètement les heures supplémentaires si nécessaire."
+        },
+        "feature4": {
+          "title": "Attribution aux projets",
+          "description": "Chaque session de travail est liée à un projet spécifique. Votre vue de paie montre quel bâtiment, quel type de travail, combien d'heures. Essentiel pour le calcul des coûts et la précision des futures soumissions."
+        },
+        "feature5": {
+          "title": "Suivi facturable vs non-facturable",
+          "description": "Distinguez les heures client génératrices de revenus des coûts opérationnels. Déplacements, maintenance d'équipement, formation, retards météo. Connaissez votre vrai coût de main-d'œuvre."
+        },
+        "feature6": {
+          "title": "Capacités d'export",
+          "description": "Export CSV pour l'intégration avec les logiciels de paie (QuickBooks, ADP, Gusto). Rapports PDF de feuilles de temps pour les archives. Détails par employé et ventilations des coûts de projet disponibles."
+        }
+      },
+      "results": {
+        "title": "Résultats mesurables",
+        "subtitle": "Des améliorations concrètes que vous verrez dès le premier jour.",
+        "result1": {
+          "title": "Économies de temps",
+          "description": "La méthode manuelle stylo-calculatrice consomme 6-10 heures par traitement de paie. OnRopePro réduit cela à 30-45 minutes. Pour une paie bimensuelle, c'est environ 260 heures économisées annuellement. Du temps qui revient à la gestion de votre entreprise."
+        },
+        "result2": {
+          "title": "Réduction des erreurs",
+          "description": "Des systèmes conflictuels (carnets, pointeuses, tableurs) créent des écarts. Une source unique de vérité élimine les litiges de réconciliation. Les corrections diminuent drastiquement quand les données sont exactes dès le départ."
+        },
+        "result3": {
+          "title": "Précision du calcul des coûts",
+          "description": "Sans attribution aux projets, vous ne savez pas pourquoi les travaux dépassent le budget. Avec elle, vous voyez exactement où sont allées les heures. Les opérateurs rapportent que la précision des soumissions s'améliore parce qu'ils travaillent avec des données historiques réelles au lieu d'estimations."
+        },
+        "result4": {
+          "title": "Propreté comptable",
+          "description": "Les paiements de correction aléatoires créent des transactions inexpliquées. Des exports propres signifient que chaque dollar est documenté avant de quitter le système. Le temps de réconciliation du comptable diminue."
+        }
+      },
+      "integration": {
+        "title": "Points d'intégration des modules",
+        "subtitle": "Le module Paie & Finances se connecte aux autres modules OnRopePro pour créer un pipeline de données complet du travail terrain à l'export de paie.",
+        "module1": {
+          "title": "Sessions de travail et suivi du temps",
+          "description": "Source de données principale. Chaque pointage d'arrivée et de départ crée des données de session de travail qui alimentent directement l'agrégation de paie."
+        },
+        "module2": {
+          "title": "Gestion des employés",
+          "description": "Recherche de taux et de rôle. Le taux horaire provient du profil de l'employé au moment de la session de travail. Les changements de taux en cours de projet sont gérés correctement."
+        },
+        "module3": {
+          "title": "Gestion de projets",
+          "description": "Source d'attribution aux projets. Les sessions de travail se lient aux projets, permettant le suivi des coûts de main-d'œuvre par bâtiment et par type de travail."
+        },
+        "module4": {
+          "title": "Planification et calendrier",
+          "description": "Contexte d'assignation de quarts. Les quarts planifiés fournissent les heures attendues pour comparaison avec les heures réellement travaillées. Les écarts deviennent visibles."
+        },
+        "module5": {
+          "title": "Conformité sécurité",
+          "description": "Vérification d'éligibilité au travail. L'inspection du harnais et les exigences de certification vérifient avant que le pointage ne soit autorisé. Les inspections échouées bloquent les sessions de travail."
+        },
+        "module6": {
+          "title": "Analytique et rapports",
+          "description": "Les données de paie alimentent l'analytique à l'échelle de l'entreprise. Coûts de main-d'œuvre, métriques de productivité et suivi budgétaire dérivent tous de la même source de vérité."
+        }
+      },
+      "impact": {
+        "title": "Arrêtez de redouter le jour de paie",
+        "paragraph1": "Le jour de paie ne devrait pas consumer votre après-midi. Ça ne devrait pas impliquer une calculatrice, un stylo et 48 pages d'imprimés étalées sur votre bureau. Ça ne devrait certainement pas résulter en des virements aléatoires qui embrouillent votre comptable et des corrections qui prennent plus de temps que le traitement initial.",
+        "paragraph2": "En ce moment, la paie est probablement la tâche la plus détestée de votre calendrier. Vous la repoussez. Vous êtes en retard. Vos employés commencent à budgéter autour du \"paiement en retard\". Cette culture de retard se répand partout ailleurs.",
+        "paragraph3": "Quand la paie prend 30 minutes au lieu de 6 heures, vous arrêtez de l'éviter. Vous êtes à l'heure. Votre équipe le remarque. Les standards professionnels que vous établissez pour la paie s'étendent aux délais de projets, aux communications clients et à la documentation de sécurité.",
+        "paragraph4": "Vous récupérez plus de 260 heures par an. C'est six semaines de travail complètes. Du temps actuellement passé à encercler des chiffres qui pourrait aller vers la soumission de nouveaux contrats, la gestion des relations clients, ou simplement être présent pour le travail que vous voulez vraiment faire."
+      },
+      "faqs": {
+        "title": "Questions fréquemment posées",
+        "subtitle": "Questions courantes sur le module Paie & Finances.",
+        "faq1": {
+          "question": "OnRopePro calcule-t-il mes impôts et déductions?",
+          "answer": "Non. OnRopePro prépare des données de feuilles de temps prêtes pour la paie à exporter. Les calculs de paie réels (RPC, AE, retenues d'impôt, sécurité sociale, assurance-maladie) se font dans votre logiciel de traitement de paie (QuickBooks, ADP, Gusto, etc.). OnRopePro gère l'agrégation du temps et l'export, pas la conformité fiscale."
+        },
+        "faq2": {
+          "question": "Quelles options de périodes de paie sont disponibles?",
+          "answer": "Hebdomadaire, bimensuelle, semi-mensuelle et mensuelle. Le système génère automatiquement les limites de période selon votre sélection."
+        },
+        "faq3": {
+          "question": "Comment fonctionne le calcul des heures supplémentaires?",
+          "answer": "Vous configurez les règles : déclenchement journalier (défaut 8 heures), déclenchement hebdomadaire (défaut 40 heures) et multiplicateur (1,5x, 2x, etc.). Le système applique ces règles automatiquement à chaque session de travail. Vous pouvez désactiver complètement les heures supplémentaires si votre structure de paie ne les inclut pas."
+        },
+        "faq4": {
+          "question": "Quel format utilise l'export?",
+          "answer": "CSV pour l'import dans les logiciels de paie. PDF pour les feuilles de temps imprimables. Les deux incluent le détail par employé et l'attribution aux projets."
+        },
+        "faq5": {
+          "question": "Qui peut voir les données de paie?",
+          "answer": "Les utilisateurs avec la permission canAccessFinancials. Ceci est accordé via le système de permissions basé sur les rôles. Les techniciens voient leurs propres heures mais pas les taux de compensation ni les données des autres employés."
+        },
+        "faq6": {
+          "question": "Que se passe-t-il si une session de travail est manquante ou incorrecte?",
+          "answer": "Les superviseurs avec les permissions appropriées peuvent réviser et ajuster les sessions de travail avant l'approbation des feuilles de temps. Tous les ajustements sont journalisés avec des raisons à des fins d'audit."
+        },
+        "faq7": {
+          "question": "Puis-je voir les périodes de paie historiques?",
+          "answer": "Oui. Les périodes de paie précédentes restent accessibles. Filtrez par plage de dates pour extraire les données de n'importe quelle période passée."
+        },
+        "faq8": {
+          "question": "L'attribution aux projets fonctionne-t-elle si un technicien travaille dans plusieurs bâtiments en une journée?",
+          "answer": "Oui. Chaque session de travail est liée à un projet spécifique. Si un technicien pointe au Bâtiment A pendant 4 heures, puis au Bâtiment B pendant 4 heures, les deux sessions apparaissent séparément avec leurs attributions de projet respectives."
+        },
+        "faq9": {
+          "question": "Qu'en est-il du temps non-facturable comme les déplacements entre sites?",
+          "answer": "Les sessions de travail non-facturables suivent les heures qui ne peuvent pas être facturées aux clients (déplacements, formation, maintenance d'équipement, retards météo). La vue de paie montre les heures facturables et non-facturables pour que vous connaissiez votre vrai coût de main-d'œuvre."
+        },
+        "faq10": {
+          "question": "Y a-t-il un flux d'approbation avant l'export?",
+          "answer": "Oui. Les feuilles de temps peuvent être révisées et approuvées avant l'export. Les feuilles de temps approuvées génèrent des fichiers d'export propres. Le flux empêche l'export de données qui n'ont pas été vérifiées."
+        }
+      },
+      "cta": {
+        "title": "Prêt à récupérer votre temps?",
+        "subtitle": "Rejoignez les entreprises d'accès sur corde qui ont éliminé le mal de tête de la paie. Commencez votre essai gratuit de 60 jours aujourd'hui.",
+        "trialButton": "Commencer votre essai gratuit de 60 jours",
+        "docsButton": "Voir la documentation technique"
       }
     },
     "workSessions": {

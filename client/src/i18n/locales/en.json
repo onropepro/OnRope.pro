@@ -5430,6 +5430,203 @@
       "features": {
         "title": "From Clock-In to Payroll Export",
         "subtitle": "The Payroll & Financial module transforms scattered work session data into organized, exportable timesheets without manual intervention."
+      },
+      "benefits": {
+        "title": "Who Benefits From This Module",
+        "subtitle": "Payroll clarity for everyone in your operation.",
+        "employers": {
+          "title": "For Employers (Company Owners)",
+          "benefit1": {
+            "title": "Reclaim 5+ hours every pay period.",
+            "description": "The calculator and pen method costs you 6-10 hours per payroll run. OnRopePro aggregates everything automatically. Select the pay period. Review the totals. Export. Done in 30-45 minutes."
+          },
+          "benefit2": {
+            "title": "Stop the random e-transfer scramble.",
+            "description": "When timesheets are wrong, you fix it with quick payments that confuse your books. Accurate data from the start means no corrections. Your bookkeeper gets clean exports every time."
+          },
+          "benefit3": {
+            "title": "Quote jobs with confidence.",
+            "description": "You underbid that building by 60 hours because you couldn't see where time went. Project attribution shows exactly how long each job takes. Your next quote includes the hours you actually need."
+          }
+        },
+        "operations": {
+          "title": "For Operations Managers & Supervisors",
+          "benefit1": {
+            "title": "Review without the paper shuffle.",
+            "description": "Your employees across multiple projects, multiple buildings, multiple shifts. The payroll view shows every work session organized by employee and pay period. Review and approve from one screen."
+          },
+          "benefit2": {
+            "title": "Catch discrepancies before payday.",
+            "description": "GPS verification and project attribution make anomalies obvious. A technician logged 8 hours at Building A but was scheduled for Building B? You see it immediately."
+          },
+          "benefit3": {
+            "title": "Historical access for audits.",
+            "description": "Previous pay periods stay accessible. When someone questions hours from three months ago, you pull the data in seconds."
+          }
+        },
+        "technicians": {
+          "title": "For Rope Access Technicians",
+          "benefit1": {
+            "title": "Your hours are accurate.",
+            "description": "GPS verification captures your actual time on site. No more discrepancies between what you logged and what the owner calculated."
+          },
+          "benefit2": {
+            "title": "See where your time goes.",
+            "description": "Every work session shows which project you were assigned to. Your 8-hour day might split across three buildings. The breakdown is clear."
+          },
+          "benefit3": {
+            "title": "Overtime calculated correctly.",
+            "description": "The system applies your company's overtime rules automatically. Daily trigger at 8 hours, weekly trigger at 40, whatever the configuration. No manual math required."
+          }
+        },
+        "buildingManagers": {
+          "title": "For Building Managers / Property Managers",
+          "benefit1": {
+            "title": "Labor documentation on demand.",
+            "description": "Need to verify how many technician hours were spent on your building last quarter? The data exists and exports cleanly."
+          },
+          "benefit2": {
+            "title": "Budget validation simplified.",
+            "description": "You contracted for 200 hours of annual maintenance. The project attribution shows exactly how many hours have been logged against your building."
+          },
+          "benefit3": {
+            "title": "Audit-ready records.",
+            "description": "Insurance, compliance, or internal review requirements? Work session data with GPS verification provides the documentation trail."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Key Features",
+        "subtitle": "Every feature exists to eliminate the gap between field work and payroll processing.",
+        "feature1": {
+          "title": "Pay Period Configuration",
+          "description": "Choose weekly, bi-weekly, semi-monthly, or monthly pay periods. The system auto-generates period boundaries. Work sessions group into the correct pay period automatically."
+        },
+        "feature2": {
+          "title": "GPS-Verified Time Data",
+          "description": "Hours come from verified work sessions, not self-reported notebooks. Clock-in location confirms the technician was actually at the job site. Eliminates disputes."
+        },
+        "feature3": {
+          "title": "Configurable Overtime Rules",
+          "description": "Set daily triggers (default 8 hours), weekly triggers (default 40 hours), or custom thresholds. Multipliers adjust from 1.5x to 3x. Disable overtime entirely if needed."
+        },
+        "feature4": {
+          "title": "Project Attribution",
+          "description": "Every work session links to a specific project. Your payroll view shows which building, which job type, how many hours. Essential for job costing and future bid accuracy."
+        },
+        "feature5": {
+          "title": "Billable vs Non-Billable Tracking",
+          "description": "Distinguish revenue-generating client hours from operational costs. Travel, equipment maintenance, training, weather delays. Know your true labor cost."
+        },
+        "feature6": {
+          "title": "Export Capabilities",
+          "description": "CSV export for payroll software integration (QuickBooks, ADP, Gusto). PDF timesheet reports for records. Employee-level detail and project cost breakdowns available."
+        }
+      },
+      "results": {
+        "title": "Measurable Results",
+        "subtitle": "Concrete improvements you'll see from day one.",
+        "result1": {
+          "title": "Time Savings",
+          "description": "The manual pen-and-calculator method consumes 6-10 hours per payroll run. OnRopePro reduces this to 30-45 minutes. For bi-weekly payroll, that's approximately 260 hours saved annually. Time that goes back into running your business."
+        },
+        "result2": {
+          "title": "Error Reduction",
+          "description": "Conflicting systems (notebooks, time clocks, spreadsheets) create discrepancies. Single-source-of-truth data eliminates reconciliation disputes. Corrections drop dramatically when the data is accurate from the start."
+        },
+        "result3": {
+          "title": "Job Costing Accuracy",
+          "description": "Without project attribution, you don't know why jobs run over budget. With it, you see exactly where hours went. Operators report quoting accuracy improves because they're working from actual historical data instead of estimates."
+        },
+        "result4": {
+          "title": "Accounting Cleanliness",
+          "description": "Random correction payments create unexplained transactions. Clean exports mean every dollar is documented before it leaves the system. Bookkeeper reconciliation time drops."
+        }
+      },
+      "integration": {
+        "title": "Module Integration Points",
+        "subtitle": "The Payroll & Financial module connects with other OnRopePro modules to create a complete data pipeline from field work to payroll export.",
+        "module1": {
+          "title": "Work Sessions & Time Tracking",
+          "description": "Primary data source. Every clock-in and clock-out creates work session data that flows directly into payroll aggregation."
+        },
+        "module2": {
+          "title": "Employee Management",
+          "description": "Rate and role lookup. Hourly rate pulls from the employee profile at the time of the work session. Mid-project rate changes are handled correctly."
+        },
+        "module3": {
+          "title": "Project Management",
+          "description": "Project attribution source. Work sessions link to projects, enabling labor cost tracking per building and per job type."
+        },
+        "module4": {
+          "title": "Scheduling & Calendar",
+          "description": "Shift assignment context. Scheduled shifts provide expected hours for comparison with actual hours worked. Discrepancies become visible."
+        },
+        "module5": {
+          "title": "Safety Compliance",
+          "description": "Work eligibility verification. Harness inspection and certification requirements verify before clock-in is allowed. Failed inspections block work sessions."
+        },
+        "module6": {
+          "title": "Analytics & Reporting",
+          "description": "Payroll data feeds into company-wide analytics. Labor costs, productivity metrics, and budget tracking all derive from the same source of truth."
+        }
+      },
+      "impact": {
+        "title": "Stop Dreading Payday",
+        "paragraph1": "Payday shouldn't consume your afternoon. It shouldn't involve a calculator, a pen, and 48 pages of printouts spread across your desk. It definitely shouldn't result in random e-transfers that confuse your bookkeeper and corrections that take longer than the original processing.",
+        "paragraph2": "Right now, payroll is probably the most hated task on your calendar. You put it off. You run late. Your employees start budgeting around \"getting paid late.\" That culture of lateness bleeds into everything else.",
+        "paragraph3": "When payroll takes 30 minutes instead of 6 hours, you stop avoiding it. You run on time. Your team notices. The professional standards you set for payroll extend to project timelines, client communications, and safety documentation.",
+        "paragraph4": "You get back 260+ hours per year. That's six full work weeks. Time currently spent circling numbers that could go toward bidding new contracts, managing client relationships, or simply being present for the work you actually want to do."
+      },
+      "faqs": {
+        "title": "Frequently Asked Questions",
+        "subtitle": "Common questions about the Payroll & Financial module.",
+        "faq1": {
+          "question": "Does OnRopePro calculate my taxes and deductions?",
+          "answer": "No. OnRopePro prepares payroll-ready timesheet data for export. Actual payroll calculations (CPP, EI, tax withholding, Social Security, Medicare) happen in your payroll processing software (QuickBooks, ADP, Gusto, etc.). OnRopePro handles time aggregation and export, not tax compliance."
+        },
+        "faq2": {
+          "question": "What pay period options are available?",
+          "answer": "Weekly, bi-weekly, semi-monthly, and monthly. The system generates period boundaries automatically based on your selection."
+        },
+        "faq3": {
+          "question": "How does overtime calculation work?",
+          "answer": "You configure the rules: daily trigger (default 8 hours), weekly trigger (default 40 hours), and multiplier (1.5x, 2x, etc.). The system applies these rules automatically to every work session. You can disable overtime entirely if your pay structure doesn't include it."
+        },
+        "faq4": {
+          "question": "What format does the export use?",
+          "answer": "CSV for payroll software import. PDF for printable timesheet records. Both include employee-level detail and project attribution."
+        },
+        "faq5": {
+          "question": "Who can see payroll data?",
+          "answer": "Users with the canAccessFinancials permission. This is granted through the role-based permission system. Technicians see their own hours but not compensation rates or other employees' data."
+        },
+        "faq6": {
+          "question": "What happens if a work session is missing or incorrect?",
+          "answer": "Supervisors with appropriate permissions can review and adjust work sessions before timesheet approval. All adjustments are logged with reasons for audit purposes."
+        },
+        "faq7": {
+          "question": "Can I see historical pay periods?",
+          "answer": "Yes. Previous pay periods remain accessible. Filter by date range to pull data from any past period."
+        },
+        "faq8": {
+          "question": "Does project attribution work if a technician works at multiple buildings in one day?",
+          "answer": "Yes. Each work session links to a specific project. If a technician clocks into Building A for 4 hours, then Building B for 4 hours, both sessions show separately with their respective project attribution."
+        },
+        "faq9": {
+          "question": "What about non-billable time like travel between sites?",
+          "answer": "Non-billable work sessions track hours that cannot be charged to clients (travel, training, equipment maintenance, weather delays). The payroll view shows both billable and non-billable hours so you know your true labor cost."
+        },
+        "faq10": {
+          "question": "Is there an approval workflow before export?",
+          "answer": "Yes. Timesheets can be reviewed and approved before export. Approved timesheets generate clean export files. The workflow prevents exporting data that hasn't been verified."
+        }
+      },
+      "cta": {
+        "title": "Ready to Reclaim Your Time?",
+        "subtitle": "Join rope access companies who've eliminated the payroll headache. Start your free 60-day trial today.",
+        "trialButton": "Start Your Free 60-Day Trial",
+        "docsButton": "View Technical Documentation"
       }
     },
     "workSessions": {

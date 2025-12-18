@@ -192,28 +192,28 @@ export default function PayrollFinancialLanding() {
                 <div className="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-3">
                   <Zap className="w-6 h-6 text-blue-600" />
                 </div>
-                <CardTitle className="text-xl">Automatic Aggregation</CardTitle>
+                <CardTitle className="text-xl">{t('modules.payroll.features.card1.title', 'Automatic Aggregation')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-base text-muted-foreground">
-                <p className="font-medium text-foreground">Every GPS-verified clock-in flows directly into timesheets.</p>
-                <p>The system calculates hours, applies overtime rules, and groups everything by pay period.</p>
-                <p className="font-medium text-foreground mt-4">What gets automated:</p>
+                <p className="font-medium text-foreground">{t('modules.payroll.features.card1.headline', 'Every GPS-verified clock-in flows directly into timesheets.')}</p>
+                <p>{t('modules.payroll.features.card1.description', 'The system calculates hours, applies overtime rules, and groups everything by pay period.')}</p>
+                <p className="font-medium text-foreground mt-4">{t('modules.payroll.features.card1.listTitle', 'What gets automated:')}</p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Regular hour totals by employee</span>
+                    <span>{t('modules.payroll.features.card1.item1', 'Regular hour totals by employee')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Overtime calculation (daily and weekly triggers)</span>
+                    <span>{t('modules.payroll.features.card1.item2', 'Overtime calculation (daily and weekly triggers)')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Pay period grouping (weekly, bi-weekly, semi-monthly, monthly)</span>
+                    <span>{t('modules.payroll.features.card1.item3', 'Pay period grouping (weekly, bi-weekly, semi-monthly, monthly)')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Project attribution per work session</span>
+                    <span>{t('modules.payroll.features.card1.item4', 'Project attribution per work session')}</span>
                   </li>
                 </ul>
               </CardContent>
@@ -226,28 +226,28 @@ export default function PayrollFinancialLanding() {
                 <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center mb-3">
                   <Target className="w-6 h-6 text-emerald-600" />
                 </div>
-                <CardTitle className="text-xl">Job Costing Visibility</CardTitle>
+                <CardTitle className="text-xl">{t('modules.payroll.features.card2.title', 'Job Costing Visibility')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-base text-muted-foreground">
-                <p className="font-medium text-foreground">Know exactly how many hours went to each building.</p>
-                <p>Stop underbidding jobs because you can finally see where time actually goes.</p>
-                <p className="font-medium text-foreground mt-4">What gets tracked:</p>
+                <p className="font-medium text-foreground">{t('modules.payroll.features.card2.headline', 'Know exactly how many hours went to each building.')}</p>
+                <p>{t('modules.payroll.features.card2.description', 'Stop underbidding jobs because you can finally see where time actually goes.')}</p>
+                <p className="font-medium text-foreground mt-4">{t('modules.payroll.features.card2.listTitle', 'What gets tracked:')}</p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Hours per project per employee</span>
+                    <span>{t('modules.payroll.features.card2.item1', 'Hours per project per employee')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Billable vs non-billable breakdown</span>
+                    <span>{t('modules.payroll.features.card2.item2', 'Billable vs non-billable breakdown')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Project labor cost totals</span>
+                    <span>{t('modules.payroll.features.card2.item3', 'Project labor cost totals')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Historical comparison across pay periods</span>
+                    <span>{t('modules.payroll.features.card2.item4', 'Historical comparison across pay periods')}</span>
                   </li>
                 </ul>
               </CardContent>
@@ -260,28 +260,28 @@ export default function PayrollFinancialLanding() {
                 <div className="w-12 h-12 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center mb-3">
                   <FileSpreadsheet className="w-6 h-6 text-amber-600" />
                 </div>
-                <CardTitle className="text-xl">Export-Ready Output</CardTitle>
+                <CardTitle className="text-xl">{t('modules.payroll.features.card3.title', 'Export-Ready Output')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-base text-muted-foreground">
-                <p className="font-medium text-foreground">Generate CSV files for QuickBooks, ADP, Gusto, or any payroll software.</p>
-                <p>PDF reports for records. No re-keying data.</p>
-                <p className="font-medium text-foreground mt-4">What gets exported:</p>
+                <p className="font-medium text-foreground">{t('modules.payroll.features.card3.headline', 'Generate CSV files for QuickBooks, ADP, Gusto, or any payroll software.')}</p>
+                <p>{t('modules.payroll.features.card3.description', 'PDF reports for records. No re-keying data.')}</p>
+                <p className="font-medium text-foreground mt-4">{t('modules.payroll.features.card3.listTitle', 'What gets exported:')}</p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Employee-by-employee timesheets</span>
+                    <span>{t('modules.payroll.features.card3.item1', 'Employee-by-employee timesheets')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Project cost breakdowns</span>
+                    <span>{t('modules.payroll.features.card3.item2', 'Project cost breakdowns')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Overtime summaries</span>
+                    <span>{t('modules.payroll.features.card3.item3', 'Overtime summaries')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Complete audit trails</span>
+                    <span>{t('modules.payroll.features.card3.item4', 'Complete audit trails')}</span>
                   </li>
                 </ul>
               </CardContent>
@@ -296,10 +296,10 @@ export default function PayrollFinancialLanding() {
       <section className="py-16 md:py-20 px-4" data-testid="section-who-benefits">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Who Benefits From This Module
+            {t('modules.payroll.benefits.title', 'Who Benefits From This Module')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-            Payroll clarity for everyone in your operation.
+            {t('modules.payroll.benefits.subtitle', 'Payroll clarity for everyone in your operation.')}
           </p>
 
           <div className="space-y-8">
@@ -310,22 +310,22 @@ export default function PayrollFinancialLanding() {
                   <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
                     <Briefcase className="w-5 h-5 text-blue-600" />
                   </div>
-                  <CardTitle className="text-xl">For Employers (Company Owners)</CardTitle>
+                  <CardTitle className="text-xl">{t('modules.payroll.benefits.employers.title', 'For Employers (Company Owners)')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-6 space-y-4">
                 <div className="grid md:grid-cols-3 gap-6">
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Reclaim 5+ hours every pay period.</h4>
-                    <p className="text-base text-muted-foreground">The calculator and pen method costs you 6-10 hours per payroll run. OnRopePro aggregates everything automatically. Select the pay period. Review the totals. Export. Done in 30-45 minutes.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.payroll.benefits.employers.benefit1.title', 'Reclaim 5+ hours every pay period.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.payroll.benefits.employers.benefit1.description', 'The calculator and pen method costs you 6-10 hours per payroll run. OnRopePro aggregates everything automatically. Select the pay period. Review the totals. Export. Done in 30-45 minutes.')}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Stop the random e-transfer scramble.</h4>
-                    <p className="text-base text-muted-foreground">When timesheets are wrong, you fix it with quick payments that confuse your books. Accurate data from the start means no corrections. Your bookkeeper gets clean exports every time.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.payroll.benefits.employers.benefit2.title', 'Stop the random e-transfer scramble.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.payroll.benefits.employers.benefit2.description', 'When timesheets are wrong, you fix it with quick payments that confuse your books. Accurate data from the start means no corrections. Your bookkeeper gets clean exports every time.')}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Quote jobs with confidence.</h4>
-                    <p className="text-base text-muted-foreground">You underbid that building by 60 hours because you couldn't see where time went. Project attribution shows exactly how long each job takes. Your next quote includes the hours you actually need.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.payroll.benefits.employers.benefit3.title', 'Quote jobs with confidence.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.payroll.benefits.employers.benefit3.description', "You underbid that building by 60 hours because you couldn't see where time went. Project attribution shows exactly how long each job takes. Your next quote includes the hours you actually need.")}</p>
                   </div>
                 </div>
               </CardContent>
@@ -338,22 +338,22 @@ export default function PayrollFinancialLanding() {
                   <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
                     <Users className="w-5 h-5 text-blue-600" />
                   </div>
-                  <CardTitle className="text-xl">For Operations Managers & Supervisors</CardTitle>
+                  <CardTitle className="text-xl">{t('modules.payroll.benefits.operations.title', 'For Operations Managers & Supervisors')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-6 space-y-4">
                 <div className="grid md:grid-cols-3 gap-6">
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Review without the paper shuffle.</h4>
-                    <p className="text-base text-muted-foreground">Your employees across multiple projects, multiple buildings, multiple shifts. The payroll view shows every work session organized by employee and pay period. Review and approve from one screen.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.payroll.benefits.operations.benefit1.title', 'Review without the paper shuffle.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.payroll.benefits.operations.benefit1.description', 'Your employees across multiple projects, multiple buildings, multiple shifts. The payroll view shows every work session organized by employee and pay period. Review and approve from one screen.')}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Catch discrepancies before payday.</h4>
-                    <p className="text-base text-muted-foreground">GPS verification and project attribution make anomalies obvious. A technician logged 8 hours at Building A but was scheduled for Building B? You see it immediately.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.payroll.benefits.operations.benefit2.title', 'Catch discrepancies before payday.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.payroll.benefits.operations.benefit2.description', 'GPS verification and project attribution make anomalies obvious. A technician logged 8 hours at Building A but was scheduled for Building B? You see it immediately.')}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Historical access for audits.</h4>
-                    <p className="text-base text-muted-foreground">Previous pay periods stay accessible. When someone questions hours from three months ago, you pull the data in seconds.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.payroll.benefits.operations.benefit3.title', 'Historical access for audits.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.payroll.benefits.operations.benefit3.description', 'Previous pay periods stay accessible. When someone questions hours from three months ago, you pull the data in seconds.')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -366,22 +366,22 @@ export default function PayrollFinancialLanding() {
                   <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center">
                     <HardHat className="w-5 h-5 text-amber-600" />
                   </div>
-                  <CardTitle className="text-xl">For Rope Access Technicians</CardTitle>
+                  <CardTitle className="text-xl">{t('modules.payroll.benefits.technicians.title', 'For Rope Access Technicians')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-6 space-y-4">
                 <div className="grid md:grid-cols-3 gap-6">
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Your hours are accurate.</h4>
-                    <p className="text-base text-muted-foreground">GPS verification captures your actual time on site. No more discrepancies between what you logged and what the owner calculated.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.payroll.benefits.technicians.benefit1.title', 'Your hours are accurate.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.payroll.benefits.technicians.benefit1.description', 'GPS verification captures your actual time on site. No more discrepancies between what you logged and what the owner calculated.')}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">See where your time goes.</h4>
-                    <p className="text-base text-muted-foreground">Every work session shows which project you were assigned to. Your 8-hour day might split across three buildings. The breakdown is clear.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.payroll.benefits.technicians.benefit2.title', 'See where your time goes.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.payroll.benefits.technicians.benefit2.description', 'Every work session shows which project you were assigned to. Your 8-hour day might split across three buildings. The breakdown is clear.')}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Overtime calculated correctly.</h4>
-                    <p className="text-base text-muted-foreground">The system applies your company's overtime rules automatically. Daily trigger at 8 hours, weekly trigger at 40, whatever the configuration. No manual math required.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.payroll.benefits.technicians.benefit3.title', 'Overtime calculated correctly.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.payroll.benefits.technicians.benefit3.description', "The system applies your company's overtime rules automatically. Daily trigger at 8 hours, weekly trigger at 40, whatever the configuration. No manual math required.")}</p>
                   </div>
                 </div>
               </CardContent>
@@ -394,22 +394,22 @@ export default function PayrollFinancialLanding() {
                   <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center">
                     <Building2 className="w-5 h-5 text-violet-600" />
                   </div>
-                  <CardTitle className="text-xl">For Building Managers / Property Managers</CardTitle>
+                  <CardTitle className="text-xl">{t('modules.payroll.benefits.buildingManagers.title', 'For Building Managers / Property Managers')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-6 space-y-4">
                 <div className="grid md:grid-cols-3 gap-6">
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Labor documentation on demand.</h4>
-                    <p className="text-base text-muted-foreground">Need to verify how many technician hours were spent on your building last quarter? The data exists and exports cleanly.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.payroll.benefits.buildingManagers.benefit1.title', 'Labor documentation on demand.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.payroll.benefits.buildingManagers.benefit1.description', 'Need to verify how many technician hours were spent on your building last quarter? The data exists and exports cleanly.')}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Budget validation simplified.</h4>
-                    <p className="text-base text-muted-foreground">You contracted for 200 hours of annual maintenance. The project attribution shows exactly how many hours have been logged against your building.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.payroll.benefits.buildingManagers.benefit2.title', 'Budget validation simplified.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.payroll.benefits.buildingManagers.benefit2.description', 'You contracted for 200 hours of annual maintenance. The project attribution shows exactly how many hours have been logged against your building.')}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Audit-ready records.</h4>
-                    <p className="text-base text-muted-foreground">Insurance, compliance, or internal review requirements? Work session data with GPS verification provides the documentation trail.</p>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.payroll.benefits.buildingManagers.benefit3.title', 'Audit-ready records.')}</h4>
+                    <p className="text-base text-muted-foreground">{t('modules.payroll.benefits.buildingManagers.benefit3.description', 'Insurance, compliance, or internal review requirements? Work session data with GPS verification provides the documentation trail.')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -424,10 +424,10 @@ export default function PayrollFinancialLanding() {
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900" data-testid="section-key-features">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Key Features
+            {t('modules.payroll.keyFeatures.title', 'Key Features')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-            Every feature exists to eliminate the gap between field work and payroll processing.
+            {t('modules.payroll.keyFeatures.subtitle', 'Every feature exists to eliminate the gap between field work and payroll processing.')}
           </p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -438,9 +438,9 @@ export default function PayrollFinancialLanding() {
                     <Calendar className="w-5 h-5 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Pay Period Configuration</h3>
+                    <h3 className="font-semibold">{t('modules.payroll.keyFeatures.feature1.title', 'Pay Period Configuration')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      Choose weekly, bi-weekly, semi-monthly, or monthly pay periods. The system auto-generates period boundaries. Work sessions group into the correct pay period automatically.
+                      {t('modules.payroll.keyFeatures.feature1.description', 'Choose weekly, bi-weekly, semi-monthly, or monthly pay periods. The system auto-generates period boundaries. Work sessions group into the correct pay period automatically.')}
                     </p>
                   </div>
                 </div>
@@ -454,9 +454,9 @@ export default function PayrollFinancialLanding() {
                     <MapPin className="w-5 h-5 text-emerald-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">GPS-Verified Time Data</h3>
+                    <h3 className="font-semibold">{t('modules.payroll.keyFeatures.feature2.title', 'GPS-Verified Time Data')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      Hours come from verified work sessions, not self-reported notebooks. Clock-in location confirms the technician was actually at the job site. Eliminates disputes.
+                      {t('modules.payroll.keyFeatures.feature2.description', 'Hours come from verified work sessions, not self-reported notebooks. Clock-in location confirms the technician was actually at the job site. Eliminates disputes.')}
                     </p>
                   </div>
                 </div>
@@ -470,9 +470,9 @@ export default function PayrollFinancialLanding() {
                     <Calculator className="w-5 h-5 text-amber-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Configurable Overtime Rules</h3>
+                    <h3 className="font-semibold">{t('modules.payroll.keyFeatures.feature3.title', 'Configurable Overtime Rules')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      Set daily triggers (default 8 hours), weekly triggers (default 40 hours), or custom thresholds. Multipliers adjust from 1.5x to 3x. Disable overtime entirely if needed.
+                      {t('modules.payroll.keyFeatures.feature3.description', 'Set daily triggers (default 8 hours), weekly triggers (default 40 hours), or custom thresholds. Multipliers adjust from 1.5x to 3x. Disable overtime entirely if needed.')}
                     </p>
                   </div>
                 </div>
@@ -486,9 +486,9 @@ export default function PayrollFinancialLanding() {
                     <Building2 className="w-5 h-5 text-violet-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Project Attribution</h3>
+                    <h3 className="font-semibold">{t('modules.payroll.keyFeatures.feature4.title', 'Project Attribution')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      Every work session links to a specific project. Your payroll view shows which building, which job type, how many hours. Essential for job costing and future bid accuracy.
+                      {t('modules.payroll.keyFeatures.feature4.description', 'Every work session links to a specific project. Your payroll view shows which building, which job type, how many hours. Essential for job costing and future bid accuracy.')}
                     </p>
                   </div>
                 </div>
@@ -502,9 +502,9 @@ export default function PayrollFinancialLanding() {
                     <DollarSign className="w-5 h-5 text-sky-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Billable vs Non-Billable Tracking</h3>
+                    <h3 className="font-semibold">{t('modules.payroll.keyFeatures.feature5.title', 'Billable vs Non-Billable Tracking')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      Distinguish revenue-generating client hours from operational costs. Travel, equipment maintenance, training, weather delays. Know your true labor cost.
+                      {t('modules.payroll.keyFeatures.feature5.description', 'Distinguish revenue-generating client hours from operational costs. Travel, equipment maintenance, training, weather delays. Know your true labor cost.')}
                     </p>
                   </div>
                 </div>
@@ -518,9 +518,9 @@ export default function PayrollFinancialLanding() {
                     <FileText className="w-5 h-5 text-rose-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Export Capabilities</h3>
+                    <h3 className="font-semibold">{t('modules.payroll.keyFeatures.feature6.title', 'Export Capabilities')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      CSV export for payroll software integration (QuickBooks, ADP, Gusto). PDF timesheet reports for records. Employee-level detail and project cost breakdowns available.
+                      {t('modules.payroll.keyFeatures.feature6.description', 'CSV export for payroll software integration (QuickBooks, ADP, Gusto). PDF timesheet reports for records. Employee-level detail and project cost breakdowns available.')}
                     </p>
                   </div>
                 </div>
@@ -536,10 +536,10 @@ export default function PayrollFinancialLanding() {
       <section className="py-16 md:py-20 px-4" data-testid="section-measurable-results">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Measurable Results
+            {t('modules.payroll.results.title', 'Measurable Results')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-            Concrete improvements you'll see from day one.
+            {t('modules.payroll.results.subtitle', "Concrete improvements you'll see from day one.")}
           </p>
 
           <div className="grid md:grid-cols-2 gap-6">
@@ -551,9 +551,9 @@ export default function PayrollFinancialLanding() {
                     <Timer className="w-6 h-6 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg mb-2">Time Savings</h3>
+                    <h3 className="font-semibold text-lg mb-2">{t('modules.payroll.results.result1.title', 'Time Savings')}</h3>
                     <p className="text-base text-muted-foreground">
-                      The manual pen-and-calculator method consumes 6-10 hours per payroll run. OnRopePro reduces this to 30-45 minutes. For bi-weekly payroll, that's approximately 260 hours saved annually. Time that goes back into running your business.
+                      {t('modules.payroll.results.result1.description', "The manual pen-and-calculator method consumes 6-10 hours per payroll run. OnRopePro reduces this to 30-45 minutes. For bi-weekly payroll, that's approximately 260 hours saved annually. Time that goes back into running your business.")}
                     </p>
                   </div>
                 </div>
@@ -568,9 +568,9 @@ export default function PayrollFinancialLanding() {
                     <CheckCircle2 className="w-6 h-6 text-emerald-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg mb-2">Error Reduction</h3>
+                    <h3 className="font-semibold text-lg mb-2">{t('modules.payroll.results.result2.title', 'Error Reduction')}</h3>
                     <p className="text-base text-muted-foreground">
-                      Conflicting systems (notebooks, time clocks, spreadsheets) create discrepancies. Single-source-of-truth data eliminates reconciliation disputes. Corrections drop dramatically when the data is accurate from the start.
+                      {t('modules.payroll.results.result2.description', 'Conflicting systems (notebooks, time clocks, spreadsheets) create discrepancies. Single-source-of-truth data eliminates reconciliation disputes. Corrections drop dramatically when the data is accurate from the start.')}
                     </p>
                   </div>
                 </div>
@@ -585,9 +585,9 @@ export default function PayrollFinancialLanding() {
                     <TrendingUp className="w-6 h-6 text-amber-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg mb-2">Job Costing Accuracy</h3>
+                    <h3 className="font-semibold text-lg mb-2">{t('modules.payroll.results.result3.title', 'Job Costing Accuracy')}</h3>
                     <p className="text-base text-muted-foreground">
-                      Without project attribution, you don't know why jobs run over budget. With it, you see exactly where hours went. Operators report quoting accuracy improves because they're working from actual historical data instead of estimates.
+                      {t('modules.payroll.results.result3.description', "Without project attribution, you don't know why jobs run over budget. With it, you see exactly where hours went. Operators report quoting accuracy improves because they're working from actual historical data instead of estimates.")}
                     </p>
                   </div>
                 </div>
@@ -602,9 +602,9 @@ export default function PayrollFinancialLanding() {
                     <PiggyBank className="w-6 h-6 text-violet-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg mb-2">Accounting Cleanliness</h3>
+                    <h3 className="font-semibold text-lg mb-2">{t('modules.payroll.results.result4.title', 'Accounting Cleanliness')}</h3>
                     <p className="text-base text-muted-foreground">
-                      Random correction payments create unexplained transactions. Clean exports mean every dollar is documented before it leaves the system. Bookkeeper reconciliation time drops.
+                      {t('modules.payroll.results.result4.description', 'Random correction payments create unexplained transactions. Clean exports mean every dollar is documented before it leaves the system. Bookkeeper reconciliation time drops.')}
                     </p>
                   </div>
                 </div>
@@ -620,10 +620,10 @@ export default function PayrollFinancialLanding() {
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900" data-testid="section-module-integration">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Module Integration Points
+            {t('modules.payroll.integration.title', 'Module Integration Points')}
           </h2>
           <p className="text-center text-muted-foreground mb-12 max-w-3xl mx-auto">
-            The Payroll & Financial module connects with other OnRopePro modules to create a complete data pipeline from field work to payroll export.
+            {t('modules.payroll.integration.subtitle', 'The Payroll & Financial module connects with other OnRopePro modules to create a complete data pipeline from field work to payroll export.')}
           </p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -634,9 +634,9 @@ export default function PayrollFinancialLanding() {
                     <Clock className="w-5 h-5 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Work Sessions & Time Tracking</h3>
+                    <h3 className="font-semibold">{t('modules.payroll.integration.module1.title', 'Work Sessions & Time Tracking')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      Primary data source. Every clock-in and clock-out creates work session data that flows directly into payroll aggregation.
+                      {t('modules.payroll.integration.module1.description', 'Primary data source. Every clock-in and clock-out creates work session data that flows directly into payroll aggregation.')}
                     </p>
                   </div>
                 </div>
@@ -650,9 +650,9 @@ export default function PayrollFinancialLanding() {
                     <Users className="w-5 h-5 text-emerald-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Employee Management</h3>
+                    <h3 className="font-semibold">{t('modules.payroll.integration.module2.title', 'Employee Management')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      Rate and role lookup. Hourly rate pulls from the employee profile at the time of the work session. Mid-project rate changes are handled correctly.
+                      {t('modules.payroll.integration.module2.description', 'Rate and role lookup. Hourly rate pulls from the employee profile at the time of the work session. Mid-project rate changes are handled correctly.')}
                     </p>
                   </div>
                 </div>
@@ -666,9 +666,9 @@ export default function PayrollFinancialLanding() {
                     <Briefcase className="w-5 h-5 text-amber-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Project Management</h3>
+                    <h3 className="font-semibold">{t('modules.payroll.integration.module3.title', 'Project Management')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      Project attribution source. Work sessions link to projects, enabling labor cost tracking per building and per job type.
+                      {t('modules.payroll.integration.module3.description', 'Project attribution source. Work sessions link to projects, enabling labor cost tracking per building and per job type.')}
                     </p>
                   </div>
                 </div>
@@ -682,9 +682,9 @@ export default function PayrollFinancialLanding() {
                     <Calendar className="w-5 h-5 text-violet-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Scheduling & Calendar</h3>
+                    <h3 className="font-semibold">{t('modules.payroll.integration.module4.title', 'Scheduling & Calendar')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      Shift assignment context. Scheduled shifts provide expected hours for comparison with actual hours worked. Discrepancies become visible.
+                      {t('modules.payroll.integration.module4.description', 'Shift assignment context. Scheduled shifts provide expected hours for comparison with actual hours worked. Discrepancies become visible.')}
                     </p>
                   </div>
                 </div>
@@ -698,9 +698,9 @@ export default function PayrollFinancialLanding() {
                     <Shield className="w-5 h-5 text-sky-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Safety Compliance</h3>
+                    <h3 className="font-semibold">{t('modules.payroll.integration.module5.title', 'Safety Compliance')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      Work eligibility verification. Harness inspection and certification requirements verify before clock-in is allowed. Failed inspections block work sessions.
+                      {t('modules.payroll.integration.module5.description', 'Work eligibility verification. Harness inspection and certification requirements verify before clock-in is allowed. Failed inspections block work sessions.')}
                     </p>
                   </div>
                 </div>
@@ -714,9 +714,9 @@ export default function PayrollFinancialLanding() {
                     <BarChart3 className="w-5 h-5 text-rose-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Analytics & Reporting</h3>
+                    <h3 className="font-semibold">{t('modules.payroll.integration.module6.title', 'Analytics & Reporting')}</h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      Payroll data feeds into company-wide analytics. Labor costs, productivity metrics, and budget tracking all derive from the same source of truth.
+                      {t('modules.payroll.integration.module6.description', 'Payroll data feeds into company-wide analytics. Labor costs, productivity metrics, and budget tracking all derive from the same source of truth.')}
                     </p>
                   </div>
                 </div>
@@ -732,23 +732,23 @@ export default function PayrollFinancialLanding() {
       <section className="py-16 md:py-20 px-4" data-testid="section-business-impact">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
-            Stop Dreading Payday
+            {t('modules.payroll.impact.title', 'Stop Dreading Payday')}
           </h2>
 
           <Card className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
             <CardContent className="p-6 md:p-8 space-y-4 text-muted-foreground">
               <p className="text-base">
-                Payday shouldn't consume your afternoon. It shouldn't involve a calculator, a pen, and 48 pages of printouts spread across your desk. It definitely shouldn't result in random e-transfers that confuse your bookkeeper and corrections that take longer than the original processing.
+                {t('modules.payroll.impact.paragraph1', "Payday shouldn't consume your afternoon. It shouldn't involve a calculator, a pen, and 48 pages of printouts spread across your desk. It definitely shouldn't result in random e-transfers that confuse your bookkeeper and corrections that take longer than the original processing.")}
               </p>
               <p className="text-base">
-                Right now, payroll is probably the most hated task on your calendar. You put it off. You run late. Your employees start budgeting around "getting paid late." That culture of lateness bleeds into everything else.
+                {t('modules.payroll.impact.paragraph2', 'Right now, payroll is probably the most hated task on your calendar. You put it off. You run late. Your employees start budgeting around "getting paid late." That culture of lateness bleeds into everything else.')}
               </p>
               <Separator className="my-6" />
               <p className="text-base">
-                When payroll takes 30 minutes instead of 6 hours, you stop avoiding it. You run on time. Your team notices. The professional standards you set for payroll extend to project timelines, client communications, and safety documentation.
+                {t('modules.payroll.impact.paragraph3', 'When payroll takes 30 minutes instead of 6 hours, you stop avoiding it. You run on time. Your team notices. The professional standards you set for payroll extend to project timelines, client communications, and safety documentation.')}
               </p>
               <p className="font-medium text-foreground text-lg">
-                You get back 260+ hours per year. That's six full work weeks. Time currently spent circling numbers that could go toward bidding new contracts, managing client relationships, or simply being present for the work you actually want to do.
+                {t('modules.payroll.impact.paragraph4', "You get back 260+ hours per year. That's six full work weeks. Time currently spent circling numbers that could go toward bidding new contracts, managing client relationships, or simply being present for the work you actually want to do.")}
               </p>
             </CardContent>
           </Card>
@@ -761,100 +761,100 @@ export default function PayrollFinancialLanding() {
       <section id="faqs" className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900" data-testid="section-faqs">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Frequently Asked Questions
+            {t('modules.payroll.faqs.title', 'Frequently Asked Questions')}
           </h2>
           <p className="text-center text-muted-foreground mb-12">
-            Common questions about the Payroll & Financial module.
+            {t('modules.payroll.faqs.subtitle', 'Common questions about the Payroll & Financial module.')}
           </p>
 
           <Accordion type="single" collapsible className="space-y-4" data-testid="accordion-faqs">
             <AccordionItem value="faq-1" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4 text-left" data-testid="faq-trigger-1">
-                Does OnRopePro calculate my taxes and deductions?
+                {t('modules.payroll.faqs.faq1.question', 'Does OnRopePro calculate my taxes and deductions?')}
               </AccordionTrigger>
               <AccordionContent className="pb-4 text-muted-foreground text-base">
-                No. OnRopePro prepares payroll-ready timesheet data for export. Actual payroll calculations (CPP, EI, tax withholding, Social Security, Medicare) happen in your payroll processing software (QuickBooks, ADP, Gusto, etc.). OnRopePro handles time aggregation and export, not tax compliance.
+                {t('modules.payroll.faqs.faq1.answer', 'No. OnRopePro prepares payroll-ready timesheet data for export. Actual payroll calculations (CPP, EI, tax withholding, Social Security, Medicare) happen in your payroll processing software (QuickBooks, ADP, Gusto, etc.). OnRopePro handles time aggregation and export, not tax compliance.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-2" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4 text-left" data-testid="faq-trigger-2">
-                What pay period options are available?
+                {t('modules.payroll.faqs.faq2.question', 'What pay period options are available?')}
               </AccordionTrigger>
               <AccordionContent className="pb-4 text-muted-foreground text-base">
-                Weekly, bi-weekly, semi-monthly, and monthly. The system generates period boundaries automatically based on your selection.
+                {t('modules.payroll.faqs.faq2.answer', 'Weekly, bi-weekly, semi-monthly, and monthly. The system generates period boundaries automatically based on your selection.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-3" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4 text-left" data-testid="faq-trigger-3">
-                How does overtime calculation work?
+                {t('modules.payroll.faqs.faq3.question', 'How does overtime calculation work?')}
               </AccordionTrigger>
               <AccordionContent className="pb-4 text-muted-foreground text-base">
-                You configure the rules: daily trigger (default 8 hours), weekly trigger (default 40 hours), and multiplier (1.5x, 2x, etc.). The system applies these rules automatically to every work session. You can disable overtime entirely if your pay structure doesn't include it.
+                {t('modules.payroll.faqs.faq3.answer', "You configure the rules: daily trigger (default 8 hours), weekly trigger (default 40 hours), and multiplier (1.5x, 2x, etc.). The system applies these rules automatically to every work session. You can disable overtime entirely if your pay structure doesn't include it.")}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-4" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4 text-left" data-testid="faq-trigger-4">
-                What format does the export use?
+                {t('modules.payroll.faqs.faq4.question', 'What format does the export use?')}
               </AccordionTrigger>
               <AccordionContent className="pb-4 text-muted-foreground text-base">
-                CSV for payroll software import. PDF for printable timesheet records. Both include employee-level detail and project attribution.
+                {t('modules.payroll.faqs.faq4.answer', 'CSV for payroll software import. PDF for printable timesheet records. Both include employee-level detail and project attribution.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-5" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4 text-left" data-testid="faq-trigger-5">
-                Who can see payroll data?
+                {t('modules.payroll.faqs.faq5.question', 'Who can see payroll data?')}
               </AccordionTrigger>
               <AccordionContent className="pb-4 text-muted-foreground text-base">
-                Users with the canAccessFinancials permission. This is granted through the role-based permission system. Technicians see their own hours but not compensation rates or other employees' data.
+                {t('modules.payroll.faqs.faq5.answer', "Users with the canAccessFinancials permission. This is granted through the role-based permission system. Technicians see their own hours but not compensation rates or other employees' data.")}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-6" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4 text-left" data-testid="faq-trigger-6">
-                What happens if a work session is missing or incorrect?
+                {t('modules.payroll.faqs.faq6.question', 'What happens if a work session is missing or incorrect?')}
               </AccordionTrigger>
               <AccordionContent className="pb-4 text-muted-foreground text-base">
-                Supervisors with appropriate permissions can review and adjust work sessions before timesheet approval. All adjustments are logged with reasons for audit purposes.
+                {t('modules.payroll.faqs.faq6.answer', 'Supervisors with appropriate permissions can review and adjust work sessions before timesheet approval. All adjustments are logged with reasons for audit purposes.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-7" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4 text-left" data-testid="faq-trigger-7">
-                Can I see historical pay periods?
+                {t('modules.payroll.faqs.faq7.question', 'Can I see historical pay periods?')}
               </AccordionTrigger>
               <AccordionContent className="pb-4 text-muted-foreground text-base">
-                Yes. Previous pay periods remain accessible. Filter by date range to pull data from any past period.
+                {t('modules.payroll.faqs.faq7.answer', 'Yes. Previous pay periods remain accessible. Filter by date range to pull data from any past period.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-8" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4 text-left" data-testid="faq-trigger-8">
-                Does project attribution work if a technician works at multiple buildings in one day?
+                {t('modules.payroll.faqs.faq8.question', 'Does project attribution work if a technician works at multiple buildings in one day?')}
               </AccordionTrigger>
               <AccordionContent className="pb-4 text-muted-foreground text-base">
-                Yes. Each work session links to a specific project. If a technician clocks into Building A for 4 hours, then Building B for 4 hours, both sessions show separately with their respective project attribution.
+                {t('modules.payroll.faqs.faq8.answer', 'Yes. Each work session links to a specific project. If a technician clocks into Building A for 4 hours, then Building B for 4 hours, both sessions show separately with their respective project attribution.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-9" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4 text-left" data-testid="faq-trigger-9">
-                What about non-billable time like travel between sites?
+                {t('modules.payroll.faqs.faq9.question', 'What about non-billable time like travel between sites?')}
               </AccordionTrigger>
               <AccordionContent className="pb-4 text-muted-foreground text-base">
-                Non-billable work sessions track hours that cannot be charged to clients (travel, training, equipment maintenance, weather delays). The payroll view shows both billable and non-billable hours so you know your true labor cost.
+                {t('modules.payroll.faqs.faq9.answer', 'Non-billable work sessions track hours that cannot be charged to clients (travel, training, equipment maintenance, weather delays). The payroll view shows both billable and non-billable hours so you know your true labor cost.')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-10" className="border rounded-lg px-4">
               <AccordionTrigger className="hover:no-underline py-4 text-left" data-testid="faq-trigger-10">
-                Is there an approval workflow before export?
+                {t('modules.payroll.faqs.faq10.question', 'Is there an approval workflow before export?')}
               </AccordionTrigger>
               <AccordionContent className="pb-4 text-muted-foreground text-base">
-                Yes. Timesheets can be reviewed and approved before export. Approved timesheets generate clean export files. The workflow prevents exporting data that hasn't been verified.
+                {t('modules.payroll.faqs.faq10.answer', "Yes. Timesheets can be reviewed and approved before export. Approved timesheets generate clean export files. The workflow prevents exporting data that hasn't been verified.")}
               </AccordionContent>
             </AccordionItem>
           </Accordion>
@@ -865,21 +865,21 @@ export default function PayrollFinancialLanding() {
       <section className="py-16 md:py-20 px-4" data-testid="section-final-cta">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Ready to Reclaim Your Time?
+            {t('modules.payroll.cta.title', 'Ready to Reclaim Your Time?')}
           </h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Join rope access companies who've eliminated the payroll headache. Start your free 60-day trial today.
+            {t('modules.payroll.cta.subtitle', "Join rope access companies who've eliminated the payroll headache. Start your free 60-day trial today.")}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="bg-[#0B64A3] hover:bg-[#0369A1] text-white" asChild data-testid="button-cta-trial">
               <Link href="/register">
-                Start Your Free 60-Day Trial
+                {t('modules.payroll.cta.trialButton', 'Start Your Free 60-Day Trial')}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>
             <Button size="lg" variant="outline" asChild data-testid="button-cta-changelog">
               <Link href="/changelog/payroll">
-                View Technical Documentation
+                {t('modules.payroll.cta.docsButton', 'View Technical Documentation')}
                 <FileText className="ml-2 w-5 h-5" />
               </Link>
             </Button>
