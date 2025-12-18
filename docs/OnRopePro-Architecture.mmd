@@ -1,0 +1,122 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#3b82f6', 'primaryTextColor': '#fff', 'primaryBorderColor': '#2563eb', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
+
+flowchart TB
+    subgraph EXTERNAL["External Stakeholders"]
+        direction LR
+        CLIENTS["Clients\n(Strata Companies)"]
+        BUILDINGS["Buildings\n& Anchors"]
+        RESIDENTS["Residents\n& Unit Links"]
+        TECHNICIANS["Technicians\n(IRATA/SPRAT Certified)"]
+        PM["Property Managers\n& Building Managers"]
+    end
+
+    subgraph CORE["Core Operations"]
+        direction TB
+        subgraph PROJECT_MGT["Project Management"]
+            PROJECTS["Projects\n- 10 Job Types\n- Progress Tracking\n- Documents & Plans"]
+            SCHEDULING["Scheduling\n- Dual Calendar\n- Job Assignments\n- Conflict Detection"]
+            WORK_SESSIONS["Work Sessions\n- Clock In/Out\n- GPS Tracking\n- Drop Logs"]
+        end
+        
+        subgraph WORKFORCE["Workforce Management"]
+            EMPLOYEES["Employees\n- Roles & Permissions\n- Referral Tracking"]
+            JOB_BOARD["Job Board\n- Postings\n- Applications\n- Talent Browse"]
+        end
+    end
+
+    subgraph SAFETY["Safety & Compliance"]
+        direction LR
+        HARNESS["Harness\nInspections"]
+        TOOLBOX["Toolbox\nMeetings"]
+        FLHA["FLHA\nForms"]
+        INCIDENTS["Incident\nReports"]
+        GEAR_INSPECT["Equipment\nInspections"]
+    end
+
+    subgraph EQUIPMENT["Equipment & Inventory"]
+        direction LR
+        GEAR_ITEMS["Gear Items\n- Serial Numbers\n- Retirement Tracking"]
+        ASSIGNMENTS["Gear\nAssignments"]
+        DAMAGE_RPT["Damage\nReports"]
+        CATALOG["Equipment\nCatalog"]
+    end
+
+    subgraph FINANCE["Financial Operations"]
+        direction LR
+        QUOTES["Quotes\n- Labor Costs\n- Tax Calculation"]
+        BILLING["Billing\n- Stripe Integration\n- Subscriptions"]
+        PAYROLL["Payroll\n- Hours Export\n- Adjustments"]
+        LICENSING["Licensing\n- Plans & Add-ons"]
+    end
+
+    subgraph COMMS["Communications"]
+        direction LR
+        WORK_NOTICES["Work Notices\n- Resident Alerts\n- White Label"]
+        COMPLAINTS["Complaints\n- Submissions\n- Responses"]
+        NOTIFICATIONS["System\nNotifications"]
+        QOC["Quality of\nCompletion"]
+    end
+
+    subgraph PLATFORM["Platform & Analytics"]
+        direction LR
+        ANALYTICS["Analytics\n- Performance\n- PSR Scores"]
+        SAFETY_RATING["Company\nSafety Rating"]
+        SUPERUSER["SuperUser\n- Admin Tools\n- Impersonation"]
+        GLOBAL_DB["Global\nBuilding DB"]
+        WHITE_LABEL["White Label\n- Logos & Colors\n- PWA Icons"]
+    end
+
+    %% External to Core relationships
+    CLIENTS --> PROJECTS
+    BUILDINGS --> PROJECTS
+    TECHNICIANS --> EMPLOYEES
+    TECHNICIANS --> JOB_BOARD
+    PM --> BUILDINGS
+    
+    %% Core internal relationships
+    PROJECTS --> SCHEDULING
+    SCHEDULING --> WORK_SESSIONS
+    EMPLOYEES --> WORK_SESSIONS
+    
+    %% Core to Safety
+    WORK_SESSIONS --> HARNESS
+    WORK_SESSIONS --> TOOLBOX
+    WORK_SESSIONS --> FLHA
+    PROJECTS --> INCIDENTS
+    
+    %% Core to Equipment
+    EMPLOYEES --> ASSIGNMENTS
+    PROJECTS --> GEAR_ITEMS
+    GEAR_ITEMS --> DAMAGE_RPT
+    GEAR_ITEMS --> CATALOG
+    
+    %% Core to Finance
+    PROJECTS --> QUOTES
+    WORK_SESSIONS --> PAYROLL
+    
+    %% Communications
+    PROJECTS --> WORK_NOTICES
+    RESIDENTS --> COMPLAINTS
+    WORK_SESSIONS --> QOC
+    
+    %% Platform connections
+    WORK_SESSIONS --> ANALYTICS
+    SAFETY --> SAFETY_RATING
+    BUILDINGS --> GLOBAL_DB
+    
+    %% Styling
+    classDef external fill:#ec4899,stroke:#be185d,color:#fff
+    classDef core fill:#3b82f6,stroke:#1d4ed8,color:#fff
+    classDef safety fill:#f59e0b,stroke:#d97706,color:#fff
+    classDef equipment fill:#06b6d4,stroke:#0891b2,color:#fff
+    classDef finance fill:#8b5cf6,stroke:#7c3aed,color:#fff
+    classDef comms fill:#10b981,stroke:#059669,color:#fff
+    classDef platform fill:#64748b,stroke:#475569,color:#fff
+    
+    class CLIENTS,BUILDINGS,RESIDENTS,TECHNICIANS,PM external
+    class PROJECTS,SCHEDULING,WORK_SESSIONS,EMPLOYEES,JOB_BOARD core
+    class HARNESS,TOOLBOX,FLHA,INCIDENTS,GEAR_INSPECT safety
+    class GEAR_ITEMS,ASSIGNMENTS,DAMAGE_RPT,CATALOG equipment
+    class QUOTES,BILLING,PAYROLL,LICENSING finance
+    class WORK_NOTICES,COMPLAINTS,NOTIFICATIONS,QOC comms
+    class ANALYTICS,SAFETY_RATING,SUPERUSER,GLOBAL_DB,WHITE_LABEL platform

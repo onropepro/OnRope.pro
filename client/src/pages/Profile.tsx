@@ -66,6 +66,14 @@ function BrandColorsSection({ user }: { user: any }) {
   }, [user?.brandingColors]);
 
   const addColor = () => {
+    if (colors.length >= 2) {
+      toast({
+        title: "Limit reached",
+        description: "You can only have up to 2 brand colors",
+        variant: "destructive"
+      });
+      return;
+    }
     setColors([...colors, '#3b82f6']);
   };
 
@@ -115,7 +123,7 @@ function BrandColorsSection({ user }: { user: any }) {
       <div>
         <Label className="text-sm font-medium">Brand Colors</Label>
         <p className="text-xs text-muted-foreground mt-1">
-          Choose colors that match your brand identity. These colors will be applied to the resident portal.
+          Choose up to 2 colors that match your brand identity. These colors will be applied to the resident portal.
         </p>
       </div>
 
@@ -153,15 +161,17 @@ function BrandColorsSection({ user }: { user: any }) {
       </div>
 
       <div className="flex gap-2">
-        <Button
-          variant="outline"
-          onClick={addColor}
-          data-testid="button-add-color"
-          className="h-12"
-        >
-          <span className="material-icons mr-2">add</span>
-          Add Color
-        </Button>
+        {colors.length < 2 && (
+          <Button
+            variant="outline"
+            onClick={addColor}
+            data-testid="button-add-color"
+            className="h-12"
+          >
+            <span className="material-icons mr-2">add</span>
+            Add Color
+          </Button>
+        )}
         <Button
           onClick={saveColors}
           disabled={isSaving}
@@ -1839,6 +1849,158 @@ export default function Profile() {
 
                   {/* Color Customization */}
                   <BrandColorsSection user={user} />
+
+                  <Separator />
+
+                  {/* PWA App Icon */}
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium flex items-center gap-2">
+                      <span className="material-icons text-base">phone_iphone</span>
+                      App Icon (for installed app)
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                      When users install this app on their phone (Add to Home Screen), this icon will appear on their device. 
+                    </p>
+                    
+                    {/* Requirements Card */}
+                    <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 space-y-2">
+                      <h4 className="text-sm font-semibold text-blue-700 dark:text-blue-300 flex items-center gap-2">
+                        <span className="material-icons text-sm">info</span>
+                        Icon Requirements
+                      </h4>
+                      <ul className="text-xs text-blue-600 dark:text-blue-400 space-y-1">
+                        <li className="flex items-start gap-2">
+                          <span className="material-icons text-xs mt-0.5">check_circle</span>
+                          <span><strong>Size:</strong> 512 x 512 pixels (will auto-resize smaller versions)</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="material-icons text-xs mt-0.5">check_circle</span>
+                          <span><strong>Format:</strong> PNG with solid background (transparent can look odd)</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="material-icons text-xs mt-0.5">check_circle</span>
+                          <span><strong>Shape:</strong> Square image (will be cropped to circle on some devices)</span>
+                        </li>
+                      </ul>
+                    </div>
+
+                    {/* Limitation Warning */}
+                    <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 space-y-2">
+                      <h4 className="text-sm font-semibold text-amber-700 dark:text-amber-300 flex items-center gap-2">
+                        <span className="material-icons text-sm">warning</span>
+                        Important Limitation
+                      </h4>
+                      <p className="text-xs text-amber-600 dark:text-amber-400">
+                        Once someone installs the app on their device, changing this icon <strong>won't update automatically</strong>. 
+                        They would need to uninstall and reinstall the app to see the new icon. This is a browser limitation, not something we can change.
+                      </p>
+                    </div>
+
+                    {/* Current Icon Preview */}
+                    {user.pwaAppIconUrl && (
+                      <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
+                        <img 
+                          src={user.pwaAppIconUrl} 
+                          alt="Current app icon" 
+                          className="w-16 h-16 object-contain rounded-lg border"
+                          data-testid="img-current-pwa-icon"
+                        />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium">Current App Icon</p>
+                          <p className="text-xs text-muted-foreground">This is how your icon appears when installed</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Upload with Resize */}
+                    <div className="space-y-2">
+                      <input
+                        type="file"
+                        id="pwa-icon-input"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          
+                          // Create canvas for resizing
+                          const img = new Image();
+                          const reader = new FileReader();
+                          
+                          reader.onload = (event) => {
+                            img.onload = async () => {
+                              // Create 512x512 canvas
+                              const canvas = document.createElement('canvas');
+                              canvas.width = 512;
+                              canvas.height = 512;
+                              const ctx = canvas.getContext('2d');
+                              
+                              if (ctx) {
+                                // Fill with white background (for transparency)
+                                ctx.fillStyle = '#ffffff';
+                                ctx.fillRect(0, 0, 512, 512);
+                                
+                                // Calculate scaling to fit and center
+                                const scale = Math.min(512 / img.width, 512 / img.height);
+                                const x = (512 - img.width * scale) / 2;
+                                const y = (512 - img.height * scale) / 2;
+                                
+                                ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+                                
+                                // Convert to blob
+                                canvas.toBlob(async (blob) => {
+                                  if (!blob) {
+                                    toast({ title: "Error", description: "Failed to process image", variant: "destructive" });
+                                    return;
+                                  }
+                                  
+                                  const formData = new FormData();
+                                  formData.append('icon', blob, 'pwa-icon.png');
+                                  
+                                  try {
+                                    const response = await fetch('/api/company/branding/pwa-icon', {
+                                      method: 'POST',
+                                      body: formData,
+                                      credentials: 'include',
+                                    });
+                                    
+                                    if (!response.ok) {
+                                      throw new Error('Failed to upload icon');
+                                    }
+                                    
+                                    toast({ title: "App icon uploaded successfully", description: "Your custom icon is now active for new app installations." });
+                                    queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+                                  } catch (error) {
+                                    toast({ 
+                                      title: "Error", 
+                                      description: error instanceof Error ? error.message : "Failed to upload icon",
+                                      variant: "destructive" 
+                                    });
+                                  }
+                                }, 'image/png', 0.95);
+                              }
+                            };
+                            img.src = event.target?.result as string;
+                          };
+                          reader.readAsDataURL(file);
+                        }}
+                        data-testid="input-pwa-icon-upload"
+                      />
+                      <Button 
+                        type="button"
+                        variant="outline"
+                        className="w-full h-12 gap-2"
+                        onClick={() => document.getElementById('pwa-icon-input')?.click()}
+                        data-testid="button-upload-pwa-icon"
+                      >
+                        <span className="material-icons text-base">upload</span>
+                        Upload & Auto-Resize to 512x512
+                      </Button>
+                      <p className="text-xs text-muted-foreground text-center">
+                        Any image will be automatically resized to the correct 512x512 size
+                      </p>
+                    </div>
+                  </div>
 
                   <Separator />
 
