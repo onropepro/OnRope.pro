@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { PublicHeader } from "@/components/PublicHeader";
 import {
   Palette,
@@ -36,6 +37,7 @@ import {
 } from "lucide-react";
 
 export default function WhiteLabelBrandingLanding() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const [brandedTouchpoints, setBrandedTouchpoints] = useState(0);
   const [contractWinRate, setContractWinRate] = useState(0);
@@ -87,30 +89,30 @@ export default function WhiteLabelBrandingLanding() {
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
           <div className="text-center space-y-6 pt-16">
             <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-module-label">
-              White-Label Branding Module
+              {t('modules.whiteLabel.hero.badge', 'White-Label Branding Module')}
             </Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              Stop Reminding Clients<br />
-              They Could Replace You<br />
-              <span className="text-blue-100">Tomorrow.</span>
+              {t('modules.whiteLabel.hero.titleLine1', 'Stop Reminding Clients')}<br />
+              {t('modules.whiteLabel.hero.titleLine2', 'They Could Replace You')}<br />
+              <span className="text-blue-100">{t('modules.whiteLabel.hero.titleLine3', 'Tomorrow.')}</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              Transform OnRopePro into your company's proprietary platform. Custom branding that turns "just another vendor" into "established partner with sophisticated systems."<br />
-              <strong>Your brand. Your system. Their trust.</strong>
+              {t('modules.whiteLabel.hero.description', 'Transform OnRopePro into your company\'s proprietary platform. Custom branding that turns "just another vendor" into "established partner with sophisticated systems."')}<br />
+              <strong>{t('modules.whiteLabel.hero.tagline', 'Your brand. Your system. Their trust.')}</strong>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-hero-trial">
                 <Link href="/register">
-                  Start Your Free 60-Day Trial
+                  {t('modules.whiteLabel.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-hero-faqs">
                 <Link href="#faqs">
-                  Find Answers
+                  {t('modules.whiteLabel.hero.ctaFaqs', 'Find Answers')}
                   <BookOpen className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
@@ -134,19 +136,19 @@ export default function WhiteLabelBrandingLanding() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-blue-600">{brandedTouchpoints}%</div>
-                  <div className="text-base text-muted-foreground mt-1">Client touchpoints branded</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.whiteLabel.stats.touchpoints', 'Client touchpoints branded')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-emerald-600">+{contractWinRate}%</div>
-                  <div className="text-base text-muted-foreground mt-1">Contract win rate increase</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.whiteLabel.stats.winRate', 'Contract win rate increase')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-amber-600">{adoptionRate}%</div>
-                  <div className="text-base text-muted-foreground mt-1">Employee adoption rate</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.whiteLabel.stats.adoption', 'Employee adoption rate')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-violet-600">&lt;{setupMinutes}min</div>
-                  <div className="text-base text-muted-foreground mt-1">Complete setup time</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.whiteLabel.stats.setup', 'Complete setup time')}</div>
                 </div>
               </div>
             </CardContent>
@@ -160,26 +162,26 @@ export default function WhiteLabelBrandingLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
-            The Professional Credibility Gap
+            {t('modules.whiteLabel.problem.title', 'The Professional Credibility Gap')}
           </h2>
           
           <Card className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
             <CardContent className="p-6 md:p-8 space-y-4 text-muted-foreground">
               <p className="text-lg leading-relaxed font-medium text-foreground">
-                Every time a property manager logs into your portal and sees OnRopePro's logo, you've told them something you didn't mean to say.
+                {t('modules.whiteLabel.problem.intro', "Every time a property manager logs into your portal and sees OnRopePro's logo, you've told them something you didn't mean to say.")}
               </p>
               <p className="text-base">
-                You've told them you're using the same software as every other contractor bidding their buildings. You've told them they could switch providers without changing systems. You've told them you're interchangeable.
+                {t('modules.whiteLabel.problem.paragraph1', "You've told them you're using the same software as every other contractor bidding their buildings. You've told them they could switch providers without changing systems. You've told them you're interchangeable.")}
               </p>
               <p className="text-base">
-                Landmark Properties manages 47 buildings across downtown Vancouver. They use five different rope access contractors for window cleaning and building maintenance. All five contractors use OnRopePro. All five portals look identical. When Landmark's operations manager pulls up work orders, she can't tell which contractor she's reviewing until she reads the project details.
+                {t('modules.whiteLabel.problem.paragraph2', "Landmark Properties manages 47 buildings across downtown Vancouver. They use five different rope access contractors for window cleaning and building maintenance. All five contractors use OnRopePro. All five portals look identical. When Landmark's operations manager pulls up work orders, she can't tell which contractor she's reviewing until she reads the project details.")}
               </p>
               <p className="text-base">
-                Your competitors aren't just bidding against your price anymore. They're bidding against your entire operational appearance. The building maintenance company that lost the $180,000 Bentall Centre contract learned this the hard way. The property manager cited "more professional systems" as the deciding factor. The winning contractor used white-labeled software that looked like custom-built internal infrastructure.
+                {t('modules.whiteLabel.problem.paragraph3', 'Your competitors aren\'t just bidding against your price anymore. They\'re bidding against your entire operational appearance. The building maintenance company that lost the $180,000 Bentall Centre contract learned this the hard way. The property manager cited "more professional systems" as the deciding factor. The winning contractor used white-labeled software that looked like custom-built internal infrastructure.')}
               </p>
               <Separator className="my-6" />
               <p className="font-medium text-foreground text-lg">
-                OnRopePro's White Label Branding eliminates the generic software problem entirely. Your logo. Your colors. Your professional image, reinforced at every single touchpoint where clients, employees, and building managers interact with your systems.
+                {t('modules.whiteLabel.problem.solution', "OnRopePro's White Label Branding eliminates the generic software problem entirely. Your logo. Your colors. Your professional image, reinforced at every single touchpoint where clients, employees, and building managers interact with your systems.")}
               </p>
             </CardContent>
           </Card>
@@ -192,10 +194,10 @@ export default function WhiteLabelBrandingLanding() {
       <section id="features" className="pt-8 md:pt-12 pb-16 md:pb-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Complete Brand Control Across Every Client Touchpoint
+            {t('modules.whiteLabel.features.title', 'Complete Brand Control Across Every Client Touchpoint')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-3xl mx-auto">
-            White Label Branding transforms OnRopePro from third-party software into what appears to be your proprietary management platform, creating professional credibility that wins contracts and justifies premium pricing.
+            {t('modules.whiteLabel.features.subtitle', 'White Label Branding transforms OnRopePro from third-party software into what appears to be your proprietary management platform, creating professional credibility that wins contracts and justifies premium pricing.')}
           </p>
 
           <div className="grid md:grid-cols-3 gap-6">

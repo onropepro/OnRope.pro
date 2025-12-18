@@ -5380,6 +5380,36 @@
         "pricingButton": "Voir les tarifs"
       }
     },
+    "whiteLabel": {
+      "hero": {
+        "badge": "Module Image de Marque Personnalisée",
+        "titleLine1": "Arrêtez de rappeler aux clients",
+        "titleLine2": "qu'ils pourraient vous remplacer",
+        "titleLine3": "Demain.",
+        "description": "Transformez OnRopePro en la plateforme propriétaire de votre entreprise. Une image de marque personnalisée qui transforme « juste un autre fournisseur » en « partenaire établi avec des systèmes sophistiqués. »",
+        "tagline": "Votre marque. Votre système. Leur confiance.",
+        "ctaTrial": "Commencer votre essai gratuit de 60 jours",
+        "ctaFaqs": "Trouver des réponses"
+      },
+      "stats": {
+        "touchpoints": "Points de contact clients personnalisés",
+        "winRate": "Augmentation du taux de gain de contrats",
+        "adoption": "Taux d'adoption des employés",
+        "setup": "Temps de configuration complet"
+      },
+      "problem": {
+        "title": "L'écart de crédibilité professionnelle",
+        "intro": "Chaque fois qu'un gestionnaire immobilier se connecte à votre portail et voit le logo d'OnRopePro, vous lui avez dit quelque chose que vous ne vouliez pas dire.",
+        "paragraph1": "Vous lui avez dit que vous utilisez le même logiciel que tous les autres entrepreneurs qui soumissionnent pour leurs bâtiments. Vous lui avez dit qu'ils pourraient changer de fournisseur sans changer de système. Vous lui avez dit que vous êtes interchangeable.",
+        "paragraph2": "Landmark Properties gère 47 bâtiments au centre-ville de Vancouver. Ils utilisent cinq différents entrepreneurs d'accès sur corde pour le nettoyage des vitres et l'entretien des bâtiments. Les cinq entrepreneurs utilisent OnRopePro. Les cinq portails sont identiques. Quand le gestionnaire des opérations de Landmark consulte les bons de travail, elle ne peut pas dire quel entrepreneur elle examine jusqu'à ce qu'elle lise les détails du projet.",
+        "paragraph3": "Vos concurrents ne soumissionnent plus seulement contre votre prix. Ils soumissionnent contre toute votre apparence opérationnelle. L'entreprise d'entretien de bâtiments qui a perdu le contrat de 180 000 $ du Bentall Centre l'a appris à ses dépens. Le gestionnaire immobilier a cité des « systèmes plus professionnels » comme facteur décisif. L'entrepreneur gagnant utilisait un logiciel en marque blanche qui ressemblait à une infrastructure interne personnalisée.",
+        "solution": "L'image de marque personnalisée d'OnRopePro élimine entièrement le problème du logiciel générique. Votre logo. Vos couleurs. Votre image professionnelle, renforcée à chaque point de contact où les clients, employés et gestionnaires d'immeubles interagissent avec vos systèmes."
+      },
+      "features": {
+        "title": "Contrôle complet de la marque à chaque point de contact client",
+        "subtitle": "L'image de marque personnalisée transforme OnRopePro d'un logiciel tiers en ce qui semble être votre plateforme de gestion propriétaire, créant une crédibilité professionnelle qui gagne des contrats et justifie des prix premium."
+      }
+    },
     "safety": {
       "hero": {
         "badge": "Module Sécurité & Conformité",
@@ -6042,6 +6072,122 @@
           "item2": "Documentation de projet incomplète (jusqu'à 25 %)",
           "item3": "Inspections de harnais non complétées avant le travail (jusqu'à 25 %)",
           "item4": "Reconnaissances d'employés non signées (jusqu'à 5 %)"
+        }
+      }
+    },
+    "residentPortal": {
+      "hero": {
+        "badge": "Module Portail Résidents",
+        "title": "Les plaintes traitées pendant que vos équipes",
+        "titleHighlight": "sont encore sur les cordes.",
+        "description": "Les résidents soumettent leurs commentaires avec photos. Votre équipe les voit en temps réel. Les problèmes sont résolus avant que la camionnette ne quitte le stationnement.",
+        "descriptionBold": "Plus de téléphone-étiquette. Plus de visites de retour. Plus de carnets de notes.",
+        "ctaTrial": "Commencez votre essai gratuit de 60 jours",
+        "ctaFaqs": "Trouver des réponses"
+      },
+      "stats": {
+        "returnVisits": "Visites de retour évitées/mois",
+        "phoneSaved": "Temps de téléphone économisé/mois",
+        "resolution": "Temps de résolution moyen",
+        "visibility": "Visibilité maintenue"
+      },
+      "problem": {
+        "title": "Le problème des plaintes que personne ne budgète",
+        "scenario": "Une résidente de l'unité 1247 envoie un courriel concernant des traces sur sa fenêtre. Une semaine plus tard, elle appelle le gestionnaire de l'immeuble. Le gestionnaire vous appelle. Vous vérifiez votre carnet. Peut-être que le courriel s'est perdu. Peut-être que non.",
+        "waste": "Maintenant, trois personnes passent du temps sur quelque chose qui aurait pu être résolu en 10 minutes si quelqu'un l'avait su pendant que l'équipe était encore dans l'immeuble.",
+        "cost": "Cette réparation de 10 minutes ? Elle devient un coût de main-d'œuvre d'une demi-journée.",
+        "returnVisit": "Emballer l'équipement, charger la camionnette, traverser la ville, installer les cordes pour une fenêtre, la nettoyer, démonter, revenir. Vous avez fait le calcul. Vous savez ce que coûtent ces visites de retour.",
+        "multiply": "Et ce n'est qu'une seule plainte. Pendant la haute saison, multipliez par les immeubles, par les unités, par les résidents qui abandonnent complètement et se plaignent sur les réseaux sociaux à la place.",
+        "solution": "Le Portail Résidents d'OnRopePro met les commentaires devant votre équipe pendant que les équipes sont encore sur place. Les résidents soumettent les problèmes avec photos. Votre superviseur reçoit une notification. Le technicien déjà installé sur cette élévation tourne sa corde et vérifie la fenêtre. Problème résolu en minutes, pas en jours."
+      },
+      "features": {
+        "title": "Ce que fait ce module",
+        "subtitle": "Communication directe entre les résidents et votre entreprise. Visibilité complète pour les gestionnaires immobiliers. Zéro téléphone-étiquette.",
+        "feedback": {
+          "title": "Système de commentaires des résidents",
+          "description": "Les résidents soumettent leurs commentaires une seule fois avec leur description et une photo optionnelle. Le nom, le numéro d'unité et le téléphone se remplissent automatiquement depuis leur compte. Votre équipe le voit immédiatement dans le tableau de bord du projet avec un badge de notification.",
+          "capturedLabel": "Ce qui est capturé :",
+          "captured1": "Description du problème avec preuve photo optionnelle",
+          "captured2": "Numéro d'unité et coordonnées du résident (auto-remplis)",
+          "captured3": "Horodatage de soumission",
+          "captured4": "Horodatage de première consultation par votre équipe"
+        },
+        "communication": {
+          "title": "Communication bidirectionnelle",
+          "description": "Votre personnel répond par notes internes (privées) ou réponses visibles (le résident voit). Les résidents peuvent répondre aux messages visibles. L'historique complet de la conversation reste attaché à cet élément de commentaire pour toujours.",
+          "trackedLabel": "Ce qui est suivi :",
+          "tracked1": "Tous les messages entre le personnel et le résident",
+          "tracked2": "Quels messages sont internes vs. visibles",
+          "tracked3": "Changements de statut (Nouveau, Vu, Fermé)",
+          "tracked4": "Horodatages de résolution pour les métriques de performance"
+        },
+        "progress": {
+          "title": "Visibilité de l'avancement du projet",
+          "description": "Les résidents voient l'avancement du projet en temps réel montrant quelle élévation ou quel côté du bâtiment est en cours de travail. Ils vérifient le statut avant d'appeler pour demander « quand ferez-vous ma fenêtre ? »",
+          "seeLabel": "Ce que voient les résidents :",
+          "see1": "Élévation actuelle en cours de travail (Nord, Sud, Est, Ouest)",
+          "see2": "Pourcentage d'achèvement global",
+          "see3": "Dates de projet prévues",
+          "see4": "Indicateurs de statut actif"
+        }
+      }
+    },
+    "quoting": {
+      "hero": {
+        "badge": "Module de soumissions et pipeline de ventes",
+        "title": "Arrêtez de perdre des soumissions.",
+        "titleHighlight": "Commencez à conclure des contrats.",
+        "description": "Vos techniciens capturent les détails du site sans voir vos prix. Vous transformez leurs données en soumissions précises et professionnelles avec des calculs de main-d'œuvre automatiques.",
+        "descriptionBold": "Pas de tableurs. Pas d'erreurs de calcul. Pas d'exposition des prix.",
+        "ctaTrial": "Commencez votre essai gratuit de 60 jours",
+        "ctaFaqs": "Trouver des réponses"
+      },
+      "stats": {
+        "quoteSpeed": "Création de soumissions plus rapide",
+        "errorReduction": "Erreurs de calcul éliminées",
+        "winRate": "Amélioration du taux de réussite",
+        "pipelineStages": "Étapes du pipeline suivies"
+      },
+      "problem": {
+        "title": "Le problème de soumission qui vous fait perdre de l'argent",
+        "scenario": "Vous envoyez votre technicien évaluer un complexe. Quatre tours, différentes élévations, services mixtes.",
+        "notes": "Il revient avec des notes griffonnées à la main sur le nombre de descentes. Vous sortez votre calculatrice, multipliez les heures par les taux, ajoutez les frais de service, vérifiez les calculs.",
+        "mistake": "Une heure plus tard, vous réalisez que vous avez oublié la Tour C. Votre soumission est sous-évaluée de 2 400 $. Vous absorbez la perte ou vous semblez incompétent en renégociant.",
+        "competitor": "Pendant ce temps, votre concurrent a envoyé sa soumission il y a trois heures. Depuis son téléphone. Avec un formatage professionnel. Votre gestionnaire immobilier lui a déjà répondu.",
+        "solution": "OnRopePro élimine les erreurs de calcul des soumissions, protège votre stratégie de prix de l'exposition aux employés, et transforme les évaluations de site en propositions professionnelles pendant que votre technicien est encore sur place. Vos prix restent privés. Vos soumissions restent précises. Votre taux de conclusion cesse de s'effondrer face aux concurrents plus rapides."
+      },
+      "features": {
+        "title": "Création de soumissions qui protège vos chiffres tout en accélérant vos ventes",
+        "subtitle": "Le module de soumissions et pipeline de ventes crée des soumissions spécifiques aux services avec des calculs de main-d'œuvre automatiques tout en maintenant une confidentialité financière complète grâce à des contrôles de permissions granulaires.",
+        "pricing": {
+          "title": "Modèles de tarification spécifiques aux services",
+          "headline": "Calculs automatiques adaptés à votre façon réelle de tarifer les travaux.",
+          "description": "Les soumissions de nettoyage de vitres calculent à partir des descentes par élévation et des objectifs quotidiens. Les soumissions de stationnement multiplient le nombre de places par votre tarif par place.",
+          "listTitle": "Ce qui est calculé automatiquement :",
+          "list1": "Lavage de vitres/bâtiment : heures selon les descentes et objectifs",
+          "list2": "Stationnement : places multipliées par le tarif par place",
+          "list3": "Conduit de sécheuse : nombre d'unités ou tarification horaire",
+          "list4": "Peinture : nombre de descentes par tarif par descente"
+        },
+        "privacy": {
+          "title": "Contrôles de confidentialité financière",
+          "headline": "Vos techniciens recueillent les données du site sans voir ce que vous facturez.",
+          "description": "La permission d'accès financier détermine qui voit les informations de tarification. Le technicien crée la soumission, entre les détails du bâtiment. Vous ajoutez les tarifs plus tard.",
+          "listTitle": "Ce qui reste protégé :",
+          "list1": "Taux horaires par type de service",
+          "list2": "Tarification par descente et par place",
+          "list3": "Valeurs totales des soumissions et marges",
+          "list4": "Données de tarification historiques"
+        },
+        "pipeline": {
+          "title": "Pipeline de ventes visuel",
+          "headline": "Tableau Kanban qui montre exactement où en est chaque opportunité.",
+          "description": "Faites glisser les soumissions de Brouillon à Soumis à En révision à Négociation à Gagné ou Perdu. Ne perdez jamais la trace des contrats potentiels.",
+          "listTitle": "Ce qui est suivi :",
+          "list1": "Étape actuelle pour chaque soumission",
+          "list2": "Valeur totale des opportunités par étape",
+          "list3": "Taux de réussite et métriques de conversion",
+          "list4": "Prévisions de revenus du pipeline"
         }
       }
     }

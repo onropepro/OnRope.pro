@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { PublicHeader } from "@/components/PublicHeader";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import {
@@ -34,6 +35,7 @@ import {
 } from "lucide-react";
 
 export default function ResidentPortalLanding() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const [returnVisits, setReturnVisits] = useState(0);
   const [phoneSaved, setPhoneSaved] = useState(0);
@@ -71,29 +73,29 @@ export default function ResidentPortalLanding() {
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
           <div className="text-center space-y-6 pt-16">
             <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-module-label">
-              Resident Portal Module
+              {t('modules.residentPortal.hero.badge', 'Resident Portal Module')}
             </Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              Complaints handled while your crews<br />
-              <span className="text-blue-100">are still on the ropes.</span>
+              {t('modules.residentPortal.hero.title', 'Complaints handled while your crews')}<br />
+              <span className="text-blue-100">{t('modules.residentPortal.hero.titleHighlight', 'are still on the ropes.')}</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              Residents submit feedback with photos. Your team sees it in real-time. Issues get resolved before the van leaves the parking lot.<br />
-              <strong>No more phone tag. No more return visits. No more notebooks.</strong>
+              {t('modules.residentPortal.hero.description', 'Residents submit feedback with photos. Your team sees it in real-time. Issues get resolved before the van leaves the parking lot.')}<br />
+              <strong>{t('modules.residentPortal.hero.descriptionBold', 'No more phone tag. No more return visits. No more notebooks.')}</strong>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-hero-trial">
                 <Link href="/register">
-                  Start Your Free 60-Day Trial
+                  {t('modules.residentPortal.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-hero-faqs">
                 <Link href="#faqs">
-                  Find Answers
+                  {t('modules.residentPortal.hero.ctaFaqs', 'Find Answers')}
                   <BookOpen className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
@@ -117,19 +119,19 @@ export default function ResidentPortalLanding() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-emerald-600">{returnVisits}</div>
-                  <div className="text-base text-muted-foreground mt-1">Return visits prevented/mo</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.residentPortal.stats.returnVisits', 'Return visits prevented/mo')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-blue-600">{phoneSaved}h</div>
-                  <div className="text-base text-muted-foreground mt-1">Phone time saved/mo</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.residentPortal.stats.phoneSaved', 'Phone time saved/mo')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-amber-600">{resolution}h</div>
-                  <div className="text-base text-muted-foreground mt-1">Avg resolution time</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.residentPortal.stats.resolution', 'Avg resolution time')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-rose-600">{controlPercentage}%</div>
-                  <div className="text-base text-muted-foreground mt-1">Visibility maintained</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.residentPortal.stats.visibility', 'Visibility maintained')}</div>
                 </div>
               </div>
             </CardContent>
@@ -143,29 +145,29 @@ export default function ResidentPortalLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
-            The Complaint Problem Nobody Budgets For
+            {t('modules.residentPortal.problem.title', 'The Complaint Problem Nobody Budgets For')}
           </h2>
           
           <Card className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
             <CardContent className="p-6 md:p-8 space-y-4 text-muted-foreground">
               <p className="text-lg leading-relaxed">
-                A resident in unit 1247 emails about streaks on her window. A week later, she calls the building manager. The building manager calls you. You check your notebook. Maybe the email got lost. Maybe it didn't.
+                {t('modules.residentPortal.problem.scenario', 'A resident in unit 1247 emails about streaks on her window. A week later, she calls the building manager. The building manager calls you. You check your notebook. Maybe the email got lost. Maybe it didn\'t.')}
               </p>
               <p>
-                Now three people are spending time on something that might have been resolved in 10 minutes if anyone had known about it while the crew was still in the building.
+                {t('modules.residentPortal.problem.waste', 'Now three people are spending time on something that might have been resolved in 10 minutes if anyone had known about it while the crew was still in the building.')}
               </p>
               <p className="font-medium text-foreground">
-                That 10-minute fix? It becomes a half-day labor cost.
+                {t('modules.residentPortal.problem.cost', 'That 10-minute fix? It becomes a half-day labor cost.')}
               </p>
               <p>
-                Packing equipment, loading the van, driving across town, rigging ropes for one window, cleaning it, derigging, driving back. You've done the math. You know what those return visits cost.
+                {t('modules.residentPortal.problem.returnVisit', 'Packing equipment, loading the van, driving across town, rigging ropes for one window, cleaning it, derigging, driving back. You\'ve done the math. You know what those return visits cost.')}
               </p>
               <Separator className="my-6" />
               <p>
-                And that's just one complaint. During busy season, multiply it by buildings, by units, by the residents who give up entirely and complain on social media instead.
+                {t('modules.residentPortal.problem.multiply', 'And that\'s just one complaint. During busy season, multiply it by buildings, by units, by the residents who give up entirely and complain on social media instead.')}
               </p>
               <p className="font-medium text-foreground text-lg">
-                OnRopePro's Resident Portal puts feedback in front of your team while crews are still on-site. Residents submit issues with photos. Your supervisor sees a notification. The technician already rigged on that elevation flips their rope and checks the window. Problem solved in minutes, not days.
+                {t('modules.residentPortal.problem.solution', 'OnRopePro\'s Resident Portal puts feedback in front of your team while crews are still on-site. Residents submit issues with photos. Your supervisor sees a notification. The technician already rigged on that elevation flips their rope and checks the window. Problem solved in minutes, not days.')}
               </p>
             </CardContent>
           </Card>
@@ -178,10 +180,10 @@ export default function ResidentPortalLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            What This Module Does
+            {t('modules.residentPortal.features.title', 'What This Module Does')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-            Direct communication between residents and your company. Complete visibility for property managers. Zero phone tag.
+            {t('modules.residentPortal.features.subtitle', 'Direct communication between residents and your company. Complete visibility for property managers. Zero phone tag.')}
           </p>
 
           <div className="grid md:grid-cols-3 gap-6">
@@ -191,20 +193,20 @@ export default function ResidentPortalLanding() {
                   <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
                     <MessageSquare className="w-5 h-5 text-blue-600" />
                   </div>
-                  <CardTitle className="text-lg">Resident Feedback System</CardTitle>
+                  <CardTitle className="text-lg">{t('modules.residentPortal.features.feedback.title', 'Resident Feedback System')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
                 <p className="text-base text-muted-foreground">
-                  Residents submit feedback once with their description and optional photo. Name, unit number, and phone auto-fill from their account. Your team sees it immediately in the project dashboard with a notification badge.
+                  {t('modules.residentPortal.features.feedback.description', 'Residents submit feedback once with their description and optional photo. Name, unit number, and phone auto-fill from their account. Your team sees it immediately in the project dashboard with a notification badge.')}
                 </p>
                 <div className="space-y-1 text-sm text-muted-foreground">
-                  <p className="font-medium text-foreground">What gets captured:</p>
+                  <p className="font-medium text-foreground">{t('modules.residentPortal.features.feedback.capturedLabel', 'What gets captured:')}</p>
                   <ul className="list-disc list-inside space-y-1">
-                    <li>Description of issue with optional photo evidence</li>
-                    <li>Unit number and resident contact info (auto-filled)</li>
-                    <li>Timestamp of submission</li>
-                    <li>Timestamp of when your team first viewed it</li>
+                    <li>{t('modules.residentPortal.features.feedback.captured1', 'Description of issue with optional photo evidence')}</li>
+                    <li>{t('modules.residentPortal.features.feedback.captured2', 'Unit number and resident contact info (auto-filled)')}</li>
+                    <li>{t('modules.residentPortal.features.feedback.captured3', 'Timestamp of submission')}</li>
+                    <li>{t('modules.residentPortal.features.feedback.captured4', 'Timestamp of when your team first viewed it')}</li>
                   </ul>
                 </div>
               </CardContent>
@@ -216,20 +218,20 @@ export default function ResidentPortalLanding() {
                   <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center">
                     <MessageCircle className="w-5 h-5 text-emerald-600" />
                   </div>
-                  <CardTitle className="text-lg">Two-Way Communication</CardTitle>
+                  <CardTitle className="text-lg">{t('modules.residentPortal.features.communication.title', 'Two-Way Communication')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
                 <p className="text-base text-muted-foreground">
-                  Your staff respond through internal notes (private) or visible replies (resident sees). Residents can reply to visible messages. The complete conversation history stays attached to that feedback item forever.
+                  {t('modules.residentPortal.features.communication.description', 'Your staff respond through internal notes (private) or visible replies (resident sees). Residents can reply to visible messages. The complete conversation history stays attached to that feedback item forever.')}
                 </p>
                 <div className="space-y-1 text-sm text-muted-foreground">
-                  <p className="font-medium text-foreground">What gets tracked:</p>
+                  <p className="font-medium text-foreground">{t('modules.residentPortal.features.communication.trackedLabel', 'What gets tracked:')}</p>
                   <ul className="list-disc list-inside space-y-1">
-                    <li>All messages between staff and resident</li>
-                    <li>Which messages are internal vs. visible</li>
-                    <li>Status changes (New, Viewed, Closed)</li>
-                    <li>Resolution timestamps for performance metrics</li>
+                    <li>{t('modules.residentPortal.features.communication.tracked1', 'All messages between staff and resident')}</li>
+                    <li>{t('modules.residentPortal.features.communication.tracked2', 'Which messages are internal vs. visible')}</li>
+                    <li>{t('modules.residentPortal.features.communication.tracked3', 'Status changes (New, Viewed, Closed)')}</li>
+                    <li>{t('modules.residentPortal.features.communication.tracked4', 'Resolution timestamps for performance metrics')}</li>
                   </ul>
                 </div>
               </CardContent>
@@ -241,20 +243,20 @@ export default function ResidentPortalLanding() {
                   <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center">
                     <BarChart3 className="w-5 h-5 text-amber-600" />
                   </div>
-                  <CardTitle className="text-lg">Project Progress Visibility</CardTitle>
+                  <CardTitle className="text-lg">{t('modules.residentPortal.features.progress.title', 'Project Progress Visibility')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
                 <p className="text-base text-muted-foreground">
-                  Residents view real-time project progress showing which elevation or side of the building is being worked on. They check status before calling to ask "when will you do my window?"
+                  {t('modules.residentPortal.features.progress.description', 'Residents view real-time project progress showing which elevation or side of the building is being worked on. They check status before calling to ask "when will you do my window?"')}
                 </p>
                 <div className="space-y-1 text-sm text-muted-foreground">
-                  <p className="font-medium text-foreground">What residents see:</p>
+                  <p className="font-medium text-foreground">{t('modules.residentPortal.features.progress.seeLabel', 'What residents see:')}</p>
                   <ul className="list-disc list-inside space-y-1">
-                    <li>Current elevation being worked (North, South, East, West)</li>
-                    <li>Overall completion percentage</li>
-                    <li>Scheduled project dates</li>
-                    <li>Active status indicators</li>
+                    <li>{t('modules.residentPortal.features.progress.see1', 'Current elevation being worked (North, South, East, West)')}</li>
+                    <li>{t('modules.residentPortal.features.progress.see2', 'Overall completion percentage')}</li>
+                    <li>{t('modules.residentPortal.features.progress.see3', 'Scheduled project dates')}</li>
+                    <li>{t('modules.residentPortal.features.progress.see4', 'Active status indicators')}</li>
                   </ul>
                 </div>
               </CardContent>

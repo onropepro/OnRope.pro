@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 import { PublicHeader } from "@/components/PublicHeader";
 import {
   ArrowRight,
@@ -44,6 +45,7 @@ const ALL_FAQ_ITEMS = [
 ];
 
 export default function QuotingSalesLanding() {
+  const { t } = useTranslation();
   const [quoteSpeed, setQuoteSpeed] = useState(0);
   const [errorReduction, setErrorReduction] = useState(0);
   const [winRateImprovement, setWinRateImprovement] = useState(0);
@@ -94,29 +96,29 @@ export default function QuotingSalesLanding() {
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
           <div className="text-center space-y-6 pt-16">
             <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-module-label">
-              Quoting & Sales Pipeline Module
+              {t('modules.quoting.hero.badge', 'Quoting & Sales Pipeline Module')}
             </Badge>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              Stop Losing Quotes.<br />
-              <span className="text-blue-100">Start Closing Deals.</span>
+              {t('modules.quoting.hero.title', 'Stop Losing Quotes.')}<br />
+              <span className="text-blue-100">{t('modules.quoting.hero.titleHighlight', 'Start Closing Deals.')}</span>
             </h1>
 
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              Your technicians capture site details without seeing your pricing. You turn their data into accurate, professional quotes with automatic labor calculations.<br />
-              <strong>No spreadsheets. No calculator errors. No pricing exposure.</strong>
+              {t('modules.quoting.hero.description', 'Your technicians capture site details without seeing your pricing. You turn their data into accurate, professional quotes with automatic labor calculations.')}<br />
+              <strong>{t('modules.quoting.hero.descriptionBold', 'No spreadsheets. No calculator errors. No pricing exposure.')}</strong>
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button size="lg" className="bg-white text-[#0B64A3]" asChild data-testid="button-hero-trial">
                 <Link href="/register">
-                  Start Your Free 60-Day Trial
+                  {t('modules.quoting.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white" asChild data-testid="button-hero-faqs">
                 <Link href="#faqs">
-                  Find Answers
+                  {t('modules.quoting.hero.ctaFaqs', 'Find Answers')}
                   <BookOpen className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
@@ -140,19 +142,19 @@ export default function QuotingSalesLanding() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-blue-600" data-testid="stat-quote-speed">{quoteSpeed}%</div>
-                  <div className="text-sm text-muted-foreground mt-1">Faster quote creation</div>
+                  <div className="text-sm text-muted-foreground mt-1">{t('modules.quoting.stats.quoteSpeed', 'Faster quote creation')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-emerald-600" data-testid="stat-error-reduction">{errorReduction}%</div>
-                  <div className="text-sm text-muted-foreground mt-1">Calculation errors eliminated</div>
+                  <div className="text-sm text-muted-foreground mt-1">{t('modules.quoting.stats.errorReduction', 'Calculation errors eliminated')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-amber-600" data-testid="stat-win-rate">+{winRateImprovement}%</div>
-                  <div className="text-sm text-muted-foreground mt-1">Win rate improvement</div>
+                  <div className="text-sm text-muted-foreground mt-1">{t('modules.quoting.stats.winRate', 'Win rate improvement')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-violet-600" data-testid="stat-pipeline-stages">{pipelineStages}</div>
-                  <div className="text-sm text-muted-foreground mt-1">Pipeline stages tracked</div>
+                  <div className="text-sm text-muted-foreground mt-1">{t('modules.quoting.stats.pipelineStages', 'Pipeline stages tracked')}</div>
                 </div>
               </div>
             </CardContent>
@@ -166,26 +168,26 @@ export default function QuotingSalesLanding() {
       <section className="py-16 md:py-20 px-4" data-testid="section-problem-statement">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
-            The Quoting Problem That's Bleeding You Dry
+            {t('modules.quoting.problem.title', "The Quoting Problem That's Bleeding You Dry")}
           </h2>
 
           <Card className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
             <CardContent className="p-6 md:p-8 space-y-4 text-muted-foreground">
               <p className="text-lg leading-relaxed font-medium text-foreground">
-                You send your tech to assess a complex. Four towers, different elevations, mixed services.
+                {t('modules.quoting.problem.scenario', 'You send your tech to assess a complex. Four towers, different elevations, mixed services.')}
               </p>
               <p className="text-base">
-                He comes back with hand-scribbled notes on drop counts. You pull out your calculator, multiply hours by rates, add service fees, double-check the math.
+                {t('modules.quoting.problem.notes', 'He comes back with hand-scribbled notes on drop counts. You pull out your calculator, multiply hours by rates, add service fees, double-check the math.')}
               </p>
               <p className="text-base">
-                An hour later, you realize you forgot Tower C. Your quote is low by $2,400. You either eat the loss or look incompetent renegotiating.
+                {t('modules.quoting.problem.mistake', 'An hour later, you realize you forgot Tower C. Your quote is low by $2,400. You either eat the loss or look incompetent renegotiating.')}
               </p>
               <p className="text-base">
-                Meanwhile, your competitor sent their quote three hours ago. From their phone. With professional formatting. Your property manager already replied to them.
+                {t('modules.quoting.problem.competitor', 'Meanwhile, your competitor sent their quote three hours ago. From their phone. With professional formatting. Your property manager already replied to them.')}
               </p>
               <Separator className="my-6" />
               <p className="font-medium text-foreground text-lg">
-                OnRopePro eliminates quote calculation errors, protects your pricing strategy from employee exposure, and turns site assessments into professional proposals while your tech is still on-site. Your pricing stays private. Your quotes stay accurate. Your closing rate stops hemorrhaging to faster competitors.
+                {t('modules.quoting.problem.solution', 'OnRopePro eliminates quote calculation errors, protects your pricing strategy from employee exposure, and turns site assessments into professional proposals while your tech is still on-site. Your pricing stays private. Your quotes stay accurate. Your closing rate stops hemorrhaging to faster competitors.')}
               </p>
             </CardContent>
           </Card>
@@ -198,10 +200,10 @@ export default function QuotingSalesLanding() {
       <section id="features" className="pt-8 md:pt-12 pb-16 md:pb-20 px-4 bg-slate-50 dark:bg-slate-900" data-testid="section-what-module-does">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Quote Creation That Protects Your Numbers While Accelerating Your Sales
+            {t('modules.quoting.features.title', 'Quote Creation That Protects Your Numbers While Accelerating Your Sales')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-3xl mx-auto">
-            The Quoting & Sales Pipeline module creates service-specific quotes with automatic labor calculations while maintaining complete financial privacy through granular permission controls.
+            {t('modules.quoting.features.subtitle', 'The Quoting & Sales Pipeline module creates service-specific quotes with automatic labor calculations while maintaining complete financial privacy through granular permission controls.')}
           </p>
 
           <div className="grid md:grid-cols-3 gap-6">
@@ -212,28 +214,28 @@ export default function QuotingSalesLanding() {
                 <div className="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-3">
                   <Calculator className="w-6 h-6 text-blue-600" />
                 </div>
-                <CardTitle className="text-xl">Service-Specific Pricing Models</CardTitle>
+                <CardTitle className="text-xl">{t('modules.quoting.features.pricing.title', 'Service-Specific Pricing Models')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-base text-muted-foreground">
-                <p className="font-medium text-foreground">Automatic calculations matched to how you actually price jobs.</p>
-                <p>Window cleaning quotes calculate from drops per elevation and daily targets. Parkade quotes multiply stall counts by your per-stall rate.</p>
-                <p className="font-medium text-foreground mt-4">What gets calculated automatically:</p>
+                <p className="font-medium text-foreground">{t('modules.quoting.features.pricing.headline', 'Automatic calculations matched to how you actually price jobs.')}</p>
+                <p>{t('modules.quoting.features.pricing.description', 'Window cleaning quotes calculate from drops per elevation and daily targets. Parkade quotes multiply stall counts by your per-stall rate.')}</p>
+                <p className="font-medium text-foreground mt-4">{t('modules.quoting.features.pricing.listTitle', 'What gets calculated automatically:')}</p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Window/building wash: hours from drops and targets</span>
+                    <span>{t('modules.quoting.features.pricing.list1', 'Window/building wash: hours from drops and targets')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Parkade: stalls multiplied by per-stall rate</span>
+                    <span>{t('modules.quoting.features.pricing.list2', 'Parkade: stalls multiplied by per-stall rate')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Dryer vent: unit count or hourly pricing</span>
+                    <span>{t('modules.quoting.features.pricing.list3', 'Dryer vent: unit count or hourly pricing')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Painting: drop count by per-drop rate</span>
+                    <span>{t('modules.quoting.features.pricing.list4', 'Painting: drop count by per-drop rate')}</span>
                   </li>
                 </ul>
               </CardContent>
@@ -246,28 +248,28 @@ export default function QuotingSalesLanding() {
                 <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center mb-3">
                   <Lock className="w-6 h-6 text-emerald-600" />
                 </div>
-                <CardTitle className="text-xl">Financial Privacy Controls</CardTitle>
+                <CardTitle className="text-xl">{t('modules.quoting.features.privacy.title', 'Financial Privacy Controls')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-base text-muted-foreground">
-                <p className="font-medium text-foreground">Your technicians gather site data without seeing what you charge.</p>
-                <p>Financial Access permission determines who sees pricing information. Tech creates the quote, enters building details. You add rates later.</p>
-                <p className="font-medium text-foreground mt-4">What stays protected:</p>
+                <p className="font-medium text-foreground">{t('modules.quoting.features.privacy.headline', 'Your technicians gather site data without seeing what you charge.')}</p>
+                <p>{t('modules.quoting.features.privacy.description', 'Financial Access permission determines who sees pricing information. Tech creates the quote, enters building details. You add rates later.')}</p>
+                <p className="font-medium text-foreground mt-4">{t('modules.quoting.features.privacy.listTitle', 'What stays protected:')}</p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Hourly rates by service type</span>
+                    <span>{t('modules.quoting.features.privacy.list1', 'Hourly rates by service type')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Per-drop and per-stall pricing</span>
+                    <span>{t('modules.quoting.features.privacy.list2', 'Per-drop and per-stall pricing')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Total quote values and margins</span>
+                    <span>{t('modules.quoting.features.privacy.list3', 'Total quote values and margins')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Historical pricing data</span>
+                    <span>{t('modules.quoting.features.privacy.list4', 'Historical pricing data')}</span>
                   </li>
                 </ul>
               </CardContent>
@@ -280,28 +282,28 @@ export default function QuotingSalesLanding() {
                 <div className="w-12 h-12 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center mb-3">
                   <Kanban className="w-6 h-6 text-amber-600" />
                 </div>
-                <CardTitle className="text-xl">Visual Sales Pipeline</CardTitle>
+                <CardTitle className="text-xl">{t('modules.quoting.features.pipeline.title', 'Visual Sales Pipeline')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-base text-muted-foreground">
-                <p className="font-medium text-foreground">Kanban board that shows exactly where every opportunity stands.</p>
-                <p>Drag quotes from Draft to Submitted to Under Review to Negotiation to Won or Lost. Never lose track of potential contracts.</p>
-                <p className="font-medium text-foreground mt-4">What gets tracked:</p>
+                <p className="font-medium text-foreground">{t('modules.quoting.features.pipeline.headline', 'Kanban board that shows exactly where every opportunity stands.')}</p>
+                <p>{t('modules.quoting.features.pipeline.description', 'Drag quotes from Draft to Submitted to Under Review to Negotiation to Won or Lost. Never lose track of potential contracts.')}</p>
+                <p className="font-medium text-foreground mt-4">{t('modules.quoting.features.pipeline.listTitle', 'What gets tracked:')}</p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Current stage for every quote</span>
+                    <span>{t('modules.quoting.features.pipeline.list1', 'Current stage for every quote')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Total opportunity value per stage</span>
+                    <span>{t('modules.quoting.features.pipeline.list2', 'Total opportunity value per stage')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Win rates and conversion metrics</span>
+                    <span>{t('modules.quoting.features.pipeline.list3', 'Win rates and conversion metrics')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
-                    <span>Revenue forecasts from pipeline</span>
+                    <span>{t('modules.quoting.features.pipeline.list4', 'Revenue forecasts from pipeline')}</span>
                   </li>
                 </ul>
               </CardContent>

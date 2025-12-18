@@ -5196,6 +5196,36 @@
         "pricingButton": "View Pricing"
       }
     },
+    "whiteLabel": {
+      "hero": {
+        "badge": "White-Label Branding Module",
+        "titleLine1": "Stop Reminding Clients",
+        "titleLine2": "They Could Replace You",
+        "titleLine3": "Tomorrow.",
+        "description": "Transform OnRopePro into your company's proprietary platform. Custom branding that turns \"just another vendor\" into \"established partner with sophisticated systems.\"",
+        "tagline": "Your brand. Your system. Their trust.",
+        "ctaTrial": "Start Your Free 60-Day Trial",
+        "ctaFaqs": "Find Answers"
+      },
+      "stats": {
+        "touchpoints": "Client touchpoints branded",
+        "winRate": "Contract win rate increase",
+        "adoption": "Employee adoption rate",
+        "setup": "Complete setup time"
+      },
+      "problem": {
+        "title": "The Professional Credibility Gap",
+        "intro": "Every time a property manager logs into your portal and sees OnRopePro's logo, you've told them something you didn't mean to say.",
+        "paragraph1": "You've told them you're using the same software as every other contractor bidding their buildings. You've told them they could switch providers without changing systems. You've told them you're interchangeable.",
+        "paragraph2": "Landmark Properties manages 47 buildings across downtown Vancouver. They use five different rope access contractors for window cleaning and building maintenance. All five contractors use OnRopePro. All five portals look identical. When Landmark's operations manager pulls up work orders, she can't tell which contractor she's reviewing until she reads the project details.",
+        "paragraph3": "Your competitors aren't just bidding against your price anymore. They're bidding against your entire operational appearance. The building maintenance company that lost the $180,000 Bentall Centre contract learned this the hard way. The property manager cited \"more professional systems\" as the deciding factor. The winning contractor used white-labeled software that looked like custom-built internal infrastructure.",
+        "solution": "OnRopePro's White Label Branding eliminates the generic software problem entirely. Your logo. Your colors. Your professional image, reinforced at every single touchpoint where clients, employees, and building managers interact with your systems."
+      },
+      "features": {
+        "title": "Complete Brand Control Across Every Client Touchpoint",
+        "subtitle": "White Label Branding transforms OnRopePro from third-party software into what appears to be your proprietary management platform, creating professional credibility that wins contracts and justifies premium pricing."
+      }
+    },
     "safety": {
       "hero": {
         "badge": "Safety & Compliance Module",
@@ -5858,6 +5888,122 @@
           "item2": "Incomplete project documentation (up to 25%)",
           "item3": "Harness inspections not completed before work (up to 25%)",
           "item4": "Unsigned employee acknowledgments (up to 5%)"
+        }
+      }
+    },
+    "residentPortal": {
+      "hero": {
+        "badge": "Resident Portal Module",
+        "title": "Complaints handled while your crews",
+        "titleHighlight": "are still on the ropes.",
+        "description": "Residents submit feedback with photos. Your team sees it in real-time. Issues get resolved before the van leaves the parking lot.",
+        "descriptionBold": "No more phone tag. No more return visits. No more notebooks.",
+        "ctaTrial": "Start Your Free 60-Day Trial",
+        "ctaFaqs": "Find Answers"
+      },
+      "stats": {
+        "returnVisits": "Return visits prevented/mo",
+        "phoneSaved": "Phone time saved/mo",
+        "resolution": "Avg resolution time",
+        "visibility": "Visibility maintained"
+      },
+      "problem": {
+        "title": "The Complaint Problem Nobody Budgets For",
+        "scenario": "A resident in unit 1247 emails about streaks on her window. A week later, she calls the building manager. The building manager calls you. You check your notebook. Maybe the email got lost. Maybe it didn't.",
+        "waste": "Now three people are spending time on something that might have been resolved in 10 minutes if anyone had known about it while the crew was still in the building.",
+        "cost": "That 10-minute fix? It becomes a half-day labor cost.",
+        "returnVisit": "Packing equipment, loading the van, driving across town, rigging ropes for one window, cleaning it, derigging, driving back. You've done the math. You know what those return visits cost.",
+        "multiply": "And that's just one complaint. During busy season, multiply it by buildings, by units, by the residents who give up entirely and complain on social media instead.",
+        "solution": "OnRopePro's Resident Portal puts feedback in front of your team while crews are still on-site. Residents submit issues with photos. Your supervisor sees a notification. The technician already rigged on that elevation flips their rope and checks the window. Problem solved in minutes, not days."
+      },
+      "features": {
+        "title": "What This Module Does",
+        "subtitle": "Direct communication between residents and your company. Complete visibility for property managers. Zero phone tag.",
+        "feedback": {
+          "title": "Resident Feedback System",
+          "description": "Residents submit feedback once with their description and optional photo. Name, unit number, and phone auto-fill from their account. Your team sees it immediately in the project dashboard with a notification badge.",
+          "capturedLabel": "What gets captured:",
+          "captured1": "Description of issue with optional photo evidence",
+          "captured2": "Unit number and resident contact info (auto-filled)",
+          "captured3": "Timestamp of submission",
+          "captured4": "Timestamp of when your team first viewed it"
+        },
+        "communication": {
+          "title": "Two-Way Communication",
+          "description": "Your staff respond through internal notes (private) or visible replies (resident sees). Residents can reply to visible messages. The complete conversation history stays attached to that feedback item forever.",
+          "trackedLabel": "What gets tracked:",
+          "tracked1": "All messages between staff and resident",
+          "tracked2": "Which messages are internal vs. visible",
+          "tracked3": "Status changes (New, Viewed, Closed)",
+          "tracked4": "Resolution timestamps for performance metrics"
+        },
+        "progress": {
+          "title": "Project Progress Visibility",
+          "description": "Residents view real-time project progress showing which elevation or side of the building is being worked on. They check status before calling to ask \"when will you do my window?\"",
+          "seeLabel": "What residents see:",
+          "see1": "Current elevation being worked (North, South, East, West)",
+          "see2": "Overall completion percentage",
+          "see3": "Scheduled project dates",
+          "see4": "Active status indicators"
+        }
+      }
+    },
+    "quoting": {
+      "hero": {
+        "badge": "Quoting & Sales Pipeline Module",
+        "title": "Stop Losing Quotes.",
+        "titleHighlight": "Start Closing Deals.",
+        "description": "Your technicians capture site details without seeing your pricing. You turn their data into accurate, professional quotes with automatic labor calculations.",
+        "descriptionBold": "No spreadsheets. No calculator errors. No pricing exposure.",
+        "ctaTrial": "Start Your Free 60-Day Trial",
+        "ctaFaqs": "Find Answers"
+      },
+      "stats": {
+        "quoteSpeed": "Faster quote creation",
+        "errorReduction": "Calculation errors eliminated",
+        "winRate": "Win rate improvement",
+        "pipelineStages": "Pipeline stages tracked"
+      },
+      "problem": {
+        "title": "The Quoting Problem That's Bleeding You Dry",
+        "scenario": "You send your tech to assess a complex. Four towers, different elevations, mixed services.",
+        "notes": "He comes back with hand-scribbled notes on drop counts. You pull out your calculator, multiply hours by rates, add service fees, double-check the math.",
+        "mistake": "An hour later, you realize you forgot Tower C. Your quote is low by $2,400. You either eat the loss or look incompetent renegotiating.",
+        "competitor": "Meanwhile, your competitor sent their quote three hours ago. From their phone. With professional formatting. Your property manager already replied to them.",
+        "solution": "OnRopePro eliminates quote calculation errors, protects your pricing strategy from employee exposure, and turns site assessments into professional proposals while your tech is still on-site. Your pricing stays private. Your quotes stay accurate. Your closing rate stops hemorrhaging to faster competitors."
+      },
+      "features": {
+        "title": "Quote Creation That Protects Your Numbers While Accelerating Your Sales",
+        "subtitle": "The Quoting & Sales Pipeline module creates service-specific quotes with automatic labor calculations while maintaining complete financial privacy through granular permission controls.",
+        "pricing": {
+          "title": "Service-Specific Pricing Models",
+          "headline": "Automatic calculations matched to how you actually price jobs.",
+          "description": "Window cleaning quotes calculate from drops per elevation and daily targets. Parkade quotes multiply stall counts by your per-stall rate.",
+          "listTitle": "What gets calculated automatically:",
+          "list1": "Window/building wash: hours from drops and targets",
+          "list2": "Parkade: stalls multiplied by per-stall rate",
+          "list3": "Dryer vent: unit count or hourly pricing",
+          "list4": "Painting: drop count by per-drop rate"
+        },
+        "privacy": {
+          "title": "Financial Privacy Controls",
+          "headline": "Your technicians gather site data without seeing what you charge.",
+          "description": "Financial Access permission determines who sees pricing information. Tech creates the quote, enters building details. You add rates later.",
+          "listTitle": "What stays protected:",
+          "list1": "Hourly rates by service type",
+          "list2": "Per-drop and per-stall pricing",
+          "list3": "Total quote values and margins",
+          "list4": "Historical pricing data"
+        },
+        "pipeline": {
+          "title": "Visual Sales Pipeline",
+          "headline": "Kanban board that shows exactly where every opportunity stands.",
+          "description": "Drag quotes from Draft to Submitted to Under Review to Negotiation to Won or Lost. Never lose track of potential contracts.",
+          "listTitle": "What gets tracked:",
+          "list1": "Current stage for every quote",
+          "list2": "Total opportunity value per stage",
+          "list3": "Win rates and conversion metrics",
+          "list4": "Revenue forecasts from pipeline"
         }
       }
     }
