@@ -91,6 +91,7 @@ import SchedulingCalendarLanding from "@/pages/SchedulingCalendarLanding";
 import PayrollFinancialLanding from "@/pages/PayrollFinancialLanding";
 import QuotingSalesLanding from "@/pages/QuotingSalesLanding";
 import WhiteLabelBrandingLanding from "@/pages/WhiteLabelBrandingLanding";
+import ResidentPortalLanding from "@/pages/ResidentPortalLanding";
 import JobBoardGuide from "@/pages/JobBoardGuide";
 import Pricing from "@/pages/Pricing";
 import ROICalculator from "@/pages/ROICalculator";
@@ -378,6 +379,7 @@ function Router() {
       <Route path="/modules/payroll-financial" component={PayrollFinancialLanding} />
       <Route path="/modules/quoting-sales-pipeline" component={QuotingSalesLanding} />
       <Route path="/modules/white-label-branding" component={WhiteLabelBrandingLanding} />
+      <Route path="/modules/resident-portal" component={ResidentPortalLanding} />
       <Route path="/changelog/user-access" component={UserAccessGuide} />
       <Route path="/changelog/projects" component={ProjectsGuide} />
       <Route path="/changelog/time-tracking" component={TimeTrackingGuide} />
