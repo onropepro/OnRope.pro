@@ -1109,7 +1109,8 @@ export class Storage {
     const newRetryCount = current.retryCount + 1;
     
     // Calculate next retry with exponential backoff: 30s, 2m, 10m, 30m, 1h
-    const backoffMs = Math.min(30000 * Math.pow(2, newRetryCount), 3600000);
+    const backoffSchedule = [30000, 120000, 600000, 1800000, 3600000]; // 30s, 2m, 10m, 30m, 1h
+    const backoffMs = backoffSchedule[Math.min(current.retryCount, backoffSchedule.length - 1)];
     const nextRetryAt = new Date(Date.now() + backoffMs);
     
     // If max retries exceeded, mark as failed
