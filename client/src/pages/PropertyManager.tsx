@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Building2, Plus, Mail, Phone, Settings, FileText, Download, AlertCircle, CheckCircle2, Clock, Upload, FileCheck, Trash2, User, Shield, Users, Map, List } from "lucide-react";
+import { Building2, Plus, Mail, Phone, Settings, FileText, Download, AlertCircle, CheckCircle2, Clock, Upload, FileCheck, Trash2, User, Shield, Users, Map } from "lucide-react";
 import { PropertyManagerBuildingsMap, MapBuildingData } from "@/components/PropertyManagerBuildingsMap";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
 import { formatLocalDate, formatTimestampDate, formatTime, formatDurationMs } from "@/lib/dateUtils";
@@ -59,10 +59,6 @@ export default function PropertyManager() {
   const [vendorToRemove, setVendorToRemove] = useState<VendorSummary | null>(null);
   const [selectedComplaint, setSelectedComplaint] = useState<any | null>(null);
   const [editBuildingInstructionsOpen, setEditBuildingInstructionsOpen] = useState(false);
-  const [showMapView, setShowMapView] = useState(() => {
-    const saved = localStorage.getItem('pm-show-map-view');
-    return saved === 'true';
-  });
   const [buildingInstructionsForm, setBuildingInstructionsForm] = useState({
     buildingAccess: "",
     keysAndFob: "",
@@ -601,12 +597,6 @@ export default function PropertyManager() {
 
   const vendors = vendorsData?.vendors || [];
 
-  const handleToggleMapView = () => {
-    const newValue = !showMapView;
-    setShowMapView(newValue);
-    localStorage.setItem('pm-show-map-view', newValue.toString());
-  };
-
   const handleMapBuildingSelect = (building: MapBuildingData) => {
     const vendor = vendors.find(v => v.linkId === building.vendorLinkId);
     if (vendor) {
@@ -636,15 +626,6 @@ export default function PropertyManager() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Button
-              variant={showMapView ? "default" : "outline"}
-              size="icon"
-              onClick={handleToggleMapView}
-              data-testid="button-toggle-map"
-              title={showMapView ? t('propertyManager.map.showVendors', 'Show Vendors') : t('propertyManager.map.showMap', 'Show Map')}
-            >
-              {showMapView ? <List className="w-4 h-4" /> : <Map className="w-4 h-4" />}
-            </Button>
             <InstallPWAButton />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -686,24 +667,22 @@ export default function PropertyManager() {
           </div>
         </div>
 
-        {showMapView && (
-          <div className="mb-6">
-            <Card data-testid="card-buildings-map">
-              <CardHeader className="pb-4">
-                <CardTitle className="flex items-center gap-2">
-                  <Map className="h-5 w-5" />
-                  {t('propertyManager.map.title', 'Buildings Map')}
-                </CardTitle>
-                <CardDescription>
-                  {t('propertyManager.map.description', 'View all your buildings with active projects on the map')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <PropertyManagerBuildingsMap onBuildingSelect={handleMapBuildingSelect} />
-              </CardContent>
-            </Card>
-          </div>
-        )}
+        <div className="mb-6">
+          <Card data-testid="card-buildings-map">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2">
+                <Map className="h-5 w-5" />
+                {t('propertyManager.map.title', 'Buildings Map')}
+              </CardTitle>
+              <CardDescription>
+                {t('propertyManager.map.description', 'View all your buildings with active projects on the map')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <PropertyManagerBuildingsMap onBuildingSelect={handleMapBuildingSelect} />
+            </CardContent>
+          </Card>
+        </div>
 
         <Card className="mb-6" data-testid="card-my-vendors">
           <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2 space-y-0 pb-4">
