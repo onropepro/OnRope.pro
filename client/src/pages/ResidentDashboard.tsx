@@ -47,10 +47,6 @@ export default function ResidentDashboard() {
   const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [selectedNotice, setSelectedNotice] = useState<any | null>(null);
-  const [lastPhotoViewTime, setLastPhotoViewTime] = useState<number>(() => {
-    const stored = localStorage.getItem('lastPhotoViewTime');
-    return stored ? parseInt(stored) : 0;
-  });
   const [lastComplaintsViewTime, setLastComplaintsViewTime] = useState<number>(() => {
     const stored = localStorage.getItem('lastComplaintsViewTime');
     return stored ? parseInt(stored) : 0;
@@ -325,18 +321,6 @@ export default function ResidentDashboard() {
     });
   };
 
-  // Fetch photos tagged with resident's unit number
-  const { data: unitPhotosData } = useQuery<{ photos: any[] }>({
-    queryKey: ["/api/my-unit-photos"],
-    enabled: !!currentUser?.unitNumber,
-  });
-
-  // Calculate new photos count
-  const newPhotosCount = unitPhotosData?.photos?.filter((photo: any) => {
-    const photoTime = new Date(photo.createdAt).getTime();
-    return photoTime > lastPhotoViewTime;
-  }).length || 0;
-
   // Calculate complaints with new responses (notes visible to resident created after last view)
   const newResponsesCount = complaintsData?.complaints?.filter((complaint: any) => {
     // Check if complaint has any notes visible to resident
@@ -349,13 +333,6 @@ export default function ResidentDashboard() {
       return noteTime > lastComplaintsViewTime;
     });
   }).length || 0;
-
-  // Mark photos as viewed when user opens the tab
-  const handlePhotoTabOpen = () => {
-    const now = Date.now();
-    setLastPhotoViewTime(now);
-    localStorage.setItem('lastPhotoViewTime', now.toString());
-  };
 
   // Mark complaints as viewed when user opens the tab
   const handleComplaintsTabOpen = () => {
@@ -780,15 +757,12 @@ export default function ResidentDashboard() {
 
         <Tabs value={activeTab} onValueChange={(value) => {
           setActiveTab(value);
-          if (value === "photos") {
-            handlePhotoTabOpen();
-          }
           if (value === "history") {
             handleComplaintsTabOpen();
           }
         }} className="w-full">
           <TabsList 
-            className="grid w-full grid-cols-5 mb-4"
+            className="grid w-full grid-cols-4 mb-4"
             style={{
               borderColor: `${hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR}20`
             }}
@@ -801,25 +775,6 @@ export default function ResidentDashboard() {
               } as React.CSSProperties}
             >
               {t('residentPortal.tabs.progress', 'Progress')}
-            </TabsTrigger>
-            <TabsTrigger 
-              value="photos" 
-              data-testid="tab-photos"
-              className="relative"
-              style={{
-                '--custom-primary': hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR
-              } as React.CSSProperties}
-            >
-              {t('residentPortal.tabs.myPhotos', 'My Photos')}
-              {newPhotosCount > 0 && (
-                <Badge 
-                  variant="destructive" 
-                  className="absolute -top-1 -right-1 h-4 min-w-[16px] flex items-center justify-center px-1 text-[10px] font-bold"
-                  data-testid="badge-new-photos"
-                >
-                  {newPhotosCount}
-                </Badge>
-              )}
             </TabsTrigger>
             <TabsTrigger 
               value="submit" 
@@ -1031,81 +986,6 @@ export default function ResidentDashboard() {
                 </div>
               )}
             </div>
-          </TabsContent>
-
-          <TabsContent value="photos" className="mt-6">
-            <Card className="shadow-xl border-border/50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <span 
-                    className="material-icons"
-                    style={{ color: hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR }}
-                  >
-                    photo_library
-                  </span>
-                  {t('residentPortal.photos.title', 'My Unit Photos')}
-                </CardTitle>
-                <CardDescription>
-                  {t('residentPortal.photos.taggedForUnit', 'Photos tagged for unit')} {currentUser?.unitNumber || "—"}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {!currentUser?.unitNumber ? (
-                  <div className="text-center py-12 text-muted-foreground">
-                    <span className="material-icons text-5xl mb-3 opacity-50">image_not_supported</span>
-                    <p>{t('residentPortal.photos.noUnitNumber', 'No unit number found in your profile.')}</p>
-                  </div>
-                ) : unitPhotosData?.photos?.length === 0 ? (
-                  <div className="text-center py-12 text-muted-foreground">
-                    <span className="material-icons text-5xl mb-3 opacity-50">photo_library</span>
-                    <p className="text-lg mb-2">{t('residentPortal.photos.noPhotosYet', 'No photos yet')}</p>
-                    <p className="text-sm">{t('residentPortal.photos.photosWillAppear', 'Photos tagged for your unit will appear here.')}</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {unitPhotosData?.photos?.map((photo: any) => (
-                      <div key={photo.id} className="bg-card rounded-lg overflow-hidden border hover-elevate group">
-                        <div className="aspect-video relative overflow-hidden">
-                          <img
-                            src={photo.imageUrl}
-                            alt={photo.comment || t('residentPortal.photos.unitPhoto', 'Unit photo')}
-                            className="w-full h-full object-cover"
-                            data-testid={`unit-photo-${photo.id}`}
-                          />
-                        </div>
-                        <div className="p-3 space-y-2">
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="flex-1 min-w-0">
-                              {photo.buildingName && (
-                                <div className="text-sm font-medium truncate">
-                                  {photo.buildingName}
-                                </div>
-                              )}
-                              {photo.buildingAddress && (
-                                <div className="text-xs text-muted-foreground truncate">
-                                  {photo.buildingAddress}
-                                </div>
-                              )}
-                            </div>
-                            <Badge variant="secondary" className="text-xs shrink-0">
-                              {t('residentPortal.photos.unit', 'Unit')} {photo.unitNumber || photo.missedUnitNumber}
-                            </Badge>
-                          </div>
-                          {photo.comment && (
-                            <div className="text-sm text-muted-foreground border-t pt-2">
-                              {photo.comment}
-                            </div>
-                          )}
-                          <div className="text-xs text-muted-foreground border-t pt-2">
-                            {formatTimestampDate(photo.createdAt)}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
           </TabsContent>
 
           <TabsContent value="submit" className="mt-6">

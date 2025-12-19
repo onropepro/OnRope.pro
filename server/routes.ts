@@ -13081,11 +13081,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Serve resident photos from dedicated bucket
-  app.get("/api/resident-photos/:fileName", async (req: Request, res: Response) => {
+  // Serve resident photos from dedicated bucket (supports nested path with complaintId folder)
+  app.get("/api/resident-photos/:complaintId/:fileName", async (req: Request, res: Response) => {
     try {
       const objectStorageService = new ObjectStorageService();
-      const file = await objectStorageService.getResidentPhoto(req.params.fileName);
+      const fullPath = `${req.params.complaintId}/${req.params.fileName}`;
+      const file = await objectStorageService.getResidentPhoto(fullPath);
       
       if (!file) {
         return res.status(404).json({ message: "Photo not found" });
