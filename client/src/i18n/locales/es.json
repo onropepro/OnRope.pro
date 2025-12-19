@@ -256,6 +256,40 @@
     "haveAccount": "Ya tienes una cuenta?",
     "signIn": "Iniciar sesion"
   },
+  "techReg": {
+    "sidebar": {
+      "title": "Crea Tu Perfil",
+      "subtitle": "Unete a miles de tecnicos de acceso con cuerdas",
+      "whatYouGet": "Lo que obtienes"
+    },
+    "steps": {
+      "accountDetails": "Detalles de Cuenta",
+      "certification": "Certificacion",
+      "complete": "Completo"
+    },
+    "benefits": {
+      "portableProfile": "Perfil profesional portatil",
+      "hourLogging": "Registro automatico de horas de trabajo",
+      "noOnboarding": "Nunca vuelvas a llenar formularios de incorporacion",
+      "freeUpgrade": "Mejora gratuita al compartir"
+    },
+    "plusBenefits": {
+      "unlimitedEmployers": "Conexiones ilimitadas con empleadores",
+      "exportablePdf": "Historial de trabajo exportable en PDF",
+      "expiryAlerts": "Alertas de vencimiento de certificacion de 30 dias",
+      "jobBoard": "Acceso a bolsa de trabajo"
+    },
+    "welcome": {
+      "badge": "Para Tecnicos IRATA y SPRAT",
+      "title": "Crea tu cuenta gratuita",
+      "subtitle": "Toma 60 segundos. Gratis para siempre.",
+      "referralLabel": "Tienes un codigo de referencia? (opcional)",
+      "referralPlaceholder": "Ingresa codigo de referencia",
+      "getStarted": "Comenzar",
+      "haveAccount": "Ya tienes una cuenta?",
+      "signIn": "Iniciar Sesion"
+    }
+  },
   "navigation": {
     "language": "Idioma",
     "help": "Ayuda",
@@ -4643,128 +4677,128 @@
     }
   },
   "roi": {
-    "title": "Calculate Your Hidden Costs In Less Than 60 Seconds",
-    "subtitle": "Most rope access companies waste $15,000-25,000 per year on scattered tools and manual processes.",
+    "title": "Calcula Tus Costos Ocultos En Menos de 60 Segundos",
+    "subtitle": "La mayoria de las empresas de acceso con cuerdas desperdician $15,000-25,000 por ano en herramientas dispersas y procesos manuales.",
     "header": {
-      "backToHome": "Back to Home"
+      "backToHome": "Volver al Inicio"
     },
     "progress": {
-      "step": "Question {{current}} of {{total}}"
+      "step": "Pregunta {{current}} de {{total}}"
     },
     "questions": {
       "employees": {
-        "title": "How many employees work in the field or office?",
-        "min": "5 employees",
-        "max": "50 employees",
-        "description": "Include all field technicians, office staff, and management"
+        "title": "Cuantos empleados trabajan en campo u oficina?",
+        "min": "5 empleados",
+        "max": "50 empleados",
+        "description": "Incluye todos los tecnicos de campo, personal de oficina y gerencia"
       },
       "timeTracking": {
-        "title": "How do you currently track employee hours for payroll?"
+        "title": "Como rastreas actualmente las horas de los empleados para la nomina?"
       },
       "projectManagement": {
-        "title": "How do you track which buildings/projects your teams are working on?"
+        "title": "Como rastreas en que edificios/proyectos estan trabajando tus equipos?"
       },
       "crm": {
-        "title": "How do you manage client relationships and track communication history?"
+        "title": "Como gestionas las relaciones con clientes y rastreas el historial de comunicacion?"
       },
       "safetyCompliance": {
-        "title": "How do you document daily harness inspections and safety meetings (IRATA/SPRAT compliance)?"
+        "title": "Como documentas las inspecciones diarias de arnes y reuniones de seguridad (cumplimiento IRATA/SPRAT)?"
       },
       "scheduling": {
-        "title": "How do you schedule which technicians work on which projects each day?"
+        "title": "Como programas que tecnicos trabajan en que proyectos cada dia?"
       },
       "documentStorage": {
-        "title": "Where do you store project photos, rope access plans, and client contracts?"
+        "title": "Donde almacenas fotos de proyectos, planes de acceso con cuerdas y contratos de clientes?"
       }
     },
     "options": {
       "timeTracking": {
-        "paper": "Paper timesheets",
-        "excel": "Excel spreadsheets",
-        "software": "Time tracking software (ClockShark, TSheets, etc.)",
-        "none": "We don't track precisely"
+        "paper": "Hojas de tiempo en papel",
+        "excel": "Hojas de calculo Excel",
+        "software": "Software de seguimiento de tiempo (ClockShark, TSheets, etc.)",
+        "none": "No rastreamos con precision"
       },
       "projectManagement": {
-        "whiteboard": "Whiteboard or paper",
+        "whiteboard": "Pizarra o papel",
         "excel": "Excel/Google Sheets",
-        "software": "Project management software (Asana, Monday.com, etc.)",
-        "texts": "Group texts and phone calls"
+        "software": "Software de gestion de proyectos (Asana, Monday.com, etc.)",
+        "texts": "Mensajes grupales y llamadas telefonicas"
       },
       "crm": {
-        "email": "Email inbox only",
-        "spreadsheet": "Spreadsheet of contacts",
-        "software": "CRM software (Pipedrive, HubSpot, etc.)",
-        "memory": "Memory and paper notes"
+        "email": "Solo bandeja de entrada de correo",
+        "spreadsheet": "Hoja de calculo de contactos",
+        "software": "Software CRM (Pipedrive, HubSpot, etc.)",
+        "memory": "Memoria y notas en papel"
       },
       "safetyCompliance": {
-        "paper": "Paper forms filed in office",
-        "none": "Nothing formal (risk!)",
-        "software": "Digital safety app (SafetyCulture, etc.)",
-        "photos": "Photos on phones"
+        "paper": "Formularios en papel archivados en oficina",
+        "none": "Nada formal (riesgo!)",
+        "software": "App de seguridad digital (SafetyCulture, etc.)",
+        "photos": "Fotos en telefonos"
       },
       "scheduling": {
-        "calls": "Phone calls each morning",
-        "excel": "Excel schedule updated daily",
-        "software": "Scheduling software (Deputy, When I Work, etc.)",
-        "verbal": "Verbal assignments day-by-day"
+        "calls": "Llamadas telefonicas cada manana",
+        "excel": "Horario en Excel actualizado diariamente",
+        "software": "Software de programacion (Deputy, When I Work, etc.)",
+        "verbal": "Asignaciones verbales dia a dia"
       },
       "documentStorage": {
-        "filing": "Filing cabinets and desk drawers",
-        "computer": "Personal computer folders",
-        "cloud": "Cloud storage (Dropbox, Google Drive, etc.)",
-        "mix": "Mix of physical and digital"
+        "filing": "Archivadores y cajones de escritorio",
+        "computer": "Carpetas en computadora personal",
+        "cloud": "Almacenamiento en la nube (Dropbox, Google Drive, etc.)",
+        "mix": "Mezcla de fisico y digital"
       }
     },
     "categories": {
-      "timeTracking": "Time Tracking",
-      "projectManagement": "Project Management",
-      "crm": "Client Communication",
-      "safetyCompliance": "Safety Compliance",
-      "scheduling": "Scheduling",
-      "documentStorage": "Document Storage"
+      "timeTracking": "Seguimiento de Tiempo",
+      "projectManagement": "Gestion de Proyectos",
+      "crm": "Comunicacion con Clientes",
+      "safetyCompliance": "Cumplimiento de Seguridad",
+      "scheduling": "Programacion",
+      "documentStorage": "Almacenamiento de Documentos"
     },
     "navigation": {
-      "previous": "Previous",
-      "next": "Next",
-      "seeResults": "See My Results",
-      "backToQuestions": "Back to Questions"
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "seeResults": "Ver Mis Resultados",
+      "backToQuestions": "Volver a las Preguntas"
     },
     "preview": {
-      "currentWaste": "Current Monthly Waste:",
-      "potentialSavings": "Potential Savings:"
+      "currentWaste": "Desperdicio Mensual Actual:",
+      "potentialSavings": "Ahorro Potencial:"
     },
     "results": {
-      "wastingTitle": "You're Currently Wasting",
-      "perMonth": "/month",
-      "currentCosts": "Current Costs",
-      "directToolCosts": "Direct Tool Costs:",
-      "hiddenAdminWaste": "Hidden Admin Waste:",
+      "wastingTitle": "Actualmente Estas Desperdiciando",
+      "perMonth": "/mes",
+      "currentCosts": "Costos Actuales",
+      "directToolCosts": "Costos Directos de Herramientas:",
+      "hiddenAdminWaste": "Desperdicio Administrativo Oculto:",
       "total": "Total:",
-      "yourSavings": "Your Savings",
-      "monthly": "Monthly:",
-      "annually": "Annually:",
-      "timeRecovered": "Time Recovered:",
-      "tier1": "Starter Plan (for teams under 8)",
-      "tier2": "Professional Plan",
+      "yourSavings": "Tus Ahorros",
+      "monthly": "Mensual:",
+      "annually": "Anual:",
+      "timeRecovered": "Tiempo Recuperado:",
+      "tier1": "Plan Inicial (para equipos menores de 8)",
+      "tier2": "Plan Profesional",
       "includes": {
-        "timeTracking": "Time Tracking",
-        "projectManagement": "Project Management",
-        "crm": "CRM & Client Portal",
-        "safetyCompliance": "Safety Compliance",
-        "scheduling": "Scheduling",
-        "documentStorage": "Document Storage"
+        "timeTracking": "Seguimiento de Tiempo",
+        "projectManagement": "Gestion de Proyectos",
+        "crm": "CRM y Portal de Clientes",
+        "safetyCompliance": "Cumplimiento de Seguridad",
+        "scheduling": "Programacion",
+        "documentStorage": "Almacenamiento de Documentos"
       },
-      "showBreakdown": "Show detailed breakdown",
-      "startFreeTrial": "Start Free Trial - 90 Days",
-      "emailAnalysis": "Email Me This Analysis",
-      "alreadyOptimized": "You're Already Well Optimized!",
-      "consolidateMessage": "You're already investing in digital tools (${{cost}}/month). OnRopePro consolidates these 6-8 separate systems into ONE platform for ${{onropeCost}}/month, eliminating tool-switching friction and data silos.",
-      "currentSetupGood": "Based on your current setup, you have a solid tech stack. However, OnRopePro could still help by consolidating your tools into one platform built specifically for rope access operations.",
-      "consolidateBenefits": "Consider the benefits of consolidating to a single platform:",
+      "showBreakdown": "Mostrar desglose detallado",
+      "startFreeTrial": "Iniciar Prueba Gratuita - 90 Dias",
+      "emailAnalysis": "Enviarme Este Analisis",
+      "alreadyOptimized": "Ya Estas Bien Optimizado!",
+      "consolidateMessage": "Ya estas invirtiendo en herramientas digitales (${{cost}}/mes). OnRopePro consolida estos 6-8 sistemas separados en UNA plataforma por ${{onropeCost}}/mes, eliminando la friccion de cambiar herramientas y silos de datos.",
+      "currentSetupGood": "Segun tu configuracion actual, tienes una buena infraestructura tecnologica. Sin embargo, OnRopePro podria ayudar al consolidar tus herramientas en una plataforma construida especificamente para operaciones de acceso con cuerdas.",
+      "consolidateBenefits": "Considera los beneficios de consolidar en una sola plataforma:",
       "benefits": {
-        "singleLogin": "Single login for all operations",
-        "integratedData": "Integrated data across all modules",
-        "ropeAccessSpecific": "Purpose-built for rope access companies"
+        "singleLogin": "Un solo inicio de sesion para todas las operaciones",
+        "integratedData": "Datos integrados en todos los modulos",
+        "ropeAccessSpecific": "Construido especificamente para empresas de acceso con cuerdas"
       }
     },
     "email": {
