@@ -109,6 +109,24 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
         style={stakeholderColor ? { backgroundColor: stakeholderColor } : undefined}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-10 flex items-center justify-end gap-3">
+          <Button 
+            variant="ghost"
+            size="sm"
+            className={stakeholderColor ? "text-white hover:bg-white/10" : ""}
+            onClick={onSignInClick || (() => setLocation("/login"))}
+            data-testid="button-sign-in-header"
+          >
+            {t('login.header.signIn', 'Sign In')}
+          </Button>
+          <Button 
+            variant="ghost"
+            size="sm"
+            className={stakeholderColor ? "text-white hover:bg-white/10" : ""}
+            onClick={() => setLocation("/pricing")}
+            data-testid="link-pricing-header"
+          >
+            {t('login.header.pricing', 'Pricing')}
+          </Button>
           <InstallPWAButton stakeholderColor={stakeholderColor} />
           <Button 
             variant="ghost"
@@ -157,24 +175,6 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button 
-            variant="ghost"
-            size="sm"
-            className={stakeholderColor ? "text-white hover:bg-white/10" : ""}
-            onClick={onSignInClick || (() => setLocation("/login"))}
-            data-testid="button-sign-in-header"
-          >
-            {t('login.header.signIn', 'Sign In')}
-          </Button>
-          <Button 
-            variant="ghost"
-            size="sm"
-            className={stakeholderColor ? "text-white hover:bg-white/10" : ""}
-            onClick={() => setLocation("/pricing")}
-            data-testid="link-pricing-header"
-          >
-            {t('login.header.pricing', 'Pricing')}
-          </Button>
         </div>
       </div>
 
