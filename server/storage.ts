@@ -3379,19 +3379,14 @@ export class Storage {
     return buildingsForMap;
   }
 
-  async getPropertyManagerProjectDetails(projectId: string, companyId: string, normalizedStrata: string): Promise<{ project: any; complaints: any[]; buildingInstructions: any | null }> {
-    // Strata number is required for security
-    if (!normalizedStrata || normalizedStrata.trim() === '') {
-      throw new Error('Strata number is required');
-    }
-    
+  async getPropertyManagerProjectDetails(projectId: string, companyId: string): Promise<{ project: any; complaints: any[]; buildingInstructions: any | null }> {
     // Normalize strata number helper function
     const normalizeStrata = (strata: string | null | undefined): string | null => {
       if (!strata || strata.trim() === '') return null;
       return strata.toUpperCase().replace(/\s+/g, '');
     };
     
-    // Verify project belongs to the company AND matches the strata number
+    // Verify project belongs to the connected vendor company
     const [project] = await db.select()
       .from(projects)
       .where(and(
@@ -3400,12 +3395,6 @@ export class Storage {
       ));
     
     if (!project) {
-      throw new Error('Project not found or access denied');
-    }
-    
-    // CRITICAL: Enforce strata filtering - prevent access to projects from other buildings
-    const projectStrata = normalizeStrata(project.strataPlanNumber);
-    if (projectStrata !== normalizedStrata) {
       throw new Error('Project not found or access denied');
     }
     
