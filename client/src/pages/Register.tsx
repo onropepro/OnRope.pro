@@ -76,29 +76,10 @@ export default function Register() {
   const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState<"resident" | "company" | "property_manager">("resident");
   const [, setLocation] = useLocation();
-  const [landingLanguage, setLandingLanguage] = useState<'en' | 'fr'>('en');
-  
   // Unit conflict dialog state
   const [showUnitConflictDialog, setShowUnitConflictDialog] = useState(false);
   const [pendingRegistrationData, setPendingRegistrationData] = useState<ResidentFormData | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Initialize landing page language from its own storage key (separate from user preference)
-  useEffect(() => {
-    const savedLandingLang = localStorage.getItem('landingPageLang') as 'en' | 'fr' | null;
-    // Default to English for landing page, only use French if explicitly set
-    const lang = savedLandingLang || 'en';
-    setLandingLanguage(lang);
-    i18n.changeLanguage(lang);
-  }, [i18n]);
-
-  // Toggle language for landing page only
-  const toggleLandingLanguage = () => {
-    const newLang = landingLanguage === 'en' ? 'fr' : 'en';
-    setLandingLanguage(newLang);
-    localStorage.setItem('landingPageLang', newLang);
-    i18n.changeLanguage(newLang);
-  };
 
   // Check if user is already logged in and redirect appropriately
   const { data: userData, isLoading: isCheckingAuth, error: authError } = useQuery<{ user: any }>({
@@ -315,7 +296,7 @@ export default function Register() {
           <CardTitle className="text-2xl font-bold text-center">{t('register.title', 'Create Account')}</CardTitle>
           <CardDescription className="text-center">{t('register.subtitle', 'Choose your account type to get started')}</CardDescription>
         </CardHeader>
-        <CardContent key={i18n.language}>
+        <CardContent>
           <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "resident" | "property_manager")}>
             <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="resident" data-testid="tab-resident">{t('register.tabs.resident', 'Resident')}</TabsTrigger>

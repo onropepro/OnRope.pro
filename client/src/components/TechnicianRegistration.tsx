@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,6 +46,7 @@ interface TechnicianRegistrationProps {
 }
 
 export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistrationProps) {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [step, setStep] = useState<RegistrationStep>("welcome");
@@ -279,17 +281,17 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
   };
 
   const benefits = [
-    { icon: Briefcase, text: "Portable professional profile" },
-    { icon: Clock, text: "Automatic work hour logging" },
-    { icon: FileText, text: "Never fill out onboarding forms again" },
-    { icon: Award, text: "Free upgrade when you share" },
+    { icon: Briefcase, text: t('techReg.benefits.portableProfile', 'Portable professional profile') },
+    { icon: Clock, text: t('techReg.benefits.hourLogging', 'Automatic work hour logging') },
+    { icon: FileText, text: t('techReg.benefits.noOnboarding', 'Never fill out onboarding forms again') },
+    { icon: Award, text: t('techReg.benefits.freeUpgrade', 'Free upgrade when you share') },
   ];
 
   const plusBenefits = [
-    "Unlimited employer connections",
-    "Exportable work history PDF",
-    "30-day certification expiry alerts",
-    "Job board access",
+    t('techReg.plusBenefits.unlimitedEmployers', 'Unlimited employer connections'),
+    t('techReg.plusBenefits.exportablePdf', 'Exportable work history PDF'),
+    t('techReg.plusBenefits.expiryAlerts', '30-day certification expiry alerts'),
+    t('techReg.plusBenefits.jobBoard', 'Job board access'),
   ];
 
   return (
@@ -300,8 +302,8 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
           <div className="hidden lg:flex lg:w-[320px] bg-[#0369A1] text-white p-8 flex-col">
             <div className="mb-8">
               <HardHat className="w-10 h-10 mb-4" />
-              <h2 className="text-xl font-bold mb-2">Create Your Profile</h2>
-              <p className="text-white/80 text-sm">Join thousands of rope access technicians</p>
+              <h2 className="text-xl font-bold mb-2">{t('techReg.sidebar.title', 'Create Your Profile')}</h2>
+              <p className="text-white/80 text-sm">{t('techReg.sidebar.subtitle', 'Join thousands of rope access technicians')}</p>
             </div>
             
             {/* Progress Steps */}
@@ -310,25 +312,25 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${getStepNumber() >= 1 ? 'bg-white text-[#0369A1]' : 'bg-white/20'}`}>
                   {getStepNumber() > 1 ? <Check className="w-4 h-4" /> : "1"}
                 </div>
-                <span className="text-sm font-medium">Account Details</span>
+                <span className="text-sm font-medium">{t('techReg.steps.accountDetails', 'Account Details')}</span>
               </div>
               <div className={`flex items-center gap-3 ${getStepNumber() >= 2 ? 'text-white' : 'text-white/50'}`}>
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${getStepNumber() >= 2 ? 'bg-white text-[#0369A1]' : 'bg-white/20'}`}>
                   {getStepNumber() > 2 ? <Check className="w-4 h-4" /> : "2"}
                 </div>
-                <span className="text-sm font-medium">Certification</span>
+                <span className="text-sm font-medium">{t('techReg.steps.certification', 'Certification')}</span>
               </div>
               <div className={`flex items-center gap-3 ${getStepNumber() >= 3 ? 'text-white' : 'text-white/50'}`}>
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${getStepNumber() >= 3 ? 'bg-white text-[#0369A1]' : 'bg-white/20'}`}>
                   {getStepNumber() >= 3 ? <Check className="w-4 h-4" /> : "3"}
                 </div>
-                <span className="text-sm font-medium">Complete</span>
+                <span className="text-sm font-medium">{t('techReg.steps.complete', 'Complete')}</span>
               </div>
             </div>
 
             {/* Benefits */}
             <div className="mt-auto">
-              <p className="text-white/60 text-xs uppercase tracking-wider mb-3">What you get</p>
+              <p className="text-white/60 text-xs uppercase tracking-wider mb-3">{t('techReg.sidebar.whatYouGet', 'What you get')}</p>
               <div className="space-y-3">
                 {benefits.map((benefit, i) => (
                   <div key={i} className="flex items-center gap-2 text-sm">
@@ -349,10 +351,10 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                   <div className="text-center mb-8">
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
                       <HardHat className="w-4 h-4 text-primary" />
-                      <span className="text-sm font-medium text-primary">For irata & SPRAT Technicians</span>
+                      <span className="text-sm font-medium text-primary">{t('techReg.welcome.badge', 'For IRATA & SPRAT Technicians')}</span>
                     </div>
-                    <h1 className="text-3xl font-bold mb-3">Create your free account</h1>
-                    <p className="text-muted-foreground">Takes 60 seconds. Free forever.</p>
+                    <h1 className="text-3xl font-bold mb-3">{t('techReg.welcome.title', 'Create your free account')}</h1>
+                    <p className="text-muted-foreground">{t('techReg.welcome.subtitle', 'Takes 60 seconds. Free forever.')}</p>
                   </div>
 
                   <div className="space-y-4 mb-8">
@@ -368,9 +370,9 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
 
                   {/* Referral Code Input */}
                   <div className="mb-6">
-                    <Label className="text-sm text-muted-foreground mb-2 block">Have a referral code? (optional)</Label>
+                    <Label className="text-sm text-muted-foreground mb-2 block">{t('techReg.welcome.referralLabel', 'Have a referral code? (optional)')}</Label>
                     <Input
-                      placeholder="Enter referral code"
+                      placeholder={t('techReg.welcome.referralPlaceholder', 'Enter referral code')}
                       value={data.referralCodeInput}
                       onChange={(e) => setData({ ...data, referralCodeInput: e.target.value.toUpperCase() })}
                       className="text-center tracking-widest"
@@ -384,17 +386,17 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                     onClick={handleContinue}
                     data-testid="button-get-started"
                   >
-                    Get Started
+                    {t('techReg.welcome.getStarted', 'Get Started')}
                     <ArrowRight className="w-5 h-5" />
                   </Button>
                   
                   <p className="text-center text-sm text-muted-foreground mt-4">
-                    Already have an account?{" "}
+                    {t('techReg.welcome.haveAccount', 'Already have an account?')}{" "}
                     <button 
                       className="text-primary font-medium hover:underline"
                       onClick={handleClose}
                     >
-                      Sign In
+                      {t('techReg.welcome.signIn', 'Sign In')}
                     </button>
                   </p>
                 </div>

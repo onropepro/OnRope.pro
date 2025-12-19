@@ -170,22 +170,7 @@ export default function ROICalculator() {
     roi: 0,
     hoursRecovered: 0
   });
-  const [landingLanguage, setLandingLanguage] = useState<'en' | 'fr'>('en');
   const [cameFromLanding, setCameFromLanding] = useState(initialValues.step > 1);
-
-  useEffect(() => {
-    const savedLandingLang = localStorage.getItem('landingPageLang') as 'en' | 'fr' | null;
-    const lang = savedLandingLang || 'en';
-    setLandingLanguage(lang);
-    i18n.changeLanguage(lang);
-  }, [i18n]);
-
-  const toggleLandingLanguage = () => {
-    const newLang = landingLanguage === 'en' ? 'fr' : 'en';
-    setLandingLanguage(newLang);
-    localStorage.setItem('landingPageLang', newLang);
-    i18n.changeLanguage(newLang);
-  };
 
   const calculateCosts = () => {
     let totalDirectCosts = 0;

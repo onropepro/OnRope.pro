@@ -214,8 +214,8 @@ export default function Login() {
       <section className="py-16 md:py-24 px-6 bg-primary/5">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-2xl md:text-4xl font-bold mb-4">
-            Calculate Your Hidden Costs<br />
-            In Less Than 60 Seconds
+            {t('login.roiCalculator.title', 'Calculate Your Hidden Costs')}<br />
+            {t('login.roiCalculator.titleLine2', 'In Less Than 60 Seconds')}
           </h2>
           <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
             {t('login.roiCalculator.subtitle', 'Most rope access companies waste $15,000-25,000 per year on scattered online SAAS tools, manual processes, hidden admin costs, and wasted time. Find out how much you could save.')}
@@ -646,7 +646,7 @@ export default function Login() {
                   data-testid="button-technician-login"
                 >
                   <HardHat className="mr-2 h-4 w-4" />
-                  Technician Login
+                  {t('login.buttons.technicianLogin', 'Technician Login')}
                 </Button>
                 <Button 
                   variant="outline" 
@@ -655,7 +655,7 @@ export default function Login() {
                   data-testid="button-building-portal"
                 >
                   <Building2 className="mr-2 h-4 w-4" />
-                  Building Portal
+                  {t('login.buttons.buildingPortal', 'Building Portal')}
                 </Button>
               </div>
             </div>
@@ -666,7 +666,7 @@ export default function Login() {
                 <span className="w-full border-t" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">New to the platform?</span>
+                <span className="bg-card px-2 text-muted-foreground">{t('login.buttons.newToPlatform', 'New to the platform?')}</span>
               </div>
             </div>
 
@@ -679,7 +679,7 @@ export default function Login() {
                 data-testid="button-get-license"
               >
                 <span className="material-icons mr-2 text-lg">shopping_cart</span>
-                Get Company License
+                {t('login.buttons.getCompanyLicense', 'Get Company License')}
               </Button>
               
               <div className="grid grid-cols-2 gap-2">
@@ -691,7 +691,7 @@ export default function Login() {
                   data-testid="link-register"
                 >
                   <span className="material-icons mr-1 text-sm">person_add</span>
-                  Resident / Manager
+                  {t('login.buttons.residentManager', 'Resident / Manager')}
                 </Button>
                 <Button 
                   variant="ghost" 
@@ -704,14 +704,14 @@ export default function Login() {
                   data-testid="button-create-technician-account"
                 >
                   <HardHat className="mr-1 h-3 w-3" />
-                  Technician
+                  {t('login.buttons.technician', 'Technician')}
                 </Button>
               </div>
             </div>
 
             {/* Footer */}
             <div className="pt-3 text-center text-xs text-muted-foreground">
-              <p>Secure, Professional, Transparent</p>
+              <p>{t('login.footer.tagline', 'Secure, Professional, Transparent')}</p>
             </div>
 
             {/* Collapsible Dev Tools Section */}
@@ -724,7 +724,7 @@ export default function Login() {
                 data-testid="button-toggle-dev-tools"
               >
                 <span className="material-icons text-xs mr-1">{showDevTools ? 'expand_less' : 'expand_more'}</span>
-                {showDevTools ? 'Hide' : 'Show'} Development Tools
+                {showDevTools ? t('login.devTools.hide', 'Hide') : t('login.devTools.show', 'Show')} {t('login.devTools.title', 'Development Tools')}
               </Button>
               
               {showDevTools && (
