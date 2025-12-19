@@ -1,8 +1,6 @@
 # Resident Portal User Guide
 
-**Welcome to the OnRopePro Resident Portal**
-
-The Resident Portal gives you direct access to view maintenance work progress on your building and communicate directly with the service company. No more wondering when work will be done or whether your concerns were received.
+Welcome to the OnRopePro Resident Portal. This guide gives you direct access to view maintenance work progress on your building and communicate directly with the service company. No more wondering when work will be done or whether your concerns were received.
 
 ---
 

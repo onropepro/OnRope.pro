@@ -243,6 +243,29 @@ export default function HelpArticle() {
                       continue;
                     }
                     
+                    // Images - ![alt text](src)
+                    const imageMatch = line.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+                    if (imageMatch) {
+                      const altText = imageMatch[1];
+                      const imageSrc = imageMatch[2];
+                      elements.push(
+                        <figure key={`img-${i}`} className="my-6">
+                          <img 
+                            src={imageSrc} 
+                            alt={altText}
+                            className="rounded-lg border shadow-sm w-full"
+                          />
+                          {altText && (
+                            <figcaption className="text-sm text-muted-foreground text-center mt-2 italic">
+                              {altText}
+                            </figcaption>
+                          )}
+                        </figure>
+                      );
+                      i++;
+                      continue;
+                    }
+                    
                     // Bullet list
                     if (line.startsWith('- ')) {
                       const items: string[] = [];
@@ -314,6 +337,7 @@ export default function HelpArticle() {
                            !lines[i].trim().startsWith('- ') &&
                            !lines[i].trim().startsWith('```') &&
                            !lines[i].trim().startsWith('**Q:') &&
+                           !lines[i].trim().startsWith('![') &&
                            !/^\d+\.\s/.test(lines[i].trim()) &&
                            lines[i].trim() !== '---') {
                       paragraphLines.push(lines[i].trim());
