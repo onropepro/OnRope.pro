@@ -35,51 +35,154 @@ interface MapBounds {
   west: number;
 }
 
+// Inject custom CSS for pulsing animation
+const injectCustomStyles = () => {
+  const styleId = 'property-map-custom-styles';
+  if (document.getElementById(styleId)) return;
+  
+  const style = document.createElement('style');
+  style.id = styleId;
+  style.textContent = `
+    @keyframes pulse-ring {
+      0% {
+        transform: scale(0.8);
+        opacity: 0.8;
+      }
+      100% {
+        transform: scale(2);
+        opacity: 0;
+      }
+    }
+    
+    .marker-pulse {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      animation: pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+    }
+    
+    .custom-building-marker {
+      background: transparent !important;
+      border: none !important;
+    }
+    
+    .leaflet-popup-content-wrapper {
+      border-radius: 12px !important;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+      padding: 0 !important;
+      overflow: hidden;
+    }
+    
+    .leaflet-popup-content {
+      margin: 0 !important;
+      min-width: 200px !important;
+    }
+    
+    .leaflet-popup-tip {
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    .dark .leaflet-popup-content-wrapper {
+      background: hsl(var(--card)) !important;
+      color: hsl(var(--card-foreground)) !important;
+    }
+    
+    .dark .leaflet-popup-tip {
+      background: hsl(var(--card)) !important;
+    }
+    
+    .leaflet-container {
+      font-family: inherit !important;
+    }
+  `;
+  document.head.appendChild(style);
+};
+
 const createBuildingIcon = (isSelected: boolean = false, status: string = 'active') => {
-  const getStatusColor = () => {
-    if (isSelected) return 'hsl(var(--primary))';
+  const getStatusColors = () => {
     switch (status) {
-      case 'active': return '#22c55e';
-      case 'scheduled': return '#3b82f6';
-      case 'completed': return '#6b7280';
-      default: return 'hsl(var(--card))';
+      case 'active': 
+        return { bg: '#10b981', ring: '#34d399', glow: 'rgba(16, 185, 129, 0.4)' };
+      case 'scheduled': 
+        return { bg: '#3b82f6', ring: '#60a5fa', glow: 'rgba(59, 130, 246, 0.4)' };
+      case 'completed': 
+        return { bg: '#6b7280', ring: '#9ca3af', glow: 'rgba(107, 114, 128, 0.3)' };
+      default: 
+        return { bg: '#6b7280', ring: '#9ca3af', glow: 'rgba(107, 114, 128, 0.3)' };
     }
   };
+
+  const colors = getStatusColors();
+  const size = isSelected ? 44 : 36;
+  const iconSize = isSelected ? 20 : 16;
+  
+  const pulseRing = status === 'active' ? `
+    <div class="marker-pulse" style="background: ${colors.ring};"></div>
+  ` : '';
 
   return L.divIcon({
     className: 'custom-building-marker',
     html: `
       <div style="
-        width: 32px;
-        height: 32px;
-        background: ${getStatusColor()};
-        border: 2px solid ${isSelected ? 'hsl(var(--primary))' : 'white'};
-        border-radius: 50%;
+        position: relative;
+        width: ${size}px;
+        height: ${size}px;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        transition: all 0.2s ease;
       ">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="4" y="2" width="16" height="20" rx="2" ry="2"/>
-          <path d="M9 22v-4h6v4"/>
-          <path d="M8 6h.01"/>
-          <path d="M16 6h.01"/>
-          <path d="M12 6h.01"/>
-          <path d="M12 10h.01"/>
-          <path d="M12 14h.01"/>
-          <path d="M16 10h.01"/>
-          <path d="M16 14h.01"/>
-          <path d="M8 10h.01"/>
-          <path d="M8 14h.01"/>
-        </svg>
+        ${pulseRing}
+        <div style="
+          position: relative;
+          width: ${size}px;
+          height: ${size}px;
+          background: linear-gradient(135deg, ${colors.bg} 0%, ${colors.ring} 100%);
+          border: 3px solid white;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 12px ${colors.glow}, 0 2px 4px rgba(0,0,0,0.1);
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          ${isSelected ? 'transform: scale(1.1);' : ''}
+        ">
+          <svg width="${iconSize}" height="${iconSize}" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="2" width="16" height="20" rx="2" ry="2"/>
+            <path d="M9 22v-4h6v4"/>
+            <path d="M8 6h.01"/>
+            <path d="M16 6h.01"/>
+            <path d="M12 6h.01"/>
+            <path d="M12 10h.01"/>
+            <path d="M12 14h.01"/>
+            <path d="M16 10h.01"/>
+            <path d="M16 14h.01"/>
+            <path d="M8 10h.01"/>
+            <path d="M8 14h.01"/>
+          </svg>
+        </div>
       </div>
     `,
-    iconSize: [32, 32],
-    iconAnchor: [16, 32],
-    popupAnchor: [0, -32],
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size],
+    popupAnchor: [0, -size],
   });
+};
+
+// Utility to detect dark mode from document
+const useIsDarkMode = () => {
+  const [isDark, setIsDark] = useState(false);
+  
+  useEffect(() => {
+    const checkDark = () => setIsDark(document.documentElement.classList.contains('dark'));
+    checkDark();
+    
+    const observer = new MutationObserver(checkDark);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
+  
+  return isDark;
 };
 
 function MapEventHandler({ 
@@ -96,6 +199,7 @@ function MapEventHandler({
   hoveredBuildingId: string | null;
 }) {
   const map = useMap();
+  const isDark = useIsDarkMode();
 
   const updateBounds = useCallback(() => {
     const bounds = map.getBounds();
@@ -116,6 +220,83 @@ function MapEventHandler({
     updateBounds();
   }, []);
 
+  const getPopupContent = (building: MapBuildingData) => {
+    const statusColors: Record<string, { bg: string; text: string; border: string }> = {
+      active: { bg: '#dcfce7', text: '#166534', border: '#86efac' },
+      scheduled: { bg: '#dbeafe', text: '#1e40af', border: '#93c5fd' },
+      completed: { bg: '#f3f4f6', text: '#374151', border: '#d1d5db' },
+    };
+    const colors = statusColors[building.status] || statusColors.completed;
+    
+    const popupDark = document.documentElement.classList.contains('dark');
+    const bgColor = popupDark ? 'hsl(var(--card))' : '#ffffff';
+    const textColor = popupDark ? 'hsl(var(--card-foreground))' : '#1f2937';
+    const mutedColor = popupDark ? 'hsl(var(--muted-foreground))' : '#6b7280';
+    
+    return `
+      <div style="padding: 16px; background: ${bgColor};">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+          <span style="
+            font-weight: 600;
+            font-size: 14px;
+            color: ${textColor};
+          ">${building.buildingName || building.strataPlanNumber}</span>
+          <span style="
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-size: 10px;
+            font-weight: 500;
+            background: ${colors.bg};
+            color: ${colors.text};
+            border: 1px solid ${colors.border};
+            text-transform: uppercase;
+          ">${building.status}</span>
+        </div>
+        ${building.buildingAddress ? `
+          <p style="
+            font-size: 12px;
+            color: ${mutedColor};
+            margin: 0 0 8px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 4px;
+          ">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            ${building.buildingAddress}
+          </p>
+        ` : ''}
+        <div style="
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          font-size: 11px;
+          color: ${mutedColor};
+          padding-top: 8px;
+          border-top: 1px solid ${popupDark ? 'hsl(var(--border))' : '#e5e7eb'};
+        ">
+          <span style="display: flex; align-items: center; gap: 4px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 7h-9"/>
+              <path d="M14 17H5"/>
+              <circle cx="17" cy="17" r="3"/>
+              <circle cx="7" cy="7" r="3"/>
+            </svg>
+            ${building.customJobType || building.jobType.replace(/_/g, ' ')}
+          </span>
+        </div>
+        <p style="
+          font-size: 11px;
+          color: ${mutedColor};
+          margin: 6px 0 0 0;
+          font-weight: 500;
+        ">${building.vendorName}</p>
+      </div>
+    `;
+  };
+
   return (
     <>
       {buildings.filter(b => b.latitude && b.longitude).map(building => (
@@ -131,14 +312,7 @@ function MapEventHandler({
           }}
         >
           <Popup>
-            <div className="text-sm">
-              <p className="font-medium">{building.buildingName || building.strataPlanNumber}</p>
-              {building.buildingAddress && (
-                <p className="text-muted-foreground text-xs">{building.buildingAddress}</p>
-              )}
-              <p className="text-xs mt-1">{building.jobType.replace(/_/g, ' ')}</p>
-              <p className="text-xs text-muted-foreground">{building.vendorName}</p>
-            </div>
+            <div dangerouslySetInnerHTML={{ __html: getPopupContent(building) }} />
           </Popup>
         </Marker>
       ))}
@@ -152,11 +326,35 @@ function FlyToBuilding({ building }: { building: MapBuildingData | null }) {
   useEffect(() => {
     if (building?.latitude && building?.longitude) {
       map.flyTo([parseFloat(building.latitude), parseFloat(building.longitude)], 16, {
-        duration: 0.5,
+        duration: 1,
+        easeLinearity: 0.25,
       });
     }
   }, [building, map]);
 
+  return null;
+}
+
+// Auto-fit map to show all markers
+function FitBounds({ buildings }: { buildings: MapBuildingData[] }) {
+  const map = useMap();
+  
+  useEffect(() => {
+    const validBuildings = buildings.filter(b => b.latitude && b.longitude);
+    if (validBuildings.length === 0) return;
+    
+    if (validBuildings.length === 1) {
+      const b = validBuildings[0];
+      map.setView([parseFloat(b.latitude!), parseFloat(b.longitude!)], 14);
+      return;
+    }
+    
+    const bounds = L.latLngBounds(
+      validBuildings.map(b => [parseFloat(b.latitude!), parseFloat(b.longitude!)] as [number, number])
+    );
+    map.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 });
+  }, [buildings.length]);
+  
   return null;
 }
 
@@ -166,6 +364,7 @@ interface PropertyManagerBuildingsMapProps {
 
 export function PropertyManagerBuildingsMap({ onBuildingSelect }: PropertyManagerBuildingsMapProps) {
   const { t } = useTranslation();
+  const isDarkMode = useIsDarkMode();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedBuilding, setSelectedBuilding] = useState<MapBuildingData | null>(null);
   const [hoveredBuildingId, setHoveredBuildingId] = useState<string | null>(null);
@@ -174,6 +373,11 @@ export function PropertyManagerBuildingsMap({ onBuildingSelect }: PropertyManage
 
   const DEFAULT_CENTER: [number, number] = [49.2827, -123.1207];
   const DEFAULT_ZOOM = 11;
+
+  // Inject custom styles on mount
+  useEffect(() => {
+    injectCustomStyles();
+  }, []);
 
   const { data: buildingsData, isLoading } = useQuery<{ buildings: MapBuildingData[] }>({
     queryKey: ["/api/property-managers/me/buildings-map"],
@@ -227,14 +431,30 @@ export function PropertyManagerBuildingsMap({ onBuildingSelect }: PropertyManage
   };
 
   const getStatusBadge = (status: string) => {
-    const statusConfig: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
-      active: { label: t('propertyManager.map.status.active', 'Active'), variant: "default" },
-      scheduled: { label: t('propertyManager.map.status.scheduled', 'Scheduled'), variant: "secondary" },
-      completed: { label: t('propertyManager.map.status.completed', 'Completed'), variant: "outline" },
+    const statusConfig: Record<string, { label: string; className: string }> = {
+      active: { 
+        label: t('propertyManager.map.status.active', 'Active'), 
+        className: 'bg-emerald-500 text-white border-emerald-600' 
+      },
+      scheduled: { 
+        label: t('propertyManager.map.status.scheduled', 'Scheduled'), 
+        className: 'bg-blue-500 text-white border-blue-600' 
+      },
+      completed: { 
+        label: t('propertyManager.map.status.completed', 'Completed'), 
+        className: 'bg-gray-400 text-white border-gray-500' 
+      },
     };
-    const config = statusConfig[status] || { label: status, variant: "outline" };
-    return <Badge variant={config.variant} className="text-xs">{config.label}</Badge>;
+    const config = statusConfig[status] || { label: status, className: 'bg-gray-400 text-white' };
+    return <Badge className={`text-xs ${config.className}`}>{config.label}</Badge>;
   };
+
+  // Choose tile layer based on dark mode
+  const tileUrl = isDarkMode 
+    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+    : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+  
+  const tileAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
 
   if (isLoading) {
     return (
@@ -262,16 +482,17 @@ export function PropertyManagerBuildingsMap({ onBuildingSelect }: PropertyManage
 
   return (
     <div className="flex flex-col lg:flex-row gap-4 h-[600px]">
-      <div className="lg:w-[60%] h-full rounded-lg overflow-hidden border">
+      <div className="lg:w-[60%] h-full rounded-xl overflow-hidden border shadow-lg relative z-0">
         <MapContainer
           center={DEFAULT_CENTER}
           zoom={DEFAULT_ZOOM}
           style={{ height: "100%", width: "100%" }}
           scrollWheelZoom={true}
+          zoomControl={true}
         >
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution={tileAttribution}
+            url={tileUrl}
           />
           <MapEventHandler
             onBoundsChange={handleBoundsChange}
@@ -281,11 +502,12 @@ export function PropertyManagerBuildingsMap({ onBuildingSelect }: PropertyManage
             hoveredBuildingId={hoveredBuildingId}
           />
           <FlyToBuilding building={flyToBuilding} />
+          <FitBounds buildings={buildings} />
         </MapContainer>
       </div>
 
       <div className="lg:w-[40%] flex flex-col gap-4">
-        <Card className="flex-1 flex flex-col overflow-hidden">
+        <Card className="flex-1 flex flex-col overflow-hidden shadow-lg">
           <CardHeader className="pb-2">
             <CardTitle className="text-lg flex items-center gap-2">
               <Building2 className="h-5 w-5" />
@@ -314,10 +536,10 @@ export function PropertyManagerBuildingsMap({ onBuildingSelect }: PropertyManage
                 {filteredBuildings.map((building) => (
                   <div
                     key={building.projectId}
-                    className={`p-3 rounded-lg border cursor-pointer transition-colors hover-elevate ${
+                    className={`p-3 rounded-lg border cursor-pointer transition-all duration-200 hover-elevate ${
                       selectedBuilding?.projectId === building.projectId
-                        ? 'border-primary bg-primary/5'
-                        : 'border-border'
+                        ? 'border-primary bg-primary/5 shadow-md'
+                        : 'border-border hover:shadow-sm'
                     }`}
                     onClick={() => handleListItemClick(building)}
                     onMouseEnter={() => setHoveredBuildingId(building.projectId)}
@@ -367,17 +589,20 @@ export function PropertyManagerBuildingsMap({ onBuildingSelect }: PropertyManage
           </CardContent>
         </Card>
 
-        <div className="flex flex-wrap gap-2 text-xs">
-          <div className="flex items-center gap-1">
-            <span className="w-3 h-3 rounded-full bg-green-500"></span>
+        <div className="flex flex-wrap gap-4 text-xs bg-card/50 backdrop-blur-sm rounded-lg p-3 border">
+          <div className="flex items-center gap-2">
+            <span className="relative">
+              <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-75"></span>
+              <span className="relative w-3 h-3 rounded-full bg-emerald-500 block"></span>
+            </span>
             {t('propertyManager.map.legend.active', 'Active')}
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             <span className="w-3 h-3 rounded-full bg-blue-500"></span>
             {t('propertyManager.map.legend.scheduled', 'Scheduled')}
           </div>
-          <div className="flex items-center gap-1">
-            <span className="w-3 h-3 rounded-full bg-gray-500"></span>
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-gray-400"></span>
             {t('propertyManager.map.legend.completed', 'Completed')}
           </div>
         </div>

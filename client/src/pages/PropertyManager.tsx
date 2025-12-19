@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Building2, Plus, Mail, Phone, Settings, FileText, Download, AlertCircle, CheckCircle2, Clock, Upload, FileCheck, Trash2, User, Shield, Users, Map } from "lucide-react";
+import { Building2, Plus, Mail, Phone, Settings, FileText, Download, AlertCircle, CheckCircle2, Clock, Upload, FileCheck, Trash2, User, Shield, Users, Map, MapPin, Save, Loader2 } from "lucide-react";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { PropertyManagerBuildingsMap, MapBuildingData } from "@/components/PropertyManagerBuildingsMap";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
 import { formatLocalDate, formatTimestampDate, formatTime, formatDurationMs } from "@/lib/dateUtils";
@@ -77,6 +78,11 @@ export default function PropertyManager() {
     tradeParkingSpots: "",
     tradeWashroomLocation: "",
     specialRequests: "",
+  });
+  const [buildingAddressForm, setBuildingAddressForm] = useState({
+    address: "",
+    latitude: null as number | null,
+    longitude: null as number | null,
   });
   
   const accountForm = useForm<UpdatePropertyManagerAccount>({
@@ -240,6 +246,30 @@ export default function PropertyManager() {
       toast({
         title: t('propertyManager.toasts.saveFailed', 'Save Failed'),
         description: error.message || t('propertyManager.toasts.instructionsSaveFailedDesc', 'Failed to save building instructions.'),
+        variant: "destructive",
+      });
+    },
+  });
+
+  const saveBuildingAddressMutation = useMutation({
+    mutationFn: async (data: typeof buildingAddressForm) => {
+      const buildingId = projectDetailsData?.project?.buildingId;
+      if (!buildingId) throw new Error("Building not found");
+      return await apiRequest("PATCH", `/api/buildings/${buildingId}/address`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ 
+        queryKey: ["/api/property-managers/vendors", selectedVendor?.linkId, "projects"] 
+      });
+      toast({
+        title: t('common.saved', 'Saved'),
+        description: t('propertyManager.toasts.addressUpdated', 'Building address has been updated.'),
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: t('common.error', 'Error'),
+        description: error.message || t('propertyManager.toasts.addressUpdateFailed', 'Failed to update building address.'),
         variant: "destructive",
       });
     },
@@ -420,6 +450,14 @@ export default function PropertyManager() {
         tradeParkingSpots: "",
         tradeWashroomLocation: "",
         specialRequests: "",
+      });
+    }
+    // Also set building address from project data
+    if (projectDetailsData?.project) {
+      setBuildingAddressForm({
+        address: projectDetailsData.project.buildingAddress || "",
+        latitude: null,
+        longitude: null,
       });
     }
   }, [projectDetailsData]);
@@ -2075,6 +2113,45 @@ export default function PropertyManager() {
             </div>
 
             <div className="space-y-4 py-4">
+              {/* Building Address */}
+              <div className="space-y-3">
+                <h4 className="text-sm font-medium flex items-center gap-2">
+                  <MapPin className="h-4 w-4" />
+                  {t('propertyManager.buildingInstructions.buildingAddress', 'Building Address')}
+                </h4>
+                <div className="space-y-2">
+                  <AddressAutocomplete
+                    value={buildingAddressForm.address}
+                    onChange={(value) => setBuildingAddressForm(prev => ({ ...prev, address: value }))}
+                    onSelect={(address, lat, lng) => {
+                      setBuildingAddressForm({ address, latitude: lat, longitude: lng });
+                    }}
+                    placeholder={t('propertyManager.buildingInstructions.addressPlaceholder', 'Start typing to search...')}
+                    data-testid="input-pm-building-address"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {t('propertyManager.buildingInstructions.addressHint', 'Select from suggestions to capture coordinates for map display')}
+                  </p>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => saveBuildingAddressMutation.mutate(buildingAddressForm)}
+                    disabled={saveBuildingAddressMutation.isPending || !buildingAddressForm.address}
+                    data-testid="button-save-pm-address"
+                  >
+                    {saveBuildingAddressMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    ) : (
+                      <Save className="h-4 w-4 mr-2" />
+                    )}
+                    {t('propertyManager.buildingInstructions.saveAddress', 'Save Address')}
+                  </Button>
+                </div>
+              </div>
+
+              <Separator />
+
               {/* Access Information */}
               <div className="space-y-3">
                 <h4 className="text-sm font-medium">{t('propertyManager.buildingInstructions.accessInfo', 'Access Information')}</h4>

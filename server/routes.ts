@@ -5640,6 +5640,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update building address with coordinates (Building managers, Property managers, SuperUser)
+  app.patch("/api/buildings/:buildingId/address", async (req: Request, res: Response) => {
+    try {
+      const { buildingId } = req.params;
+      const { address, latitude, longitude } = req.body;
+
+      // SuperUser can update any building
+      if (req.session.userId === 'superuser') {
+        await storage.updateBuildingAddress(buildingId, address, latitude, longitude);
+        return res.json({ success: true });
+      }
+
+      // Building manager session (uses buildingId, not userId)
+      if (req.session.role === 'building' && req.session.buildingId) {
+        if (req.session.buildingId === buildingId) {
+          await storage.updateBuildingAddress(buildingId, address, latitude, longitude);
+          return res.json({ success: true });
+        }
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      // Regular user session
+      if (!req.session.userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      const user = await storage.getUserById(req.session.userId);
+      if (!user) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      // Property managers can update buildings they are linked to via strata numbers
+      if (user.role === 'property_manager') {
+        const links = await storage.getPropertyManagerVendorLinks(user.id);
+        const allStrataNums = links.flatMap(link => 
+          (link.strataNumbers || []).map(s => s.toUpperCase().replace(/\s/g, ''))
+        );
+        const building = await storage.getBuildingById(buildingId);
+        if (building && allStrataNums.includes(building.strataPlanNumber.toUpperCase().replace(/\s/g, ''))) {
+          await storage.updateBuildingAddress(buildingId, address, latitude, longitude);
+          return res.json({ success: true });
+        }
+      }
+
+      // Company owners can update buildings they have projects for
+      if (user.role === 'company') {
+        const building = await storage.getBuildingById(buildingId);
+        if (building) {
+          const projects = await storage.getProjectsByCompany(user.id);
+          const hasProjectForBuilding = projects.some(p => 
+            p.strataPlanNumber && 
+            p.strataPlanNumber.toUpperCase().replace(/\s/g, '') === 
+            building.strataPlanNumber.toUpperCase().replace(/\s/g, '')
+          );
+          if (hasProjectForBuilding) {
+            await storage.updateBuildingAddress(buildingId, address, latitude, longitude);
+            return res.json({ success: true });
+          }
+        }
+      }
+
+      return res.status(403).json({ message: "Access denied" });
+    } catch (error) {
+      console.error('[BuildingAddress] Update error:', error);
+      res.status(500).json({ message: "Failed to update building address" });
+    }
+  });
+
   // Delete building instructions (SuperUser and building managers only)
   app.delete("/api/buildings/:buildingId/instructions", async (req: Request, res: Response) => {
     try {
@@ -10076,10 +10144,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
             totalFloors: project.totalFloors,
             buildingFloors: project.buildingFloors,
             dailyDropTarget: project.dailyDropTarget,
+            latitude: project.latitude,
+            longitude: project.longitude,
           });
         } catch (buildingError) {
           // Log but don't fail project creation if building creation fails
           console.error("[Buildings] Failed to auto-create building:", buildingError);
+        }
+      }
+      
+      // If a clientId is provided, add the building to the client's lmsNumbers if not already present
+      if (project.clientId && project.strataPlanNumber) {
+        try {
+          const client = await storage.getClient(project.clientId);
+          if (client) {
+            const normalizedStrata = normalizeStrataPlan(project.strataPlanNumber);
+            const existingBuildings = client.lmsNumbers || [];
+            
+            // Check if this strata already exists in the client's buildings
+            const strataExists = existingBuildings.some(
+              (b: { number: string }) => normalizeStrataPlan(b.number) === normalizedStrata
+            );
+            
+            if (!strataExists) {
+              // Add the new building to the client's lmsNumbers
+              const newBuilding = {
+                number: project.strataPlanNumber,
+                buildingName: project.buildingName || undefined,
+                address: project.buildingAddress || '',
+                stories: project.floorCount || project.buildingFloors || undefined,
+                parkingStalls: project.totalStalls || undefined,
+                dailyDropTarget: project.dailyDropTarget || undefined,
+                totalDropsNorth: project.totalDropsNorth || undefined,
+                totalDropsEast: project.totalDropsEast || undefined,
+                totalDropsSouth: project.totalDropsSouth || undefined,
+                totalDropsWest: project.totalDropsWest || undefined,
+              };
+              
+              await storage.updateClient(project.clientId, {
+                lmsNumbers: [...existingBuildings, newBuilding],
+              });
+              
+              console.log(`[Clients] Added new building ${normalizedStrata} to client ${client.firstName} ${client.lastName}`);
+            }
+          }
+        } catch (clientError) {
+          // Log but don't fail project creation
+          console.error("[Clients] Failed to add building to client:", clientError);
         }
       }
       

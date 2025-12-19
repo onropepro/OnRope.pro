@@ -15,9 +15,10 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate, formatLocalDateLong } from "@/lib/dateUtils";
-import { Loader2, Building2, History, CheckCircle, Clock, AlertCircle, LogOut, Lock, Hash, ArrowLeft, KeyRound, DoorOpen, Phone, User, Wrench, FileText, Pencil, Save, Copy, Users, Download, Megaphone } from "lucide-react";
+import { Loader2, Building2, History, CheckCircle, Clock, AlertCircle, LogOut, Lock, Hash, ArrowLeft, KeyRound, DoorOpen, Phone, User, Wrench, FileText, Pencil, Save, Copy, Users, Download, Megaphone, MapPin } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { loadLogoAsBase64 } from "@/lib/pdfBranding";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import type { BuildingInstructions } from "@shared/schema";
 
 interface BuildingData {
@@ -130,6 +131,11 @@ export default function BuildingPortal() {
     tradeParkingSpots: "",
     tradeWashroomLocation: "",
   });
+  const [addressForm, setAddressForm] = useState({
+    address: "",
+    latitude: null as number | null,
+    longitude: null as number | null,
+  });
 
   const { 
     data: portalData, 
@@ -180,6 +186,17 @@ export default function BuildingPortal() {
     }
   }, [buildingInstructions]);
 
+  // Initialize address form when building data is loaded
+  useEffect(() => {
+    if (portalData?.building) {
+      setAddressForm({
+        address: portalData.building.address || "",
+        latitude: null,
+        longitude: null,
+      });
+    }
+  }, [portalData?.building]);
+
   const saveInstructionsMutation = useMutation({
     mutationFn: async (data: typeof instructionsForm) => {
       const response = await apiRequest("POST", `/api/buildings/${buildingId}/instructions`, data);
@@ -197,6 +214,27 @@ export default function BuildingPortal() {
       toast({
         title: "Save Failed",
         description: error.message || "Failed to save building instructions.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const saveAddressMutation = useMutation({
+    mutationFn: async (data: typeof addressForm) => {
+      const response = await apiRequest("PATCH", `/api/buildings/${buildingId}/address`, data);
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: t("common.saved"),
+        description: "Building address has been updated.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/building/portal"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: t("common.error"),
+        description: error.message || "Failed to update building address.",
         variant: "destructive",
       });
     },
@@ -1193,6 +1231,46 @@ export default function BuildingPortal() {
           </DialogHeader>
           
           <div className="space-y-6 py-4">
+            {/* Building Address Section */}
+            <div className="space-y-4">
+              <h4 className="font-medium flex items-center gap-2">
+                <MapPin className="h-4 w-4" />
+                Building Address
+              </h4>
+              <div className="space-y-2">
+                <Label>Address</Label>
+                <AddressAutocomplete
+                  value={addressForm.address}
+                  onChange={(value) => setAddressForm(prev => ({ ...prev, address: value }))}
+                  onSelect={(address, lat, lng) => {
+                    setAddressForm({ address, latitude: lat, longitude: lng });
+                  }}
+                  placeholder="Start typing to search..."
+                  data-testid="input-building-address"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Select from suggestions to capture coordinates for map display
+                </p>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => saveAddressMutation.mutate(addressForm)}
+                  disabled={saveAddressMutation.isPending || !addressForm.address}
+                  data-testid="button-save-address"
+                >
+                  {saveAddressMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : (
+                    <Save className="h-4 w-4 mr-2" />
+                  )}
+                  Save Address
+                </Button>
+              </div>
+            </div>
+
+            <Separator />
+
             {/* Contact Information Section */}
             <div className="space-y-4">
               <h4 className="font-medium flex items-center gap-2">

@@ -26,7 +26,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Check, ChevronsUpDown, Star, Calculator } from "lucide-react";
+import { Check, ChevronsUpDown, Star, Calculator, ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
@@ -1176,6 +1176,8 @@ export default function Dashboard() {
   const [selectedStrataForProject, setSelectedStrataForProject] = useState<string>("");
   const isManualEntryRef = useRef(false);
   const [clientDropdownOpen, setClientDropdownOpen] = useState(false);
+  const [clientDropdownStep, setClientDropdownStep] = useState<"clients" | "buildings">("clients");
+  const [selectedClientInDropdown, setSelectedClientInDropdown] = useState<string | null>(null);
   const [clientSearchQuery, setClientSearchQuery] = useState("");
   const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
   const [employeeToSuspendSeat, setEmployeeToSuspendSeat] = useState<any | null>(null); // For seat removal/suspend
@@ -2556,6 +2558,10 @@ export default function Dashboard() {
       ...normalizedData,
       ropeAccessPlanUrl,
       anchorInspectionCertificateUrl,
+      // Include clientId if a client was selected (even if strata was changed to new one)
+      clientId: selectedClientForProject && selectedClientForProject !== "manual" 
+        ? (selectedClientForProject.includes('|') ? selectedClientForProject.split('|')[0] : selectedClientForProject)
+        : undefined,
     });
     setUploadedPlanFile(null);
     setUploadedAnchorCertFile(null);
@@ -3961,7 +3967,13 @@ export default function Dashboard() {
                         })} className="space-y-4">
                         <div className="mb-4">
                           <label className="text-sm font-medium mb-2 block">{t('dashboard.projects.quickFill', 'Quick Fill from Client Database')}</label>
-                          <Popover open={clientDropdownOpen} onOpenChange={setClientDropdownOpen}>
+                          <Popover open={clientDropdownOpen} onOpenChange={(open) => {
+                              setClientDropdownOpen(open);
+                              if (!open) {
+                                setClientDropdownStep("clients");
+                                setSelectedClientInDropdown(null);
+                              }
+                            }}>
                             <PopoverTrigger asChild>
                               <Button
                                 variant="outline"
@@ -3974,8 +3986,11 @@ export default function Dashboard() {
                                   ? (() => {
                                       const [clientId, strataIdx] = selectedStrataForProject.split("|");
                                       const client = clientsData?.find(c => c.id === clientId);
+                                      if (strataIdx === "new") {
+                                        return `${client?.firstName} ${client?.lastName} - ${t('dashboard.projects.newBuilding', 'New Building')}`;
+                                      }
                                       const strata = client?.lmsNumbers?.[parseInt(strataIdx)];
-                                      return strata ? `${strata.number} - ${client.firstName} ${client.lastName}` : t('dashboard.createProject.selectBuilding', 'Select a client');
+                                      return strata ? `${strata.number} - ${client?.firstName} ${client?.lastName}` : t('dashboard.createProject.selectBuilding', 'Select a client');
                                     })()
                                   : selectedStrataForProject === "manual"
                                   ? t('dashboard.projects.enterManually', 'Enter Details Manually')
@@ -3985,60 +4000,129 @@ export default function Dashboard() {
                             </PopoverTrigger>
                             <PopoverContent className="w-[400px] p-0">
                               <Command>
-                                <CommandInput placeholder={t('dashboard.projects.searchClientPlaceholder', 'Search by client, strata, or address...')} />
+                                <CommandInput placeholder={clientDropdownStep === "clients" 
+                                  ? t('dashboard.projects.searchClientsPlaceholder', 'Search clients...') 
+                                  : t('dashboard.projects.searchBuildingsPlaceholder', 'Search buildings...')} 
+                                />
                                 <CommandList>
-                                  <CommandEmpty>
-                                    <div className="py-6 text-center">
-                                      <p className="text-sm text-muted-foreground mb-3">{t('dashboard.projects.noClientsFound', 'No clients found.')}</p>
-                                      <Button
-                                        className="bg-primary text-primary-foreground hover:bg-primary/90"
-                                        size="default"
-                                        onClick={() => {
-                                          handleClientStrataSelection("manual");
-                                          setClientDropdownOpen(false);
-                                        }}
-                                        data-testid="button-manual-entry-empty"
-                                      >
-                                        <span className="material-icons mr-2">edit</span>
-                                        {t('dashboard.projects.enterManually', 'Enter Details Manually')}
-                                      </Button>
-                                    </div>
-                                  </CommandEmpty>
-                                  <CommandGroup>
-                                    <CommandItem
-                                      value="manual"
-                                      onSelect={() => {
-                                        handleClientStrataSelection("manual");
-                                        setClientDropdownOpen(false);
-                                      }}
-                                      className="!bg-primary !text-primary-foreground font-medium hover:!bg-primary/90 rounded-xl mx-2 my-1"
-                                    >
-                                      <span className="material-icons mr-2 text-sm">edit</span>
-                                      {t('dashboard.projects.enterManually', 'Enter Details Manually')}
-                                    </CommandItem>
-                                    {clientsData && clientsData.length > 0 && clientsData.flatMap((client) =>
-                                      client.lmsNumbers && client.lmsNumbers.length > 0
-                                        ? client.lmsNumbers.map((strata, idx) => (
-                                            <CommandItem
-                                              key={`${client.id}-${idx}`}
-                                              value={`${strata.number} ${client.firstName} ${client.lastName} ${strata.address || ""}`}
-                                              onSelect={() => {
-                                                handleClientStrataSelection(`${client.id}|${idx}`);
-                                                setClientDropdownOpen(false);
-                                              }}
-                                            >
-                                              <Check
-                                                className={`mr-2 h-4 w-4 ${selectedStrataForProject === `${client.id}|${idx}` ? "opacity-100" : "opacity-0"}`}
-                                              />
+                                  {clientDropdownStep === "clients" ? (
+                                    <>
+                                      {(!clientsData || clientsData.length === 0) && (
+                                        <div className="py-4 text-center text-sm text-muted-foreground">
+                                          {t('dashboard.projects.noClientsAvailable', 'No clients in database. Enter details manually.')}
+                                        </div>
+                                      )}
+                                      <CommandGroup heading={t('dashboard.projects.options', 'Options')}>
+                                        <CommandItem
+                                          value="manual"
+                                          onSelect={() => {
+                                            handleClientStrataSelection("manual");
+                                            setClientDropdownOpen(false);
+                                            setClientDropdownStep("clients");
+                                          }}
+                                          className="!bg-primary !text-primary-foreground font-medium hover:!bg-primary/90 rounded-xl mx-2 my-1"
+                                        >
+                                          <span className="material-icons mr-2 text-sm">edit</span>
+                                          {t('dashboard.projects.enterManually', 'Enter Details Manually')}
+                                        </CommandItem>
+                                      </CommandGroup>
+                                      <CommandGroup heading={t('dashboard.projects.selectClient', 'Select a Client')}>
+                                        {clientsData && clientsData.length > 0 && clientsData.map((client) => (
+                                          <CommandItem
+                                            key={client.id}
+                                            value={`${client.firstName} ${client.lastName} ${client.companyName || ""}`}
+                                            onSelect={() => {
+                                              setSelectedClientInDropdown(client.id);
+                                              setClientDropdownStep("buildings");
+                                            }}
+                                          >
+                                            <div className="flex items-center gap-2">
+                                              <span className="material-icons text-muted-foreground">person</span>
                                               <div className="flex flex-col">
-                                                <span className="font-medium">{strata.number} - {client.firstName} {client.lastName}</span>
-                                                {strata.address && <span className="text-xs text-muted-foreground">{strata.address}</span>}
+                                                <span className="font-medium">{client.firstName} {client.lastName}</span>
+                                                {client.companyName && <span className="text-xs text-muted-foreground">{client.companyName}</span>}
+                                                <span className="text-xs text-muted-foreground">
+                                                  {client.lmsNumbers?.length || 0} {t('dashboard.projects.buildings', 'building(s)')}
+                                                </span>
                                               </div>
-                                            </CommandItem>
-                                          ))
-                                        : []
-                                    )}
-                                  </CommandGroup>
+                                            </div>
+                                            <ChevronRight className="ml-auto h-4 w-4 opacity-50" />
+                                          </CommandItem>
+                                        ))}
+                                      </CommandGroup>
+                                    </>
+                                  ) : (
+                                    <>
+                                      {(() => {
+                                        const selectedClient = clientsData?.find(c => c.id === selectedClientInDropdown);
+                                        return (
+                                          <>
+                                            <CommandGroup>
+                                              <CommandItem
+                                                value="back-to-clients"
+                                                onSelect={() => {
+                                                  setClientDropdownStep("clients");
+                                                  setSelectedClientInDropdown(null);
+                                                }}
+                                                className="text-muted-foreground"
+                                              >
+                                                <ChevronLeft className="mr-2 h-4 w-4" />
+                                                {t('dashboard.projects.backToClients', 'Back to Clients')}
+                                              </CommandItem>
+                                            </CommandGroup>
+                                            <CommandGroup heading={selectedClient ? `${selectedClient.firstName} ${selectedClient.lastName}` : t('dashboard.projects.buildings', 'Buildings')}>
+                                              <CommandItem
+                                                value="add-new-building"
+                                                onSelect={() => {
+                                                  setSelectedClientForProject(selectedClientInDropdown || "");
+                                                  setSelectedStrataForProject(`${selectedClientInDropdown}|new`);
+                                                  isManualEntryRef.current = false;
+                                                  projectForm.setValue("strataPlanNumber", "");
+                                                  projectForm.setValue("buildingName", "");
+                                                  projectForm.setValue("buildingAddress", "");
+                                                  projectForm.setValue("floorCount", "");
+                                                  projectForm.setValue("totalStalls", "");
+                                                  projectForm.setValue("dailyDropTarget", "");
+                                                  projectForm.setValue("totalDropsNorth", "");
+                                                  projectForm.setValue("totalDropsEast", "");
+                                                  projectForm.setValue("totalDropsSouth", "");
+                                                  projectForm.setValue("totalDropsWest", "");
+                                                  projectForm.setValue("latitude", null as any);
+                                                  projectForm.setValue("longitude", null as any);
+                                                  setClientDropdownOpen(false);
+                                                  setClientDropdownStep("clients");
+                                                }}
+                                                className="!bg-accent font-medium rounded-xl mx-2 my-1"
+                                              >
+                                                <Plus className="mr-2 h-4 w-4" />
+                                                {t('dashboard.projects.addNewBuilding', 'Add New Building for this Client')}
+                                              </CommandItem>
+                                              {selectedClient?.lmsNumbers?.map((strata, idx) => (
+                                                <CommandItem
+                                                  key={`${selectedClient.id}-${idx}`}
+                                                  value={`${strata.number} ${strata.address || ""} ${strata.buildingName || ""}`}
+                                                  onSelect={() => {
+                                                    handleClientStrataSelection(`${selectedClient.id}|${idx}`);
+                                                    setClientDropdownOpen(false);
+                                                    setClientDropdownStep("clients");
+                                                  }}
+                                                >
+                                                  <Check
+                                                    className={`mr-2 h-4 w-4 ${selectedStrataForProject === `${selectedClient.id}|${idx}` ? "opacity-100" : "opacity-0"}`}
+                                                  />
+                                                  <div className="flex flex-col">
+                                                    <span className="font-medium">{strata.number}</span>
+                                                    {strata.buildingName && <span className="text-xs text-muted-foreground">{strata.buildingName}</span>}
+                                                    {strata.address && <span className="text-xs text-muted-foreground">{strata.address}</span>}
+                                                  </div>
+                                                </CommandItem>
+                                              ))}
+                                            </CommandGroup>
+                                          </>
+                                        );
+                                      })()}
+                                    </>
+                                  )}
                                 </CommandList>
                               </Command>
                             </PopoverContent>
