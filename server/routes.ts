@@ -10162,7 +10162,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // If a clientId is provided, add the building to the client's lmsNumbers if not already present
       if (project.clientId && project.strataPlanNumber) {
         try {
-          const client = await storage.getClient(project.clientId);
+          const client = await storage.getClientById(project.clientId);
           if (client) {
             const normalizedStrata = normalizeStrataPlan(project.strataPlanNumber);
             const existingBuildings = client.lmsNumbers || [];
