@@ -6,6 +6,16 @@ Two-way feedback system connecting building residents with service providers.
 
 The Resident Portal creates a direct communication channel between building residents and rope access service providers. Residents can submit issues with photo evidence, track status, and receive updates. Vendors manage feedback centrally, improving response times and resident satisfaction.
 
+## Portal Navigation
+
+The Resident Portal has five main tabs:
+
+1. **Progress** - View real-time project completion status
+2. **My Photos** - Access photos related to your building's work
+3. **Submit** - Submit new feedback or concerns
+4. **Feedback** - View your feedback history and status
+5. **Notices** - Read official work notices from your building
+
 ## The Company Code (10-Character Code)
 
 The **Company Code** is a 10-character alphanumeric code that connects residents to their service provider. This is sometimes called the "vendor code" or "company number".
@@ -45,31 +55,62 @@ This creates a portable account system. As vendors add more buildings, the netwo
 
 ## Key Features
 
-### For Residents
+### Progress Tab
 
-#### Issue Submission
-- Report maintenance issues
-- Upload photo evidence
-- Describe the problem
-- Select issue category
+View real-time project completion with visual progress indicators:
 
-#### Status Tracking
-Issues move through statuses:
-- **New**: Just submitted
-- **Viewed**: Vendor has seen it
-- **Closed**: Issue resolved
+- **Total Drops Summary** - Shows overall completion (e.g., "22 of 50 Total Drops Complete")
+- **Elevation Breakdown** - Progress for each building face (North, East, South, West)
+- **Visual Fill Bars** - Intuitive fill-level indicators showing completion percentage
+- **Detailed Stats** - Shows drops completed vs total (e.g., "4/12" for North elevation at 33%)
 
-#### Communication
-- Receive updates on submitted issues
-- View vendor replies
-- Track resolution progress
+The progress display updates automatically as technicians complete their work, giving you real-time visibility into project status.
 
-#### Resilient Photo Uploads
-Photos are uploaded reliably even during temporary storage issues:
-- Your feedback is saved immediately (photos never block submission)
-- Photos upload in the background automatically
-- If upload fails, the system retries up to 5 times with increasing delays
-- You receive confirmation that your photo is being processed
+### Submit Feedback Tab
+
+Submit concerns or questions directly to the service team:
+
+**Required Fields:**
+- **Your Name** - Pre-filled from your account
+- **Phone Number** - Contact number for follow-up
+- **Unit Number** - Your apartment or suite number
+- **Which Project?** - Select from active projects at your building
+- **Message** - Describe your concern or question
+
+**Optional:**
+- **Photo Attachment** - Upload images showing the issue
+
+After submission, your feedback appears in the Feedback tab where you can track its status.
+
+### Feedback History Tab
+
+View the status of all your submitted feedback:
+
+- **Feedback List** - All your submissions in one place
+- **Status Badges** - Color-coded status indicators
+  - **Open** (Green) - Awaiting review by the service team
+  - **In Progress** - Currently being addressed
+  - **Closed** - Issue has been resolved
+- **Submission Details** - Unit number and date for each item
+- **Response Thread** - View replies from the service team
+
+### Work Notices Tab
+
+Access official notices about work at your building:
+
+- **Official Notices** - Important announcements with header badges
+- **Work Period** - Scheduled dates (e.g., "Thu, Dec 11 - Thu, Jan 8, 2026")
+- **Service Type** - Badge showing the type of work (e.g., "Window Cleaning")
+- **Notice Content** - Full details including:
+  - Privacy notices and recommendations
+  - Safety requirements
+  - What to expect during work
+- **View/PDF Options** - Read online or download as PDF
+
+Notices include important information like:
+- Closing blinds/curtains during work hours
+- Keeping windows and balcony doors closed
+- Securing loose items on balconies
 
 ### For Vendors (Rope Access Companies)
 
@@ -101,11 +142,11 @@ Photos are uploaded reliably even during temporary storage issues:
 ## How It Works
 
 ### Resident Access
-1. Resident visits the portal
+1. Resident visits onrope.pro/resident
 2. Enters vendor code (provided by building management)
 3. Enters their Strata/LMS number
 4. Creates account or logs in
-5. Submits and tracks issues
+5. Accesses all five portal tabs
 
 ### Vendor Workflow
 1. Navigate to Resident Feedback
@@ -152,10 +193,12 @@ Your feedback is never lost due to temporary storage issues. The system prioriti
 ## Benefits
 
 ### For Residents
-- Easy way to report issues
+- Real-time project progress visibility
+- Easy feedback submission
 - Track resolution status
 - Direct communication with service provider
 - Photo evidence capability
+- Official work notices access
 
 ### For Vendors
 - Centralized feedback management
@@ -194,6 +237,12 @@ A: Your feedback is saved immediately regardless of photo status. The system aut
 
 **Q: How long does photo upload take?**
 A: Photos typically upload within 30 seconds. You can check status in your feedback history.
+
+**Q: How do I know when technicians are working?**
+A: Check the Notices tab for official work schedules with specific dates and requirements.
+
+**Q: Can I track progress on my building's project?**
+A: Yes, the Progress tab shows real-time completion percentages for each building elevation.
 
 ## Related Modules
 
