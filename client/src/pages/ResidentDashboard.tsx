@@ -447,11 +447,26 @@ export default function ResidentDashboard() {
 
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (response: { complaint: any; photoStatus: string | null }) => {
       form.reset();
       setSelectedPhoto(null);
       queryClient.invalidateQueries({ queryKey: ["/api/complaints"] });
-      toast({ title: t('residentPortal.toast.messageSubmitted', 'Message submitted successfully') });
+      
+      // Show appropriate message based on photo status
+      if (response.photoStatus === "queued") {
+        toast({ 
+          title: t('residentPortal.toast.messageSubmitted', 'Message submitted successfully'),
+          description: t('residentPortal.toast.photoUploading', 'Your photo is being uploaded in the background')
+        });
+      } else if (response.photoStatus === "queue_failed") {
+        toast({ 
+          title: t('residentPortal.toast.messageSubmitted', 'Message submitted successfully'),
+          description: t('residentPortal.toast.photoUploadFailed', 'Photo could not be saved but your feedback was received'),
+          variant: "destructive"
+        });
+      } else {
+        toast({ title: t('residentPortal.toast.messageSubmitted', 'Message submitted successfully') });
+      }
       setActiveTab("history");
     },
     onError: (error: Error) => {
