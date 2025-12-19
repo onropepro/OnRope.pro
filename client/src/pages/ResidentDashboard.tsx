@@ -27,6 +27,9 @@ import { formatTimestampDate } from "@/lib/dateUtils";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
 import { loadLogoAsBase64 } from "@/lib/pdfBranding";
 
+// Official Resident color from stakeholder palette
+const RESIDENT_COLOR = "#86A59C";
+
 const createComplaintSchema = (t: (key: string, fallback: string) => string) => z.object({
   residentName: z.string().min(1, t('residentPortal.validation.nameRequired', 'Name is required')),
   phoneNumber: z.string().min(10, t('residentPortal.validation.phoneRequired', 'Valid phone number is required')),
@@ -491,7 +494,7 @@ export default function ResidentDashboard() {
       <div className="min-h-screen bg-background flex flex-col">
         <header 
           className="flex items-center justify-between p-4 border-b"
-          style={hasCustomBranding && primaryColor ? { borderColor: `${primaryColor}20` } : {}}
+          style={{ borderColor: `${hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR}20` }}
         >
           <div className="flex items-center gap-3">
             {branding.logoUrl ? (
@@ -502,11 +505,11 @@ export default function ResidentDashboard() {
                 data-testid="img-company-logo"
               />
             ) : (
-              <span className="material-icons text-2xl text-primary">apartment</span>
+              <span className="material-icons text-2xl" style={{ color: RESIDENT_COLOR }}>apartment</span>
             )}
             <h1 
               className="text-xl font-semibold"
-              style={hasCustomBranding && primaryColor ? { color: primaryColor } : {}}
+              style={{ color: hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR }}
             >
               {branding.companyName || t('residentPortal.title', 'Resident Portal')}
             </h1>
@@ -652,7 +655,7 @@ export default function ResidentDashboard() {
       <div className="min-h-screen bg-background flex flex-col">
         <header 
           className="flex items-center justify-between p-4 border-b"
-          style={hasCustomBranding && primaryColor ? { borderColor: `${primaryColor}20` } : {}}
+          style={{ borderColor: `${hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR}20` }}
         >
           <div className="flex items-center gap-3">
             {branding.logoUrl ? (
@@ -663,11 +666,11 @@ export default function ResidentDashboard() {
                 data-testid="img-company-logo"
               />
             ) : (
-              <span className="material-icons text-2xl text-primary">apartment</span>
+              <span className="material-icons text-2xl" style={{ color: RESIDENT_COLOR }}>apartment</span>
             )}
             <h1 
               className="text-xl font-semibold"
-              style={hasCustomBranding && primaryColor ? { color: primaryColor } : {}}
+              style={{ color: hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR }}
             >
               {branding.companyName || t('residentPortal.title', 'Resident Portal')}
             </h1>
@@ -846,7 +849,7 @@ export default function ResidentDashboard() {
       {/* Modern Header */}
       <header 
         className="sticky top-0 z-[100] bg-card/80 backdrop-blur-xl border-b border-border/50 shadow-lg"
-        style={hasCustomBranding && primaryColor ? { borderColor: `${primaryColor}30` } : {}}
+        style={{ borderColor: `${hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR}30` }}
       >
         <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="h-20 flex items-center justify-between">
@@ -862,10 +865,10 @@ export default function ResidentDashboard() {
                 </div>
               ) : (
                 <div 
-                  className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg"
-                  style={hasCustomBranding && primaryColor ? { 
-                    background: `linear-gradient(to bottom right, ${primaryColor}, ${primaryColor}99)` 
-                  } : {}}
+                  className="h-12 w-12 rounded-xl flex items-center justify-center shadow-lg"
+                  style={{ 
+                    background: `linear-gradient(to bottom right, ${hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR}, ${hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR}99)` 
+                  }}
                 >
                   <span className="material-icons text-white text-2xl">domain</span>
                 </div>
@@ -880,7 +883,7 @@ export default function ResidentDashboard() {
                   {companyData?.company?.residentCode && (
                     <span 
                       className="font-mono text-xs ml-2"
-                      style={hasCustomBranding && primaryColor ? { color: primaryColor } : {}}
+                      style={{ color: hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR }}
                     >
                       ({companyData.company.residentCode})
                     </span>
@@ -892,15 +895,15 @@ export default function ResidentDashboard() {
               <Badge 
                 variant="secondary" 
                 className="text-base px-4 py-2"
-                style={hasCustomBranding && primaryColor ? {
-                  backgroundColor: `${primaryColor}20`,
-                  borderColor: `${primaryColor}40`,
-                  color: primaryColor
-                } : {}}
+                style={{
+                  backgroundColor: `${hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR}20`,
+                  borderColor: `${hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR}40`,
+                  color: hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR
+                }}
               >
                 <span 
                   className="material-icons text-sm mr-1.5"
-                  style={hasCustomBranding && primaryColor ? { color: primaryColor } : {}}
+                  style={{ color: hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR }}
                 >
                   layers
                 </span>
@@ -942,7 +945,7 @@ export default function ResidentDashboard() {
               <div className="flex items-center gap-4">
                 <span 
                   className="material-icons"
-                  style={hasCustomBranding && primaryColor ? { color: primaryColor } : {}}
+                  style={{ color: hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR }}
                 >
                   apartment
                 </span>
@@ -977,16 +980,16 @@ export default function ResidentDashboard() {
         }} className="w-full">
           <TabsList 
             className="grid w-full grid-cols-5 mb-4"
-            style={hasCustomBranding && primaryColor ? {
-              borderColor: `${primaryColor}20`
-            } : {}}
+            style={{
+              borderColor: `${hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR}20`
+            }}
           >
             <TabsTrigger 
               value="building" 
               data-testid="tab-building"
-              style={hasCustomBranding && primaryColor ? {
-                '--custom-primary': primaryColor
-              } as React.CSSProperties : {}}
+              style={{
+                '--custom-primary': hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR
+              } as React.CSSProperties}
             >
               {t('residentPortal.tabs.progress', 'Progress')}
             </TabsTrigger>
@@ -994,9 +997,9 @@ export default function ResidentDashboard() {
               value="photos" 
               data-testid="tab-photos"
               className="relative"
-              style={hasCustomBranding && primaryColor ? {
-                '--custom-primary': primaryColor
-              } as React.CSSProperties : {}}
+              style={{
+                '--custom-primary': hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR
+              } as React.CSSProperties}
             >
               {t('residentPortal.tabs.myPhotos', 'My Photos')}
               {newPhotosCount > 0 && (
@@ -1012,9 +1015,9 @@ export default function ResidentDashboard() {
             <TabsTrigger 
               value="submit" 
               data-testid="tab-submit"
-              style={hasCustomBranding && primaryColor ? {
-                '--custom-primary': primaryColor
-              } as React.CSSProperties : {}}
+              style={{
+                '--custom-primary': hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR
+              } as React.CSSProperties}
             >
               {t('residentPortal.tabs.submit', 'Submit')}
             </TabsTrigger>
@@ -1022,9 +1025,9 @@ export default function ResidentDashboard() {
               value="history" 
               data-testid="tab-history"
               className="relative"
-              style={hasCustomBranding && primaryColor ? {
-                '--custom-primary': primaryColor
-              } as React.CSSProperties : {}}
+              style={{
+                '--custom-primary': hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR
+              } as React.CSSProperties}
             >
               {t('residentPortal.tabs.feedback', 'Feedback')}
               {newResponsesCount > 0 && (
@@ -1041,9 +1044,9 @@ export default function ResidentDashboard() {
               value="notices" 
               data-testid="tab-notices"
               className="relative"
-              style={hasCustomBranding && primaryColor ? {
-                '--custom-primary': primaryColor
-              } as React.CSSProperties : {}}
+              style={{
+                '--custom-primary': hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR
+              } as React.CSSProperties}
             >
               {t('residentPortal.tabs.notices', 'Notices')}
               {(workNoticesData?.notices?.length || 0) > 0 && (
@@ -1084,7 +1087,7 @@ export default function ResidentDashboard() {
                       <div className="text-center mb-8">
                         <h3 
                           className="text-5xl font-bold mb-2"
-                          style={hasCustomBranding && primaryColor ? { color: primaryColor } : {}}
+                          style={{ color: hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR }}
                         >
                           {Math.round(projectData.progressPercentage)}%
                         </h3>
@@ -1097,11 +1100,9 @@ export default function ResidentDashboard() {
                       <div className="relative h-8 bg-muted rounded-full overflow-hidden">
                         <div 
                           className="absolute inset-y-0 left-0 transition-all duration-500 ease-out"
-                          style={hasCustomBranding && primaryColor ? { 
+                          style={{ 
                             width: `${projectData.progressPercentage}%`,
-                            background: `linear-gradient(to right, ${primaryColor}, ${primaryColor}cc)`
-                          } : {
-                            width: `${projectData.progressPercentage}%`
+                            background: `linear-gradient(to right, ${hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR}, ${hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR}cc)`
                           }}
                         />
                       </div>
@@ -1114,7 +1115,7 @@ export default function ResidentDashboard() {
                       <div className="text-center mb-8">
                         <h3 
                           className="text-5xl font-bold mb-2"
-                          style={hasCustomBranding && primaryColor ? { color: primaryColor } : {}}
+                          style={{ color: hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR }}
                         >
                           {projectData.completedSuites} / {projectData.totalSuites}
                         </h3>
@@ -1127,11 +1128,9 @@ export default function ResidentDashboard() {
                       <div className="relative h-8 bg-muted rounded-full overflow-hidden">
                         <div 
                           className="absolute inset-y-0 left-0 transition-all duration-500 ease-out"
-                          style={hasCustomBranding && primaryColor ? { 
+                          style={{ 
                             width: `${projectData.totalSuites > 0 ? (projectData.completedSuites / projectData.totalSuites * 100) : 0}%`,
-                            background: `linear-gradient(to right, ${primaryColor}, ${primaryColor}cc)`
-                          } : {
-                            width: `${projectData.totalSuites > 0 ? (projectData.completedSuites / projectData.totalSuites * 100) : 0}%`
+                            background: `linear-gradient(to right, ${hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR}, ${hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR}cc)`
                           }}
                         />
                       </div>
@@ -1162,14 +1161,14 @@ export default function ResidentDashboard() {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8">
                   <div 
                     className="text-center p-6 rounded-xl border"
-                    style={hasCustomBranding && primaryColor ? {
-                      background: `linear-gradient(to bottom right, ${primaryColor}1a, ${primaryColor}0d)`,
-                      borderColor: `${primaryColor}33`
-                    } : {}}
+                    style={{
+                      background: `linear-gradient(to bottom right, ${hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR}1a, ${hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR}0d)`,
+                      borderColor: `${hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR}33`
+                    }}
                   >
                     <div 
                       className="text-3xl font-bold mb-1"
-                      style={hasCustomBranding && primaryColor ? { color: primaryColor } : {}}
+                      style={{ color: hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR }}
                     >
                       {projectData.dailyDropTarget}
                     </div>
@@ -1231,7 +1230,7 @@ export default function ResidentDashboard() {
                 <CardTitle className="flex items-center gap-2">
                   <span 
                     className="material-icons"
-                    style={hasCustomBranding && primaryColor ? { color: primaryColor } : {}}
+                    style={{ color: hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR }}
                   >
                     photo_library
                   </span>
@@ -1415,12 +1414,12 @@ export default function ResidentDashboard() {
 
                   <Button 
                     type="submit" 
-                    className="w-full h-12" 
+                    className="w-full h-12 text-white" 
                     data-testid="button-submit-complaint"
-                    style={hasCustomBranding && primaryColor ? {
-                      backgroundColor: primaryColor,
-                      borderColor: primaryColor
-                    } : {}}
+                    style={{
+                      backgroundColor: hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR,
+                      borderColor: hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR
+                    }}
                   >
                     {t('residentPortal.form.submitFeedback', 'Submit Feedback')}
                   </Button>
@@ -1891,10 +1890,10 @@ function LinkCompanyCodeCard() {
   };
 
   return (
-    <Card className="shadow-lg border-primary/20">
+    <Card className="shadow-lg" style={{ borderColor: `${RESIDENT_COLOR}33` }}>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <span className="material-icons text-primary">link</span>
+          <span className="material-icons" style={{ color: RESIDENT_COLOR }}>link</span>
           {t('residentPortal.linkCode.title', 'Link Your Account')}
         </CardTitle>
         <CardDescription>
@@ -1916,7 +1915,8 @@ function LinkCompanyCodeCard() {
           </div>
           <Button
             type="submit"
-            className="w-full h-12"
+            className="w-full h-12 text-white"
+            style={{ backgroundColor: RESIDENT_COLOR, borderColor: RESIDENT_COLOR }}
             disabled={linkCodeMutation.isPending || residentCode.length !== 10}
             data-testid="button-link-code"
           >
