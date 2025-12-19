@@ -71,7 +71,8 @@ export default function ResidentLanding() {
             </h1>
             
             <p className="text-xl md:text-2xl text-white/80 max-w-3xl mx-auto leading-relaxed">
-              Submit feedback with photos, see exactly when it was viewed, and track progress in real-time.<br />
+              Submit feedback with photos, see exactly when it was viewed,<br />
+              and track progress in real-time.<br />
               <strong>No more phone calls. No more guessing.</strong>
             </p>
             
