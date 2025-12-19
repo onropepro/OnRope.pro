@@ -3311,25 +3311,23 @@ export class Storage {
       vendorLogo: string | null;
     }> = [];
 
+    // Track which companies we've already processed to avoid duplicate projects
+    const processedCompanyIds = new Set<string>();
+    
     for (const link of links) {
-      if (!link.strataNumber) continue;
-      
-      const normalizedStrata = normalizeStrata(link.strataNumber);
-      if (!normalizedStrata) continue;
+      // Skip if we've already processed this company's projects
+      if (processedCompanyIds.has(link.companyId)) continue;
+      processedCompanyIds.add(link.companyId);
       
       const company = companies.find(c => c.id === link.companyId);
       if (!company) continue;
       
+      // Get ALL projects from this connected vendor (no strata filtering)
       const companyProjects = await db.select()
         .from(projects)
         .where(eq(projects.companyId, link.companyId));
       
-      const matchingProjects = companyProjects.filter(project => {
-        const projectStrata = normalizeStrata(project.strataPlanNumber);
-        return projectStrata !== null && projectStrata === normalizedStrata;
-      });
-      
-      for (const project of matchingProjects) {
+      for (const project of companyProjects) {
         // Safely convert date to ISO string
         const toISOString = (date: Date | string | null | undefined): string | null => {
           if (!date) return null;
@@ -3344,8 +3342,9 @@ export class Storage {
         let address = project.buildingAddress || '';
         
         // If project doesn't have coordinates, try to get them from the building record
-        if (!lat || !lng) {
-          const building = await this.getBuildingByStrata(normalizedStrata);
+        const projectStrata = normalizeStrata(project.strataPlanNumber);
+        if ((!lat || !lng) && projectStrata) {
+          const building = await this.getBuildingByStrata(projectStrata);
           if (building) {
             lat = building.latitude || lat;
             lng = building.longitude || lng;
