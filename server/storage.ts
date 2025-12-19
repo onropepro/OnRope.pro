@@ -24,6 +24,17 @@ export class Storage {
     return result[0] ? decryptSensitiveFields(result[0]) : undefined;
   }
 
+  async getResidentByStrataAndUnit(strataPlanNumber: string, unitNumber: string): Promise<User | undefined> {
+    const result = await db.select().from(users).where(
+      and(
+        eq(users.strataPlanNumber, strataPlanNumber),
+        eq(users.unitNumber, unitNumber),
+        eq(users.role, 'resident')
+      )
+    ).limit(1);
+    return result[0] ? decryptSensitiveFields(result[0]) : undefined;
+  }
+
   async getUserByPropertyManagerCode(propertyManagerCode: string): Promise<User | undefined> {
     const result = await db.select().from(users).where(eq(users.propertyManagerCode, propertyManagerCode)).limit(1);
     return result[0] ? decryptSensitiveFields(result[0]) : undefined;

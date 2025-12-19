@@ -1888,6 +1888,101 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Internal server error" });
     }
   });
+
+  // Unlink resident from company
+  app.post("/api/unlink-resident", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (currentUser.role !== 'resident') {
+        return res.status(403).json({ message: "Only residents can unlink their account" });
+      }
+      
+      console.log(`[unlink-resident] Resident ${currentUser.email} unlinking from company ${currentUser.companyId}`);
+      
+      await storage.updateUser(currentUser.id, { 
+        companyId: null,
+        linkedResidentCode: null
+      });
+      
+      res.json({ message: "Account unlinked successfully" });
+    } catch (error) {
+      console.error("Unlink resident error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Update resident profile (strata/HOA/LMS number, unit number, phone)
+  app.patch("/api/resident/profile", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (currentUser.role !== 'resident') {
+        return res.status(403).json({ message: "Only residents can update their profile" });
+      }
+      
+      const { strataPlanNumber, unitNumber, phoneNumber, name } = req.body;
+      
+      // Validate that at least one field is provided
+      if (!strataPlanNumber && !unitNumber && !phoneNumber && !name) {
+        return res.status(400).json({ message: "At least one field to update is required" });
+      }
+      
+      // If changing strata+unit, check for duplicates (unless same as current)
+      if (strataPlanNumber && unitNumber) {
+        const isDifferent = strataPlanNumber !== currentUser.strataPlanNumber || 
+                           unitNumber !== currentUser.unitNumber;
+        
+        if (isDifferent) {
+          // Check if another resident already claims this strata+unit
+          const existingResident = await storage.getResidentByStrataAndUnit(
+            strataPlanNumber, 
+            unitNumber
+          );
+          
+          if (existingResident && existingResident.id !== currentUser.id) {
+            return res.status(409).json({ 
+              message: "This unit is already registered to another resident account",
+              conflict: true
+            });
+          }
+        }
+      }
+      
+      const updates: Partial<typeof currentUser> = {};
+      if (strataPlanNumber !== undefined) updates.strataPlanNumber = strataPlanNumber;
+      if (unitNumber !== undefined) updates.unitNumber = unitNumber;
+      if (phoneNumber !== undefined) updates.phoneNumber = phoneNumber;
+      if (name !== undefined) updates.name = name;
+      
+      console.log(`[resident-profile] Updating profile for ${currentUser.email}:`, updates);
+      
+      await storage.updateUser(currentUser.id, updates);
+      
+      const updatedUser = await storage.getUserById(currentUser.id);
+      
+      res.json({ 
+        message: "Profile updated successfully",
+        user: {
+          strataPlanNumber: updatedUser?.strataPlanNumber,
+          unitNumber: updatedUser?.unitNumber,
+          phoneNumber: updatedUser?.phoneNumber,
+          name: updatedUser?.name
+        }
+      });
+    } catch (error) {
+      console.error("Update resident profile error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
   
   // OLD LICENSE VERIFICATION ENDPOINT REMOVED - Now using Stripe subscriptions
   // See /api/stripe/* endpoints for subscription management
