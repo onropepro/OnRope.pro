@@ -98,6 +98,11 @@ Photos are uploaded reliably even during temporary storage issues:
 
 The resident portal uses a resilient photo upload system:
 
+### Supported Formats
+- **JPEG, PNG, WebP** - Standard image formats
+- **HEIC, HEIF** - iPhone photo formats fully supported
+- **Maximum file size**: 10MB
+
 ### How It Works
 1. When you submit feedback with a photo, your message is saved immediately
 2. The photo is queued for upload in the background
