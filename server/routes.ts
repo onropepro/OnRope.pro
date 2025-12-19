@@ -1323,6 +1323,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
+      // CRITICAL: Check for duplicate certification numbers to prevent data integrity issues
+      if (irataLicenseNumber) {
+        const existingIrataTech = await storage.getTechnicianByIrataLicense(irataLicenseNumber);
+        if (existingIrataTech) {
+          console.log(`[Technician-Register] Duplicate IRATA license rejected: ${irataLicenseNumber}`);
+          return res.status(400).json({ 
+            message: "An account with this IRATA license number already exists. If this is your license, please log in to your existing account or contact support." 
+          });
+        }
+      }
+      if (spratLicenseNumber) {
+        const existingSpratTech = await storage.getTechnicianBySpratLicense(spratLicenseNumber);
+        if (existingSpratTech) {
+          console.log(`[Technician-Register] Duplicate SPRAT license rejected: ${spratLicenseNumber}`);
+          return res.status(400).json({ 
+            message: "An account with this SPRAT license number already exists. If this is your license, please log in to your existing account or contact support." 
+          });
+        }
+      }
+
       // Check if user already exists
       const existingUser = await storage.getUserByEmail(email);
       if (existingUser) {
