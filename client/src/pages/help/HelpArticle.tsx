@@ -143,69 +143,160 @@ export default function HelpArticle() {
           <Card>
             <CardContent className="pt-6">
               <div className="prose dark:prose-invert max-w-none prose-headings:text-foreground prose-p:text-foreground/90 prose-strong:text-foreground prose-li:text-foreground/90">
-                {article.content.split('\n\n').map((block, index) => {
-                  const trimmedBlock = block.trim();
+                {(() => {
+                  // Helper function to render inline formatting (bold, links)
+                  const renderInlineFormatting = (text: string) => {
+                    const parts = text.split(/(\*\*[^*]+\*\*|\[[^\]]+\]\([^)]+\))/g);
+                    return parts.map((part, i) => {
+                      if (part.startsWith('**') && part.endsWith('**')) {
+                        return <strong key={i} className="font-semibold">{part.slice(2, -2)}</strong>;
+                      }
+                      const linkMatch = part.match(/\[([^\]]+)\]\(([^)]+)\)/);
+                      if (linkMatch) {
+                        return (
+                          <a key={i} href={linkMatch[2]} className="text-primary hover:underline">
+                            {linkMatch[1]}
+                          </a>
+                        );
+                      }
+                      return <span key={i}>{part}</span>;
+                    });
+                  };
                   
-                  // Render h2 headings
-                  if (trimmedBlock.startsWith('## ')) {
-                    return (
-                      <h2 key={index} className="text-xl font-semibold mt-8 mb-4 first:mt-0 border-b pb-2">
-                        {trimmedBlock.slice(3)}
-                      </h2>
-                    );
-                  }
+                  // Parse content line by line for more accurate rendering
+                  const lines = article.content.split('\n');
+                  const elements: JSX.Element[] = [];
+                  let i = 0;
                   
-                  // Render h3 headings
-                  if (trimmedBlock.startsWith('### ')) {
-                    return (
-                      <h3 key={index} className="text-lg font-medium mt-6 mb-3">
-                        {trimmedBlock.slice(4)}
-                      </h3>
-                    );
-                  }
-                  
-                  // Render horizontal rules
-                  if (trimmedBlock === '---') {
-                    return <hr key={index} className="my-6 border-border" />;
-                  }
-                  
-                  // Render list items
-                  if (trimmedBlock.startsWith('- ')) {
-                    const items = trimmedBlock.split('\n').filter(line => line.startsWith('- '));
-                    return (
-                      <ul key={index} className="list-disc list-inside space-y-2 my-4">
-                        {items.map((item, i) => {
-                          const content = item.slice(2);
-                          // Handle bold text in list items
-                          const parts = content.split(/(\*\*[^*]+\*\*)/g);
-                          return (
-                            <li key={i} className="text-base">
-                              {parts.map((part, j) => {
-                                if (part.startsWith('**') && part.endsWith('**')) {
-                                  return <strong key={j}>{part.slice(2, -2)}</strong>;
-                                }
-                                return <span key={j}>{part}</span>;
-                              })}
+                  while (i < lines.length) {
+                    const line = lines[i].trim();
+                    
+                    // Skip empty lines
+                    if (!line) {
+                      i++;
+                      continue;
+                    }
+                    
+                    // Skip h1 title (rendered separately)
+                    if (line.startsWith('# ') && !line.startsWith('## ')) {
+                      i++;
+                      continue;
+                    }
+                    
+                    // h2 headings
+                    if (line.startsWith('## ')) {
+                      elements.push(
+                        <h2 key={`h2-${i}`} className="text-xl font-semibold mt-8 mb-4 first:mt-0 border-b pb-2">
+                          {line.slice(3)}
+                        </h2>
+                      );
+                      i++;
+                      continue;
+                    }
+                    
+                    // h3 headings
+                    if (line.startsWith('### ')) {
+                      elements.push(
+                        <h3 key={`h3-${i}`} className="text-lg font-medium mt-6 mb-3">
+                          {line.slice(4)}
+                        </h3>
+                      );
+                      i++;
+                      continue;
+                    }
+                    
+                    // Horizontal rules
+                    if (line === '---') {
+                      elements.push(<hr key={`hr-${i}`} className="my-6 border-border" />);
+                      i++;
+                      continue;
+                    }
+                    
+                    // Bullet list
+                    if (line.startsWith('- ')) {
+                      const items: string[] = [];
+                      while (i < lines.length && lines[i].trim().startsWith('- ')) {
+                        items.push(lines[i].trim().slice(2));
+                        i++;
+                      }
+                      elements.push(
+                        <ul key={`ul-${i}`} className="list-disc pl-6 space-y-1 my-4">
+                          {items.map((item, idx) => (
+                            <li key={idx} className="text-base">
+                              {renderInlineFormatting(item)}
                             </li>
-                          );
-                        })}
-                      </ul>
-                    );
+                          ))}
+                        </ul>
+                      );
+                      continue;
+                    }
+                    
+                    // Numbered list
+                    if (/^\d+\.\s/.test(line)) {
+                      const items: string[] = [];
+                      while (i < lines.length && /^\d+\.\s/.test(lines[i].trim())) {
+                        items.push(lines[i].trim().replace(/^\d+\.\s/, ''));
+                        i++;
+                      }
+                      elements.push(
+                        <ol key={`ol-${i}`} className="list-decimal pl-6 space-y-1 my-4">
+                          {items.map((item, idx) => (
+                            <li key={idx} className="text-base">
+                              {renderInlineFormatting(item)}
+                            </li>
+                          ))}
+                        </ol>
+                      );
+                      continue;
+                    }
+                    
+                    // Q&A format - capture both Q and A lines together
+                    if (line.startsWith('**Q:')) {
+                      const questionLine = line;
+                      i++;
+                      // Get the answer line if it exists
+                      let answerLine = '';
+                      if (i < lines.length && lines[i].trim().startsWith('A:')) {
+                        answerLine = lines[i].trim();
+                        i++;
+                      }
+                      elements.push(
+                        <div key={`qa-${i}`} className="my-4 p-4 bg-muted/50 rounded-lg space-y-2">
+                          <p className="text-base font-medium">
+                            {renderInlineFormatting(questionLine)}
+                          </p>
+                          {answerLine && (
+                            <p className="text-base text-muted-foreground">
+                              {renderInlineFormatting(answerLine)}
+                            </p>
+                          )}
+                        </div>
+                      );
+                      continue;
+                    }
+                    
+                    // Regular paragraph - collect consecutive non-empty text lines
+                    const paragraphLines: string[] = [];
+                    while (i < lines.length && 
+                           lines[i].trim() && 
+                           !lines[i].trim().startsWith('#') && 
+                           !lines[i].trim().startsWith('- ') &&
+                           !/^\d+\.\s/.test(lines[i].trim()) &&
+                           lines[i].trim() !== '---') {
+                      paragraphLines.push(lines[i].trim());
+                      i++;
+                    }
+                    if (paragraphLines.length > 0) {
+                      elements.push(
+                        <p key={`p-${i}`} className="mb-4 text-base leading-relaxed">
+                          {renderInlineFormatting(paragraphLines.join(' '))}
+                        </p>
+                      );
+                    }
                   }
                   
-                  // Render paragraphs with bold text support
-                  const parts = trimmedBlock.split(/(\*\*[^*]+\*\*)/g);
-                  return (
-                    <p key={index} className="mb-4 text-base leading-relaxed">
-                      {parts.map((part, i) => {
-                        if (part.startsWith('**') && part.endsWith('**')) {
-                          return <strong key={i} className="font-semibold">{part.slice(2, -2)}</strong>;
-                        }
-                        return <span key={i}>{part}</span>;
-                      })}
-                    </p>
-                  );
-                })}
+                  return elements;
+                })()}
               </div>
             </CardContent>
           </Card>

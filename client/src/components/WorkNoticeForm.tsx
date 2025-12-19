@@ -1184,6 +1184,7 @@ export function WorkNoticeList({ projectId, project }: WorkNoticeListProps) {
   const { toast } = useToast();
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingNotice, setEditingNotice] = useState<WorkNotice | null>(null);
+  const [previewNotice, setPreviewNotice] = useState<WorkNotice | null>(null);
 
   const { data: noticesData, isLoading } = useQuery<{ notices: WorkNotice[] }>({
     queryKey: ["/api/projects", projectId, "work-notices"],
@@ -1263,6 +1264,15 @@ export function WorkNoticeList({ projectId, project }: WorkNoticeListProps) {
                     <Button
                       variant="ghost"
                       size="icon"
+                      onClick={() => setPreviewNotice(notice)}
+                      data-testid={`button-preview-notice-${notice.id}`}
+                      title={t('workNotice.preview', 'Preview as Resident')}
+                    >
+                      <span className="material-icons">visibility</span>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       onClick={() => setEditingNotice(notice)}
                       data-testid={`button-edit-notice-${notice.id}`}
                     >
@@ -1319,6 +1329,120 @@ export function WorkNoticeList({ projectId, project }: WorkNoticeListProps) {
               existingNotice={editingNotice}
               onClose={() => setEditingNotice(null)}
             />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Preview Notice Dialog - Shows how residents will see this notice */}
+      <Dialog open={!!previewNotice} onOpenChange={(open) => !open && setPreviewNotice(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <span className="material-icons">visibility</span>
+              {t('workNotice.previewTitle', 'Resident View Preview')}
+            </DialogTitle>
+            <DialogDescription>
+              {t('workNotice.previewDescription', 'This is how residents will see this notice in their portal.')}
+            </DialogDescription>
+          </DialogHeader>
+          {previewNotice && (
+            <div className="space-y-4">
+              {/* Notice Card - Mimics Resident Portal View */}
+              <Card className="border-2 border-dashed">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      <span className="material-icons text-primary">campaign</span>
+                    </div>
+                    <div className="flex-1">
+                      <CardTitle className="text-lg">{previewNotice.noticeTitle}</CardTitle>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge variant={previewNotice.isPublished ? "default" : "secondary"}>
+                          {previewNotice.isPublished ? t('workNotice.status.published', 'Published') : t('workNotice.status.draft', 'Draft')}
+                        </Badge>
+                        {!previewNotice.isPublished && (
+                          <span className="text-xs text-muted-foreground">
+                            {t('workNotice.draftNote', '(Residents cannot see draft notices)')}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Building Info */}
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <span className="material-icons text-sm">apartment</span>
+                    <span>{project.buildingName || t('workNotice.building', 'Building')}</span>
+                  </div>
+
+                  {/* Date Range */}
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="material-icons text-sm text-muted-foreground">event</span>
+                    <span className="font-medium">
+                      {previewNotice.startDate ? format(new Date(previewNotice.startDate), "MMM d, yyyy") : t('workNotice.tbd', 'TBD')} 
+                      {' - '}
+                      {previewNotice.endDate ? format(new Date(previewNotice.endDate), "MMM d, yyyy") : t('workNotice.tbd', 'TBD')}
+                    </span>
+                  </div>
+
+                  {/* Notice Content */}
+                  <div className="bg-muted/50 rounded-lg p-4">
+                    <h4 className="font-medium mb-2 text-sm">{t('workNotice.details', 'Notice Details')}</h4>
+                    <p className="text-sm whitespace-pre-wrap">{previewNotice.noticeDetails}</p>
+                  </div>
+
+                  {/* Additional Instructions */}
+                  {previewNotice.additionalInstructions && (
+                    <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+                      <h4 className="font-medium mb-2 text-sm flex items-center gap-2 text-amber-800 dark:text-amber-200">
+                        <span className="material-icons text-sm">info</span>
+                        {t('workNotice.additionalInstructions', 'Additional Instructions')}
+                      </h4>
+                      <p className="text-sm whitespace-pre-wrap text-amber-900 dark:text-amber-100">{previewNotice.additionalInstructions}</p>
+                    </div>
+                  )}
+
+                  {/* Unit Schedule if exists */}
+                  {previewNotice.unitSchedule && Array.isArray(previewNotice.unitSchedule) && previewNotice.unitSchedule.length > 0 && (
+                    <div className="border rounded-lg p-4">
+                      <h4 className="font-medium mb-3 text-sm flex items-center gap-2">
+                        <span className="material-icons text-sm">schedule</span>
+                        {t('workNotice.schedule', 'Schedule')}
+                      </h4>
+                      <div className="space-y-3">
+                        {(previewNotice.unitSchedule as any[]).map((day: any, idx: number) => (
+                          <div key={idx} className="border-l-2 border-primary pl-3">
+                            <div className="font-medium text-sm">
+                              {day.date ? format(new Date(day.date), "EEEE, MMMM d, yyyy") : t('workNotice.dateTbd', 'Date TBD')}
+                            </div>
+                            {day.slots && day.slots.map((slot: any, slotIdx: number) => (
+                              <div key={slotIdx} className="text-sm text-muted-foreground mt-1">
+                                {slot.startTime} - {slot.endTime}: {slot.units || t('workNotice.unitsTbd', 'Units TBD')}
+                              </div>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Property Manager */}
+                  {previewNotice.propertyManagerName && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground pt-2 border-t">
+                      <span className="material-icons text-sm">person</span>
+                      <span>{t('workNotice.propertyManager', 'Property Manager')}: {previewNotice.propertyManagerName}</span>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              <div className="flex justify-end">
+                <Button variant="outline" onClick={() => setPreviewNotice(null)}>
+                  {t('common.close', 'Close')}
+                </Button>
+              </div>
+            </div>
           )}
         </DialogContent>
       </Dialog>

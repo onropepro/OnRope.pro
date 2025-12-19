@@ -648,3 +648,18 @@
 .superuser-root .material-symbols-outlined {
   font-family: 'Material Icons' !important;
 }
+
+/* Leaflet Map z-index control - ensure dialogs appear on top of maps */
+.leaflet-container {
+  z-index: 1 !important;
+}
+
+.leaflet-pane,
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 1 !important;
+}
+
+.leaflet-control {
+  z-index: 2 !important;
+}

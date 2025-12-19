@@ -1,3 +1,6 @@
+import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -27,6 +30,20 @@ const PM_COLOR = "#6E9075";
 const PM_GRADIENT = "linear-gradient(135deg, #6E9075 0%, #5A7A60 100%)";
 
 export default function PropertyManagerLanding() {
+  const [, setLocation] = useLocation();
+  
+  // Check if user is already logged in as property manager
+  const { data: userData } = useQuery<{ user: any }>({
+    queryKey: ["/api/user"],
+    retry: false,
+  });
+
+  useEffect(() => {
+    if (userData?.user?.role === "property_manager") {
+      setLocation("/pm-dashboard");
+    }
+  }, [userData, setLocation]);
+
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
       <PublicHeader />

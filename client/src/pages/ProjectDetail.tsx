@@ -25,6 +25,7 @@ import { AlertCircle, MapPin, Calculator } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
@@ -122,6 +123,8 @@ export default function ProjectDetail() {
   const [selectedSession, setSelectedSession] = useState<any>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editJobType, setEditJobType] = useState<string>("");
+  const [editAddressCoords, setEditAddressCoords] = useState<{ latitude: number | null; longitude: number | null }>({ latitude: null, longitude: null });
+  const [editAddressValue, setEditAddressValue] = useState<string>("");
   const [selectedPhoto, setSelectedPhoto] = useState<any>(null);
   const [showStartDayDialog, setShowStartDayDialog] = useState(false);
   const [showEndDayDialog, setShowEndDayDialog] = useState(false);
@@ -2894,6 +2897,11 @@ export default function ProjectDetail() {
                   variant="outline" 
                   onClick={() => {
                     setEditJobType(project.jobType);
+                    setEditAddressValue(project.buildingAddress || "");
+                    setEditAddressCoords({ 
+                      latitude: project.latitude ? parseFloat(project.latitude) : null, 
+                      longitude: project.longitude ? parseFloat(project.longitude) : null 
+                    });
                     setShowEditDialog(true);
                   }}
                   className="w-full h-12"
@@ -3274,7 +3282,7 @@ export default function ProjectDetail() {
                 
                 const updateData: any = {
                   buildingName: formData.get('buildingName'),
-                  buildingAddress: formData.get('buildingAddress') || undefined,
+                  buildingAddress: editAddressValue || formData.get('buildingAddress') || undefined,
                   strataPlanNumber: formData.get('strataPlanNumber'),
                   jobType: formData.get('jobType'),
                   targetCompletionDate: formData.get('targetCompletionDate') || undefined,
@@ -3282,6 +3290,9 @@ export default function ProjectDetail() {
                   buildingHeight: formData.get('buildingHeight') || undefined,
                   startDate: formData.get('startDate') || undefined,
                   endDate: formData.get('endDate') || undefined,
+                  // Include coordinates from address autocomplete
+                  latitude: editAddressCoords.latitude,
+                  longitude: editAddressCoords.longitude,
                 };
                 
                 // Add drop-based fields
@@ -3291,11 +3302,33 @@ export default function ProjectDetail() {
                   updateData.totalDropsSouth = formData.get('totalDropsSouth') ? parseInt(formData.get('totalDropsSouth') as string) : 0;
                   updateData.totalDropsWest = formData.get('totalDropsWest') ? parseInt(formData.get('totalDropsWest') as string) : 0;
                   updateData.dailyDropTarget = formData.get('dailyDropTarget') ? parseInt(formData.get('dailyDropTarget') as string) : 0;
-                  // Completed drops adjustments
-                  updateData.dropsAdjustmentNorth = formData.get('dropsAdjustmentNorth') ? parseInt(formData.get('dropsAdjustmentNorth') as string) : 0;
-                  updateData.dropsAdjustmentEast = formData.get('dropsAdjustmentEast') ? parseInt(formData.get('dropsAdjustmentEast') as string) : 0;
-                  updateData.dropsAdjustmentSouth = formData.get('dropsAdjustmentSouth') ? parseInt(formData.get('dropsAdjustmentSouth') as string) : 0;
-                  updateData.dropsAdjustmentWest = formData.get('dropsAdjustmentWest') ? parseInt(formData.get('dropsAdjustmentWest') as string) : 0;
+                  // Set completed drops - calculate adjustment based on absolute value entered
+                  // sessionTotal = completedDrops - currentAdjustment
+                  // If user enters value X, we need adjustment so that sessionTotal + adjustment = X
+                  // Therefore: adjustment = X - sessionTotal
+                  const sessionNorth = completedDropsNorth - (project.dropsAdjustmentNorth ?? 0);
+                  const sessionEast = completedDropsEast - (project.dropsAdjustmentEast ?? 0);
+                  const sessionSouth = completedDropsSouth - (project.dropsAdjustmentSouth ?? 0);
+                  const sessionWest = completedDropsWest - (project.dropsAdjustmentWest ?? 0);
+                  
+                  const setNorthVal = formData.get('setCompletedNorth') as string;
+                  const setEastVal = formData.get('setCompletedEast') as string;
+                  const setSouthVal = formData.get('setCompletedSouth') as string;
+                  const setWestVal = formData.get('setCompletedWest') as string;
+                  
+                  // Only update adjustment if user entered a value (non-empty)
+                  if (setNorthVal !== '' && setNorthVal !== null) {
+                    updateData.dropsAdjustmentNorth = parseInt(setNorthVal) - sessionNorth;
+                  }
+                  if (setEastVal !== '' && setEastVal !== null) {
+                    updateData.dropsAdjustmentEast = parseInt(setEastVal) - sessionEast;
+                  }
+                  if (setSouthVal !== '' && setSouthVal !== null) {
+                    updateData.dropsAdjustmentSouth = parseInt(setSouthVal) - sessionSouth;
+                  }
+                  if (setWestVal !== '' && setWestVal !== null) {
+                    updateData.dropsAdjustmentWest = parseInt(setWestVal) - sessionWest;
+                  }
                 }
                 
                 // Add in-suite fields
@@ -3346,11 +3379,15 @@ export default function ProjectDetail() {
                 
                 <div>
                   <Label htmlFor="buildingAddress">{t('projectDetail.dialogs.editProject.buildingAddress', 'Building Address')}</Label>
-                  <Input
-                    id="buildingAddress"
-                    name="buildingAddress"
-                    defaultValue={project.buildingAddress || ""}
+                  <AddressAutocomplete
                     data-testid="input-edit-building-address"
+                    placeholder={t('projectDetail.dialogs.editProject.buildingAddressPlaceholder', 'Start typing address...')}
+                    value={editAddressValue || project.buildingAddress || ""}
+                    onChange={(value) => setEditAddressValue(value)}
+                    onSelect={(address) => {
+                      setEditAddressValue(address.formatted);
+                      setEditAddressCoords({ latitude: address.latitude, longitude: address.longitude });
+                    }}
                   />
                 </div>
                 
@@ -3481,49 +3518,53 @@ export default function ProjectDetail() {
                           <div className="text-lg font-bold" data-testid="display-completed-west">{completedDropsWest - (project.dropsAdjustmentWest ?? 0)}</div>
                         </div>
                       </div>
-                      <h4 className="font-medium text-sm mb-2">{t('projectDetail.dialogs.editProject.adjustments', 'Adjustments')}</h4>
+                      <h4 className="font-medium text-sm mb-2">{t('projectDetail.dialogs.editProject.setCompleted', 'Set Completed Drops')}</h4>
                       <p className="text-xs text-muted-foreground mb-3">
-                        {t('projectDetail.dialogs.editProject.adjustmentsHelp', 'Enter positive or negative numbers to adjust the totals above.')}
+                        {t('projectDetail.dialogs.editProject.setCompletedHelp', 'Enter the new total completed drops for each direction. Leave empty to keep current value.')}
                       </p>
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <Label htmlFor="dropsAdjustmentNorth">{t('projectDetail.directions.northAdjustment', 'North Adj.')}</Label>
+                          <Label htmlFor="setCompletedNorth">{t('projectDetail.directions.setNorth', 'Set North')}</Label>
                           <Input
-                            id="dropsAdjustmentNorth"
-                            name="dropsAdjustmentNorth"
+                            id="setCompletedNorth"
+                            name="setCompletedNorth"
                             type="number"
-                            defaultValue={project.dropsAdjustmentNorth || 0}
-                            data-testid="input-edit-adjustment-north"
+                            min="0"
+                            placeholder={String(completedDropsNorth)}
+                            data-testid="input-edit-set-north"
                           />
                         </div>
                         <div>
-                          <Label htmlFor="dropsAdjustmentEast">{t('projectDetail.directions.eastAdjustment', 'East Adj.')}</Label>
+                          <Label htmlFor="setCompletedEast">{t('projectDetail.directions.setEast', 'Set East')}</Label>
                           <Input
-                            id="dropsAdjustmentEast"
-                            name="dropsAdjustmentEast"
+                            id="setCompletedEast"
+                            name="setCompletedEast"
                             type="number"
-                            defaultValue={project.dropsAdjustmentEast || 0}
-                            data-testid="input-edit-adjustment-east"
+                            min="0"
+                            placeholder={String(completedDropsEast)}
+                            data-testid="input-edit-set-east"
                           />
                         </div>
                         <div>
-                          <Label htmlFor="dropsAdjustmentSouth">{t('projectDetail.directions.southAdjustment', 'South Adj.')}</Label>
+                          <Label htmlFor="setCompletedSouth">{t('projectDetail.directions.setSouth', 'Set South')}</Label>
                           <Input
-                            id="dropsAdjustmentSouth"
-                            name="dropsAdjustmentSouth"
+                            id="setCompletedSouth"
+                            name="setCompletedSouth"
                             type="number"
-                            defaultValue={project.dropsAdjustmentSouth || 0}
-                            data-testid="input-edit-adjustment-south"
+                            min="0"
+                            placeholder={String(completedDropsSouth)}
+                            data-testid="input-edit-set-south"
                           />
                         </div>
                         <div>
-                          <Label htmlFor="dropsAdjustmentWest">{t('projectDetail.directions.westAdjustment', 'West Adj.')}</Label>
+                          <Label htmlFor="setCompletedWest">{t('projectDetail.directions.setWest', 'Set West')}</Label>
                           <Input
-                            id="dropsAdjustmentWest"
-                            name="dropsAdjustmentWest"
+                            id="setCompletedWest"
+                            name="setCompletedWest"
                             type="number"
-                            defaultValue={project.dropsAdjustmentWest || 0}
-                            data-testid="input-edit-adjustment-west"
+                            min="0"
+                            placeholder={String(completedDropsWest)}
+                            data-testid="input-edit-set-west"
                           />
                         </div>
                       </div>

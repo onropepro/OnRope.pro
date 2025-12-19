@@ -10,6 +10,8 @@ type AddressResult = {
   state: string;
   country: string;
   postcode: string;
+  latitude: number | null;
+  longitude: number | null;
 };
 
 type AddressAutocompleteProps = {

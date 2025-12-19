@@ -3270,6 +3270,116 @@ export class Storage {
     });
   }
 
+  async getPropertyManagerBuildingsForMap(propertyManagerId: string): Promise<Array<{
+    projectId: string;
+    strataPlanNumber: string;
+    buildingName: string | null;
+    buildingAddress: string;
+    latitude: string | null;
+    longitude: string | null;
+    status: string;
+    jobType: string;
+    customJobType: string | null;
+    startDate: string | null;
+    endDate: string | null;
+    vendorLinkId: string;
+    vendorName: string;
+    vendorLogo: string | null;
+  }>> {
+    const normalizeStrata = (strata: string | null | undefined): string | null => {
+      if (!strata || strata.trim() === '') return null;
+      return strata.toUpperCase().replace(/\s+/g, '');
+    };
+
+    const links = await this.getPropertyManagerCompanyLinks(propertyManagerId);
+    const companies = await this.getPropertyManagerLinkedCompanies(propertyManagerId);
+    
+    const buildingsForMap: Array<{
+      projectId: string;
+      strataPlanNumber: string;
+      buildingName: string | null;
+      buildingAddress: string;
+      latitude: string | null;
+      longitude: string | null;
+      status: string;
+      jobType: string;
+      customJobType: string | null;
+      startDate: string | null;
+      endDate: string | null;
+      vendorLinkId: string;
+      vendorName: string;
+      vendorLogo: string | null;
+    }> = [];
+
+    for (const link of links) {
+      if (!link.strataNumber) continue;
+      
+      const normalizedStrata = normalizeStrata(link.strataNumber);
+      if (!normalizedStrata) continue;
+      
+      const company = companies.find(c => c.id === link.companyId);
+      if (!company) continue;
+      
+      const companyProjects = await db.select()
+        .from(projects)
+        .where(eq(projects.companyId, link.companyId));
+      
+      const matchingProjects = companyProjects.filter(project => {
+        const projectStrata = normalizeStrata(project.strataPlanNumber);
+        return projectStrata !== null && projectStrata === normalizedStrata;
+      });
+      
+      for (const project of matchingProjects) {
+        // Safely convert date to ISO string
+        const toISOString = (date: Date | string | null | undefined): string | null => {
+          if (!date) return null;
+          if (typeof date === 'string') return date;
+          if (date instanceof Date) return date.toISOString();
+          return null;
+        };
+        
+        // Try to get coordinates from project first, then fall back to building
+        let lat = project.latitude;
+        let lng = project.longitude;
+        let address = project.buildingAddress || '';
+        
+        // If project doesn't have coordinates, try to get them from the building record
+        if (!lat || !lng) {
+          const building = await this.getBuildingByStrata(normalizedStrata);
+          if (building) {
+            lat = building.latitude || lat;
+            lng = building.longitude || lng;
+            // Also use building address if project doesn't have one
+            if (!address && building.buildingAddress) {
+              address = building.buildingAddress;
+            }
+          }
+        }
+        
+        buildingsForMap.push({
+          projectId: project.id,
+          strataPlanNumber: project.strataPlanNumber || '',
+          buildingName: project.buildingName,
+          buildingAddress: address,
+          latitude: lat,
+          longitude: lng,
+          status: project.status || 'active',
+          jobType: project.jobType || '',
+          customJobType: project.customJobType,
+          startDate: toISOString(project.startDate),
+          endDate: toISOString(project.endDate),
+          vendorLinkId: link.id,
+          vendorName: company.companyName || company.email || 'Unknown Vendor',
+          vendorLogo: company.whitelabelBrandingActive && company.brandingLogoUrl 
+            ? company.brandingLogoUrl 
+            : company.logo,
+        });
+      }
+    }
+
+    return buildingsForMap;
+  }
+
   async getPropertyManagerProjectDetails(projectId: string, companyId: string, normalizedStrata: string): Promise<{ project: any; complaints: any[]; buildingInstructions: any | null }> {
     // Strata number is required for security
     if (!normalizedStrata || normalizedStrata.trim() === '') {
@@ -4006,6 +4116,22 @@ export class Storage {
   }
 
   /**
+   * Update building address with coordinates for map display
+   */
+  async updateBuildingAddress(id: string, address: string, latitude?: number | null, longitude?: number | null): Promise<Building | undefined> {
+    const result = await db.update(buildings)
+      .set({ 
+        buildingAddress: address,
+        latitude: latitude ?? null,
+        longitude: longitude ?? null,
+        updatedAt: new Date() 
+      })
+      .where(eq(buildings.id, id))
+      .returning();
+    return result[0];
+  }
+
+  /**
    * Auto-create building from project data if it doesn't exist
    * Updates existing building with new data if fields are missing
    * Returns the building (existing or newly created)
@@ -4023,6 +4149,8 @@ export class Storage {
     dailyDropTarget?: number | null;
     totalFloors?: number | null;
     buildingFloors?: number | null;
+    latitude?: string | null;
+    longitude?: string | null;
   }): Promise<Building> {
     if (!projectData.strataPlanNumber) {
       throw new Error("Strata plan number is required to track building");
@@ -4064,6 +4192,13 @@ export class Storage {
       if (existing.dropsWest === 0 && projectData.totalDropsWest && projectData.totalDropsWest > 0) {
         updates.dropsWest = projectData.totalDropsWest;
       }
+      // Update coordinates if existing are null and new data provided
+      if (!existing.latitude && projectData.latitude) {
+        updates.latitude = projectData.latitude;
+      }
+      if (!existing.longitude && projectData.longitude) {
+        updates.longitude = projectData.longitude;
+      }
       
       // If we have updates, apply them
       if (Object.keys(updates).length > 0) {
@@ -4090,6 +4225,8 @@ export class Storage {
       dropsEast: projectData.totalDropsEast || 0,
       dropsSouth: projectData.totalDropsSouth || 0,
       dropsWest: projectData.totalDropsWest || 0,
+      latitude: projectData.latitude || undefined,
+      longitude: projectData.longitude || undefined,
     });
 
     console.log(`[Buildings] Created new building: ${normalized} - ${projectData.buildingName || 'Unnamed'}`);

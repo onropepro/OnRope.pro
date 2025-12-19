@@ -123,7 +123,7 @@ export default function HelpCenter() {
             <div className="max-w-xl mx-auto pt-4">
               <HelpSearchBar 
                 size="large" 
-                placeholder="Search for help with projects, safety, scheduling..."
+                placeholder="Ask a question or search for help with projects, safety, scheduling..."
                 autoFocus
               />
             </div>

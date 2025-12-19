@@ -241,6 +241,11 @@ function Router() {
           <PropertyManager />
         </ProtectedRoute>
       </Route>
+      <Route path="/pm-dashboard">
+        <ProtectedRoute allowedRoles={["property_manager"]}>
+          <PropertyManager />
+        </ProtectedRoute>
+      </Route>
       <Route path="/dashboard">
         <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
           <Dashboard />
