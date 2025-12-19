@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import HelpArticleCard from '@/components/help/HelpArticleCard';
 import HelpChatWidget from '@/components/help/HelpChatWidget';
+import HelpSearchBar from '@/components/help/HelpSearchBar';
 
 interface HelpArticle {
   id: string;
@@ -85,6 +86,13 @@ export default function ForResidents() {
                 Submit feedback and track issues at your building
               </p>
             </div>
+          </div>
+          
+          <div className="max-w-xl mt-6">
+            <HelpSearchBar 
+              size="large" 
+              placeholder="Ask about submitting feedback, tracking issues..."
+            />
           </div>
         </div>
         <div className="absolute bottom-0 left-0 right-0 z-10 translate-y-[10px]">
