@@ -22,6 +22,7 @@ import OpenAI from "openai";
 import { generateQuizFromDocument } from "./gemini";
 import helpRouter from "./routes/help";
 import { startPhotoUploadWorker, runBucketHealthCheck } from "./residentPhotoWorker";
+import convert from "heic-convert";
 
 // SECURITY: Rate limiting for login endpoint to prevent brute force attacks
 const loginRateLimiter = rateLimit({
@@ -13082,10 +13083,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Serve resident photos from dedicated bucket (supports nested path with complaintId folder)
-  app.get("/api/resident-photos/:complaintId/:fileName", async (req: Request, res: Response) => {
+  // Converts HEIC/HEIF to JPEG on-the-fly for browser compatibility
+  app.get("/api/resident-photos/:folderId/:fileName", async (req: Request, res: Response) => {
     try {
       const objectStorageService = new ObjectStorageService();
-      const fullPath = `${req.params.complaintId}/${req.params.fileName}`;
+      const fullPath = `${req.params.folderId}/${req.params.fileName}`;
       const file = await objectStorageService.getResidentPhoto(fullPath);
       
       if (!file) {
@@ -13093,11 +13095,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const [metadata] = await file.getMetadata();
-      res.setHeader("Content-Type", metadata.contentType || "image/jpeg");
-      res.setHeader("Cache-Control", "public, max-age=31536000");
+      const contentType = metadata.contentType || "image/jpeg";
+      const fileName = req.params.fileName.toLowerCase();
+      const isHeic = fileName.endsWith(".heic") || fileName.endsWith(".heif");
       
-      const stream = file.createReadStream();
-      stream.pipe(res);
+      // If HEIC/HEIF, convert to JPEG for browser compatibility
+      if (isHeic) {
+        const chunks: Buffer[] = [];
+        const stream = file.createReadStream();
+        
+        stream.on("data", (chunk: Buffer) => chunks.push(chunk));
+        stream.on("end", async () => {
+          try {
+            const heicBuffer = Buffer.concat(chunks);
+            const jpegBuffer = await convert({
+              buffer: heicBuffer,
+              format: "JPEG",
+              quality: 0.9,
+            });
+            
+            res.setHeader("Content-Type", "image/jpeg");
+            res.setHeader("Cache-Control", "public, max-age=31536000");
+            res.send(jpegBuffer);
+          } catch (conversionError) {
+            console.error("HEIC conversion error:", conversionError);
+            // Fallback: send original HEIC (won't display in most browsers but won't error)
+            res.setHeader("Content-Type", contentType);
+            res.setHeader("Cache-Control", "public, max-age=31536000");
+            res.send(Buffer.concat(chunks));
+          }
+        });
+        stream.on("error", (err: Error) => {
+          console.error("Stream error:", err);
+          res.status(500).json({ message: "Error reading photo" });
+        });
+      } else {
+        // Non-HEIC: stream directly
+        res.setHeader("Content-Type", contentType);
+        res.setHeader("Cache-Control", "public, max-age=31536000");
+        const stream = file.createReadStream();
+        stream.pipe(res);
+      }
     } catch (error) {
       console.error("Get resident photo error:", error);
       res.status(500).json({ message: "Internal server error" });
