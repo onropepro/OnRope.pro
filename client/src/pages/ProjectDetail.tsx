@@ -25,6 +25,7 @@ import { AlertCircle, MapPin, Calculator } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
@@ -122,6 +123,8 @@ export default function ProjectDetail() {
   const [selectedSession, setSelectedSession] = useState<any>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editJobType, setEditJobType] = useState<string>("");
+  const [editAddressCoords, setEditAddressCoords] = useState<{ latitude: number | null; longitude: number | null }>({ latitude: null, longitude: null });
+  const [editAddressValue, setEditAddressValue] = useState<string>("");
   const [selectedPhoto, setSelectedPhoto] = useState<any>(null);
   const [showStartDayDialog, setShowStartDayDialog] = useState(false);
   const [showEndDayDialog, setShowEndDayDialog] = useState(false);
@@ -2894,6 +2897,11 @@ export default function ProjectDetail() {
                   variant="outline" 
                   onClick={() => {
                     setEditJobType(project.jobType);
+                    setEditAddressValue(project.buildingAddress || "");
+                    setEditAddressCoords({ 
+                      latitude: project.latitude ? parseFloat(project.latitude) : null, 
+                      longitude: project.longitude ? parseFloat(project.longitude) : null 
+                    });
                     setShowEditDialog(true);
                   }}
                   className="w-full h-12"
@@ -3274,7 +3282,7 @@ export default function ProjectDetail() {
                 
                 const updateData: any = {
                   buildingName: formData.get('buildingName'),
-                  buildingAddress: formData.get('buildingAddress') || undefined,
+                  buildingAddress: editAddressValue || formData.get('buildingAddress') || undefined,
                   strataPlanNumber: formData.get('strataPlanNumber'),
                   jobType: formData.get('jobType'),
                   targetCompletionDate: formData.get('targetCompletionDate') || undefined,
@@ -3282,6 +3290,9 @@ export default function ProjectDetail() {
                   buildingHeight: formData.get('buildingHeight') || undefined,
                   startDate: formData.get('startDate') || undefined,
                   endDate: formData.get('endDate') || undefined,
+                  // Include coordinates from address autocomplete
+                  latitude: editAddressCoords.latitude,
+                  longitude: editAddressCoords.longitude,
                 };
                 
                 // Add drop-based fields
@@ -3346,11 +3357,15 @@ export default function ProjectDetail() {
                 
                 <div>
                   <Label htmlFor="buildingAddress">{t('projectDetail.dialogs.editProject.buildingAddress', 'Building Address')}</Label>
-                  <Input
-                    id="buildingAddress"
-                    name="buildingAddress"
-                    defaultValue={project.buildingAddress || ""}
+                  <AddressAutocomplete
                     data-testid="input-edit-building-address"
+                    placeholder={t('projectDetail.dialogs.editProject.buildingAddressPlaceholder', 'Start typing address...')}
+                    value={editAddressValue || project.buildingAddress || ""}
+                    onChange={(value) => setEditAddressValue(value)}
+                    onSelect={(address) => {
+                      setEditAddressValue(address.formatted);
+                      setEditAddressCoords({ latitude: address.latitude, longitude: address.longitude });
+                    }}
                   />
                 </div>
                 
