@@ -2357,7 +2357,7 @@ export default function TechnicianPortal() {
                 data-testid="button-return-dashboard"
               >
                 <span className="material-icons text-base">dashboard</span>
-                <span className="hidden sm:inline">{language === 'en' ? 'Dashboard' : 'Tableau de bord'}</span>
+                <span className="hidden sm:inline">{language === 'en' ? 'Dashboard' : language === 'es' ? 'Panel' : 'Tableau de bord'}</span>
               </Button>
             )}
             <LanguageDropdown />
