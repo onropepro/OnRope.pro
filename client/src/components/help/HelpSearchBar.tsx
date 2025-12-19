@@ -57,10 +57,12 @@ export default function HelpSearchBar({
   const [, setLocation] = useLocation();
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
   }, [chatMessages]);
 
   useEffect(() => {
@@ -348,7 +350,7 @@ export default function HelpSearchBar({
 
       {chatMode && (
         <div className="bg-background rounded-b-xl shadow-xl border border-t-0 z-50">
-          <div className="max-h-80 overflow-y-auto p-4 space-y-4">
+          <div ref={chatContainerRef} className="max-h-80 overflow-y-auto p-4 space-y-4">
             {chatMessages.filter(m => m.id !== 'greeting' || isChatLoading).map(message => (
               <div
                 key={message.id}
@@ -399,8 +401,6 @@ export default function HelpSearchBar({
                 </div>
               </div>
             )}
-            
-            <div ref={messagesEndRef} />
           </div>
           
           <div className="border-t px-4 py-3 flex items-center justify-between gap-2">
