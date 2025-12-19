@@ -2551,8 +2551,11 @@
     "noVendorsYet": "No vendors connected yet. Add a company code to get started.",
     "vendorCount": "You have access to {{count}} rope access company",
     "vendorCountPlural": "You have access to {{count}} rope access companies",
-    "addVendor": "Add Vendor",
-    "loadingVendors": "Loading vendors...",
+    "addVendor": "Agregar proveedor",
+    "vendorCard": {
+      "residentCode": "Código de residente:"
+    },
+    "loadingVendors": "Cargando proveedores...",
     "noVendorsTitle": "No Vendors Yet",
     "noVendorsDescription": "Request a company code from your rope access company and add it above",
     "activeProjects": "Active Projects",
@@ -2641,13 +2644,45 @@
       "hoursBasedTracking": "Hours-based tracking",
       "unitsCompleted": "{{completed}} of {{total}} units completed",
       "stallsCompleted": "{{completed}} of {{total}} stalls completed",
+      "active": "Activo",
+      "completed": "Completado",
       "buildingProgress": {
-        "title": "Building Progress",
-        "description": "Visual representation of work completed across all four elevations",
-        "overallProgress": "Overall Progress",
-        "dropsCompleted": "{{completed}} of {{total}} drops completed"
+        "title": "Progreso del edificio",
+        "description": "Representación visual del trabajo completado en las cuatro elevaciones",
+        "overallProgress": "Progreso general",
+        "dropsCompleted": "{{completed}} de {{total}} descensos completados"
       },
-      "ropeAccessPlan": "Rope Access Plan",
+      "progress": {
+        "projectCompletion": "Finalización del proyecto",
+        "hoursBased": "Seguimiento basado en horas",
+        "unitsCompleted": "{{completed}} de {{total}} unidades completadas",
+        "stallsCompleted": "{{completed}} de {{total}} puestos completados"
+      },
+      "buildingInstructions": {
+        "title": "Instrucciones del edificio",
+        "edit": "Editar",
+        "description": "Detalles de acceso e información de contacto para este edificio",
+        "accessInfo": "Información de acceso",
+        "buildingAccess": "Acceso al edificio",
+        "keysAndFob": "Llaves/Control remoto",
+        "roofAccess": "Acceso al techo",
+        "contacts": "Contactos",
+        "buildingManager": "Administrador del edificio",
+        "concierge": "Conserje",
+        "maintenance": "Mantenimiento",
+        "councilUnits": "Unidades de consejeros",
+        "tradeFacilities": "Instalaciones para trabajadores",
+        "tradeParking": "Estacionamiento de trabajo",
+        "tradeParkingSpotsCount": "{{count}} lugares",
+        "tradeWashroom": "Baño para trabajadores",
+        "specialRequests": "Solicitudes especiales",
+        "noInstructions": "Aún no se han agregado instrucciones del edificio.",
+        "addInstructions": "Agregar instrucciones"
+      },
+      "ropeAccessPlan": {
+        "title": "Plan de acceso con cuerdas",
+        "viewDownload": "Ver/Descargar plan de acceso con cuerdas"
+      },
       "viewDownloadPlan": "View/Download Rope Access Plan",
       "anchorInspection": {
         "title": "Anchor Inspection Document",
@@ -9935,6 +9970,7 @@
   },
   "residentPortal": {
     "title": "Portal de Residente",
+    "companyLogo": "Logo de la empresa",
     "submitFeedback": "Enviar Comentarios",
     "myFeedback": "Mis Comentarios",
     "buildingProgress": "Progreso del Edificio",
@@ -9961,7 +9997,24 @@
     "phoneNumber": "Numero de Telefono",
     "unitNumber": "Numero de Unidad",
     "feedbackDescription": "Haznos saber si tienes alguna preocupacion o pregunta sobre el trabajo",
-    "selectAProject": "Seleccionar un proyecto"
+    "selectAProject": "Seleccionar un proyecto",
+    "pdf": {
+      "workNotice": "Aviso de Trabajo",
+      "officialNotice": "AVISO OFICIAL",
+      "building": "Edificio",
+      "workPeriod": "PERIODO DE TRABAJO:",
+      "serviceType": "TIPO DE SERVICIO:",
+      "stallSchedule": "HORARIO DE ESTACIONAMIENTOS",
+      "unitSchedule": "HORARIO DE UNIDADES"
+    },
+    "notices": {
+      "tbd": "Por determinar",
+      "serviceProvider": "Proveedor de Servicios",
+      "contact": "Contacto"
+    },
+    "form": {
+      "whichProject": "Cual Proyecto?"
+    }
   },
   "modules": {
     "scheduling": {

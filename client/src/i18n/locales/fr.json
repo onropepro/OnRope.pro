@@ -2538,6 +2538,9 @@
     "vendorCount": "Vous avez accès à {{count}} entreprise d'accès sur corde",
     "vendorCountPlural": "Vous avez accès à {{count}} entreprises d'accès sur corde",
     "addVendor": "Ajouter un fournisseur",
+    "vendorCard": {
+      "residentCode": "Code résident :"
+    },
     "loadingVendors": "Chargement des fournisseurs...",
     "noVendorsTitle": "Aucun fournisseur",
     "noVendorsDescription": "Demandez un code d'entreprise à votre entreprise d'accès sur corde et ajoutez-le ci-dessus",
@@ -2627,13 +2630,45 @@
       "hoursBasedTracking": "Suivi basé sur les heures",
       "unitsCompleted": "{{completed}} sur {{total}} unités terminées",
       "stallsCompleted": "{{completed}} sur {{total}} places terminées",
+      "active": "Actif",
+      "completed": "Terminé",
       "buildingProgress": {
         "title": "Progression du bâtiment",
         "description": "Représentation visuelle du travail effectué sur les quatre élévations",
         "overallProgress": "Progression globale",
         "dropsCompleted": "{{completed}} sur {{total}} descentes terminées"
       },
-      "ropeAccessPlan": "Plan d'accès sur corde",
+      "progress": {
+        "projectCompletion": "Achèvement du projet",
+        "hoursBased": "Suivi basé sur les heures",
+        "unitsCompleted": "{{completed}} sur {{total}} unités terminées",
+        "stallsCompleted": "{{completed}} sur {{total}} places terminées"
+      },
+      "buildingInstructions": {
+        "title": "Instructions du bâtiment",
+        "edit": "Modifier",
+        "description": "Détails d'accès et coordonnées pour ce bâtiment",
+        "accessInfo": "Informations d'accès",
+        "buildingAccess": "Accès au bâtiment",
+        "keysAndFob": "Clés/Télécommande",
+        "roofAccess": "Accès au toit",
+        "contacts": "Contacts",
+        "buildingManager": "Gestionnaire du bâtiment",
+        "concierge": "Concierge",
+        "maintenance": "Entretien",
+        "councilUnits": "Unités des conseillers",
+        "tradeFacilities": "Installations pour corps de métier",
+        "tradeParking": "Stationnement de travail",
+        "tradeParkingSpotsCount": "{{count}} places",
+        "tradeWashroom": "Toilettes pour corps de métier",
+        "specialRequests": "Demandes spéciales",
+        "noInstructions": "Aucune instruction de bâtiment n'a encore été ajoutée.",
+        "addInstructions": "Ajouter des instructions"
+      },
+      "ropeAccessPlan": {
+        "title": "Plan d'accès sur corde",
+        "viewDownload": "Voir/Télécharger le plan d'accès sur corde"
+      },
       "viewDownloadPlan": "Voir/Télécharger le plan d'accès sur corde",
       "anchorInspection": {
         "title": "Document d'inspection des ancrages",
@@ -10359,6 +10394,7 @@
   },
   "residentPortal": {
     "title": "Portail Resident",
+    "companyLogo": "Logo de l'entreprise",
     "submitFeedback": "Soumettre un Commentaire",
     "myFeedback": "Mes Commentaires",
     "buildingProgress": "Progression du Batiment",
@@ -10385,7 +10421,24 @@
     "phoneNumber": "Numero de Telephone",
     "unitNumber": "Numero d'Unite",
     "feedbackDescription": "Faites-nous savoir si vous avez des preoccupations ou des questions sur les travaux",
-    "selectAProject": "Selectionner un projet"
+    "selectAProject": "Selectionner un projet",
+    "pdf": {
+      "workNotice": "Avis de Travaux",
+      "officialNotice": "AVIS OFFICIEL",
+      "building": "Batiment",
+      "workPeriod": "PERIODE DE TRAVAUX:",
+      "serviceType": "TYPE DE SERVICE:",
+      "stallSchedule": "HORAIRE DES STATIONNEMENTS",
+      "unitSchedule": "HORAIRE DES UNITES"
+    },
+    "notices": {
+      "tbd": "A determiner",
+      "serviceProvider": "Prestataire de Services",
+      "contact": "Contact"
+    },
+    "form": {
+      "whichProject": "Quel Projet?"
+    }
   },
   "modules": {
     "scheduling": {

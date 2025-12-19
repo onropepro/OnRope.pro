@@ -772,7 +772,7 @@ export default function PropertyManager() {
                               {vendor.residentCode && (
                                 <div className="flex items-center gap-2 mt-2 pt-2 border-t">
                                   <Users className="w-3 h-3 flex-shrink-0" />
-                                  <span className="text-xs text-muted-foreground">Resident Code:</span>
+                                  <span className="text-xs text-muted-foreground">{t('propertyManager.vendorCard.residentCode', 'Resident Code:')}</span>
                                   <span className="font-mono font-medium text-foreground" data-testid={`text-vendor-resident-code-${vendor.id}`}>
                                     {vendor.residentCode}
                                   </span>
@@ -1525,7 +1525,7 @@ export default function PropertyManager() {
                                       <Label className="text-xs text-muted-foreground">{t('propertyManager.projectDetails.buildingInstructions.tradeParking', 'Trade Parking')}</Label>
                                       <p className="text-sm">{projectDetailsData.buildingInstructions.tradeParkingInstructions}</p>
                                       {projectDetailsData.buildingInstructions.tradeParkingSpots && (
-                                        <Badge variant="secondary" className="mt-1">{projectDetailsData.buildingInstructions.tradeParkingSpots} spots</Badge>
+                                        <Badge variant="secondary" className="mt-1">{t('propertyManager.projectDetails.buildingInstructions.tradeParkingSpotsCount', '{{count}} spots', { count: projectDetailsData.buildingInstructions.tradeParkingSpots })}</Badge>
                                       )}
                                     </div>
                                   )}

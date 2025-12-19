@@ -2538,6 +2538,9 @@
     "vendorCount": "You have access to {{count}} rope access company",
     "vendorCountPlural": "You have access to {{count}} rope access companies",
     "addVendor": "Add Vendor",
+    "vendorCard": {
+      "residentCode": "Resident Code:"
+    },
     "loadingVendors": "Loading vendors...",
     "noVendorsTitle": "No Vendors Yet",
     "noVendorsDescription": "Request a company code from your rope access company and add it above",
@@ -2627,13 +2630,45 @@
       "hoursBasedTracking": "Hours-based tracking",
       "unitsCompleted": "{{completed}} of {{total}} units completed",
       "stallsCompleted": "{{completed}} of {{total}} stalls completed",
+      "active": "Active",
+      "completed": "Completed",
       "buildingProgress": {
         "title": "Building Progress",
         "description": "Visual representation of work completed across all four elevations",
         "overallProgress": "Overall Progress",
         "dropsCompleted": "{{completed}} of {{total}} drops completed"
       },
-      "ropeAccessPlan": "Rope Access Plan",
+      "progress": {
+        "projectCompletion": "Project Completion",
+        "hoursBased": "Hours-based tracking",
+        "unitsCompleted": "{{completed}} of {{total}} units completed",
+        "stallsCompleted": "{{completed}} of {{total}} stalls completed"
+      },
+      "buildingInstructions": {
+        "title": "Building Instructions",
+        "edit": "Edit",
+        "description": "Access details and contact information for this building",
+        "accessInfo": "Access Information",
+        "buildingAccess": "Building Access",
+        "keysAndFob": "Keys/Fob",
+        "roofAccess": "Roof Access",
+        "contacts": "Contacts",
+        "buildingManager": "Building Manager",
+        "concierge": "Concierge",
+        "maintenance": "Maintenance",
+        "councilUnits": "Council Member Units",
+        "tradeFacilities": "Trade Facilities",
+        "tradeParking": "Trade Parking",
+        "tradeParkingSpotsCount": "{{count}} spots",
+        "tradeWashroom": "Trade Washroom",
+        "specialRequests": "Special Requests",
+        "noInstructions": "No building instructions have been added yet.",
+        "addInstructions": "Add Instructions"
+      },
+      "ropeAccessPlan": {
+        "title": "Rope Access Plan",
+        "viewDownload": "View/Download Rope Access Plan"
+      },
       "viewDownloadPlan": "View/Download Rope Access Plan",
       "anchorInspection": {
         "title": "Anchor Inspection Document",
@@ -9692,6 +9727,7 @@
   },
   "residentPortal": {
     "title": "Resident Portal",
+    "companyLogo": "Company logo",
     "submitFeedback": "Submit Feedback",
     "myFeedback": "My Feedback",
     "buildingProgress": "Building Progress",
@@ -9718,7 +9754,24 @@
     "phoneNumber": "Phone Number",
     "unitNumber": "Unit Number",
     "feedbackDescription": "Let us know if you have any concerns or questions about the work",
-    "selectAProject": "Select a project"
+    "selectAProject": "Select a project",
+    "pdf": {
+      "workNotice": "Work Notice",
+      "officialNotice": "OFFICIAL NOTICE",
+      "building": "Building",
+      "workPeriod": "WORK PERIOD:",
+      "serviceType": "SERVICE TYPE:",
+      "stallSchedule": "STALL SCHEDULE",
+      "unitSchedule": "UNIT SCHEDULE"
+    },
+    "notices": {
+      "tbd": "TBD",
+      "serviceProvider": "Service Provider",
+      "contact": "Contact"
+    },
+    "form": {
+      "whichProject": "Which Project?"
+    }
   },
   "modules": {
     "scheduling": {

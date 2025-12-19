@@ -128,7 +128,7 @@ export default function ResidentDashboard() {
     let yPos = 25;
 
     // Use mapped field names with fallbacks to original field names
-    const noticeTitle = notice.title || notice.noticeTitle || 'Work Notice';
+    const noticeTitle = notice.title || notice.noticeTitle || t('residentPortal.pdf.workNotice', 'Work Notice');
     const noticeContent = notice.content || notice.noticeDetails || '';
     const noticeStartDate = notice.workStartDate || notice.startDate;
     const noticeEndDate = notice.workEndDate || notice.endDate;
@@ -155,7 +155,7 @@ export default function ResidentDashboard() {
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
-    doc.text('OFFICIAL NOTICE', margin + 5, yPos + 11);
+    doc.text(t('residentPortal.pdf.officialNotice', 'OFFICIAL NOTICE'), margin + 5, yPos + 11);
     yPos += 22;
 
     // Notice title
@@ -170,7 +170,7 @@ export default function ResidentDashboard() {
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(100, 100, 100);
-    doc.text(notice.buildingName || 'Building', margin, yPos);
+    doc.text(notice.buildingName || t('residentPortal.pdf.building', 'Building'), margin, yPos);
     yPos += 10;
 
     // Dates banner
@@ -182,17 +182,17 @@ export default function ResidentDashboard() {
     doc.setTextColor(146, 64, 14);
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
-    doc.text('WORK PERIOD:', margin + 5, yPos + 8);
+    doc.text(t('residentPortal.pdf.workPeriod', 'WORK PERIOD:'), margin + 5, yPos + 8);
     doc.setFont('helvetica', 'normal');
     
-    const startDate = noticeStartDate ? new Date(noticeStartDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD';
-    const endDate = noticeEndDate ? new Date(noticeEndDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD';
+    const startDate = noticeStartDate ? new Date(noticeStartDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : t('residentPortal.notices.tbd', 'TBD');
+    const endDate = noticeEndDate ? new Date(noticeEndDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : t('residentPortal.notices.tbd', 'TBD');
     doc.text(`${startDate} - ${endDate}`, margin + 35, yPos + 8);
     
     // Job type
     if (notice.jobType) {
       doc.setFont('helvetica', 'bold');
-      doc.text('SERVICE TYPE:', margin + 5, yPos + 16);
+      doc.text(t('residentPortal.pdf.serviceType', 'SERVICE TYPE:'), margin + 5, yPos + 16);
       doc.setFont('helvetica', 'normal');
       doc.text(notice.jobType.replace(/_/g, ' ').toUpperCase(), margin + 35, yPos + 16);
     }
@@ -243,7 +243,7 @@ export default function ResidentDashboard() {
       doc.setTextColor(0, 0, 0);
       doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
-      const scheduleTitle = notice.jobType === 'parkade_pressure_cleaning' ? 'STALL SCHEDULE' : 'UNIT SCHEDULE';
+      const scheduleTitle = notice.jobType === 'parkade_pressure_cleaning' ? t('residentPortal.pdf.stallSchedule', 'STALL SCHEDULE') : t('residentPortal.pdf.unitSchedule', 'UNIT SCHEDULE');
       doc.text(scheduleTitle, margin + 5, yPos + 8);
       yPos += 18;
       
@@ -497,7 +497,7 @@ export default function ResidentDashboard() {
             {branding.logoUrl ? (
               <img 
                 src={branding.logoUrl} 
-                alt={branding.companyName || 'Company logo'} 
+                alt={branding.companyName || t('residentPortal.companyLogo', 'Company logo')} 
                 className="w-8 h-8 object-contain"
                 data-testid="img-company-logo"
               />
@@ -658,7 +658,7 @@ export default function ResidentDashboard() {
             {branding.logoUrl ? (
               <img 
                 src={branding.logoUrl} 
-                alt={branding.companyName || 'Company logo'} 
+                alt={branding.companyName || t('residentPortal.companyLogo', 'Company logo')} 
                 className="w-8 h-8 object-contain"
                 data-testid="img-company-logo"
               />
@@ -752,7 +752,7 @@ export default function ResidentDashboard() {
                       name="projectId"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Which Project? *</FormLabel>
+                          <FormLabel>{t('residentPortal.form.whichProject', 'Which Project?')} *</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger data-testid="select-project" className="h-12">
@@ -855,7 +855,7 @@ export default function ResidentDashboard() {
                 <div className="h-12 w-12 rounded-xl bg-white dark:bg-muted flex items-center justify-center shadow-lg p-1">
                   <img 
                     src={branding.logoUrl} 
-                    alt={branding.companyName || 'Company logo'} 
+                    alt={branding.companyName || t('residentPortal.companyLogo', 'Company logo')} 
                     className="w-full h-full object-contain"
                     data-testid="img-company-logo-header"
                   />
@@ -1808,7 +1808,7 @@ export default function ResidentDashboard() {
                     <div className="flex items-start gap-2 text-sm">
                       <span className="material-icons text-muted-foreground">engineering</span>
                       <div>
-                        <p className="text-xs text-muted-foreground uppercase">Service Provider</p>
+                        <p className="text-xs text-muted-foreground uppercase">{t('residentPortal.notices.serviceProvider', 'Service Provider')}</p>
                         <p className="font-medium">{selectedNotice.contractors}</p>
                       </div>
                     </div>
@@ -1817,7 +1817,7 @@ export default function ResidentDashboard() {
                     <div className="flex items-start gap-2 text-sm">
                       <span className="material-icons text-muted-foreground">contact_phone</span>
                       <div>
-                        <p className="text-xs text-muted-foreground uppercase">Contact</p>
+                        <p className="text-xs text-muted-foreground uppercase">{t('residentPortal.notices.contact', 'Contact')}</p>
                         <p className="font-medium">{selectedNotice.contactInfo}</p>
                       </div>
                     </div>
