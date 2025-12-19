@@ -37,7 +37,9 @@
     "needToPass": "Vous avez besoin de 80%",
     "reviewAndRetry": "pour reussir. Revisez le materiel et reessayez.",
     "done": "Termine",
-    "close": "Fermer"
+    "close": "Fermer",
+    "healthSafetyManual": "Manuel de Sante et Securite",
+    "companyPolicy": "Politique d'Entreprise"
   },
   "login": {
     "header": {

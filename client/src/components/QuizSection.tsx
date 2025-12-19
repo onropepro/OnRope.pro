@@ -95,9 +95,9 @@ export function QuizSection() {
   const getDocumentTypeLabel = (type: string) => {
     switch (type) {
       case 'health_safety_manual':
-        return 'Health & Safety Manual';
+        return t('quiz.healthSafetyManual', 'Health & Safety Manual');
       case 'company_policy':
-        return 'Company Policy';
+        return t('quiz.companyPolicy', 'Company Policy');
       default:
         return type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
     }

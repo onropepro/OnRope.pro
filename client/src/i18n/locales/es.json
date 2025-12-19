@@ -37,7 +37,9 @@
     "needToPass": "Necesita 80%",
     "reviewAndRetry": "para aprobar. Revise el material e intente de nuevo.",
     "done": "Listo",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "healthSafetyManual": "Manual de Salud y Seguridad",
+    "companyPolicy": "Politica de la Empresa"
   },
   "login": {
     "header": {
