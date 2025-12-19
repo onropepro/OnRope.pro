@@ -525,9 +525,9 @@ export default function ResidentDashboard() {
           <Card className="shadow-lg">
             <CardContent className="pt-8 pb-6 text-center">
               <span className="material-icons text-6xl text-muted-foreground mb-3">info</span>
-              <h2 className="text-xl font-bold mb-2">{t('residentPortal.noWorkScheduled.title', 'No Work Scheduled')}</h2>
+              <h2 className="text-xl font-bold mb-2">{t('residentPortal.noWorkScheduled.title', 'No Active Projects')}</h2>
               <p className="text-muted-foreground text-sm">
-                {t('residentPortal.noWorkScheduled.description', 'No maintenance work has been scheduled for your building yet.')}
+                {t('residentPortal.noWorkScheduled.description', 'There are no ongoing maintenance projects at your building. When work begins, you will see project details and progress here.')}
               </p>
             </CardContent>
           </Card>
