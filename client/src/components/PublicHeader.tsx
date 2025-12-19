@@ -178,11 +178,8 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
         </div>
       </div>
 
-      {/* Main Navigation Bar */}
-      <div 
-        className={stakeholderColor ? "border-b border-white/20" : "bg-background border-b border-border"}
-        style={stakeholderColor ? { backgroundColor: stakeholderColor } : undefined}
-      >
+      {/* Main Navigation Bar - Always white/background */}
+      <div className="bg-background border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           {/* Logo - Left */}
           <div className="flex items-center shrink-0">
@@ -200,7 +197,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
           <Button
             variant="ghost"
             size="icon"
-            className={stakeholderColor ? "lg:hidden text-white hover:bg-white/10" : "lg:hidden"}
+            className="lg:hidden"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             data-testid="button-mobile-menu-toggle"
           >
@@ -218,7 +215,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
             >
               <Button
                 variant={activeNav === "employer" || activeNav === "modules" ? "default" : "ghost"}
-                className={stakeholderColor && activeNav !== "employer" && activeNav !== "modules" ? "text-sm font-medium text-white hover:bg-white/10" : "text-sm font-medium"}
+                className="text-sm font-medium"
                 onClick={() => setLocation("/employer")}
                 data-testid="nav-employer"
               >
@@ -527,7 +524,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
             >
               <Button
                 variant={activeNav === "technician" ? "default" : "ghost"}
-                className={stakeholderColor && activeNav !== "technician" ? "text-sm font-medium text-white hover:bg-white/10" : "text-sm font-medium"}
+                className="text-sm font-medium"
                 onClick={() => setLocation("/technician")}
                 data-testid="nav-technician"
               >
@@ -580,7 +577,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
               <Button
                 key={item.id}
                 variant={activeNav === item.id ? "default" : "ghost"}
-                className={stakeholderColor && activeNav !== item.id ? "text-sm font-medium text-white hover:bg-white/10" : "text-sm font-medium"}
+                className="text-sm font-medium"
                 onClick={() => setLocation(item.href)}
                 data-testid={`nav-${item.id}`}
               >
