@@ -256,6 +256,40 @@
     "haveAccount": "Ya tienes una cuenta?",
     "signIn": "Iniciar sesion"
   },
+  "techLogin": {
+    "dialog": {
+      "title": "Inicio de Sesion de Tecnico",
+      "subtitle": "Inicia sesion con tu numero de licencia IRATA/SPRAT o correo electronico",
+      "licenseNumber": "Numero de Licencia",
+      "email": "Correo Electronico",
+      "licenseLabel": "Numero de Licencia IRATA o SPRAT",
+      "emailLabel": "Direccion de Correo Electronico",
+      "licenseHint": "Ingresa solo el numero sin el prefijo de nivel (ej: 123456 no 1/123456)",
+      "password": "Contrasena",
+      "passwordPlaceholder": "Ingresa tu contrasena",
+      "signIn": "Iniciar Sesion",
+      "signingIn": "Iniciando sesion...",
+      "newTechnician": "Nuevo tecnico?",
+      "register": "Registrarse como Tecnico"
+    },
+    "hero": {
+      "badge": "Pasaporte para Tecnicos IRATA y SPRAT",
+      "title": "Tus Horas Registradas. Tus Certificaciones. Tu Carrera.",
+      "titleLine2": "Finalmente en Un Solo Lugar.",
+      "subtitle": "Tu identidad profesional portatil. Una cuenta que viaja contigo a traves de cada empleador, cada proyecto, cada evaluacion.",
+      "subtitleBold": "Nunca pierdas otra hora de historial de trabajo.",
+      "createPassport": "Crea Tu Pasaporte Gratis",
+      "signIn": "Iniciar Sesion"
+    },
+    "stats": {
+      "onboarding": "Tiempo de incorporacion",
+      "zeroValue": "Cero",
+      "guesswork": "Adivinanzas en horas",
+      "compliance": "Cumplimiento de seguridad",
+      "foreverValue": "Siempre",
+      "protection": "Proteccion de carrera"
+    }
+  },
   "techReg": {
     "sidebar": {
       "title": "Crea Tu Perfil",

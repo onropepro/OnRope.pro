@@ -66,6 +66,7 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function TechnicianLogin() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [loginMethod, setLoginMethod] = useState<"license" | "email">("license");
@@ -341,17 +342,17 @@ export default function TechnicianLogin() {
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
           <div className="text-center space-y-6 pt-16">
             <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-module-label">
-              Passport for IRATA & SPRAT Technicians
+              {t('techLogin.hero.badge', 'Passport for IRATA & SPRAT Technicians')}
             </Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              Your Logged Hours. Your Certs. Your Career.<br />
-              <span className="text-blue-100">Finally in One Place.</span>
+              {t('techLogin.hero.title', 'Your Logged Hours. Your Certs. Your Career.')}<br />
+              <span className="text-blue-100">{t('techLogin.hero.titleLine2', 'Finally in One Place.')}</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              Your portable professional identity. One account that travels with you across every employer, every project, every assessment.<br />
-              <strong>Never lose another hour of work history.</strong>
+              {t('techLogin.hero.subtitle', 'Your portable professional identity. One account that travels with you across every employer, every project, every assessment.')}<br />
+              <strong>{t('techLogin.hero.subtitleBold', 'Never lose another hour of work history.')}</strong>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
@@ -361,7 +362,7 @@ export default function TechnicianLogin() {
                 onClick={() => setShowRegistration(true)}
                 data-testid="button-hero-cta"
               >
-                Create Your Free Passport
+                {t('techLogin.hero.createPassport', 'Create Your Free Passport')}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
               <Button 
@@ -371,7 +372,7 @@ export default function TechnicianLogin() {
                 onClick={() => setShowLoginDialog(true)}
                 data-testid="button-hero-signin"
               >
-                Sign In
+                {t('techLogin.hero.signIn', 'Sign In')}
                 <BookOpen className="ml-2 w-5 h-5" />
               </Button>
             </div>
@@ -394,19 +395,19 @@ export default function TechnicianLogin() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-blue-600">10s</div>
-                  <div className="text-base text-muted-foreground mt-1">Onboarding time</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('techLogin.stats.onboarding', 'Onboarding time')}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-emerald-600">Zero</div>
-                  <div className="text-base text-muted-foreground mt-1">Guesswork on hours</div>
+                  <div className="text-3xl md:text-4xl font-bold text-emerald-600">{t('techLogin.stats.zeroValue', 'Zero')}</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('techLogin.stats.guesswork', 'Guesswork on hours')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-amber-600">100%</div>
-                  <div className="text-base text-muted-foreground mt-1">Safety compliance</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('techLogin.stats.compliance', 'Safety compliance')}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-violet-600">Forever</div>
-                  <div className="text-base text-muted-foreground mt-1">Career protection</div>
+                  <div className="text-3xl md:text-4xl font-bold text-violet-600">{t('techLogin.stats.foreverValue', 'Forever')}</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('techLogin.stats.protection', 'Career protection')}</div>
                 </div>
               </div>
             </CardContent>
@@ -2086,10 +2087,10 @@ export default function TechnicianLogin() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <HardHat className="w-5 h-5 text-primary" />
-              Technician Sign In
+              {t('techLogin.dialog.title', 'Technician Sign In')}
             </DialogTitle>
             <DialogDescription>
-              Sign in with your irata/SPRAT license number or email
+              {t('techLogin.dialog.subtitle', 'Sign in with your IRATA/SPRAT license number or email')}
             </DialogDescription>
           </DialogHeader>
           
@@ -2106,7 +2107,7 @@ export default function TechnicianLogin() {
                 data-testid="button-login-license"
               >
                 <CreditCard className="w-4 h-4" />
-                License Number
+                {t('techLogin.dialog.licenseNumber', 'License Number')}
               </Button>
               <Button
                 type="button"
@@ -2119,7 +2120,7 @@ export default function TechnicianLogin() {
                 data-testid="button-login-email"
               >
                 <Mail className="w-4 h-4" />
-                Email
+                {t('techLogin.dialog.email', 'Email')}
               </Button>
             </div>
 
@@ -2131,7 +2132,7 @@ export default function TechnicianLogin() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>
-                        {loginMethod === "license" ? "irata or SPRAT License Number" : "Email Address"}
+                        {loginMethod === "license" ? t('techLogin.dialog.licenseLabel', 'IRATA or SPRAT License Number') : t('techLogin.dialog.emailLabel', 'Email Address')}
                       </FormLabel>
                       <FormControl>
                         <Input
@@ -2143,7 +2144,7 @@ export default function TechnicianLogin() {
                       </FormControl>
                       {loginMethod === "license" && (
                         <p className="text-xs text-muted-foreground">
-                          Enter just the number without the level prefix (e.g., 123456 not 1/123456)
+                          {t('techLogin.dialog.licenseHint', 'Enter just the number without the level prefix (e.g., 123456 not 1/123456)')}
                         </p>
                       )}
                       <FormMessage />
@@ -2155,12 +2156,12 @@ export default function TechnicianLogin() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Password</FormLabel>
+                      <FormLabel>{t('techLogin.dialog.password', 'Password')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           type="password"
-                          placeholder="Enter your password"
+                          placeholder={t('techLogin.dialog.passwordPlaceholder', 'Enter your password')}
                           data-testid="input-password"
                         />
                       </FormControl>
@@ -2174,7 +2175,7 @@ export default function TechnicianLogin() {
                   disabled={form.formState.isSubmitting}
                   data-testid="button-login-submit"
                 >
-                  {form.formState.isSubmitting ? "Signing in..." : "Sign In"}
+                  {form.formState.isSubmitting ? t('techLogin.dialog.signingIn', 'Signing in...') : t('techLogin.dialog.signIn', 'Sign In')}
                 </Button>
               </form>
             </Form>
@@ -2185,7 +2186,7 @@ export default function TechnicianLogin() {
               </div>
               <div className="relative flex justify-center text-xs uppercase">
                 <span className="bg-background px-2 text-muted-foreground">
-                  New technician?
+                  {t('techLogin.dialog.newTechnician', 'New technician?')}
                 </span>
               </div>
             </div>
@@ -2200,7 +2201,7 @@ export default function TechnicianLogin() {
               data-testid="button-register"
             >
               <HardHat className="w-4 h-4" />
-              Register as a Technician
+              {t('techLogin.dialog.register', 'Register as a Technician')}
             </Button>
           </div>
         </DialogContent>
