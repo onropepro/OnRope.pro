@@ -3229,13 +3229,31 @@ export class Storage {
           return null;
         };
         
+        // Try to get coordinates from project first, then fall back to building
+        let lat = project.latitude;
+        let lng = project.longitude;
+        let address = project.buildingAddress || '';
+        
+        // If project doesn't have coordinates, try to get them from the building record
+        if (!lat || !lng) {
+          const building = await this.getBuildingByStrata(normalizedStrata);
+          if (building) {
+            lat = building.latitude || lat;
+            lng = building.longitude || lng;
+            // Also use building address if project doesn't have one
+            if (!address && building.buildingAddress) {
+              address = building.buildingAddress;
+            }
+          }
+        }
+        
         buildingsForMap.push({
           projectId: project.id,
           strataPlanNumber: project.strataPlanNumber || '',
           buildingName: project.buildingName,
-          buildingAddress: project.buildingAddress || '',
-          latitude: project.latitude,
-          longitude: project.longitude,
+          buildingAddress: address,
+          latitude: lat,
+          longitude: lng,
           status: project.status || 'active',
           jobType: project.jobType || '',
           customJobType: project.customJobType,
