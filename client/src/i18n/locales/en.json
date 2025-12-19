@@ -239,6 +239,122 @@
     "haveAccount": "Already have an account?",
     "signIn": "Sign in"
   },
+  "techReg": {
+    "sidebar": {
+      "title": "Create Your Profile",
+      "subtitle": "Join thousands of rope access technicians",
+      "whatYouGet": "What you get"
+    },
+    "steps": {
+      "accountDetails": "Account Details",
+      "certification": "Certification",
+      "complete": "Complete"
+    },
+    "benefits": {
+      "portableProfile": "Portable professional profile",
+      "hourLogging": "Automatic work hour logging",
+      "noOnboarding": "Never fill out onboarding forms again",
+      "freeUpgrade": "Free upgrade when you share"
+    },
+    "plusBenefits": {
+      "unlimitedEmployers": "Unlimited employer connections",
+      "exportablePdf": "Exportable work history PDF",
+      "expiryAlerts": "30-day certification expiry alerts",
+      "jobBoard": "Job board access"
+    },
+    "welcome": {
+      "badge": "For IRATA & SPRAT Technicians",
+      "title": "Create your free account",
+      "subtitle": "Takes 60 seconds. Free forever.",
+      "referralLabel": "Have a referral code? (optional)",
+      "referralPlaceholder": "Enter referral code",
+      "getStarted": "Get Started",
+      "haveAccount": "Already have an account?",
+      "signIn": "Sign In"
+    },
+    "errors": {
+      "firstNameRequired": "First name is required",
+      "lastNameRequired": "Last name is required",
+      "validEmailRequired": "Valid email is required",
+      "phoneRequired": "Phone number is required",
+      "passwordMinLength": "Password must be at least 8 characters",
+      "passwordUppercase": "Password must contain at least one uppercase letter",
+      "passwordLowercase": "Password must contain at least one lowercase letter",
+      "passwordNumber": "Password must contain at least one number",
+      "passwordsMismatch": "Passwords do not match",
+      "fullAddressRequired": "Full address is required",
+      "selectCertification": "Please select a certification type",
+      "irataRequired": "IRATA level and license number are required",
+      "spratRequired": "SPRAT level and license number are required"
+    },
+    "accountDetails": {
+      "step": "Step 1 of 3",
+      "title": "Account Details",
+      "firstName": "First Name",
+      "firstNamePlaceholder": "John",
+      "lastName": "Last Name",
+      "lastNamePlaceholder": "Smith",
+      "email": "Email",
+      "emailPlaceholder": "john@example.com",
+      "phone": "Phone",
+      "phonePlaceholder": "+1 (555) 000-0000",
+      "password": "Password",
+      "passwordPlaceholder": "Create a password",
+      "passwordHint": "Min 8 chars, 1 uppercase, 1 lowercase, 1 number",
+      "confirmPassword": "Confirm Password",
+      "confirmPasswordPlaceholder": "Confirm your password",
+      "address": "Address",
+      "streetAddress": "Street Address",
+      "streetAddressPlaceholder": "123 Main St",
+      "city": "City",
+      "cityPlaceholder": "Vancouver",
+      "provinceState": "Province/State",
+      "provinceStatePlaceholder": "BC",
+      "country": "Country",
+      "countryPlaceholder": "Canada",
+      "postalCode": "Postal Code",
+      "postalCodePlaceholder": "V6B 1A1"
+    },
+    "certification": {
+      "step": "Step 2 of 3",
+      "title": "Verify Your Certification",
+      "subtitle": "Select your certification type",
+      "both": "Both",
+      "trainee": "Trainee",
+      "irataDetails": "IRATA Details",
+      "spratDetails": "SPRAT Details",
+      "level": "Level",
+      "levelNumber": "Level",
+      "licenseNumber": "License Number",
+      "uploadCardLabel": "Upload Certification Card (optional)",
+      "tapToUpload": "Tap to upload photo",
+      "supportedFormats": "Supported: JPG, PNG, PDF",
+      "employerConnection": "Employer Connection (Optional)",
+      "employerConnectionDesc": "We will search to see if your employer already has an OnRopePro account and will initiate a connection if they do.",
+      "employerCompanyName": "Employer Company Name",
+      "employerCompanyNamePlaceholder": "Acme Rope Access Inc.",
+      "employerEmail": "Employer Email Address",
+      "employerEmailPlaceholder": "office@acmerope.com"
+    },
+    "buttons": {
+      "back": "Back",
+      "continue": "Continue",
+      "createAccount": "Create Account",
+      "creatingAccount": "Creating Account..."
+    },
+    "success": {
+      "title": "Welcome to OnRopePro!",
+      "subtitle": "Your account is ready",
+      "yourReferralCode": "YOUR REFERRAL CODE",
+      "shareForUpgrade": "Share with 1 other tech and you get a free upgrade to Plus",
+      "text": "Text",
+      "email": "Email",
+      "copy": "Copy",
+      "includes": "includes",
+      "goToSignIn": "Go to Sign In",
+      "closeDialog": "Close this dialog"
+    }
+  },
   "navigation": {
     "dashboard": "Dashboard",
     "projects": "Projects",

@@ -72,6 +72,16 @@ export default function TechnicianLogin() {
   const [loginMethod, setLoginMethod] = useState<"license" | "email">("license");
   const [showRegistration, setShowRegistration] = useState(false);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
+  
+  // Check for register query parameter to auto-open registration dialog
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('register') === 'true') {
+      setShowRegistration(true);
+      // Clean up URL without refreshing page
+      window.history.replaceState({}, '', '/technician-login');
+    }
+  }, []);
   const [expandedTechProblems, setExpandedTechProblems] = useState<string[]>([]);
   const [expandedEmployerProblems, setExpandedEmployerProblems] = useState<string[]>([]);
   const [expandedFaqs, setExpandedFaqs] = useState<string[]>([]);

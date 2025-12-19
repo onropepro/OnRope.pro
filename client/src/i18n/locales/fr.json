@@ -281,6 +281,122 @@
     "haveAccount": "Vous avez déjà un compte?",
     "signIn": "Connexion"
   },
+  "techReg": {
+    "sidebar": {
+      "title": "Créez Votre Profil",
+      "subtitle": "Rejoignez des milliers de techniciens en accès sur corde",
+      "whatYouGet": "Ce que vous obtenez"
+    },
+    "steps": {
+      "accountDetails": "Détails du Compte",
+      "certification": "Certification",
+      "complete": "Terminé"
+    },
+    "benefits": {
+      "portableProfile": "Profil professionnel portable",
+      "hourLogging": "Enregistrement automatique des heures de travail",
+      "noOnboarding": "Ne remplissez plus jamais de formulaires d'intégration",
+      "freeUpgrade": "Mise à niveau gratuite en partageant"
+    },
+    "plusBenefits": {
+      "unlimitedEmployers": "Connexions employeurs illimitées",
+      "exportablePdf": "Historique de travail exportable en PDF",
+      "expiryAlerts": "Alertes d'expiration de certification 30 jours",
+      "jobBoard": "Accès au tableau d'emplois"
+    },
+    "welcome": {
+      "badge": "Pour les Techniciens IRATA et SPRAT",
+      "title": "Créez votre compte gratuit",
+      "subtitle": "60 secondes. Gratuit pour toujours.",
+      "referralLabel": "Vous avez un code de parrainage? (optionnel)",
+      "referralPlaceholder": "Entrez le code de parrainage",
+      "getStarted": "Commencer",
+      "haveAccount": "Vous avez déjà un compte?",
+      "signIn": "Connexion"
+    },
+    "errors": {
+      "firstNameRequired": "Le prénom est obligatoire",
+      "lastNameRequired": "Le nom de famille est obligatoire",
+      "validEmailRequired": "Un courriel valide est requis",
+      "phoneRequired": "Le numéro de téléphone est obligatoire",
+      "passwordMinLength": "Le mot de passe doit comporter au moins 8 caractères",
+      "passwordUppercase": "Le mot de passe doit contenir au moins une majuscule",
+      "passwordLowercase": "Le mot de passe doit contenir au moins une minuscule",
+      "passwordNumber": "Le mot de passe doit contenir au moins un chiffre",
+      "passwordsMismatch": "Les mots de passe ne correspondent pas",
+      "fullAddressRequired": "L'adresse complète est obligatoire",
+      "selectCertification": "Veuillez sélectionner un type de certification",
+      "irataRequired": "Le niveau et numéro de licence IRATA sont obligatoires",
+      "spratRequired": "Le niveau et numéro de licence SPRAT sont obligatoires"
+    },
+    "accountDetails": {
+      "step": "Étape 1 sur 3",
+      "title": "Détails du Compte",
+      "firstName": "Prénom",
+      "firstNamePlaceholder": "Jean",
+      "lastName": "Nom de famille",
+      "lastNamePlaceholder": "Tremblay",
+      "email": "Courriel",
+      "emailPlaceholder": "jean@exemple.com",
+      "phone": "Téléphone",
+      "phonePlaceholder": "+1 (555) 000-0000",
+      "password": "Mot de passe",
+      "passwordPlaceholder": "Créez un mot de passe",
+      "passwordHint": "Min 8 car., 1 majuscule, 1 minuscule, 1 chiffre",
+      "confirmPassword": "Confirmer le Mot de passe",
+      "confirmPasswordPlaceholder": "Confirmez votre mot de passe",
+      "address": "Adresse",
+      "streetAddress": "Adresse",
+      "streetAddressPlaceholder": "123 rue Principale",
+      "city": "Ville",
+      "cityPlaceholder": "Montréal",
+      "provinceState": "Province/État",
+      "provinceStatePlaceholder": "QC",
+      "country": "Pays",
+      "countryPlaceholder": "Canada",
+      "postalCode": "Code Postal",
+      "postalCodePlaceholder": "H2X 1Y4"
+    },
+    "certification": {
+      "step": "Étape 2 sur 3",
+      "title": "Vérifiez Votre Certification",
+      "subtitle": "Sélectionnez votre type de certification",
+      "both": "Les deux",
+      "trainee": "Stagiaire",
+      "irataDetails": "Détails IRATA",
+      "spratDetails": "Détails SPRAT",
+      "level": "Niveau",
+      "levelNumber": "Niveau",
+      "licenseNumber": "Numéro de Licence",
+      "uploadCardLabel": "Télécharger la Carte de Certification (optionnel)",
+      "tapToUpload": "Appuyez pour télécharger une photo",
+      "supportedFormats": "Formats supportés: JPG, PNG, PDF",
+      "employerConnection": "Connexion Employeur (Optionnel)",
+      "employerConnectionDesc": "Nous rechercherons si votre employeur a déjà un compte OnRopePro et initierons une connexion si c'est le cas.",
+      "employerCompanyName": "Nom de l'Entreprise Employeur",
+      "employerCompanyNamePlaceholder": "Acme Accès sur Corde Inc.",
+      "employerEmail": "Courriel de l'Employeur",
+      "employerEmailPlaceholder": "bureau@acmerope.com"
+    },
+    "buttons": {
+      "back": "Retour",
+      "continue": "Continuer",
+      "createAccount": "Créer le Compte",
+      "creatingAccount": "Création du Compte..."
+    },
+    "success": {
+      "title": "Bienvenue sur OnRopePro!",
+      "subtitle": "Votre compte est prêt",
+      "yourReferralCode": "VOTRE CODE DE PARRAINAGE",
+      "shareForUpgrade": "Partagez avec 1 autre technicien et obtenez une mise à niveau gratuite vers Plus",
+      "text": "Texte",
+      "email": "Courriel",
+      "copy": "Copier",
+      "includes": "inclut",
+      "goToSignIn": "Aller à la Connexion",
+      "closeDialog": "Fermer ce dialogue"
+    }
+  },
   "navigation": {
     "dashboard": "Tableau de bord",
     "projects": "Projets",
