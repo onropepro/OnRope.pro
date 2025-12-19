@@ -39,6 +39,14 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
       console.log("⛔ User role not allowed, redirecting to appropriate dashboard");
       if (user.role === "resident") {
         setLocation("/resident");
+      } else if (user.role === "superuser") {
+        setLocation("/superuser");
+      } else if (user.role === "property_manager") {
+        setLocation("/property-manager");
+      } else if (user.role === "building_manager") {
+        setLocation("/building-portal");
+      } else if (user.role === "rope_access_tech") {
+        setLocation("/technician-portal");
       } else {
         setLocation("/dashboard");
       }
