@@ -3989,6 +3989,22 @@ export class Storage {
   }
 
   /**
+   * Update building address with coordinates for map display
+   */
+  async updateBuildingAddress(id: string, address: string, latitude?: number | null, longitude?: number | null): Promise<Building | undefined> {
+    const result = await db.update(buildings)
+      .set({ 
+        buildingAddress: address,
+        latitude: latitude ?? null,
+        longitude: longitude ?? null,
+        updatedAt: new Date() 
+      })
+      .where(eq(buildings.id, id))
+      .returning();
+    return result[0];
+  }
+
+  /**
    * Auto-create building from project data if it doesn't exist
    * Updates existing building with new data if fields are missing
    * Returns the building (existing or newly created)
