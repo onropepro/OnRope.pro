@@ -11,6 +11,7 @@ const RESIDENT_COLOR = "#86A59C";
 
 interface ResidentSlidingSignupProps {
   onClose?: () => void;
+  onShowSignIn?: () => void;
 }
 
 type Step = 
@@ -24,7 +25,7 @@ type Step =
 
 const STEPS: Step[] = ["name", "email", "phone", "strata", "unit", "parking", "password"];
 
-export function ResidentSlidingSignup({ onClose }: ResidentSlidingSignupProps) {
+export function ResidentSlidingSignup({ onClose, onShowSignIn }: ResidentSlidingSignupProps) {
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState<Step>("name");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -475,9 +476,14 @@ export function ResidentSlidingSignup({ onClose }: ResidentSlidingSignupProps) {
       {renderStepContent()}
       <p className="text-center text-sm text-muted-foreground mt-4">
         Already have an account?{" "}
-        <a href="/login" className="font-medium hover:underline" style={{ color: RESIDENT_COLOR }}>
+        <button 
+          onClick={onShowSignIn}
+          className="font-medium hover:underline"
+          style={{ color: RESIDENT_COLOR }}
+          data-testid="button-switch-to-signin"
+        >
           Sign In
-        </a>
+        </button>
       </p>
     </div>
   );

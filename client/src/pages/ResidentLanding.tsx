@@ -227,7 +227,13 @@ export default function ResidentLanding() {
                   transition={{ duration: 0.3 }}
                   className="max-w-md mx-auto pt-6"
                 >
-                  <ResidentSlidingSignup onClose={() => setShowSignup(false)} />
+                  <ResidentSlidingSignup 
+                    onClose={() => setShowSignup(false)} 
+                    onShowSignIn={() => {
+                      setShowSignup(false);
+                      setShowSignIn(true);
+                    }}
+                  />
                 </motion.div>
               )}
             </AnimatePresence>
