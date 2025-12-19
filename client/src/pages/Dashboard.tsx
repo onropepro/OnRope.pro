@@ -80,6 +80,8 @@ const projectSchema = z.object({
   strataPlanNumber: z.string().optional(),
   buildingName: z.string().optional(),
   buildingAddress: z.string().optional(),
+  latitude: z.number().nullable().optional(),
+  longitude: z.number().nullable().optional(),
   jobCategory: z.enum(['building_maintenance', 'ndt', 'rock_scaling', 'wind_turbine', 'oil_field']).default('building_maintenance'),
   jobType: z.enum(ALL_JOB_TYPE_VALUES, {
     errorMap: () => ({ message: "Please select a valid job type" })
@@ -1662,6 +1664,8 @@ export default function Dashboard() {
       strataPlanNumber: "",
       buildingName: "",
       buildingAddress: "",
+      latitude: null,
+      longitude: null,
       jobCategory: "building_maintenance",
       jobType: "window_cleaning",
       customJobType: "",
@@ -4087,6 +4091,9 @@ export default function Dashboard() {
                                   onBlur={field.onBlur}
                                   onSelect={(address) => {
                                     field.onChange(address.formatted);
+                                    // Capture coordinates from geocoded address
+                                    projectForm.setValue('latitude', address.latitude);
+                                    projectForm.setValue('longitude', address.longitude);
                                   }}
                                 />
                               </FormControl>

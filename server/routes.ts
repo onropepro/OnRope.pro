@@ -845,7 +845,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         city: result.city || result.town || result.village || "",
         state: result.state || result.province || "",
         country: result.country || "",
-        postcode: result.postcode || ""
+        postcode: result.postcode || "",
+        latitude: result.lat || null,
+        longitude: result.lon || null
       }));
       
       return res.json({ results });
