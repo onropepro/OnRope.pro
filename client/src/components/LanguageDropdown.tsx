@@ -37,6 +37,7 @@ export function LanguageDropdown({
 
   const changeLanguage = (lang: 'en' | 'fr' | 'es') => {
     setCurrentLanguage(lang);
+    localStorage.setItem('i18nextLng', lang);
     i18n.changeLanguage(lang);
   };
 

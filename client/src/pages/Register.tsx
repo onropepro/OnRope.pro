@@ -301,7 +301,7 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4" key={i18n.language}>
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-2">
           <div className="flex items-center justify-between mb-2">
@@ -315,7 +315,7 @@ export default function Register() {
           <CardTitle className="text-2xl font-bold text-center">{t('register.title', 'Create Account')}</CardTitle>
           <CardDescription className="text-center">{t('register.subtitle', 'Choose your account type to get started')}</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent key={i18n.language}>
           <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "resident" | "property_manager")}>
             <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="resident" data-testid="tab-resident">{t('register.tabs.resident', 'Resident')}</TabsTrigger>
