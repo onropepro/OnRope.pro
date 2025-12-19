@@ -8,9 +8,6 @@ import {
   Bell,
   CheckCircle,
   Loader2,
-  Eye,
-  Clock,
-  Lock,
   BookOpen,
   ExternalLink,
 } from 'lucide-react';
@@ -18,7 +15,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import HelpArticleCard from '@/components/help/HelpArticleCard';
 import HelpChatWidget from '@/components/help/HelpChatWidget';
-import companyCodeImage from '@assets/residents_company_code.png';
 
 interface HelpArticle {
   id: string;
@@ -176,119 +172,23 @@ export default function ForResidents() {
         </section>
 
         <section className="mb-12">
-          <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
-            <h2 className="text-2xl font-semibold flex items-center gap-2">
-              <BookOpen className="h-6 w-6 text-[#86A59C]" />
-              Resident Portal User Guide
-            </h2>
-            <Link href="/changelog/resident-portal#user-guide">
-              <Button variant="outline" size="sm" className="gap-2" data-testid="button-full-guide">
-                View Full Guide
-                <ExternalLink className="h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
-
-          <Card className="border-[#86A59C]/30">
-            <CardContent className="pt-6 space-y-6">
-              <p className="text-base text-muted-foreground leading-relaxed">
-                The Resident Portal gives you direct access to view maintenance work progress on your building and communicate directly with the service company. No more wondering when work will be done or whether your concerns were received.
-              </p>
-
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Creating Your Account</h3>
-                <p className="text-base text-muted-foreground">
-                  To sign up for an account, go to: <Link href="/resident"><span className="text-[#86A59C] underline">onrope.pro/resident</span></Link>
-                </p>
-                <p className="text-base text-muted-foreground mb-2">You'll need to provide:</p>
-                <ul className="list-disc list-inside space-y-1 ml-2 text-base text-muted-foreground">
-                  <li><strong>Full name</strong>, <strong>Email</strong>, and <strong>Phone number</strong></li>
-                  <li><strong>Strata plan / HOA / LMS number</strong> - Your building's strata plan identifier</li>
-                  <li><strong>Unit number</strong> - Your apartment or suite number</li>
-                  <li><strong>Password</strong> - Create a secure password for your account</li>
-                </ul>
-              </div>
-
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Entering Your Company Code</h3>
-                <p className="text-base text-muted-foreground">
-                  After logging in for the first time, you'll need to enter a <strong>10-character Company Code</strong> to complete your portal setup.
-                </p>
-                <div className="border rounded-lg overflow-hidden max-w-2xl">
-                  <img 
-                    src={companyCodeImage} 
-                    alt="Where to add your company code" 
-                    className="w-full"
-                  />
-                  <p className="text-sm text-center text-muted-foreground py-2 bg-muted/30">Where to add your company code</p>
+          <Card className="border-[#86A59C]/30 bg-[#86A59C]/5">
+            <CardContent className="pt-6">
+              <div className="flex items-start gap-4 flex-wrap">
+                <div className="w-12 h-12 rounded-lg bg-[#86A59C]/20 flex items-center justify-center text-[#86A59C] shrink-0">
+                  <BookOpen className="h-6 w-6" />
                 </div>
-                <div className="bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
-                  <p className="text-base text-blue-800 dark:text-blue-200">
-                    <strong>Important:</strong> Active work and building information won't appear in your control panel until you've entered the company code.
+                <div className="flex-1 min-w-[200px]">
+                  <h2 className="text-xl font-semibold mb-2">Resident Portal User Guide</h2>
+                  <p className="text-muted-foreground mb-4">
+                    Complete step-by-step guide for setting up your account, entering your company code, submitting feedback, and tracking your issues.
                   </p>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">What You Can Do</h3>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#86A59C]/20 flex items-center justify-center text-[#86A59C] shrink-0">
-                      <Eye className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <p className="font-medium">View Project Progress</p>
-                      <p className="text-sm text-muted-foreground">See real-time progress updates showing which elevations are complete</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#86A59C]/20 flex items-center justify-center text-[#86A59C] shrink-0">
-                      <MessageSquare className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <p className="font-medium">Submit Feedback</p>
-                      <p className="text-sm text-muted-foreground">Report issues, concerns, or compliments with photo attachments</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#86A59C]/20 flex items-center justify-center text-[#86A59C] shrink-0">
-                      <Clock className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <p className="font-medium">Track Your Feedback</p>
-                      <p className="text-sm text-muted-foreground">See current status (Open, In Progress, or Closed)</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#86A59C]/20 flex items-center justify-center text-[#86A59C] shrink-0">
-                      <Lock className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <p className="font-medium">Privacy & Security</p>
-                      <p className="text-sm text-muted-foreground">Your data is protected with encrypted passwords and secure sessions</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <h3 className="text-lg font-semibold">Feedback Status</h3>
-                <div className="flex flex-wrap gap-3">
-                  <div className="flex items-center gap-2 bg-muted/50 rounded-lg px-4 py-2">
-                    <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                    <span className="font-medium">Open</span>
-                    <span className="text-muted-foreground text-sm">- Awaiting review</span>
-                  </div>
-                  <div className="flex items-center gap-2 bg-muted/50 rounded-lg px-4 py-2">
-                    <div className="w-3 h-3 rounded-full bg-amber-500"></div>
-                    <span className="font-medium">In Progress</span>
-                    <span className="text-muted-foreground text-sm">- Being resolved</span>
-                  </div>
-                  <div className="flex items-center gap-2 bg-muted/50 rounded-lg px-4 py-2">
-                    <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
-                    <span className="font-medium">Closed</span>
-                    <span className="text-muted-foreground text-sm">- Issue resolved</span>
-                  </div>
+                  <Link href="/help/resident-portal-guide">
+                    <Button className="bg-[#86A59C] hover:bg-[#6B8A80] gap-2" data-testid="button-user-guide">
+                      View User Guide
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </CardContent>

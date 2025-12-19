@@ -111,6 +111,7 @@ import ForTechnicians from "@/pages/help/stakeholders/ForTechnicians";
 import ForBuildingManagers from "@/pages/help/stakeholders/ForBuildingManagers";
 import ForPropertyManagers from "@/pages/help/stakeholders/ForPropertyManagers";
 import ForResidents from "@/pages/help/stakeholders/ForResidents";
+import ResidentPortalUserGuide from "@/pages/help/ResidentPortalUserGuide";
 import TechnicianPortal from "@/pages/TechnicianPortal";
 import Employer from "@/pages/Employer";
 import TechnicianLoggedHours from "@/pages/TechnicianLoggedHours";
@@ -428,6 +429,7 @@ function Router() {
       <Route path="/help/for-building-managers" component={ForBuildingManagers} />
       <Route path="/help/for-property-managers" component={ForPropertyManagers} />
       <Route path="/help/for-residents" component={ForResidents} />
+      <Route path="/help/resident-portal-guide" component={ResidentPortalUserGuide} />
       <Route component={NotFound} />
     </Switch>
   );
