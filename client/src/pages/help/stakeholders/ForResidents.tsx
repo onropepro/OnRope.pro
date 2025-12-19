@@ -192,8 +192,6 @@ export default function ForResidents() {
 
       </div>
       </div>
-      
-      <HelpChatWidget />
     </div>
   );
 }
