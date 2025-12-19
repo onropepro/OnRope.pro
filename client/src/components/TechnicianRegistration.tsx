@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { 
   User, ArrowRight, ArrowLeft, Award, Loader2, 
   Check, Upload, Shield, Copy, Mail, MessageSquare,
@@ -506,12 +507,22 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                       <div className="space-y-3">
                         <div>
                           <Label htmlFor="streetAddress">{t('techReg.accountDetails.streetAddress', 'Street Address')}</Label>
-                          <Input
-                            id="streetAddress"
-                            placeholder={t('techReg.accountDetails.streetAddressPlaceholder', '123 Main St')}
-                            value={data.streetAddress}
-                            onChange={(e) => setData({ ...data, streetAddress: e.target.value })}
+                          <AddressAutocomplete
                             data-testid="input-street-address"
+                            placeholder={t('techReg.accountDetails.streetAddressPlaceholder', 'Start typing your address...')}
+                            value={data.streetAddress}
+                            onChange={(value) => setData({ ...data, streetAddress: value })}
+                            onSelect={(address) => {
+                              const streetParts = [address.houseNumber, address.street].filter(Boolean);
+                              setData({
+                                ...data,
+                                streetAddress: streetParts.join(' ') || address.formatted.split(',')[0] || '',
+                                city: address.city || '',
+                                provinceState: address.state || '',
+                                country: address.country || '',
+                                postalCode: address.postcode || '',
+                              });
+                            }}
                           />
                         </div>
                         <div className="grid grid-cols-2 gap-3">
