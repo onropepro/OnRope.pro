@@ -198,15 +198,22 @@ export default function TechnicianLanding() {
                   <div className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0" />
                     <div>
+                      <p className="font-medium">Logbook Photo Import</p>
+                      <p className="text-sm text-muted-foreground">Snap a photo of your physical logbook pages. The app reads them and imports your historical data automatically. Years of work history uploaded in minutes.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0" />
+                    <div>
                       <p className="font-medium">Instant Employer Connection</p>
-                      <p className="text-sm text-muted-foreground">10 seconds to onboard, not 60 minutes of paperwork</p>
+                      <p className="text-sm text-muted-foreground">When connected to an employer on OnRopePro: 10 seconds to onboard, not 60 minutes of paperwork</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0" />
                     <div>
                       <p className="font-medium">Automatic Hour Tracking</p>
-                      <p className="text-sm text-muted-foreground">Every work session, building, height, and task logged automatically</p>
+                      <p className="text-sm text-muted-foreground">Every work session, building, height, and task logged automatically (when employer uses OnRopePro)</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
