@@ -1714,77 +1714,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const resetLink = `${baseUrl}/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
       
-      // Send email via Resend
+      // Send email via SendGrid (Replit connector)
       try {
-        const resend = new Resend(process.env.RESEND_API_KEY);
+        const { sendPasswordResetEmail } = await import('./sendgrid');
+        const userName = user.name || user.companyName || 'there';
         
-        const { error } = await resend.emails.send({
-          from: 'OnRopePro <noreply@onropepro.com>',
-          to: email,
-          subject: 'Reset Your Password - OnRopePro',
-          html: `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; background-color: #f5f5f5;">
-  <table role="presentation" style="width: 100%; border-collapse: collapse;">
-    <tr>
-      <td align="center" style="padding: 40px 0;">
-        <table role="presentation" style="width: 100%; max-width: 600px; border-collapse: collapse; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-          <tr>
-            <td style="padding: 40px 40px 20px 40px; text-align: center;">
-              <h1 style="margin: 0; color: #1a1a1a; font-size: 24px; font-weight: 600;">Reset Your Password</h1>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding: 0 40px 20px 40px;">
-              <p style="margin: 0 0 16px 0; color: #4a4a4a; font-size: 16px; line-height: 24px;">
-                Hi ${user.name || user.companyName || 'there'},
-              </p>
-              <p style="margin: 0 0 24px 0; color: #4a4a4a; font-size: 16px; line-height: 24px;">
-                We received a request to reset your password for your OnRopePro account. Click the button below to create a new password:
-              </p>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding: 0 40px 24px 40px; text-align: center;">
-              <a href="${resetLink}" style="display: inline-block; padding: 14px 32px; background-color: #86A59C; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 600; border-radius: 6px;">Reset Password</a>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding: 0 40px 24px 40px;">
-              <p style="margin: 0 0 16px 0; color: #4a4a4a; font-size: 14px; line-height: 22px;">
-                This link will expire in <strong>1 hour</strong>. If you did not request a password reset, you can safely ignore this email.
-              </p>
-              <p style="margin: 0; color: #888888; font-size: 12px; line-height: 18px;">
-                If the button above does not work, copy and paste this link into your browser:<br>
-                <a href="${resetLink}" style="color: #86A59C; word-break: break-all;">${resetLink}</a>
-              </p>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding: 24px 40px; border-top: 1px solid #eeeeee;">
-              <p style="margin: 0; color: #888888; font-size: 12px; text-align: center;">
-                OnRopePro - Rope Access Management Platform
-              </p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>
-          `,
-        });
+        const result = await sendPasswordResetEmail(email, resetLink, userName);
         
-        if (error) {
-          console.error('[Forgot-Password] Email send error:', error);
-        } else {
+        if (result.success) {
           console.log(`[Forgot-Password] Reset email sent to: ${email}`);
+        } else {
+          console.error('[Forgot-Password] Email send error:', result.error);
         }
       } catch (emailError) {
         console.error('[Forgot-Password] Failed to send email:', emailError);
