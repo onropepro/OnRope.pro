@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown, IdCard, HardHat, Search, Package, Calendar, DollarSign, Calculator, Palette, HelpCircle, MessageSquare, Globe } from "lucide-react";
+import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown, IdCard, HardHat, Search, Package, Calendar, DollarSign, Calculator, Palette, HelpCircle, MessageSquare, Globe, BookOpen } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 interface PublicHeaderProps {
@@ -495,6 +495,22 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                     <button
                       className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group w-full"
                       onClick={() => {
+                        setLocation("/technician");
+                        setShowTechnicianMenu(false);
+                      }}
+                      data-testid="nav-technician-passport"
+                    >
+                      <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <BookOpen className="w-5 h-5 text-amber-600" />
+                      </div>
+                      <div>
+                        <div className="font-semibold text-sm">{t('navigation.modules.passportLogbook.title', 'Passport & Log Book')}</div>
+                        <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.passportLogbook.description', 'Your portable work history, certifications, and career tracking')}</div>
+                      </div>
+                    </button>
+                    <button
+                      className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group w-full"
+                      onClick={() => {
                         setLocation("/modules/technician-job-board");
                         setShowTechnicianMenu(false);
                       }}
@@ -764,10 +780,10 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                       setLocation("/technician");
                       setMobileMenuOpen(false);
                     }}
-                    data-testid="nav-mobile-technician-landing"
+                    data-testid="nav-mobile-technician-passport"
                   >
-                    <HardHat className="w-5 h-5 text-amber-600" />
-                    <span className="text-sm">{t('navigation.technician', 'Technician Portal')}</span>
+                    <BookOpen className="w-5 h-5 text-amber-600" />
+                    <span className="text-sm">{t('navigation.modules.passportLogbook.title', 'Passport & Log Book')}</span>
                   </button>
                   <button
                     className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
