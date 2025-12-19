@@ -149,7 +149,7 @@ export default function TechnicianLanding() {
               Not locked in your employer's filing cabinet. Not lost when companies fold. Not starting from zero every time you change jobs.
             </p>
             <p>
-              Your IRATA or SPRAT number becomes your permanent identifier. Your work history accumulates automatically. Your professional reputation travels with you—Vancouver to Toronto to Seattle and back.
+              Your IRATA or SPRAT number becomes your permanent identifier. Your work history accumulates—automatically when your employer uses OnRopePro, or via photo import of your existing logbook. Your professional reputation travels with you—Vancouver to Toronto to Seattle and back.
             </p>
           </div>
           
