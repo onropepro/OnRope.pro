@@ -144,11 +144,14 @@ export default function HelpArticle() {
             <CardContent className="pt-6">
               <div className="prose dark:prose-invert max-w-none prose-headings:text-foreground prose-p:text-foreground/90 prose-strong:text-foreground prose-li:text-foreground/90">
                 {(() => {
+                  try {
                   // Helper function to render inline formatting (bold, links)
                   const renderInlineFormatting = (text: string) => {
+                    if (!text) return null;
                     const parts = text.split(/(\*\*[^*]+\*\*|\[[^\]]+\]\([^)]+\))/g);
                     return parts.map((part, i) => {
-                      if (part.startsWith('**') && part.endsWith('**')) {
+                      if (!part) return null;
+                      if (part.startsWith('**') && part.endsWith('**') && part.length > 4) {
                         return <strong key={i} className="font-semibold">{part.slice(2, -2)}</strong>;
                       }
                       const linkMatch = part.match(/\[([^\]]+)\]\(([^)]+)\)/);
@@ -329,6 +332,10 @@ export default function HelpArticle() {
                   }
                   
                   return elements;
+                  } catch (error) {
+                    console.error('Error parsing markdown:', error);
+                    return <p className="text-destructive">Error rendering content. Please try refreshing the page.</p>;
+                  }
                 })()}
               </div>
             </CardContent>
