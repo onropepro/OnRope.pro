@@ -224,6 +224,10 @@ export const users = pgTable("users", {
   disabledReason: text("disabled_reason"), // Reason for suspension (fraud, misuse, etc.)
   disabledBy: varchar("disabled_by"), // SuperUser who disabled the account
   
+  // Password reset
+  passwordResetToken: varchar("password_reset_token"), // Token for password reset
+  passwordResetExpires: timestamp("password_reset_expires"), // When the reset token expires
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
