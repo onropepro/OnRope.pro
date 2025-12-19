@@ -146,43 +146,43 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
 
   const validateAccountDetails = (): boolean => {
     if (!data.firstName.trim()) {
-      setError("First name is required");
+      setError(t('techReg.errors.firstNameRequired', 'First name is required'));
       return false;
     }
     if (!data.lastName.trim()) {
-      setError("Last name is required");
+      setError(t('techReg.errors.lastNameRequired', 'Last name is required'));
       return false;
     }
     if (!data.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-      setError("Valid email is required");
+      setError(t('techReg.errors.validEmailRequired', 'Valid email is required'));
       return false;
     }
     if (!data.phone.trim()) {
-      setError("Phone number is required");
+      setError(t('techReg.errors.phoneRequired', 'Phone number is required'));
       return false;
     }
     if (!data.password || data.password.length < 8) {
-      setError("Password must be at least 8 characters");
+      setError(t('techReg.errors.passwordMinLength', 'Password must be at least 8 characters'));
       return false;
     }
     if (!/[A-Z]/.test(data.password)) {
-      setError("Password must contain at least one uppercase letter");
+      setError(t('techReg.errors.passwordUppercase', 'Password must contain at least one uppercase letter'));
       return false;
     }
     if (!/[a-z]/.test(data.password)) {
-      setError("Password must contain at least one lowercase letter");
+      setError(t('techReg.errors.passwordLowercase', 'Password must contain at least one lowercase letter'));
       return false;
     }
     if (!/[0-9]/.test(data.password)) {
-      setError("Password must contain at least one number");
+      setError(t('techReg.errors.passwordNumber', 'Password must contain at least one number'));
       return false;
     }
     if (data.password !== data.confirmPassword) {
-      setError("Passwords do not match");
+      setError(t('techReg.errors.passwordsMismatch', 'Passwords do not match'));
       return false;
     }
     if (!data.streetAddress.trim() || !data.city.trim() || !data.provinceState.trim() || !data.country.trim() || !data.postalCode.trim()) {
-      setError("Full address is required");
+      setError(t('techReg.errors.fullAddressRequired', 'Full address is required'));
       return false;
     }
     return true;
@@ -190,18 +190,18 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
 
   const validateCertification = (): boolean => {
     if (!data.certification) {
-      setError("Please select a certification type");
+      setError(t('techReg.errors.selectCertification', 'Please select a certification type'));
       return false;
     }
     if (data.certification === "irata" || data.certification === "both") {
       if (!data.irataLevel || !data.irataLicenseNumber.trim()) {
-        setError("irata level and license number are required");
+        setError(t('techReg.errors.irataRequired', 'IRATA level and license number are required'));
         return false;
       }
     }
     if (data.certification === "sprat" || data.certification === "both") {
       if (!data.spratLevel || !data.spratLicenseNumber.trim()) {
-        setError("SPRAT level and license number are required");
+        setError(t('techReg.errors.spratRequired', 'SPRAT level and license number are required'));
         return false;
       }
     }
@@ -406,27 +406,27 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
               {step === "accountDetails" && (
                 <div className="max-w-lg mx-auto">
                   <div className="mb-6">
-                    <p className="text-sm text-muted-foreground mb-1">Step 1 of 3</p>
-                    <h2 className="text-2xl font-bold">Account Details</h2>
+                    <p className="text-sm text-muted-foreground mb-1">{t('techReg.accountDetails.step', 'Step 1 of 3')}</p>
+                    <h2 className="text-2xl font-bold">{t('techReg.accountDetails.title', 'Account Details')}</h2>
                   </div>
 
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="firstName">First Name</Label>
+                        <Label htmlFor="firstName">{t('techReg.accountDetails.firstName', 'First Name')}</Label>
                         <Input
                           id="firstName"
-                          placeholder="John"
+                          placeholder={t('techReg.accountDetails.firstNamePlaceholder', 'John')}
                           value={data.firstName}
                           onChange={(e) => setData({ ...data, firstName: e.target.value })}
                           data-testid="input-first-name"
                         />
                       </div>
                       <div>
-                        <Label htmlFor="lastName">Last Name</Label>
+                        <Label htmlFor="lastName">{t('techReg.accountDetails.lastName', 'Last Name')}</Label>
                         <Input
                           id="lastName"
-                          placeholder="Smith"
+                          placeholder={t('techReg.accountDetails.lastNamePlaceholder', 'Smith')}
                           value={data.lastName}
                           onChange={(e) => setData({ ...data, lastName: e.target.value })}
                           data-testid="input-last-name"
@@ -435,11 +435,11 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                     </div>
 
                     <div>
-                      <Label htmlFor="email">Email</Label>
+                      <Label htmlFor="email">{t('techReg.accountDetails.email', 'Email')}</Label>
                       <Input
                         id="email"
                         type="email"
-                        placeholder="john@example.com"
+                        placeholder={t('techReg.accountDetails.emailPlaceholder', 'john@example.com')}
                         value={data.email}
                         onChange={(e) => setData({ ...data, email: e.target.value })}
                         data-testid="input-email"
@@ -447,11 +447,11 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                     </div>
 
                     <div>
-                      <Label htmlFor="phone">Phone</Label>
+                      <Label htmlFor="phone">{t('techReg.accountDetails.phone', 'Phone')}</Label>
                       <Input
                         id="phone"
                         type="tel"
-                        placeholder="+1 (555) 000-0000"
+                        placeholder={t('techReg.accountDetails.phonePlaceholder', '+1 (555) 000-0000')}
                         value={data.phone}
                         onChange={(e) => setData({ ...data, phone: e.target.value })}
                         data-testid="input-phone"
@@ -459,12 +459,12 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                     </div>
 
                     <div>
-                      <Label htmlFor="password">Password</Label>
+                      <Label htmlFor="password">{t('techReg.accountDetails.password', 'Password')}</Label>
                       <div className="relative">
                         <Input
                           id="password"
                           type={showPassword ? "text" : "password"}
-                          placeholder="Create a password"
+                          placeholder={t('techReg.accountDetails.passwordPlaceholder', 'Create a password')}
                           value={data.password}
                           onChange={(e) => setData({ ...data, password: e.target.value })}
                           data-testid="input-password"
@@ -477,16 +477,16 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                           {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-1">Min 8 chars, 1 uppercase, 1 lowercase, 1 number</p>
+                      <p className="text-xs text-muted-foreground mt-1">{t('techReg.accountDetails.passwordHint', 'Min 8 chars, 1 uppercase, 1 lowercase, 1 number')}</p>
                     </div>
 
                     <div>
-                      <Label htmlFor="confirmPassword">Confirm Password</Label>
+                      <Label htmlFor="confirmPassword">{t('techReg.accountDetails.confirmPassword', 'Confirm Password')}</Label>
                       <div className="relative">
                         <Input
                           id="confirmPassword"
                           type={showConfirmPassword ? "text" : "password"}
-                          placeholder="Confirm your password"
+                          placeholder={t('techReg.accountDetails.confirmPasswordPlaceholder', 'Confirm your password')}
                           value={data.confirmPassword}
                           onChange={(e) => setData({ ...data, confirmPassword: e.target.value })}
                           data-testid="input-confirm-password"
@@ -502,13 +502,13 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                     </div>
 
                     <div className="border-t pt-4 mt-4">
-                      <h3 className="font-medium mb-3">Address</h3>
+                      <h3 className="font-medium mb-3">{t('techReg.accountDetails.address', 'Address')}</h3>
                       <div className="space-y-3">
                         <div>
-                          <Label htmlFor="streetAddress">Street Address</Label>
+                          <Label htmlFor="streetAddress">{t('techReg.accountDetails.streetAddress', 'Street Address')}</Label>
                           <Input
                             id="streetAddress"
-                            placeholder="123 Main St"
+                            placeholder={t('techReg.accountDetails.streetAddressPlaceholder', '123 Main St')}
                             value={data.streetAddress}
                             onChange={(e) => setData({ ...data, streetAddress: e.target.value })}
                             data-testid="input-street-address"
@@ -516,20 +516,20 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                           <div>
-                            <Label htmlFor="city">City</Label>
+                            <Label htmlFor="city">{t('techReg.accountDetails.city', 'City')}</Label>
                             <Input
                               id="city"
-                              placeholder="Vancouver"
+                              placeholder={t('techReg.accountDetails.cityPlaceholder', 'Vancouver')}
                               value={data.city}
                               onChange={(e) => setData({ ...data, city: e.target.value })}
                               data-testid="input-city"
                             />
                           </div>
                           <div>
-                            <Label htmlFor="provinceState">Province/State</Label>
+                            <Label htmlFor="provinceState">{t('techReg.accountDetails.provinceState', 'Province/State')}</Label>
                             <Input
                               id="provinceState"
-                              placeholder="BC"
+                              placeholder={t('techReg.accountDetails.provinceStatePlaceholder', 'BC')}
                               value={data.provinceState}
                               onChange={(e) => setData({ ...data, provinceState: e.target.value })}
                               data-testid="input-province-state"
@@ -538,20 +538,20 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                           <div>
-                            <Label htmlFor="country">Country</Label>
+                            <Label htmlFor="country">{t('techReg.accountDetails.country', 'Country')}</Label>
                             <Input
                               id="country"
-                              placeholder="Canada"
+                              placeholder={t('techReg.accountDetails.countryPlaceholder', 'Canada')}
                               value={data.country}
                               onChange={(e) => setData({ ...data, country: e.target.value })}
                               data-testid="input-country"
                             />
                           </div>
                           <div>
-                            <Label htmlFor="postalCode">Postal Code</Label>
+                            <Label htmlFor="postalCode">{t('techReg.accountDetails.postalCode', 'Postal Code')}</Label>
                             <Input
                               id="postalCode"
-                              placeholder="V6B 1A1"
+                              placeholder={t('techReg.accountDetails.postalCodePlaceholder', 'V6B 1A1')}
                               value={data.postalCode}
                               onChange={(e) => setData({ ...data, postalCode: e.target.value })}
                               data-testid="input-postal-code"
@@ -571,14 +571,14 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                   <div className="flex gap-3 mt-6">
                     <Button variant="outline" onClick={handleBack} className="gap-2">
                       <ArrowLeft className="w-4 h-4" />
-                      Back
+                      {t('techReg.buttons.back', 'Back')}
                     </Button>
                     <Button 
                       className="flex-1 gap-2 bg-[#0369A1]"
                       onClick={handleContinue}
                       data-testid="button-continue-to-certification"
                     >
-                      Continue
+                      {t('techReg.buttons.continue', 'Continue')}
                       <ArrowRight className="w-4 h-4" />
                     </Button>
                   </div>
@@ -589,17 +589,17 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
               {step === "certification" && (
                 <div className="max-w-lg mx-auto">
                   <div className="mb-6">
-                    <p className="text-sm text-muted-foreground mb-1">Step 2 of 3</p>
-                    <h2 className="text-2xl font-bold">Verify Your Certification</h2>
-                    <p className="text-muted-foreground mt-1">Select your certification type</p>
+                    <p className="text-sm text-muted-foreground mb-1">{t('techReg.certification.step', 'Step 2 of 3')}</p>
+                    <h2 className="text-2xl font-bold">{t('techReg.certification.title', 'Verify Your Certification')}</h2>
+                    <p className="text-muted-foreground mt-1">{t('techReg.certification.subtitle', 'Select your certification type')}</p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3 mb-6">
                     {[
-                      { value: "irata", label: "irata" },
+                      { value: "irata", label: "IRATA" },
                       { value: "sprat", label: "SPRAT" },
-                      { value: "both", label: "Both" },
-                      { value: "trainee", label: "Trainee" },
+                      { value: "both", label: t('techReg.certification.both', 'Both') },
+                      { value: "trainee", label: t('techReg.certification.trainee', 'Trainee') },
                     ].map((cert) => (
                       <button
                         key={cert.value}
@@ -617,16 +617,16 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                     ))}
                   </div>
 
-                  {/* irata Fields */}
+                  {/* IRATA Fields */}
                   {(data.certification === "irata" || data.certification === "both") && (
                     <div className="space-y-4 mb-4 p-4 rounded-lg bg-muted/50">
                       <h4 className="font-medium flex items-center gap-2">
                         <Award className="w-4 h-4 text-[#0369A1]" />
-                        irata Details
+                        {t('techReg.certification.irataDetails', 'IRATA Details')}
                       </h4>
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <Label>Level</Label>
+                          <Label>{t('techReg.certification.level', 'Level')}</Label>
                           <div className="flex gap-2 mt-1">
                             {["1", "2", "3"].map((level) => (
                               <button
@@ -640,13 +640,13 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                                 onClick={() => setData({ ...data, irataLevel: level })}
                                 data-testid={`button-irata-level-${level}`}
                               >
-                                Level {level}
+                                {t('techReg.certification.levelNumber', 'Level')} {level}
                               </button>
                             ))}
                           </div>
                         </div>
                         <div>
-                          <Label htmlFor="irataLicenseNumber">License Number</Label>
+                          <Label htmlFor="irataLicenseNumber">{t('techReg.certification.licenseNumber', 'License Number')}</Label>
                           <Input
                             id="irataLicenseNumber"
                             placeholder="123456"
@@ -665,11 +665,11 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                     <div className="space-y-4 mb-4 p-4 rounded-lg bg-muted/50">
                       <h4 className="font-medium flex items-center gap-2">
                         <Award className="w-4 h-4 text-[#0369A1]" />
-                        SPRAT Details
+                        {t('techReg.certification.spratDetails', 'SPRAT Details')}
                       </h4>
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <Label>Level</Label>
+                          <Label>{t('techReg.certification.level', 'Level')}</Label>
                           <div className="flex gap-2 mt-1">
                             {["1", "2", "3"].map((level) => (
                               <button
@@ -683,13 +683,13 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                                 onClick={() => setData({ ...data, spratLevel: level })}
                                 data-testid={`button-sprat-level-${level}`}
                               >
-                                Level {level}
+                                {t('techReg.certification.levelNumber', 'Level')} {level}
                               </button>
                             ))}
                           </div>
                         </div>
                         <div>
-                          <Label htmlFor="spratLicenseNumber">License Number</Label>
+                          <Label htmlFor="spratLicenseNumber">{t('techReg.certification.licenseNumber', 'License Number')}</Label>
                           <Input
                             id="spratLicenseNumber"
                             placeholder="123456"
@@ -706,7 +706,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                   {/* Certification Card Upload */}
                   {data.certification && data.certification !== "trainee" && (
                     <div className="mb-4">
-                      <Label className="mb-2 block">Upload Certification Card (optional)</Label>
+                      <Label className="mb-2 block">{t('techReg.certification.uploadCardLabel', 'Upload Certification Card (optional)')}</Label>
                       <input
                         type="file"
                         ref={fileInputRef}
@@ -733,11 +733,11 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                         ) : (
                           <>
                             <Upload className="w-4 h-4" />
-                            Tap to upload photo
+                            {t('techReg.certification.tapToUpload', 'Tap to upload photo')}
                           </>
                         )}
                       </Button>
-                      <p className="text-xs text-muted-foreground mt-1">Supported: JPG, PNG, PDF</p>
+                      <p className="text-xs text-muted-foreground mt-1">{t('techReg.certification.supportedFormats', 'Supported: JPG, PNG, PDF')}</p>
                     </div>
                   )}
 
@@ -745,17 +745,17 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                   <div className="space-y-3 mb-4 p-4 rounded-lg bg-muted/50">
                     <h4 className="font-medium flex items-center gap-2">
                       <Building className="w-4 h-4 text-[#0369A1]" />
-                      Employer Connection (Optional)
+                      {t('techReg.certification.employerConnection', 'Employer Connection (Optional)')}
                     </h4>
                     <p className="text-xs text-muted-foreground">
-                      We will search to see if your employer already has an OnRopePro account and will initiate a connection if they do.
+                      {t('techReg.certification.employerConnectionDesc', 'We will search to see if your employer already has an OnRopePro account and will initiate a connection if they do.')}
                     </p>
                     <div className="space-y-3">
                       <div>
-                        <Label htmlFor="employerCompanyName">Employer Company Name</Label>
+                        <Label htmlFor="employerCompanyName">{t('techReg.certification.employerCompanyName', 'Employer Company Name')}</Label>
                         <Input
                           id="employerCompanyName"
-                          placeholder="Acme Rope Access Inc."
+                          placeholder={t('techReg.certification.employerCompanyNamePlaceholder', 'Acme Rope Access Inc.')}
                           value={data.employerCompanyName || ""}
                           onChange={(e) => setData({ ...data, employerCompanyName: e.target.value })}
                           className="mt-1"
@@ -763,11 +763,11 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                         />
                       </div>
                       <div>
-                        <Label htmlFor="employerEmail">Employer Email Address</Label>
+                        <Label htmlFor="employerEmail">{t('techReg.certification.employerEmail', 'Employer Email Address')}</Label>
                         <Input
                           id="employerEmail"
                           type="email"
-                          placeholder="office@acmerope.com"
+                          placeholder={t('techReg.certification.employerEmailPlaceholder', 'office@acmerope.com')}
                           value={data.employerEmail || ""}
                           onChange={(e) => setData({ ...data, employerEmail: e.target.value })}
                           className="mt-1"
@@ -786,7 +786,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                   <div className="flex gap-3 mt-6">
                     <Button variant="outline" onClick={handleBack} className="gap-2">
                       <ArrowLeft className="w-4 h-4" />
-                      Back
+                      {t('techReg.buttons.back', 'Back')}
                     </Button>
                     <Button 
                       className="flex-1 gap-2 bg-[#0369A1]"
@@ -797,11 +797,11 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                       {registrationMutation.isPending ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          Creating Account...
+                          {t('techReg.buttons.creatingAccount', 'Creating Account...')}
                         </>
                       ) : (
                         <>
-                          Create Account
+                          {t('techReg.buttons.createAccount', 'Create Account')}
                           <ArrowRight className="w-4 h-4" />
                         </>
                       )}
@@ -817,15 +817,15 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                     <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
                   </div>
                   
-                  <h2 className="text-2xl font-bold mb-2">Welcome to OnRopePro!</h2>
+                  <h2 className="text-2xl font-bold mb-2">{t('techReg.success.title', 'Welcome to OnRopePro!')}</h2>
                   <p className="text-muted-foreground mb-8">
-                    Your account is ready, {data.firstName}
+                    {t('techReg.success.subtitle', 'Your account is ready')}, {data.firstName}
                   </p>
 
                   {/* Referral Code Section */}
                   {generatedReferralCode && (
                     <div className="bg-muted/50 rounded-xl p-6 mb-6 text-left">
-                      <h3 className="font-semibold text-center mb-4">YOUR REFERRAL CODE</h3>
+                      <h3 className="font-semibold text-center mb-4">{t('techReg.success.yourReferralCode', 'YOUR REFERRAL CODE')}</h3>
                       
                       <div className="flex items-center gap-2 bg-background rounded-lg p-3 mb-4">
                         <span className="flex-1 text-center font-mono text-lg font-bold tracking-widest">
@@ -842,21 +842,21 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                       </div>
                       
                       <p className="text-center text-sm text-muted-foreground mb-4">
-                        Share with 1 other tech and you get a free upgrade to Plus
+                        {t('techReg.success.shareForUpgrade', 'Share with 1 other tech and you get a free upgrade to Plus')}
                       </p>
                       
                       <div className="flex justify-center gap-2">
                         <Button variant="outline" size="sm" className="gap-2">
                           <MessageSquare className="w-4 h-4" />
-                          Text
+                          {t('techReg.success.text', 'Text')}
                         </Button>
                         <Button variant="outline" size="sm" className="gap-2">
                           <Mail className="w-4 h-4" />
-                          Email
+                          {t('techReg.success.email', 'Email')}
                         </Button>
                         <Button variant="outline" size="sm" className="gap-2" onClick={copyReferralCode}>
                           <Copy className="w-4 h-4" />
-                          Copy
+                          {t('techReg.success.copy', 'Copy')}
                         </Button>
                       </div>
                     </div>
@@ -866,7 +866,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                   <div className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 rounded-xl p-6 mb-6 text-left">
                     <div className="flex items-center gap-2 mb-3">
                       <span className="text-sm font-bold text-amber-600 dark:text-amber-400">PLUS</span>
-                      <span className="text-sm text-muted-foreground">includes:</span>
+                      <span className="text-sm text-muted-foreground">{t('techReg.success.includes', 'includes')}:</span>
                     </div>
                     <div className="space-y-2">
                       {plusBenefits.map((benefit, i) => (
@@ -887,7 +887,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                     }}
                     data-testid="button-go-to-profile"
                   >
-                    Go to Sign In
+                    {t('techReg.success.goToSignIn', 'Go to Sign In')}
                     <ChevronRight className="w-5 h-5" />
                   </Button>
                   
@@ -895,7 +895,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                     className="text-sm text-muted-foreground mt-4 hover:underline"
                     onClick={handleClose}
                   >
-                    Close this dialog
+                    {t('techReg.success.closeDialog', 'Close this dialog')}
                   </button>
                 </div>
               )}
