@@ -205,7 +205,11 @@ function cleanText(text: string): string {
  */
 function getMarkdownContent(slug: string): { title: string; description: string; content: string } | null {
   try {
-    const mdPath = path.resolve(process.cwd(), `server/help-content/${slug}.md`);
+    // Check both locations: root and modules subfolder
+    let mdPath = path.resolve(process.cwd(), `server/help-content/modules/${slug}.md`);
+    if (!fs.existsSync(mdPath)) {
+      mdPath = path.resolve(process.cwd(), `server/help-content/${slug}.md`);
+    }
     
     if (!fs.existsSync(mdPath)) {
       return null;
