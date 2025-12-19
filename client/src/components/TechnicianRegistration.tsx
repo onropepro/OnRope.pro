@@ -281,11 +281,21 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
     return 0;
   };
 
-  const benefits = [
-    { icon: Briefcase, text: t('techReg.benefits.portableProfile', 'Portable professional profile') },
-    { icon: Clock, text: t('techReg.benefits.hourLogging', 'Automatic work hour logging') },
-    { icon: FileText, text: t('techReg.benefits.noOnboarding', 'Never fill out onboarding forms again') },
-    { icon: Award, text: t('techReg.benefits.freeUpgrade', 'Free upgrade when you share') },
+  // Left sidebar benefits
+  const sidebarBenefits = [
+    { icon: Briefcase, text: t('techReg.benefits.hoursTravel', 'Your hours travel with you - every employer, every city') },
+    { icon: Clock, text: t('techReg.benefits.importLogbook', 'Import your existing logbook via photo') },
+    { icon: FileText, text: t('techReg.benefits.fastOnboarding', '10-second onboarding vs 60 minutes of paperwork') },
+    { icon: Bell, text: t('techReg.benefits.autoLogging', 'Automatic logging when your employer joins') },
+    { icon: Award, text: t('techReg.benefits.freeUpgrade', 'Free PLUS upgrade when you refer a tech') },
+  ];
+
+  // Right panel welcome screen benefits  
+  const welcomeBenefits = [
+    t('techReg.welcome.benefit1', 'Never lose hours when companies fold'),
+    t('techReg.welcome.benefit2', 'Import your logbook history via photo'),
+    t('techReg.welcome.benefit3', 'Skip onboarding paperwork at every new job'),
+    t('techReg.welcome.benefit4', 'Refer one tech - unlock PLUS free'),
   ];
 
   const plusBenefits = [
@@ -303,8 +313,8 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
           <div className="hidden lg:flex lg:w-[320px] bg-[#AB4521] text-white p-8 flex-col">
             <div className="mb-8">
               <HardHat className="w-10 h-10 mb-4" />
-              <h2 className="text-xl font-bold mb-2">{t('techReg.sidebar.title', 'Create Your Profile')}</h2>
-              <p className="text-white/80 text-sm">{t('techReg.sidebar.subtitle', 'Join thousands of rope access technicians')}</p>
+              <h2 className="text-xl font-bold mb-2">{t('techReg.sidebar.title', 'Your Urban Rope Access Work Passport')}</h2>
+              <p className="text-white/80 text-sm">{t('techReg.sidebar.subtitle', 'Your hours. Your proof. Forever.')}</p>
             </div>
             
             {/* Progress Steps */}
@@ -331,11 +341,11 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
 
             {/* Benefits */}
             <div className="mt-auto">
-              <p className="text-white/60 text-xs uppercase tracking-wider mb-3">{t('techReg.sidebar.whatYouGet', 'What you get')}</p>
+              <p className="text-white/60 text-xs uppercase tracking-wider mb-3">{t('techReg.sidebar.whatYouGet', 'Included Free:')}</p>
               <div className="space-y-3">
-                {benefits.map((benefit, i) => (
-                  <div key={i} className="flex items-center gap-2 text-sm">
-                    <benefit.icon className="w-4 h-4 text-white/80" />
+                {sidebarBenefits.map((benefit, i) => (
+                  <div key={i} className="flex items-start gap-2 text-sm">
+                    <benefit.icon className="w-4 h-4 text-white/80 mt-0.5 shrink-0" />
                     <span className="text-white/90">{benefit.text}</span>
                   </div>
                 ))}
@@ -355,23 +365,23 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                       <span className="text-sm font-medium text-primary">{t('techReg.welcome.badge', 'For IRATA & SPRAT Technicians')}</span>
                     </div>
                     <h1 className="text-3xl font-bold mb-3">{t('techReg.welcome.title', 'Create your free account')}</h1>
-                    <p className="text-muted-foreground">{t('techReg.welcome.subtitle', 'Takes 60 seconds. Free forever.')}</p>
+                    <p className="text-muted-foreground">{t('techReg.welcome.subtitle', '60 seconds to set up. Protected forever.')}</p>
                   </div>
 
                   <div className="space-y-4 mb-8">
-                    {benefits.map((benefit, i) => (
+                    {welcomeBenefits.map((benefit, i) => (
                       <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                         <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
                           <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
                         </div>
-                        <span className="font-medium">{benefit.text}</span>
+                        <span className="font-medium">{benefit}</span>
                       </div>
                     ))}
                   </div>
 
                   {/* Referral Code Input */}
                   <div className="mb-6">
-                    <Label className="text-sm text-muted-foreground mb-2 block">{t('techReg.welcome.referralLabel', 'Have a referral code? (optional)')}</Label>
+                    <Label className="text-sm text-muted-foreground mb-2 block">{t('techReg.welcome.referralLabel', 'Got a referral code from a friend? (optional)')}</Label>
                     <Input
                       placeholder={t('techReg.welcome.referralPlaceholder', 'Enter referral code')}
                       value={data.referralCodeInput}
@@ -387,7 +397,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                     onClick={handleContinue}
                     data-testid="button-get-started"
                   >
-                    {t('techReg.welcome.getStarted', 'Get Started')}
+                    {t('techReg.welcome.getStarted', 'Create My Passport')}
                     <ArrowRight className="w-5 h-5" />
                   </Button>
                   
