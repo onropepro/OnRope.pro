@@ -214,8 +214,15 @@ export default function ComplaintDetail() {
             <span className="material-icons">arrow_back</span>
           </Button>
           <h1 className="text-lg font-bold flex-1">{t('feedbackDetail.feedbackDetails', 'Feedback Details')}</h1>
-          <Badge variant={complaint.status === "open" ? "default" : "secondary"} data-testid="badge-status">
-            {complaint.status}
+          <Badge 
+            variant="secondary" 
+            className={complaint.status === "open" 
+              ? "bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20" 
+              : "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20"
+            }
+            data-testid="badge-status"
+          >
+            {complaint.status === "open" ? t('feedbackDetail.statusOpen', 'Open') : t('feedbackDetail.statusClosed', 'Closed')}
           </Badge>
         </div>
       </header>
