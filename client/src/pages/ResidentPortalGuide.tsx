@@ -189,7 +189,7 @@ export default function ResidentPortalGuide() {
                 </div>
                 <div>
                   <p className="font-medium">Photo Evidence Upload</p>
-                  <p className="text-base text-muted-foreground">Residents attach photos directly to feedback submissions, eliminating back-and-forth emails requesting documentation.</p>
+                  <p className="text-base text-muted-foreground">Residents attach photos directly to feedback submissions, eliminating back-and-forth emails requesting documentation. Supports iPhone photos (HEIC/HEIF), JPEG, PNG, and WebP formats up to 10MB.</p>
                 </div>
               </CardContent>
             </Card>

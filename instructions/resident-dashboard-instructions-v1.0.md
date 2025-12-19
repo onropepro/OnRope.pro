@@ -105,9 +105,14 @@ buildings.residentCode // This field does not exist
 **Rule**: `Complaint is saved BEFORE any photo operations`
 
 Photo uploads never block feedback submission. The system:
-1. Saves complaint record immediately (line 12909 in routes.ts)
-2. Queues photo for background upload (lines 12911-12934)
+1. Saves complaint record immediately (line 13033 in routes.ts)
+2. Queues photo for background upload (lines 13035-13058)
 3. Returns success with photoStatus indicator
+
+**Supported Photo Formats**: JPEG, PNG, WebP, HEIC, HEIF (max 10MB)
+- HEIC/HEIF from iPhones validated by file extension (browsers often report incorrect MIME type)
+- Frontend: `handlePhotoChange()` in ResidentDashboard.tsx checks both MIME type and extension
+- Backend: `imageUpload` multer filter in routes.ts (lines 8888-8904) validates similarly
 
 ```typescript
 // CORRECT: Save complaint first

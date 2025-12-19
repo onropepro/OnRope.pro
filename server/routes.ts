@@ -8876,12 +8876,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Upload images (photos)
+  // Upload images (photos) - supports HEIC/HEIF from iPhones
   const imageUpload = multer({
     storage: multer.memoryStorage(),
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max for high-res photos
     fileFilter: (req, file, cb) => {
-      if (file.mimetype.startsWith('image/')) {
+      // Check MIME type or file extension for HEIC/HEIF support (browsers often report wrong MIME type)
+      const fileName = file.originalname.toLowerCase();
+      const isHeicOrHeif = fileName.endsWith('.heic') || fileName.endsWith('.heif');
+      const isImage = file.mimetype.startsWith('image/') || isHeicOrHeif;
+      
+      if (isImage) {
         cb(null, true);
       } else {
         cb(new Error('Only image files are allowed'));
