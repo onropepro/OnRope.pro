@@ -362,11 +362,11 @@ export default function HelpSearchBar({
                     'max-w-[85%] rounded-2xl px-4 py-3',
                     message.role === 'user'
                       ? 'bg-blue-600 text-white rounded-br-md'
-                      : 'bg-muted rounded-bl-md'
+                      : 'bg-muted text-foreground rounded-bl-md'
                   )}
                   data-testid={`chat-message-${message.role}-${message.id}`}
                 >
-                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                  <p className="text-sm whitespace-pre-wrap text-foreground">{message.content}</p>
                   
                   {message.sources && message.sources.length > 0 && (
                     <div className="mt-3 pt-3 border-t border-border/30">
