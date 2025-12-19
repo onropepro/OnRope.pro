@@ -28,7 +28,10 @@ import {
   Search,
   Eye,
   BarChart3,
-  Share2
+  Share2,
+  Camera,
+  XCircle,
+  Calculator
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
@@ -309,6 +312,169 @@ export default function TechnicianLanding() {
               </CardContent>
             </Card>
           </div>
+        </div>
+      </section>
+
+      <Separator />
+
+      {/* When Your Employer Also Uses OnRopePro */}
+      <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center space-y-4 mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold">
+              Good alone. Unstoppable together.
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Your tech account is valuable on its own. But when your employer also uses OnRopePro, everything changes.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-8 mb-12">
+            {/* Without Employer on OnRopePro */}
+            <Card className="overflow-hidden">
+              <CardHeader className="bg-slate-100 dark:bg-slate-800 border-b">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
+                    <XCircle className="w-5 h-5 text-slate-500" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">WITHOUT employer on OnRopePro</CardTitle>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6 space-y-3">
+                <div className="space-y-2 text-base text-muted-foreground">
+                  <p>You log hours manually (or photograph your logbook pages to import)</p>
+                  <p>You enter building names, heights, and tasks yourself</p>
+                  <p>You track your own certification dates</p>
+                  <p>You manage your own document storage</p>
+                  <p>Onboarding with new employers = standard paperwork</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* With Employer on OnRopePro */}
+            <Card className="overflow-hidden border-2 border-[#AB4521]">
+              <CardHeader className="bg-[#AB4521]/10 border-b border-[#AB4521]/20">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-[#AB4521]/20 flex items-center justify-center">
+                    <Zap className="w-5 h-5 text-[#AB4521]" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">WITH employer on OnRopePro</CardTitle>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6 space-y-3">
+                <div className="space-y-2 text-base text-muted-foreground">
+                  <p>Hours log <strong className="text-foreground">automatically</strong> when you clock in/out</p>
+                  <p>Building address, height, tasks, and duration captured without you lifting a finger</p>
+                  <p>Your logbook data accumulates in the background while you work</p>
+                  <p>Safety documents pushed to you automatically—sign once, done</p>
+                  <p>Harness inspections tracked and credited to your safety rating</p>
+                  <p>New employer onboarding = <strong className="text-foreground">10 seconds, not 60 minutes</strong></p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* The Math */}
+          <Card className="border-2 border-[#AB4521]/30 bg-[#AB4521]/5">
+            <CardHeader className="border-b border-[#AB4521]/20">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-[#AB4521]/20 flex items-center justify-center">
+                  <Calculator className="w-5 h-5 text-[#AB4521]" />
+                </div>
+                <CardTitle className="text-xl">The Math</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6 space-y-4">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <p className="font-medium text-foreground">Manual logging:</p>
+                  <p className="text-muted-foreground">5-10 minutes per day tracking your own work = 20-40 hours per year</p>
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">Automatic logging:</p>
+                  <p className="text-muted-foreground">0 minutes. It just happens.</p>
+                </div>
+              </div>
+              <p className="text-lg font-semibold text-[#AB4521] text-center pt-4 border-t">
+                At $50/hour, that's $1,000-2,000 worth of your time back every year.
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* What This Means For You */}
+          <div className="mt-8 space-y-4 text-center">
+            <p className="text-lg text-muted-foreground">
+              Your account works great standalone. Import your history, store your certs, access the job board.
+            </p>
+            <p className="text-lg text-muted-foreground">
+              But the real magic happens when your employer joins too. Everything becomes automatic. Your professional history builds itself while you focus on the work.
+            </p>
+            <p className="text-base font-medium text-foreground mt-6">
+              Already have an account? Tell your employer about OnRopePro. When they adopt it, your account levels up instantly.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <Separator />
+
+      {/* Import Your Existing Logbook */}
+      <section className="py-16 md:py-20 px-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center space-y-4 mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold">
+              Years of work history. Uploaded in minutes.
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              You've got a physical logbook with hundreds of entries. Maybe thousands. Starting from scratch isn't an option.
+            </p>
+          </div>
+          
+          <Card className="border-2 border-[#AB4521]/30">
+            <CardHeader className="border-b">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-[#AB4521]/10 flex items-center justify-center">
+                  <Camera className="w-5 h-5 text-[#AB4521]" />
+                </div>
+                <CardTitle className="text-xl">Here's how it works:</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                <div className="flex items-start gap-4">
+                  <div className="w-8 h-8 rounded-full bg-[#AB4521] text-white flex items-center justify-center shrink-0 font-bold">1</div>
+                  <p className="text-base text-muted-foreground pt-1">Open the app</p>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="w-8 h-8 rounded-full bg-[#AB4521] text-white flex items-center justify-center shrink-0 font-bold">2</div>
+                  <p className="text-base text-muted-foreground pt-1">Photograph your logbook pages</p>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="w-8 h-8 rounded-full bg-[#AB4521] text-white flex items-center justify-center shrink-0 font-bold">3</div>
+                  <p className="text-base text-muted-foreground pt-1">The app reads your handwriting and extracts the data</p>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="w-8 h-8 rounded-full bg-[#AB4521] text-white flex items-center justify-center shrink-0 font-bold">4</div>
+                  <p className="text-base text-muted-foreground pt-1">Review the import, confirm accuracy</p>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="w-8 h-8 rounded-full bg-[#AB4521] text-white flex items-center justify-center shrink-0 font-bold">5</div>
+                  <p className="text-base text-muted-foreground pt-1">Your historical hours are now in your digital profile</p>
+                </div>
+              </div>
+              <p className="text-base text-muted-foreground mt-6">
+                No manual data entry. No retyping years of work. Just point, shoot, and import.
+              </p>
+            </CardContent>
+          </Card>
+
+          <p className="text-center text-lg font-medium text-foreground mt-8">
+            Your past work matters. We made it easy to bring it with you.
+          </p>
         </div>
       </section>
 
