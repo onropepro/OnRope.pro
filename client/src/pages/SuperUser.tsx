@@ -249,6 +249,171 @@ export default function SuperUser() {
             </div>
           </div>
         </div>
+
+        {/* Development Quick Logins - For Testing */}
+        <div className="su-card">
+          <div className="su-card-header">
+            <h3 className="su-section-title flex items-center gap-2">
+              <span className="material-icons text-purple-500">developer_mode</span>
+              Development Quick Logins
+            </h3>
+            <p className="su-section-subtitle text-sm mt-1">Quick login as different user types for testing</p>
+          </div>
+          <div className="su-card-body">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+              <Button 
+                className="bg-yellow-500 hover:bg-yellow-600 text-black" 
+                onClick={async () => {
+                  try {
+                    const response = await fetch("/api/login", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ identifier: "testcom", password: "test123" }),
+                      credentials: "include",
+                    });
+                    const result = await response.json();
+                    if (response.ok) {
+                      window.location.href = "/dashboard";
+                    } else {
+                      toast({ title: "Failed", description: result.message, variant: "destructive" });
+                    }
+                  } catch (error) {
+                    toast({ title: "Error", description: "Network error", variant: "destructive" });
+                  }
+                }}
+                data-testid="button-quick-login-testcom"
+              >
+                <span className="material-icons mr-1 text-sm">business</span>
+                Owner
+              </Button>
+              <Button 
+                className="bg-green-600 hover:bg-green-700 text-white" 
+                onClick={async () => {
+                  try {
+                    const response = await fetch("/api/login", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ identifier: "tester@tester.com", password: "tester123" }),
+                      credentials: "include",
+                    });
+                    const result = await response.json();
+                    if (response.ok) {
+                      window.location.href = "/dashboard";
+                    } else {
+                      toast({ title: "Failed", description: result.message, variant: "destructive" });
+                    }
+                  } catch (error) {
+                    toast({ title: "Error", description: "Network error", variant: "destructive" });
+                  }
+                }}
+                data-testid="button-quick-login-tester"
+              >
+                <span className="material-icons mr-1 text-sm">science</span>
+                Tester
+              </Button>
+              <Button 
+                className="bg-primary hover:bg-primary/90 text-white" 
+                onClick={async () => {
+                  try {
+                    const response = await fetch("/api/login", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ identifier: "employee@employee.com", password: "employee123" }),
+                      credentials: "include",
+                    });
+                    const result = await response.json();
+                    if (response.ok) {
+                      window.location.href = "/dashboard";
+                    } else {
+                      toast({ title: "Failed", description: result.message, variant: "destructive" });
+                    }
+                  } catch (error) {
+                    toast({ title: "Error", description: "Network error", variant: "destructive" });
+                  }
+                }}
+                data-testid="button-quick-login-employee"
+              >
+                <span className="material-icons mr-1 text-sm">badge</span>
+                Employee
+              </Button>
+              <Button 
+                variant="secondary"
+                onClick={async () => {
+                  try {
+                    const response = await fetch("/api/login", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ identifier: "resident@resident.com", password: "resident123" }),
+                      credentials: "include",
+                    });
+                    const result = await response.json();
+                    if (response.ok) {
+                      window.location.href = "/resident";
+                    } else {
+                      toast({ title: "Failed", description: result.message, variant: "destructive" });
+                    }
+                  } catch (error) {
+                    toast({ title: "Error", description: "Network error", variant: "destructive" });
+                  }
+                }}
+                data-testid="button-quick-login-resident"
+              >
+                <span className="material-icons mr-1 text-sm">person</span>
+                Resident
+              </Button>
+              <Button 
+                variant="secondary"
+                onClick={async () => {
+                  try {
+                    const response = await fetch("/api/login", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ identifier: "property@property.com", password: "property123" }),
+                      credentials: "include",
+                    });
+                    const result = await response.json();
+                    if (response.ok) {
+                      window.location.href = "/property-manager";
+                    } else {
+                      toast({ title: "Failed", description: result.message, variant: "destructive" });
+                    }
+                  } catch (error) {
+                    toast({ title: "Error", description: "Network error", variant: "destructive" });
+                  }
+                }}
+                data-testid="button-quick-login-property-manager"
+              >
+                <span className="material-icons mr-1 text-sm">apartment</span>
+                Prop Mgr
+              </Button>
+              <Button 
+                className="bg-purple-600 hover:bg-purple-700 text-white" 
+                onClick={async () => {
+                  try {
+                    const response = await fetch("/api/login", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ identifier: "info@onrope.pro", password: "onropepro" }),
+                      credentials: "include",
+                    });
+                    const result = await response.json();
+                    if (response.ok) {
+                      window.location.href = "/superuser";
+                    } else {
+                      toast({ title: "Failed", description: result.message, variant: "destructive" });
+                    }
+                  } catch (error) {
+                    toast({ title: "Error", description: "Network error", variant: "destructive" });
+                  }
+                }}
+                data-testid="button-quick-login-superuser"
+              >
+                <span className="material-icons mr-1 text-sm">admin_panel_settings</span>
+                SuperUser
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Gift Company Dialog */}
