@@ -348,7 +348,7 @@ export function PropertyManagerBuildingsMap({ onBuildingSelect }: PropertyManage
                       {building.startDate && (
                         <span className="flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
-                          {formatLocalDate(new Date(building.startDate))}
+                          {formatLocalDate(building.startDate)}
                         </span>
                       )}
                     </div>
