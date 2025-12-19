@@ -17,9 +17,18 @@ interface PublicHeaderProps {
   onSignInClick?: () => void;
 }
 
+// Stakeholder color constants
+const STAKEHOLDER_COLORS = {
+  technician: "#AB4521",
+  "property-manager": "#6E9075", 
+  resident: "#86A59C",
+  "building-manager": "#4A6C8C",
+  employer: "#1e40af", // Blue for employer
+} as const;
+
 export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
   const { t, i18n } = useTranslation();
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const [showModulesMenu, setShowModulesMenu] = useState(false);
   const [showTechnicianMenu, setShowTechnicianMenu] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -33,6 +42,29 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
   });
   const modulesMenuRef = useRef<HTMLDivElement>(null);
   const technicianMenuRef = useRef<HTMLDivElement>(null);
+  
+  // Determine stakeholder color based on current path
+  const getStakeholderColor = (): string | null => {
+    const path = location.toLowerCase();
+    if (path.startsWith('/technician') || path.includes('/modules/technician')) {
+      return STAKEHOLDER_COLORS.technician;
+    }
+    if (path.startsWith('/property-manager')) {
+      return STAKEHOLDER_COLORS["property-manager"];
+    }
+    if (path.startsWith('/resident')) {
+      return STAKEHOLDER_COLORS.resident;
+    }
+    if (path.startsWith('/building-portal') || path.startsWith('/building-manager')) {
+      return STAKEHOLDER_COLORS["building-manager"];
+    }
+    if (path.startsWith('/employer') || path.startsWith('/modules/')) {
+      return STAKEHOLDER_COLORS.employer;
+    }
+    return null;
+  };
+  
+  const stakeholderColor = getStakeholderColor();
 
   const changeLanguage = (lang: 'en' | 'fr' | 'es') => {
     setCurrentLanguage(lang);
@@ -72,13 +104,17 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
   return (
     <header className="sticky top-0 z-50">
       {/* Top Utility Bar */}
-      <div className="bg-muted/50 border-b border-border/50">
+      <div 
+        className={stakeholderColor ? "border-b border-white/20" : "bg-muted border-b border-border/50"}
+        style={stakeholderColor ? { backgroundColor: stakeholderColor } : undefined}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-10 flex items-center justify-end gap-3">
-          <InstallPWAButton />
+          <InstallPWAButton stakeholderColor={stakeholderColor} />
           <Button 
             variant="ghost"
             size="sm"
             onClick={() => setLocation("/help")}
+            className={stakeholderColor ? "text-white hover:bg-white/10" : ""}
             data-testid="button-help-header"
           >
             <HelpCircle className="w-4 h-4 mr-1" />
@@ -89,6 +125,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
               <Button 
                 variant="ghost"
                 size="sm"
+                className={stakeholderColor ? "text-white hover:bg-white/10" : ""}
                 data-testid="button-language-dropdown"
               >
                 <Globe className="w-4 h-4 mr-1" />
@@ -123,6 +160,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
           <Button 
             variant="ghost"
             size="sm"
+            className={stakeholderColor ? "text-white hover:bg-white/10" : ""}
             onClick={onSignInClick || (() => setLocation("/login"))}
             data-testid="button-sign-in-header"
           >
@@ -131,6 +169,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
           <Button 
             variant="ghost"
             size="sm"
+            className={stakeholderColor ? "text-white hover:bg-white/10" : ""}
             onClick={() => setLocation("/pricing")}
             data-testid="link-pricing-header"
           >
@@ -140,7 +179,10 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
       </div>
 
       {/* Main Navigation Bar */}
-      <div className="bg-background/95 backdrop-blur-sm border-b border-border">
+      <div 
+        className={stakeholderColor ? "border-b border-white/20" : "bg-background border-b border-border"}
+        style={stakeholderColor ? { backgroundColor: stakeholderColor } : undefined}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           {/* Logo - Left */}
           <div className="flex items-center shrink-0">
@@ -158,7 +200,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
           <Button
             variant="ghost"
             size="icon"
-            className="lg:hidden"
+            className={stakeholderColor ? "lg:hidden text-white hover:bg-white/10" : "lg:hidden"}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             data-testid="button-mobile-menu-toggle"
           >
@@ -176,7 +218,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
             >
               <Button
                 variant={activeNav === "employer" || activeNav === "modules" ? "default" : "ghost"}
-                className="text-sm font-medium"
+                className={stakeholderColor && activeNav !== "employer" && activeNav !== "modules" ? "text-sm font-medium text-white hover:bg-white/10" : "text-sm font-medium"}
                 onClick={() => setLocation("/employer")}
                 data-testid="nav-employer"
               >
@@ -485,7 +527,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
             >
               <Button
                 variant={activeNav === "technician" ? "default" : "ghost"}
-                className="text-sm font-medium"
+                className={stakeholderColor && activeNav !== "technician" ? "text-sm font-medium text-white hover:bg-white/10" : "text-sm font-medium"}
                 onClick={() => setLocation("/technician")}
                 data-testid="nav-technician"
               >
@@ -538,7 +580,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
               <Button
                 key={item.id}
                 variant={activeNav === item.id ? "default" : "ghost"}
-                className="text-sm font-medium"
+                className={stakeholderColor && activeNav !== item.id ? "text-sm font-medium text-white hover:bg-white/10" : "text-sm font-medium"}
                 onClick={() => setLocation(item.href)}
                 data-testid={`nav-${item.id}`}
               >

@@ -9,7 +9,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-export function InstallPWAButton() {
+interface InstallPWAButtonProps {
+  stakeholderColor?: string | null;
+}
+
+export function InstallPWAButton({ stakeholderColor }: InstallPWAButtonProps) {
   const [showDialog, setShowDialog] = useState(false);
 
   return (
@@ -18,7 +22,7 @@ export function InstallPWAButton() {
         onClick={() => setShowDialog(true)}
         variant="outline"
         size="sm"
-        className="gap-2"
+        className={stakeholderColor ? "gap-2 text-white border-white/30 hover:bg-white/10" : "gap-2"}
         data-testid="button-install-app"
       >
         <Download className="h-4 w-4" />
