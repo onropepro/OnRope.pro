@@ -230,7 +230,7 @@ export function ResidentSlidingSignup({ onClose }: ResidentSlidingSignupProps) {
         >
           {currentStep === "name" && (
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-sm font-medium">Full Name</Label>
+              <Label htmlFor="name" className="text-sm font-medium text-foreground">Full Name</Label>
               <div className="flex gap-2">
                 <Input
                   id="name"
@@ -257,7 +257,7 @@ export function ResidentSlidingSignup({ onClose }: ResidentSlidingSignupProps) {
 
           {currentStep === "email" && (
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium">Email Address</Label>
+              <Label htmlFor="email" className="text-sm font-medium text-foreground">Email Address</Label>
               <div className="flex gap-2">
                 <Input
                   id="email"
@@ -285,7 +285,7 @@ export function ResidentSlidingSignup({ onClose }: ResidentSlidingSignupProps) {
 
           {currentStep === "phone" && (
             <div className="space-y-2">
-              <Label htmlFor="phone" className="text-sm font-medium">Phone Number</Label>
+              <Label htmlFor="phone" className="text-sm font-medium text-foreground">Phone Number</Label>
               <div className="flex gap-2">
                 <Input
                   id="phone"
@@ -313,7 +313,7 @@ export function ResidentSlidingSignup({ onClose }: ResidentSlidingSignupProps) {
 
           {currentStep === "strata" && (
             <div className="space-y-2">
-              <Label htmlFor="strata" className="text-sm font-medium">Strata/HOA/LMS Plan Number</Label>
+              <Label htmlFor="strata" className="text-sm font-medium text-foreground">Strata/HOA/LMS Plan Number</Label>
               <div className="flex gap-2">
                 <Input
                   id="strata"
@@ -340,7 +340,7 @@ export function ResidentSlidingSignup({ onClose }: ResidentSlidingSignupProps) {
 
           {currentStep === "unit" && (
             <div className="space-y-2">
-              <Label htmlFor="unit" className="text-sm font-medium">Unit Number</Label>
+              <Label htmlFor="unit" className="text-sm font-medium text-foreground">Unit Number</Label>
               <div className="flex gap-2">
                 <Input
                   id="unit"
@@ -367,7 +367,7 @@ export function ResidentSlidingSignup({ onClose }: ResidentSlidingSignupProps) {
 
           {currentStep === "parking" && (
             <div className="space-y-2">
-              <Label htmlFor="parking" className="text-sm font-medium">Parking Stall Number (Optional)</Label>
+              <Label htmlFor="parking" className="text-sm font-medium text-foreground">Parking Stall Number (Optional)</Label>
               <div className="flex gap-2">
                 <Input
                   id="parking"
@@ -393,7 +393,7 @@ export function ResidentSlidingSignup({ onClose }: ResidentSlidingSignupProps) {
           {currentStep === "password" && (
             <div className="space-y-3">
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium">Password</Label>
+                <Label htmlFor="password" className="text-sm font-medium text-foreground">Password</Label>
                 <Input
                   id="password"
                   type="password"
@@ -408,7 +408,7 @@ export function ResidentSlidingSignup({ onClose }: ResidentSlidingSignupProps) {
                 {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-sm font-medium">Confirm Password</Label>
+                <Label htmlFor="confirmPassword" className="text-sm font-medium text-foreground">Confirm Password</Label>
                 <Input
                   id="confirmPassword"
                   type="password"
