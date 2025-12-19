@@ -37,7 +37,7 @@ const stakeholderCards = [
     description: 'Manage your business, team, and grow efficiently',
     href: '/help/for-company-owners',
     icon: Building2,
-    color: 'bg-blue-500',
+    color: '#0B64A3',
   },
   {
     id: 'technician',
@@ -45,7 +45,7 @@ const stakeholderCards = [
     description: 'Track your time, certifications, and career',
     href: '/help/for-technicians',
     icon: HardHat,
-    color: 'bg-amber-500',
+    color: '#AB4521',
   },
   {
     id: 'building-manager',
@@ -53,7 +53,7 @@ const stakeholderCards = [
     description: 'Monitor work, compliance, and communicate with residents',
     href: '/help/for-building-managers',
     icon: Building2,
-    color: 'bg-violet-500',
+    color: '#B89685',
   },
   {
     id: 'property-manager',
@@ -61,7 +61,7 @@ const stakeholderCards = [
     description: 'Oversee your portfolio and vendor relationships',
     href: '/help/for-property-managers',
     icon: Users,
-    color: 'bg-emerald-500',
+    color: '#6E9075',
   },
   {
     id: 'resident',
@@ -69,7 +69,7 @@ const stakeholderCards = [
     description: 'Submit feedback and track issues at your building',
     href: '/help/for-residents',
     icon: Home,
-    color: 'bg-rose-500',
+    color: '#86A59C',
   },
 ];
 
@@ -149,7 +149,7 @@ export default function HelpCenter() {
                   data-testid={`card-stakeholder-${card.id}`}
                 >
                   <CardHeader className="flex flex-col gap-3">
-                    <div className={`w-12 h-12 ${card.color} rounded-lg flex items-center justify-center text-white`}>
+                    <div className="w-12 h-12 rounded-lg flex items-center justify-center text-white" style={{ backgroundColor: card.color }}>
                       <card.icon className="h-6 w-6" />
                     </div>
                     <div>
