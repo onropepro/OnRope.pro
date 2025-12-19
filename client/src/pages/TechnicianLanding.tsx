@@ -306,7 +306,7 @@ export default function TechnicianLanding() {
                     <Search className="w-5 h-5 text-[#AB4521] mt-0.5 shrink-0" />
                     <div>
                       <p className="font-medium">Job Board Access</p>
-                      <p className="text-sm text-muted-foreground">See and apply to positions posted by companies on the platform</p>
+                      <p className="text-sm text-muted-foreground">See and apply to urban rope tech positions posted by companies on the platform</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
