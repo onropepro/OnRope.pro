@@ -195,13 +195,41 @@ export default function HelpArticle() {
                     }
                     
                     // h3 headings
-                    if (line.startsWith('### ')) {
+                    if (line.startsWith('### ') && !line.startsWith('#### ')) {
                       elements.push(
                         <h3 key={`h3-${i}`} className="text-lg font-medium mt-6 mb-3">
                           {line.slice(4)}
                         </h3>
                       );
                       i++;
+                      continue;
+                    }
+                    
+                    // h4 headings
+                    if (line.startsWith('#### ')) {
+                      elements.push(
+                        <h4 key={`h4-${i}`} className="text-base font-medium mt-4 mb-2">
+                          {line.slice(5)}
+                        </h4>
+                      );
+                      i++;
+                      continue;
+                    }
+                    
+                    // Code blocks
+                    if (line.startsWith('```')) {
+                      const codeLines: string[] = [];
+                      i++; // Skip opening ```
+                      while (i < lines.length && !lines[i].trim().startsWith('```')) {
+                        codeLines.push(lines[i]);
+                        i++;
+                      }
+                      if (i < lines.length) i++; // Skip closing ``` if it exists
+                      elements.push(
+                        <pre key={`code-${i}`} className="bg-muted p-4 rounded-lg overflow-x-auto my-4">
+                          <code className="text-sm">{codeLines.join('\n')}</code>
+                        </pre>
+                      );
                       continue;
                     }
                     
@@ -281,6 +309,8 @@ export default function HelpArticle() {
                            lines[i].trim() && 
                            !lines[i].trim().startsWith('#') && 
                            !lines[i].trim().startsWith('- ') &&
+                           !lines[i].trim().startsWith('```') &&
+                           !lines[i].trim().startsWith('**Q:') &&
                            !/^\d+\.\s/.test(lines[i].trim()) &&
                            lines[i].trim() !== '---') {
                       paragraphLines.push(lines[i].trim());
@@ -292,6 +322,9 @@ export default function HelpArticle() {
                           {renderInlineFormatting(paragraphLines.join(' '))}
                         </p>
                       );
+                    } else {
+                      // Safety fallback - if nothing matched, skip this line to prevent infinite loop
+                      i++;
                     }
                   }
                   
