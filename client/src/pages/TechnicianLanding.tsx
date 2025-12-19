@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
+import { TechnicianRegistration } from "@/components/TechnicianRegistration";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -40,6 +41,17 @@ const TECHNICIAN_GRADIENT_END = "#8B371A";
 
 export default function TechnicianLanding() {
   const [faqOpen, setFaqOpen] = useState<string[]>([]);
+  const [showRegistration, setShowRegistration] = useState(false);
+
+  // Check for register query parameter to auto-open registration dialog
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('register') === 'true') {
+      setShowRegistration(true);
+      // Clean up URL without refreshing page
+      window.history.replaceState({}, '', '/technician');
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
@@ -66,16 +78,24 @@ export default function TechnicianLanding() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" className="bg-white hover:bg-orange-50" style={{color: TECHNICIAN_COLOR}} asChild data-testid="button-hero-create-account">
-                <Link href="/technician?register=true">
-                  Create Free Account
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
+              <Button 
+                size="lg" 
+                className="bg-white hover:bg-orange-50" 
+                style={{color: TECHNICIAN_COLOR}} 
+                onClick={() => setShowRegistration(true)}
+                data-testid="button-hero-create-account"
+              >
+                Create Free Account
+                <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
-              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-hero-login">
-                <Link href="/technician">
-                  Sign In
-                </Link>
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="border-white/40 text-white hover:bg-white/10" 
+                onClick={() => setShowRegistration(true)}
+                data-testid="button-hero-login"
+              >
+                Sign In
               </Button>
             </div>
             
@@ -537,11 +557,13 @@ export default function TechnicianLanding() {
               </Card>
               
               <div className="flex justify-center">
-                <Button className="bg-[#AB4521] hover:bg-[#8B371A] text-white" asChild data-testid="button-career-climbers-cta">
-                  <Link href="/technician?register=true">
-                    Create Free Account
-                    <ArrowRight className="ml-2 w-4 h-4" />
-                  </Link>
+                <Button 
+                  className="bg-[#AB4521] hover:bg-[#8B371A] text-white" 
+                  onClick={() => setShowRegistration(true)}
+                  data-testid="button-career-climbers-cta"
+                >
+                  Create Free Account
+                  <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
               </div>
             </CardContent>
@@ -599,17 +621,21 @@ export default function TechnicianLanding() {
               </Card>
               
               <div className="flex flex-wrap justify-center gap-4">
-                <Button className="bg-[#AB4521] hover:bg-[#8B371A] text-white" asChild data-testid="button-hustlers-cta">
-                  <Link href="/technician?register=true">
-                    Create Free Account
-                    <ArrowRight className="ml-2 w-4 h-4" />
-                  </Link>
+                <Button 
+                  className="bg-[#AB4521] hover:bg-[#8B371A] text-white" 
+                  onClick={() => setShowRegistration(true)}
+                  data-testid="button-hustlers-cta"
+                >
+                  Create Free Account
+                  <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
-                <Button variant="outline" asChild data-testid="button-hustlers-plus">
-                  <Link href="/technician?register=true">
-                    Upgrade to PLUS with 1 Referral
-                    <Share2 className="ml-2 w-4 h-4" />
-                  </Link>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowRegistration(true)}
+                  data-testid="button-hustlers-plus"
+                >
+                  Upgrade to PLUS with 1 Referral
+                  <Share2 className="ml-2 w-4 h-4" />
                 </Button>
               </div>
             </CardContent>
@@ -667,11 +693,13 @@ export default function TechnicianLanding() {
               </Card>
               
               <div className="flex justify-center">
-                <Button className="bg-[#AB4521] hover:bg-[#8B371A] text-white" asChild data-testid="button-freedom-seekers-cta">
-                  <Link href="/technician?register=true">
-                    Create Free Account
-                    <ArrowRight className="ml-2 w-4 h-4" />
-                  </Link>
+                <Button 
+                  className="bg-[#AB4521] hover:bg-[#8B371A] text-white" 
+                  onClick={() => setShowRegistration(true)}
+                  data-testid="button-freedom-seekers-cta"
+                >
+                  Create Free Account
+                  <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
               </div>
             </CardContent>
@@ -1061,17 +1089,25 @@ export default function TechnicianLanding() {
             Create your account. Start building your portable professional identity. It's free. It's yours. Forever.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Button size="lg" className="bg-white hover:bg-orange-50" style={{color: TECHNICIAN_COLOR}} asChild data-testid="button-final-create-account">
-              <Link href="/technician?register=true">
-                Create Free Account
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Link>
+            <Button 
+              size="lg" 
+              className="bg-white hover:bg-orange-50" 
+              style={{color: TECHNICIAN_COLOR}} 
+              onClick={() => setShowRegistration(true)}
+              data-testid="button-final-create-account"
+            >
+              Create Free Account
+              <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
-            <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-final-refer">
-              <Link href="/technician?register=true">
-                Refer a tech and unlock PLUS
-                <UserPlus className="ml-2 w-5 h-5" />
-              </Link>
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="border-white/40 text-white hover:bg-white/10" 
+              onClick={() => setShowRegistration(true)}
+              data-testid="button-final-refer"
+            >
+              Refer a tech and unlock PLUS
+              <UserPlus className="ml-2 w-5 h-5" />
             </Button>
           </div>
           <p className="text-sm text-white/80 pt-2">
@@ -1097,6 +1133,12 @@ export default function TechnicianLanding() {
           </div>
         </div>
       </footer>
+
+      {/* Registration Modal */}
+      <TechnicianRegistration 
+        open={showRegistration} 
+        onOpenChange={setShowRegistration} 
+      />
     </div>
   );
 }
