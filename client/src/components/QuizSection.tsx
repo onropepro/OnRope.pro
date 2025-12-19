@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -48,6 +49,7 @@ interface QuizResult {
 
 export function QuizSection() {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});
@@ -215,11 +217,11 @@ export function QuizSection() {
             )}
           </div>
           <div className="text-sm text-muted-foreground flex items-center gap-2 flex-wrap">
-            <span>{quiz.questionCount} questions</span>
+            <span>{quiz.questionCount} {t('quiz.questions', 'questions')}</span>
             {quiz.attemptCount > 0 && (
               <>
                 <span className="text-muted-foreground/50">|</span>
-                <span>{quiz.attemptCount} attempt{quiz.attemptCount !== 1 ? 's' : ''}</span>
+                <span>{quiz.attemptCount} {t('quiz.attempts', 'attempts')}</span>
               </>
             )}
           </div>
@@ -228,7 +230,7 @@ export function QuizSection() {
           {quiz.hasPassed ? (
             <Badge variant="default" className="bg-green-600 text-white">
               <CheckCircle2 className="h-3 w-3 mr-1" />
-              Completed
+              {t('quiz.completed', 'Completed')}
             </Badge>
           ) : (
             <Button
@@ -236,7 +238,7 @@ export function QuizSection() {
               onClick={() => handleStartQuiz(quiz)}
               data-testid={`start-quiz-${quiz.id}`}
             >
-              {quiz.attemptCount > 0 ? 'Retry' : 'Start Quiz'}
+              {quiz.attemptCount > 0 ? t('quiz.retry', 'Retry') : t('quiz.startQuiz', 'Start Quiz')}
               <ArrowRight className="h-4 w-4 ml-1" />
             </Button>
           )}
@@ -251,7 +253,7 @@ export function QuizSection() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <ClipboardList className="h-5 w-5 text-primary" />
-            Safety Quizzes
+            {t('quiz.safetyQuizzes', 'Safety Quizzes')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -269,17 +271,17 @@ export function QuizSection() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <ClipboardList className="h-5 w-5 text-primary" />
-            Safety Quizzes
+            {t('quiz.safetyQuizzes', 'Safety Quizzes')}
           </CardTitle>
-          <CardDescription>Complete quizzes to demonstrate your knowledge</CardDescription>
+          <CardDescription>{t('quiz.completeQuizzes', 'Complete quizzes to demonstrate your knowledge')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8">
             <div className="inline-flex p-4 bg-muted/50 rounded-full mb-4">
               <ClipboardList className="h-8 w-8 text-muted-foreground" />
             </div>
-            <p className="text-muted-foreground">No quizzes available yet</p>
-            <p className="text-sm text-muted-foreground mt-1">Check back later when your company uploads safety documents</p>
+            <p className="text-muted-foreground">{t('quiz.noQuizzes', 'No quizzes available yet')}</p>
+            <p className="text-sm text-muted-foreground mt-1">{t('quiz.checkBackLater', 'Check back later when your company uploads safety documents')}</p>
           </div>
         </CardContent>
       </Card>
@@ -292,12 +294,12 @@ export function QuizSection() {
         {certificationQuizzes.length > 0 && (
           <Card>
             <CardHeader>
-              <div className="text-xs text-muted-foreground mb-1">Aligned with IRATA & SPRAT training concepts</div>
+              <div className="text-xs text-muted-foreground mb-1">{t('quiz.alignedWith', 'Aligned with IRATA & SPRAT training concepts')}</div>
               <CardTitle className="flex items-center gap-2">
                 <GraduationCap className="h-5 w-5 text-blue-600" />
-                Rope Access Knowledge Quizzes
+                {t('quiz.ropeAccessQuizzes', 'Rope Access Knowledge Quizzes')}
               </CardTitle>
-              <CardDescription>Test your rope access knowledge with practice quizzes</CardDescription>
+              <CardDescription>{t('quiz.testRopeAccess', 'Test your rope access knowledge with practice quizzes')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid gap-4">
@@ -312,9 +314,9 @@ export function QuizSection() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <ShieldCheck className="h-5 w-5 text-teal-600" />
-                Safety Practice Quizzes
+                {t('quiz.safetyPracticeQuizzes', 'Safety Practice Quizzes')}
               </CardTitle>
-              <CardDescription>Test your knowledge of Safe Work Procedures, FLHA, and harness inspections</CardDescription>
+              <CardDescription>{t('quiz.testSafetyKnowledge', 'Test your knowledge of Safe Work Procedures, FLHA, and harness inspections')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid gap-4">
@@ -329,9 +331,9 @@ export function QuizSection() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <ClipboardList className="h-5 w-5 text-primary" />
-                Company Safety Quizzes
+                {t('quiz.companyQuizzes', 'Company Safety Quizzes')}
               </CardTitle>
-              <CardDescription>Complete quizzes to demonstrate your knowledge and earn CSR points</CardDescription>
+              <CardDescription>{t('quiz.earnCsrPoints', 'Complete quizzes to demonstrate your knowledge and earn CSR points')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid gap-4">
@@ -355,7 +357,7 @@ export function QuizSection() {
               )}
             </DialogTitle>
             <DialogDescription>
-              Answer all questions to the best of your ability. You need 80% ({Math.ceil(selectedQuiz?.questionCount ? selectedQuiz.questionCount * 0.8 : 16)}/{selectedQuiz?.questionCount || 20}) to pass.
+              {t('quiz.answerAllQuestions', 'Answer all questions to the best of your ability. You need 80%')} ({Math.ceil(selectedQuiz?.questionCount ? selectedQuiz.questionCount * 0.8 : 16)}/{selectedQuiz?.questionCount || 20}) {t('quiz.toPass', 'to pass')}.
             </DialogDescription>
           </DialogHeader>
 
@@ -369,10 +371,10 @@ export function QuizSection() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">
-                    Question {currentQuestionIndex + 1} of {questions.length}
+                    {t('quiz.questionOf', 'Question')} {currentQuestionIndex + 1} {t('quiz.of', 'of')} {questions.length}
                   </span>
                   <span className="text-muted-foreground">
-                    {answeredCount} answered
+                    {answeredCount} {t('quiz.answered', 'answered')}
                   </span>
                 </div>
                 <Progress value={progress} className="h-2" />
@@ -407,7 +409,7 @@ export function QuizSection() {
                   data-testid="button-prev-question"
                 >
                   <ChevronLeft className="h-4 w-4 mr-1" />
-                  Previous
+                  {t('quiz.previous', 'Previous')}
                 </Button>
                 <div className="flex gap-2">
                   {currentQuestionIndex < questions.length - 1 ? (
@@ -415,7 +417,7 @@ export function QuizSection() {
                       onClick={handleNextQuestion}
                       data-testid="button-next-question"
                     >
-                      Next
+                      {t('quiz.next', 'Next')}
                       <ChevronRight className="h-4 w-4 ml-1" />
                     </Button>
                   ) : (
@@ -427,11 +429,11 @@ export function QuizSection() {
                       {isSubmitting ? (
                         <>
                           <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-                          Submitting...
+                          {t('quiz.submitting', 'Submitting...')}
                         </>
                       ) : (
                         <>
-                          Submit Quiz
+                          {t('quiz.submitQuiz', 'Submit Quiz')}
                           <CheckCircle2 className="h-4 w-4 ml-1" />
                         </>
                       )}
@@ -445,7 +447,7 @@ export function QuizSection() {
                 <div className="flex items-center gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400">
                   <AlertCircle className="h-4 w-4 flex-shrink-0" />
                   <span className="text-sm">
-                    {questions.length - answeredCount} question{questions.length - answeredCount !== 1 ? 's' : ''} unanswered
+                    {questions.length - answeredCount} {t('quiz.questionsUnanswered', 'questions unanswered')}
                   </span>
                 </div>
               )}
@@ -464,7 +466,7 @@ export function QuizSection() {
               ) : (
                 <XCircle className="h-6 w-6 text-destructive" />
               )}
-              Quiz {quizResult?.passed ? 'Passed' : 'Not Passed'}
+              {quizResult?.passed ? t('quiz.passed', 'Quiz Passed') : t('quiz.notPassed', 'Quiz Not Passed')}
             </DialogTitle>
           </DialogHeader>
 
@@ -475,7 +477,7 @@ export function QuizSection() {
                 {quizResult?.score}%
               </div>
               <p className="text-muted-foreground mt-2">
-                {quizResult?.correctAnswers} out of {quizResult?.totalQuestions} correct
+                {quizResult?.correctAnswers} {t('quiz.outOf', 'out of')} {quizResult?.totalQuestions} {t('quiz.correct', 'correct')}
               </p>
             </div>
 
@@ -485,13 +487,13 @@ export function QuizSection() {
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="font-medium text-green-600 dark:text-green-400">Congratulations!</p>
+                    <p className="font-medium text-green-600 dark:text-green-400">{t('quiz.congratulations', 'Congratulations!')}</p>
                     <p className="text-sm text-muted-foreground mt-1">
-                      You have successfully passed this quiz.
+                      {t('quiz.successfullyPassed', 'You have successfully passed this quiz.')}
                     </p>
                     {selectedQuiz?.quizCategory === 'company' && (
                       <p className="text-sm font-medium text-green-600 dark:text-green-400 mt-2">
-                        +1 CSR Point earned for your company!
+                        {t('quiz.csrPointEarned', '+1 CSR Point earned for your company!')}
                       </p>
                     )}
                   </div>
@@ -500,9 +502,9 @@ export function QuizSection() {
                 <div className="flex items-start gap-3">
                   <XCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="font-medium text-destructive">Not quite there</p>
+                    <p className="font-medium text-destructive">{t('quiz.notQuiteYet', 'Not quite there')}</p>
                     <p className="text-sm text-muted-foreground mt-1">
-                      You need 80% ({Math.ceil((quizResult?.totalQuestions || 20) * 0.8)}/{quizResult?.totalQuestions || 20}) to pass. Review the material and try again.
+                      {t('quiz.needToPass', 'You need 80%')} ({Math.ceil((quizResult?.totalQuestions || 20) * 0.8)}/{quizResult?.totalQuestions || 20}) {t('quiz.reviewAndRetry', 'to pass. Review the material and try again.')}
                     </p>
                   </div>
                 </div>
@@ -512,7 +514,7 @@ export function QuizSection() {
 
           <DialogFooter>
             <Button onClick={handleCloseQuiz} className="w-full" data-testid="button-close-results">
-              {quizResult?.passed ? 'Done' : 'Close'}
+              {quizResult?.passed ? t('quiz.done', 'Done') : t('quiz.close', 'Close')}
             </Button>
           </DialogFooter>
         </DialogContent>
