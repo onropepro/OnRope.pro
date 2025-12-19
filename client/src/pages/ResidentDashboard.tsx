@@ -59,14 +59,14 @@ export default function ResidentDashboard() {
   const [, setLocation] = useLocation();
 
   // Fetch current user
-  const { data: userData } = useQuery({
+  const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
   });
 
   const currentUser = userData?.user;
 
   // Fetch projects (resident's building)
-  const { data: projectsData, isLoading } = useQuery({
+  const { data: projectsData, isLoading } = useQuery<{ projects: any[]; projectInfo: any }>({
     queryKey: ["/api/projects"],
   });
 
@@ -87,19 +87,40 @@ export default function ResidentDashboard() {
     }
   }, [activeProjects, selectedProjectId]);
   
-  const { data: progressData } = useQuery({
+  const { data: progressData } = useQuery<{
+    totalDrops: number;
+    completedDrops: number;
+    totalDropsNorth: number;
+    totalDropsEast: number;
+    totalDropsSouth: number;
+    totalDropsWest: number;
+    completedDropsNorth: number;
+    completedDropsEast: number;
+    completedDropsSouth: number;
+    completedDropsWest: number;
+    progressPercentage: number;
+    totalStalls: number;
+    completedStalls: number;
+    totalSuites: number;
+    completedSuites: number;
+  }>({
     queryKey: ["/api/projects", activeProject?.id, "progress"],
     enabled: !!activeProject?.id,
   });
 
   // Fetch company information for active project
-  const { data: companyData } = useQuery({
+  const { data: companyData } = useQuery<{ company: any }>({
     queryKey: ["/api/companies", activeProject?.companyId],
     enabled: !!activeProject?.companyId,
   });
 
   // Fetch company branding for white label support
-  const { data: brandingData } = useQuery({
+  const { data: brandingData } = useQuery<{
+    subscriptionActive?: boolean;
+    logoUrl?: string;
+    colors?: string[];
+    companyName?: string;
+  }>({
     queryKey: ["/api/company", activeProject?.companyId, "branding"],
     enabled: !!activeProject?.companyId,
   });
@@ -113,12 +134,12 @@ export default function ResidentDashboard() {
   const hasCustomBranding = !!(branding.subscriptionActive && (branding.logoUrl || (branding.colors && branding.colors.length > 0)));
 
   // Fetch resident's complaints
-  const { data: complaintsData } = useQuery({
+  const { data: complaintsData } = useQuery<{ complaints: any[] }>({
     queryKey: ["/api/complaints"],
   });
 
   // Fetch work notices for resident
-  const { data: workNoticesData } = useQuery({
+  const { data: workNoticesData } = useQuery<{ notices: any[] }>({
     queryKey: ["/api/resident/work-notices"],
   });
 
@@ -305,7 +326,7 @@ export default function ResidentDashboard() {
   };
 
   // Fetch photos tagged with resident's unit number
-  const { data: unitPhotosData } = useQuery({
+  const { data: unitPhotosData } = useQuery<{ photos: any[] }>({
     queryKey: ["/api/my-unit-photos"],
     enabled: !!currentUser?.unitNumber,
   });
@@ -1732,7 +1753,7 @@ function LinkCompanyCodeCard() {
 // Component showing linked company
 function CompanyLinkedCard({ companyId }: { companyId: string }) {
   const { t } = useTranslation();
-  const { data: companyData } = useQuery({
+  const { data: companyData } = useQuery<{ company: any }>({
     queryKey: ["/api/companies", companyId],
     enabled: !!companyId,
   });
