@@ -22,9 +22,14 @@ import {
   MessageCircle,
   Building2,
   UserPlus,
-  BookOpen,
+  LogIn,
   X,
+  Loader2,
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
@@ -38,6 +43,16 @@ const RESIDENT_COLOR = "#86A59C";
 export default function ResidentLanding() {
   const [, setLocation] = useLocation();
   const [showSignup, setShowSignup] = useState(false);
+  const [showSignIn, setShowSignIn] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [signInEmail, setSignInEmail] = useState("");
+  const [signInPassword, setSignInPassword] = useState("");
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
+  const [isSigningIn, setIsSigningIn] = useState(false);
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
+  const [signInError, setSignInError] = useState("");
+  const [resetSuccess, setResetSuccess] = useState(false);
+  const { toast } = useToast();
   
   // Check if user is already logged in as resident
   const { data: userData } = useQuery<{ user: any }>({
@@ -50,6 +65,86 @@ export default function ResidentLanding() {
       setLocation("/resident-dashboard");
     }
   }, [userData, setLocation]);
+
+  // Handle sign in
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSignInError("");
+    setIsSigningIn(true);
+    
+    try {
+      const response = await apiRequest("POST", "/api/login", {
+        email: signInEmail,
+        password: signInPassword,
+      });
+      
+      if (response.ok) {
+        toast({
+          title: "Welcome back!",
+          description: "Redirecting to your dashboard...",
+        });
+        window.location.href = "/resident-dashboard";
+      } else {
+        const data = await response.json();
+        setSignInError(data.message || "Invalid email or password");
+      }
+    } catch (error) {
+      setSignInError("Something went wrong. Please try again.");
+    } finally {
+      setIsSigningIn(false);
+    }
+  };
+
+  // Handle forgot password
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsResettingPassword(true);
+    
+    try {
+      const response = await apiRequest("POST", "/api/forgot-password", {
+        email: forgotPasswordEmail,
+      });
+      
+      if (response.ok) {
+        setResetSuccess(true);
+        toast({
+          title: "Check your email",
+          description: "If an account exists with that email, you will receive password reset instructions.",
+        });
+      } else {
+        // Still show success message for security (don't reveal if email exists)
+        setResetSuccess(true);
+        toast({
+          title: "Check your email",
+          description: "If an account exists with that email, you will receive password reset instructions.",
+        });
+      }
+    } catch (error) {
+      // Still show success for security
+      setResetSuccess(true);
+      toast({
+        title: "Check your email",
+        description: "If an account exists with that email, you will receive password reset instructions.",
+      });
+    } finally {
+      setIsResettingPassword(false);
+    }
+  };
+
+  // Toggle handlers that close the other form
+  const handleToggleSignup = () => {
+    setShowSignIn(false);
+    setShowForgotPassword(false);
+    setShowSignup(!showSignup);
+  };
+
+  const handleToggleSignIn = () => {
+    setShowSignup(false);
+    setShowForgotPassword(false);
+    setShowSignIn(!showSignIn);
+    setSignInError("");
+    setResetSuccess(false);
+  };
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
@@ -81,7 +176,7 @@ export default function ResidentLanding() {
                 size="lg" 
                 className="bg-white hover:bg-gray-50" 
                 style={{color: RESIDENT_COLOR}} 
-                onClick={() => setShowSignup(!showSignup)}
+                onClick={handleToggleSignup}
                 data-testid="button-create-account-hero"
               >
                 {showSignup ? (
@@ -96,12 +191,28 @@ export default function ResidentLanding() {
                   </>
                 )}
               </Button>
-              {!showSignup && (
-                <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild>
-                  <Link href="#how-it-works" data-testid="button-learn-how">
-                    Learn How It Works
-                    <BookOpen className="ml-2 w-5 h-5" />
-                  </Link>
+              {!showSignup && !showSignIn && (
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="border-white/40 text-white hover:bg-white/10"
+                  onClick={handleToggleSignIn}
+                  data-testid="button-sign-in-hero"
+                >
+                  Sign In
+                  <LogIn className="ml-2 w-5 h-5" />
+                </Button>
+              )}
+              {showSignIn && (
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="border-white/40 text-white hover:bg-white/10"
+                  onClick={handleToggleSignIn}
+                  data-testid="button-close-signin"
+                >
+                  <X className="mr-2 w-5 h-5" />
+                  Close
                 </Button>
               )}
             </div>
@@ -117,6 +228,173 @@ export default function ResidentLanding() {
                   className="max-w-md mx-auto pt-6"
                 >
                   <ResidentSlidingSignup onClose={() => setShowSignup(false)} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Sliding Sign In Form */}
+            <AnimatePresence>
+              {showSignIn && (
+                <motion.div
+                  initial={{ opacity: 0, y: -20, height: 0 }}
+                  animate={{ opacity: 1, y: 0, height: "auto" }}
+                  exit={{ opacity: 0, y: -20, height: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="max-w-md mx-auto pt-6"
+                >
+                  <Card className="shadow-xl">
+                    <CardContent className="p-6">
+                      {!showForgotPassword ? (
+                        <form onSubmit={handleSignIn} className="space-y-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="signin-email" className="text-sm font-medium text-foreground">Email Address</Label>
+                            <Input
+                              id="signin-email"
+                              type="email"
+                              placeholder="you@example.com"
+                              value={signInEmail}
+                              onChange={(e) => setSignInEmail(e.target.value)}
+                              required
+                              data-testid="input-signin-email"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="signin-password" className="text-sm font-medium text-foreground">Password</Label>
+                            <Input
+                              id="signin-password"
+                              type="password"
+                              placeholder="Your password"
+                              value={signInPassword}
+                              onChange={(e) => setSignInPassword(e.target.value)}
+                              required
+                              data-testid="input-signin-password"
+                            />
+                          </div>
+                          
+                          {signInError && (
+                            <p className="text-sm text-red-500">{signInError}</p>
+                          )}
+                          
+                          <Button
+                            type="submit"
+                            className="w-full"
+                            style={{ backgroundColor: RESIDENT_COLOR }}
+                            disabled={isSigningIn}
+                            data-testid="button-submit-signin"
+                          >
+                            {isSigningIn ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <>
+                                Sign In
+                                <ArrowRight className="ml-2 w-4 h-4" />
+                              </>
+                            )}
+                          </Button>
+                          
+                          <div className="text-center">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowForgotPassword(true);
+                                setForgotPasswordEmail(signInEmail);
+                                setResetSuccess(false);
+                              }}
+                              className="text-sm text-muted-foreground hover:underline"
+                              data-testid="link-forgot-password"
+                            >
+                              Forgot Password?
+                            </button>
+                          </div>
+                          
+                          <div className="text-center text-sm text-muted-foreground">
+                            Do not have an account?{" "}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowSignIn(false);
+                                setShowSignup(true);
+                              }}
+                              className="font-medium hover:underline"
+                              style={{ color: RESIDENT_COLOR }}
+                              data-testid="link-create-account"
+                            >
+                              Create Account
+                            </button>
+                          </div>
+                        </form>
+                      ) : (
+                        <div className="space-y-4">
+                          {!resetSuccess ? (
+                            <form onSubmit={handleForgotPassword} className="space-y-4">
+                              <div className="text-center mb-4">
+                                <h3 className="text-lg font-semibold text-foreground">Reset Your Password</h3>
+                                <p className="text-sm text-muted-foreground">Enter your email and we will send you reset instructions.</p>
+                              </div>
+                              <div className="space-y-2">
+                                <Label htmlFor="forgot-email" className="text-sm font-medium text-foreground">Email Address</Label>
+                                <Input
+                                  id="forgot-email"
+                                  type="email"
+                                  placeholder="you@example.com"
+                                  value={forgotPasswordEmail}
+                                  onChange={(e) => setForgotPasswordEmail(e.target.value)}
+                                  required
+                                  data-testid="input-forgot-email"
+                                />
+                              </div>
+                              
+                              <Button
+                                type="submit"
+                                className="w-full"
+                                style={{ backgroundColor: RESIDENT_COLOR }}
+                                disabled={isResettingPassword}
+                                data-testid="button-submit-reset"
+                              >
+                                {isResettingPassword ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  "Send Reset Link"
+                                )}
+                              </Button>
+                              
+                              <div className="text-center">
+                                <button
+                                  type="button"
+                                  onClick={() => setShowForgotPassword(false)}
+                                  className="text-sm text-muted-foreground hover:underline"
+                                  data-testid="link-back-to-signin"
+                                >
+                                  Back to Sign In
+                                </button>
+                              </div>
+                            </form>
+                          ) : (
+                            <div className="text-center space-y-4">
+                              <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center" style={{ backgroundColor: `${RESIDENT_COLOR}20` }}>
+                                <CheckCircle2 className="w-8 h-8" style={{ color: RESIDENT_COLOR }} />
+                              </div>
+                              <h3 className="text-lg font-semibold text-foreground">Check Your Email</h3>
+                              <p className="text-sm text-muted-foreground">
+                                If an account exists with that email, you will receive password reset instructions shortly.
+                              </p>
+                              <Button
+                                onClick={() => {
+                                  setShowForgotPassword(false);
+                                  setResetSuccess(false);
+                                }}
+                                variant="outline"
+                                className="w-full"
+                                data-testid="button-back-signin-after-reset"
+                              >
+                                Back to Sign In
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
                 </motion.div>
               )}
             </AnimatePresence>
