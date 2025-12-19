@@ -64,6 +64,13 @@ The platform is built with a React 18 frontend (TypeScript, Wouter for routing),
     - Mobile-first responsive design with accessibility features
     - Database tables: help_articles, help_embeddings, help_conversations, help_messages, help_searches
     - SuperUser-only reindexing endpoint for content updates
+*   **Stakeholder Landing Pages:** Public-facing landing pages for each stakeholder type with unique branding:
+    - **/technician** - Technician Portal landing (Rust Brown gradient #AB4521 → #8B371A). Targets urban technicians with portable work passport value proposition, Free vs PLUS tier comparison, referral program, FAQ section.
+    - **/resident** - Resident Portal landing (Mint Green gradient #86A59C → #6B8A80). Issue reporting and building communication features.
+    - **/property-manager** - Property Manager landing (Sage Green gradient #6E9075 → #5A7A60). Vendor oversight and portfolio management.
+    - **/building-portal** - Building Manager portal with dedicated login.
+    - Each page follows consistent design: Hero with gradient + badge + CTA, problem validation, value propositions, FAQ accordion, Final CTA section with stakeholder color, dark slate footer (bg-slate-900 text-slate-300).
+    - Navigation: PublicHeader links each stakeholder nav button to respective landing page.
 *   **Building Maintenance Focus:** Platform exclusively supports building maintenance services with 10 specialized job types: Window Cleaning, Exterior Dryer Vent Cleaning, Building Wash/Pressure Washing, General Pressure Washing, Gutter Cleaning, In-Suite Dryer Vent Cleaning, Parkade Pressure Cleaning, Ground Window Cleaning, Painting, and Inspection. Each job type has category-specific progress tracking (drops/hours/suites/stalls). Companies can also create custom job types.
 *   **Security Architecture:** Session-based authentication with secure HTTP-only cookies, multi-tenant data isolation, permission-based API response filtering, and robust API security. Sensitive employee data (SIN, bank details, driver's license, medical conditions) is encrypted at rest using AES-256-GCM.
 *   **UI/UX Standards:** Emphasizes obvious, prominent buttons with icons, clear visual feedback, mobile-first design, and accessibility, using `max-w-4xl` for dialogs and `grid-cols-4 sm:grid-cols-6` for options.

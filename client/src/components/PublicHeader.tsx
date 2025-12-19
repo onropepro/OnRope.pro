@@ -63,7 +63,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
 
   const navItems = [
     { id: "employer", label: t('navigation.employer', 'Employer'), href: "/employer" },
-    { id: "technician", label: t('navigation.technician', 'Technician'), href: "/technician-login" },
+    { id: "technician", label: t('navigation.technician', 'Technician'), href: "/technician" },
     { id: "property-manager", label: t('navigation.propertyManager', 'Property Manager'), href: "/property-manager" },
     { id: "resident", label: t('navigation.resident', 'Resident'), href: "/resident" },
     { id: "building-manager", label: t('navigation.buildingManager', 'Building Manager'), href: "/building-portal" },
@@ -484,7 +484,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
               <Button
                 variant={activeNav === "technician" ? "default" : "ghost"}
                 className="text-sm font-medium"
-                onClick={() => setLocation("/technician-login")}
+                onClick={() => setLocation("/technician")}
                 data-testid="nav-technician"
               >
                 {t('navigation.technician', 'Technician')}
@@ -758,6 +758,17 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
               
               {mobileTechnicianExpanded && (
                 <div className="mt-2 ml-4 space-y-1">
+                  <button
+                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
+                    onClick={() => {
+                      setLocation("/technician");
+                      setMobileMenuOpen(false);
+                    }}
+                    data-testid="nav-mobile-technician-landing"
+                  >
+                    <HardHat className="w-5 h-5 text-amber-600" />
+                    <span className="text-sm">{t('navigation.technician', 'Technician Portal')}</span>
+                  </button>
                   <button
                     className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
                     onClick={() => {
