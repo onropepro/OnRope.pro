@@ -2556,6 +2556,10 @@ export default function Dashboard() {
       ...normalizedData,
       ropeAccessPlanUrl,
       anchorInspectionCertificateUrl,
+      // Include clientId if a client was selected (even if strata was changed to new one)
+      clientId: selectedClientForProject && selectedClientForProject !== "manual" 
+        ? (selectedClientForProject.includes('|') ? selectedClientForProject.split('|')[0] : selectedClientForProject)
+        : undefined,
     });
     setUploadedPlanFile(null);
     setUploadedAnchorCertFile(null);

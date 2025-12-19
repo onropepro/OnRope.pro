@@ -419,6 +419,9 @@ export const projects = pgTable("projects", {
   peaceWork: boolean("peace_work").notNull().default(false), // Peace work toggle for project billing/tracking
   pricePerDrop: integer("price_per_drop"), // Price per drop when peace work is enabled
   
+  // Client reference (optional) - links to clients table for tracking which client this project belongs to
+  clientId: varchar("client_id").references(() => clients.id, { onDelete: "set null" }),
+  
   // Overall completion percentage for percentage-based jobs (non-elevation or hours-based)
   // Updated by the "last one out" technician at end of day
   overallCompletionPercentage: integer("overall_completion_percentage"), // 0-100

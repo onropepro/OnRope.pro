@@ -10153,6 +10153,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      // If a clientId is provided, add the building to the client's lmsNumbers if not already present
+      if (project.clientId && project.strataPlanNumber) {
+        try {
+          const client = await storage.getClient(project.clientId);
+          if (client) {
+            const normalizedStrata = normalizeStrataPlan(project.strataPlanNumber);
+            const existingBuildings = client.lmsNumbers || [];
+            
+            // Check if this strata already exists in the client's buildings
+            const strataExists = existingBuildings.some(
+              (b: { number: string }) => normalizeStrataPlan(b.number) === normalizedStrata
+            );
+            
+            if (!strataExists) {
+              // Add the new building to the client's lmsNumbers
+              const newBuilding = {
+                number: project.strataPlanNumber,
+                buildingName: project.buildingName || undefined,
+                address: project.buildingAddress || '',
+                stories: project.floorCount || project.buildingFloors || undefined,
+                parkingStalls: project.totalStalls || undefined,
+                dailyDropTarget: project.dailyDropTarget || undefined,
+                totalDropsNorth: project.totalDropsNorth || undefined,
+                totalDropsEast: project.totalDropsEast || undefined,
+                totalDropsSouth: project.totalDropsSouth || undefined,
+                totalDropsWest: project.totalDropsWest || undefined,
+              };
+              
+              await storage.updateClient(project.clientId, {
+                lmsNumbers: [...existingBuildings, newBuilding],
+              });
+              
+              console.log(`[Clients] Added new building ${normalizedStrata} to client ${client.firstName} ${client.lastName}`);
+            }
+          }
+        } catch (clientError) {
+          // Log but don't fail project creation
+          console.error("[Clients] Failed to add building to client:", clientError);
+        }
+      }
+      
       // If this is a custom job type, save it to the company's custom job types list (if not already exists)
       if ((project.jobType === "other" || project.jobType === "ndt_other") && project.customJobType) {
         const existingCustomJobType = await storage.getCustomJobTypeByName(companyId, project.customJobType);
