@@ -35,7 +35,7 @@ const createComplaintSchema = (t: (key: string, fallback: string) => string) => 
   phoneNumber: z.string().min(10, t('residentPortal.validation.phoneRequired', 'Valid phone number is required')),
   unitNumber: z.string().min(1, t('residentPortal.validation.unitRequired', 'Unit number is required')),
   message: z.string().optional(),
-  projectId: z.string().optional(),
+  projectId: z.string().min(1, t('residentPortal.validation.projectRequired', 'Please select a project')),
 });
 
 type ComplaintFormData = z.infer<ReturnType<typeof createComplaintSchema>>;
@@ -406,12 +406,8 @@ export default function ResidentDashboard() {
       formData.append("residentName", data.residentName);
       formData.append("phoneNumber", data.phoneNumber);
       formData.append("unitNumber", data.unitNumber);
-      formData.append("message", data.message);
-      
-      // Only append projectId if it's provided
-      if (data.projectId) {
-        formData.append("projectId", data.projectId);
-      }
+      formData.append("message", data.message || "");
+      formData.append("projectId", data.projectId);
       
       if (selectedPhoto) {
         formData.append("photo", selectedPhoto);
@@ -1301,130 +1297,162 @@ export default function ResidentDashboard() {
 
           <TabsContent value="submit" className="mt-6">
             <div className="bg-card/60 backdrop-blur-sm rounded-2xl border border-border/50 shadow-xl p-6 sm:p-8">
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold mb-2">{t('residentPortal.submit.title', 'Submit Feedback')}</h2>
-                <p className="text-muted-foreground">{t('residentPortal.submit.description', 'Let us know if you have any concerns or questions about the work')}</p>
-              </div>
-              
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-                    <FormField
-                      control={form.control}
-                      name="residentName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('residentPortal.yourName', 'Your Name')} *</FormLabel>
-                          <FormControl>
-                            <Input {...field} data-testid="input-resident-name" className="h-12" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="phoneNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('residentPortal.phoneNumber', 'Phone Number')} *</FormLabel>
-                          <FormControl>
-                            <Input type="tel" {...field} data-testid="input-phone" className="h-12" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="unitNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('residentPortal.unitNumber', 'Unit Number')} *</FormLabel>
-                          <FormControl>
-                            <Input {...field} data-testid="input-unit" className="h-12" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    {activeProjects.length > 1 && (
-                      <FormField
-                        control={form.control}
-                        name="projectId"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t('residentPortal.form.whichProject', 'Which Project?')} *</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value}>
-                              <FormControl>
-                                <SelectTrigger data-testid="select-project" className="h-12">
-                                  <SelectValue placeholder={t('residentPortal.selectProject', 'Select the project this is about')} />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {activeProjects.map((project: any) => (
-                                  <SelectItem key={project.id} value={project.id.toString()}>
-                                    {project.buildingName || `${project.strataPlanNumber}`} - {project.jobType?.replace(/_/g, ' ')}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    )}
-
-                    <FormField
-                      control={form.control}
-                      name="message"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('residentPortal.form.message', 'Message')} *</FormLabel>
-                          <FormControl>
-                            <Textarea 
-                              {...field} 
-                              placeholder={t('residentPortal.form.describeConcern', 'Please describe your concern or question...')}
-                              data-testid="input-message"
-                              className="min-h-32 resize-none"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">{t('residentPortal.form.attachPhoto', 'Attach Photo (Optional)')}</label>
-                      <Input
-                        type="file"
-                        accept="image/*"
-                        onChange={handlePhotoChange}
-                        data-testid="input-complaint-photo"
-                        className="h-12"
-                      />
-                      {selectedPhoto && (
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {t('residentPortal.form.selected', 'Selected')}: {selectedPhoto.name}
-                        </p>
-                      )}
-                    </div>
-
-                  <Button 
-                    type="submit" 
-                    className="w-full h-12 text-white" 
-                    data-testid="button-submit-complaint"
-                    style={{
-                      backgroundColor: hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR,
-                      borderColor: hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR
-                    }}
+              {activeProjects.length === 0 ? (
+                /* No active projects - show helpful message */
+                <div className="text-center py-12">
+                  <span 
+                    className="material-icons text-6xl mb-4"
+                    style={{ color: hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR }}
                   >
-                    {t('residentPortal.form.submitFeedback', 'Submit Feedback')}
-                  </Button>
-                </form>
-              </Form>
+                    feedback
+                  </span>
+                  <h2 className="text-2xl font-bold mb-3">
+                    {t('residentPortal.submit.noProjects.title', 'No Active Projects')}
+                  </h2>
+                  <p className="text-muted-foreground max-w-md mx-auto mb-6">
+                    {t('residentPortal.submit.noProjects.description', 'Feedback can only be submitted for active projects at your building. When your maintenance vendor starts a new project, you will be able to submit feedback here.')}
+                  </p>
+                  {allProjects.length === 0 && (
+                    <div 
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm"
+                      style={{ 
+                        backgroundColor: `${hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR}15`,
+                        color: hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR
+                      }}
+                    >
+                      <span className="material-icons text-sm">info</span>
+                      {t('residentPortal.submit.noProjects.connectHint', 'Make sure you have connected to your vendor using their company code.')}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                /* Active projects exist - show feedback form */
+                <>
+                  <div className="mb-6">
+                    <h2 className="text-2xl font-bold mb-2">{t('residentPortal.submit.title', 'Submit Feedback')}</h2>
+                    <p className="text-muted-foreground">{t('residentPortal.submit.description', 'Let us know if you have any concerns or questions about the work')}</p>
+                  </div>
+                  
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+                        <FormField
+                          control={form.control}
+                          name="residentName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('residentPortal.yourName', 'Your Name')} *</FormLabel>
+                              <FormControl>
+                                <Input {...field} data-testid="input-resident-name" className="h-12" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="phoneNumber"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('residentPortal.phoneNumber', 'Phone Number')} *</FormLabel>
+                              <FormControl>
+                                <Input type="tel" {...field} data-testid="input-phone" className="h-12" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="unitNumber"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('residentPortal.unitNumber', 'Unit Number')} *</FormLabel>
+                              <FormControl>
+                                <Input {...field} data-testid="input-unit" className="h-12" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        {/* Always show project selector when there are active projects */}
+                        <FormField
+                          control={form.control}
+                          name="projectId"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('residentPortal.form.whichProject', 'Which Project?')} *</FormLabel>
+                              <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                  <SelectTrigger data-testid="select-project" className="h-12">
+                                    <SelectValue placeholder={t('residentPortal.selectProject', 'Select the project this is about')} />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {activeProjects.map((project: any) => (
+                                    <SelectItem key={project.id} value={project.id.toString()}>
+                                      {project.buildingName || `${project.strataPlanNumber}`} - {project.jobType?.replace(/_/g, ' ')}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="message"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('residentPortal.form.message', 'Message')} *</FormLabel>
+                              <FormControl>
+                                <Textarea 
+                                  {...field} 
+                                  placeholder={t('residentPortal.form.describeConcern', 'Please describe your concern or question...')}
+                                  data-testid="input-message"
+                                  className="min-h-32 resize-none"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <div>
+                          <label className="text-sm font-medium mb-2 block">{t('residentPortal.form.attachPhoto', 'Attach Photo (Optional)')}</label>
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            onChange={handlePhotoChange}
+                            data-testid="input-complaint-photo"
+                            className="h-12"
+                          />
+                          {selectedPhoto && (
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {t('residentPortal.form.selected', 'Selected')}: {selectedPhoto.name}
+                            </p>
+                          )}
+                        </div>
+
+                      <Button 
+                        type="submit" 
+                        className="w-full h-12 text-white" 
+                        data-testid="button-submit-complaint"
+                        style={{
+                          backgroundColor: hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR,
+                          borderColor: hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR
+                        }}
+                      >
+                        {t('residentPortal.form.submitFeedback', 'Submit Feedback')}
+                      </Button>
+                    </form>
+                  </Form>
+                </>
+              )}
             </div>
           </TabsContent>
 
