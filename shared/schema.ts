@@ -3034,3 +3034,48 @@ export const insertHelpSearchSchema = createInsertSchema(helpSearches).omit({
 
 export type HelpSearch = typeof helpSearches.$inferSelect;
 export type InsertHelpSearch = z.infer<typeof insertHelpSearchSchema>;
+
+// ============================================
+// RESIDENT PHOTO UPLOAD QUEUE
+// ============================================
+
+// Photo upload statuses
+export const PHOTO_UPLOAD_STATUS = {
+  pending: "pending",
+  uploading: "uploading",
+  uploaded: "uploaded",
+  failed: "failed",
+} as const;
+
+export type PhotoUploadStatus = keyof typeof PHOTO_UPLOAD_STATUS;
+
+// Resident Feedback Photo Queue - Stores photos for async upload with retry
+export const residentFeedbackPhotoQueue = pgTable("resident_feedback_photo_queue", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  complaintId: varchar("complaint_id").notNull().references(() => complaints.id, { onDelete: "cascade" }),
+  status: varchar("status").notNull().default("pending"), // pending | uploading | uploaded | failed
+  retryCount: integer("retry_count").notNull().default(0),
+  maxRetries: integer("max_retries").notNull().default(5),
+  nextRetryAt: timestamp("next_retry_at"), // When to attempt next retry
+  lastAttemptAt: timestamp("last_attempt_at"), // When last upload was attempted
+  lastError: text("last_error"), // Error message from last failed attempt
+  objectKey: varchar("object_key").notNull(), // Target storage path (unique per photo)
+  contentType: varchar("content_type").notNull(), // MIME type (image/jpeg, image/png, etc.)
+  fileSize: integer("file_size").notNull(), // File size in bytes
+  payload: text("payload").notNull(), // Base64 encoded image data (temporary storage)
+  uploadedUrl: text("uploaded_url"), // Final URL after successful upload
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_photo_queue_status").on(table.status),
+  index("IDX_photo_queue_complaint").on(table.complaintId),
+  index("IDX_photo_queue_next_retry").on(table.nextRetryAt),
+]);
+
+export const insertResidentFeedbackPhotoQueueSchema = createInsertSchema(residentFeedbackPhotoQueue).omit({
+  id: true,
+  createdAt: true,
+  uploadedUrl: true,
+});
+
+export type ResidentFeedbackPhotoQueue = typeof residentFeedbackPhotoQueue.$inferSelect;
+export type InsertResidentFeedbackPhotoQueue = z.infer<typeof insertResidentFeedbackPhotoQueueSchema>;
