@@ -4073,6 +4073,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Property Manager: Get buildings for map view
+  app.get("/api/property-managers/me/buildings-map", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
+    try {
+      const buildings = await storage.getPropertyManagerBuildingsForMap(req.session.userId!);
+      res.json({ buildings });
+    } catch (error) {
+      console.error("Get property manager buildings for map error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Property Manager: Add new vendor using company code
   app.post("/api/property-managers/vendors", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
     try {

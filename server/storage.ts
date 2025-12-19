@@ -3161,6 +3161,92 @@ export class Storage {
     });
   }
 
+  async getPropertyManagerBuildingsForMap(propertyManagerId: string): Promise<Array<{
+    projectId: string;
+    strataPlanNumber: string;
+    buildingName: string | null;
+    buildingAddress: string;
+    latitude: string | null;
+    longitude: string | null;
+    status: string;
+    jobType: string;
+    customJobType: string | null;
+    startDate: string | null;
+    endDate: string | null;
+    vendorLinkId: string;
+    vendorName: string;
+    vendorLogo: string | null;
+  }>> {
+    const normalizeStrata = (strata: string | null | undefined): string | null => {
+      if (!strata || strata.trim() === '') return null;
+      return strata.toUpperCase().replace(/\s+/g, '');
+    };
+
+    const links = await this.getPropertyManagerCompanyLinks(propertyManagerId);
+    const companies = await this.getPropertyManagerLinkedCompanies(propertyManagerId);
+    
+    const buildingsForMap: Array<{
+      projectId: string;
+      strataPlanNumber: string;
+      buildingName: string | null;
+      buildingAddress: string;
+      latitude: string | null;
+      longitude: string | null;
+      status: string;
+      jobType: string;
+      customJobType: string | null;
+      startDate: string | null;
+      endDate: string | null;
+      vendorLinkId: string;
+      vendorName: string;
+      vendorLogo: string | null;
+    }> = [];
+
+    for (const link of links) {
+      if (!link.strataNumber) continue;
+      
+      const normalizedStrata = normalizeStrata(link.strataNumber);
+      if (!normalizedStrata) continue;
+      
+      const company = companies.find(c => c.id === link.companyId);
+      if (!company) continue;
+      
+      const companyProjects = await db.select()
+        .from(projects)
+        .where(eq(projects.companyId, link.companyId));
+      
+      const matchingProjects = companyProjects.filter(project => {
+        const projectStrata = normalizeStrata(project.strataPlanNumber);
+        return projectStrata !== null && projectStrata === normalizedStrata;
+      });
+      
+      for (const project of matchingProjects) {
+        if (!project.latitude || !project.longitude) continue;
+        
+        buildingsForMap.push({
+          projectId: project.id,
+          strataPlanNumber: project.strataPlanNumber || '',
+          buildingName: project.buildingName,
+          buildingAddress: project.buildingAddress || '',
+          latitude: project.latitude,
+          longitude: project.longitude,
+          status: project.status || 'active',
+          jobType: project.jobType || '',
+          customJobType: project.customJobType,
+          startDate: project.startDate ? project.startDate.toISOString() : null,
+          endDate: project.endDate ? project.endDate.toISOString() : null,
+          vendorLinkId: link.id,
+          vendorName: company.companyName || company.email || 'Unknown Vendor',
+          vendorLogo: company.whitelabelBrandingActive && company.brandingLogoUrl 
+            ? company.brandingLogoUrl 
+            : company.logo,
+        });
+      }
+    }
+
+    return buildingsForMap;
+  }
+
   async getPropertyManagerProjectDetails(projectId: string, companyId: string, normalizedStrata: string): Promise<{ project: any; complaints: any[]; buildingInstructions: any | null }> {
     // Strata number is required for security
     if (!normalizedStrata || normalizedStrata.trim() === '') {
