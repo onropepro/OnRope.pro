@@ -1761,21 +1761,27 @@ export default function TechnicianPortal() {
   const profileCompletion = useMemo(() => {
     if (!user) return { percentage: 0, incompleteFields: [], isComplete: false };
     
+    const getLabel = (en: string, fr: string, es: string) => {
+      if (language === 'en') return en;
+      if (language === 'es') return es;
+      return fr;
+    };
+    
     const profileFields = [
       // Fields typically filled during registration
-      { label: language === 'en' ? 'Full Name' : 'Nom complet', complete: !!user.name },
-      { label: language === 'en' ? 'Email' : 'Courriel', complete: !!user.email },
-      { label: language === 'en' ? 'Phone Number' : 'Numéro de téléphone', complete: !!user.phone },
-      { label: language === 'en' ? 'irata/SPRAT Cert' : 'Certification irata/SPRAT', complete: !!user.irataLicenseNumber || !!user.spratLicenseNumber },
+      { label: getLabel('Full Name', 'Nom complet', 'Nombre Completo'), complete: !!user.name },
+      { label: getLabel('Email', 'Courriel', 'Correo'), complete: !!user.email },
+      { label: getLabel('Phone Number', 'Numéro de téléphone', 'Teléfono'), complete: !!user.phone },
+      { label: getLabel('IRATA/SPRAT Cert', 'Certification IRATA/SPRAT', 'Cert. IRATA/SPRAT'), complete: !!user.irataLicenseNumber || !!user.spratLicenseNumber },
       // Additional profile fields
-      { label: language === 'en' ? 'Emergency Contact' : 'Contact d\'urgence', complete: !!user.emergencyContactName && !!user.emergencyContactPhone },
-      { label: language === 'en' ? 'Banking Info' : 'Info bancaire', complete: !!user.bankAccountNumber },
-      { label: language === 'en' ? 'Birthday' : 'Date de naissance', complete: !!user.birthday },
-      { label: language === 'en' ? 'First Aid' : 'Premiers soins', complete: !!user.hasFirstAid },
-      { label: language === 'en' ? 'Driver\'s License' : 'Permis de conduire', complete: !!user.driversLicenseNumber },
-      { label: language === 'en' ? 'Address' : 'Adresse', complete: !!user.streetAddress },
+      { label: getLabel('Emergency Contact', 'Contact d\'urgence', 'Contacto de Emergencia'), complete: !!user.emergencyContactName && !!user.emergencyContactPhone },
+      { label: getLabel('Banking Info', 'Info bancaire', 'Info Bancaria'), complete: !!user.bankAccountNumber },
+      { label: getLabel('Birthday', 'Date de naissance', 'Cumpleaños'), complete: !!user.birthday },
+      { label: getLabel('First Aid', 'Premiers soins', 'Primeros Auxilios'), complete: !!user.hasFirstAid },
+      { label: getLabel('Driver\'s License', 'Permis de conduire', 'Licencia de Conducir'), complete: !!user.driversLicenseNumber },
+      { label: getLabel('Address', 'Adresse', 'Dirección'), complete: !!user.streetAddress },
       // Employer-visible profile fields
-      { label: language === 'en' ? 'Specialties' : 'Spécialités', complete: !!(user.ropeAccessSpecialties && user.ropeAccessSpecialties.length > 0) },
+      { label: getLabel('Specialties', 'Spécialités', 'Especialidades'), complete: !!(user.ropeAccessSpecialties && user.ropeAccessSpecialties.length > 0) },
     ];
     
     const completedCount = profileFields.filter(f => f.complete).length;
@@ -2501,7 +2507,7 @@ export default function TechnicianPortal() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2 mb-2">
                         <h3 className="font-semibold text-sm">
-                          {language === 'en' ? 'Complete Your Profile' : 'Complétez votre profil'}
+                          {language === 'en' ? 'Complete Your Profile' : language === 'es' ? 'Completa Tu Perfil' : 'Complétez votre profil'}
                         </h3>
                         <span className="text-sm font-medium text-amber-600 dark:text-amber-400">{profileCompletion.percentage}%</span>
                       </div>
@@ -2514,6 +2520,8 @@ export default function TechnicianPortal() {
                       <p className="text-xs text-muted-foreground mb-2">
                         {language === 'en' 
                           ? 'Complete your profile to connect with employers instantly' 
+                          : language === 'es'
+                          ? 'Completa tu perfil para conectarte con empleadores al instante'
                           : 'Complétez votre profil pour vous connecter instantanément avec les employeurs'}
                       </p>
                       {profileCompletion.incompleteFields.length > 0 && (
@@ -2525,7 +2533,7 @@ export default function TechnicianPortal() {
                           ))}
                           {profileCompletion.incompleteFields.length > 3 && (
                             <Badge variant="outline" className="text-xs bg-background">
-                              +{profileCompletion.incompleteFields.length - 3} {language === 'en' ? 'more' : 'de plus'}
+                              +{profileCompletion.incompleteFields.length - 3} {language === 'en' ? 'more' : language === 'es' ? 'más' : 'de plus'}
                             </Badge>
                           )}
                         </div>
@@ -3506,7 +3514,7 @@ export default function TechnicianPortal() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2 mb-2">
                         <h3 className="font-semibold text-sm">
-                          {language === 'en' ? 'Complete Your Profile' : 'Complétez votre profil'}
+                          {language === 'en' ? 'Complete Your Profile' : language === 'es' ? 'Completa Tu Perfil' : 'Complétez votre profil'}
                         </h3>
                         <span className="text-sm font-medium text-amber-600 dark:text-amber-400">{profileCompletion.percentage}%</span>
                       </div>
@@ -3519,6 +3527,8 @@ export default function TechnicianPortal() {
                       <p className="text-xs text-muted-foreground mb-2">
                         {language === 'en' 
                           ? 'Complete your profile to connect with employers instantly' 
+                          : language === 'es'
+                          ? 'Completa tu perfil para conectarte con empleadores al instante'
                           : 'Complétez votre profil pour vous connecter instantanément avec les employeurs'}
                       </p>
                       {profileCompletion.incompleteFields.length > 0 && (
@@ -3530,7 +3540,7 @@ export default function TechnicianPortal() {
                           ))}
                           {profileCompletion.incompleteFields.length > 3 && (
                             <Badge variant="outline" className="text-xs bg-background">
-                              +{profileCompletion.incompleteFields.length - 3} {language === 'en' ? 'more' : 'de plus'}
+                              +{profileCompletion.incompleteFields.length - 3} {language === 'en' ? 'more' : language === 'es' ? 'más' : 'de plus'}
                             </Badge>
                           )}
                         </div>
