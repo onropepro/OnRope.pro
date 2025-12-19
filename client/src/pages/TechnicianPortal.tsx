@@ -919,6 +919,7 @@ const translations = {
     noResume: "Sin curriculum subido",
     noResumeDesc: "Suba un curriculum para que los empleadores lo vean",
     uploadResume: "Subir Curriculum",
+    addResume: "Agregar Curriculum",
     uploadResumeDesc: "Suba su curriculum en formato PDF o documento",
     dragDropResume: "Arrastre y suelte su curriculum aqui",
     orClickToUpload: "o haga clic para subir",
@@ -1467,11 +1468,6 @@ export default function TechnicianPortal() {
     },
   });
 
-  const toggleLanguage = () => {
-    const newLang = language === 'en' ? 'fr' : 'en';
-    setLanguage(newLang);
-    localStorage.setItem('techPortalLanguage', newLang);
-  };
 
   const updateMutation = useMutation({
     mutationFn: async (data: ProfileFormData) => {
