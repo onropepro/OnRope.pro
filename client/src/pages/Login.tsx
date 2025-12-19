@@ -148,6 +148,15 @@ export default function Login() {
       } else if (user.role === "property_manager") {
         console.log("🏢 Redirecting to property manager dashboard...");
         setLocation("/property-manager");
+      } else if (user.role === "superuser") {
+        console.log("🔧 Redirecting to superuser dashboard...");
+        setLocation("/superuser");
+      } else if (user.role === "building_manager") {
+        console.log("🏗️ Redirecting to building portal...");
+        setLocation("/building-portal");
+      } else if (user.role === "rope_access_tech") {
+        console.log("🧗 Redirecting to technician portal...");
+        setLocation("/technician-portal");
       } else {
         console.log("📊 Redirecting to employee dashboard...");
         setLocation("/dashboard");
