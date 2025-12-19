@@ -62,7 +62,7 @@ export default function TechnicianLanding() {
             
             <p className="text-xl md:text-2xl text-orange-100 max-w-3xl mx-auto leading-relaxed">
               The portable work passport for rope access technicians.<br />
-              <strong>Every building. Every drop. Every hour—logged, protected, and owned by you.</strong>
+              <strong>Every building. Every drop. Every hour-logged, protected, and owned by you.</strong>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
@@ -110,7 +110,7 @@ export default function TechnicianLanding() {
               Three weeks ago. The industrial complex out by the port. Was it 6 hours or 8?
             </p>
             <p>
-              Six months ago. The company that folded. All those hours—gone with their paperwork.
+              Six months ago. The company that folded. All those hours-gone with their paperwork.
             </p>
             <p>
               You're not careless. You're busy hitting 5 buildings a week, managing gear, staying safe at height. Details blur. Memory fails. And when you sit down to fill your IRATA logbook, you're guessing at the data your certification depends on.
@@ -149,7 +149,7 @@ export default function TechnicianLanding() {
               Not locked in your employer's filing cabinet. Not lost when companies fold. Not starting from zero every time you change jobs.
             </p>
             <p>
-              Your IRATA or SPRAT number becomes your permanent identifier. Your work history accumulates—automatically when your employer uses OnRopePro, or via photo import of your existing logbook. Your professional reputation travels with you—Vancouver to Toronto to Seattle and back.
+              Your IRATA or SPRAT number becomes your permanent identifier. Your work history accumulates-automatically when your employer uses OnRopePro, or via photo import of your existing logbook. Your professional reputation travels with you-Vancouver to Toronto to Seattle and back.
             </p>
           </div>
           
@@ -195,7 +195,7 @@ export default function TechnicianLanding() {
                     <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0" />
                     <div>
                       <p className="font-medium">Portable Profile</p>
-                      <p className="text-sm text-muted-foreground">Your certifications, contact info, and work history in one place—owned by you</p>
+                      <p className="text-sm text-muted-foreground">Your certifications, contact info, and work history in one place-owned by you</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -370,10 +370,10 @@ export default function TechnicianLanding() {
                   <p>Hours log <strong className="text-foreground">automatically</strong> when you clock in/out</p>
                   <p>Building address, height, tasks, and duration captured without you lifting a finger</p>
                   <p>Your logbook data accumulates in the background while you work</p>
-                  <p>Safety documents pushed to you automatically—sign once, done</p>
+                  <p>Safety documents pushed to you automatically-sign once, done</p>
                   <p>Harness inspections tracked and credited to your safety rating</p>
                   <p>New employer onboarding = <strong className="text-foreground">10 seconds, not 60 minutes</strong></p>
-                  <p>If employer adds a new safety procedure, you sign it before accessing your dashboard—automatic compliance</p>
+                  <p>If employer adds a new safety procedure, you sign it before accessing your dashboard-automatic compliance</p>
                 </div>
               </CardContent>
             </Card>
@@ -519,7 +519,7 @@ export default function TechnicianLanding() {
                     The Solution
                   </h4>
                   <p className="text-base text-muted-foreground">
-                    Every drop. Every building. Every hour. Logged automatically, timestamped, and exportable. When you sit down to fill your physical IRATA logbook—which you still need to do—you're copying accurate data instead of guessing.
+                    Every drop. Every building. Every hour. Logged automatically, timestamped, and exportable. When you sit down to fill your physical IRATA logbook-which you still need to do-you're copying accurate data instead of guessing.
                   </p>
                   <p className="text-base font-medium text-foreground">
                     You still keep your physical logbook. That's required. OnRopePro just makes sure what goes in it is right.
@@ -532,7 +532,7 @@ export default function TechnicianLanding() {
                   <p className="text-base italic text-muted-foreground">
                     "I passed my L2 audit with 1,247 documented hours. Every single one of them verified in my export."
                   </p>
-                  <p className="text-sm font-medium text-foreground mt-2">— Jake M., L2 IRATA, Vancouver</p>
+                  <p className="text-sm font-medium text-foreground mt-2">- Jake M., L2 IRATA, Vancouver</p>
                 </CardContent>
               </Card>
               
@@ -569,7 +569,7 @@ export default function TechnicianLanding() {
                     The Problem
                   </h4>
                   <p className="text-base text-muted-foreground">
-                    You've built a portfolio career—main employer plus side gigs, maximizing your hourly rate. Smart. But every employer means separate onboarding, separate paperwork, and no unified view of your total hours.
+                    You've built a portfolio career-main employer plus side gigs, maximizing your hourly rate. Smart. But every employer means separate onboarding, separate paperwork, and no unified view of your total hours.
                   </p>
                   <p className="text-base text-muted-foreground">
                     You're losing 4-6 hours per month to administrative chaos. At $50/hour, that's $3,000/year in unpaid time.
@@ -581,7 +581,7 @@ export default function TechnicianLanding() {
                     The Solution
                   </h4>
                   <p className="text-base text-muted-foreground">
-                    One profile. Multiple employer connections. Each employer sees what you share—nothing more, nothing less. Hours logged separately by company. Your aggregate career data always accessible.
+                    One profile. Multiple employer connections. Each employer sees what you share-nothing more, nothing less. Hours logged separately by company. Your aggregate career data always accessible.
                   </p>
                   <p className="text-base font-medium text-foreground">
                     PLUS accounts connect to unlimited employers. One referral unlocks it.
@@ -594,7 +594,7 @@ export default function TechnicianLanding() {
                   <p className="text-base italic text-muted-foreground">
                     "I added my third employer in 10 seconds. Same profile, same certifications, separate time tracking."
                   </p>
-                  <p className="text-sm font-medium text-foreground mt-2">— Marcus C., L3 IRATA, Toronto</p>
+                  <p className="text-sm font-medium text-foreground mt-2">- Marcus C., L3 IRATA, Toronto</p>
                 </CardContent>
               </Card>
               
@@ -662,7 +662,7 @@ export default function TechnicianLanding() {
                   <p className="text-base italic text-muted-foreground">
                     "I showed up in Toronto with nothing but my gear and my OnRopePro profile. Started working that afternoon."
                   </p>
-                  <p className="text-sm font-medium text-foreground mt-2">— Lena B., L2 IRATA, Nomadic</p>
+                  <p className="text-sm font-medium text-foreground mt-2">- Lena B., L2 IRATA, Nomadic</p>
                 </CardContent>
               </Card>
               
@@ -736,7 +736,7 @@ export default function TechnicianLanding() {
               <div className="space-y-2">
                 <h3 className="text-xl font-semibold">Export and Fill Your Physical Logbook</h3>
                 <p className="text-base text-muted-foreground">
-                  Download your complete work history as PDF or CSV. Transfer accurate data into your physical IRATA/SPRAT logbook. Your assessor still checks your physical book—OnRopePro just makes sure the data in it is correct.
+                  Download your complete work history as PDF or CSV. Transfer accurate data into your physical IRATA/SPRAT logbook. Your assessor still checks your physical book-OnRopePro just makes sure the data in it is correct.
                 </p>
               </div>
             </div>
@@ -745,7 +745,7 @@ export default function TechnicianLanding() {
           <Card className="mt-8 bg-slate-50 dark:bg-slate-800 border-0">
             <CardContent className="p-6">
               <p className="text-base text-muted-foreground">
-                <strong className="text-foreground">Note:</strong> Your account works even without an employer on the platform. You can store certifications, track history manually, and access the job board (PLUS). But when your employer also uses OnRopePro? Everything supercharges—automatic hour tracking, instant onboarding, seamless documentation.
+                <strong className="text-foreground">Note:</strong> Your account works even without an employer on the platform. You can store certifications, track history manually, and access the job board (PLUS). But when your employer also uses OnRopePro? Everything supercharges-automatic hour tracking, instant onboarding, seamless documentation.
               </p>
               <p className="text-base font-medium text-[#AB4521] mt-3">
                 Tell your boss to check it out. You both win.
@@ -769,7 +769,7 @@ export default function TechnicianLanding() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-base text-amber-900 dark:text-amber-100">
-                <strong>Your IRATA/SPRAT physical logbook is still required.</strong> OnRopePro is a digital assistant that gives you accurate data to transfer into your official logbook—it does not replace it.
+                <strong>Your IRATA/SPRAT physical logbook is still required.</strong> OnRopePro is a digital assistant that gives you accurate data to transfer into your official logbook-it does not replace it.
               </p>
               <p className="text-base text-amber-900 dark:text-amber-100">
                 IRATA and SPRAT certification bodies require you to maintain your physical logbook. That requirement hasn't changed. What has changed is how accurate your entries can be.
@@ -858,7 +858,7 @@ export default function TechnicianLanding() {
                 <p className="text-base italic text-muted-foreground">
                   "I almost lost 187 hours when Skyline Rope Access folded. Those hours are still in my OnRopePro account. Portable, protected, mine."
                 </p>
-                <p className="text-sm font-medium text-foreground mt-4">— Tyler R., L2 IRATA, Calgary</p>
+                <p className="text-sm font-medium text-foreground mt-4">- Tyler R., L2 IRATA, Calgary</p>
               </CardContent>
             </Card>
 
@@ -867,7 +867,7 @@ export default function TechnicianLanding() {
                 <p className="text-base italic text-muted-foreground">
                   "Switched employers twice this year. Total onboarding time: under 5 minutes. Combined."
                 </p>
-                <p className="text-sm font-medium text-foreground mt-4">— Sarah K., L3 IRATA, Toronto</p>
+                <p className="text-sm font-medium text-foreground mt-4">- Sarah K., L3 IRATA, Toronto</p>
               </CardContent>
             </Card>
 
@@ -876,7 +876,7 @@ export default function TechnicianLanding() {
                 <p className="text-base italic text-muted-foreground">
                   "I'm not good with apps. But this one? I log a building in 10 seconds between drops. A year later, I have perfect records."
                 </p>
-                <p className="text-sm font-medium text-foreground mt-4">— Mike D., L1 SPRAT, Vancouver</p>
+                <p className="text-sm font-medium text-foreground mt-4">- Mike D., L1 SPRAT, Vancouver</p>
               </CardContent>
             </Card>
 
@@ -885,7 +885,7 @@ export default function TechnicianLanding() {
                 <p className="text-base italic text-muted-foreground">
                   "Finally something built for techs, not for employers pretending to care about techs."
                 </p>
-                <p className="text-sm font-medium text-foreground mt-4">— Jordan L., L2 IRATA, Seattle</p>
+                <p className="text-sm font-medium text-foreground mt-4">- Jordan L., L2 IRATA, Seattle</p>
               </CardContent>
             </Card>
           </div>
@@ -976,7 +976,7 @@ export default function TechnicianLanding() {
                   <li>Log hours manually</li>
                   <li>Access the job board (PLUS)</li>
                 </ul>
-                <p>What you won't get is automatic hour tracking—that only works when your employer is also on the platform. But here's the thing: when your employer joins, your account instantly upgrades. All that manual logging becomes automatic. Tell your boss.</p>
+                <p>What you won't get is automatic hour tracking-that only works when your employer is also on the platform. But here's the thing: when your employer joins, your account instantly upgrades. All that manual logging becomes automatic. Tell your boss.</p>
               </AccordionContent>
             </AccordionItem>
 
@@ -985,7 +985,7 @@ export default function TechnicianLanding() {
                 How do I import my existing logbook?
               </AccordionTrigger>
               <AccordionContent className="text-base text-muted-foreground pb-4">
-                Open the app, photograph your logbook pages, and the app reads your handwriting and extracts the data. Review, confirm, done. Years of historical hours imported in minutes—no manual data entry.
+                Open the app, photograph your logbook pages, and the app reads your handwriting and extracts the data. Review, confirm, done. Years of historical hours imported in minutes-no manual data entry.
               </AccordionContent>
             </AccordionItem>
 
@@ -994,7 +994,7 @@ export default function TechnicianLanding() {
                 Does this replace my IRATA/SPRAT logbook?
               </AccordionTrigger>
               <AccordionContent className="text-base text-muted-foreground pb-4">
-                <strong>No. You still need your physical logbook.</strong> IRATA and SPRAT require it. Your assessor will check it. OnRopePro is a digital assistant that captures accurate data so you can fill your physical logbook correctly—not a replacement for it.
+                <strong>No. You still need your physical logbook.</strong> IRATA and SPRAT require it. Your assessor will check it. OnRopePro is a digital assistant that captures accurate data so you can fill your physical logbook correctly-not a replacement for it.
               </AccordionContent>
             </AccordionItem>
 
@@ -1004,7 +1004,7 @@ export default function TechnicianLanding() {
               </AccordionTrigger>
               <AccordionContent className="text-base text-muted-foreground pb-4 space-y-3">
                 <p><strong className="text-foreground">Manual logging:</strong> You enter hours, buildings, and tasks yourself (or photograph your logbook to import). Works anytime, with or without an employer on the platform.</p>
-                <p><strong className="text-foreground">Automatic logging:</strong> When your employer uses OnRopePro, your hours log automatically when you clock in/out. Building, height, tasks, duration—all captured without you entering anything. This is the real time-saver.</p>
+                <p><strong className="text-foreground">Automatic logging:</strong> When your employer uses OnRopePro, your hours log automatically when you clock in/out. Building, height, tasks, duration-all captured without you entering anything. This is the real time-saver.</p>
               </AccordionContent>
             </AccordionItem>
 
@@ -1055,7 +1055,7 @@ export default function TechnicianLanding() {
           </h2>
           <p className="text-lg text-white/90">
             Companies fold. Supervisors quit. Paper gets lost. Spreadsheets corrupt.<br />
-            But your career investment—the 500, 1,000, 2,000 hours you've worked at height—that should never disappear.
+            But your career investment-the 500, 1,000, 2,000 hours you've worked at height-that should never disappear.
           </p>
           <p className="font-medium text-white">
             Create your account. Start building your portable professional identity. It's free. It's yours. Forever.
