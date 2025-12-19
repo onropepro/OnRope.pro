@@ -1924,7 +1924,7 @@ export default function TechnicianPortal() {
         credentials: "include",
       });
       queryClient.clear();
-      setLocation("/technician-login");
+      setLocation("/technician");
     } catch (error) {
       console.error("Logout error:", error);
     }
@@ -2268,7 +2268,7 @@ export default function TechnicianPortal() {
         <Card className="max-w-md">
           <CardContent className="pt-6 text-center">
             <p className="text-muted-foreground mb-4">{t.pleaseLogin}</p>
-            <Button onClick={() => setLocation("/technician-login")}>
+            <Button onClick={() => setLocation("/technician")}>
               {t.goToLogin}
             </Button>
           </CardContent>

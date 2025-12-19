@@ -650,7 +650,7 @@ export default function Login() {
                 <Button 
                   variant="outline" 
                   className="h-11 text-sm font-medium border-amber-500/50 text-amber-600 dark:text-amber-400" 
-                  onClick={() => setLocation("/technician-login")}
+                  onClick={() => setLocation("/technician")}
                   data-testid="button-technician-login"
                 >
                   <HardHat className="mr-2 h-4 w-4" />

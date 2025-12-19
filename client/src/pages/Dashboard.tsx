@@ -3094,7 +3094,7 @@ export default function Dashboard() {
       queryClient.clear();
       // Redirect technicians to technician login, others to regular login
       if (userRole === 'rope_access_tech') {
-        setLocation("/technician-login");
+        setLocation("/technician");
       } else {
         setLocation("/login");
       }

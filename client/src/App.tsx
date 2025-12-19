@@ -110,7 +110,6 @@ import ForTechnicians from "@/pages/help/stakeholders/ForTechnicians";
 import ForBuildingManagers from "@/pages/help/stakeholders/ForBuildingManagers";
 import ForPropertyManagers from "@/pages/help/stakeholders/ForPropertyManagers";
 import ForResidents from "@/pages/help/stakeholders/ForResidents";
-import TechnicianLogin from "@/pages/TechnicianLogin";
 import TechnicianPortal from "@/pages/TechnicianPortal";
 import Employer from "@/pages/Employer";
 import TechnicianLoggedHours from "@/pages/TechnicianLoggedHours";
@@ -210,7 +209,6 @@ function Router() {
         </ProtectedRoute>
       </Route>
       <Route path="/building-portal" component={BuildingPortal} />
-      <Route path="/technician-login" component={TechnicianLogin} />
       <Route path="/technician-portal">
         <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
           <TechnicianPortal />

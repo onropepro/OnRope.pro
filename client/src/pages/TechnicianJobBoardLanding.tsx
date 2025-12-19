@@ -57,7 +57,7 @@ export default function TechnicianJobBoardLanding() {
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button size="lg" className="bg-white hover:bg-orange-50" style={{color: TECHNICIAN_COLOR}} asChild data-testid="button-hero-create-account">
-                <Link href="/technician-login?register=true">
+                <Link href="/technician?register=true">
                   Create Your Free Account
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
@@ -228,7 +228,7 @@ export default function TechnicianJobBoardLanding() {
           
           <div className="text-center mt-8">
             <Button size="lg" className="bg-[#AB4521] hover:bg-[#8B371A] text-white" asChild data-testid="button-tier-get-plus">
-              <Link href="/technician-login?register=true&plus=true">
+              <Link href="/technician?register=true&plus=true">
                 Get PLUS Free
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
@@ -383,7 +383,7 @@ export default function TechnicianJobBoardLanding() {
           
           <div className="text-center mt-12">
             <Button size="lg" className="bg-[#AB4521] hover:bg-[#8B371A] text-white" asChild data-testid="button-how-create-account">
-              <Link href="/technician-login?register=true">
+              <Link href="/technician?register=true">
                 Create Your Free Account Now
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
@@ -719,13 +719,13 @@ export default function TechnicianJobBoardLanding() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
             <Button size="lg" className="bg-white hover:bg-orange-50" style={{color: TECHNICIAN_COLOR}} asChild data-testid="button-final-create-account">
-              <Link href="/technician-login?register=true">
+              <Link href="/technician?register=true">
                 Create Your Free Account
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>
             <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-final-upgrade-plus">
-              <Link href="/technician-login?register=true&plus=true">
+              <Link href="/technician?register=true&plus=true">
                 Upgrade to PLUS Free
                 <Award className="ml-2 w-5 h-5" />
               </Link>

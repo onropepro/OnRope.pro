@@ -883,7 +883,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                     className="w-full gap-2 rounded-full bg-[#AB4521]"
                     onClick={() => {
                       handleClose();
-                      setLocation("/technician-login");
+                      setLocation("/technician");
                     }}
                     data-testid="button-go-to-profile"
                   >

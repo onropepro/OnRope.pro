@@ -389,7 +389,7 @@ const pagesData: PageCategory[] = [
     icon: Globe,
     iconColor: "text-action-600 dark:text-action-400",
     pages: [
-      { name: "Technician Landing", path: "/technician-login", description: "Technician signup and PLUS upgrade page", roles: ["Public"] },
+      { name: "Technician Landing", path: "/technician", description: "Technician signup and PLUS upgrade page", roles: ["Public"] },
       { name: "Employer Landing", path: "/employer", description: "Employer/company information page", roles: ["Public"] },
       { name: "Login", path: "/login", description: "User authentication", roles: ["Public"] },
       { name: "Register", path: "/register", description: "New company registration", roles: ["Public"] },
@@ -459,7 +459,7 @@ const pagesData: PageCategory[] = [
       { name: "My Employers", path: "/technician/employers", description: "Connected companies and PLUS multi-employer management", roles: ["Technician"] },
       { name: "Pending Invitations", path: "/technician/invitations", description: "Team invitations from companies", roles: ["Technician"] },
       { name: "Personal Safety Docs", path: "/personal-safety-documents", description: "View personal safety documentation", roles: ["Technician"] },
-      { name: "Technician Registration", path: "/technician-login", description: "Technician signup and PLUS upgrade page", roles: ["Public"] },
+      { name: "Technician Registration", path: "/technician", description: "Technician signup and PLUS upgrade page", roles: ["Public"] },
     ]
   },
   {
