@@ -262,7 +262,7 @@ export function PropertyManagerBuildingsMap({ onBuildingSelect }: PropertyManage
 
   return (
     <div className="flex flex-col lg:flex-row gap-4 h-[600px]">
-      <div className="lg:w-[60%] h-full rounded-lg overflow-hidden border">
+      <div className="lg:w-[60%] h-full rounded-lg overflow-hidden border relative z-0">
         <MapContainer
           center={DEFAULT_CENTER}
           zoom={DEFAULT_ZOOM}
