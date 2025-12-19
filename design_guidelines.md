@@ -22,7 +22,8 @@
 - Light Gray: #F3F3F3 (page backgrounds, light surfaces)
 - Rust Brown: #AB4521 (call-to-action buttons, emphasis)
 
-**Stakeholder Colors (Audience-Specific Branding - 4 Colors):**
+**Stakeholder Colors (Audience-Specific Branding - 5 Colors):**
+- Employers/Company Owners: #0B64A3 (ocean blue - for main site, employer dashboard, cards)
 - Property Manager: #6E9075 (sage green - for PM landing pages, cards, accents)
 - Resident: #86A59C (mint green - for resident portal, feedback, cards)
 - Building Manager: #B89685 (warm taupe - for BM landing pages, cards)

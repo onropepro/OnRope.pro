@@ -1,5 +1,9 @@
 import { useState, useEffect } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { TechnicianRegistration } from "@/components/TechnicianRegistration";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +11,11 @@ import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Separator } from "@/components/ui/separator";
 import { PublicHeader } from "@/components/PublicHeader";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/queryClient";
 import {
   ArrowRight,
   HardHat,
@@ -32,16 +41,89 @@ import {
   Share2,
   Camera,
   XCircle,
-  Calculator
+  Calculator,
+  CreditCard,
+  Mail
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
+
+const loginSchema = z.object({
+  identifier: z.string().min(1, "License number or email is required"),
+  password: z.string().min(1, "Password is required"),
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
 
 const TECHNICIAN_COLOR = "#AB4521";
 const TECHNICIAN_GRADIENT_END = "#8B371A";
 
 export default function TechnicianLanding() {
+  const { t } = useTranslation();
+  const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const [faqOpen, setFaqOpen] = useState<string[]>([]);
   const [showRegistration, setShowRegistration] = useState(false);
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
+  const [loginMethod, setLoginMethod] = useState<"license" | "email">("license");
+
+  const form = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      identifier: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = async (data: LoginFormData) => {
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+        credentials: "include",
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        form.setError("identifier", { message: result.message || "Login failed" });
+        return;
+      }
+
+      await queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      
+      const userResponse = await fetch("/api/user", {
+        credentials: "include",
+      });
+      
+      if (!userResponse.ok) {
+        form.setError("identifier", { 
+          message: "Failed to verify account status. Please try again." 
+        });
+        return;
+      }
+      
+      const userDataResult = await userResponse.json();
+      const user = userDataResult.user;
+      
+      toast({
+        title: t('techLogin.toast.welcome', 'Welcome back!'),
+        description: t('techLogin.toast.loggedIn', 'Logged in as') + ` ${user.name}`,
+      });
+      
+      if (user.role === "rope_access_tech") {
+        if (user.companyId && !user.terminatedDate) {
+          setLocation("/dashboard");
+        } else {
+          setLocation("/technician-portal");
+        }
+      } else {
+        setLocation("/dashboard");
+      }
+    } catch (error) {
+      form.setError("identifier", { message: "An error occurred. Please try again." });
+    }
+  };
 
   // Check for register query parameter to auto-open registration dialog
   useEffect(() => {
@@ -55,7 +137,7 @@ export default function TechnicianLanding() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
-      <PublicHeader activeNav="technician" />
+      <PublicHeader activeNav="technician" onSignInClick={() => setShowLoginDialog(true)} />
       
       {/* Hero Section - Rust Brown Gradient */}
       <section className="relative text-white pb-[120px]" style={{backgroundImage: `linear-gradient(135deg, ${TECHNICIAN_COLOR} 0%, ${TECHNICIAN_GRADIENT_END} 100%)`}}>
@@ -92,10 +174,10 @@ export default function TechnicianLanding() {
                 size="lg" 
                 variant="outline" 
                 className="border-white/40 text-white hover:bg-white/10" 
-                onClick={() => setShowRegistration(true)}
+                onClick={() => setShowLoginDialog(true)}
                 data-testid="button-hero-login"
               >
-                Sign In
+                {t('techLogin.hero.signIn', 'Sign In')}
               </Button>
             </div>
             
@@ -1133,6 +1215,132 @@ export default function TechnicianLanding() {
           </div>
         </div>
       </footer>
+
+      {/* Login Dialog */}
+      <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
+        <DialogContent className="sm:max-w-md" data-testid="dialog-login">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <HardHat className="w-5 h-5 text-primary" />
+              {t('techLogin.dialog.title', 'Technician Sign In')}
+            </DialogTitle>
+            <DialogDescription>
+              {t('techLogin.dialog.subtitle', 'Sign in with your IRATA/SPRAT license number or email')}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant={loginMethod === "license" ? "default" : "outline"}
+                className="flex-1 gap-2"
+                onClick={() => {
+                  setLoginMethod("license");
+                  form.setValue("identifier", "");
+                }}
+                data-testid="button-login-license"
+              >
+                <CreditCard className="w-4 h-4" />
+                {t('techLogin.dialog.licenseNumber', 'License Number')}
+              </Button>
+              <Button
+                type="button"
+                variant={loginMethod === "email" ? "default" : "outline"}
+                className="flex-1 gap-2"
+                onClick={() => {
+                  setLoginMethod("email");
+                  form.setValue("identifier", "");
+                }}
+                data-testid="button-login-email"
+              >
+                <Mail className="w-4 h-4" />
+                {t('techLogin.dialog.email', 'Email')}
+              </Button>
+            </div>
+
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="identifier"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        {loginMethod === "license" ? t('techLogin.dialog.licenseLabel', 'IRATA or SPRAT License Number') : t('techLogin.dialog.emailLabel', 'Email Address')}
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type={loginMethod === "email" ? "email" : "text"}
+                          placeholder={loginMethod === "license" ? "e.g., 123456 (without /1, /2, /3)" : "you@example.com"}
+                          data-testid="input-identifier"
+                        />
+                      </FormControl>
+                      {loginMethod === "license" && (
+                        <p className="text-xs text-muted-foreground">
+                          {t('techLogin.dialog.licenseHint', 'Enter just the number without the level prefix (e.g., 123456 not 1/123456)')}
+                        </p>
+                      )}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('techLogin.dialog.password', 'Password')}</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="password"
+                          placeholder={t('techLogin.dialog.passwordPlaceholder', 'Enter your password')}
+                          data-testid="input-password"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button 
+                  type="submit" 
+                  className="w-full"
+                  disabled={form.formState.isSubmitting}
+                  data-testid="button-login-submit"
+                >
+                  {form.formState.isSubmitting ? t('techLogin.dialog.signingIn', 'Signing in...') : t('techLogin.dialog.signIn', 'Sign In')}
+                </Button>
+              </form>
+            </Form>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  {t('techLogin.dialog.newTechnician', 'New technician?')}
+                </span>
+              </div>
+            </div>
+
+            <Button
+              variant="outline"
+              className="w-full gap-2"
+              onClick={() => {
+                setShowLoginDialog(false);
+                setShowRegistration(true);
+              }}
+              data-testid="button-register"
+            >
+              <HardHat className="w-4 h-4" />
+              {t('techLogin.dialog.register', 'Register as a Technician')}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Registration Modal */}
       <TechnicianRegistration 
