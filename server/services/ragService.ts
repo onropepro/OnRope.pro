@@ -106,7 +106,14 @@ export const guideRegistry = [
     title: 'Resident Portal',
     category: 'communication',
     sourceFile: 'client/src/pages/ResidentPortalGuide.tsx',
-    stakeholders: ['building-manager', 'property-manager'],
+    stakeholders: ['building-manager', 'property-manager', 'resident'],
+  },
+  {
+    slug: 'resident-portal-user-guide',
+    title: 'Resident Portal User Guide',
+    category: 'communication',
+    sourceFile: 'client/src/pages/help/ResidentPortalUserGuide.tsx',
+    stakeholders: ['resident'],
   },
   {
     slug: 'property-manager-interface',

@@ -6,15 +6,40 @@ Two-way feedback system connecting building residents with service providers.
 
 The Resident Portal creates a direct communication channel between building residents and rope access service providers. Residents can submit issues with photo evidence, track status, and receive updates. Vendors manage feedback centrally, improving response times and resident satisfaction.
 
-## The Golden Rule
+## The Company Code (10-Character Code)
+
+The **Company Code** is a 10-character alphanumeric code that connects residents to their service provider. This is sometimes called the "vendor code" or "company number".
+
+### What is the Company Code?
+- A unique 10-character code assigned to each rope access company
+- Residents enter this code after creating their account
+- It binds the resident's account to the correct service company
+- Without it, the resident's control panel will be empty
+
+### How to Get the Company Code
+Residents can obtain the company code from:
+1. Their building manager or strata council
+2. The rope access service company directly
+3. Notices posted in common areas during work
+
+### Where to Enter the Company Code
+After logging into the Resident Portal for the first time:
+1. Go to onrope.pro/resident
+2. Look for the "Enter Company Code" field on your dashboard
+3. Enter the 10-character code provided
+4. Click submit to link your account
+
+**Important**: Active work and building information won't appear until you've entered the company code.
+
+## The Access Formula
 
 ```
-Vendor Code + Strata/LMS Number = Access
+Company Code + Strata/LMS Number = Full Portal Access
 ```
 
-Residents access the portal using:
-- **Vendor Code**: ONE unique code per company (not per building)
-- **Strata/LMS Number**: Identifies their specific building
+Residents need both pieces of information:
+- **Company Code**: The 10-character code from the service company (one code per company, not per building)
+- **Strata/LMS Number**: Your building's strata plan identifier
 
 This creates a portable account system. As vendors add more buildings, the network grows.
 

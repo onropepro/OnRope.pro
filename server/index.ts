@@ -145,14 +145,24 @@ app.use((req, res, next) => {
   });
   
   // Watch for Guide file changes in development mode
+  // Includes both TSX guides and markdown content files for automatic RAG updates
   if (app.get("env") === "development") {
-    const watcher = chokidar.watch('client/src/pages/*Guide.tsx', {
+    const watcher = chokidar.watch([
+      'client/src/pages/*Guide.tsx',
+      'client/src/pages/help/**/*.tsx',
+      'server/help-content/**/*.md'
+    ], {
       persistent: true,
       ignoreInitial: true,
     });
     
     watcher.on('change', async (filePath) => {
       log(`[RAG] Detected change in ${filePath}, reindexing...`);
+      await indexAllGuides();
+    });
+    
+    watcher.on('add', async (filePath) => {
+      log(`[RAG] Detected new file ${filePath}, reindexing...`);
       await indexAllGuides();
     });
   }
