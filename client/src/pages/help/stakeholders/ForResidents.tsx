@@ -144,7 +144,7 @@ export default function ForResidents() {
           )}
         </section>
         
-        <section className="bg-[#86A59C]/10 dark:bg-[#86A59C]/20 rounded-lg p-8">
+        <section className="bg-[#86A59C]/10 dark:bg-[#86A59C]/20 rounded-lg p-8 mb-8">
           <h2 className="text-xl font-semibold mb-4">Getting Started as a Resident</h2>
           <div className="space-y-3">
             <div className="flex items-start gap-3">
@@ -171,29 +171,27 @@ export default function ForResidents() {
           </div>
         </section>
 
-        <section className="mb-12">
-          <Card className="border-[#86A59C]/30 bg-[#86A59C]/5">
-            <CardContent className="pt-6">
-              <div className="flex items-start gap-4 flex-wrap">
-                <div className="w-12 h-12 rounded-lg bg-[#86A59C]/20 flex items-center justify-center text-[#86A59C] shrink-0">
-                  <BookOpen className="h-6 w-6" />
-                </div>
-                <div className="flex-1 min-w-[200px]">
-                  <h2 className="text-xl font-semibold mb-2">Resident Portal User Guide</h2>
-                  <p className="text-muted-foreground mb-4">
-                    Complete step-by-step guide for setting up your account, entering your company code, submitting feedback, and tracking your issues.
-                  </p>
-                  <Link href="/help/resident-portal-guide">
-                    <Button className="bg-[#86A59C] hover:bg-[#6B8A80] gap-2" data-testid="button-user-guide">
-                      View User Guide
-                      <ExternalLink className="h-4 w-4" />
-                    </Button>
-                  </Link>
-                </div>
+        <Card className="border-[#86A59C]/30 bg-[#86A59C]/5">
+          <CardContent className="pt-6">
+            <div className="flex items-start gap-4 flex-wrap">
+              <div className="w-12 h-12 rounded-lg bg-[#86A59C]/20 flex items-center justify-center text-[#86A59C] shrink-0">
+                <BookOpen className="h-6 w-6" />
               </div>
-            </CardContent>
-          </Card>
-        </section>
+              <div className="flex-1 min-w-[200px]">
+                <h2 className="text-xl font-semibold mb-2">Resident Portal User Guide</h2>
+                <p className="text-muted-foreground mb-4">
+                  Complete step-by-step guide for setting up your account, entering your company code, submitting feedback, and tracking your issues.
+                </p>
+                <Link href="/help/resident-portal-guide">
+                  <Button className="bg-[#86A59C] hover:bg-[#6B8A80] gap-2" data-testid="button-user-guide">
+                    View User Guide
+                    <ExternalLink className="h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
       
       <HelpChatWidget />
