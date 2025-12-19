@@ -322,10 +322,10 @@ export default function EmployerJobBoardLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Who Benefits From This Module
+            {t('modules.employerJobBoard.whoBenefits.title', 'Who Benefits From This Module')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-            Every stakeholder in the hiring process gains visibility and efficiency
+            {t('modules.employerJobBoard.whoBenefits.subtitle', 'Every stakeholder in the hiring process gains visibility and efficiency')}
           </p>
 
           <div className="space-y-8">
@@ -336,27 +336,27 @@ export default function EmployerJobBoardLanding() {
                   <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
                     <Briefcase className="w-5 h-5 text-blue-600" />
                   </div>
-                  <CardTitle className="text-xl">For Employers (Company Owners)</CardTitle>
+                  <CardTitle className="text-xl">{t('modules.employerJobBoard.whoBenefits.employers.title', 'For Employers (Company Owners)')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-6 space-y-4">
                 <div className="grid md:grid-cols-3 gap-6">
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Zero filtering. Every applicant is a rope tech.</h4>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.employerJobBoard.whoBenefits.employers.benefit1.title', 'Zero filtering. Every applicant is a rope tech.')}</h4>
                     <p className="text-base text-muted-foreground">
-                      You post a job. You receive applications from people who actually work in rope access building maintenance. Not pipe fitters. Not offshore workers. Not "interested in learning." Your applicant-to-interview ratio improves immediately.
+                      {t('modules.employerJobBoard.whoBenefits.employers.benefit1.description', 'You post a job. You receive applications from people who actually work in rope access building maintenance. Not pipe fitters. Not offshore workers. Not "interested in learning." Your applicant-to-interview ratio improves immediately.')}
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Know salary expectations before you reach out.</h4>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.employerJobBoard.whoBenefits.employers.benefit2.title', 'Know salary expectations before you reach out.')}</h4>
                     <p className="text-base text-muted-foreground">
-                      Technicians set their expected pay rate in their profile. When you browse talent, you see their number before sending an offer. If someone won't work under $60/hour and your budget is $45, you know before wasting an hour on an interview.
+                      {t('modules.employerJobBoard.whoBenefits.employers.benefit2.description', "Technicians set their expected pay rate in their profile. When you browse talent, you see their number before sending an offer. If someone won't work under $60/hour and your budget is $45, you know before wasting an hour on an interview.")}
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Included in your subscription.</h4>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.employerJobBoard.whoBenefits.employers.benefit3.title', 'Included in your subscription.')}</h4>
                     <p className="text-base text-muted-foreground">
-                      Post unlimited jobs. Receive unlimited applications. Indeed charges $22 per application if you don't respond in 48 hours. OnRopePro charges $0. Your job board access is part of what you already pay for.
+                      {t('modules.employerJobBoard.whoBenefits.employers.benefit3.description', "Post unlimited jobs. Receive unlimited applications. Indeed charges $22 per application if you don't respond in 48 hours. OnRopePro charges $0. Your job board access is part of what you already pay for.")}
                     </p>
                   </div>
                 </div>
@@ -370,21 +370,21 @@ export default function EmployerJobBoardLanding() {
                   <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
                     <ClipboardList className="w-5 h-5 text-blue-600" />
                   </div>
-                  <CardTitle className="text-xl">For Operations Managers</CardTitle>
+                  <CardTitle className="text-xl">{t('modules.employerJobBoard.whoBenefits.operationsManagers.title', 'For Operations Managers')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-6 space-y-4">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Browse talent before you post.</h4>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.employerJobBoard.whoBenefits.operationsManagers.benefit1.title', 'Browse talent before you post.')}</h4>
                     <p className="text-base text-muted-foreground">
-                      Need a Level 2 with caulking experience in the Lower Mainland? Search the Talent Browser. See who's available, check their safety ratings, review their expected rates. Find candidates first, then create the job posting to match what's available.
+                      {t('modules.employerJobBoard.whoBenefits.operationsManagers.benefit1.description', "Need a Level 2 with caulking experience in the Lower Mainland? Search the Talent Browser. See who's available, check their safety ratings, review their expected rates. Find candidates first, then create the job posting to match what's available.")}
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">Direct offers streamline hiring.</h4>
+                    <h4 className="text-lg font-semibold text-foreground">{t('modules.employerJobBoard.whoBenefits.operationsManagers.benefit2.title', 'Direct offers streamline hiring.')}</h4>
                     <p className="text-base text-muted-foreground">
-                      Find a strong candidate? Send them an offer linked to your job posting. No more "I'll send you an email with the details." The offer, the job specs, and the accept/decline button are all in one place.
+                      {t('modules.employerJobBoard.whoBenefits.operationsManagers.benefit2.description', 'Find a strong candidate? Send them an offer linked to your job posting. No more "I\'ll send you an email with the details." The offer, the job specs, and the accept/decline button are all in one place.')}
                     </p>
                   </div>
                 </div>
@@ -398,14 +398,14 @@ export default function EmployerJobBoardLanding() {
                   <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center">
                     <Building2 className="w-5 h-5 text-violet-600" />
                   </div>
-                  <CardTitle className="text-xl">For Building Managers</CardTitle>
+                  <CardTitle className="text-xl">{t('modules.employerJobBoard.whoBenefits.buildingManagers.title', 'For Building Managers')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-6 space-y-4">
                 <div className="space-y-2">
-                  <h4 className="text-lg font-semibold text-foreground">Verify contractor hiring practices.</h4>
+                  <h4 className="text-lg font-semibold text-foreground">{t('modules.employerJobBoard.whoBenefits.buildingManagers.benefit1.title', 'Verify contractor hiring practices.')}</h4>
                   <p className="text-base text-muted-foreground">
-                    When your rope access contractor uses OnRopePro, their technicians have documented IRATA/SPRAT certifications and visible safety ratings. You're not just trusting their word. You're seeing verified credentials tied to real work history.
+                    {t('modules.employerJobBoard.whoBenefits.buildingManagers.benefit1.description', "When your rope access contractor uses OnRopePro, their technicians have documented IRATA/SPRAT certifications and visible safety ratings. You're not just trusting their word. You're seeing verified credentials tied to real work history.")}
                   </p>
                 </div>
               </CardContent>
@@ -418,14 +418,14 @@ export default function EmployerJobBoardLanding() {
                   <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center">
                     <Globe className="w-5 h-5 text-emerald-600" />
                   </div>
-                  <CardTitle className="text-xl">For Property Managers</CardTitle>
+                  <CardTitle className="text-xl">{t('modules.employerJobBoard.whoBenefits.propertyManagers.title', 'For Property Managers')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-6 space-y-4">
                 <div className="space-y-2">
-                  <h4 className="text-lg font-semibold text-foreground">Confidence in contractor quality.</h4>
+                  <h4 className="text-lg font-semibold text-foreground">{t('modules.employerJobBoard.whoBenefits.propertyManagers.benefit1.title', 'Confidence in contractor quality.')}</h4>
                   <p className="text-base text-muted-foreground">
-                    The contractors bidding on your portfolio use a system where every technician is verified. When they tell you "our team is certified and safety-focused," you can see the data backing that claim.
+                    {t('modules.employerJobBoard.whoBenefits.propertyManagers.benefit1.description', 'The contractors bidding on your portfolio use a system where every technician is verified. When they tell you "our team is certified and safety-focused," you can see the data backing that claim.')}
                   </p>
                 </div>
               </CardContent>
@@ -438,14 +438,14 @@ export default function EmployerJobBoardLanding() {
                   <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center">
                     <HardHat className="w-5 h-5 text-amber-600" />
                   </div>
-                  <CardTitle className="text-xl">For Technicians</CardTitle>
+                  <CardTitle className="text-xl">{t('modules.employerJobBoard.whoBenefits.technicians.title', 'For Technicians')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-6 space-y-4">
                 <div className="space-y-2">
-                  <h4 className="text-lg font-semibold text-foreground">Get found by employers who matter.</h4>
+                  <h4 className="text-lg font-semibold text-foreground">{t('modules.employerJobBoard.whoBenefits.technicians.benefit1.title', 'Get found by employers who matter.')}</h4>
                   <p className="text-base text-muted-foreground">
-                    When you turn on profile visibility, only verified rope access companies can see you. No random recruiters. No spam. Companies actively hiring in your specialty can search for you directly and send offers to your portal.
+                    {t('modules.employerJobBoard.whoBenefits.technicians.benefit1.description', 'When you turn on profile visibility, only verified rope access companies can see you. No random recruiters. No spam. Companies actively hiring in your specialty can search for you directly and send offers to your portal.')}
                   </p>
                 </div>
               </CardContent>
@@ -459,9 +459,9 @@ export default function EmployerJobBoardLanding() {
       {/* Key Features */}
       <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Key Features</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">{t('modules.employerJobBoard.keyFeatures.title', 'Key Features')}</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            The Job Board ecosystem combines posting, searching, and hiring into one integrated system
+            {t('modules.employerJobBoard.keyFeatures.subtitle', 'The Job Board ecosystem combines posting, searching, and hiring into one integrated system')}
           </p>
         </div>
 
@@ -473,15 +473,15 @@ export default function EmployerJobBoardLanding() {
                 <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
                   <Lock className="w-5 h-5 text-blue-600" />
                 </div>
-                <CardTitle className="text-lg">Verified Employer Ecosystem</CardTitle>
+                <CardTitle className="text-lg">{t('modules.employerJobBoard.keyFeatures.verifiedEcosystem.title', 'Verified Employer Ecosystem')}</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
               <p className="text-base text-muted-foreground">
-                Only rope access building maintenance companies post here. Every employer is verified when they create an account. No bakeries, no car washes, no unrelated industries.
+                {t('modules.employerJobBoard.keyFeatures.verifiedEcosystem.description1', 'Only rope access building maintenance companies post here. Every employer is verified when they create an account. No bakeries, no car washes, no unrelated industries.')}
               </p>
               <p className="text-base text-muted-foreground mt-2">
-                When you browse competitors' postings, you're seeing your actual market.
+                {t('modules.employerJobBoard.keyFeatures.verifiedEcosystem.description2', "When you browse competitors' postings, you're seeing your actual market.")}
               </p>
             </CardContent>
           </Card>
@@ -493,15 +493,15 @@ export default function EmployerJobBoardLanding() {
                 <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center">
                   <Zap className="w-5 h-5 text-emerald-600" />
                 </div>
-                <CardTitle className="text-lg">One-Click Applications Inbound</CardTitle>
+                <CardTitle className="text-lg">{t('modules.employerJobBoard.keyFeatures.oneClickApplications.title', 'One-Click Applications Inbound')}</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
               <p className="text-base text-muted-foreground">
-                When technicians apply, their profile data, resume, and certifications auto-attach. You see everything you need to evaluate them in one view.
+                {t('modules.employerJobBoard.keyFeatures.oneClickApplications.description1', 'When technicians apply, their profile data, resume, and certifications auto-attach. You see everything you need to evaluate them in one view.')}
               </p>
               <p className="text-base text-muted-foreground mt-2">
-                No "please resend your resume" emails. No "can you confirm your IRATA number" phone calls.
+                {t('modules.employerJobBoard.keyFeatures.oneClickApplications.description2', 'No "please resend your resume" emails. No "can you confirm your IRATA number" phone calls.')}
               </p>
             </CardContent>
           </Card>
@@ -513,15 +513,15 @@ export default function EmployerJobBoardLanding() {
                 <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center">
                   <DollarSign className="w-5 h-5 text-amber-600" />
                 </div>
-                <CardTitle className="text-lg">Expected Pay Rate Visibility</CardTitle>
+                <CardTitle className="text-lg">{t('modules.employerJobBoard.keyFeatures.payRateVisibility.title', 'Expected Pay Rate Visibility')}</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
               <p className="text-base text-muted-foreground">
-                See what candidates want before you engage. If your budget is $45/hour and they want $60, you know immediately.
+                {t('modules.employerJobBoard.keyFeatures.payRateVisibility.description1', 'See what candidates want before you engage. If your budget is $45/hour and they want $60, you know immediately.')}
               </p>
               <p className="text-base text-muted-foreground mt-2">
-                Stop wasting interview time on compensation mismatches.
+                {t('modules.employerJobBoard.keyFeatures.payRateVisibility.description2', 'Stop wasting interview time on compensation mismatches.')}
               </p>
             </CardContent>
           </Card>
@@ -533,15 +533,15 @@ export default function EmployerJobBoardLanding() {
                 <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center">
                   <Shield className="w-5 h-5 text-violet-600" />
                 </div>
-                <CardTitle className="text-lg">Safety Rating Integration</CardTitle>
+                <CardTitle className="text-lg">{t('modules.employerJobBoard.keyFeatures.safetyRating.title', 'Safety Rating Integration')}</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
               <p className="text-base text-muted-foreground">
-                Every technician has an Individual Safety Rating (0-100) built from daily harness inspections, toolbox talk participation, and safety quiz completions.
+                {t('modules.employerJobBoard.keyFeatures.safetyRating.description1', 'Every technician has an Individual Safety Rating (0-100) built from daily harness inspections, toolbox talk participation, and safety quiz completions.')}
               </p>
               <p className="text-base text-muted-foreground mt-2">
-                See it in their profile. Factor it into your hiring decisions.
+                {t('modules.employerJobBoard.keyFeatures.safetyRating.description2', 'See it in their profile. Factor it into your hiring decisions.')}
               </p>
             </CardContent>
           </Card>
@@ -553,15 +553,15 @@ export default function EmployerJobBoardLanding() {
                 <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center">
                   <BarChart3 className="w-5 h-5 text-rose-600" />
                 </div>
-                <CardTitle className="text-lg">Application Status Dashboard</CardTitle>
+                <CardTitle className="text-lg">{t('modules.employerJobBoard.keyFeatures.statusDashboard.title', 'Application Status Dashboard')}</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
               <p className="text-base text-muted-foreground">
-                Track every applicant across every posting. See who's under review, who you've contacted, who's been offered, who's accepted.
+                {t('modules.employerJobBoard.keyFeatures.statusDashboard.description1', "Track every applicant across every posting. See who's under review, who you've contacted, who's been offered, who's accepted.")}
               </p>
               <p className="text-base text-muted-foreground mt-2">
-                No spreadsheets. No losing candidates between the cracks.
+                {t('modules.employerJobBoard.keyFeatures.statusDashboard.description2', 'No spreadsheets. No losing candidates between the cracks.')}
               </p>
             </CardContent>
           </Card>
@@ -573,15 +573,15 @@ export default function EmployerJobBoardLanding() {
                 <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
                   <UserPlus className="w-5 h-5 text-blue-600" />
                 </div>
-                <CardTitle className="text-lg">Instant Onboarding Connection</CardTitle>
+                <CardTitle className="text-lg">{t('modules.employerJobBoard.keyFeatures.instantOnboarding.title', 'Instant Onboarding Connection')}</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
               <p className="text-base text-muted-foreground">
-                When a technician accepts your offer, their profile data flows into your employee management system. IRATA number, certifications, banking details (if shared), emergency contacts.
+                {t('modules.employerJobBoard.keyFeatures.instantOnboarding.description1', 'When a technician accepts your offer, their profile data flows into your employee management system. IRATA number, certifications, banking details (if shared), emergency contacts.')}
               </p>
               <p className="text-base text-muted-foreground mt-2">
-                Day-one ready without the paperwork marathon.
+                {t('modules.employerJobBoard.keyFeatures.instantOnboarding.description2', 'Day-one ready without the paperwork marathon.')}
               </p>
             </CardContent>
           </Card>
@@ -593,10 +593,10 @@ export default function EmployerJobBoardLanding() {
       {/* Problems Solved */}
       <section id="problems-solved" className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto">
         <div className="flex items-center justify-between flex-wrap gap-4 mb-8">
-          <h2 className="text-3xl md:text-4xl font-bold">Problems Solved</h2>
+          <h2 className="text-3xl md:text-4xl font-bold">{t('modules.employerJobBoard.problemsSolved.title', 'Problems Solved')}</h2>
           <Button onClick={toggleAll} variant="outline" data-testid="button-toggle-all-accordions">
             <ChevronsUpDown className="w-4 h-4 mr-2" />
-            {allExpanded ? "Collapse All" : "Expand All"}
+            {allExpanded ? t('modules.employerJobBoard.problemsSolved.collapseAll', 'Collapse All') : t('modules.employerJobBoard.problemsSolved.expandAll', 'Expand All')}
           </Button>
         </div>
 
@@ -604,66 +604,66 @@ export default function EmployerJobBoardLanding() {
         <div className="space-y-6">
           <div className="flex items-center gap-3 pb-2 border-b">
             <Briefcase className="w-5 h-5 text-blue-500" />
-            <h3 className="text-xl md:text-2xl font-semibold">For Employers</h3>
+            <h3 className="text-xl md:text-2xl font-semibold">{t('modules.employerJobBoard.problemsSolved.forEmployers', 'For Employers')}</h3>
           </div>
 
           <Accordion type="multiple" value={openItems} onValueChange={setOpenItems} className="space-y-3">
             <AccordionItem value="employer-1" className="border rounded-lg px-4">
               <AccordionTrigger className="text-left font-medium" data-testid="accordion-employer-1">
-                "I post on Indeed and get 50 applicants. Only 2 are actual rope techs."
+                {t('modules.employerJobBoard.problemsSolved.employer1.question', '"I post on Indeed and get 50 applicants. Only 2 are actual rope techs."')}
               </AccordionTrigger>
               <AccordionContent className="space-y-4 text-muted-foreground pb-4">
                 <p>
-                  <span className="font-medium text-foreground">The Pain:</span> You post everywhere: Indeed, LinkedIn, Craigslist, Facebook. Applications flood in from people who've never touched a rope system.
+                  <span className="font-medium text-foreground">{t('modules.employerJobBoard.problemsSolved.painLabel', 'The Pain:')}</span> {t('modules.employerJobBoard.problemsSolved.employer1.pain', "You post everywhere: Indeed, LinkedIn, Craigslist, Facebook. Applications flood in from people who've never touched a rope system.")}
                 </p>
                 <p>
-                  <span className="font-medium text-foreground">Real Example:</span> Shop laborers, general construction workers, offshore candidates. Two hours filtering to find two relevant resumes out of fifty applications.
+                  <span className="font-medium text-foreground">{t('modules.employerJobBoard.problemsSolved.exampleLabel', 'Real Example:')}</span> {t('modules.employerJobBoard.problemsSolved.employer1.example', 'Shop laborers, general construction workers, offshore candidates. Two hours filtering to find two relevant resumes out of fifty applications.')}
                 </p>
                 <p>
-                  <span className="font-medium text-foreground">Solution:</span> OnRopePro's Job Board is a closed ecosystem. Every technician on the platform is in rope access building maintenance.
+                  <span className="font-medium text-foreground">{t('modules.employerJobBoard.problemsSolved.solutionLabel', 'Solution:')}</span> {t('modules.employerJobBoard.problemsSolved.employer1.solution', "OnRopePro's Job Board is a closed ecosystem. Every technician on the platform is in rope access building maintenance.")}
                 </p>
                 <p>
-                  <span className="font-medium text-foreground">Benefit:</span> When you post a job, 100% of applicants are relevant. No filtering required. Two hours of wasted time becomes zero.
+                  <span className="font-medium text-foreground">{t('modules.employerJobBoard.problemsSolved.benefitLabel', 'Benefit:')}</span> {t('modules.employerJobBoard.problemsSolved.employer1.benefit', 'When you post a job, 100% of applicants are relevant. No filtering required. Two hours of wasted time becomes zero.')}
                 </p>
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="employer-2" className="border rounded-lg px-4">
               <AccordionTrigger className="text-left font-medium" data-testid="accordion-employer-2">
-                "Indeed charges me $22 per application if I don't respond in 48 hours."
+                {t('modules.employerJobBoard.problemsSolved.employer2.question', '"Indeed charges me $22 per application if I don\'t respond in 48 hours."')}
               </AccordionTrigger>
               <AccordionContent className="space-y-4 text-muted-foreground pb-4">
                 <p>
-                  <span className="font-medium text-foreground">The Pain:</span> Someone has to log in daily, open every application, decline or respond. Miss a few days and the charges pile up.
+                  <span className="font-medium text-foreground">{t('modules.employerJobBoard.problemsSolved.painLabel', 'The Pain:')}</span> {t('modules.employerJobBoard.problemsSolved.employer2.pain', 'Someone has to log in daily, open every application, decline or respond. Miss a few days and the charges pile up.')}
                 </p>
                 <p>
-                  <span className="font-medium text-foreground">Real Example:</span> That's $22 times every unopened application. A single job posting can cost $300 in "engagement fees" before you've hired anyone.
+                  <span className="font-medium text-foreground">{t('modules.employerJobBoard.problemsSolved.exampleLabel', 'Real Example:')}</span> {t('modules.employerJobBoard.problemsSolved.employer2.example', "That's $22 times every unopened application. A single job posting can cost $300 in \"engagement fees\" before you've hired anyone.")}
                 </p>
                 <p>
-                  <span className="font-medium text-foreground">Solution:</span> OnRopePro includes unlimited postings and applications in your subscription. No per-application fees. No surprise charges.
+                  <span className="font-medium text-foreground">{t('modules.employerJobBoard.problemsSolved.solutionLabel', 'Solution:')}</span> {t('modules.employerJobBoard.problemsSolved.employer2.solution', 'OnRopePro includes unlimited postings and applications in your subscription. No per-application fees. No surprise charges.')}
                 </p>
                 <p>
-                  <span className="font-medium text-foreground">Benefit:</span> No daily login obligation just to avoid billing. Post freely, review on your schedule, pay nothing extra.
+                  <span className="font-medium text-foreground">{t('modules.employerJobBoard.problemsSolved.benefitLabel', 'Benefit:')}</span> {t('modules.employerJobBoard.problemsSolved.employer2.benefit', 'No daily login obligation just to avoid billing. Post freely, review on your schedule, pay nothing extra.')}
                 </p>
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="employer-3" className="border rounded-lg px-4">
               <AccordionTrigger className="text-left font-medium" data-testid="accordion-employer-3">
-                "I spent an hour interviewing someone who wants $20/hour more than my budget."
+                {t('modules.employerJobBoard.problemsSolved.employer3.question', '"I spent an hour interviewing someone who wants $20/hour more than my budget."')}
               </AccordionTrigger>
               <AccordionContent className="space-y-4 text-muted-foreground pb-4">
                 <p>
-                  <span className="font-medium text-foreground">The Pain:</span> The interview went well. References checked out. You're ready to make an offer. Then you ask about compensation.
+                  <span className="font-medium text-foreground">{t('modules.employerJobBoard.problemsSolved.painLabel', 'The Pain:')}</span> {t('modules.employerJobBoard.problemsSolved.employer3.pain', "The interview went well. References checked out. You're ready to make an offer. Then you ask about compensation.")}
                 </p>
                 <p>
-                  <span className="font-medium text-foreground">Real Example:</span> They want $60/hour. Your budget is $45. An hour wasted for both parties because expectations were never aligned.
+                  <span className="font-medium text-foreground">{t('modules.employerJobBoard.problemsSolved.exampleLabel', 'Real Example:')}</span> {t('modules.employerJobBoard.problemsSolved.employer3.example', 'They want $60/hour. Your budget is $45. An hour wasted for both parties because expectations were never aligned.')}
                 </p>
                 <p>
-                  <span className="font-medium text-foreground">Solution:</span> Technicians set expected pay rate in their profile. You see it in the Talent Browser before reaching out.
+                  <span className="font-medium text-foreground">{t('modules.employerJobBoard.problemsSolved.solutionLabel', 'Solution:')}</span> {t('modules.employerJobBoard.problemsSolved.employer3.solution', 'Technicians set expected pay rate in their profile. You see it in the Talent Browser before reaching out.')}
                 </p>
                 <p>
-                  <span className="font-medium text-foreground">Benefit:</span> Compensation mismatches get filtered before the interview, not during. Only interview candidates within your budget.
+                  <span className="font-medium text-foreground">{t('modules.employerJobBoard.problemsSolved.benefitLabel', 'Benefit:')}</span> {t('modules.employerJobBoard.problemsSolved.employer3.benefit', 'Compensation mismatches get filtered before the interview, not during. Only interview candidates within your budget.')}
                 </p>
               </AccordionContent>
             </AccordionItem>
@@ -672,26 +672,26 @@ export default function EmployerJobBoardLanding() {
           {/* For Operations Managers */}
           <div className="flex items-center gap-3 pb-2 border-b mt-8">
             <ClipboardList className="w-5 h-5 text-blue-500" />
-            <h3 className="text-xl md:text-2xl font-semibold">For Operations Managers</h3>
+            <h3 className="text-xl md:text-2xl font-semibold">{t('modules.employerJobBoard.problemsSolved.forOperationsManagers', 'For Operations Managers')}</h3>
           </div>
 
           <Accordion type="multiple" value={openItems} onValueChange={setOpenItems} className="space-y-3">
             <AccordionItem value="ops-1" className="border rounded-lg px-4">
               <AccordionTrigger className="text-left font-medium" data-testid="accordion-ops-1">
-                "I don't know if we have capacity to take this new contract."
+                {t('modules.employerJobBoard.problemsSolved.ops1.question', '"I don\'t know if we have capacity to take this new contract."')}
               </AccordionTrigger>
               <AccordionContent className="space-y-4 text-muted-foreground pb-4">
                 <p>
-                  <span className="font-medium text-foreground">The Pain:</span> A client calls with urgent work. You think Tommy finishes Tower A on Friday, but you're not certain. Is Sarah on vacation?
+                  <span className="font-medium text-foreground">{t('modules.employerJobBoard.problemsSolved.painLabel', 'The Pain:')}</span> {t('modules.employerJobBoard.problemsSolved.ops1.pain', "A client calls with urgent work. You think Tommy finishes Tower A on Friday, but you're not certain. Is Sarah on vacation?")}
                 </p>
                 <p>
-                  <span className="font-medium text-foreground">Real Example:</span> You either decline the work (lost revenue) or commit and hope (risk of overcommitting and failing to deliver).
+                  <span className="font-medium text-foreground">{t('modules.employerJobBoard.problemsSolved.exampleLabel', 'Real Example:')}</span> {t('modules.employerJobBoard.problemsSolved.ops1.example', 'You either decline the work (lost revenue) or commit and hope (risk of overcommitting and failing to deliver).')}
                 </p>
                 <p>
-                  <span className="font-medium text-foreground">Solution:</span> The Job Board connects to your scheduling and employee management systems. When you post a job and receive applications, you can cross-reference against crew availability.
+                  <span className="font-medium text-foreground">{t('modules.employerJobBoard.problemsSolved.solutionLabel', 'Solution:')}</span> {t('modules.employerJobBoard.problemsSolved.ops1.solution', 'The Job Board connects to your scheduling and employee management systems. When you post a job and receive applications, you can cross-reference against crew availability.')}
                 </p>
                 <p>
-                  <span className="font-medium text-foreground">Benefit:</span> Know if you have capacity before you commit. Make informed decisions about new contracts based on real data.
+                  <span className="font-medium text-foreground">{t('modules.employerJobBoard.problemsSolved.benefitLabel', 'Benefit:')}</span> {t('modules.employerJobBoard.problemsSolved.ops1.benefit', 'Know if you have capacity before you commit. Make informed decisions about new contracts based on real data.')}
                 </p>
               </AccordionContent>
             </AccordionItem>
@@ -700,26 +700,26 @@ export default function EmployerJobBoardLanding() {
           {/* For Building Managers */}
           <div className="flex items-center gap-3 pb-2 border-b mt-8">
             <Building2 className="w-5 h-5 text-violet-500" />
-            <h3 className="text-xl md:text-2xl font-semibold">For Building Managers</h3>
+            <h3 className="text-xl md:text-2xl font-semibold">{t('modules.employerJobBoard.problemsSolved.forBuildingManagers', 'For Building Managers')}</h3>
           </div>
 
           <Accordion type="multiple" value={openItems} onValueChange={setOpenItems} className="space-y-3">
             <AccordionItem value="bm-1" className="border rounded-lg px-4">
               <AccordionTrigger className="text-left font-medium" data-testid="accordion-bm-1">
-                "How do I know this contractor hires qualified workers?"
+                {t('modules.employerJobBoard.problemsSolved.bm1.question', '"How do I know this contractor hires qualified workers?"')}
               </AccordionTrigger>
               <AccordionContent className="space-y-4 text-muted-foreground pb-4">
                 <p>
-                  <span className="font-medium text-foreground">The Pain:</span> You hire a rope access company but have no visibility into who they're actually sending to your building.
+                  <span className="font-medium text-foreground">{t('modules.employerJobBoard.problemsSolved.painLabel', 'The Pain:')}</span> {t('modules.employerJobBoard.problemsSolved.bm1.pain', 'You hire a rope access company but have no visibility into who they\'re actually sending to your building.')}
                 </p>
                 <p>
-                  <span className="font-medium text-foreground">Real Example:</span> Are these people certified? Do they have safety records? You're trusting the contractor's word with no way to verify.
+                  <span className="font-medium text-foreground">{t('modules.employerJobBoard.problemsSolved.exampleLabel', 'Real Example:')}</span> {t('modules.employerJobBoard.problemsSolved.bm1.example', "Are these people certified? Do they have safety records? You're trusting the contractor's word with no way to verify.")}
                 </p>
                 <p>
-                  <span className="font-medium text-foreground">Solution:</span> When contractors use OnRopePro, their technicians have verified IRATA/SPRAT certifications and visible safety ratings.
+                  <span className="font-medium text-foreground">{t('modules.employerJobBoard.problemsSolved.solutionLabel', 'Solution:')}</span> {t('modules.employerJobBoard.problemsSolved.bm1.solution', 'When contractors use OnRopePro, their technicians have verified IRATA/SPRAT certifications and visible safety ratings.')}
                 </p>
                 <p>
-                  <span className="font-medium text-foreground">Benefit:</span> You can ask for documentation. The data exists in their system. Trust is backed by verifiable records.
+                  <span className="font-medium text-foreground">{t('modules.employerJobBoard.problemsSolved.benefitLabel', 'Benefit:')}</span> {t('modules.employerJobBoard.problemsSolved.bm1.benefit', 'You can ask for documentation. The data exists in their system. Trust is backed by verifiable records.')}
                 </p>
               </AccordionContent>
             </AccordionItem>
@@ -732,9 +732,9 @@ export default function EmployerJobBoardLanding() {
       {/* Connected Modules */}
       <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Connected Modules</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">{t('modules.employerJobBoard.connectedModules.title', 'Connected Modules')}</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            The Job Board doesn't exist in isolation. It connects to the systems you already use.
+            {t('modules.employerJobBoard.connectedModules.subtitle', "The Job Board doesn't exist in isolation. It connects to the systems you already use.")}
           </p>
         </div>
 
@@ -746,14 +746,14 @@ export default function EmployerJobBoardLanding() {
                   <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
                     <Users className="w-5 h-5 text-blue-600" />
                   </div>
-                  <CardTitle className="text-lg">Employee Management</CardTitle>
+                  <CardTitle className="text-lg">{t('modules.employerJobBoard.connectedModules.employeeManagement.title', 'Employee Management')}</CardTitle>
                 </div>
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
               </div>
             </CardHeader>
             <CardContent>
               <p className="text-base text-muted-foreground">
-                When a technician accepts your offer, their profile data flows into your employee roster. IRATA number, certifications, contact information. Start onboarding immediately.
+                {t('modules.employerJobBoard.connectedModules.employeeManagement.description', 'When a technician accepts your offer, their profile data flows into your employee roster. IRATA number, certifications, contact information. Start onboarding immediately.')}
               </p>
             </CardContent>
           </Card>
@@ -765,14 +765,14 @@ export default function EmployerJobBoardLanding() {
                   <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center">
                     <Shield className="w-5 h-5 text-emerald-600" />
                   </div>
-                  <CardTitle className="text-lg">Safety & Compliance</CardTitle>
+                  <CardTitle className="text-lg">{t('modules.employerJobBoard.connectedModules.safetyCompliance.title', 'Safety & Compliance')}</CardTitle>
                 </div>
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
               </div>
             </CardHeader>
             <CardContent>
               <p className="text-base text-muted-foreground">
-                Candidate safety ratings come from real data: harness inspections, toolbox talks, safety quizzes. The score you see is earned, not self-reported.
+                {t('modules.employerJobBoard.connectedModules.safetyCompliance.description', 'Candidate safety ratings come from real data: harness inspections, toolbox talks, safety quizzes. The score you see is earned, not self-reported.')}
               </p>
             </CardContent>
           </Card>
@@ -784,14 +784,14 @@ export default function EmployerJobBoardLanding() {
                   <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center">
                     <ClipboardList className="w-5 h-5 text-violet-600" />
                   </div>
-                  <CardTitle className="text-lg">Project Management</CardTitle>
+                  <CardTitle className="text-lg">{t('modules.employerJobBoard.connectedModules.projectManagement.title', 'Project Management')}</CardTitle>
                 </div>
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
               </div>
             </CardHeader>
             <CardContent>
               <p className="text-base text-muted-foreground">
-                Hiring for a specific project? See which positions you need to fill by checking your active projects. Staff appropriately based on real workload.
+                {t('modules.employerJobBoard.connectedModules.projectManagement.description', 'Hiring for a specific project? See which positions you need to fill by checking your active projects. Staff appropriately based on real workload.')}
               </p>
             </CardContent>
           </Card>
@@ -803,14 +803,14 @@ export default function EmployerJobBoardLanding() {
                   <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center">
                     <Calendar className="w-5 h-5 text-amber-600" />
                   </div>
-                  <CardTitle className="text-lg">Scheduling & Calendar</CardTitle>
+                  <CardTitle className="text-lg">{t('modules.employerJobBoard.connectedModules.schedulingCalendar.title', 'Scheduling & Calendar')}</CardTitle>
                 </div>
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
               </div>
             </CardHeader>
             <CardContent>
               <p className="text-base text-muted-foreground">
-                Cross-reference new hires against crew availability. Know when you have capacity to bring someone on and which projects they'll join.
+                {t('modules.employerJobBoard.connectedModules.schedulingCalendar.description', "Cross-reference new hires against crew availability. Know when you have capacity to bring someone on and which projects they'll join.")}
               </p>
             </CardContent>
           </Card>
@@ -823,26 +823,26 @@ export default function EmployerJobBoardLanding() {
       <section className="py-16 md:py-24 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Your Hiring Time Goes to Zero.<br />
-            <span className="text-blue-600">Your Talent Pool Goes to Everyone.</span>
+            {t('modules.employerJobBoard.cta.title', 'Your Hiring Time Goes to Zero.')}<br />
+            <span className="text-blue-600">{t('modules.employerJobBoard.cta.titleHighlight', 'Your Talent Pool Goes to Everyone.')}</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-            Right now, hiring eats your week. You post on Indeed. You wait for applications. You filter through irrelevant resumes. You interview people who want double your budget. You pay $22 per application from pipe fitters.
+            {t('modules.employerJobBoard.cta.description1', 'Right now, hiring eats your week. You post on Indeed. You wait for applications. You filter through irrelevant resumes. You interview people who want double your budget. You pay $22 per application from pipe fitters.')}
           </p>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-            With OnRopePro's Job Board, your next hire is already in the system. Search the Talent Browser. Find Level 2 techs with caulking experience in your region. See their safety rating, their expected rate, their certifications. Send an offer directly.
+            {t('modules.employerJobBoard.cta.description2', "With OnRopePro's Job Board, your next hire is already in the system. Search the Talent Browser. Find Level 2 techs with caulking experience in your region. See their safety rating, their expected rate, their certifications. Send an offer directly.")}
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="bg-[#0B64A3] text-white hover:bg-[#0369A1]" asChild data-testid="button-cta-start">
               <Link href="/register">
-                Start Posting Jobs Free
+                {t('modules.employerJobBoard.cta.ctaPrimary', 'Start Posting Jobs Free')}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>
             <Button size="lg" variant="outline" asChild data-testid="button-cta-learn">
               <Link href="/changelog/job-board">
-                Learn More
+                {t('modules.employerJobBoard.cta.ctaSecondary', 'Learn More')}
                 <BookOpen className="ml-2 w-5 h-5" />
               </Link>
             </Button>
@@ -854,7 +854,7 @@ export default function EmployerJobBoardLanding() {
       <footer className="bg-slate-50 dark:bg-slate-900 border-t py-8">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <p className="text-sm text-muted-foreground">
-            Part of the OnRopePro platform for rope access building maintenance companies.
+            {t('modules.employerJobBoard.footer.text', 'Part of the OnRopePro platform for rope access building maintenance companies.')}
           </p>
         </div>
       </footer>

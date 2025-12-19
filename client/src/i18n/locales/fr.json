@@ -320,7 +320,244 @@
       },
       "payroll": {
         "title": "Paie et finances",
-        "description": "Feuilles de temps automatisées, calcul des heures supplémentaires, exports de paie"
+        "description": "Feuilles de temps automatisées, calcul des heures supplémentaires, exports de paie",
+        "hero": {
+          "badge": "Arrêtez de détester le jour de paie",
+          "title": "Préparation de la paie qui",
+          "titleHighlight": "fonctionne vraiment",
+          "subtitle": "Des sessions de travail vérifiées aux feuilles de temps prêtes à exporter. Heures supplémentaires calculées. Coûts de projet suivis. Des heures qui correspondent à votre logiciel comptable du premier coup.",
+          "primaryCta": "Essai gratuit de 60 jours",
+          "secondaryCta": "Voir comment ça marche"
+        },
+        "stats": {
+          "stat1": {
+            "value": "30min",
+            "label": "Temps de préparation de paie typique",
+            "sublabel": "(était 6-10 heures)"
+          },
+          "stat2": {
+            "value": "95%",
+            "label": "Réduction des corrections de paie"
+          },
+          "stat3": {
+            "value": "260+",
+            "label": "Heures économisées par an",
+            "sublabel": "(6 semaines de travail)"
+          }
+        },
+        "problem": {
+          "title": "Le problème de paie dont personne ne parle",
+          "subtitle": "Vos taux horaires sont corrects. Vos heures de travail sont correctes. Alors pourquoi le jour de paie ressemble-t-il à une négociation d'otages?",
+          "card1": {
+            "title": "Le chaos du suivi du temps",
+            "description": "Votre technicien a enregistré 8 heures dans son carnet. L'horloge dit 7,5 heures. Le GPS montre qu'il est arrivé à 7h45. Quel chiffre payez-vous?"
+          },
+          "card2": {
+            "title": "Le mystère de l'allocation",
+            "description": "Sarah a travaillé sur trois bâtiments hier. Comment répartissez-vous ses 8 heures sur trois budgets de projet différents avec précision? La plupart des propriétaires devinent."
+          },
+          "card3": {
+            "title": "La confusion des heures supplémentaires",
+            "description": "Dave a atteint 40 heures jeudi après-midi. Il a travaillé vendredi. Les heures supplémentaires se déclenchent-elles quotidiennement ou hebdomadairement? À 1,5x ou 2x? Votre tableur ne sait pas."
+          }
+        },
+        "benefits": {
+          "title": "Qui bénéficie de données de paie appropriées",
+          "subtitle": "Le module Paie répond à des besoins différents pour chaque rôle dans votre opération d'accès sur corde.",
+          "owners": {
+            "title": "Pour les propriétaires d'entreprises d'accès sur corde",
+            "benefit1": {
+              "title": "Plus de virements aléatoires.",
+              "description": "« Je pensais avoir payé Dave vendredi » devient un historique documenté et consultable. Chaque paiement est suivi. Chaque écart a une raison attachée."
+            },
+            "benefit2": {
+              "title": "Arrêtez de subventionner les projets clients.",
+              "description": "Avec l'attribution de projet sur chaque heure, vous savez enfin quels bâtiments sont rentables. Ce « bon client » qui paie net-60 pourrait en fait vous coûter de l'argent."
+            },
+            "benefit3": {
+              "title": "Des exports QuickBooks qui fonctionnent.",
+              "description": "L'export CSV correspond au format d'import de votre logiciel de paie. Pas de reformatage. Pas de ressaisie manuelle. Pas d'erreurs de transcription."
+            }
+          },
+          "operations": {
+            "title": "Pour les directeurs des opérations / superviseurs",
+            "benefit1": {
+              "title": "Révision sans la paperasse.",
+              "description": "Vos employés sur plusieurs projets, plusieurs bâtiments, plusieurs quarts. La vue paie montre chaque session de travail organisée par employé et période de paie. Révisez et approuvez depuis un seul écran."
+            },
+            "benefit2": {
+              "title": "Détectez les écarts avant le jour de paie.",
+              "description": "La vérification GPS et l'attribution de projet rendent les anomalies évidentes. Un technicien a enregistré 8 heures au Bâtiment A mais était programmé au Bâtiment B? Vous le voyez immédiatement."
+            },
+            "benefit3": {
+              "title": "Accès historique pour les audits.",
+              "description": "Les périodes de paie précédentes restent accessibles. Quand quelqu'un questionne des heures d'il y a trois mois, vous tirez les données en secondes."
+            }
+          },
+          "technicians": {
+            "title": "Pour les techniciens d'accès sur corde",
+            "benefit1": {
+              "title": "Vos heures sont exactes.",
+              "description": "La vérification GPS capture votre temps réel sur site. Plus d'écarts entre ce que vous avez enregistré et ce que le propriétaire a calculé."
+            },
+            "benefit2": {
+              "title": "Voyez où va votre temps.",
+              "description": "Chaque session de travail montre à quel projet vous étiez assigné. Votre journée de 8 heures peut se diviser sur trois bâtiments. La répartition est claire."
+            },
+            "benefit3": {
+              "title": "Heures supplémentaires calculées correctement.",
+              "description": "Le système applique automatiquement les règles d'heures supplémentaires de votre entreprise. Déclencheur quotidien à 8 heures, hebdomadaire à 40, quelle que soit la configuration. Aucun calcul manuel requis."
+            }
+          },
+          "buildingManagers": {
+            "title": "Pour les gestionnaires d'immeubles / gestionnaires immobiliers",
+            "benefit1": {
+              "title": "Documentation de main-d'œuvre sur demande.",
+              "description": "Besoin de vérifier combien d'heures de techniciens ont été passées sur votre bâtiment le trimestre dernier? Les données existent et s'exportent proprement."
+            },
+            "benefit2": {
+              "title": "Validation budgétaire simplifiée.",
+              "description": "Vous avez contracté pour 200 heures d'entretien annuel. L'attribution de projet montre exactement combien d'heures ont été enregistrées contre votre bâtiment."
+            },
+            "benefit3": {
+              "title": "Dossiers prêts pour l'audit.",
+              "description": "Exigences d'assurance, de conformité ou de révision interne? Les données de session de travail avec vérification GPS fournissent la piste de documentation."
+            }
+          }
+        },
+        "keyFeatures": {
+          "title": "Fonctionnalités clés",
+          "subtitle": "Chaque fonctionnalité existe pour éliminer l'écart entre le travail sur le terrain et le traitement de la paie.",
+          "feature1": {
+            "title": "Configuration des périodes de paie",
+            "description": "Choisissez des périodes de paie hebdomadaires, bimensuelles, semi-mensuelles ou mensuelles. Le système génère automatiquement les limites de période. Les sessions de travail se regroupent automatiquement dans la bonne période de paie."
+          },
+          "feature2": {
+            "title": "Données de temps vérifiées par GPS",
+            "description": "Les heures proviennent de sessions de travail vérifiées, pas de carnets auto-déclarés. L'emplacement de pointage confirme que le technicien était réellement sur le site. Élimine les litiges."
+          },
+          "feature3": {
+            "title": "Règles d'heures supplémentaires configurables",
+            "description": "Définissez des déclencheurs quotidiens (8 heures par défaut), des déclencheurs hebdomadaires (40 heures par défaut) ou des seuils personnalisés. Les multiplicateurs s'ajustent de 1,5x à 3x. Désactivez complètement les heures supplémentaires si nécessaire."
+          },
+          "feature4": {
+            "title": "Attribution de projet",
+            "description": "Chaque session de travail est liée à un projet spécifique. Votre vue paie montre quel bâtiment, quel type de travail, combien d'heures. Essentiel pour l'établissement des coûts et la précision des futures soumissions."
+          },
+          "feature5": {
+            "title": "Suivi facturable vs non facturable",
+            "description": "Distinguez les heures client génératrices de revenus des coûts opérationnels. Déplacements, entretien d'équipement, formation, délais météo. Connaissez votre vrai coût de main-d'œuvre."
+          },
+          "feature6": {
+            "title": "Capacités d'exportation",
+            "description": "Export CSV pour l'intégration avec les logiciels de paie (QuickBooks, ADP, Gusto). Rapports de feuilles de temps PDF pour les dossiers. Détails par employé et ventilations des coûts de projet disponibles."
+          }
+        },
+        "results": {
+          "title": "Résultats mesurables",
+          "subtitle": "Des améliorations concrètes que vous verrez dès le premier jour.",
+          "result1": {
+            "title": "Gain de temps",
+            "description": "La méthode manuelle stylo-et-calculatrice consomme 6-10 heures par cycle de paie. OnRopePro réduit cela à 30-45 minutes. Pour une paie bimensuelle, c'est environ 260 heures économisées par an. Du temps qui retourne à la gestion de votre entreprise."
+          },
+          "result2": {
+            "title": "Réduction des erreurs",
+            "description": "Les systèmes conflictuels (carnets, pointeuses, tableurs) créent des écarts. Des données de source unique de vérité éliminent les litiges de réconciliation. Les corrections chutent dramatiquement quand les données sont exactes dès le départ."
+          },
+          "result3": {
+            "title": "Précision de l'établissement des coûts",
+            "description": "Sans attribution de projet, vous ne savez pas pourquoi les travaux dépassent le budget. Avec elle, vous voyez exactement où sont allées les heures. Les opérateurs rapportent que la précision des devis s'améliore parce qu'ils travaillent à partir de données historiques réelles plutôt que d'estimations."
+          },
+          "result4": {
+            "title": "Propreté comptable",
+            "description": "Les paiements de correction aléatoires créent des transactions inexpliquées. Des exports propres signifient que chaque dollar est documenté avant de quitter le système. Le temps de réconciliation du comptable diminue."
+          }
+        },
+        "integration": {
+          "title": "Points d'intégration des modules",
+          "subtitle": "Le module Paie et Finances se connecte aux autres modules OnRopePro pour créer un pipeline de données complet du travail sur le terrain à l'export de paie.",
+          "module1": {
+            "title": "Sessions de travail et suivi du temps",
+            "description": "Source de données principale. Chaque pointage d'entrée et de sortie crée des données de session de travail qui alimentent directement l'agrégation de la paie."
+          },
+          "module2": {
+            "title": "Gestion des employés",
+            "description": "Recherche de taux et de rôle. Le taux horaire est tiré du profil de l'employé au moment de la session de travail. Les changements de taux en cours de projet sont gérés correctement."
+          },
+          "module3": {
+            "title": "Gestion de projets",
+            "description": "Source d'attribution de projet. Les sessions de travail sont liées aux projets, permettant le suivi des coûts de main-d'œuvre par bâtiment et par type de travail."
+          },
+          "module4": {
+            "title": "Planification et calendrier",
+            "description": "Contexte d'assignation de quart. Les quarts planifiés fournissent les heures attendues pour comparaison avec les heures réellement travaillées. Les écarts deviennent visibles."
+          },
+          "module5": {
+            "title": "Conformité sécurité",
+            "description": "Vérification de l'éligibilité au travail. Les exigences d'inspection de harnais et de certification sont vérifiées avant que le pointage soit autorisé. Les inspections échouées bloquent les sessions de travail."
+          },
+          "module6": {
+            "title": "Analytique et rapports",
+            "description": "Les données de paie alimentent l'analytique à l'échelle de l'entreprise. Les coûts de main-d'œuvre, les métriques de productivité et le suivi budgétaire dérivent tous de la même source de vérité."
+          }
+        },
+        "impact": {
+          "title": "Arrêtez de redouter le jour de paie",
+          "paragraph1": "Le jour de paie ne devrait pas consommer votre après-midi. Il ne devrait pas impliquer une calculatrice, un stylo et 48 pages d'impressions étalées sur votre bureau. Il ne devrait certainement pas résulter en virements aléatoires qui confondent votre comptable et des corrections qui prennent plus de temps que le traitement original.",
+          "paragraph2": "En ce moment, la paie est probablement la tâche la plus détestée de votre calendrier. Vous la repoussez. Vous êtes en retard. Vos employés commencent à budgétiser autour de « être payé en retard ». Cette culture du retard se répand partout ailleurs.",
+          "paragraph3": "Quand la paie prend 30 minutes au lieu de 6 heures, vous arrêtez de l'éviter. Vous êtes à l'heure. Votre équipe le remarque. Les standards professionnels que vous établissez pour la paie s'étendent aux délais de projet, aux communications clients et à la documentation de sécurité.",
+          "paragraph4": "Vous récupérez 260+ heures par an. C'est six semaines de travail complètes. Du temps actuellement passé à entourer des chiffres qui pourrait aller vers la soumission de nouveaux contrats, la gestion des relations clients, ou simplement être présent pour le travail que vous voulez vraiment faire."
+        },
+        "faqs": {
+          "title": "Questions fréquemment posées",
+          "subtitle": "Questions courantes sur le module Paie et Finances.",
+          "faq1": {
+            "question": "OnRopePro calcule-t-il mes impôts et déductions?",
+            "answer": "Non. OnRopePro prépare des données de feuilles de temps prêtes pour la paie pour l'exportation. Les calculs de paie réels (RPC, AE, retenue d'impôt, Sécurité sociale, Medicare) se font dans votre logiciel de traitement de paie (QuickBooks, ADP, Gusto, etc.). OnRopePro gère l'agrégation du temps et l'exportation, pas la conformité fiscale."
+          },
+          "faq2": {
+            "question": "Quelles options de période de paie sont disponibles?",
+            "answer": "Hebdomadaire, bimensuelle, semi-mensuelle et mensuelle. Le système génère automatiquement les limites de période en fonction de votre sélection."
+          },
+          "faq3": {
+            "question": "Comment fonctionne le calcul des heures supplémentaires?",
+            "answer": "Vous configurez les règles: déclencheur quotidien (8 heures par défaut), déclencheur hebdomadaire (40 heures par défaut) et multiplicateur (1,5x, 2x, etc.). Le système applique ces règles automatiquement à chaque session de travail. Vous pouvez désactiver complètement les heures supplémentaires si votre structure de paie ne les inclut pas."
+          },
+          "faq4": {
+            "question": "Quel format utilise l'exportation?",
+            "answer": "CSV pour l'importation dans les logiciels de paie. PDF pour les enregistrements de feuilles de temps imprimables. Les deux incluent les détails par employé et l'attribution de projet."
+          },
+          "faq5": {
+            "question": "Qui peut voir les données de paie?",
+            "answer": "Les utilisateurs avec la permission canAccessFinancials. Ceci est accordé via le système de permissions basé sur les rôles. Les techniciens voient leurs propres heures mais pas les taux de rémunération ni les données des autres employés."
+          },
+          "faq6": {
+            "question": "Que se passe-t-il si une session de travail manque ou est incorrecte?",
+            "answer": "Les superviseurs avec les permissions appropriées peuvent réviser et ajuster les sessions de travail avant l'approbation des feuilles de temps. Tous les ajustements sont enregistrés avec des raisons à des fins d'audit."
+          },
+          "faq7": {
+            "question": "Puis-je voir les périodes de paie historiques?",
+            "answer": "Oui. Les périodes de paie précédentes restent accessibles. Filtrez par plage de dates pour tirer les données de n'importe quelle période passée."
+          },
+          "faq8": {
+            "question": "L'attribution de projet fonctionne-t-elle si un technicien travaille dans plusieurs bâtiments en une journée?",
+            "answer": "Oui. Chaque session de travail est liée à un projet spécifique. Si un technicien pointe au Bâtiment A pendant 4 heures, puis au Bâtiment B pendant 4 heures, les deux sessions apparaissent séparément avec leurs attributions de projet respectives."
+          },
+          "faq9": {
+            "question": "Qu'en est-il du temps non facturable comme les déplacements entre sites?",
+            "answer": "Les sessions de travail non facturables suivent les heures qui ne peuvent pas être facturées aux clients (déplacements, formation, entretien d'équipement, délais météo). La vue paie montre les heures facturables et non facturables pour que vous connaissiez votre vrai coût de main-d'œuvre."
+          },
+          "faq10": {
+            "question": "Y a-t-il un flux d'approbation avant l'exportation?",
+            "answer": "Oui. Les feuilles de temps peuvent être révisées et approuvées avant l'exportation. Les feuilles de temps approuvées génèrent des fichiers d'exportation propres. Le flux empêche l'exportation de données qui n'ont pas été vérifiées."
+          }
+        },
+        "cta": {
+          "title": "Prêt à récupérer votre temps?",
+          "subtitle": "Rejoignez les entreprises d'accès sur corde qui ont éliminé le casse-tête de la paie. Commencez votre essai gratuit de 60 jours aujourd'hui.",
+          "trialButton": "Commencer votre essai gratuit de 60 jours",
+          "docsButton": "Voir la documentation technique"
+        }
       },
       "quoting": {
         "title": "Devis et pipeline de ventes",
@@ -2301,6 +2538,9 @@
     "vendorCount": "Vous avez accès à {{count}} entreprise d'accès sur corde",
     "vendorCountPlural": "Vous avez accès à {{count}} entreprises d'accès sur corde",
     "addVendor": "Ajouter un fournisseur",
+    "vendorCard": {
+      "residentCode": "Code résident :"
+    },
     "loadingVendors": "Chargement des fournisseurs...",
     "noVendorsTitle": "Aucun fournisseur",
     "noVendorsDescription": "Demandez un code d'entreprise à votre entreprise d'accès sur corde et ajoutez-le ci-dessus",
@@ -2390,13 +2630,45 @@
       "hoursBasedTracking": "Suivi basé sur les heures",
       "unitsCompleted": "{{completed}} sur {{total}} unités terminées",
       "stallsCompleted": "{{completed}} sur {{total}} places terminées",
+      "active": "Actif",
+      "completed": "Terminé",
       "buildingProgress": {
         "title": "Progression du bâtiment",
         "description": "Représentation visuelle du travail effectué sur les quatre élévations",
         "overallProgress": "Progression globale",
         "dropsCompleted": "{{completed}} sur {{total}} descentes terminées"
       },
-      "ropeAccessPlan": "Plan d'accès sur corde",
+      "progress": {
+        "projectCompletion": "Achèvement du projet",
+        "hoursBased": "Suivi basé sur les heures",
+        "unitsCompleted": "{{completed}} sur {{total}} unités terminées",
+        "stallsCompleted": "{{completed}} sur {{total}} places terminées"
+      },
+      "buildingInstructions": {
+        "title": "Instructions du bâtiment",
+        "edit": "Modifier",
+        "description": "Détails d'accès et coordonnées pour ce bâtiment",
+        "accessInfo": "Informations d'accès",
+        "buildingAccess": "Accès au bâtiment",
+        "keysAndFob": "Clés/Télécommande",
+        "roofAccess": "Accès au toit",
+        "contacts": "Contacts",
+        "buildingManager": "Gestionnaire du bâtiment",
+        "concierge": "Concierge",
+        "maintenance": "Entretien",
+        "councilUnits": "Unités des conseillers",
+        "tradeFacilities": "Installations pour corps de métier",
+        "tradeParking": "Stationnement de travail",
+        "tradeParkingSpotsCount": "{{count}} places",
+        "tradeWashroom": "Toilettes pour corps de métier",
+        "specialRequests": "Demandes spéciales",
+        "noInstructions": "Aucune instruction de bâtiment n'a encore été ajoutée.",
+        "addInstructions": "Ajouter des instructions"
+      },
+      "ropeAccessPlan": {
+        "title": "Plan d'accès sur corde",
+        "viewDownload": "Voir/Télécharger le plan d'accès sur corde"
+      },
       "viewDownloadPlan": "Voir/Télécharger le plan d'accès sur corde",
       "anchorInspection": {
         "title": "Document d'inspection des ancrages",
@@ -8417,40 +8689,168 @@
           "step4": "La réponse revient à votre tableau de bord"
         }
       },
-      "benefits": {
-        "title": "Qui beneficie de ce module",
-        "subtitle": "Recrutement de techniciens verifies.",
+      "whoBenefits": {
+        "title": "Qui bénéficie de ce module",
+        "subtitle": "Chaque intervenant dans le processus d'embauche gagne en visibilité et en efficacité",
         "employers": {
-          "title": "Pour les employeurs",
+          "title": "Pour les employeurs (propriétaires d'entreprise)",
           "benefit1": {
-            "title": "Accedez a des talents verifies.",
-            "description": "Parcourez les profils de techniciens avec des certifications et un historique de travail verifies. Pas de suppositions sur les qualifications."
+            "title": "Zéro filtrage. Chaque candidat est un technicien sur corde.",
+            "description": "Vous publiez un emploi. Vous recevez des candidatures de personnes qui travaillent vraiment dans l'entretien de bâtiments sur corde. Pas de tuyauteurs. Pas de travailleurs offshore. Pas « d'intéressés à apprendre ». Votre ratio candidat-entrevue s'améliore immédiatement."
           },
           "benefit2": {
-            "title": "Publiez des opportunites.",
-            "description": "Creez des offres d emploi que les techniciens qualifies voient. Atteignez des candidats qui cherchent activement."
+            "title": "Connaissez les attentes salariales avant de contacter.",
+            "description": "Les techniciens définissent leur taux horaire attendu dans leur profil. Quand vous parcourez les talents, vous voyez leur chiffre avant d'envoyer une offre. Si quelqu'un ne travaillera pas sous 60$/heure et que votre budget est de 45$, vous le savez avant de perdre une heure en entrevue."
+          },
+          "benefit3": {
+            "title": "Inclus dans votre abonnement.",
+            "description": "Publiez des emplois illimités. Recevez des candidatures illimitées. Indeed facture 22$ par candidature si vous ne répondez pas en 48 heures. OnRopePro facture 0$. Votre accès au tableau d'emplois fait partie de ce que vous payez déjà."
+          }
+        },
+        "operationsManagers": {
+          "title": "Pour les directeurs des opérations",
+          "benefit1": {
+            "title": "Parcourez les talents avant de publier.",
+            "description": "Besoin d'un niveau 2 avec expérience en calfeutrage dans le Lower Mainland ? Cherchez dans le navigateur de talents. Voyez qui est disponible, vérifiez leurs cotes de sécurité, examinez leurs taux attendus. Trouvez d'abord les candidats, puis créez l'offre d'emploi pour correspondre à ce qui est disponible."
+          },
+          "benefit2": {
+            "title": "Les offres directes simplifient l'embauche.",
+            "description": "Vous trouvez un bon candidat ? Envoyez-lui une offre liée à votre publication. Plus de « je vous envoie un courriel avec les détails ». L'offre, les spécifications du poste et le bouton accepter/refuser sont tous au même endroit."
+          }
+        },
+        "buildingManagers": {
+          "title": "Pour les gestionnaires d'immeubles",
+          "benefit1": {
+            "title": "Vérifiez les pratiques d'embauche des entrepreneurs.",
+            "description": "Quand votre entrepreneur d'accès sur corde utilise OnRopePro, ses techniciens ont des certifications IRATA/SPRAT documentées et des cotes de sécurité visibles. Vous ne faites pas que leur faire confiance. Vous voyez des accréditations vérifiées liées à un véritable historique de travail."
+          }
+        },
+        "propertyManagers": {
+          "title": "Pour les gestionnaires immobiliers",
+          "benefit1": {
+            "title": "Confiance dans la qualité des entrepreneurs.",
+            "description": "Les entrepreneurs soumissionnant sur votre portefeuille utilisent un système où chaque technicien est vérifié. Quand ils vous disent « notre équipe est certifiée et axée sur la sécurité », vous pouvez voir les données qui appuient cette affirmation."
+          }
+        },
+        "technicians": {
+          "title": "Pour les techniciens",
+          "benefit1": {
+            "title": "Soyez trouvé par les employeurs qui comptent.",
+            "description": "Quand vous activez la visibilité de votre profil, seules les entreprises d'accès sur corde vérifiées peuvent vous voir. Pas de recruteurs aléatoires. Pas de spam. Les entreprises qui embauchent activement dans votre spécialité peuvent vous rechercher directement et envoyer des offres à votre portail."
           }
         }
       },
       "keyFeatures": {
-        "title": "Caracteristiques cles",
-        "feature1": {
-          "title": "Publication d offres d emploi",
-          "description": "Creez des offres avec details du poste, exigences et fourchette de salaire."
+        "title": "Caractéristiques clés",
+        "subtitle": "L'écosystème du tableau d'emplois combine publication, recherche et embauche dans un système intégré",
+        "verifiedEcosystem": {
+          "title": "Écosystème d'employeurs vérifiés",
+          "description1": "Seules les entreprises d'entretien de bâtiments sur corde publient ici. Chaque employeur est vérifié lors de la création de son compte. Pas de boulangeries, pas de lave-autos, pas d'industries non reliées.",
+          "description2": "Quand vous parcourez les publications des concurrents, vous voyez votre véritable marché."
         },
-        "feature2": {
-          "title": "Parcours des profils de techniciens",
-          "description": "Recherchez des techniciens qui ont opte pour la visibilite."
+        "oneClickApplications": {
+          "title": "Candidatures en un clic reçues",
+          "description1": "Quand les techniciens postulent, leurs données de profil, CV et certifications s'attachent automatiquement. Vous voyez tout ce dont vous avez besoin pour les évaluer en une seule vue.",
+          "description2": "Pas de courriels « veuillez renvoyer votre CV ». Pas d'appels « pouvez-vous confirmer votre numéro IRATA »."
         },
-        "feature3": {
-          "title": "Contact direct",
-          "description": "Connectez-vous directement avec les techniciens interesses."
+        "payRateVisibility": {
+          "title": "Visibilité du taux horaire attendu",
+          "description1": "Voyez ce que veulent les candidats avant de les contacter. Si votre budget est de 45$/heure et qu'ils veulent 60$, vous le savez immédiatement.",
+          "description2": "Arrêtez de perdre du temps d'entrevue sur des incompatibilités de rémunération."
+        },
+        "safetyRating": {
+          "title": "Intégration de la cote de sécurité",
+          "description1": "Chaque technicien a une cote de sécurité individuelle (0-100) construite à partir d'inspections quotidiennes de harnais, de participation aux réunions de sécurité et de complétion de quiz de sécurité.",
+          "description2": "Voyez-la dans leur profil. Intégrez-la dans vos décisions d'embauche."
+        },
+        "statusDashboard": {
+          "title": "Tableau de bord du statut des candidatures",
+          "description1": "Suivez chaque candidat sur chaque publication. Voyez qui est en révision, qui vous avez contacté, qui a reçu une offre, qui a accepté.",
+          "description2": "Pas de tableurs. Pas de candidats perdus entre les mailles."
+        },
+        "instantOnboarding": {
+          "title": "Connexion d'intégration instantanée",
+          "description1": "Quand un technicien accepte votre offre, ses données de profil s'intègrent à votre système de gestion des employés. Numéro IRATA, certifications, coordonnées bancaires (si partagées), contacts d'urgence.",
+          "description2": "Prêt dès le premier jour sans le marathon de paperasse."
+        }
+      },
+      "problemsSolved": {
+        "title": "Problèmes résolus",
+        "collapseAll": "Tout réduire",
+        "expandAll": "Tout développer",
+        "forEmployers": "Pour les employeurs",
+        "forOperationsManagers": "Pour les directeurs des opérations",
+        "forBuildingManagers": "Pour les gestionnaires d'immeubles",
+        "painLabel": "Le problème :",
+        "exampleLabel": "Exemple réel :",
+        "solutionLabel": "Solution :",
+        "benefitLabel": "Bénéfice :",
+        "employer1": {
+          "question": "« Je publie sur Indeed et je reçois 50 candidats. Seulement 2 sont de vrais techniciens sur corde. »",
+          "pain": "Vous publiez partout : Indeed, LinkedIn, Craigslist, Facebook. Les candidatures affluent de personnes qui n'ont jamais touché un système de corde.",
+          "example": "Ouvriers d'atelier, travailleurs de construction générale, candidats offshore. Deux heures de filtrage pour trouver deux CV pertinents sur cinquante candidatures.",
+          "solution": "Le tableau d'emplois d'OnRopePro est un écosystème fermé. Chaque technicien sur la plateforme est dans l'entretien de bâtiments sur corde.",
+          "benefit": "Quand vous publiez un emploi, 100% des candidats sont pertinents. Aucun filtrage requis. Deux heures de temps perdu devient zéro."
+        },
+        "employer2": {
+          "question": "« Indeed me facture 22$ par candidature si je ne réponds pas en 48 heures. »",
+          "pain": "Quelqu'un doit se connecter quotidiennement, ouvrir chaque candidature, refuser ou répondre. Manquez quelques jours et les frais s'accumulent.",
+          "example": "C'est 22$ fois chaque candidature non ouverte. Une seule publication d'emploi peut coûter 300$ en « frais d'engagement » avant que vous ayez embauché qui que ce soit.",
+          "solution": "OnRopePro inclut des publications et candidatures illimitées dans votre abonnement. Pas de frais par candidature. Pas de frais surprises.",
+          "benefit": "Pas d'obligation de connexion quotidienne juste pour éviter la facturation. Publiez librement, examinez selon votre horaire, ne payez rien de plus."
+        },
+        "employer3": {
+          "question": "« J'ai passé une heure en entrevue avec quelqu'un qui veut 20$/heure de plus que mon budget. »",
+          "pain": "L'entrevue s'est bien passée. Les références ont été vérifiées. Vous êtes prêt à faire une offre. Puis vous demandez la rémunération.",
+          "example": "Ils veulent 60$/heure. Votre budget est de 45$. Une heure perdue pour les deux parties parce que les attentes n'étaient jamais alignées.",
+          "solution": "Les techniciens définissent leur taux horaire attendu dans leur profil. Vous le voyez dans le navigateur de talents avant de les contacter.",
+          "benefit": "Les incompatibilités de rémunération sont filtrées avant l'entrevue, pas pendant. Interviewez seulement les candidats dans votre budget."
+        },
+        "ops1": {
+          "question": "« Je ne sais pas si nous avons la capacité de prendre ce nouveau contrat. »",
+          "pain": "Un client appelle avec du travail urgent. Vous pensez que Tommy finit la Tour A vendredi, mais vous n'êtes pas certain. Sarah est-elle en vacances ?",
+          "example": "Vous refusez le travail (revenu perdu) ou vous vous engagez en espérant (risque de surengagement et d'échec de livraison).",
+          "solution": "Le tableau d'emplois se connecte à vos systèmes de planification et de gestion des employés. Quand vous publiez un emploi et recevez des candidatures, vous pouvez croiser avec la disponibilité de l'équipe.",
+          "benefit": "Sachez si vous avez la capacité avant de vous engager. Prenez des décisions éclairées sur les nouveaux contrats basées sur des données réelles."
+        },
+        "bm1": {
+          "question": "« Comment puis-je savoir que cet entrepreneur embauche des travailleurs qualifiés ? »",
+          "pain": "Vous embauchez une entreprise d'accès sur corde mais n'avez aucune visibilité sur qui ils envoient vraiment à votre immeuble.",
+          "example": "Ces personnes sont-elles certifiées ? Ont-elles des dossiers de sécurité ? Vous faites confiance à la parole de l'entrepreneur sans moyen de vérifier.",
+          "solution": "Quand les entrepreneurs utilisent OnRopePro, leurs techniciens ont des certifications IRATA/SPRAT vérifiées et des cotes de sécurité visibles.",
+          "benefit": "Vous pouvez demander de la documentation. Les données existent dans leur système. La confiance est appuyée par des dossiers vérifiables."
+        }
+      },
+      "connectedModules": {
+        "title": "Modules connectés",
+        "subtitle": "Le tableau d'emplois n'existe pas en isolation. Il se connecte aux systèmes que vous utilisez déjà.",
+        "employeeManagement": {
+          "title": "Gestion des employés",
+          "description": "Quand un technicien accepte votre offre, ses données de profil s'intègrent à votre liste d'employés. Numéro IRATA, certifications, coordonnées. Commencez l'intégration immédiatement."
+        },
+        "safetyCompliance": {
+          "title": "Sécurité et conformité",
+          "description": "Les cotes de sécurité des candidats proviennent de données réelles : inspections de harnais, réunions de sécurité, quiz de sécurité. Le score que vous voyez est mérité, pas auto-déclaré."
+        },
+        "projectManagement": {
+          "title": "Gestion de projets",
+          "description": "Vous embauchez pour un projet spécifique ? Voyez quels postes vous devez combler en vérifiant vos projets actifs. Dotez adéquatement selon la charge de travail réelle."
+        },
+        "schedulingCalendar": {
+          "title": "Planification et calendrier",
+          "description": "Croisez les nouvelles embauches avec la disponibilité de l'équipe. Sachez quand vous avez la capacité d'intégrer quelqu'un et à quels projets il se joindra."
         }
       },
       "cta": {
-        "title": "Pret a trouver des techniciens?",
-        "subtitle": "Connectez-vous avec des professionnels d acces sur corde verifies. Commencez votre essai gratuit de 60 jours.",
-        "trialButton": "Commencer votre essai gratuit de 60 jours"
+        "title": "Votre temps d'embauche tombe à zéro.",
+        "titleHighlight": "Votre bassin de talents s'étend à tous.",
+        "description1": "En ce moment, l'embauche mange votre semaine. Vous publiez sur Indeed. Vous attendez les candidatures. Vous filtrez des CV non pertinents. Vous interviewez des gens qui veulent le double de votre budget. Vous payez 22$ par candidature de tuyauteurs.",
+        "description2": "Avec le tableau d'emplois d'OnRopePro, votre prochaine embauche est déjà dans le système. Cherchez dans le navigateur de talents. Trouvez des techniciens niveau 2 avec expérience en calfeutrage dans votre région. Voyez leur cote de sécurité, leur taux attendu, leurs certifications. Envoyez une offre directement.",
+        "ctaPrimary": "Commencer à publier gratuitement",
+        "ctaSecondary": "En savoir plus"
+      },
+      "footer": {
+        "text": "Partie de la plateforme OnRopePro pour les entreprises d'entretien de bâtiments sur corde."
       }
     },
     "userAccess": {
@@ -8812,10 +9212,10 @@
     },
     "technicianJobBoard": {
       "hero": {
-        "badge": "Bourse d'Emploi",
-        "title": "Chaque emploi ici est en travail sur cordes.",
+        "badge": "Écosystème de la Bourse d'Emploi",
+        "title": "Chaque emploi ici est en travaux sur cordes.",
         "subtitle": "Chaque entreprise est réelle.",
-        "description": "Connectez-vous avec des employeurs d'acces sur corde dans le monde entier",
+        "description": "La Bourse d'Emploi d'OnRopePro est exclusivement dédiée à l'entretien de bâtiments sur cordes. Parcourez de vrais emplois d'entreprises vérifiées. Postulez en 30 secondes.",
         "descriptionBold": "Contrôlez qui voit votre profil.",
         "ctaPrimary": "Parcourir les emplois gratuitement",
         "ctaSecondary": "Trouver des réponses"
@@ -8829,75 +9229,251 @@
         "interviewAlignment": "Alignement d'entrevue"
       },
       "problem": {
-        "title": "Le Probleme",
-        "intro": "Vous cherchez « travail sur cordes » sur Indeed. Qu'obtenez-vous ?",
-        "paragraph1": "Les techniciens perdent des heures a chercher sur des sites d'emploi generiques",
-        "paragraph2": "Les employeurs peinent a trouver des candidats qualifies",
-        "paragraph3": "L'inadequation des competences entraine des embauches couteuses",
-        "solutionTitle": "Le tableau d'emplois d'OnRopePro fonctionne différemment.",
+        "title": "Indeed pense que vous voulez être tuyauteur",
+        "intro": "Vous cherchez « travaux sur cordes » sur Indeed. Qu'obtenez-vous ?",
+        "paragraph1": "Plateformes pétrolières offshore dans les Maritimes. Emplois d'accès industriel dans les raffineries de l'Alberta. Postes de tuyauteur qui mentionnent « corde » une fois dans la section sécurité. Travaux de construction généraux qui exigent le « travail en hauteur ».",
+        "paragraph2": "Vous faites défiler pendant 20 minutes pour trouver 3 emplois qui pourraient être de l'entretien de bâtiments sur cordes. Peut-être.",
+        "paragraph3": "Ensuite, vous postulez. Téléversez votre CV. Remplissez le même formulaire pour la 50e fois. Tapez manuellement votre numéro IRATA parce qu'il n'y a pas de champ pour cela. Vous vous demandez si l'entreprise a même vérifié votre certification.",
+        "solutionTitle": "La Bourse d'Emploi d'OnRopePro fonctionne différemment.",
         "solutionParagraph1": "Chaque emploi publié ici est de l'entretien de bâtiments sur cordes. Nettoyage de vitres. Calfeutrage. Lavage à pression. Nettoyage de gouttières. Peinture et revêtement. Inspection visuelle. Pas d'offshore. Pas de plateformes pétrolières. Pas de tuyauterie.",
-        "solutionParagraph2": "Chaque entreprise qui publie est vérifiée. De vrais opérateurs de travail sur cordes qui font de l'entretien de bâtiments réel. Quand vous postulez, vos certifications, expérience et cote de sécurité accompagnent automatiquement votre candidature."
+        "solutionParagraph2": "Chaque entreprise qui publie est vérifiée. De vrais opérateurs de travaux sur cordes qui font de l'entretien de bâtiments réel. Quand vous postulez, vos certifications, expérience et cote de sécurité accompagnent automatiquement votre candidature."
       },
       "features": {
-        "title": "Fonctionnalites",
-        "subtitle": "Tout ce dont vous avez besoin pour trouver votre prochain emploi",
+        "title": "Votre centre de carrière en travaux sur cordes",
+        "subtitle": "Où chaque emploi correspond à vos compétences et chaque employeur comprend votre travail",
         "jobBrowser": {
           "title": "Navigateur d'emplois",
-          "headline": "Trouvez des emplois correspondant a vos competences",
+          "headline": "Voyez uniquement les emplois d'entretien de bâtiments sur cordes.",
           "description": "Filtrez par emplacement, type d'emploi et exigences de certification. Chaque offre affiche les détails de l'entreprise, la fourchette salariale (si fournie), les dates de début et la portée du projet. Chaque entreprise est vérifiée. Chaque emploi est pertinent.",
-          "filterLabel": "Filtres"
+          "filterLabel": "Ce que vous pouvez filtrer :",
+          "filterLocation": "Emplacement (ville, région)",
+          "filterJobType": "Type d'emploi (nettoyage de vitres, calfeutrage, etc.)",
+          "filterEmploymentType": "Type d'emploi (temps plein, contrat)",
+          "filterCertLevel": "Niveau de certification requis",
+          "filterPayRange": "Fourchette salariale"
         },
         "oneClickApplications": {
           "title": "Candidatures en un clic",
-          "headline": "Postulez instantanement avec votre profil verifie",
+          "headline": "Vos données de profil voyagent avec votre candidature.",
           "description": "CV, certifications, numéros IRATA/SPRAT, années d'expérience, cote de sécurité. Tout est joint automatiquement. Postulez à un emploi en 30 secondes au lieu de ressaisir les mêmes informations pour la 100e fois.",
-          "sentLabel": "Envoye"
+          "sentLabel": "Ce qui est envoyé automatiquement :",
+          "sentResume": "CV (si téléversé)",
+          "sentCert": "Détails de certification IRATA/SPRAT",
+          "sentExperience": "Années d'expérience",
+          "sentSafetyRating": "Score de cote de sécurité",
+          "sentPayRate": "Votre taux horaire attendu"
         },
         "profileVisibility": {
-          "title": "Visibilité du profil",
-          "headline": "Controlez qui voit votre profil",
+          "title": "Basculement de visibilité du profil",
+          "headline": "Contrôlez qui vous trouve.",
           "description": "Activez la visibilité : les employeurs peuvent vous rechercher dans le navigateur de talents, voir vos qualifications et vous envoyer des offres d'emploi directes. Désactivez-la : vous êtes invisible aux recherches mais pouvez toujours parcourir et postuler aux emplois normalement.",
-          "visibleLabel": "Visible"
+          "visibleLabel": "Ce que les employeurs voient quand vous êtes visible :",
+          "visibleName": "Nom et photo",
+          "visibleCert": "Niveaux et numéros de certification",
+          "visibleExperience": "Années d'expérience",
+          "visibleSafetyRating": "Cote de sécurité",
+          "visiblePayRate": "Taux horaire attendu"
         }
       },
-      "benefits": {
-        "title": "Qui beneficie de ce module",
-        "subtitle": "Decouverte d opportunites pour les techniciens.",
+      "whoBenefits": {
+        "title": "Qui bénéficie de ce module",
+        "subtitle": "Un écosystème fermé où chaque participant obtient exactement ce dont il a besoin",
         "technicians": {
           "title": "Pour les techniciens",
-          "benefit1": {
-            "title": "Voyez les opportunites actives.",
-            "description": "Parcourez les offres d emploi d entreprises verifiees. Postes a temps plein, contrats, travail saisonnier."
-          },
-          "benefit2": {
-            "title": "Laissez les employeurs vous trouver.",
-            "description": "Activez la visibilite du profil et les employeurs peuvent vous contacter directement."
-          },
-          "benefit3": {
-            "title": "Historique verifie.",
-            "description": "Votre passeport technicien parle pour vous. Les employeurs voient une experience prouvable."
-          }
+          "benefit1Title": "Chaque emploi est de l'entretien de bâtiments sur cordes",
+          "benefit1Desc": "Fini de défiler devant les plateformes offshore, les postes de tuyauteur et les travaux de construction « en hauteur ». Chaque offre ici provient d'une entreprise vérifiée de travaux sur cordes faisant de l'entretien de bâtiments.",
+          "benefit2Title": "Postulez une fois, vos qualifications suivent partout",
+          "benefit2Desc": "Téléversez votre CV, entrez votre numéro IRATA, définissez votre taux horaire attendu. Chaque candidature que vous envoyez inclut ces informations automatiquement. Fini de taper les mêmes détails dans 50 formulaires différents.",
+          "benefit3Title": "Vous contrôlez qui vous voit",
+          "benefit3Desc": "Activez la visibilité du profil quand vous cherchez activement. Désactivez-la quand ce n'est pas le cas. Si vous êtes employé mais naviguez occasionnellement, gardez-la désactivée. Les employeurs ne peuvent pas vous trouver sauf si vous le voulez.",
+          "benefit4Title": "Sachez ce qu'ils paient avant de postuler",
+          "benefit4Desc": "De nombreux employeurs indiquent les fourchettes salariales dans leurs offres. Pour ceux qui ne le font pas, vous pouvez définir votre taux attendu et les laisser décider si cela correspond à leur budget avant de vous contacter."
+        },
+        "employers": {
+          "title": "Pour les employeurs",
+          "benefit1Title": "Trouvez des techniciens qui correspondent à vos exigences",
+          "benefit1Desc": "Recherchez dans le navigateur de talents par niveau de certification, emplacement, expérience et taux horaire attendu. Voyez les cotes de sécurité avant de contacter. Envoyez des offres directement aux candidats qui correspondent."
+        },
+        "buildingManagers": {
+          "title": "Pour les gestionnaires d'immeubles",
+          "benefit1Title": "Vérifiez les normes d'embauche des sous-traitants",
+          "benefit1Desc": "Quand les sous-traitants utilisent OnRopePro, leurs techniciens ont des qualifications et des cotes de sécurité documentées. Vous ne faites pas confiance à leur parole. Vous voyez des données vérifiées."
+        },
+        "propertyManagers": {
+          "title": "Pour les gestionnaires immobiliers",
+          "benefit1Title": "Confiance dans la qualité des prestataires de services",
+          "benefit1Desc": "Les techniciens travaillant sur vos propriétés font partie d'un écosystème vérifié. Les certifications IRATA/SPRAT sont confirmées. Les cotes de sécurité sont gagnées par une activité réelle."
         }
       },
       "keyFeatures": {
-        "title": "Caracteristiques cles",
-        "feature1": {
-          "title": "Parcours des offres d emploi",
-          "description": "Voyez les opportunites actives avec details et exigences."
+        "title": "Fonctionnalités clés",
+        "subtitle": "La Bourse d'Emploi vous donne le contrôle de votre carrière",
+        "closedEcosystem": {
+          "title": "Écosystème fermé",
+          "desc1": "Seules les entreprises d'entretien de bâtiments sur cordes publient ici. Pas d'entrepreneurs généraux. Pas d'agences d'intérim. Pas de plateformes offshore.",
+          "desc2": "Quand vous postulez, vous savez que l'entreprise fait ce que vous faites."
         },
-        "feature2": {
-          "title": "Controle de visibilite du profil",
-          "description": "Choisissez quand votre profil est visible pour les employeurs."
+        "instantApplications": {
+          "title": "Candidatures instantanées",
+          "desc1": "Vos données de profil, CV, certifications et cote de sécurité sont jointes à chaque candidature.",
+          "desc2": "Un clic pour postuler. Pas de formulaires à remplir. 30 secondes de la navigation à la candidature."
         },
-        "feature3": {
-          "title": "Contact direct",
-          "description": "Les employeurs interesses peuvent vous contacter directement."
+        "directOffers": {
+          "title": "Offres d'emploi directes",
+          "desc1": "Quand votre visibilité de profil est activée, les employeurs peuvent vous envoyer des offres directement depuis le navigateur de talents.",
+          "desc2": "Acceptez ou refusez d'un simple tap. Pas de chaînes d'emails. Pas de téléphone."
+        },
+        "expectedPayRate": {
+          "title": "Taux horaire attendu",
+          "desc1": "Définissez ce que vous voulez gagner. Les employeurs le voient dans le navigateur de talents.",
+          "desc2": "Si quelqu'un ne peut pas correspondre à votre taux, il ne perdra pas votre temps avec une entrevue. Les inadéquations salariales sont filtrées avant qu'elles ne se produisent."
+        },
+        "safetyRating": {
+          "title": "Affichage de la cote de sécurité",
+          "desc1": "Votre cote de sécurité individuelle (0-100) montre aux employeurs que vous prenez le travail au sérieux.",
+          "desc2": "Construite à partir des inspections de harnais, des causeries de sécurité, des quiz de sécurité. Un score élevé est un avantage compétitif."
+        },
+        "statusTracking": {
+          "title": "Suivi du statut des candidatures",
+          "desc1": "Voyez où en est chaque candidature. En révision. Présélectionné. Offre envoyée. Refusée.",
+          "desc2": "Fini l'incertitude « ont-ils même vu mon CV ? »."
         }
       },
-      "cta": {
-        "title": "Pret a trouver des opportunites?",
-        "subtitle": "Connectez-vous avec des employeurs a la recherche de vos competences. Creez votre profil gratuitement.",
-        "trialButton": "Creer un profil gratuit"
+      "problemsSolved": {
+        "title": "Problèmes résolus",
+        "expandAll": "Tout développer",
+        "collapseAll": "Tout réduire",
+        "forTechnicians": "Pour les techniciens",
+        "forEmployed": "Pour les techniciens actuellement employés",
+        "thePain": "Le problème :",
+        "realExample": "Exemple réel :",
+        "solution": "Solution :",
+        "benefit": "Avantage :",
+        "tech1": {
+          "question": "« Je cherche 'travaux sur cordes' sur Indeed et j'obtiens des emplois de tuyauteur et de pétrole offshore. »",
+          "pain": "Vous voulez du travail d'entretien de bâtiments sur cordes. Vous cherchez sur Indeed. Résultats : accès industriel dans les raffineries, plateformes offshore, construction générale qui mentionne « hauteurs ».",
+          "example": "Vous défilez pendant 30 minutes pour trouver 2-3 offres peut-être pertinentes. La plupart sont des plateformes offshore ou des sites industriels, pas des bâtiments.",
+          "solution": "La Bourse d'Emploi d'OnRopePro est exclusivement pour l'entretien de bâtiments sur cordes. Chaque emploi est du nettoyage de vitres, du calfeutrage, du lavage à pression, du nettoyage de gouttières, de la peinture ou de l'inspection visuelle sur des bâtiments.",
+          "benefit": "100% d'offres pertinentes. Zéro défilement dans des offres non pertinentes. Trouvez ce que vous cherchez immédiatement."
+        },
+        "tech2": {
+          "question": "« Je postule à des emplois et j'entre manuellement mon numéro IRATA à chaque fois. »",
+          "pain": "Indeed n'a pas de champ pour la certification IRATA. LinkedIn non plus. Vous téléversez votre CV, puis tapez manuellement votre numéro de certification dans un champ de notes.",
+          "example": "Parfois vous oubliez. Parfois ils ne le lisent même pas. Vous avez tapé votre numéro IRATA dans plus de 50 candidatures cette année.",
+          "solution": "Sur OnRopePro, votre certification IRATA/SPRAT fait partie de votre profil. Elle est jointe à chaque candidature automatiquement.",
+          "benefit": "Les employeurs voient votre niveau de certification, votre numéro, votre date d'expiration. Pas de saisie manuelle. Pas d'information oubliée. Postulez en 30 secondes au lieu de 15-20 minutes."
+        },
+        "tech3": {
+          "question": "« Je ne veux pas que mon employeur actuel sache que je cherche du travail. »",
+          "pain": "Vous êtes employé. Ça va. Mais vous aimeriez bien voir ce qu'il y a d'autre. Problème : si vous vous rendez visible sur une bourse d'emploi, votre patron pourrait le découvrir.",
+          "example": "Vous mettez votre LinkedIn en « Ouvert aux opportunités » et votre superviseur vous en parle le lendemain. Conversation gênante en vue.",
+          "solution": "La visibilité du profil est optionnelle. Gardez-la désactivée : vous pouvez parcourir les emplois, postuler aux offres et rester invisible au navigateur de talents.",
+          "benefit": "Votre employeur actuel ne peut pas tomber sur votre profil. Activez-la seulement quand vous êtes prêt à être trouvé."
+        },
+        "tech4": {
+          "question": "« J'ai passé une heure en entrevue pour un emploi qui paie 15$/h de moins que ce dont j'ai besoin. »",
+          "pain": "L'offre n'affichait pas le salaire. Vous avez postulé, passé l'entrevue, bien accroché avec le propriétaire. Puis ils ont offert 45$/h. Vous avez besoin de 60$ pour que les chiffres fonctionnent.",
+          "example": "Une heure de votre temps perdue. Une heure de leur temps perdue. Vous retournez défiler sur Indeed.",
+          "solution": "Définissez votre taux horaire attendu dans votre profil. Les employeurs le voient dans le navigateur de talents. S'ils ne peuvent pas correspondre à votre chiffre, ils ne vous contacteront pas.",
+          "benefit": "Les inadéquations de rémunération sont filtrées avant l'entrevue, pas pendant. Fini les entrevues perdues pour des emplois qui ne peuvent pas correspondre à votre taux."
+        },
+        "employed1": {
+          "question": "« Je veux savoir ce qu'il y a dehors sans annoncer que je cherche. »",
+          "pain": "Vous n'êtes pas malheureux à votre emploi actuel. Mais les opportunités vont et viennent. Vous aimeriez voir quelles entreprises recrutent sans annoncer à l'industrie que vous êtes sur le marché.",
+          "example": "Vous consultez la section emploi de LinkedIn mais vous inquiétez que votre activité soit visible. Les travaux sur cordes sont une petite industrie. Les rumeurs circulent.",
+          "solution": "Gardez la visibilité du profil désactivée. Parcourez les offres d'emploi anonymement. Postulez sélectivement aux postes qui vous intéressent vraiment.",
+          "benefit": "Personne ne sait que vous cherchez à moins que vous ne le disiez. Restez informé du marché sans risquer votre position actuelle."
+        },
+        "employed2": {
+          "question": "« Je n'ai aucun moyen de construire une réputation qui me suit entre employeurs. »",
+          "pain": "Vous avez travaillé en sécurité pendant cinq ans. Jamais eu d'incident. Votre employeur actuel le sait. Mais quand vous postulez à une nouvelle entreprise, vous repartez de zéro.",
+          "example": "Pas de parcours documenté. Juste votre parole. Le nouvel employeur n'a aucun moyen de vérifier votre historique de sécurité.",
+          "solution": "Votre cote de sécurité individuelle voyage avec vous. Construite à partir des inspections de harnais, des causeries de sécurité, des rapports de quasi-incidents, des quiz de sécurité.",
+          "benefit": "Quand vous postulez à un nouvel emploi, les employeurs voient votre score. Cinq ans de travail sécuritaire devient un avantage compétitif, pas juste une affirmation sur votre CV."
+        }
+      },
+      "connectedModules": {
+        "title": "Modules connectés",
+        "subtitle": "La Bourse d'Emploi se connecte à votre profil professionnel à travers la plateforme",
+        "documentVault": {
+          "title": "Coffre-fort de documents",
+          "desc1": "Vos certifications, CV, informations bancaires et contacts d'urgence sont stockés en sécurité.",
+          "desc2": "Quand vous acceptez une offre d'emploi, partagez-les avec votre nouvel employeur en un clic. Pas de recherche de chèques annulés."
+        },
+        "safetyCompliance": {
+          "title": "Sécurité et conformité",
+          "desc1": "Votre cote de sécurité individuelle se construit à partir d'activités réelles : inspections quotidiennes de harnais, participation aux causeries de sécurité, quiz de sécurité.",
+          "desc2": "Les employeurs voient un chiffre que vous avez gagné, pas un chiffre que vous avez déclaré."
+        },
+        "logbook": {
+          "title": "Carnet de bord",
+          "desc1": "Votre historique de travail, heures enregistrées, bâtiments complétés et tâches effectuées.",
+          "desc2": "Vous acceptez un nouvel emploi ? Votre parcours voyage avec vous."
+        },
+        "employeeManagement": {
+          "title": "Gestion des employés",
+          "desc1": "Quand vous acceptez une offre, vos données de profil sont transmises au système de votre nouvel employeur.",
+          "desc2": "Numéro IRATA, certifications, coordonnées. Prêt dès le premier jour sans paperasse."
+        }
+      },
+      "faqs": {
+        "title": "Questions fréquemment posées",
+        "faq1": {
+          "question": "Dois-je payer pour accéder à la bourse d'emploi ?",
+          "answer": "Les comptes gratuits peuvent parcourir les offres d'emploi. Les comptes Plus obtiennent un accès complet à la bourse d'emploi, y compris les options de visibilité du profil et la possibilité de recevoir des offres directes des employeurs."
+        },
+        "faq2": {
+          "question": "Mon employeur actuel peut-il voir que je cherche du travail ?",
+          "answer": "Seulement si vous activez la visibilité du profil. Gardez-la désactivée et vous êtes invisible au navigateur de talents. Vous pouvez toujours parcourir et postuler aux emplois sans que personne ne le sache."
+        },
+        "faq3": {
+          "question": "Et si je ne suis pas employé actuellement ?",
+          "answer": "Vous pouvez quand même créer un compte, téléverser vos certifications et postuler aux emplois. Votre cote de sécurité se construira une fois que vous serez connecté à un employeur sur la plateforme."
+        },
+        "faq4": {
+          "question": "Comment fonctionne le taux horaire attendu ?",
+          "answer": "Vous définissez ce que vous voulez gagner par heure. Les employeurs le voient quand ils parcourent le navigateur de talents. Si votre taux est de 55$/h et qu'ils offrent 40$, ils peuvent choisir de ne pas vous contacter. Économise du temps à tout le monde."
+        },
+        "faq5": {
+          "question": "Que se passe-t-il quand j'accepte une offre d'emploi ?",
+          "answer": "Si l'employeur utilise OnRopePro, l'intégration est presque instantanée. Vos données de profil sont transmises à leur système. Ils entrent votre taux horaire et vos permissions. Vous êtes prêt à travailler dès le premier jour sans ressaisir vos informations."
+        },
+        "faq6": {
+          "question": "Quelles certifications ai-je besoin pour utiliser la bourse d'emploi ?",
+          "answer": "La bourse d'emploi est destinée aux professionnels de l'entretien de bâtiments sur cordes. La plupart des employeurs exigeront une certification IRATA ou SPRAT. Vous pouvez indiquer votre niveau de certification et votre numéro dans votre profil."
+        },
+        "faq7": {
+          "question": "Puis-je postuler à plusieurs emplois en même temps ?",
+          "answer": "Oui. Postulez à autant d'emplois qui vous intéressent. Suivez le statut de chaque candidature depuis votre tableau de bord."
+        },
+        "faq8": {
+          "question": "Et si un employeur m'envoie une offre mais que je ne suis pas intéressé ?",
+          "answer": "Refusez-la d'un simple tap. L'employeur est notifié. Pas d'appels téléphoniques gênants nécessaires."
+        }
+      },
+      "accessRequirements": {
+        "title": "Exigences d'accès",
+        "feature": "Fonctionnalité",
+        "freeTier": "Niveau gratuit",
+        "plusAccount": "Compte Plus",
+        "browseJobs": "Parcourir les offres d'emploi",
+        "applyToJobs": "Postuler aux emplois",
+        "limited": "Limité",
+        "profileVisibility": "Basculement de visibilité du profil",
+        "receiveOffers": "Recevoir des offres directes",
+        "setPayRate": "Définir le taux horaire attendu",
+        "safetyRatingDisplay": "Affichage de la cote de sécurité",
+        "requiresEmployer": "Nécessite un employeur"
+      },
+      "finalCta": {
+        "title": "Chaque emploi ici est du travail sur cordes.",
+        "subtitle": "Sans exception.",
+        "description": "Arrêtez de défiler dans les offres de tuyauteur et les plateformes offshore. La Bourse d'Emploi d'OnRopePro est conçue pour les techniciens qui font de l'entretien de bâtiments sur cordes. Parcourez les emplois, postulez en secondes, contrôlez qui vous trouve.",
+        "browseJobs": "Parcourir les emplois gratuitement",
+        "upgradePlus": "Passer à Plus pour un accès complet"
+      },
+      "footer": {
+        "tagline": "La plateforme conçue pour l'entretien de bâtiments sur cordes."
       }
     }
   },
@@ -9818,6 +10394,7 @@
   },
   "residentPortal": {
     "title": "Portail Resident",
+    "companyLogo": "Logo de l'entreprise",
     "submitFeedback": "Soumettre un Commentaire",
     "myFeedback": "Mes Commentaires",
     "buildingProgress": "Progression du Batiment",
@@ -9844,7 +10421,24 @@
     "phoneNumber": "Numero de Telephone",
     "unitNumber": "Numero d'Unite",
     "feedbackDescription": "Faites-nous savoir si vous avez des preoccupations ou des questions sur les travaux",
-    "selectAProject": "Selectionner un projet"
+    "selectAProject": "Selectionner un projet",
+    "pdf": {
+      "workNotice": "Avis de Travaux",
+      "officialNotice": "AVIS OFFICIEL",
+      "building": "Batiment",
+      "workPeriod": "PERIODE DE TRAVAUX:",
+      "serviceType": "TYPE DE SERVICE:",
+      "stallSchedule": "HORAIRE DES STATIONNEMENTS",
+      "unitSchedule": "HORAIRE DES UNITES"
+    },
+    "notices": {
+      "tbd": "A determiner",
+      "serviceProvider": "Prestataire de Services",
+      "contact": "Contact"
+    },
+    "form": {
+      "whichProject": "Quel Projet?"
+    }
   },
   "modules": {
     "scheduling": {
@@ -11817,6 +12411,501 @@
         "tagline": "Logiciel de Gestion pour l'Accès sur Corde",
         "privacyPolicy": "Politique de Confidentialité",
         "termsOfService": "Conditions d'Utilisation"
+      }
+    },
+    "payroll": {
+      "hero": {
+        "badge": "Module Paie et Finances",
+        "titleLine1": "Arrêtez d'Encercler des Chiffres",
+        "titleLine2": "Avec un Stylo",
+        "description": "Les sessions de travail alimentent directement les feuilles de temps prêtes pour la paie. Pas de papier. Pas de calculatrice. Pas d'encerclement.",
+        "descriptionBold": "Exportez vers QuickBooks, ADP ou Gusto en quelques minutes.",
+        "trialButton": "Commencez Votre Essai Gratuit de 60 Jours",
+        "faqButton": "Trouvez des Réponses"
+      },
+      "stats": {
+        "timeEliminated": "Temps de paie éliminé",
+        "annualValue": "Valeur annuelle du temps",
+        "hoursSaved": "Heures économisées par an",
+        "problemsSolved": "Problèmes résolus"
+      },
+      "problem": {
+        "title": "Le Problème de Paie Que Personne N'Admet",
+        "line1": "Vous imprimez des feuilles de temps. Les données d'un employé s'étalent sur quatre pages.",
+        "line2": "Douze employés signifie 48 pages minimum. Vous les étalez sur votre bureau, encerclez les heures avec un stylo et prenez une calculatrice.",
+        "line3": "Trois heures plus tard, vous n'avez toujours pas terminé. Et vous avez probablement fait une erreur que vous ne remarquerez pas jusqu'à ce que l'employé appelle pour demander pourquoi il manque 130 $.",
+        "line4": "Alors vous envoyez un virement rapide. Problème résolu pour eux. Problème créé pour vos livres. Votre comptable demande ce qu'était ce paiement aléatoire. Maintenant vous expliquez au lieu de diriger votre entreprise.",
+        "line5": "Ce chaos ne reste pas contenu. Quand la paie est pénible, vous la repoussez. Quand vous êtes constamment en retard, votre équipe le remarque. Une culture se forme où les délais sont optionnels. Cette mentalité s'étend à tout.",
+        "solution": "OnRopePro élimine la saisie manuelle entre le travail sur le terrain et la paie. Chaque pointage devient automatiquement des données de paie. Vérifié par GPS. Attribué au projet. Heures supplémentaires calculées. Prêt à exporter."
+      },
+      "features": {
+        "title": "Du Pointage à l'Export de Paie",
+        "subtitle": "Le module Paie et Finances transforme les données de sessions de travail dispersées en feuilles de temps organisées et exportables sans intervention manuelle.",
+        "card1": {
+          "title": "Agrégation Automatique",
+          "headline": "Chaque pointage vérifié par GPS alimente directement les feuilles de temps.",
+          "description": "Le système calcule les heures, applique les règles d'heures supplémentaires et regroupe tout par période de paie.",
+          "listTitle": "Ce qui est automatisé :",
+          "item1": "Totaux d'heures régulières par employé",
+          "item2": "Calcul des heures supplémentaires (déclencheurs quotidiens et hebdomadaires)",
+          "item3": "Regroupement par période de paie (hebdomadaire, bihebdomadaire, bimensuel, mensuel)",
+          "item4": "Attribution de projet par session de travail"
+        },
+        "card2": {
+          "title": "Visibilité des Coûts de Travail",
+          "headline": "Sachez exactement combien d'heures sont allées à chaque bâtiment.",
+          "description": "Arrêtez de sous-évaluer les travaux parce que vous pouvez enfin voir où va vraiment le temps.",
+          "listTitle": "Ce qui est suivi :",
+          "item1": "Heures par projet par employé",
+          "item2": "Répartition facturable vs non facturable",
+          "item3": "Totaux des coûts de main-d'œuvre par projet",
+          "item4": "Comparaison historique entre les périodes de paie"
+        },
+        "card3": {
+          "title": "Sortie Prête à Exporter",
+          "headline": "Générez des fichiers CSV pour QuickBooks, ADP, Gusto ou tout logiciel de paie.",
+          "description": "Rapports PDF pour les archives. Pas de ressaisie de données.",
+          "listTitle": "Ce qui est exporté :",
+          "item1": "Feuilles de temps employé par employé",
+          "item2": "Répartitions des coûts par projet",
+          "item3": "Résumés des heures supplémentaires",
+          "item4": "Pistes d'audit complètes"
+        }
+      },
+      "benefits": {
+        "title": "Qui Bénéficie de Ce Module",
+        "subtitle": "Clarté de la paie pour tous dans votre exploitation.",
+        "employers": {
+          "title": "Pour les Employeurs (Propriétaires d'Entreprise)",
+          "benefit1": {
+            "title": "Récupérez 5+ heures à chaque période de paie.",
+            "description": "La méthode calculatrice et stylo vous coûte 6 à 10 heures par traitement de paie. OnRopePro agrège tout automatiquement. Sélectionnez la période de paie. Vérifiez les totaux. Exportez. Terminé en 30-45 minutes."
+          },
+          "benefit2": {
+            "title": "Arrêtez la course aux virements aléatoires.",
+            "description": "Quand les feuilles de temps sont fausses, vous corrigez avec des paiements rapides qui embrouillent vos livres. Des données précises dès le départ signifie pas de corrections. Votre comptable reçoit des exports propres à chaque fois."
+          },
+          "benefit3": {
+            "title": "Établissez des devis avec confiance.",
+            "description": "Vous avez sous-évalué ce bâtiment de 60 heures parce que vous ne pouviez pas voir où allait le temps. L'attribution de projet montre exactement combien de temps prend chaque travail. Votre prochain devis inclut les heures dont vous avez vraiment besoin."
+          }
+        },
+        "operations": {
+          "title": "Pour les Responsables d'Exploitation et Superviseurs",
+          "benefit1": {
+            "title": "Vérifiez sans le brassage de papiers.",
+            "description": "Vos employés sur plusieurs projets, plusieurs bâtiments, plusieurs équipes. La vue paie montre chaque session de travail organisée par employé et période de paie. Vérifiez et approuvez depuis un seul écran."
+          },
+          "benefit2": {
+            "title": "Détectez les écarts avant le jour de paie.",
+            "description": "La vérification GPS et l'attribution de projet rendent les anomalies évidentes. Un technicien a enregistré 8 heures au Bâtiment A mais était prévu au Bâtiment B ? Vous le voyez immédiatement."
+          },
+          "benefit3": {
+            "title": "Accès historique pour les audits.",
+            "description": "Les périodes de paie précédentes restent accessibles. Quand quelqu'un questionne des heures d'il y a trois mois, vous récupérez les données en quelques secondes."
+          }
+        },
+        "technicians": {
+          "title": "Pour les Techniciens d'Accès sur Corde",
+          "benefit1": {
+            "title": "Vos heures sont exactes.",
+            "description": "La vérification GPS capture votre temps réel sur site. Plus d'écarts entre ce que vous avez enregistré et ce que le propriétaire a calculé."
+          },
+          "benefit2": {
+            "title": "Voyez où va votre temps.",
+            "description": "Chaque session de travail montre à quel projet vous étiez assigné. Votre journée de 8 heures peut se diviser entre trois bâtiments. La répartition est claire."
+          },
+          "benefit3": {
+            "title": "Heures supplémentaires calculées correctement.",
+            "description": "Le système applique automatiquement les règles d'heures supplémentaires de votre entreprise. Déclencheur quotidien à 8 heures, déclencheur hebdomadaire à 40, quelle que soit la configuration. Pas de calcul manuel requis."
+          }
+        },
+        "buildingManagers": {
+          "title": "Pour les Gestionnaires d'Immeubles / Gestionnaires de Propriétés",
+          "benefit1": {
+            "title": "Documentation de main-d'œuvre à la demande.",
+            "description": "Besoin de vérifier combien d'heures de techniciens ont été consacrées à votre bâtiment au dernier trimestre ? Les données existent et s'exportent proprement."
+          },
+          "benefit2": {
+            "title": "Validation budgétaire simplifiée.",
+            "description": "Vous avez contracté 200 heures de maintenance annuelle. L'attribution de projet montre exactement combien d'heures ont été enregistrées contre votre bâtiment."
+          },
+          "benefit3": {
+            "title": "Dossiers prêts pour l'audit.",
+            "description": "Exigences d'assurance, de conformité ou de révision interne ? Les données de session de travail avec vérification GPS fournissent la piste de documentation."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Fonctionnalités Clés",
+        "subtitle": "Chaque fonctionnalité existe pour éliminer l'écart entre le travail sur le terrain et le traitement de la paie.",
+        "feature1": {
+          "title": "Configuration des Périodes de Paie",
+          "description": "Choisissez des périodes de paie hebdomadaires, bihebdomadaires, bimensuelles ou mensuelles. Le système génère automatiquement les limites de période. Les sessions de travail se regroupent automatiquement dans la bonne période de paie."
+        },
+        "feature2": {
+          "title": "Données de Temps Vérifiées par GPS",
+          "description": "Les heures proviennent de sessions de travail vérifiées, pas de carnets auto-déclarés. L'emplacement du pointage confirme que le technicien était vraiment sur le chantier. Élimine les litiges."
+        },
+        "feature3": {
+          "title": "Règles d'Heures Supplémentaires Configurables",
+          "description": "Définissez les déclencheurs quotidiens (par défaut 8 heures), hebdomadaires (par défaut 40 heures) ou des seuils personnalisés. Les multiplicateurs s'ajustent de 1,5x à 3x. Désactivez complètement les heures supplémentaires si nécessaire."
+        },
+        "feature4": {
+          "title": "Attribution de Projet",
+          "description": "Chaque session de travail est liée à un projet spécifique. Votre vue paie montre quel bâtiment, quel type de travail, combien d'heures. Essentiel pour le chiffrage des travaux et la précision des devis futurs."
+        },
+        "feature5": {
+          "title": "Suivi Facturable vs Non Facturable",
+          "description": "Distinguez les heures clients génératrices de revenus des coûts opérationnels. Déplacements, maintenance d'équipement, formation, retards météo. Connaissez votre vrai coût de main-d'œuvre."
+        },
+        "feature6": {
+          "title": "Capacités d'Export",
+          "description": "Export CSV pour l'intégration avec les logiciels de paie (QuickBooks, ADP, Gusto). Rapports PDF de feuilles de temps pour les archives. Détails par employé et répartitions des coûts par projet disponibles."
+        }
+      },
+      "results": {
+        "title": "Résultats Mesurables",
+        "subtitle": "Des améliorations concrètes que vous verrez dès le premier jour.",
+        "result1": {
+          "title": "Gain de Temps",
+          "description": "La méthode manuelle stylo-et-calculatrice consomme 6 à 10 heures par traitement de paie. OnRopePro réduit cela à 30-45 minutes. Pour une paie bihebdomadaire, c'est environ 260 heures économisées annuellement. Du temps qui retourne à la gestion de votre entreprise."
+        },
+        "result2": {
+          "title": "Réduction des Erreurs",
+          "description": "Les systèmes conflictuels (carnets, pointeuses, tableurs) créent des écarts. Les données de source unique de vérité éliminent les litiges de réconciliation. Les corrections chutent dramatiquement quand les données sont exactes dès le départ."
+        },
+        "result3": {
+          "title": "Précision du Chiffrage des Travaux",
+          "description": "Sans attribution de projet, vous ne savez pas pourquoi les travaux dépassent le budget. Avec, vous voyez exactement où sont allées les heures. Les opérateurs rapportent que la précision des devis s'améliore parce qu'ils travaillent avec des données historiques réelles au lieu d'estimations."
+        },
+        "result4": {
+          "title": "Propreté Comptable",
+          "description": "Les paiements de correction aléatoires créent des transactions inexpliquées. Des exports propres signifient que chaque dollar est documenté avant de quitter le système. Le temps de réconciliation du comptable diminue."
+        }
+      },
+      "integration": {
+        "title": "Points d'Intégration des Modules",
+        "subtitle": "Le module Paie et Finances se connecte aux autres modules OnRopePro pour créer un pipeline de données complet du travail sur le terrain à l'export de paie.",
+        "module1": {
+          "title": "Sessions de Travail et Suivi du Temps",
+          "description": "Source de données principale. Chaque pointage d'entrée et de sortie crée des données de session de travail qui alimentent directement l'agrégation de paie."
+        },
+        "module2": {
+          "title": "Gestion des Employés",
+          "description": "Recherche de taux et de rôle. Le taux horaire est extrait du profil de l'employé au moment de la session de travail. Les changements de taux en cours de projet sont gérés correctement."
+        },
+        "module3": {
+          "title": "Gestion de Projet",
+          "description": "Source d'attribution de projet. Les sessions de travail sont liées aux projets, permettant le suivi des coûts de main-d'œuvre par bâtiment et par type de travail."
+        },
+        "module4": {
+          "title": "Planification et Calendrier",
+          "description": "Contexte d'affectation des équipes. Les équipes planifiées fournissent les heures prévues pour comparaison avec les heures réellement travaillées. Les écarts deviennent visibles."
+        },
+        "module5": {
+          "title": "Conformité Sécurité",
+          "description": "Vérification d'éligibilité au travail. L'inspection du harnais et les exigences de certification sont vérifiées avant que le pointage soit autorisé. Les inspections échouées bloquent les sessions de travail."
+        },
+        "module6": {
+          "title": "Analytique et Rapports",
+          "description": "Les données de paie alimentent l'analytique à l'échelle de l'entreprise. Les coûts de main-d'œuvre, les métriques de productivité et le suivi budgétaire dérivent tous de la même source de vérité."
+        }
+      },
+      "impact": {
+        "title": "Arrêtez de Redouter le Jour de Paie",
+        "paragraph1": "Le jour de paie ne devrait pas consommer votre après-midi. Il ne devrait pas impliquer une calculatrice, un stylo et 48 pages d'impressions étalées sur votre bureau. Il ne devrait certainement pas aboutir à des virements aléatoires qui embrouillent votre comptable et des corrections qui prennent plus de temps que le traitement initial.",
+        "paragraph2": "En ce moment, la paie est probablement la tâche la plus détestée de votre calendrier. Vous la repoussez. Vous êtes en retard. Vos employés commencent à prévoir « être payés en retard ». Cette culture du retard s'étend à tout le reste.",
+        "paragraph3": "Quand la paie prend 30 minutes au lieu de 6 heures, vous arrêtez de l'éviter. Vous êtes à l'heure. Votre équipe le remarque. Les standards professionnels que vous établissez pour la paie s'étendent aux délais de projet, aux communications client et à la documentation de sécurité.",
+        "paragraph4": "Vous récupérez 260+ heures par an. C'est six semaines de travail complètes. Du temps actuellement passé à entourer des chiffres qui pourrait aller vers la soumission de nouveaux contrats, la gestion des relations clients, ou simplement être présent pour le travail que vous voulez vraiment faire."
+      },
+      "faqs": {
+        "title": "Questions Fréquemment Posées",
+        "subtitle": "Questions courantes sur le module Paie et Finances.",
+        "faq1": {
+          "question": "OnRopePro calcule-t-il mes impôts et déductions ?",
+          "answer": "Non. OnRopePro prépare des données de feuilles de temps prêtes pour la paie pour l'export. Les calculs de paie réels (RPC, AE, retenues fiscales, Sécurité Sociale, Medicare) se font dans votre logiciel de traitement de paie (QuickBooks, ADP, Gusto, etc.). OnRopePro gère l'agrégation du temps et l'export, pas la conformité fiscale."
+        },
+        "faq2": {
+          "question": "Quelles options de période de paie sont disponibles ?",
+          "answer": "Hebdomadaire, bihebdomadaire, bimensuelle et mensuelle. Le système génère automatiquement les limites de période selon votre sélection."
+        },
+        "faq3": {
+          "question": "Comment fonctionne le calcul des heures supplémentaires ?",
+          "answer": "Vous configurez les règles : déclencheur quotidien (par défaut 8 heures), déclencheur hebdomadaire (par défaut 40 heures), et multiplicateur (1,5x, 2x, etc.). Le système applique ces règles automatiquement à chaque session de travail. Vous pouvez désactiver complètement les heures supplémentaires si votre structure de paie ne les inclut pas."
+        },
+        "faq4": {
+          "question": "Quel format utilise l'export ?",
+          "answer": "CSV pour l'import dans les logiciels de paie. PDF pour les enregistrements imprimables des feuilles de temps. Les deux incluent les détails par employé et l'attribution de projet."
+        },
+        "faq5": {
+          "question": "Qui peut voir les données de paie ?",
+          "answer": "Les utilisateurs avec la permission canAccessFinancials. Celle-ci est accordée via le système de permissions basé sur les rôles. Les techniciens voient leurs propres heures mais pas les taux de rémunération ou les données des autres employés."
+        },
+        "faq6": {
+          "question": "Que se passe-t-il si une session de travail est manquante ou incorrecte ?",
+          "answer": "Les superviseurs avec les permissions appropriées peuvent examiner et ajuster les sessions de travail avant l'approbation des feuilles de temps. Tous les ajustements sont enregistrés avec des raisons à des fins d'audit."
+        },
+        "faq7": {
+          "question": "Puis-je voir les périodes de paie historiques ?",
+          "answer": "Oui. Les périodes de paie précédentes restent accessibles. Filtrez par plage de dates pour récupérer des données de n'importe quelle période passée."
+        },
+        "faq8": {
+          "question": "L'attribution de projet fonctionne-t-elle si un technicien travaille dans plusieurs bâtiments en une journée ?",
+          "answer": "Oui. Chaque session de travail est liée à un projet spécifique. Si un technicien pointe au Bâtiment A pendant 4 heures, puis au Bâtiment B pendant 4 heures, les deux sessions apparaissent séparément avec leur attribution de projet respective."
+        },
+        "faq9": {
+          "question": "Qu'en est-il du temps non facturable comme les déplacements entre les sites ?",
+          "answer": "Les sessions de travail non facturables suivent les heures qui ne peuvent pas être facturées aux clients (déplacements, formation, maintenance d'équipement, retards météo). La vue paie affiche les heures facturables et non facturables pour que vous connaissiez votre vrai coût de main-d'œuvre."
+        },
+        "faq10": {
+          "question": "Y a-t-il un flux d'approbation avant l'export ?",
+          "answer": "Oui. Les feuilles de temps peuvent être examinées et approuvées avant l'export. Les feuilles de temps approuvées génèrent des fichiers d'export propres. Le flux empêche l'export de données qui n'ont pas été vérifiées."
+        }
+      },
+      "cta": {
+        "title": "Prêt à Récupérer Votre Temps ?",
+        "subtitle": "Rejoignez les entreprises d'accès sur corde qui ont éliminé le casse-tête de la paie. Commencez votre essai gratuit de 60 jours aujourd'hui.",
+        "trialButton": "Commencez Votre Essai Gratuit de 60 Jours",
+        "docsButton": "Voir la Documentation Technique"
+      }
+    },
+    "employerJobBoard": {
+      "hero": {
+        "badge": "Écosystème d'offres d'emploi",
+        "title": "Arrêtez de payer 22$ par candidature",
+        "subtitle": "De personnes qui n'ont jamais touché une corde.",
+        "description": "Le tableau d'emploi OnRopePro est un écosystème fermé. Chaque employeur vérifié. Chaque technicien pertinent. Publiez des emplois illimités.",
+        "descriptionBold": "Zéro frais par candidature.",
+        "ctaPrimary": "Commencer à publier gratuitement",
+        "ctaSecondary": "Trouver des réponses"
+      },
+      "stats": {
+        "filteringTime": {
+          "value": "0 heures",
+          "label": "Temps de filtrage"
+        },
+        "platformFees": {
+          "value": "0$",
+          "label": "Frais de plateforme"
+        },
+        "timeToHire": {
+          "value": "1-3 jours",
+          "label": "Délai d'embauche"
+        },
+        "interviews": {
+          "value": "2-3",
+          "label": "Entrevues nécessaires"
+        }
+      },
+      "problemStatement": {
+        "title": "La taxe Indeed",
+        "paragraph1": "Vous publiez sur Indeed. LinkedIn. Craigslist. Facebook. Vous recevez 50 candidatures. Vous ouvrez chacune, espérant trouver un niveau 2 avec expérience en calfeutrage.",
+        "paragraph2": "Ce que vous trouvez : des ouvriers d'atelier, des tuyauteurs, des candidats pour plateformes pétrolières, et 23 personnes qui « ont toujours été intéressées à apprendre ». Deux heures de filtrage. Deux vrais techniciens d'accès sur corde.",
+        "paragraph3": "Puis Indeed vous envoie la facture. 22$ par candidature si vous ne répondez pas dans les 48 heures. Une seule publication vous coûte 300$ avant même d'avoir programmé une entrevue. Quelqu'un de votre équipe doit se connecter chaque jour juste pour cliquer « refuser » sur des CV de mécaniciens auto.",
+        "solutionTitle": "Le tableau d'emploi OnRopePro fonctionne différemment.",
+        "solutionText": "Chaque entreprise ici fait de l'entretien de bâtiments en accès sur corde. Chaque technicien ici est dans l'industrie. Quand vous publiez un emploi, 100% des candidats sont pertinents. Pas de bruit. Pas de filtrage. Pas de frais surprises de 22$."
+      },
+      "features": {
+        "title": "Votre écosystème fermé",
+        "subtitle": "Où chaque candidat est un technicien d'accès sur corde et chaque employeur est vérifié",
+        "description": "Le tableau d'emploi vous connecte avec des techniciens d'accès sur corde qualifiés sur toute la plateforme. Publiez des emplois, parcourez les talents et envoyez des offres directes aux candidats qui correspondent à vos exigences.",
+        "talentBrowser": {
+          "title": "Explorateur de talents",
+          "description1": "Recherchez dans le bassin de techniciens avant même de publier un emploi. Filtrez par emplacement, niveau de certification, expérience et taux horaire attendu.",
+          "description2": "Voyez qui est disponible, ce qu'ils recherchent et si votre budget correspond à leurs attentes avant de passer du temps en entrevue.",
+          "filterLabel": "Ce que vous pouvez filtrer :",
+          "filter1": "Emplacement (ville, région)",
+          "filter2": "Niveau de certification IRATA/SPRAT",
+          "filter3": "Années d'expérience",
+          "filter4": "Taux horaire attendu",
+          "filter5": "Score de sécurité",
+          "filter6": "Spécialités (calfeutrage, lavage de vitres, etc.)"
+        },
+        "unlimitedPostings": {
+          "title": "Publications d'emploi illimitées",
+          "description1": "Publiez autant d'emplois que votre opération l'exige. Temps plein, temps partiel, contrat, saisonnier.",
+          "description2": "Six types d'emplois supportés : lavage de vitres, calfeutrage, nettoyage haute pression, nettoyage de gouttières, peinture et revêtement, inspection visuelle. Pas de frais par publication. Pas de frais par candidature. Pas de factures surprises.",
+          "controlLabel": "Ce que vous contrôlez :",
+          "control1": "Type d'emploi et portée du service",
+          "control2": "Emplacement et détails du site",
+          "control3": "Certifications requises",
+          "control4": "Échelle salariale (optionnel mais recommandé)",
+          "control5": "Date de début et durée"
+        },
+        "directOffers": {
+          "title": "Offres d'emploi directes",
+          "description1": "Trouvé un candidat parfait dans l'explorateur de talents ? Envoyez-lui une offre directement. Liez-la à l'une de vos publications d'emploi actives.",
+          "description2": "Ils reçoivent une notification dans leur portail. Accepter ou refuser d'un seul clic. Pas de chaînes de courriels. Pas de téléphone tag.",
+          "stepsLabel": "Comment ça fonctionne :",
+          "step1": "Sélectionnez un candidat dans les résultats de recherche",
+          "step2": "Choisissez quelle publication d'emploi lier",
+          "step3": "Le technicien reçoit une notification dans son portail",
+          "step4": "La réponse revient à votre tableau de bord"
+        }
+      },
+      "whoBenefits": {
+        "title": "Qui bénéficie de ce module",
+        "subtitle": "Chaque partie prenante dans le processus d'embauche gagne en visibilité et efficacité",
+        "employers": {
+          "title": "Pour les employeurs (propriétaires d'entreprise)",
+          "benefit1": {
+            "title": "Zéro filtrage. Chaque candidat est un technicien d'accès sur corde.",
+            "description": "Vous publiez un emploi. Vous recevez des candidatures de personnes qui travaillent vraiment en entretien de bâtiments en accès sur corde. Pas de tuyauteurs. Pas de travailleurs offshore. Pas de « intéressé à apprendre ». Votre ratio candidat-entrevue s'améliore immédiatement."
+          },
+          "benefit2": {
+            "title": "Connaissez les attentes salariales avant de contacter.",
+            "description": "Les techniciens définissent leur taux horaire attendu dans leur profil. Quand vous parcourez les talents, vous voyez leur chiffre avant d'envoyer une offre. Si quelqu'un ne travaille pas sous 60$/heure et que votre budget est de 45$, vous le savez avant de perdre une heure en entrevue."
+          },
+          "benefit3": {
+            "title": "Inclus dans votre abonnement.",
+            "description": "Publiez des emplois illimités. Recevez des candidatures illimitées. Indeed facture 22$ par candidature si vous ne répondez pas en 48 heures. OnRopePro facture 0$. Votre accès au tableau d'emploi fait partie de ce que vous payez déjà."
+          }
+        },
+        "operationsManagers": {
+          "title": "Pour les directeurs des opérations",
+          "benefit1": {
+            "title": "Parcourez les talents avant de publier.",
+            "description": "Besoin d'un niveau 2 avec expérience en calfeutrage dans le Lower Mainland ? Cherchez dans l'explorateur de talents. Voyez qui est disponible, vérifiez leurs scores de sécurité, examinez leurs taux attendus. Trouvez d'abord les candidats, puis créez la publication d'emploi en fonction de ce qui est disponible."
+          },
+          "benefit2": {
+            "title": "Les offres directes simplifient l'embauche.",
+            "description": "Trouvé un bon candidat ? Envoyez-lui une offre liée à votre publication d'emploi. Fini le « Je vous enverrai un courriel avec les détails ». L'offre, les spécifications du poste et le bouton accepter/refuser sont tous au même endroit."
+          }
+        },
+        "buildingManagers": {
+          "title": "Pour les gestionnaires d'immeubles",
+          "benefit1": {
+            "title": "Vérifiez les pratiques d'embauche des entrepreneurs.",
+            "description": "Quand votre entrepreneur d'accès sur corde utilise OnRopePro, leurs techniciens ont des certifications IRATA/SPRAT documentées et des scores de sécurité visibles. Vous ne faites pas que faire confiance à leur parole. Vous voyez des accréditations vérifiées liées à un vrai historique de travail."
+          }
+        },
+        "propertyManagers": {
+          "title": "Pour les gestionnaires immobiliers",
+          "benefit1": {
+            "title": "Confiance dans la qualité de l'entrepreneur.",
+            "description": "Les entrepreneurs qui soumissionnent sur votre portefeuille utilisent un système où chaque technicien est vérifié. Quand ils vous disent « notre équipe est certifiée et axée sur la sécurité », vous pouvez voir les données qui appuient cette affirmation."
+          }
+        },
+        "technicians": {
+          "title": "Pour les techniciens",
+          "benefit1": {
+            "title": "Soyez trouvé par les employeurs qui comptent.",
+            "description": "Quand vous activez la visibilité de votre profil, seules les entreprises d'accès sur corde vérifiées peuvent vous voir. Pas de recruteurs aléatoires. Pas de spam. Les entreprises qui embauchent activement dans votre spécialité peuvent vous chercher directement et envoyer des offres à votre portail."
+          }
+        }
+      },
+      "keyFeatures": {
+        "title": "Fonctionnalités clés",
+        "subtitle": "L'écosystème du tableau d'emploi combine publication, recherche et embauche dans un système intégré",
+        "verifiedEcosystem": {
+          "title": "Écosystème d'employeurs vérifiés",
+          "description1": "Seules les entreprises d'entretien de bâtiments en accès sur corde publient ici. Chaque employeur est vérifié lors de la création de compte. Pas de boulangeries, pas de lave-autos, pas d'industries non reliées.",
+          "description2": "Quand vous parcourez les publications des concurrents, vous voyez votre vrai marché."
+        },
+        "oneClickApplications": {
+          "title": "Candidatures en un clic",
+          "description1": "Quand les techniciens postulent, leurs données de profil, CV et certifications se joignent automatiquement. Vous voyez tout ce dont vous avez besoin pour les évaluer en une seule vue.",
+          "description2": "Pas de courriels « veuillez renvoyer votre CV ». Pas d'appels « pouvez-vous confirmer votre numéro IRATA »."
+        },
+        "payRateVisibility": {
+          "title": "Visibilité du taux horaire attendu",
+          "description1": "Voyez ce que les candidats veulent avant de les contacter. Si votre budget est de 45$/heure et qu'ils veulent 60$, vous le savez immédiatement.",
+          "description2": "Arrêtez de perdre du temps en entrevue sur des désaccords de rémunération."
+        },
+        "safetyRating": {
+          "title": "Intégration du score de sécurité",
+          "description1": "Chaque technicien a un score de sécurité individuel (0-100) construit à partir des inspections quotidiennes de harnais, de la participation aux réunions de sécurité et des quiz de sécurité complétés.",
+          "description2": "Voyez-le dans leur profil. Intégrez-le dans vos décisions d'embauche."
+        },
+        "statusDashboard": {
+          "title": "Tableau de bord du statut des candidatures",
+          "description1": "Suivez chaque candidat à travers chaque publication. Voyez qui est en cours d'examen, qui vous avez contacté, qui a reçu une offre, qui a accepté.",
+          "description2": "Pas de tableurs. Pas de candidats perdus entre les mailles."
+        },
+        "instantOnboarding": {
+          "title": "Connexion d'intégration instantanée",
+          "description1": "Quand un technicien accepte votre offre, ses données de profil s'intègrent à votre système de gestion des employés. Numéro IRATA, certifications, coordonnées bancaires (si partagées), contacts d'urgence.",
+          "description2": "Prêt dès le premier jour sans marathon de paperasse."
+        }
+      },
+      "problemsSolved": {
+        "title": "Problèmes résolus",
+        "expandAll": "Tout développer",
+        "collapseAll": "Tout réduire",
+        "forEmployers": "Pour les employeurs",
+        "forOperationsManagers": "Pour les directeurs des opérations",
+        "forBuildingManagers": "Pour les gestionnaires d'immeubles",
+        "painLabel": "La douleur :",
+        "exampleLabel": "Exemple réel :",
+        "solutionLabel": "Solution :",
+        "benefitLabel": "Bénéfice :",
+        "employer1": {
+          "question": "« Je publie sur Indeed et je reçois 50 candidatures. Seulement 2 sont de vrais techniciens d'accès sur corde. »",
+          "pain": "Vous publiez partout : Indeed, LinkedIn, Craigslist, Facebook. Les candidatures affluent de personnes qui n'ont jamais touché un système de corde.",
+          "example": "Ouvriers d'atelier, travailleurs de construction générale, candidats offshore. Deux heures de filtrage pour trouver deux CV pertinents sur cinquante candidatures.",
+          "solution": "Le tableau d'emploi OnRopePro est un écosystème fermé. Chaque technicien sur la plateforme est en entretien de bâtiments en accès sur corde.",
+          "benefit": "Quand vous publiez un emploi, 100% des candidats sont pertinents. Aucun filtrage requis. Deux heures de temps perdu deviennent zéro."
+        },
+        "employer2": {
+          "question": "« Indeed me facture 22$ par candidature si je ne réponds pas en 48 heures. »",
+          "pain": "Quelqu'un doit se connecter quotidiennement, ouvrir chaque candidature, refuser ou répondre. Manquez quelques jours et les frais s'accumulent.",
+          "example": "Ça fait 22$ fois chaque candidature non ouverte. Une seule publication d'emploi peut coûter 300$ en « frais d'engagement » avant d'avoir embauché qui que ce soit.",
+          "solution": "OnRopePro inclut des publications et candidatures illimitées dans votre abonnement. Pas de frais par candidature. Pas de frais surprises.",
+          "benefit": "Pas d'obligation de connexion quotidienne juste pour éviter la facturation. Publiez librement, examinez selon votre horaire, ne payez rien de plus."
+        },
+        "employer3": {
+          "question": "« J'ai passé une heure en entrevue avec quelqu'un qui veut 20$/heure de plus que mon budget. »",
+          "pain": "L'entrevue s'est bien passée. Les références ont été vérifiées. Vous êtes prêt à faire une offre. Puis vous demandez la rémunération.",
+          "example": "Ils veulent 60$/heure. Votre budget est de 45$. Une heure perdue pour les deux parties parce que les attentes n'ont jamais été alignées.",
+          "solution": "Les techniciens définissent leur taux horaire attendu dans leur profil. Vous le voyez dans l'explorateur de talents avant de contacter.",
+          "benefit": "Les désaccords de rémunération sont filtrés avant l'entrevue, pas pendant. N'interviewez que les candidats dans votre budget."
+        },
+        "ops1": {
+          "question": "« Je ne sais pas si nous avons la capacité de prendre ce nouveau contrat. »",
+          "pain": "Un client appelle avec du travail urgent. Vous pensez que Tommy termine la Tour A vendredi, mais vous n'êtes pas certain. Sarah est-elle en vacances ?",
+          "example": "Vous refusez le travail (revenus perdus) ou vous vous engagez et espérez (risque de surengagement et d'échec de livraison).",
+          "solution": "Le tableau d'emploi se connecte à vos systèmes de planification et de gestion des employés. Quand vous publiez un emploi et recevez des candidatures, vous pouvez les croiser avec la disponibilité de l'équipe.",
+          "benefit": "Sachez si vous avez la capacité avant de vous engager. Prenez des décisions éclairées sur les nouveaux contrats basées sur des données réelles."
+        },
+        "bm1": {
+          "question": "« Comment savoir si cet entrepreneur embauche des travailleurs qualifiés ? »",
+          "pain": "Vous embauchez une entreprise d'accès sur corde mais n'avez aucune visibilité sur qui ils envoient réellement à votre bâtiment.",
+          "example": "Ces personnes sont-elles certifiées ? Ont-elles des dossiers de sécurité ? Vous faites confiance à la parole de l'entrepreneur sans moyen de vérifier.",
+          "solution": "Quand les entrepreneurs utilisent OnRopePro, leurs techniciens ont des certifications IRATA/SPRAT vérifiées et des scores de sécurité visibles.",
+          "benefit": "Vous pouvez demander de la documentation. Les données existent dans leur système. La confiance est appuyée par des dossiers vérifiables."
+        }
+      },
+      "connectedModules": {
+        "title": "Modules connectés",
+        "subtitle": "Le tableau d'emploi n'existe pas en isolation. Il se connecte aux systèmes que vous utilisez déjà.",
+        "employeeManagement": {
+          "title": "Gestion des employés",
+          "description": "Quand un technicien accepte votre offre, ses données de profil s'intègrent à votre liste d'employés. Numéro IRATA, certifications, coordonnées. Commencez l'intégration immédiatement."
+        },
+        "safetyCompliance": {
+          "title": "Sécurité et conformité",
+          "description": "Les scores de sécurité des candidats proviennent de données réelles : inspections de harnais, réunions de sécurité, quiz de sécurité. Le score que vous voyez est mérité, pas auto-déclaré."
+        },
+        "projectManagement": {
+          "title": "Gestion de projets",
+          "description": "Embauchez pour un projet spécifique ? Voyez quels postes vous devez combler en vérifiant vos projets actifs. Staffez adéquatement basé sur la charge de travail réelle."
+        },
+        "schedulingCalendar": {
+          "title": "Planification et calendrier",
+          "description": "Croisez les nouvelles embauches avec la disponibilité de l'équipe. Sachez quand vous avez la capacité d'intégrer quelqu'un et à quels projets ils se joindront."
+        }
+      },
+      "cta": {
+        "title": "Votre temps d'embauche tombe à zéro.",
+        "titleHighlight": "Votre bassin de talents s'étend à tous.",
+        "description1": "En ce moment, l'embauche mange votre semaine. Vous publiez sur Indeed. Vous attendez les candidatures. Vous filtrez des CV non pertinents. Vous interviewez des gens qui veulent le double de votre budget. Vous payez 22$ par candidature de tuyauteurs.",
+        "description2": "Avec le tableau d'emploi OnRopePro, votre prochaine embauche est déjà dans le système. Cherchez dans l'explorateur de talents. Trouvez des techniciens niveau 2 avec expérience en calfeutrage dans votre région. Voyez leur score de sécurité, leur taux attendu, leurs certifications. Envoyez une offre directement.",
+        "ctaPrimary": "Commencer à publier gratuitement",
+        "ctaSecondary": "En savoir plus"
+      },
+      "footer": {
+        "text": "Fait partie de la plateforme OnRopePro pour les entreprises d'entretien de bâtiments en accès sur corde."
       }
     }
   }

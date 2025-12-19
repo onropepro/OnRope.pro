@@ -27,15 +27,15 @@ import { formatTimestampDate } from "@/lib/dateUtils";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
 import { loadLogoAsBase64 } from "@/lib/pdfBranding";
 
-const complaintSchema = z.object({
-  residentName: z.string().min(1, "Name is required"),
-  phoneNumber: z.string().min(10, "Valid phone number is required"),
-  unitNumber: z.string().min(1, "Unit number is required"),
+const createComplaintSchema = (t: (key: string, fallback: string) => string) => z.object({
+  residentName: z.string().min(1, t('residentPortal.validation.nameRequired', 'Name is required')),
+  phoneNumber: z.string().min(10, t('residentPortal.validation.phoneRequired', 'Valid phone number is required')),
+  unitNumber: z.string().min(1, t('residentPortal.validation.unitRequired', 'Unit number is required')),
   message: z.string().optional(),
   projectId: z.string().optional(),
 });
 
-type ComplaintFormData = z.infer<typeof complaintSchema>;
+type ComplaintFormData = z.infer<ReturnType<typeof createComplaintSchema>>;
 
 export default function ResidentDashboard() {
   const { t } = useTranslation();
@@ -128,7 +128,7 @@ export default function ResidentDashboard() {
     let yPos = 25;
 
     // Use mapped field names with fallbacks to original field names
-    const noticeTitle = notice.title || notice.noticeTitle || 'Work Notice';
+    const noticeTitle = notice.title || notice.noticeTitle || t('residentPortal.pdf.workNotice', 'Work Notice');
     const noticeContent = notice.content || notice.noticeDetails || '';
     const noticeStartDate = notice.workStartDate || notice.startDate;
     const noticeEndDate = notice.workEndDate || notice.endDate;
@@ -155,7 +155,7 @@ export default function ResidentDashboard() {
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
-    doc.text('OFFICIAL NOTICE', margin + 5, yPos + 11);
+    doc.text(t('residentPortal.pdf.officialNotice', 'OFFICIAL NOTICE'), margin + 5, yPos + 11);
     yPos += 22;
 
     // Notice title
@@ -170,7 +170,7 @@ export default function ResidentDashboard() {
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(100, 100, 100);
-    doc.text(notice.buildingName || 'Building', margin, yPos);
+    doc.text(notice.buildingName || t('residentPortal.pdf.building', 'Building'), margin, yPos);
     yPos += 10;
 
     // Dates banner
@@ -182,17 +182,17 @@ export default function ResidentDashboard() {
     doc.setTextColor(146, 64, 14);
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
-    doc.text('WORK PERIOD:', margin + 5, yPos + 8);
+    doc.text(t('residentPortal.pdf.workPeriod', 'WORK PERIOD:'), margin + 5, yPos + 8);
     doc.setFont('helvetica', 'normal');
     
-    const startDate = noticeStartDate ? new Date(noticeStartDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD';
-    const endDate = noticeEndDate ? new Date(noticeEndDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD';
+    const startDate = noticeStartDate ? new Date(noticeStartDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : t('residentPortal.notices.tbd', 'TBD');
+    const endDate = noticeEndDate ? new Date(noticeEndDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : t('residentPortal.notices.tbd', 'TBD');
     doc.text(`${startDate} - ${endDate}`, margin + 35, yPos + 8);
     
     // Job type
     if (notice.jobType) {
       doc.setFont('helvetica', 'bold');
-      doc.text('SERVICE TYPE:', margin + 5, yPos + 16);
+      doc.text(t('residentPortal.pdf.serviceType', 'SERVICE TYPE:'), margin + 5, yPos + 16);
       doc.setFont('helvetica', 'normal');
       doc.text(notice.jobType.replace(/_/g, ' ').toUpperCase(), margin + 35, yPos + 16);
     }
@@ -243,7 +243,7 @@ export default function ResidentDashboard() {
       doc.setTextColor(0, 0, 0);
       doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
-      const scheduleTitle = notice.jobType === 'parkade_pressure_cleaning' ? 'STALL SCHEDULE' : 'UNIT SCHEDULE';
+      const scheduleTitle = notice.jobType === 'parkade_pressure_cleaning' ? t('residentPortal.pdf.stallSchedule', 'STALL SCHEDULE') : t('residentPortal.pdf.unitSchedule', 'UNIT SCHEDULE');
       doc.text(scheduleTitle, margin + 5, yPos + 8);
       yPos += 18;
       
@@ -259,7 +259,7 @@ export default function ResidentDashboard() {
         // Date header
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(51, 65, 85);
-        const dateText = day.date ? new Date(day.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : 'Date TBD';
+        const dateText = day.date ? new Date(day.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : t('residentPortal.notices.dateTbd', 'Date TBD');
         doc.text(dateText, margin, yPos);
         yPos += 6;
         
@@ -269,8 +269,8 @@ export default function ResidentDashboard() {
         if (day.slots && Array.isArray(day.slots)) {
           for (const slot of day.slots) {
             const timeText = `${slot.startTime || '??:??'} - ${slot.endTime || '??:??'}`;
-            const unitLabel = notice.jobType === 'parkade_pressure_cleaning' ? 'Stalls' : 'Units';
-            const slotText = `${timeText}  |  ${unitLabel}: ${slot.units || 'TBD'}`;
+            const unitLabel = notice.jobType === 'parkade_pressure_cleaning' ? t('residentPortal.notices.stalls', 'Stalls') : t('residentPortal.notices.units', 'Units');
+            const slotText = `${timeText}  |  ${unitLabel}: ${slot.units || t('residentPortal.notices.tbd', 'TBD')}`;
             doc.text(slotText, margin + 10, yPos);
             yPos += 5;
           }
@@ -287,17 +287,17 @@ export default function ResidentDashboard() {
     doc.setFontSize(9);
     doc.setTextColor(100, 100, 100);
     if (notice.contractors) {
-      doc.text(`Service Provider: ${notice.contractors}`, margin, doc.internal.pageSize.getHeight() - 14);
+      doc.text(`${t('residentPortal.notices.serviceProvider', 'Service Provider')}: ${notice.contractors}`, margin, doc.internal.pageSize.getHeight() - 14);
     }
-    doc.text(`Generated: ${new Date().toLocaleDateString()}`, pageWidth - margin - 40, doc.internal.pageSize.getHeight() - 14);
+    doc.text(`${t('residentPortal.notices.generated', 'Generated')}: ${new Date().toLocaleDateString()}`, pageWidth - margin - 40, doc.internal.pageSize.getHeight() - 14);
 
     // Download
     const filename = `Notice-${(noticeTitle).replace(/[^a-zA-Z0-9]/g, '_').substring(0, 30)}.pdf`;
     doc.save(filename);
     
     toast({
-      title: "PDF Downloaded",
-      description: "Notice has been saved to your device.",
+      title: t('residentPortal.toast.pdfDownloaded', 'PDF Downloaded'),
+      description: t('residentPortal.toast.noticeSaved', 'Notice has been saved to your device.'),
     });
   };
 
@@ -343,7 +343,7 @@ export default function ResidentDashboard() {
 
   const projectData = {
     strataPlanNumber: activeProject?.strataPlanNumber || "",
-    jobType: activeProject?.jobType?.replace(/_/g, ' ') || "Window Cleaning",
+    jobType: activeProject?.jobType?.replace(/_/g, ' ') || t('residentPortal.fallback.windowCleaning', 'Window Cleaning'),
     floorCount: activeProject?.floorCount || 24,
     totalDrops: progressData?.totalDrops || activeProject?.totalDrops || 0,
     completedDrops: progressData?.completedDrops || 0,
@@ -363,6 +363,7 @@ export default function ResidentDashboard() {
     completedSuites: progressData?.completedSuites || 0,
   };
 
+  const complaintSchema = createComplaintSchema(t);
   const form = useForm<ComplaintFormData>({
     resolver: zodResolver(complaintSchema),
     defaultValues: {
@@ -421,7 +422,7 @@ export default function ResidentDashboard() {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || "Failed to submit message");
+        throw new Error(error.message || t('residentPortal.error.submitFailed', 'Failed to submit message'));
       }
 
       return response.json();
@@ -430,11 +431,11 @@ export default function ResidentDashboard() {
       form.reset();
       setSelectedPhoto(null);
       queryClient.invalidateQueries({ queryKey: ["/api/complaints"] });
-      toast({ title: "Message submitted successfully" });
+      toast({ title: t('residentPortal.toast.messageSubmitted', 'Message submitted successfully') });
       setActiveTab("history");
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('residentPortal.error.title', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -447,12 +448,12 @@ export default function ResidentDashboard() {
     if (file) {
       // Validate file type
       if (!file.type.startsWith('image/')) {
-        toast({ title: "Error", description: "Please select an image file", variant: "destructive" });
+        toast({ title: t('residentPortal.error.title', 'Error'), description: t('residentPortal.error.selectImage', 'Please select an image file'), variant: "destructive" });
         return;
       }
       // Validate file size (max 10MB)
       if (file.size > 10 * 1024 * 1024) {
-        toast({ title: "Error", description: "Image size must be less than 10MB", variant: "destructive" });
+        toast({ title: t('residentPortal.error.title', 'Error'), description: t('residentPortal.error.imageTooLarge', 'Image size must be less than 10MB'), variant: "destructive" });
         return;
       }
       setSelectedPhoto(file);
@@ -472,7 +473,7 @@ export default function ResidentDashboard() {
       // Redirect to login page
       setLocation("/login");
     } catch (error) {
-      toast({ title: "Error", description: "Failed to logout", variant: "destructive" });
+      toast({ title: t('residentPortal.error.title', 'Error'), description: t('residentPortal.error.logoutFailed', 'Failed to logout'), variant: "destructive" });
       setShowLogoutDialog(false);
     }
   };
@@ -480,7 +481,7 @@ export default function ResidentDashboard() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-lg font-medium">Loading...</div>
+        <div className="text-lg font-medium">{t('residentPortal.loading', 'Loading...')}</div>
       </div>
     );
   }
@@ -496,7 +497,7 @@ export default function ResidentDashboard() {
             {branding.logoUrl ? (
               <img 
                 src={branding.logoUrl} 
-                alt={branding.companyName || 'Company logo'} 
+                alt={branding.companyName || t('residentPortal.companyLogo', 'Company logo')} 
                 className="w-8 h-8 object-contain"
                 data-testid="img-company-logo"
               />
@@ -507,7 +508,7 @@ export default function ResidentDashboard() {
               className="text-xl font-semibold"
               style={hasCustomBranding && primaryColor ? { color: primaryColor } : {}}
             >
-              {branding.companyName || 'Resident Portal'}
+              {branding.companyName || t('residentPortal.title', 'Resident Portal')}
             </h1>
           </div>
           <div className="flex items-center gap-2">
@@ -525,9 +526,9 @@ export default function ResidentDashboard() {
           <Card className="shadow-lg">
             <CardContent className="pt-8 pb-6 text-center">
               <span className="material-icons text-6xl text-muted-foreground mb-3">info</span>
-              <h2 className="text-xl font-bold mb-2">No Work Scheduled</h2>
+              <h2 className="text-xl font-bold mb-2">{t('residentPortal.noWorkScheduled.title', 'No Work Scheduled')}</h2>
               <p className="text-muted-foreground text-sm">
-                No maintenance work has been scheduled for your building yet.
+                {t('residentPortal.noWorkScheduled.description', 'No maintenance work has been scheduled for your building yet.')}
               </p>
             </CardContent>
           </Card>
@@ -541,9 +542,9 @@ export default function ResidentDashboard() {
 
           <Card className="shadow-lg">
             <CardHeader>
-              <CardTitle>Send a Message</CardTitle>
+              <CardTitle>{t('residentPortal.sendMessage.title', 'Send a Message')}</CardTitle>
               <CardDescription>
-                Have a question or concern? Send us a message and we'll get back to you.
+                {t('residentPortal.sendMessage.description', "Have a question or concern? Send us a message and we'll get back to you.")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -596,7 +597,7 @@ export default function ResidentDashboard() {
                     name="message"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Message</FormLabel>
+                        <FormLabel>{t('residentPortal.form.message', 'Message')}</FormLabel>
                         <FormControl>
                           <Textarea 
                             {...field} 
@@ -611,7 +612,7 @@ export default function ResidentDashboard() {
                   />
 
                   <div>
-                    <label className="text-sm font-medium mb-2 block">Attach Photo (Optional)</label>
+                    <label className="text-sm font-medium mb-2 block">{t('residentPortal.form.attachPhoto', 'Attach Photo (Optional)')}</label>
                     <Input
                       type="file"
                       accept="image/*"
@@ -621,7 +622,7 @@ export default function ResidentDashboard() {
                     />
                     {selectedPhoto && (
                       <p className="text-xs text-muted-foreground mt-1">
-                        Selected: {selectedPhoto.name}
+                        {t('residentPortal.form.selected', 'Selected')}: {selectedPhoto.name}
                       </p>
                     )}
                   </div>
@@ -632,7 +633,7 @@ export default function ResidentDashboard() {
                     disabled={submitComplaintMutation.isPending}
                     data-testid="button-submit-message"
                   >
-                    {submitComplaintMutation.isPending ? "Sending..." : "Send Message"}
+                    {submitComplaintMutation.isPending ? t('residentPortal.form.sending', 'Sending...') : t('residentPortal.form.sendMessage', 'Send Message')}
                   </Button>
                 </form>
               </Form>
@@ -657,7 +658,7 @@ export default function ResidentDashboard() {
             {branding.logoUrl ? (
               <img 
                 src={branding.logoUrl} 
-                alt={branding.companyName || 'Company logo'} 
+                alt={branding.companyName || t('residentPortal.companyLogo', 'Company logo')} 
                 className="w-8 h-8 object-contain"
                 data-testid="img-company-logo"
               />
@@ -668,7 +669,7 @@ export default function ResidentDashboard() {
               className="text-xl font-semibold"
               style={hasCustomBranding && primaryColor ? { color: primaryColor } : {}}
             >
-              {branding.companyName || 'Resident Portal'}
+              {branding.companyName || t('residentPortal.title', 'Resident Portal')}
             </h1>
           </div>
           <div className="flex items-center gap-2">
@@ -686,18 +687,18 @@ export default function ResidentDashboard() {
           <Card className="shadow-lg">
             <CardContent className="pt-8 pb-6 text-center">
               <span className="material-icons text-6xl text-green-600 mb-3">check_circle</span>
-              <h2 className="text-xl font-bold mb-2">Work Completed</h2>
+              <h2 className="text-xl font-bold mb-2">{t('residentPortal.workCompleted.title', 'Work Completed')}</h2>
               <p className="text-muted-foreground text-sm">
-                All scheduled maintenance for your building has been completed.
+                {t('residentPortal.workCompleted.description', 'All scheduled maintenance for your building has been completed.')}
               </p>
             </CardContent>
           </Card>
 
           <Card className="shadow-lg">
             <CardHeader>
-              <CardTitle>Send a Message</CardTitle>
+              <CardTitle>{t('residentPortal.sendMessage.title', 'Send a Message')}</CardTitle>
               <CardDescription>
-                Have a question or concern? Send us a message and we'll get back to you.
+                {t('residentPortal.sendMessage.description', "Have a question or concern? Send us a message and we'll get back to you.")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -751,7 +752,7 @@ export default function ResidentDashboard() {
                       name="projectId"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Which Project? *</FormLabel>
+                          <FormLabel>{t('residentPortal.form.whichProject', 'Which Project?')} *</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger data-testid="select-project" className="h-12">
@@ -777,7 +778,7 @@ export default function ResidentDashboard() {
                     name="message"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Message</FormLabel>
+                        <FormLabel>{t('residentPortal.form.message', 'Message')}</FormLabel>
                         <FormControl>
                           <Textarea 
                             {...field} 
@@ -792,7 +793,7 @@ export default function ResidentDashboard() {
                   />
 
                   <div>
-                    <label className="text-sm font-medium mb-2 block">Attach Photo (Optional)</label>
+                    <label className="text-sm font-medium mb-2 block">{t('residentPortal.form.attachPhoto', 'Attach Photo (Optional)')}</label>
                     <Input
                       type="file"
                       accept="image/*"
@@ -802,7 +803,7 @@ export default function ResidentDashboard() {
                     />
                     {selectedPhoto && (
                       <p className="text-xs text-muted-foreground mt-1">
-                        Selected: {selectedPhoto.name}
+                        {t('residentPortal.form.selected', 'Selected')}: {selectedPhoto.name}
                       </p>
                     )}
                   </div>
@@ -813,7 +814,7 @@ export default function ResidentDashboard() {
                     disabled={submitComplaintMutation.isPending}
                     data-testid="button-submit-message"
                   >
-                    {submitComplaintMutation.isPending ? "Sending..." : "Send Message"}
+                    {submitComplaintMutation.isPending ? t('residentPortal.form.sending', 'Sending...') : t('residentPortal.form.sendMessage', 'Send Message')}
                   </Button>
                 </form>
               </Form>
@@ -854,7 +855,7 @@ export default function ResidentDashboard() {
                 <div className="h-12 w-12 rounded-xl bg-white dark:bg-muted flex items-center justify-center shadow-lg p-1">
                   <img 
                     src={branding.logoUrl} 
-                    alt={branding.companyName || 'Company logo'} 
+                    alt={branding.companyName || t('residentPortal.companyLogo', 'Company logo')} 
                     className="w-full h-full object-contain"
                     data-testid="img-company-logo-header"
                   />
@@ -904,8 +905,8 @@ export default function ResidentDashboard() {
                   layers
                 </span>
                 {activeProject?.jobType === 'in_suite_dryer_vent_cleaning' 
-                  ? `${projectData.floorCount} Units`
-                  : `${projectData.floorCount} Floors`}
+                  ? `${projectData.floorCount} ${t('residentPortal.stats.units', 'Units')}`
+                  : `${projectData.floorCount} ${t('residentPortal.stats.floors', 'Floors')}`}
               </Badge>
               <InstallPWAButton />
               <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-profile" onClick={() => setLocation("/profile")}>
@@ -924,9 +925,9 @@ export default function ResidentDashboard() {
         <Alert className="mx-4 mt-4 border-yellow-500/50 bg-yellow-500/10">
           <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-500" />
           <div className="flex-1">
-            <AlertTitle className="text-yellow-700 dark:text-yellow-400">Read-Only Mode</AlertTitle>
+            <AlertTitle className="text-yellow-700 dark:text-yellow-400">{t('residentPortal.readOnly.title', 'Read-Only Mode')}</AlertTitle>
             <AlertDescription className="text-yellow-600 dark:text-yellow-500">
-              Your company is in read-only mode and must verify its license to submit feedback or make changes.
+              {t('residentPortal.readOnly.description', 'Your company is in read-only mode and must verify its license to submit feedback or make changes.')}
             </AlertDescription>
           </div>
         </Alert>
@@ -946,7 +947,7 @@ export default function ResidentDashboard() {
                   apartment
                 </span>
                 <div className="flex-1">
-                  <label className="text-sm font-medium mb-2 block">Select Project to View</label>
+                  <label className="text-sm font-medium mb-2 block">{t('residentPortal.selectProjectToView', 'Select Project to View')}</label>
                   <Select value={selectedProjectId || ''} onValueChange={setSelectedProjectId}>
                     <SelectTrigger className="h-12">
                       <SelectValue placeholder={t('residentPortal.selectAProject', 'Select a project')} />
@@ -987,7 +988,7 @@ export default function ResidentDashboard() {
                 '--custom-primary': primaryColor
               } as React.CSSProperties : {}}
             >
-              Progress
+              {t('residentPortal.tabs.progress', 'Progress')}
             </TabsTrigger>
             <TabsTrigger 
               value="photos" 
@@ -997,7 +998,7 @@ export default function ResidentDashboard() {
                 '--custom-primary': primaryColor
               } as React.CSSProperties : {}}
             >
-              My Photos
+              {t('residentPortal.tabs.myPhotos', 'My Photos')}
               {newPhotosCount > 0 && (
                 <Badge 
                   variant="destructive" 
@@ -1015,7 +1016,7 @@ export default function ResidentDashboard() {
                 '--custom-primary': primaryColor
               } as React.CSSProperties : {}}
             >
-              Submit
+              {t('residentPortal.tabs.submit', 'Submit')}
             </TabsTrigger>
             <TabsTrigger 
               value="history" 
@@ -1025,7 +1026,7 @@ export default function ResidentDashboard() {
                 '--custom-primary': primaryColor
               } as React.CSSProperties : {}}
             >
-              Feedback
+              {t('residentPortal.tabs.feedback', 'Feedback')}
               {newResponsesCount > 0 && (
                 <Badge 
                   variant="destructive" 
@@ -1044,7 +1045,7 @@ export default function ResidentDashboard() {
                 '--custom-primary': primaryColor
               } as React.CSSProperties : {}}
             >
-              Notices
+              {t('residentPortal.tabs.notices', 'Notices')}
               {(workNoticesData?.notices?.length || 0) > 0 && (
                 <Badge 
                   variant="secondary" 
@@ -1088,7 +1089,7 @@ export default function ResidentDashboard() {
                           {Math.round(projectData.progressPercentage)}%
                         </h3>
                         <p className="text-muted-foreground">
-                          Work in Progress
+                          {t('residentPortal.progress.workInProgress', 'Work in Progress')}
                         </p>
                       </div>
                       
@@ -1118,7 +1119,7 @@ export default function ResidentDashboard() {
                           {projectData.completedSuites} / {projectData.totalSuites}
                         </h3>
                         <p className="text-muted-foreground">
-                          Suites Completed
+                          {t('residentPortal.progress.suitesCompleted', 'Suites Completed')}
                         </p>
                       </div>
                       
@@ -1172,7 +1173,7 @@ export default function ResidentDashboard() {
                     >
                       {projectData.dailyDropTarget}
                     </div>
-                    <div className="text-sm text-muted-foreground">Daily Target</div>
+                    <div className="text-sm text-muted-foreground">{t('residentPortal.stats.dailyTarget', 'Daily Target')}</div>
                   </div>
                   <div 
                     className="text-center p-6 rounded-xl border"
@@ -1187,7 +1188,7 @@ export default function ResidentDashboard() {
                     >
                       {projectData.completedDrops > 0 ? Math.ceil((projectData.totalDrops - projectData.completedDrops) / projectData.dailyDropTarget) : "N/A"}
                     </div>
-                    <div className="text-sm text-muted-foreground">Days Remaining</div>
+                    <div className="text-sm text-muted-foreground">{t('residentPortal.stats.daysRemaining', 'Days Remaining')}</div>
                   </div>
                   <div 
                     className="text-center p-6 rounded-xl border"
@@ -1202,7 +1203,7 @@ export default function ResidentDashboard() {
                     >
                       {projectData.completedDrops}
                     </div>
-                    <div className="text-sm text-muted-foreground">Completed</div>
+                    <div className="text-sm text-muted-foreground">{t('residentPortal.stats.completed', 'Completed')}</div>
                   </div>
                   <div 
                     className="text-center p-6 rounded-xl border"
@@ -1217,7 +1218,7 @@ export default function ResidentDashboard() {
                     >
                       {projectData.totalDrops - projectData.completedDrops}
                     </div>
-                    <div className="text-sm text-muted-foreground">Remaining</div>
+                    <div className="text-sm text-muted-foreground">{t('residentPortal.stats.remaining', 'Remaining')}</div>
                   </div>
                 </div>
               )}
@@ -1234,23 +1235,23 @@ export default function ResidentDashboard() {
                   >
                     photo_library
                   </span>
-                  My Unit Photos
+                  {t('residentPortal.photos.title', 'My Unit Photos')}
                 </CardTitle>
                 <CardDescription>
-                  Photos tagged for unit {currentUser?.unitNumber || "—"}
+                  {t('residentPortal.photos.taggedForUnit', 'Photos tagged for unit')} {currentUser?.unitNumber || "—"}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {!currentUser?.unitNumber ? (
                   <div className="text-center py-12 text-muted-foreground">
                     <span className="material-icons text-5xl mb-3 opacity-50">image_not_supported</span>
-                    <p>No unit number found in your profile.</p>
+                    <p>{t('residentPortal.photos.noUnitNumber', 'No unit number found in your profile.')}</p>
                   </div>
                 ) : unitPhotosData?.photos?.length === 0 ? (
                   <div className="text-center py-12 text-muted-foreground">
                     <span className="material-icons text-5xl mb-3 opacity-50">photo_library</span>
-                    <p className="text-lg mb-2">No photos yet</p>
-                    <p className="text-sm">Photos tagged for your unit will appear here.</p>
+                    <p className="text-lg mb-2">{t('residentPortal.photos.noPhotosYet', 'No photos yet')}</p>
+                    <p className="text-sm">{t('residentPortal.photos.photosWillAppear', 'Photos tagged for your unit will appear here.')}</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1259,7 +1260,7 @@ export default function ResidentDashboard() {
                         <div className="aspect-video relative overflow-hidden">
                           <img
                             src={photo.imageUrl}
-                            alt={photo.comment || "Unit photo"}
+                            alt={photo.comment || t('residentPortal.photos.unitPhoto', 'Unit photo')}
                             className="w-full h-full object-cover"
                             data-testid={`unit-photo-${photo.id}`}
                           />
@@ -1279,7 +1280,7 @@ export default function ResidentDashboard() {
                               )}
                             </div>
                             <Badge variant="secondary" className="text-xs shrink-0">
-                              Unit {photo.unitNumber || photo.missedUnitNumber}
+                              {t('residentPortal.photos.unit', 'Unit')} {photo.unitNumber || photo.missedUnitNumber}
                             </Badge>
                           </div>
                           {photo.comment && (
@@ -1302,8 +1303,8 @@ export default function ResidentDashboard() {
           <TabsContent value="submit" className="mt-6">
             <div className="bg-card/60 backdrop-blur-sm rounded-2xl border border-border/50 shadow-xl p-6 sm:p-8">
               <div className="mb-6">
-                <h2 className="text-2xl font-bold mb-2">{t('residentPortal.submitFeedback')}</h2>
-                <p className="text-muted-foreground">{t('residentPortal.feedbackDescription', 'Let us know if you have any concerns or questions about the work')}</p>
+                <h2 className="text-2xl font-bold mb-2">{t('residentPortal.submit.title', 'Submit Feedback')}</h2>
+                <p className="text-muted-foreground">{t('residentPortal.submit.description', 'Let us know if you have any concerns or questions about the work')}</p>
               </div>
               
               <Form {...form}>
@@ -1356,7 +1357,7 @@ export default function ResidentDashboard() {
                         name="projectId"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Which Project? *</FormLabel>
+                            <FormLabel>{t('residentPortal.form.whichProject', 'Which Project?')} *</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
                                 <SelectTrigger data-testid="select-project" className="h-12">
@@ -1382,11 +1383,11 @@ export default function ResidentDashboard() {
                       name="message"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Message *</FormLabel>
+                          <FormLabel>{t('residentPortal.form.message', 'Message')} *</FormLabel>
                           <FormControl>
                             <Textarea 
                               {...field} 
-                              placeholder="Please describe your concern or question..."
+                              placeholder={t('residentPortal.form.describeConcern', 'Please describe your concern or question...')}
                               data-testid="input-message"
                               className="min-h-32 resize-none"
                             />
@@ -1397,7 +1398,7 @@ export default function ResidentDashboard() {
                     />
 
                     <div>
-                      <label className="text-sm font-medium mb-2 block">Attach Photo (Optional)</label>
+                      <label className="text-sm font-medium mb-2 block">{t('residentPortal.form.attachPhoto', 'Attach Photo (Optional)')}</label>
                       <Input
                         type="file"
                         accept="image/*"
@@ -1407,7 +1408,7 @@ export default function ResidentDashboard() {
                       />
                       {selectedPhoto && (
                         <p className="text-xs text-muted-foreground mt-1">
-                          Selected: {selectedPhoto.name}
+                          {t('residentPortal.form.selected', 'Selected')}: {selectedPhoto.name}
                         </p>
                       )}
                     </div>
@@ -1421,7 +1422,7 @@ export default function ResidentDashboard() {
                       borderColor: primaryColor
                     } : {}}
                   >
-                    Submit Feedback
+                    {t('residentPortal.form.submitFeedback', 'Submit Feedback')}
                   </Button>
                 </form>
               </Form>
@@ -1431,13 +1432,13 @@ export default function ResidentDashboard() {
           <TabsContent value="history" className="mt-6">
             <div className="bg-card/60 backdrop-blur-sm rounded-2xl border border-border/50 shadow-xl p-6 sm:p-8">
               <div className="mb-6">
-                <h2 className="text-2xl font-bold mb-2">My Feedback History</h2>
-                <p className="text-muted-foreground">View the status of your submitted feedback</p>
+                <h2 className="text-2xl font-bold mb-2">{t('residentPortal.history.title', 'My Feedback History')}</h2>
+                <p className="text-muted-foreground">{t('residentPortal.history.description', 'View the status of your submitted feedback')}</p>
               </div>
                 {!complaintsData?.complaints || complaintsData.complaints.length === 0 ? (
                   <div className="text-center py-8">
                     <span className="material-icons text-6xl text-muted-foreground mb-3">feedback</span>
-                    <p className="text-muted-foreground">No feedback submitted yet</p>
+                    <p className="text-muted-foreground">{t('residentPortal.history.noFeedback', 'No feedback submitted yet')}</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -1448,13 +1449,13 @@ export default function ResidentDashboard() {
                       let statusBadge;
                       let statusIcon;
                       if (status === 'closed') {
-                        statusBadge = <Badge variant="secondary" className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20">Closed</Badge>;
+                        statusBadge = <Badge variant="secondary" className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20">{t('residentPortal.status.closed', 'Closed')}</Badge>;
                         statusIcon = <span className="material-icons text-green-600">check_circle</span>;
                       } else if (isViewed) {
-                        statusBadge = <Badge variant="secondary" className="bg-primary/50/10 text-primary dark:text-primary border-primary/50/20">Viewed</Badge>;
+                        statusBadge = <Badge variant="secondary" className="bg-primary/50/10 text-primary dark:text-primary border-primary/50/20">{t('residentPortal.status.viewed', 'Viewed')}</Badge>;
                         statusIcon = <span className="material-icons text-primary">visibility</span>;
                       } else {
-                        statusBadge = <Badge variant="secondary" className="bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20">Open</Badge>;
+                        statusBadge = <Badge variant="secondary" className="bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20">{t('residentPortal.status.open', 'Open')}</Badge>;
                         statusIcon = <span className="material-icons text-orange-600">pending</span>;
                       }
                       
@@ -1479,7 +1480,7 @@ export default function ResidentDashboard() {
                               {statusBadge}
                             </div>
                             <div className="flex items-center justify-between text-xs text-muted-foreground">
-                              <span>Unit {complaint.unitNumber}</span>
+                              <span>{t('residentPortal.photos.unit', 'Unit')} {complaint.unitNumber}</span>
                               <span>{formatTimestampDate(complaint.createdAt)}</span>
                             </div>
                           </div>
@@ -1494,16 +1495,16 @@ export default function ResidentDashboard() {
           <TabsContent value="notices" className="mt-6">
             <div className="bg-card/60 backdrop-blur-sm rounded-2xl border border-border/50 shadow-xl p-6 sm:p-8">
               <div className="mb-6">
-                <h2 className="text-2xl font-bold mb-2">Work Notices</h2>
-                <p className="text-muted-foreground">Important notices about upcoming and ongoing work at your building</p>
+                <h2 className="text-2xl font-bold mb-2">{t('residentPortal.notices.title', 'Work Notices')}</h2>
+                <p className="text-muted-foreground">{t('residentPortal.notices.description', 'Important notices about upcoming and ongoing work at your building')}</p>
               </div>
               {!workNoticesData?.notices || workNoticesData.notices.length === 0 ? (
                 <div className="text-center py-12">
                   <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted/50 mb-4">
                     <span className="material-icons text-3xl text-muted-foreground">notifications_none</span>
                   </div>
-                  <p className="text-muted-foreground font-medium">No Active Notices</p>
-                  <p className="text-sm text-muted-foreground mt-1">You will be notified when maintenance work is scheduled</p>
+                  <p className="text-muted-foreground font-medium">{t('residentPortal.notices.noActiveNotices', 'No Active Notices')}</p>
+                  <p className="text-sm text-muted-foreground mt-1">{t('residentPortal.notices.willBeNotified', 'You will be notified when maintenance work is scheduled')}</p>
                 </div>
               ) : (
                 <div className="space-y-6">
@@ -1532,7 +1533,7 @@ export default function ResidentDashboard() {
                           )}
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
-                              <span className="text-xs font-medium uppercase tracking-wider text-white/70">Official Notice</span>
+                              <span className="text-xs font-medium uppercase tracking-wider text-white/70">{t('residentPortal.notices.officialNotice', 'Official Notice')}</span>
                             </div>
                             <h3 className="text-xl font-bold truncate">{notice.title || notice.buildingName}</h3>
                           </div>
@@ -1547,7 +1548,7 @@ export default function ResidentDashboard() {
                               data-testid={`button-view-notice-${notice.id}`}
                             >
                               <Eye className="h-4 w-4 mr-1" />
-                              View
+                              {t('residentPortal.notices.view', 'View')}
                             </Button>
                             <Button
                               size="sm"
@@ -1559,7 +1560,7 @@ export default function ResidentDashboard() {
                               data-testid={`button-download-notice-${notice.id}`}
                             >
                               <Download className="h-4 w-4 mr-1" />
-                              PDF
+                              {t('residentPortal.notices.pdf', 'PDF')}
                             </Button>
                           </div>
                         </div>
@@ -1573,7 +1574,7 @@ export default function ResidentDashboard() {
                               <span className="material-icons text-amber-700 dark:text-amber-400">event</span>
                             </div>
                             <div>
-                              <p className="text-xs font-medium text-amber-700 dark:text-amber-400 uppercase tracking-wide">Work Period</p>
+                              <p className="text-xs font-medium text-amber-700 dark:text-amber-400 uppercase tracking-wide">{t('residentPortal.notices.workPeriod', 'Work Period')}</p>
                               <p className="font-semibold text-amber-900 dark:text-amber-100">
                                 {notice.workStartDate && notice.workEndDate ? (
                                   <>
@@ -1582,9 +1583,9 @@ export default function ResidentDashboard() {
                                     {new Date(notice.workEndDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
                                   </>
                                 ) : notice.workStartDate ? (
-                                  <>Starting {new Date(notice.workStartDate).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</>
+                                  <>{t('residentPortal.notices.starting', 'Starting')} {new Date(notice.workStartDate).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</>
                                 ) : (
-                                  'Dates to be announced'
+                                  t('residentPortal.notices.datesToBeAnnounced', 'Dates to be announced')
                                 )}
                               </p>
                             </div>
@@ -1596,9 +1597,9 @@ export default function ResidentDashboard() {
                                 <span className="material-icons text-amber-700 dark:text-amber-400">schedule</span>
                               </div>
                               <div>
-                                <p className="text-xs font-medium text-amber-700 dark:text-amber-400 uppercase tracking-wide">Daily Hours</p>
+                                <p className="text-xs font-medium text-amber-700 dark:text-amber-400 uppercase tracking-wide">{t('residentPortal.notices.dailyHours', 'Daily Hours')}</p>
                                 <p className="font-semibold text-amber-900 dark:text-amber-100">
-                                  {notice.workStartTime || 'TBD'} - {notice.workEndTime || 'TBD'}
+                                  {notice.workStartTime || t('residentPortal.notices.tbd', 'TBD')} - {notice.workEndTime || t('residentPortal.notices.tbd', 'TBD')}
                                 </p>
                               </div>
                             </div>
@@ -1633,7 +1634,7 @@ export default function ResidentDashboard() {
                                 <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
                                   <span className="material-icons text-muted-foreground mt-0.5">engineering</span>
                                   <div>
-                                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">Service Provider</p>
+                                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">{t('residentPortal.notices.serviceProvider', 'Service Provider')}</p>
                                     <p className="text-sm font-medium">{notice.contractors}</p>
                                   </div>
                                 </div>
@@ -1642,7 +1643,7 @@ export default function ResidentDashboard() {
                                 <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
                                   <span className="material-icons text-muted-foreground mt-0.5">contact_phone</span>
                                   <div>
-                                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">Contact</p>
+                                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">{t('residentPortal.notices.contact', 'Contact')}</p>
                                     <p className="text-sm font-medium">{notice.contactInfo}</p>
                                   </div>
                                 </div>
@@ -1661,7 +1662,7 @@ export default function ResidentDashboard() {
                           </div>
                           <div className="flex items-center gap-1.5">
                             <span className="material-icons text-sm">history</span>
-                            <span>Posted {formatTimestampDate(notice.createdAt)}</span>
+                            <span>{t('residentPortal.notices.posted', 'Posted')} {formatTimestampDate(notice.createdAt)}</span>
                           </div>
                         </div>
                       </div>
@@ -1678,15 +1679,15 @@ export default function ResidentDashboard() {
       <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
+            <AlertDialogTitle>{t('residentPortal.logout.confirmTitle', 'Confirm Logout')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to logout?
+              {t('residentPortal.logout.confirmMessage', 'Are you sure you want to logout?')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel data-testid="button-cancel-logout">Cancel</AlertDialogCancel>
+            <AlertDialogCancel data-testid="button-cancel-logout">{t('residentPortal.logout.cancel', 'Cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={confirmLogout} data-testid="button-confirm-logout">
-              Logout
+              {t('residentPortal.logout.confirm', 'Logout')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1703,7 +1704,7 @@ export default function ResidentDashboard() {
                     <div className="flex-shrink-0 bg-muted rounded-lg p-2">
                       <img 
                         src={selectedNotice.logoUrl} 
-                        alt="Company logo" 
+                        alt={t('residentPortal.notices.companyLogo', 'Company logo')} 
                         className="h-10 w-auto object-contain"
                       />
                     </div>
@@ -1713,7 +1714,7 @@ export default function ResidentDashboard() {
                     </div>
                   )}
                   <div className="flex-1">
-                    <Badge variant="outline" className="mb-1 text-xs">Official Notice</Badge>
+                    <Badge variant="outline" className="mb-1 text-xs">{t('residentPortal.notices.officialNotice', 'Official Notice')}</Badge>
                     <DialogTitle className="text-xl">{selectedNotice.title || selectedNotice.buildingName}</DialogTitle>
                   </div>
                 </div>
@@ -1732,9 +1733,9 @@ export default function ResidentDashboard() {
                           {new Date(selectedNotice.workEndDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
                         </>
                       ) : selectedNotice.workStartDate ? (
-                        <>Starting {new Date(selectedNotice.workStartDate).toLocaleDateString()}</>
+                        <>{t('residentPortal.notices.starting', 'Starting')} {new Date(selectedNotice.workStartDate).toLocaleDateString()}</>
                       ) : (
-                        'Dates to be announced'
+                        t('residentPortal.notices.datesToBeAnnounced', 'Dates to be announced')
                       )}
                     </span>
                   </div>
@@ -1742,7 +1743,7 @@ export default function ResidentDashboard() {
                     <div className="flex items-center gap-2">
                       <span className="material-icons text-amber-700 dark:text-amber-400">schedule</span>
                       <span className="font-medium text-amber-900 dark:text-amber-100">
-                        {selectedNotice.workStartTime || 'TBD'} - {selectedNotice.workEndTime || 'TBD'}
+                        {selectedNotice.workStartTime || t('residentPortal.notices.tbd', 'TBD')} - {selectedNotice.workEndTime || t('residentPortal.notices.tbd', 'TBD')}
                       </span>
                     </div>
                   )}
@@ -1772,7 +1773,7 @@ export default function ResidentDashboard() {
                   <div className="bg-muted px-4 py-2 border-b">
                     <h4 className="font-medium text-sm flex items-center gap-2">
                       <span className="material-icons text-sm">schedule</span>
-                      {selectedNotice.jobType === 'parkade_pressure_cleaning' ? 'Stall Schedule' : 'Unit Schedule'}
+                      {selectedNotice.jobType === 'parkade_pressure_cleaning' ? t('residentPortal.notices.stallSchedule', 'Stall Schedule') : t('residentPortal.notices.unitSchedule', 'Unit Schedule')}
                     </h4>
                   </div>
                   <div className="divide-y">
@@ -1780,7 +1781,7 @@ export default function ResidentDashboard() {
                       <div key={dayIndex} className="p-3">
                         <div className="font-medium text-sm mb-2 flex items-center gap-2">
                           <span className="material-icons text-sm text-primary">event</span>
-                          {day.date ? new Date(day.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : 'Date TBD'}
+                          {day.date ? new Date(day.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : t('residentPortal.notices.dateTbd', 'Date TBD')}
                         </div>
                         <div className="space-y-1 ml-6">
                           {day.slots && day.slots.map((slot: any, slotIndex: number) => (
@@ -1789,7 +1790,7 @@ export default function ResidentDashboard() {
                                 {slot.startTime || '??:??'} - {slot.endTime || '??:??'}
                               </span>
                               <span className="text-foreground">
-                                {selectedNotice.jobType === 'parkade_pressure_cleaning' ? 'Stalls' : 'Units'}: <span className="font-medium">{slot.units || 'TBD'}</span>
+                                {selectedNotice.jobType === 'parkade_pressure_cleaning' ? t('residentPortal.notices.stalls', 'Stalls') : t('residentPortal.notices.units', 'Units')}: <span className="font-medium">{slot.units || t('residentPortal.notices.tbd', 'TBD')}</span>
                               </span>
                             </div>
                           ))}
@@ -1807,7 +1808,7 @@ export default function ResidentDashboard() {
                     <div className="flex items-start gap-2 text-sm">
                       <span className="material-icons text-muted-foreground">engineering</span>
                       <div>
-                        <p className="text-xs text-muted-foreground uppercase">Service Provider</p>
+                        <p className="text-xs text-muted-foreground uppercase">{t('residentPortal.notices.serviceProvider', 'Service Provider')}</p>
                         <p className="font-medium">{selectedNotice.contractors}</p>
                       </div>
                     </div>
@@ -1816,7 +1817,7 @@ export default function ResidentDashboard() {
                     <div className="flex items-start gap-2 text-sm">
                       <span className="material-icons text-muted-foreground">contact_phone</span>
                       <div>
-                        <p className="text-xs text-muted-foreground uppercase">Contact</p>
+                        <p className="text-xs text-muted-foreground uppercase">{t('residentPortal.notices.contact', 'Contact')}</p>
                         <p className="font-medium">{selectedNotice.contactInfo}</p>
                       </div>
                     </div>
@@ -1836,7 +1837,7 @@ export default function ResidentDashboard() {
                   data-testid="button-download-notice-dialog"
                 >
                   <Download className="h-4 w-4 mr-1" />
-                  Download PDF
+                  {t('residentPortal.notices.downloadPdf', 'Download PDF')}
                 </Button>
               </div>
             </>
@@ -1850,6 +1851,7 @@ export default function ResidentDashboard() {
 
 // Component for linking company code
 function LinkCompanyCodeCard() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [residentCode, setResidentCode] = useState("");
   
@@ -1863,18 +1865,18 @@ function LinkCompanyCodeCard() {
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || "Failed to link account");
+        throw new Error(error.message || t('residentPortal.linkCode.failedToLink', 'Failed to link account'));
       }
       return response.json();
     },
     onSuccess: () => {
-      toast({ title: "Success!", description: "Your account has been linked successfully" });
+      toast({ title: t('residentPortal.linkCode.success', 'Success!'), description: t('residentPortal.linkCode.successDescription', 'Your account has been linked successfully') });
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
       window.location.reload();
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('residentPortal.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -1882,7 +1884,7 @@ function LinkCompanyCodeCard() {
     e.preventDefault();
     const code = residentCode.trim().toUpperCase();
     if (code.length !== 10) {
-      toast({ title: "Invalid Code", description: "Company code must be 10 characters", variant: "destructive" });
+      toast({ title: t('residentPortal.linkCode.invalidCode', 'Invalid Code'), description: t('residentPortal.linkCode.codeLength', 'Company code must be 10 characters'), variant: "destructive" });
       return;
     }
     linkCodeMutation.mutate(code);
@@ -1893,20 +1895,20 @@ function LinkCompanyCodeCard() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <span className="material-icons text-primary">link</span>
-          Link Your Account
+          {t('residentPortal.linkCode.title', 'Link Your Account')}
         </CardTitle>
         <CardDescription>
-          Enter the code provided by your building maintenance staff to link your account and view ongoing projects
+          {t('residentPortal.linkCode.description', 'Enter the code provided by your building maintenance staff to link your account and view ongoing projects')}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="text-sm font-medium mb-2 block">Company Code</label>
+            <label className="text-sm font-medium mb-2 block">{t('residentPortal.linkCode.companyCode', 'Company Code')}</label>
             <Input
               value={residentCode}
               onChange={(e) => setResidentCode(e.target.value.toUpperCase())}
-              placeholder="Enter 10-character code"
+              placeholder={t('residentPortal.linkCode.placeholder', 'Enter 10-character code')}
               maxLength={10}
               className="h-12 text-lg font-mono"
               data-testid="input-resident-code"
@@ -1918,7 +1920,7 @@ function LinkCompanyCodeCard() {
             disabled={linkCodeMutation.isPending || residentCode.length !== 10}
             data-testid="button-link-code"
           >
-            {linkCodeMutation.isPending ? "Linking..." : "Link Account"}
+            {linkCodeMutation.isPending ? t('residentPortal.linkCode.linking', 'Linking...') : t('residentPortal.linkCode.linkAccount', 'Link Account')}
           </Button>
         </form>
       </CardContent>
@@ -1928,6 +1930,7 @@ function LinkCompanyCodeCard() {
 
 // Component showing linked company
 function CompanyLinkedCard({ companyId }: { companyId: string }) {
+  const { t } = useTranslation();
   const { data: companyData } = useQuery({
     queryKey: ["/api/companies", companyId],
     enabled: !!companyId,
@@ -1943,7 +1946,7 @@ function CompanyLinkedCard({ companyId }: { companyId: string }) {
             <span className="material-icons text-success text-2xl">check_circle</span>
           </div>
           <div className="flex-1">
-            <p className="text-sm text-muted-foreground">Linked to</p>
+            <p className="text-sm text-muted-foreground">{t('residentPortal.linkedCompany.linkedTo', 'Linked to')}</p>
             <p className="text-lg font-semibold">{companyData.company.companyName}</p>
           </div>
         </div>

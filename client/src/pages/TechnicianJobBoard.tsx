@@ -45,6 +45,7 @@ import type { JobPosting, User, JobApplication } from "@shared/schema";
 
 type ApplicationWithJob = JobApplication & { jobPosting: JobPosting };
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
+import { LanguageDropdown } from "@/components/LanguageDropdown";
 
 type Language = 'en' | 'fr';
 
@@ -634,18 +635,7 @@ export default function TechnicianJobBoard() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                const newLang = language === "en" ? "fr" : "en";
-                setLanguage(newLang);
-                localStorage.setItem("techPortalLanguage", newLang);
-              }}
-              data-testid="button-toggle-language"
-            >
-              {language === "en" ? "FR" : "EN"}
-            </Button>
+            <LanguageDropdown />
             <Button
               variant="outline"
               size="sm"

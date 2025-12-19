@@ -117,6 +117,7 @@ import {
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import { QuizSection } from "@/components/QuizSection";
 import { TechnicianDocumentRequests } from "@/components/TechnicianDocumentRequests";
+import { LanguageDropdown } from "@/components/LanguageDropdown";
 
 type Language = 'en' | 'fr';
 
@@ -1954,16 +1955,7 @@ export default function TechnicianPortal() {
                 <span className="hidden sm:inline">{language === 'en' ? 'Dashboard' : 'Tableau de bord'}</span>
               </Button>
             )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={toggleLanguage}
-              className="gap-1.5"
-              data-testid="button-toggle-language"
-            >
-              <Languages className="w-4 h-4" />
-              {language === 'en' ? 'FR' : 'EN'}
-            </Button>
+            <LanguageDropdown />
             <Button
               variant="outline"
               size="sm"

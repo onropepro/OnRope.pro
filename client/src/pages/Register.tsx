@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import { ArrowLeft, AlertTriangle } from "lucide-react";
 import { Link } from "wouter";
+import { LanguageDropdown } from "@/components/LanguageDropdown";
 
 const residentSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -309,19 +310,12 @@ export default function Register() {
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             </Link>
-            <Button 
-              variant="ghost"
-              size="sm"
-              onClick={toggleLandingLanguage}
-              data-testid="button-language-toggle"
-            >
-              {landingLanguage === 'en' ? 'FR' : 'EN'}
-            </Button>
+            <LanguageDropdown />
           </div>
           <CardTitle className="text-2xl font-bold text-center">{t('register.title', 'Create Account')}</CardTitle>
           <CardDescription className="text-center">{t('register.subtitle', 'Choose your account type to get started')}</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent key={i18n.language}>
           <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "resident" | "property_manager")}>
             <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="resident" data-testid="tab-resident">{t('register.tabs.resident', 'Resident')}</TabsTrigger>

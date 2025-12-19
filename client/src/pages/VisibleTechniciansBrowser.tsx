@@ -39,6 +39,7 @@ import {
 import { format, differenceInYears } from "date-fns";
 import type { User as UserType } from "@shared/schema";
 import { JOB_TYPES } from "@shared/jobTypes";
+import { LanguageDropdown } from "@/components/LanguageDropdown";
 
 type Language = 'en' | 'fr';
 
@@ -339,18 +340,7 @@ export default function VisibleTechniciansBrowser() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                const newLang = language === "en" ? "fr" : "en";
-                setLanguage(newLang);
-                localStorage.setItem("dashboardLanguage", newLang);
-              }}
-              data-testid="button-toggle-language"
-            >
-              {language === "en" ? "FR" : "EN"}
-            </Button>
+            <LanguageDropdown />
             <Button
               variant="outline"
               size="sm"
