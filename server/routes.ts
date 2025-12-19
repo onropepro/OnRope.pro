@@ -4235,16 +4235,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Unauthorized: This vendor link does not belong to you" });
       }
       
-      // SECURITY: Require strata number to prevent cross-building data leaks
-      if (!ownedLink.strataNumber) {
-        return res.status(400).json({ message: "Strata number required. Please set your strata/building number first." });
-      }
-      
-      // Get project details with complaints - enforces strata filtering
+      // Get project details - PM can view any project from connected vendor
       const details = await storage.getPropertyManagerProjectDetails(
         projectId, 
-        ownedLink.companyId,
-        ownedLink.strataNumber // Pass normalized strata for dual-filter security
+        ownedLink.companyId
       );
       
       res.json(details);
@@ -8927,16 +8921,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Unauthorized: This vendor link does not belong to you" });
       }
       
-      // SECURITY: Require strata number to prevent cross-building data leaks
-      if (!ownedLink.strataNumber) {
-        return res.status(400).json({ message: "Strata number required. Please set your strata/building number first." });
-      }
-      
       // Get project to verify access
       const projectDetails = await storage.getPropertyManagerProjectDetails(
         projectId, 
-        ownedLink.companyId,
-        ownedLink.strataNumber
+        ownedLink.companyId
       );
       
       if (!projectDetails.project.strataPlanNumber) {
@@ -9002,16 +8990,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Unauthorized: This vendor link does not belong to you" });
       }
       
-      // SECURITY: Require strata number to prevent cross-building data leaks
-      if (!ownedLink.strataNumber) {
-        return res.status(400).json({ message: "Strata number required. Please set your strata/building number first." });
-      }
-      
       // Get project to verify access and get company info
       const projectDetails = await storage.getPropertyManagerProjectDetails(
         projectId, 
-        ownedLink.companyId,
-        ownedLink.strataNumber
+        ownedLink.companyId
       );
       
       // Upload file to object storage
