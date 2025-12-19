@@ -9913,7 +9913,7 @@
     "year": "ano",
     "hour": "hr",
     "goToWorkDashboard": "Ir al Panel de Trabajo",
-    "accessProjects": "Accede a proyectos, entrada/salida y formularios de seguridad",
+    "accessProjects": "Accede a proyectos, entrada/salida y formularios de seguridad. Debe estar vinculado a una empresa.",
     "dashboardDisabledNoCompany": "Necesitas estar vinculado con una empresa para acceder al Panel de Trabajo. Acepta una invitacion abajo para comenzar.",
     "dashboardDisabledTerminated": "Tu empleo ha sido terminado. Acepta una nueva invitacion para acceder al Panel de Trabajo.",
     "selectEmployer": "Seleccionar Empleador",

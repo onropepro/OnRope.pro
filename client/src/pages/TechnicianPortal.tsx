@@ -299,7 +299,7 @@ const translations = {
     year: "year",
     hour: "hr",
     goToWorkDashboard: "Go to Work Dashboard",
-    accessProjects: "Access projects, clock in/out, and safety forms",
+    accessProjects: "Access projects, clock in/out, and safety forms. Must be linked to a company.",
     dashboardDisabledNoCompany: "You need to be linked with a company to access the Work Dashboard. Accept an invitation below to get started.",
     dashboardDisabledTerminated: "Your employment has been terminated. Accept a new invitation to access the Work Dashboard.",
     selectEmployer: "Select Employer",

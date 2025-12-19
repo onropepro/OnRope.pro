@@ -10271,7 +10271,7 @@
     "year": "an",
     "hour": "h",
     "goToWorkDashboard": "Accéder au tableau de bord",
-    "accessProjects": "Accéder aux projets, pointage et formulaires de sécurité",
+    "accessProjects": "Accéder aux projets, pointage et formulaires de sécurité. Doit être lié à une entreprise.",
     "dashboardDisabledNoCompany": "Vous devez être lié à une entreprise pour accéder au tableau de bord. Acceptez une invitation ci-dessous pour commencer.",
     "dashboardDisabledTerminated": "Votre emploi a été résilié. Acceptez une nouvelle invitation pour accéder au tableau de bord.",
     "selectEmployer": "Sélectionner l",
