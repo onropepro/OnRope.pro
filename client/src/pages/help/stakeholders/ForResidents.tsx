@@ -59,7 +59,7 @@ export default function ForResidents() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="relative text-white pb-[120px]" style={{backgroundImage: 'linear-gradient(135deg, #F43F5E 0%, #E11D48 100%)'}}>
+      <div className="relative text-white pb-[120px]" style={{backgroundImage: 'linear-gradient(135deg, #86A59C 0%, #6B8A80 100%)'}}>
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIwOS0xLjc5MS00LTQtNHMtNCAxLjc5MS00IDQgMS43OTEgNCA0IDQgNC0xLjc5MSA0LTR6bTAtMThjMC0yLjIwOS0xLjc5MS00LTQtNHMtNCAxLjc5MS00IDQgMS43OTEgNCA0IDQgNC0xLjc5MSA0LTR6bTE4IDBjMC0yLjIwOS0xLjc5MS00LTQtNHMtNCAxLjc5MS00IDQgMS43OTEgNCA0IDQgNC0xLjc5MSA0LTR6bS0xOCAxOGMwLTIuMjA5LTEuNzkxLTQtNC00cy00IDEuNzkxLTQgNCAxLjc5MSA0IDQgNCA0LTEuNzkxIDQtNHptMTggMGMwLTIuMjA5LTEuNzkxLTQtNC00cy00IDEuNzkxLTQgNCAxLjc5MSA0IDQgNCA0LTEuNzkxIDQtNHptMC0xOGMwLTIuMjA5LTEuNzkxLTQtNC00cy00IDEuNzkxLTQgNCAxLjc5MSA0IDQgNCA0LTEuNzkxIDQtNHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-30"></div>
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
           <div className="flex items-center gap-4 mb-6 flex-wrap">
@@ -79,7 +79,7 @@ export default function ForResidents() {
               <h1 className="text-4xl font-bold tracking-tight" data-testid="text-stakeholder-title">
                 For Residents
               </h1>
-              <p className="text-xl text-rose-100">
+              <p className="text-xl text-white/80">
                 Submit feedback and track issues at your building
               </p>
             </div>
@@ -99,7 +99,7 @@ export default function ForResidents() {
             {keyFeatures.map((feature, index) => (
               <Card key={index}>
                 <CardHeader className="flex flex-col gap-3">
-                  <div className="w-10 h-10 bg-rose-100 dark:bg-rose-900/30 rounded-lg flex items-center justify-center text-rose-600 dark:text-rose-400">
+                  <div className="w-10 h-10 bg-[#86A59C]/20 dark:bg-[#86A59C]/30 rounded-lg flex items-center justify-center text-[#86A59C]">
                     <feature.icon className="h-5 w-5" />
                   </div>
                   <div>
@@ -142,29 +142,29 @@ export default function ForResidents() {
           )}
         </section>
         
-        <section className="bg-rose-50 dark:bg-rose-900/20 rounded-lg p-8">
+        <section className="bg-[#86A59C]/10 dark:bg-[#86A59C]/20 rounded-lg p-8">
           <h2 className="text-xl font-semibold mb-4">Getting Started as a Resident</h2>
           <div className="space-y-3">
             <div className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-full bg-rose-600 text-white flex items-center justify-center text-sm shrink-0">1</div>
+              <div className="w-6 h-6 rounded-full bg-[#86A59C] text-white flex items-center justify-center text-sm shrink-0">1</div>
               <p>Get your building access code from your property manager or strata council</p>
             </div>
             <div className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-full bg-rose-600 text-white flex items-center justify-center text-sm shrink-0">2</div>
+              <div className="w-6 h-6 rounded-full bg-[#86A59C] text-white flex items-center justify-center text-sm shrink-0">2</div>
               <p>Visit the Resident Portal and enter your vendor code and building number</p>
             </div>
             <div className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-full bg-rose-600 text-white flex items-center justify-center text-sm shrink-0">3</div>
+              <div className="w-6 h-6 rounded-full bg-[#86A59C] text-white flex items-center justify-center text-sm shrink-0">3</div>
               <p>Submit feedback about work quality or issues with photos</p>
             </div>
             <div className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-full bg-rose-600 text-white flex items-center justify-center text-sm shrink-0">4</div>
+              <div className="w-6 h-6 rounded-full bg-[#86A59C] text-white flex items-center justify-center text-sm shrink-0">4</div>
               <p>Track your submission status and receive responses from the vendor</p>
             </div>
           </div>
           <div className="mt-6">
             <Link href="/help/modules/resident-portal">
-              <Button className="bg-rose-600" data-testid="button-learn-resident-portal">Learn More About Resident Portal</Button>
+              <Button className="bg-[#86A59C] hover:bg-[#6B8A80]" data-testid="button-learn-resident-portal">Learn More About Resident Portal</Button>
             </Link>
           </div>
         </section>
