@@ -252,29 +252,31 @@ export default function ResidentLanding() {
                     <CardContent className="p-6">
                       {!showForgotPassword ? (
                         <form onSubmit={handleSignIn} className="space-y-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="signin-email" className="text-sm font-medium text-foreground">Email Address</Label>
-                            <Input
-                              id="signin-email"
-                              type="email"
-                              placeholder="you@example.com"
-                              value={signInEmail}
-                              onChange={(e) => setSignInEmail(e.target.value)}
-                              required
-                              data-testid="input-signin-email"
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="signin-password" className="text-sm font-medium text-foreground">Password</Label>
-                            <Input
-                              id="signin-password"
-                              type="password"
-                              placeholder="Your password"
-                              value={signInPassword}
-                              onChange={(e) => setSignInPassword(e.target.value)}
-                              required
-                              data-testid="input-signin-password"
-                            />
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-2">
+                              <Label htmlFor="signin-email" className="text-sm font-medium text-foreground">Email Address</Label>
+                              <Input
+                                id="signin-email"
+                                type="email"
+                                placeholder="you@example.com"
+                                value={signInEmail}
+                                onChange={(e) => setSignInEmail(e.target.value)}
+                                required
+                                data-testid="input-signin-email"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="signin-password" className="text-sm font-medium text-foreground">Password</Label>
+                              <Input
+                                id="signin-password"
+                                type="password"
+                                placeholder="Your password"
+                                value={signInPassword}
+                                onChange={(e) => setSignInPassword(e.target.value)}
+                                required
+                                data-testid="input-signin-password"
+                              />
+                            </div>
                           </div>
                           
                           {signInError && (
