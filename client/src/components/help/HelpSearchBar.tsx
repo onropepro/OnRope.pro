@@ -368,7 +368,7 @@ export default function HelpSearchBar({
                   )}
                   data-testid={`chat-message-${message.role}-${message.id}`}
                 >
-                  <p className="text-sm whitespace-pre-wrap text-foreground">{message.content}</p>
+                  <p className="text-sm whitespace-pre-wrap text-foreground text-left">{message.content}</p>
                   
                   {message.sources && message.sources.length > 0 && (
                     <div className="mt-3 pt-3 border-t border-border/30">
