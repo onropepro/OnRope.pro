@@ -54,7 +54,7 @@ export function LanguageDropdown({
           <ChevronDown className="w-3 h-3 ml-1" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="z-[200]" sideOffset={5}>
         <DropdownMenuItem 
           onClick={() => changeLanguage('en')}
           className={currentLanguage === 'en' ? 'bg-accent' : ''}
