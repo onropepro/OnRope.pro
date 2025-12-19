@@ -29,9 +29,9 @@ import {
   FolderOpen,
   MessageSquare,
   Shield,
-  Globe
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
+import { LanguageDropdown } from "@/components/LanguageDropdown";
 
 type TimeTrackingOption = 'paper' | 'excel' | 'software' | 'none';
 type ProjectManagementOption = 'whiteboard' | 'excel' | 'software' | 'texts';
@@ -764,16 +764,7 @@ export default function ROICalculator() {
           <img src={onRopeProLogo} alt="OnRopePro" className="h-16 object-contain" />
         </div>
         <div className="flex items-center gap-3">
-          <Button 
-            variant="ghost"
-            size="sm"
-            onClick={toggleLandingLanguage}
-            className="gap-1.5"
-            data-testid="button-language-toggle"
-          >
-            <Globe className="w-4 h-4" />
-            {landingLanguage === 'en' ? 'FR' : 'EN'}
-          </Button>
+          <LanguageDropdown />
           <Button variant="ghost" onClick={() => setLocation("/")} data-testid="button-back-home">
             <ArrowLeft className="w-4 h-4 mr-2" />
             {t('roi.header.backToHome')}

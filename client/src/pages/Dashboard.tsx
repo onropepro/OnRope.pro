@@ -69,6 +69,7 @@ import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { ProgressPromptDialog } from "@/components/ProgressPromptDialog";
 import { BusinessCardScanner } from "@/components/BusinessCardScanner";
 import { DoubleBookingWarningDialog } from "@/components/DoubleBookingWarningDialog";
+import { LanguageDropdown } from "@/components/LanguageDropdown";
 
 import { JOB_CATEGORIES, JOB_TYPES, getJobTypesByCategory, getJobTypeConfig, getDefaultElevation, isElevationConfigurable, isDropBasedJobType, getAllJobTypeValues, getProgressType, getCategoryForJobType, type JobCategory } from "@shared/jobTypes";
 
@@ -3676,14 +3677,7 @@ export default function Dashboard() {
             )}
             <CSRBadge user={currentUser} />
             {/* Language Toggle Button */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => changeLanguage(currentLanguage === 'en' ? 'fr' : 'en')}
-              data-testid="button-language-toggle"
-            >
-              <span className="text-xs font-medium">{currentLanguage === 'en' ? 'FR' : 'EN'}</span>
-            </Button>
+            <LanguageDropdown />
             <RefreshButton />
             <Button variant="ghost" size="icon" data-testid="button-logout" onClick={() => setShowLogoutDialog(true)}>
               <span className="material-icons text-xl sm:text-2xl">logout</span>
