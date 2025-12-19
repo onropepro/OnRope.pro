@@ -40,7 +40,7 @@ import {
 import { format } from "date-fns";
 import type { TechnicianDocumentRequest, TechnicianDocumentRequestFile } from "@shared/schema";
 
-type Language = 'en' | 'fr';
+type Language = 'en' | 'fr' | 'es';
 
 interface DocumentRequestWithDetails extends TechnicianDocumentRequest {
   files: TechnicianDocumentRequestFile[];
@@ -123,6 +123,40 @@ const translations = {
     viewDetails: "Voir les details",
     noFilesYet: "Aucun fichier telecharge",
     yourResponse: "Votre reponse",
+  },
+  es: {
+    title: "Solicitudes de Documentos",
+    subtitle: "Documentos solicitados por tus empleadores",
+    noRequests: "Sin solicitudes de documentos",
+    noRequestsDesc: "No tienes solicitudes de documentos pendientes de empleadores.",
+    pending: "Pendiente",
+    fulfilled: "Completado",
+    cancelled: "Cancelado",
+    requestedBy: "Solicitado por",
+    requestedOn: "Solicitado el",
+    details: "Detalles",
+    uploadFiles: "Subir Archivos",
+    uploadedFiles: "Archivos Subidos",
+    responseNote: "Nota de Respuesta (Opcional)",
+    responseNotePlaceholder: "Agrega notas para el empleador sobre estos documentos...",
+    submitResponse: "Enviar Respuesta",
+    submitting: "Enviando...",
+    dropFilesHere: "Arrastra archivos aqui o haz clic para buscar",
+    supportedFormats: "PDF, imagenes, documentos hasta 25MB cada uno",
+    removeFile: "Eliminar archivo",
+    downloadFile: "Descargar archivo",
+    filesUploaded: "archivos subidos",
+    respondedOn: "Respondido el",
+    markAsFulfilled: "Marcar como Completado",
+    atLeastOneFile: "Por favor sube al menos un archivo",
+    uploadSuccess: "Archivos subidos exitosamente",
+    fulfillSuccess: "Solicitud de documento completada",
+    uploadError: "Error al subir archivos",
+    fulfillError: "Error al enviar respuesta",
+    loading: "Cargando solicitudes de documentos...",
+    viewDetails: "Ver Detalles",
+    noFilesYet: "Aun no hay archivos subidos",
+    yourResponse: "Tu Respuesta",
   }
 };
 
@@ -141,7 +175,7 @@ function formatFileSize(bytes: number): string {
 
 export function TechnicianDocumentRequests({ language = 'en' }: TechnicianDocumentRequestsProps) {
   const { toast } = useToast();
-  const t = translations[language];
+  const t = translations[language] || translations.en;
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [selectedRequest, setSelectedRequest] = useState<DocumentRequestWithDetails | null>(null);
