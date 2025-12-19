@@ -41,7 +41,8 @@
     },
     "roiCalculator": {
       "badge": "Evaluacion de 60 Segundos",
-      "title": "Calcula Tus Costos Ocultos en Menos de 60 Segundos",
+      "title": "Calcula Tus Costos Ocultos",
+      "titleLine2": "En Menos de 60 Segundos",
       "subtitle": "La mayoria de las empresas de acceso con cuerdas desperdician $15,000-25,000 por ano en herramientas SAAS dispersas, procesos manuales, costos administrativos ocultos y tiempo perdido. Descubre cuanto podrias ahorrar.",
       "cta": "Calcular Mis Ahorros"
     },
