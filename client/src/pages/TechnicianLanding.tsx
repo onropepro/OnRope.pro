@@ -373,6 +373,7 @@ export default function TechnicianLanding() {
                   <p>Safety documents pushed to you automatically—sign once, done</p>
                   <p>Harness inspections tracked and credited to your safety rating</p>
                   <p>New employer onboarding = <strong className="text-foreground">10 seconds, not 60 minutes</strong></p>
+                  <p>If employer adds a new safety procedure, you sign it before accessing your dashboard—automatic compliance</p>
                 </div>
               </CardContent>
             </Card>
