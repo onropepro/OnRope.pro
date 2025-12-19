@@ -4080,6 +4080,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/property-managers/me/buildings-map", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
     try {
       const buildings = await storage.getPropertyManagerBuildingsForMap(req.session.userId!);
+      console.log("[DEBUG Map] Buildings returned:", buildings.map(b => ({
+        name: b.buildingName,
+        lat: b.latitude,
+        lng: b.longitude,
+        hasCoords: !!(b.latitude && b.longitude)
+      })));
       res.json({ buildings });
     } catch (error) {
       console.error("Get property manager buildings for map error:", error);
