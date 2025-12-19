@@ -967,13 +967,29 @@ export default function TechnicianLanding() {
               <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-2">
                 What if my employer doesn't use OnRopePro?
               </AccordionTrigger>
-              <AccordionContent className="text-base text-muted-foreground pb-4">
-                Your account still works. You can store certifications, track your career history manually, and access the job board (PLUS). Automatic hour tracking kicks in when your employer joins the platform.
+              <AccordionContent className="text-base text-muted-foreground pb-4 space-y-3">
+                <p>Your account still works. You can:</p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li>Store certifications and profile data</li>
+                  <li>Import your existing logbook via photo</li>
+                  <li>Log hours manually</li>
+                  <li>Access the job board (PLUS)</li>
+                </ul>
+                <p>What you won't get is automatic hour tracking—that only works when your employer is also on the platform. But here's the thing: when your employer joins, your account instantly upgrades. All that manual logging becomes automatic. Tell your boss.</p>
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="faq-3" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
               <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-3">
+                How do I import my existing logbook?
+              </AccordionTrigger>
+              <AccordionContent className="text-base text-muted-foreground pb-4">
+                Open the app, photograph your logbook pages, and the app reads your handwriting and extracts the data. Review, confirm, done. Years of historical hours imported in minutes—no manual data entry.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="faq-4" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
+              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-4">
                 Does this replace my IRATA/SPRAT logbook?
               </AccordionTrigger>
               <AccordionContent className="text-base text-muted-foreground pb-4">
@@ -981,8 +997,18 @@ export default function TechnicianLanding() {
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="faq-4" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
-              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-4">
+            <AccordionItem value="faq-5" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
+              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-5">
+                What's the difference between automatic and manual logging?
+              </AccordionTrigger>
+              <AccordionContent className="text-base text-muted-foreground pb-4 space-y-3">
+                <p><strong className="text-foreground">Manual logging:</strong> You enter hours, buildings, and tasks yourself (or photograph your logbook to import). Works anytime, with or without an employer on the platform.</p>
+                <p><strong className="text-foreground">Automatic logging:</strong> When your employer uses OnRopePro, your hours log automatically when you clock in/out. Building, height, tasks, duration—all captured without you entering anything. This is the real time-saver.</p>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="faq-6" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
+              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-6">
                 What happens to my data if I leave a company?
               </AccordionTrigger>
               <AccordionContent className="text-base text-muted-foreground pb-4">
@@ -990,8 +1016,8 @@ export default function TechnicianLanding() {
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="faq-5" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
-              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-5">
+            <AccordionItem value="faq-7" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
+              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-7">
                 How do I get PLUS?
               </AccordionTrigger>
               <AccordionContent className="text-base text-muted-foreground pb-4">
@@ -999,8 +1025,8 @@ export default function TechnicianLanding() {
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="faq-6" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
-              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-6">
+            <AccordionItem value="faq-8" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
+              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-8">
                 Is my data secure?
               </AccordionTrigger>
               <AccordionContent className="text-base text-muted-foreground pb-4">
@@ -1008,8 +1034,8 @@ export default function TechnicianLanding() {
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="faq-7" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
-              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-7">
+            <AccordionItem value="faq-9" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
+              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-9">
                 Can employers see that I'm looking for other work?
               </AccordionTrigger>
               <AccordionContent className="text-base text-muted-foreground pb-4">
