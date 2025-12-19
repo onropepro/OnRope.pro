@@ -772,140 +772,159 @@
     "accountCreated": "Your account has been created successfully"
   },
   "dashboard": {
-    "title": "Dashboard",
-    "welcome": "Welcome back",
-    "overview": "Overview",
-    "quickActions": "Quick Actions",
-    "recentActivity": "Recent Activity",
-    "activeProjects": "Active Projects",
-    "totalEmployees": "Total Employees",
-    "pendingTasks": "Pending Tasks",
-    "safetyCompliance": "Safety Compliance",
-    "hoursThisWeek": "Hours This Week",
-    "hoursToday": "Hours Today",
-    "clockedIn": "Clocked In",
-    "onSite": "On Site",
-    "offSite": "Off Site",
-    "projectProgress": "Project Progress",
-    "upcomingDeadlines": "Upcoming Deadlines",
-    "todaySchedule": "Today's Schedule",
-    "noActiveProjects": "No active projects",
-    "noUpcomingDeadlines": "No upcoming deadlines",
-    "noRecentActivity": "No recent activity",
-    "viewAllProjects": "View All Projects",
-    "viewAllEmployees": "View All Employees",
-    "createNewProject": "Create New Project",
-    "clockInNow": "Clock In Now",
-    "myLoggedHours": "My Logged Hours",
-    "harnessInspections": "Harness Inspections",
-    "toolboxMeetings": "Toolbox Meetings",
-    "incidentReports": "Incident Reports",
-    "flhaForms": "FLHA Forms",
-    "companySafetyRating": "Company Safety Rating",
-    "csrScore": "CSR Score",
-    "workSessionsToday": "Work Sessions Today",
-    "dropsToday": "Drops Today",
+    "title": "Panel",
+    "welcome": "Bienvenido de nuevo",
+    "overview": "Resumen",
+    "quickActions": "Acciones Rapidas",
+    "recentActivity": "Actividad Reciente",
+    "activeProjects": "Proyectos Activos",
+    "totalEmployees": "Total de Empleados",
+    "pendingTasks": "Tareas Pendientes",
+    "safetyCompliance": "Cumplimiento de Seguridad",
+    "hoursThisWeek": "Horas Esta Semana",
+    "hoursToday": "Horas Hoy",
+    "clockedIn": "Registrado",
+    "onSite": "En Sitio",
+    "offSite": "Fuera del Sitio",
+    "projectProgress": "Progreso del Proyecto",
+    "upcomingDeadlines": "Fechas Limite Proximas",
+    "todaySchedule": "Horario de Hoy",
+    "noActiveProjects": "Sin proyectos activos",
+    "noUpcomingDeadlines": "Sin fechas limite proximas",
+    "noRecentActivity": "Sin actividad reciente",
+    "viewAllProjects": "Ver Todos los Proyectos",
+    "viewAllEmployees": "Ver Todos los Empleados",
+    "createNewProject": "Crear Nuevo Proyecto",
+    "clockInNow": "Registrar Entrada Ahora",
+    "myLoggedHours": "Mis Horas Registradas",
+    "harnessInspections": "Inspecciones de Arnes",
+    "toolboxMeetings": "Reuniones de Seguridad",
+    "incidentReports": "Reportes de Incidentes",
+    "flhaForms": "Formularios FLHA",
+    "companySafetyRating": "Calificacion de Seguridad",
+    "csrScore": "Puntuacion CSR",
+    "workSessionsToday": "Sesiones de Trabajo Hoy",
+    "dropsToday": "Bajadas Hoy",
     "cards": {
       "projects": {
-        "label": "Projects",
-        "description": "Active projects"
+        "label": "Proyectos",
+        "description": "Proyectos activos"
       },
       "nonBillableHours": {
-        "label": "Non-Billable Hours",
-        "description": "Errands & training"
+        "label": "Horas No Facturables",
+        "description": "Mandados y capacitacion"
       },
       "myLoggedHours": {
-        "label": "My Logged Hours",
-        "description": "IRATA / SPRAT logbook"
+        "label": "Mis Horas Registradas",
+        "description": "Bitacora IRATA / SPRAT"
+      },
+      "myProfile": {
+        "label": "Mi Perfil",
+        "description": "Horas y certificaciones"
+      },
+      "myAccount": {
+        "label": "Mi Cuenta"
       },
       "pastProjects": {
-        "label": "Past Projects",
-        "description": "Completed work"
+        "label": "Proyectos Anteriores",
+        "description": "Trabajo completado"
       },
       "employees": {
-        "label": "Employees",
-        "description": "Manage team"
+        "label": "Empleados",
+        "description": "Gestionar equipo"
+      },
+      "jobBoard": {
+        "label": "Bolsa de Trabajo",
+        "description": "Empleos y talento"
       },
       "clients": {
-        "label": "Clients",
-        "description": "Property managers"
+        "label": "Clientes",
+        "description": "Administradores de propiedades"
       },
       "performance": {
-        "label": "Performance",
-        "description": "View analytics"
+        "label": "Rendimiento",
+        "description": "Ver analiticas"
       },
       "activeWorkers": {
-        "label": "Active Workers",
-        "description": "Who's working"
+        "label": "Trabajadores Activos",
+        "description": "Quien esta trabajando"
       },
       "feedback": {
-        "label": "Feedback",
-        "description": "Resident feedback"
+        "label": "Comentarios",
+        "description": "Comentarios de residentes"
       },
       "inventory": {
-        "label": "Inventory & Inspections",
-        "description": "Gear & safety checks"
+        "label": "Inventario e Inspecciones",
+        "description": "Equipo y verificaciones"
       },
       "safetyForms": {
-        "label": "Safety Forms",
-        "description": "Safety meeting"
+        "label": "Formularios de Seguridad",
+        "description": "Reuniones de seguridad"
       },
       "payroll": {
-        "label": "Payroll",
-        "description": "Employee hours"
+        "label": "Nomina",
+        "description": "Horas de empleados"
       },
       "quotes": {
-        "label": "Quotes & CRM",
-        "description": "Service quotes"
+        "label": "Cotizaciones y CRM",
+        "description": "Cotizaciones de servicio"
       },
       "schedule": {
-        "label": "Job Schedule",
-        "description": "Team assignments"
+        "label": "Horario de Trabajo",
+        "description": "Asignaciones del equipo"
       },
       "documents": {
-        "label": "Documents and Training",
-        "description": "All company files"
+        "label": "Documentos y Capacitacion",
+        "description": "Archivos de la empresa"
       },
       "residents": {
-        "label": "Residents",
-        "description": "Building residents"
+        "label": "Residentes",
+        "description": "Residentes del edificio"
       }
     },
-    "backToDashboard": "Back to Dashboard",
-    "rearrangeCards": "Rearrange Cards",
-    "done": "Done",
-    "reset": "Reset",
-    "layoutReset": "Layout reset",
-    "layoutResetDesc": "Dashboard cards restored to default order",
+    "categories": {
+      "all": "Todos",
+      "operations": "Operaciones",
+      "safety": "Seguridad",
+      "financial": "Financiero",
+      "team": "Equipo",
+      "communication": "Comunicacion"
+    },
+    "backToDashboard": "Volver al Panel",
+    "rearrangeCards": "Reorganizar Tarjetas",
+    "done": "Listo",
+    "reset": "Restablecer",
+    "layoutReset": "Diseno restablecido",
+    "layoutResetDesc": "Tarjetas del panel restauradas al orden predeterminado",
     "deletedProjects": {
-      "title": "Deleted Projects",
-      "noDeleted": "No deleted projects",
-      "deleted": "Deleted",
-      "restore": "Restore",
-      "restored": "Project restored successfully",
-      "restoreFailed": "Failed to restore project"
+      "title": "Proyectos Eliminados",
+      "noDeleted": "Sin proyectos eliminados",
+      "deleted": "Eliminado",
+      "restore": "Restaurar",
+      "restored": "Proyecto restaurado exitosamente",
+      "restoreFailed": "Error al restaurar proyecto"
     },
     "projectInfo": {
-      "title": "Projects",
-      "used": "{{used}} of {{total}} used",
-      "remaining": "{{count}} {{plural}} remaining",
-      "projectsRemaining_one": "project",
-      "projectsRemaining_other": "projects",
-      "unlimited": "Unlimited available",
-      "manageCapacity": "Manage your project capacity",
-      "limitReached": "Project Limit Reached",
-      "limitReachedDesc": "You've reached your {{limit}}-project limit. Visit Profile → Subscription to upgrade your tier or add more projects.",
-      "manageSubscription": "Manage Subscription"
+      "title": "Proyectos",
+      "used": "{{used}} de {{total}} usados",
+      "remaining": "{{count}} {{plural}} restantes",
+      "projectsRemaining_one": "proyecto",
+      "projectsRemaining_other": "proyectos",
+      "unlimited": "Ilimitados disponibles",
+      "manageCapacity": "Administra la capacidad de tus proyectos",
+      "limitReached": "Limite de Proyectos Alcanzado",
+      "limitReachedDesc": "Has alcanzado tu limite de {{limit}} proyectos. Visita Perfil → Suscripcion para mejorar tu plan o agregar mas proyectos.",
+      "manageSubscription": "Administrar Suscripcion"
     },
     "search": {
-      "placeholder": "Search by strata or job number..."
+      "placeholder": "Buscar por strata o numero de trabajo..."
     },
-    "newProject": "New Project",
-    "limitReachedButton": "Project Limit Reached",
+    "newProject": "Nuevo Proyecto",
+    "limitReachedButton": "Limite de Proyectos Alcanzado",
     "readOnlyMode": {
-      "title": "Read-Only Mode",
-      "description": "Your account is in read-only mode. Verify your license to create, edit, or delete data.",
-      "verifyLicense": "Verify License Key"
+      "title": "Modo Solo Lectura",
+      "description": "Tu cuenta esta en modo solo lectura. Verifica tu licencia para crear, editar o eliminar datos.",
+      "verifyLicense": "Verificar Clave de Licencia"
     },
     "createProject": {
       "title": "Create New Project",
