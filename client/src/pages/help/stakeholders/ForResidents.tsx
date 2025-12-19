@@ -15,7 +15,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import HelpArticleCard from '@/components/help/HelpArticleCard';
 import HelpChatWidget from '@/components/help/HelpChatWidget';
-import HelpSearchBar from '@/components/help/HelpSearchBar';
 
 interface HelpArticle {
   id: string;
@@ -88,12 +87,6 @@ export default function ForResidents() {
             </div>
           </div>
           
-          <div className="max-w-xl mt-6">
-            <HelpSearchBar 
-              size="large" 
-              placeholder="Ask a question about submitting feedback, tracking issues..."
-            />
-          </div>
         </div>
         <div className="absolute bottom-0 left-0 right-0 z-10 translate-y-[10px]">
           <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto block" preserveAspectRatio="none">
