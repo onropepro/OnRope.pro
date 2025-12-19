@@ -481,8 +481,12 @@ export default function ResidentDashboard() {
   const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
+      // Validate file type - check MIME type or file extension for HEIC/HEIF support
+      const fileName = file.name.toLowerCase();
+      const isHeicOrHeif = fileName.endsWith('.heic') || fileName.endsWith('.heif');
+      const isImage = file.type.startsWith('image/') || isHeicOrHeif;
+      
+      if (!isImage) {
         toast({ title: t('residentPortal.error.title', 'Error'), description: t('residentPortal.error.selectImage', 'Please select an image file'), variant: "destructive" });
         return;
       }
