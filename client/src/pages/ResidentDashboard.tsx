@@ -1897,7 +1897,7 @@ function LinkCompanyCodeCard() {
           {t('residentPortal.linkCode.title', 'Link Your Account')}
         </CardTitle>
         <CardDescription>
-          {t('residentPortal.linkCode.description', 'Enter the code provided by your building maintenance staff to link your account and view ongoing projects')}
+          {t('residentPortal.linkCode.description', "Enter your vendor's 10-character company code to connect. Your property manager or the maintenance company servicing your building can provide this. Once linked, you'll see real-time project progress, receive work notices, and submit feedback directly to your vendor.")}
         </CardDescription>
       </CardHeader>
       <CardContent>
