@@ -183,7 +183,8 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                 {t('navigation.employer', 'Employer')}
               </Button>
               {showModulesMenu && (
-                <div className="absolute top-full right-0 mt-1 bg-card border border-border rounded-xl shadow-xl p-4 w-[960px] z-50">
+                <div className="absolute top-full right-0 pt-2 z-50">
+                  <div className="bg-card border border-border rounded-xl shadow-xl p-4 w-[960px]">
                   <div className="flex gap-3">
                     {/* Column 1: Safety & Operations (4 items, Document Management at bottom) */}
                     <div className="flex-1 flex flex-col gap-2">
@@ -470,6 +471,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                       </button>
                     </div>
                   </div>
+                  </div>
                 </div>
               )}
             </div>
@@ -490,8 +492,9 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                 {t('navigation.technician', 'Technician')}
               </Button>
               {showTechnicianMenu && (
-                <div className="absolute top-full left-0 mt-1 bg-card border border-border rounded-xl shadow-xl p-4 w-[320px] z-50">
-                  <div className="space-y-3">
+                <div className="absolute top-full left-0 pt-2 z-50">
+                  <div className="bg-card border border-border rounded-xl shadow-xl p-4 w-[320px]">
+                    <div className="space-y-3">
                     <button
                       className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group w-full"
                       onClick={() => {
@@ -524,6 +527,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                         <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.technicianJobBoard.description', 'Browse jobs, apply instantly, control profile visibility')}</div>
                       </div>
                     </button>
+                    </div>
                   </div>
                 </div>
               )}
