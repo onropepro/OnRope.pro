@@ -38,7 +38,7 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
     if (allowedRoles && !allowedRoles.includes(user.role)) {
       console.log("⛔ User role not allowed, redirecting to appropriate dashboard");
       if (user.role === "resident") {
-        setLocation("/resident");
+        setLocation("/resident-dashboard");
       } else if (user.role === "superuser") {
         setLocation("/superuser");
       } else if (user.role === "property_manager") {

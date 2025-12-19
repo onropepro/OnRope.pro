@@ -138,7 +138,7 @@ export default function TechnicianLogin() {
           setLocation("/technician-portal");
         }
       } else if (userData.user.role === "resident") {
-        setLocation("/resident");
+        setLocation("/resident-dashboard");
       } else if (userData.user.role === "property_manager") {
         setLocation("/property-manager");
       } else if (userData.user.role === "superuser") {

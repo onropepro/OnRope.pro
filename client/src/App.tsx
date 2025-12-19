@@ -229,7 +229,7 @@ function Router() {
           <PersonalSafetyDocuments />
         </ProtectedRoute>
       </Route>
-      <Route path="/resident">
+      <Route path="/resident-dashboard">
         <ProtectedRoute allowedRoles={["resident"]}>
           <ResidentDashboard />
         </ProtectedRoute>

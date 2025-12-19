@@ -85,7 +85,7 @@ export default function Login() {
     if (userData?.user) {
       console.log("👤 Already logged in, redirecting...", userData.user.role);
       if (userData.user.role === "resident") {
-        setLocation("/resident");
+        setLocation("/resident-dashboard");
       } else if (userData.user.role === "property_manager") {
         setLocation("/property-manager");
       } else if (userData.user.role === "superuser") {
@@ -143,7 +143,7 @@ export default function Login() {
       // Use client-side navigation to preserve React state and cache
       if (user.role === "resident") {
         console.log("🏠 Redirecting to resident dashboard...");
-        setLocation("/resident");
+        setLocation("/resident-dashboard");
       } else if (user.role === "property_manager") {
         console.log("🏢 Redirecting to property manager dashboard...");
         setLocation("/property-manager");

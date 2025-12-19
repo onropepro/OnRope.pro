@@ -348,7 +348,7 @@ export default function SuperUser() {
                     });
                     const result = await response.json();
                     if (response.ok) {
-                      window.location.href = "/resident";
+                      window.location.href = "/resident-dashboard";
                     } else {
                       toast({ title: "Failed", description: result.message, variant: "destructive" });
                     }

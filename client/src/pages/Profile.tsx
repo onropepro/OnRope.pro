@@ -1079,7 +1079,7 @@ export default function Profile() {
 
   const handleBack = () => {
     if (user?.role === "resident") {
-      setLocation("/resident");
+      setLocation("/resident-dashboard");
     } else if (user?.role === "rope_access_tech") {
       setLocation("/tech");
     } else {
@@ -1111,7 +1111,7 @@ export default function Profile() {
         
         // Force full page reload to clear all caches
         setTimeout(() => {
-          window.location.href = "/resident";
+          window.location.href = "/resident-dashboard";
         }, 1500);
         return; // Prevent regular profile update from running
       } catch (error) {

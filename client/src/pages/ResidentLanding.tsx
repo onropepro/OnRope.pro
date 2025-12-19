@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,15 +23,34 @@ import {
   Building2,
   UserPlus,
   BookOpen,
+  X,
 } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
+import { motion, AnimatePresence } from "framer-motion";
 import { PublicHeader } from "@/components/PublicHeader";
+import { ResidentSlidingSignup } from "@/components/ResidentSlidingSignup";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 // Official Resident color from stakeholder palette
 const RESIDENT_COLOR = "#86A59C";
 
 export default function ResidentLanding() {
+  const [, setLocation] = useLocation();
+  const [showSignup, setShowSignup] = useState(false);
+  
+  // Check if user is already logged in as resident
+  const { data: userData } = useQuery<{ user: any }>({
+    queryKey: ["/api/user"],
+    retry: false,
+  });
+
+  useEffect(() => {
+    if (userData?.user?.role === "resident") {
+      setLocation("/resident-dashboard");
+    }
+  }, [userData, setLocation]);
+
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
       <PublicHeader />
@@ -56,19 +76,49 @@ export default function ResidentLanding() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" className="bg-white hover:bg-gray-50" style={{color: RESIDENT_COLOR}} asChild>
-                <Link href="/register" data-testid="button-create-account-hero">
-                  Create Your Account
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
+              <Button 
+                size="lg" 
+                className="bg-white hover:bg-gray-50" 
+                style={{color: RESIDENT_COLOR}} 
+                onClick={() => setShowSignup(!showSignup)}
+                data-testid="button-create-account-hero"
+              >
+                {showSignup ? (
+                  <>
+                    <X className="mr-2 w-5 h-5" />
+                    Close
+                  </>
+                ) : (
+                  <>
+                    Create Your Account
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </>
+                )}
               </Button>
-              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild>
-                <Link href="#how-it-works" data-testid="button-learn-how">
-                  Learn How It Works
-                  <BookOpen className="ml-2 w-5 h-5" />
-                </Link>
-              </Button>
+              {!showSignup && (
+                <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild>
+                  <Link href="#how-it-works" data-testid="button-learn-how">
+                    Learn How It Works
+                    <BookOpen className="ml-2 w-5 h-5" />
+                  </Link>
+                </Button>
+              )}
             </div>
+
+            {/* Sliding Signup Form */}
+            <AnimatePresence>
+              {showSignup && (
+                <motion.div
+                  initial={{ opacity: 0, y: -20, height: 0 }}
+                  animate={{ opacity: 1, y: 0, height: "auto" }}
+                  exit={{ opacity: 0, y: -20, height: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="max-w-md mx-auto pt-6"
+                >
+                  <ResidentSlidingSignup onClose={() => setShowSignup(false)} />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
         

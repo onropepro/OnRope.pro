@@ -97,7 +97,7 @@ export default function Register() {
     if (userData?.user) {
       console.log("👤 Already logged in, redirecting...", userData.user.role);
       if (userData.user.role === "resident") {
-        setLocation("/resident");
+        setLocation("/resident-dashboard");
       } else if (userData.user.role === "property_manager") {
         setLocation("/property-manager");
       } else if (userData.user.role === "superuser") {
@@ -190,7 +190,7 @@ export default function Register() {
       }
 
       // Redirect to resident dashboard
-      window.location.href = "/resident";
+      window.location.href = "/resident-dashboard";
     } catch (error) {
       residentForm.setError("email", { message: "An error occurred. Please try again." });
       setIsSubmitting(false);
