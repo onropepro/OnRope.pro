@@ -160,6 +160,22 @@
       "ownerDemo": "Demo Propietario",
       "residentDemo": "Demo Residente",
       "propertyManagerDemo": "Demo Administrador de Propiedades"
+    },
+    "buttons": {
+      "technicianLogin": "Inicio de Sesion Tecnico",
+      "buildingPortal": "Portal del Edificio",
+      "newToPlatform": "Nuevo en la plataforma?",
+      "getCompanyLicense": "Obtener Licencia de Empresa",
+      "residentManager": "Residente / Administrador",
+      "technician": "Tecnico"
+    },
+    "footer": {
+      "tagline": "Seguro, Profesional, Transparente"
+    },
+    "devTools": {
+      "show": "Mostrar",
+      "hide": "Ocultar",
+      "title": "Herramientas de Desarrollo"
     }
   },
   "register": {
