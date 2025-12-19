@@ -1675,6 +1675,183 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
+  // Forgot Password endpoint - generates reset token and sends email
+  app.post("/api/forgot-password", loginRateLimiter, async (req: Request, res: Response) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+      
+      // Find user by email
+      const user = await storage.getUserByEmail(email);
+      
+      // Always return success for security (don't reveal if email exists)
+      if (!user) {
+        console.log(`[Forgot-Password] No user found for email: ${email}`);
+        return res.json({ message: "If an account exists with that email, you will receive password reset instructions." });
+      }
+      
+      // Generate a secure random token
+      const crypto = await import('crypto');
+      const resetToken = crypto.randomBytes(32).toString('hex');
+      const resetExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour from now
+      
+      // Hash the token before storing (for security)
+      const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+      
+      // Store the hashed token and expiry in the database
+      await storage.updateUser(user.id, {
+        passwordResetToken: hashedToken,
+        passwordResetExpires: resetExpires,
+      });
+      
+      // Get the base URL for the reset link
+      const baseUrl = process.env.REPLIT_DEPLOYMENT_URL || process.env.REPL_SLUG 
+        ? `https://${process.env.REPLIT_DEPLOYMENT_URL || process.env.REPL_SLUG}.replit.app`
+        : 'http://localhost:5000';
+      
+      const resetLink = `${baseUrl}/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
+      
+      // Send email via Resend
+      try {
+        const resend = new Resend(process.env.RESEND_API_KEY);
+        
+        const { error } = await resend.emails.send({
+          from: 'OnRopePro <noreply@onropepro.com>',
+          to: email,
+          subject: 'Reset Your Password - OnRopePro',
+          html: `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; background-color: #f5f5f5;">
+  <table role="presentation" style="width: 100%; border-collapse: collapse;">
+    <tr>
+      <td align="center" style="padding: 40px 0;">
+        <table role="presentation" style="width: 100%; max-width: 600px; border-collapse: collapse; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+          <tr>
+            <td style="padding: 40px 40px 20px 40px; text-align: center;">
+              <h1 style="margin: 0; color: #1a1a1a; font-size: 24px; font-weight: 600;">Reset Your Password</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 0 40px 20px 40px;">
+              <p style="margin: 0 0 16px 0; color: #4a4a4a; font-size: 16px; line-height: 24px;">
+                Hi ${user.name || user.companyName || 'there'},
+              </p>
+              <p style="margin: 0 0 24px 0; color: #4a4a4a; font-size: 16px; line-height: 24px;">
+                We received a request to reset your password for your OnRopePro account. Click the button below to create a new password:
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 0 40px 24px 40px; text-align: center;">
+              <a href="${resetLink}" style="display: inline-block; padding: 14px 32px; background-color: #86A59C; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 600; border-radius: 6px;">Reset Password</a>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 0 40px 24px 40px;">
+              <p style="margin: 0 0 16px 0; color: #4a4a4a; font-size: 14px; line-height: 22px;">
+                This link will expire in <strong>1 hour</strong>. If you did not request a password reset, you can safely ignore this email.
+              </p>
+              <p style="margin: 0; color: #888888; font-size: 12px; line-height: 18px;">
+                If the button above does not work, copy and paste this link into your browser:<br>
+                <a href="${resetLink}" style="color: #86A59C; word-break: break-all;">${resetLink}</a>
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 24px 40px; border-top: 1px solid #eeeeee;">
+              <p style="margin: 0; color: #888888; font-size: 12px; text-align: center;">
+                OnRopePro - Rope Access Management Platform
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+          `,
+        });
+        
+        if (error) {
+          console.error('[Forgot-Password] Email send error:', error);
+        } else {
+          console.log(`[Forgot-Password] Reset email sent to: ${email}`);
+        }
+      } catch (emailError) {
+        console.error('[Forgot-Password] Failed to send email:', emailError);
+      }
+      
+      res.json({ message: "If an account exists with that email, you will receive password reset instructions." });
+    } catch (error) {
+      console.error("[Forgot-Password] Error:", error);
+      res.status(500).json({ message: "An error occurred. Please try again." });
+    }
+  });
+
+  // Reset Password endpoint - verifies token and updates password
+  app.post("/api/reset-password", loginRateLimiter, async (req: Request, res: Response) => {
+    try {
+      const { token, email, newPassword } = req.body;
+      
+      if (!token || !email || !newPassword) {
+        return res.status(400).json({ message: "Token, email, and new password are required" });
+      }
+      
+      // Validate password strength using existing validation function
+      const passwordValidation = validatePasswordStrength(newPassword);
+      if (!passwordValidation.valid) {
+        return res.status(400).json({ message: passwordValidation.message });
+      }
+      
+      // Find user by email
+      const user = await storage.getUserByEmail(email);
+      
+      if (!user) {
+        return res.status(400).json({ message: "Invalid or expired reset link" });
+      }
+      
+      // Hash the provided token to compare with stored hash
+      const crypto = await import('crypto');
+      const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+      
+      // Check if token matches and hasn't expired
+      if (user.passwordResetToken !== hashedToken) {
+        return res.status(400).json({ message: "Invalid or expired reset link" });
+      }
+      
+      if (!user.passwordResetExpires || new Date(user.passwordResetExpires) < new Date()) {
+        return res.status(400).json({ message: "Reset link has expired. Please request a new one." });
+      }
+      
+      // Hash the new password
+      const newPasswordHash = await bcrypt.hash(newPassword, 10);
+      
+      // Update user with new password and clear reset token
+      await storage.updateUser(user.id, {
+        passwordHash: newPasswordHash,
+        passwordResetToken: null,
+        passwordResetExpires: null,
+        isTempPassword: false,
+      });
+      
+      console.log(`[Reset-Password] Password reset successful for: ${email}`);
+      
+      res.json({ message: "Your password has been reset successfully. You can now sign in with your new password." });
+    } catch (error) {
+      console.error("[Reset-Password] Error:", error);
+      res.status(500).json({ message: "An error occurred. Please try again." });
+    }
+  });
+
   // IRATA License Verification endpoint (public - for technician registration)
   // SECURITY: Rate limited due to resource-intensive Playwright browser automation
   app.post("/api/verify-irata", irataVerificationRateLimiter, async (req: Request, res: Response) => {

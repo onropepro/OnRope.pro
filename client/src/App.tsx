@@ -93,6 +93,7 @@ import QuotingSalesLanding from "@/pages/QuotingSalesLanding";
 import WhiteLabelBrandingLanding from "@/pages/WhiteLabelBrandingLanding";
 import ResidentPortalLanding from "@/pages/ResidentPortalLanding";
 import ResidentLanding from "@/pages/ResidentLanding";
+import ResetPassword from "@/pages/ResetPassword";
 import PropertyManagerLanding from "@/pages/PropertyManagerLanding";
 import PropertyManagerInterfaceLanding from "@/pages/PropertyManagerInterfaceLanding";
 import TechnicianLanding from "@/pages/TechnicianLanding";
@@ -137,6 +138,7 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/employer" component={Employer} />
       <Route path="/resident" component={ResidentLanding} />
+      <Route path="/reset-password" component={ResetPassword} />
       <Route path="/property-manager" component={PropertyManagerLanding} />
       <Route path="/technician" component={TechnicianLanding} />
       <Route path="/pricing" component={GetLicense} />
