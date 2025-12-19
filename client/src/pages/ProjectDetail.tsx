@@ -3290,9 +3290,9 @@ export default function ProjectDetail() {
                   buildingHeight: formData.get('buildingHeight') || undefined,
                   startDate: formData.get('startDate') || undefined,
                   endDate: formData.get('endDate') || undefined,
-                  // Include coordinates from address autocomplete
-                  latitude: editAddressCoords.latitude,
-                  longitude: editAddressCoords.longitude,
+                  // Include coordinates from address autocomplete - convert to strings for drizzle numeric type
+                  latitude: editAddressCoords.latitude !== null ? String(editAddressCoords.latitude) : undefined,
+                  longitude: editAddressCoords.longitude !== null ? String(editAddressCoords.longitude) : undefined,
                 };
                 
                 // Add drop-based fields

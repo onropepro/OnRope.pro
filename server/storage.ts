@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, quoteHistory, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff, documentReviewSignatures, equipmentDamageReports, featureRequests, featureRequestMessages, churnEvents, buildings, buildingInstructions, normalizeStrataPlan, teamInvitations, historicalHours, technicianEmployerConnections, csrRatingHistory, documentQuizzes, quizAttempts, technicianDocumentRequests, technicianDocumentRequestFiles } from "@shared/schema";
-import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, QuoteHistory, InsertQuoteHistory, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff, DocumentReviewSignature, InsertDocumentReviewSignature, EquipmentDamageReport, InsertEquipmentDamageReport, FeatureRequest, InsertFeatureRequest, FeatureRequestMessage, InsertFeatureRequestMessage, FeatureRequestWithMessages, ChurnEvent, InsertChurnEvent, Building, InsertBuilding, BuildingInstructions, InsertBuildingInstructions, TeamInvitation, InsertTeamInvitation, HistoricalHours, InsertHistoricalHours, CsrRatingHistory, InsertCsrRatingHistory, DocumentQuiz, InsertDocumentQuiz, QuizAttempt, InsertQuizAttempt, TechnicianDocumentRequest, InsertTechnicianDocumentRequest, TechnicianDocumentRequestFile, InsertTechnicianDocumentRequestFile } from "@shared/schema";
+import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, quoteHistory, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff, documentReviewSignatures, equipmentDamageReports, featureRequests, featureRequestMessages, churnEvents, buildings, buildingInstructions, normalizeStrataPlan, teamInvitations, historicalHours, technicianEmployerConnections, csrRatingHistory, documentQuizzes, quizAttempts, technicianDocumentRequests, technicianDocumentRequestFiles, residentFeedbackPhotoQueue } from "@shared/schema";
+import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, QuoteHistory, InsertQuoteHistory, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff, DocumentReviewSignature, InsertDocumentReviewSignature, EquipmentDamageReport, InsertEquipmentDamageReport, FeatureRequest, InsertFeatureRequest, FeatureRequestMessage, InsertFeatureRequestMessage, FeatureRequestWithMessages, ChurnEvent, InsertChurnEvent, Building, InsertBuilding, BuildingInstructions, InsertBuildingInstructions, TeamInvitation, InsertTeamInvitation, HistoricalHours, InsertHistoricalHours, CsrRatingHistory, InsertCsrRatingHistory, DocumentQuiz, InsertDocumentQuiz, QuizAttempt, InsertQuizAttempt, TechnicianDocumentRequest, InsertTechnicianDocumentRequest, TechnicianDocumentRequestFile, InsertTechnicianDocumentRequestFile, ResidentFeedbackPhotoQueue, InsertResidentFeedbackPhotoQueue } from "@shared/schema";
 import { eq, and, or, desc, sql, isNull, isNotNull, not, gte, lte, between, inArray } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import { encryptSensitiveFields, decryptSensitiveFields } from "./encryption";
@@ -1032,6 +1032,115 @@ export class Storage {
       totalClosed: validCount,
       averageResolutionMs: validCount > 0 ? Math.round(totalResolutionMs / validCount) : null,
     };
+  }
+
+  // Photo queue operations for resilient photo uploads
+  async enqueueResidentPhoto(data: {
+    complaintId: string;
+    objectKey: string;
+    contentType: string;
+    fileSize: number;
+    payload: string; // base64 encoded
+  }): Promise<ResidentFeedbackPhotoQueue> {
+    const result = await db.insert(residentFeedbackPhotoQueue).values({
+      complaintId: data.complaintId,
+      objectKey: data.objectKey,
+      contentType: data.contentType,
+      fileSize: data.fileSize,
+      payload: data.payload,
+      status: "pending",
+      retryCount: 0,
+      maxRetries: 5,
+    }).returning();
+    return result[0];
+  }
+
+  async getPendingPhotoUploads(limit: number = 10): Promise<ResidentFeedbackPhotoQueue[]> {
+    const now = new Date();
+    return db.select().from(residentFeedbackPhotoQueue)
+      .where(and(
+        eq(residentFeedbackPhotoQueue.status, "pending"),
+        or(
+          isNull(residentFeedbackPhotoQueue.nextRetryAt),
+          lte(residentFeedbackPhotoQueue.nextRetryAt, now)
+        )
+      ))
+      .orderBy(residentFeedbackPhotoQueue.createdAt)
+      .limit(limit);
+  }
+
+  async markPhotoUploading(id: string): Promise<void> {
+    await db.update(residentFeedbackPhotoQueue)
+      .set({ 
+        status: "uploading", 
+        lastAttemptAt: new Date() 
+      })
+      .where(eq(residentFeedbackPhotoQueue.id, id));
+  }
+
+  async markPhotoUploaded(id: string, uploadedUrl: string): Promise<void> {
+    await db.update(residentFeedbackPhotoQueue)
+      .set({ 
+        status: "uploaded", 
+        uploadedUrl,
+        payload: "", // Clear the base64 data to save space
+      })
+      .where(eq(residentFeedbackPhotoQueue.id, id));
+  }
+
+  async markPhotoFailed(id: string, error: string): Promise<void> {
+    await db.update(residentFeedbackPhotoQueue)
+      .set({ 
+        status: "failed", 
+        lastError: error.substring(0, 1000), // Truncate error message
+      })
+      .where(eq(residentFeedbackPhotoQueue.id, id));
+  }
+
+  async incrementPhotoRetry(id: string, error: string): Promise<void> {
+    // Get current retry count
+    const [current] = await db.select()
+      .from(residentFeedbackPhotoQueue)
+      .where(eq(residentFeedbackPhotoQueue.id, id))
+      .limit(1);
+    
+    if (!current) return;
+    
+    const newRetryCount = current.retryCount + 1;
+    
+    // Calculate next retry with exponential backoff: 30s, 2m, 10m, 30m, 1h
+    const backoffSchedule = [30000, 120000, 600000, 1800000, 3600000]; // 30s, 2m, 10m, 30m, 1h
+    const backoffMs = backoffSchedule[Math.min(current.retryCount, backoffSchedule.length - 1)];
+    const nextRetryAt = new Date(Date.now() + backoffMs);
+    
+    // If max retries exceeded, mark as failed
+    if (newRetryCount >= current.maxRetries) {
+      await this.markPhotoFailed(id, error);
+      return;
+    }
+    
+    await db.update(residentFeedbackPhotoQueue)
+      .set({ 
+        status: "pending",
+        retryCount: newRetryCount,
+        lastError: error.substring(0, 1000),
+        nextRetryAt,
+      })
+      .where(eq(residentFeedbackPhotoQueue.id, id));
+  }
+
+  async getPhotoQueueStatus(complaintId: string): Promise<ResidentFeedbackPhotoQueue | undefined> {
+    const result = await db.select()
+      .from(residentFeedbackPhotoQueue)
+      .where(eq(residentFeedbackPhotoQueue.complaintId, complaintId))
+      .limit(1);
+    return result[0];
+  }
+
+  async updateComplaintPhotoUrl(complaintId: string, photoUrl: string): Promise<void> {
+    await db.update(complaints)
+      .set({ photoUrl, updatedAt: new Date() })
+      .where(eq(complaints.id, complaintId));
   }
 
   // Work session operations
@@ -3202,25 +3311,23 @@ export class Storage {
       vendorLogo: string | null;
     }> = [];
 
+    // Track which companies we've already processed to avoid duplicate projects
+    const processedCompanyIds = new Set<string>();
+    
     for (const link of links) {
-      if (!link.strataNumber) continue;
-      
-      const normalizedStrata = normalizeStrata(link.strataNumber);
-      if (!normalizedStrata) continue;
+      // Skip if we've already processed this company's projects
+      if (processedCompanyIds.has(link.companyId)) continue;
+      processedCompanyIds.add(link.companyId);
       
       const company = companies.find(c => c.id === link.companyId);
       if (!company) continue;
       
+      // Get ALL projects from this connected vendor (no strata filtering)
       const companyProjects = await db.select()
         .from(projects)
         .where(eq(projects.companyId, link.companyId));
       
-      const matchingProjects = companyProjects.filter(project => {
-        const projectStrata = normalizeStrata(project.strataPlanNumber);
-        return projectStrata !== null && projectStrata === normalizedStrata;
-      });
-      
-      for (const project of matchingProjects) {
+      for (const project of companyProjects) {
         // Safely convert date to ISO string
         const toISOString = (date: Date | string | null | undefined): string | null => {
           if (!date) return null;
@@ -3235,8 +3342,9 @@ export class Storage {
         let address = project.buildingAddress || '';
         
         // If project doesn't have coordinates, try to get them from the building record
-        if (!lat || !lng) {
-          const building = await this.getBuildingByStrata(normalizedStrata);
+        const projectStrata = normalizeStrata(project.strataPlanNumber);
+        if ((!lat || !lng) && projectStrata) {
+          const building = await this.getBuildingByStrata(projectStrata);
           if (building) {
             lat = building.latitude || lat;
             lng = building.longitude || lng;
@@ -3271,19 +3379,14 @@ export class Storage {
     return buildingsForMap;
   }
 
-  async getPropertyManagerProjectDetails(projectId: string, companyId: string, normalizedStrata: string): Promise<{ project: any; complaints: any[]; buildingInstructions: any | null }> {
-    // Strata number is required for security
-    if (!normalizedStrata || normalizedStrata.trim() === '') {
-      throw new Error('Strata number is required');
-    }
-    
+  async getPropertyManagerProjectDetails(projectId: string, companyId: string): Promise<{ project: any; complaints: any[]; buildingInstructions: any | null }> {
     // Normalize strata number helper function
     const normalizeStrata = (strata: string | null | undefined): string | null => {
       if (!strata || strata.trim() === '') return null;
       return strata.toUpperCase().replace(/\s+/g, '');
     };
     
-    // Verify project belongs to the company AND matches the strata number
+    // Verify project belongs to the connected vendor company
     const [project] = await db.select()
       .from(projects)
       .where(and(
@@ -3292,12 +3395,6 @@ export class Storage {
       ));
     
     if (!project) {
-      throw new Error('Project not found or access denied');
-    }
-    
-    // CRITICAL: Enforce strata filtering - prevent access to projects from other buildings
-    const projectStrata = normalizeStrata(project.strataPlanNumber);
-    if (projectStrata !== normalizedStrata) {
       throw new Error('Project not found or access denied');
     }
     

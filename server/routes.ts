@@ -21,6 +21,7 @@ import rateLimit from "express-rate-limit";
 import OpenAI from "openai";
 import { generateQuizFromDocument } from "./gemini";
 import helpRouter from "./routes/help";
+import { startPhotoUploadWorker, runBucketHealthCheck } from "./residentPhotoWorker";
 
 // SECURITY: Rate limiting for login endpoint to prevent brute force attacks
 const loginRateLimiter = rateLimit({
@@ -4234,16 +4235,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Unauthorized: This vendor link does not belong to you" });
       }
       
-      // SECURITY: Require strata number to prevent cross-building data leaks
-      if (!ownedLink.strataNumber) {
-        return res.status(400).json({ message: "Strata number required. Please set your strata/building number first." });
-      }
-      
-      // Get project details with complaints - enforces strata filtering
+      // Get project details - PM can view any project from connected vendor
       const details = await storage.getPropertyManagerProjectDetails(
         projectId, 
-        ownedLink.companyId,
-        ownedLink.strataNumber // Pass normalized strata for dual-filter security
+        ownedLink.companyId
       );
       
       res.json(details);
@@ -8921,16 +8916,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Unauthorized: This vendor link does not belong to you" });
       }
       
-      // SECURITY: Require strata number to prevent cross-building data leaks
-      if (!ownedLink.strataNumber) {
-        return res.status(400).json({ message: "Strata number required. Please set your strata/building number first." });
-      }
-      
       // Get project to verify access
       const projectDetails = await storage.getPropertyManagerProjectDetails(
         projectId, 
-        ownedLink.companyId,
-        ownedLink.strataNumber
+        ownedLink.companyId
       );
       
       if (!projectDetails.project.strataPlanNumber) {
@@ -8996,16 +8985,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Unauthorized: This vendor link does not belong to you" });
       }
       
-      // SECURITY: Require strata number to prevent cross-building data leaks
-      if (!ownedLink.strataNumber) {
-        return res.status(400).json({ message: "Strata number required. Please set your strata/building number first." });
-      }
-      
       // Get project to verify access and get company info
       const projectDetails = await storage.getPropertyManagerProjectDetails(
         projectId, 
-        ownedLink.companyId,
-        ownedLink.strataNumber
+        ownedLink.companyId
       );
       
       // Upload file to object storage
@@ -10156,7 +10139,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // If a clientId is provided, add the building to the client's lmsNumbers if not already present
       if (project.clientId && project.strataPlanNumber) {
         try {
-          const client = await storage.getClient(project.clientId);
+          const client = await storage.getClientById(project.clientId);
           if (client) {
             const normalizedStrata = normalizeStrataPlan(project.strataPlanNumber);
             const existingBuildings = client.lmsNumbers || [];
@@ -12992,7 +12975,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // ==================== COMPLAINT ROUTES ====================
   
-  // Create complaint (with optional photo upload)
+  // Create complaint (with optional photo upload via resilient queue)
   app.post("/api/complaints", requireAuth, imageUpload.single('photo'), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
@@ -13021,34 +13004,96 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Handle photo upload if provided
-      let photoUrl = null;
-      if (req.file) {
-        const objectStorageService = new ObjectStorageService();
-        const timestamp = Date.now();
-        const filename = `complaints/${companyId}/${timestamp}-${req.file.originalname}`;
-        photoUrl = await objectStorageService.uploadPublicFile(
-          filename,
-          req.file.buffer,
-          req.file.mimetype
-        );
-      }
-      
-      // Now validate with companyId resolved
+      // Create complaint first (without photo URL - will be updated async)
       const complaintData = insertComplaintSchema.parse({
         ...req.body,
         companyId,
-        photoUrl,
+        photoUrl: null, // Photo will be added asynchronously after queue processing
         residentId: currentUser?.role === "resident" ? currentUser.id : null,
       });
       
       const complaint = await storage.createComplaint(complaintData);
-      res.json({ complaint });
+      
+      // Queue photo upload asynchronously (never blocks complaint creation)
+      let photoStatus = null;
+      if (req.file) {
+        try {
+          const timestamp = Date.now();
+          const objectKey = `${companyId}/${timestamp}-${req.file.originalname}`;
+          const payload = req.file.buffer.toString("base64");
+          
+          await storage.enqueueResidentPhoto({
+            complaintId: complaint.id,
+            objectKey,
+            contentType: req.file.mimetype,
+            fileSize: req.file.size,
+            payload,
+          });
+          
+          photoStatus = "queued";
+          console.log(`[Complaints] Photo queued for complaint ${complaint.id}`);
+        } catch (queueError: any) {
+          // Even if queuing fails, complaint is already saved
+          console.error(`[Complaints] Failed to queue photo: ${queueError.message}`);
+          photoStatus = "queue_failed";
+        }
+      }
+      
+      res.json({ complaint, photoStatus });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Validation error", errors: error.errors });
       }
       console.error("Create complaint error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Get photo upload status for a complaint
+  app.get("/api/complaints/:id/photo-status", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const complaintId = req.params.id;
+      const queueEntry = await storage.getPhotoQueueStatus(complaintId);
+      
+      if (!queueEntry) {
+        // No photo was uploaded for this complaint
+        const complaint = await storage.getComplaintById(complaintId);
+        if (complaint?.photoUrl) {
+          return res.json({ status: "uploaded", photoUrl: complaint.photoUrl });
+        }
+        return res.json({ status: "none" });
+      }
+      
+      res.json({ 
+        status: queueEntry.status,
+        photoUrl: queueEntry.uploadedUrl || null,
+        retryCount: queueEntry.retryCount,
+        lastError: queueEntry.status === "failed" ? queueEntry.lastError : null,
+      });
+    } catch (error) {
+      console.error("Get photo status error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Serve resident photos from dedicated bucket
+  app.get("/api/resident-photos/:fileName", async (req: Request, res: Response) => {
+    try {
+      const objectStorageService = new ObjectStorageService();
+      const file = await objectStorageService.getResidentPhoto(req.params.fileName);
+      
+      if (!file) {
+        return res.status(404).json({ message: "Photo not found" });
+      }
+      
+      const [metadata] = await file.getMetadata();
+      res.setHeader("Content-Type", metadata.contentType || "image/jpeg");
+      res.setHeader("Cache-Control", "public, max-age=31536000");
+      
+      const stream = file.createReadStream();
+      stream.pipe(res);
+    } catch (error) {
+      console.error("Get resident photo error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
@@ -21490,5 +21535,15 @@ Do not include any other text, just the JSON object.`
   });
 
   const httpServer = createServer(app);
+  
+  // Start background workers
+  runBucketHealthCheck().then(healthy => {
+    if (healthy) {
+      startPhotoUploadWorker();
+    } else {
+      console.warn("[PhotoWorker] Worker not started - bucket health check failed. Photos will queue but not upload until bucket is accessible.");
+    }
+  });
+  
   return httpServer;
 }

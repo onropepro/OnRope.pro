@@ -34,6 +34,74 @@ export class ObjectNotFoundError extends Error {
 export class ObjectStorageService {
   constructor() {}
 
+  // Gets the resident photos bucket path (dedicated bucket for resident feedback photos)
+  getResidentPhotosBucket(): string {
+    const bucket = process.env.RESIDENT_PHOTOS_BUCKET || "";
+    if (!bucket) {
+      throw new Error(
+        "RESIDENT_PHOTOS_BUCKET not set. Create a bucket in 'App Storage' " +
+          "tool and set RESIDENT_PHOTOS_BUCKET env var."
+      );
+    }
+    return bucket;
+  }
+
+  // Check if resident photos bucket is accessible (health check)
+  async checkResidentPhotosBucketHealth(): Promise<{ ok: boolean; error?: string }> {
+    try {
+      const bucketPath = this.getResidentPhotosBucket();
+      const { bucketName } = parseObjectPath(bucketPath);
+      const bucket = objectStorageClient.bucket(bucketName);
+      
+      // Try to list files (limit 1) to verify access
+      await bucket.getFiles({ maxResults: 1 });
+      return { ok: true };
+    } catch (error: any) {
+      const errorMessage = error.message || "Unknown error";
+      console.error("[ObjectStorage] Resident photos bucket health check failed:", errorMessage);
+      return { ok: false, error: errorMessage };
+    }
+  }
+
+  // Upload a resident photo to the dedicated bucket
+  async uploadResidentPhoto(fileName: string, fileBuffer: Buffer, contentType: string): Promise<string> {
+    const bucketPath = this.getResidentPhotosBucket();
+    const fullPath = `${bucketPath}/${fileName}`;
+    
+    const { bucketName, objectName } = parseObjectPath(fullPath);
+    const bucket = objectStorageClient.bucket(bucketName);
+    const file = bucket.file(objectName);
+
+    // Upload the file (resumable: false for better performance on small files)
+    await file.save(fileBuffer, {
+      metadata: {
+        contentType,
+      },
+      resumable: false,
+    });
+
+    // Return the API URL path to access this resident photo
+    return `/api/resident-photos/${fileName}`;
+  }
+
+  // Get a resident photo for download
+  async getResidentPhoto(fileName: string): Promise<File | null> {
+    const bucketPath = this.getResidentPhotosBucket();
+    const fullPath = `${bucketPath}/${fileName}`;
+    
+    const { bucketName, objectName } = parseObjectPath(fullPath);
+    const bucket = objectStorageClient.bucket(bucketName);
+    const file = bucket.file(objectName);
+
+    // Check if file exists
+    const [exists] = await file.exists();
+    if (!exists) {
+      return null;
+    }
+
+    return file;
+  }
+
   // Gets the public object search paths.
   getPublicObjectSearchPaths(): Array<string> {
     const pathsStr = process.env.PUBLIC_OBJECT_SEARCH_PATHS || "";

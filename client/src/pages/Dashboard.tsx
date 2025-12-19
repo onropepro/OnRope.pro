@@ -2126,6 +2126,9 @@ export default function Dashboard() {
           peaceWork: data.peaceWork || false,
           pricePerDrop: data.pricePerDrop ? parseInt(data.pricePerDrop) : undefined,
           forceAssignment: data.forceAssignment || false,
+          // Explicitly include coordinates for map display
+          latitude: data.latitude !== null && data.latitude !== undefined ? String(data.latitude) : undefined,
+          longitude: data.longitude !== null && data.longitude !== undefined ? String(data.longitude) : undefined,
         }),
         credentials: "include",
       });
