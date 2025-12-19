@@ -1,117 +1,72 @@
+import { useState } from "react";
+import { Link } from "wouter";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { useState, useEffect } from "react";
-import { Link } from "wouter";
-import { useTranslation } from "react-i18next";
+import { Separator } from "@/components/ui/separator";
 import { PublicHeader } from "@/components/PublicHeader";
-import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import {
-  Briefcase,
-  CheckCircle2,
   ArrowRight,
-  BookOpen,
-  Building2,
   Search,
-  FileText,
-  Eye,
-  EyeOff,
   Clock,
+  CheckCircle2,
+  XCircle,
+  Globe,
+  TrendingUp,
+  Award,
+  Bell,
+  Users,
   Shield,
   DollarSign,
-  BarChart3,
-  Send,
-  Target,
-  Lock,
   Zap,
-  Users,
-  ClipboardList,
-  ChevronsUpDown,
-  Wrench,
-  Globe,
-  HardHat,
-  ChevronRight,
-  Star,
-  TrendingUp
+  Send,
+  ToggleLeft
 } from "lucide-react";
+import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
-const ALL_ACCORDION_ITEMS = [
-  "tech-1", "tech-2", "tech-3", "tech-4", "employed-1", "employed-2"
-];
-
-const FAQ_ITEMS = [
-  "faq-1", "faq-2", "faq-3", "faq-4", "faq-5", "faq-6", "faq-7", "faq-8"
-];
+const TECHNICIAN_COLOR = "#AB4521";
+const TECHNICIAN_GRADIENT_END = "#8B371A";
 
 export default function TechnicianJobBoardLanding() {
-  const { t } = useTranslation();
-  const [openItems, setOpenItems] = useState<string[]>([]);
-  const [faqOpenItems, setFaqOpenItems] = useState<string[]>([]);
-  const [applicationTime, setApplicationTime] = useState(0);
-  const [relevantPercent, setRelevantPercent] = useState(0);
-
-  const allExpanded = openItems.length === ALL_ACCORDION_ITEMS.length;
-
-  const toggleAll = () => {
-    setOpenItems(allExpanded ? [] : [...ALL_ACCORDION_ITEMS]);
-  };
-
-  useEffect(() => {
-    let appTime = 0;
-    let relevant = 0;
-    
-    const interval = setInterval(() => {
-      if (appTime < 30) { appTime++; setApplicationTime(appTime); }
-      if (relevant < 100) { relevant += 2; setRelevantPercent(Math.min(relevant, 100)); }
-      
-      if (appTime >= 30 && relevant >= 100) {
-        clearInterval(interval);
-      }
-    }, 50);
-
-    return () => clearInterval(interval);
-  }, []);
+  const [faqOpen, setFaqOpen] = useState<string[]>([]);
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
       <PublicHeader activeNav="technician" />
       
-      {/* Hero Section */}
-      <section className="relative text-white pb-[120px]" style={{backgroundImage: 'linear-gradient(135deg, #0B64A3 0%, #0369A1 100%)'}}>
+      {/* Hero Section - Rust Brown Gradient */}
+      <section className="relative text-white pb-[120px]" style={{backgroundImage: `linear-gradient(135deg, ${TECHNICIAN_COLOR} 0%, ${TECHNICIAN_GRADIENT_END} 100%)`}}>
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMtOS45NDEgMC0xOCA4LjA1OS0xOCAxOHM4LjA1OSAxOCAxOCAxOGM5Ljk0MSAwIDE4LTguMDU5IDE4LTE4cy04LjA1OS0xOC0xOC0xOHptMCAzMmMtNy43MzIgMC0xNC02LjI2OC0xNC0xNHM2LjI2OC0xNCAxNC0xNHMxNCA2LjI2OCAxNCAxNC02LjI2OCAxNC0xNCAxNHoiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wMykiLz48L2c+PC9zdmc+')] opacity-30"></div>
         
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
           <div className="text-center space-y-6 pt-16">
-            <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-module-label">
-              {t('modules.technicianJobBoard.hero.badge', 'Job Board Ecosystem')}
+            <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-job-board-module">
+              Job Board Module
             </Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              {t('modules.technicianJobBoard.hero.title', 'Every Job Here Is Rope Access.')}<br />
-              <span className="text-blue-100">{t('modules.technicianJobBoard.hero.subtitle', 'Every Company Is Real.')}</span>
+              One Job Board. Every Rope Access Gig.<br />
+              <span className="text-orange-100">Zero Pipe Fitter Listings.</span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              {t('modules.technicianJobBoard.hero.description', "OnRopePro's Job Board is exclusively for rope access building maintenance. Browse real jobs from verified companies. Apply in 30 seconds.")}<br />
-              <strong>{t('modules.technicianJobBoard.hero.descriptionBold', 'Control who sees your profile.')}</strong>
+            <p className="text-xl md:text-2xl text-orange-100 max-w-3xl mx-auto leading-relaxed">
+              Search "rope access" on Indeed and get oil rigs, pipe fitting, and random construction gigs.<br />
+              <strong>OnRopePro's Job Board shows only rope access building maintenance jobs. Every employer is verified. Every listing is relevant.</strong>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-hero-browse">
-                <Link href="/technician-login">
-                  {t('modules.technicianJobBoard.hero.ctaPrimary', 'Browse Jobs Free')}
+              <Button size="lg" className="bg-white hover:bg-orange-50" style={{color: TECHNICIAN_COLOR}} asChild data-testid="button-hero-create-account">
+                <Link href="/technician-login?register=true">
+                  Create Your Free Account
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-hero-answers">
-                <Link href="#faqs">
-                  {t('modules.technicianJobBoard.hero.ctaSecondary', 'Find Answers')}
-                  <BookOpen className="ml-2 w-5 h-5" />
-                </Link>
-              </Button>
             </div>
+            
+            <p className="text-sm text-orange-100/80">
+              (No credit card. No spam. Takes 60 seconds.)
+            </p>
           </div>
         </div>
         
@@ -123,723 +78,680 @@ export default function TechnicianJobBoardLanding() {
         </div>
       </section>
 
-      {/* Stats Panel */}
-      <section className="relative bg-white dark:bg-slate-950 -mt-px overflow-visible">
-        <div className="max-w-3xl mx-auto px-4 pt-4 pb-12">
-          <Card className="shadow-xl border-0 relative z-20 -mt-20">
-            <CardContent className="p-8">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-                <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-blue-600">{applicationTime}s</div>
-                  <div className="text-base text-muted-foreground mt-1">{t('modules.technicianJobBoard.stats.applicationTime', 'Application Time')}</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-emerald-600">{relevantPercent}%</div>
-                  <div className="text-base text-muted-foreground mt-1">{t('modules.technicianJobBoard.stats.relevantListings', 'Relevant Listings')}</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-amber-600">{t('modules.technicianJobBoard.stats.immediateValue', 'Immediate')}</div>
-                  <div className="text-base text-muted-foreground mt-1">{t('modules.technicianJobBoard.stats.searchTime', 'Search Time')}</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-violet-600">{t('modules.technicianJobBoard.stats.upfrontValue', 'Upfront')}</div>
-                  <div className="text-base text-muted-foreground mt-1">{t('modules.technicianJobBoard.stats.interviewAlignment', 'Interview Alignment')}</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      <Separator className="my-8" />
-
-      {/* Problem Statement Section */}
+      {/* Tier Breakdown Section */}
       <section className="py-16 md:py-20 px-4">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
-            {t('modules.technicianJobBoard.problem.title', 'Indeed Thinks You Want to Be a Pipe Fitter')}
-          </h2>
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center space-y-4 mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold">
+              Two Tiers. Both Free Right Now.
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Every rope access technician deserves access to real opportunities. Here's exactly what you get.
+            </p>
+          </div>
           
-          <Card className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
-            <CardContent className="p-6 md:p-8 space-y-4 text-muted-foreground">
-              <p className="text-lg leading-relaxed font-medium text-foreground">
-                {t('modules.technicianJobBoard.problem.intro', 'You search "rope access" on Indeed. What do you get?')}
-              </p>
-              <p>
-                {t('modules.technicianJobBoard.problem.paragraph1', 'Offshore oil platforms in the Maritimes. Industrial access jobs at Alberta refineries. Pipe fitter positions that mention "rope" once in the safety section. General construction gigs that require "working at heights."')}
-              </p>
-              <p>
-                {t('modules.technicianJobBoard.problem.paragraph2', 'You scroll for 20 minutes to find 3 jobs that might actually be rope access building maintenance. Maybe.')}
-              </p>
-              <p>
-                {t('modules.technicianJobBoard.problem.paragraph3', "Then you apply. Upload your resume. Fill out the same form for the 50th time. Manually type your IRATA number because there's no field for it. Wonder if the company even checked your certification.")}
-              </p>
-              <Separator className="my-6" />
-              <p className="font-medium text-foreground text-lg">
-                {t('modules.technicianJobBoard.problem.solutionTitle', "OnRopePro's Job Board works differently.")}
-              </p>
-              <p>
-                {t('modules.technicianJobBoard.problem.solutionParagraph1', 'Every job posted here is rope access building maintenance. Window washing. Caulking. Pressure washing. Gutter cleaning. Painting and coating. Visual inspection. No offshore. No oil rigs. No pipe fitting.')}
-              </p>
-              <p>
-                {t('modules.technicianJobBoard.problem.solutionParagraph2', 'Every company posting is verified. Real rope access operators who do real building maintenance. When you apply, your certifications, experience, and safety rating go with your application automatically.')}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      <Separator className="my-0" />
-
-      {/* What This Module Does Section */}
-      <section id="features" className="pt-8 md:pt-12 pb-16 md:pb-20 px-4 bg-slate-50 dark:bg-slate-900">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            {t('modules.technicianJobBoard.features.title', 'Your Rope Access Career Hub')}
-          </h2>
-          <p className="text-center text-muted-foreground text-lg mb-12 max-w-3xl mx-auto">
-            {t('modules.technicianJobBoard.features.subtitle', 'Where every job matches your skills and every employer understands your work')}
-          </p>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {/* Card 1: Job Browser */}
-            <Card className="relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-cyan-600"></div>
-              <CardHeader>
-                <div className="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-3">
-                  <Search className="w-6 h-6 text-blue-600" />
-                </div>
-                <CardTitle className="text-xl">{t('modules.technicianJobBoard.features.jobBrowser.title', 'Job Browser')}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-base text-muted-foreground">
-                <p className="font-medium text-foreground">{t('modules.technicianJobBoard.features.jobBrowser.headline', 'See only rope access building maintenance jobs.')}</p>
-                <p>{t('modules.technicianJobBoard.features.jobBrowser.description', 'Filter by location, job type, and certification requirements. Each listing shows company details, pay range (when provided), start dates, and project scope. Every company is verified. Every job is relevant.')}</p>
-                <p className="font-medium text-foreground mt-4">{t('modules.technicianJobBoard.features.jobBrowser.filterLabel', 'What you can filter by:')}</p>
-                <ul className="space-y-1 ml-2">
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> {t('modules.technicianJobBoard.features.jobBrowser.filterLocation', 'Location (city, region)')}</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> {t('modules.technicianJobBoard.features.jobBrowser.filterJobType', 'Job type (window washing, caulking, etc.)')}</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> {t('modules.technicianJobBoard.features.jobBrowser.filterEmploymentType', 'Employment type (full-time, contract)')}</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> {t('modules.technicianJobBoard.features.jobBrowser.filterCertLevel', 'Required certification level')}</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> {t('modules.technicianJobBoard.features.jobBrowser.filterPayRange', 'Pay range')}</li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            {/* Card 2: One-Click Applications */}
-            <Card className="relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-600"></div>
-              <CardHeader>
-                <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center mb-3">
-                  <Send className="w-6 h-6 text-emerald-600" />
-                </div>
-                <CardTitle className="text-xl">{t('modules.technicianJobBoard.features.oneClickApplications.title', 'One-Click Applications')}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-base text-muted-foreground">
-                <p className="font-medium text-foreground">{t('modules.technicianJobBoard.features.oneClickApplications.headline', 'Your profile data travels with your application.')}</p>
-                <p>{t('modules.technicianJobBoard.features.oneClickApplications.description', 'Resume, certifications, IRATA/SPRAT numbers, years of experience, safety rating. All attached automatically. Apply to a job in 30 seconds instead of re-entering the same information for the 100th time.')}</p>
-                <p className="font-medium text-foreground mt-4">{t('modules.technicianJobBoard.features.oneClickApplications.sentLabel', 'What gets sent automatically:')}</p>
-                <ul className="space-y-1 ml-2">
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> {t('modules.technicianJobBoard.features.oneClickApplications.sentResume', 'Resume/CV (if uploaded)')}</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> {t('modules.technicianJobBoard.features.oneClickApplications.sentCert', 'IRATA/SPRAT certification details')}</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> {t('modules.technicianJobBoard.features.oneClickApplications.sentExperience', 'Years of experience')}</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> {t('modules.technicianJobBoard.features.oneClickApplications.sentSafetyRating', 'Safety rating score')}</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> {t('modules.technicianJobBoard.features.oneClickApplications.sentPayRate', 'Your expected pay rate')}</li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            {/* Card 3: Profile Visibility Toggle */}
-            <Card className="relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-orange-600"></div>
-              <CardHeader>
-                <div className="w-12 h-12 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center mb-3">
-                  <Eye className="w-6 h-6 text-amber-600" />
-                </div>
-                <CardTitle className="text-xl">{t('modules.technicianJobBoard.features.profileVisibility.title', 'Profile Visibility Toggle')}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-base text-muted-foreground">
-                <p className="font-medium text-foreground">{t('modules.technicianJobBoard.features.profileVisibility.headline', 'Control who finds you.')}</p>
-                <p>{t('modules.technicianJobBoard.features.profileVisibility.description', "Toggle visibility ON: employers can search for you in the Talent Browser, see your credentials, and send you direct job offers. Toggle it OFF: you're invisible to searches but can still browse and apply to jobs normally.")}</p>
-                <p className="font-medium text-foreground mt-4">{t('modules.technicianJobBoard.features.profileVisibility.visibleLabel', "What employers see when you're visible:")}</p>
-                <ul className="space-y-1 ml-2">
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> {t('modules.technicianJobBoard.features.profileVisibility.visibleName', 'Name and photo')}</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> {t('modules.technicianJobBoard.features.profileVisibility.visibleCert', 'Certification levels and numbers')}</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> {t('modules.technicianJobBoard.features.profileVisibility.visibleExperience', 'Years of experience')}</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> {t('modules.technicianJobBoard.features.profileVisibility.visibleSafetyRating', 'Safety rating')}</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> {t('modules.technicianJobBoard.features.profileVisibility.visiblePayRate', 'Expected pay rate')}</li>
-                </ul>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      <Separator className="my-0" />
-
-      {/* Who Benefits Section */}
-      <section className="py-16 md:py-20 px-4">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            {t('modules.technicianJobBoard.whoBenefits.title', 'Who Benefits From This Module')}
-          </h2>
-          <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-            {t('modules.technicianJobBoard.whoBenefits.subtitle', 'A closed ecosystem where every participant gets exactly what they need')}
-          </p>
-
-          <div className="space-y-8">
-            {/* For Technicians */}
-            <Card className="overflow-hidden">
-              <CardHeader className="bg-amber-50 dark:bg-amber-950 border-b">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center">
-                    <HardHat className="w-5 h-5 text-amber-600" />
-                  </div>
-                  <CardTitle className="text-xl">{t('modules.technicianJobBoard.whoBenefits.technicians.title', 'For Technicians')}</CardTitle>
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* FREE Tier */}
+            <Card className="border-2 border-border" data-testid="card-free-tier">
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <CardTitle className="text-2xl">FREE Account</CardTitle>
+                  <Badge variant="secondary" className="text-base px-3 py-1">Free Forever</Badge>
                 </div>
               </CardHeader>
-              <CardContent className="p-6 space-y-4">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">{t('modules.technicianJobBoard.whoBenefits.technicians.benefit1Title', 'Every job is rope access building maintenance')}</h4>
-                    <p className="text-base text-muted-foreground">{t('modules.technicianJobBoard.whoBenefits.technicians.benefit1Desc', 'No more scrolling past offshore rigs, pipe fitting positions, and "working at heights" construction gigs. Every posting here is from a verified rope access company doing building maintenance.')}</p>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <Search className="w-5 h-5 text-[#AB4521] mt-0.5 shrink-0" />
+                    <div>
+                      <p className="font-medium text-foreground">Browse All Jobs</p>
+                      <p className="text-sm text-muted-foreground">Filter by city, job type, and certification level. Every listing is rope access building maintenance. No oil rigs. No pipe fitting.</p>
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">{t('modules.technicianJobBoard.whoBenefits.technicians.benefit2Title', 'Apply once, your credentials follow everywhere')}</h4>
-                    <p className="text-base text-muted-foreground">{t('modules.technicianJobBoard.whoBenefits.technicians.benefit2Desc', 'Upload your resume, enter your IRATA number, set your expected pay rate. Every application you send includes this information automatically. No more typing the same details into 50 different forms.')}</p>
+                  
+                  <div className="flex items-start gap-3">
+                    <Zap className="w-5 h-5 text-[#AB4521] mt-0.5 shrink-0" />
+                    <div>
+                      <p className="font-medium text-foreground">Apply in 30 Seconds</p>
+                      <p className="text-sm text-muted-foreground">Your profile, resume, and certifications auto-attach. One tap application. No retyping the same information 15 times.</p>
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">{t('modules.technicianJobBoard.whoBenefits.technicians.benefit3Title', 'You control who sees you')}</h4>
-                    <p className="text-base text-muted-foreground">{t('modules.technicianJobBoard.whoBenefits.technicians.benefit3Desc', "Toggle profile visibility on when you're actively looking. Toggle it off when you're not. If you're employed but casually browsing, keep it off. Employers can't find you unless you want them to.")}</p>
+                  
+                  <div className="flex items-start gap-3">
+                    <Clock className="w-5 h-5 text-[#AB4521] mt-0.5 shrink-0" />
+                    <div>
+                      <p className="font-medium text-foreground">Track Application Status</p>
+                      <p className="text-sm text-muted-foreground">See when employers view your application. Know where you stand without chasing follow-ups.</p>
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">{t('modules.technicianJobBoard.whoBenefits.technicians.benefit4Title', 'Know what they\'re paying before you apply')}</h4>
-                    <p className="text-base text-muted-foreground">{t('modules.technicianJobBoard.whoBenefits.technicians.benefit4Desc', "Many employers list pay ranges on job postings. For those who don't, you can set your expected rate and let them decide if it matches their budget before they reach out.")}</p>
+                  
+                  <div className="flex items-start gap-3">
+                    <Globe className="w-5 h-5 text-[#AB4521] mt-0.5 shrink-0" />
+                    <div>
+                      <p className="font-medium text-foreground">Portable Profile</p>
+                      <p className="text-sm text-muted-foreground">Your IRATA/SPRAT certification number becomes your permanent identifier. Your professional history follows you, not your employer.</p>
+                    </div>
                   </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <DollarSign className="w-5 h-5 text-[#AB4521] mt-0.5 shrink-0" />
+                    <div>
+                      <p className="font-medium text-foreground">Set Your Expected Pay Rate</p>
+                      <p className="text-sm text-muted-foreground">Tell employers what you're worth before they reach out. No wasted interviews with companies that can't meet your number.</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <Separator />
+                
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    <strong className="text-foreground">Who It's For:</strong> Techs who want to browse opportunities, apply to specific jobs, and keep their profile private until they're ready.
+                  </p>
                 </div>
               </CardContent>
             </Card>
-
-            {/* For Employers */}
-            <Card className="overflow-hidden">
-              <CardHeader className="bg-blue-50 dark:bg-blue-950 border-b">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                    <Briefcase className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <CardTitle className="text-xl">{t('modules.technicianJobBoard.whoBenefits.employers.title', 'For Employers')}</CardTitle>
+            
+            {/* PLUS Tier */}
+            <Card className="border-2 border-[#AB4521] relative overflow-hidden" data-testid="card-plus-tier">
+              <div className="absolute top-0 right-0 bg-[#AB4521] text-white text-xs font-semibold px-3 py-1 rounded-bl-lg">
+                Free During Launch
+              </div>
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <CardTitle className="text-2xl flex items-center gap-2">
+                    PLUS Account
+                    <Badge className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100">PRO</Badge>
+                  </CardTitle>
                 </div>
               </CardHeader>
-              <CardContent className="p-6 space-y-4">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">{t('modules.technicianJobBoard.whoBenefits.employers.benefit1Title', 'Find technicians who match your requirements')}</h4>
-                    <p className="text-base text-muted-foreground">{t('modules.technicianJobBoard.whoBenefits.employers.benefit1Desc', 'Search the Talent Browser by certification level, location, experience, and expected pay rate. See safety ratings before reaching out. Send offers directly to candidates who fit.')}</p>
+              <CardContent className="space-y-6">
+                <p className="text-sm text-muted-foreground font-medium">Everything in FREE, plus:</p>
+                
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <ToggleLeft className="w-5 h-5 text-[#AB4521] mt-0.5 shrink-0" />
+                    <div>
+                      <p className="font-medium text-foreground">Profile Visibility Toggle</p>
+                      <p className="text-sm text-muted-foreground">Make your profile visible to every hiring company on the platform. Get found instead of hunting.</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <Send className="w-5 h-5 text-[#AB4521] mt-0.5 shrink-0" />
+                    <div>
+                      <p className="font-medium text-foreground">Direct Job Offers</p>
+                      <p className="text-sm text-muted-foreground">Employers send offers directly to your portal. Accept or decline with one tap. No phone tag.</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <Shield className="w-5 h-5 text-[#AB4521] mt-0.5 shrink-0" />
+                    <div>
+                      <p className="font-medium text-foreground">Individual Safety Rating Display</p>
+                      <p className="text-sm text-muted-foreground">Your ISR shows on your profile. Employers see documented proof of your safety track record.</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <Users className="w-5 h-5 text-[#AB4521] mt-0.5 shrink-0" />
+                    <div>
+                      <p className="font-medium text-foreground">Multi-Employer Management</p>
+                      <p className="text-sm text-muted-foreground">Work for 2, 3, 4 companies? Manage all your connections from one dashboard. Your hours, your records, one place.</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <Bell className="w-5 h-5 text-[#AB4521] mt-0.5 shrink-0" />
+                    <div>
+                      <p className="font-medium text-foreground">Certification Tracking</p>
+                      <p className="text-sm text-muted-foreground">Never miss a renewal. Automatic reminders before your IRATA or SPRAT expires.</p>
+                    </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* For Building Managers */}
-            <Card className="overflow-hidden">
-              <CardHeader className="bg-violet-50 dark:bg-violet-950 border-b">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center">
-                    <Building2 className="w-5 h-5 text-violet-600" />
-                  </div>
-                  <CardTitle className="text-xl">{t('modules.technicianJobBoard.whoBenefits.buildingManagers.title', 'For Building Managers')}</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="p-6 space-y-4">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">{t('modules.technicianJobBoard.whoBenefits.buildingManagers.benefit1Title', 'Verify contractor hiring standards')}</h4>
-                    <p className="text-base text-muted-foreground">{t('modules.technicianJobBoard.whoBenefits.buildingManagers.benefit1Desc', "When contractors use OnRopePro, their technicians have documented credentials and safety ratings. You're not trusting their word. You're seeing verified data.")}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* For Property Managers */}
-            <Card className="overflow-hidden">
-              <CardHeader className="bg-emerald-50 dark:bg-emerald-950 border-b">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center">
-                    <Globe className="w-5 h-5 text-emerald-600" />
-                  </div>
-                  <CardTitle className="text-xl">{t('modules.technicianJobBoard.whoBenefits.propertyManagers.title', 'For Property Managers')}</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="p-6 space-y-4">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <h4 className="text-lg font-semibold text-foreground">{t('modules.technicianJobBoard.whoBenefits.propertyManagers.benefit1Title', 'Confidence in service provider quality')}</h4>
-                    <p className="text-base text-muted-foreground">{t('modules.technicianJobBoard.whoBenefits.propertyManagers.benefit1Desc', 'The technicians doing work on your properties are part of a verified ecosystem. IRATA/SPRAT certifications are confirmed. Safety ratings are earned through real activity.')}</p>
+                
+                <Separator />
+                
+                <div className="space-y-3">
+                  <p className="text-sm text-muted-foreground">
+                    <strong className="text-foreground">Who It's For:</strong> Techs actively looking for work, building their reputation, or managing multiple employers.
+                  </p>
+                  <div className="bg-[#AB4521]/10 border border-[#AB4521]/30 rounded-lg p-3">
+                    <p className="text-sm font-medium text-[#AB4521]">
+                      Upgrade to PLUS free during our technician launch. No credit card. No time limit on this offer for early adopters.
+                    </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
           </div>
-        </div>
-      </section>
-
-      <Separator className="my-0" />
-
-      {/* Key Features Section */}
-      <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            {t('modules.technicianJobBoard.keyFeatures.title', 'Key Features')}
-          </h2>
-          <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-            {t('modules.technicianJobBoard.keyFeatures.subtitle', 'The Job Board puts you in control of your career')}
-          </p>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Card>
-              <CardHeader className="pb-3">
-                <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-2">
-                  <Lock className="w-5 h-5 text-blue-600" />
-                </div>
-                <CardTitle className="text-lg">{t('modules.technicianJobBoard.keyFeatures.closedEcosystem.title', 'Closed Ecosystem')}</CardTitle>
-              </CardHeader>
-              <CardContent className="text-base text-muted-foreground">
-                <p>{t('modules.technicianJobBoard.keyFeatures.closedEcosystem.desc1', 'Only rope access building maintenance companies post here. No general contractors. No staffing agencies. No offshore platforms.')}</p>
-                <p className="mt-2">{t('modules.technicianJobBoard.keyFeatures.closedEcosystem.desc2', 'When you apply, you know the company does what you do.')}</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-3">
-                <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center mb-2">
-                  <Zap className="w-5 h-5 text-emerald-600" />
-                </div>
-                <CardTitle className="text-lg">{t('modules.technicianJobBoard.keyFeatures.instantApplications.title', 'Instant Applications')}</CardTitle>
-              </CardHeader>
-              <CardContent className="text-base text-muted-foreground">
-                <p>{t('modules.technicianJobBoard.keyFeatures.instantApplications.desc1', 'Your profile data, resume, certifications, and safety rating attach to every application.')}</p>
-                <p className="mt-2">{t('modules.technicianJobBoard.keyFeatures.instantApplications.desc2', 'One click to apply. No forms to fill. 30 seconds from browsing to applied.')}</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-3">
-                <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center mb-2">
-                  <Send className="w-5 h-5 text-amber-600" />
-                </div>
-                <CardTitle className="text-lg">{t('modules.technicianJobBoard.keyFeatures.directOffers.title', 'Direct Job Offers')}</CardTitle>
-              </CardHeader>
-              <CardContent className="text-base text-muted-foreground">
-                <p>{t('modules.technicianJobBoard.keyFeatures.directOffers.desc1', 'When your profile visibility is on, employers can send you offers directly from the Talent Browser.')}</p>
-                <p className="mt-2">{t('modules.technicianJobBoard.keyFeatures.directOffers.desc2', 'Accept or decline with one tap. No email chains. No phone tag.')}</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-3">
-                <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center mb-2">
-                  <DollarSign className="w-5 h-5 text-violet-600" />
-                </div>
-                <CardTitle className="text-lg">{t('modules.technicianJobBoard.keyFeatures.expectedPayRate.title', 'Expected Pay Rate')}</CardTitle>
-              </CardHeader>
-              <CardContent className="text-base text-muted-foreground">
-                <p>{t('modules.technicianJobBoard.keyFeatures.expectedPayRate.desc1', 'Set what you want to earn. Employers see this in the Talent Browser.')}</p>
-                <p className="mt-2">{t('modules.technicianJobBoard.keyFeatures.expectedPayRate.desc2', "If someone can't meet your rate, they won't waste your time with an interview. Salary mismatches get filtered before they happen.")}</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-3">
-                <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center mb-2">
-                  <Shield className="w-5 h-5 text-rose-600" />
-                </div>
-                <CardTitle className="text-lg">{t('modules.technicianJobBoard.keyFeatures.safetyRating.title', 'Safety Rating Display')}</CardTitle>
-              </CardHeader>
-              <CardContent className="text-base text-muted-foreground">
-                <p>{t('modules.technicianJobBoard.keyFeatures.safetyRating.desc1', 'Your Individual Safety Rating (0-100) shows employers you take the work seriously.')}</p>
-                <p className="mt-2">{t('modules.technicianJobBoard.keyFeatures.safetyRating.desc2', 'Built from harness inspections, toolbox talks, safety quizzes. A high score is a competitive advantage.')}</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-3">
-                <div className="w-10 h-10 rounded-lg bg-cyan-100 dark:bg-cyan-900 flex items-center justify-center mb-2">
-                  <BarChart3 className="w-5 h-5 text-cyan-600" />
-                </div>
-                <CardTitle className="text-lg">{t('modules.technicianJobBoard.keyFeatures.statusTracking.title', 'Application Status Tracking')}</CardTitle>
-              </CardHeader>
-              <CardContent className="text-base text-muted-foreground">
-                <p>{t('modules.technicianJobBoard.keyFeatures.statusTracking.desc1', 'See where each application stands. Under review. Shortlisted. Offer extended. Declined.')}</p>
-                <p className="mt-2">{t('modules.technicianJobBoard.keyFeatures.statusTracking.desc2', 'No more "did they even see my resume?" uncertainty.')}</p>
-              </CardContent>
-            </Card>
+          
+          <div className="text-center mt-8">
+            <Button size="lg" className="bg-[#AB4521] hover:bg-[#8B371A] text-white" asChild data-testid="button-tier-get-plus">
+              <Link href="/technician-login?register=true&plus=true">
+                Get PLUS Free
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Link>
+            </Button>
+            <p className="text-sm text-muted-foreground mt-2">Limited to first 500 technicians</p>
           </div>
         </div>
       </section>
 
-      <Separator className="my-0" />
+      <Separator />
 
       {/* Problems Solved Section */}
+      <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center space-y-4 mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold">
+              Sound Familiar?
+            </h2>
+          </div>
+          
+          <div className="space-y-8">
+            {/* Problem 1 */}
+            <Card className="border bg-white dark:bg-slate-950" data-testid="card-problem-1">
+              <CardContent className="p-6 space-y-4">
+                <p className="text-lg font-semibold text-foreground italic">
+                  "I search 'rope access' on Indeed and get 50 results. 48 of them are pipe fitters, welders, or offshore oil rigs."
+                </p>
+                <p className="text-muted-foreground">
+                  You spend 30 minutes scrolling through irrelevant listings to find 2-3 that might be building maintenance. Half of those turn out to be posted by staffing agencies that don't understand the industry.
+                </p>
+                <div className="bg-[#AB4521]/5 border border-[#AB4521]/20 rounded-lg p-4">
+                  <p className="text-foreground">
+                    <strong>OnRopePro's Job Board</strong> is a closed ecosystem. Every job is rope access building maintenance. Filter by city, job type, and certification level. Every listing is verified. Every employer is real.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Problem 2 */}
+            <Card className="border bg-white dark:bg-slate-950" data-testid="card-problem-2">
+              <CardContent className="p-6 space-y-4">
+                <p className="text-lg font-semibold text-foreground italic">
+                  "I don't want my current boss to know I'm looking."
+                </p>
+                <p className="text-muted-foreground">
+                  You're employed but casually browsing. Maybe testing the market. You don't want to flip your LinkedIn to "Open to Work" and have it get back to your crew lead.
+                </p>
+                <div className="bg-[#AB4521]/5 border border-[#AB4521]/20 rounded-lg p-4">
+                  <p className="text-foreground">
+                    <strong>Profile visibility is a toggle.</strong> Turn it on when actively looking. Turn it off when you're not. Browse and apply to jobs with your profile hidden. Only reveal yourself when you're ready.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Problem 3 */}
+            <Card className="border bg-white dark:bg-slate-950" data-testid="card-problem-3">
+              <CardContent className="p-6 space-y-4">
+                <p className="text-lg font-semibold text-foreground italic">
+                  "I applied to a job and never heard anything. Then saw it reposted two weeks later."
+                </p>
+                <p className="text-muted-foreground">
+                  Black hole applications. No acknowledgment. No timeline. Just silence.
+                </p>
+                <div className="bg-[#AB4521]/5 border border-[#AB4521]/20 rounded-lg p-4">
+                  <p className="text-foreground">
+                    <strong>OnRopePro shows application status in real time.</strong> Submitted. Viewed. Under consideration. Offer sent. You always know where you stand.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Problem 4 */}
+            <Card className="border bg-white dark:bg-slate-950" data-testid="card-problem-4">
+              <CardContent className="p-6 space-y-4">
+                <p className="text-lg font-semibold text-foreground italic">
+                  "Every time I switch jobs, I have to re-enter all my certifications, emergency contacts, and upload the same documents again."
+                </p>
+                <p className="text-muted-foreground">
+                  Three hours of paperwork just to start working. New void cheque. New tax forms. New copies of your certifications.
+                </p>
+                <div className="bg-[#AB4521]/5 border border-[#AB4521]/20 rounded-lg p-4">
+                  <p className="text-foreground">
+                    <strong>Your OnRopePro profile is portable.</strong> When an employer already on the platform hires you, onboarding takes 10 seconds. They enter your rate and permissions. Everything else is already there.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Problem 5 */}
+            <Card className="border bg-white dark:bg-slate-950" data-testid="card-problem-5">
+              <CardContent className="p-6 space-y-4">
+                <p className="text-lg font-semibold text-foreground italic">
+                  "I want to know if a company is legit before I apply."
+                </p>
+                <p className="text-muted-foreground">
+                  Is this a real operation? Do they pay on time? Are their guys happy?
+                </p>
+                <div className="bg-[#AB4521]/5 border border-[#AB4521]/20 rounded-lg p-4">
+                  <p className="text-foreground">
+                    <strong>Every employer on OnRopePro is verified</strong> as a rope access building maintenance company. You can see company information before you apply. No mystery postings. No bait-and-switch.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      <Separator />
+
+      {/* How It Works Section */}
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between flex-wrap gap-4 mb-8">
-            <h2 className="text-3xl md:text-4xl font-bold">{t('modules.technicianJobBoard.problemsSolved.title', 'Problems Solved')}</h2>
-            <Button onClick={toggleAll} variant="outline" data-testid="button-toggle-all-accordions">
-              <ChevronsUpDown className="w-4 h-4 mr-2" />
-              {allExpanded ? t('modules.technicianJobBoard.problemsSolved.collapseAll', 'Collapse All') : t('modules.technicianJobBoard.problemsSolved.expandAll', 'Expand All')}
+          <div className="text-center space-y-4 mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold">
+              Three Steps. Under Two Minutes.
+            </h2>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 rounded-full bg-[#AB4521] text-white flex items-center justify-center mx-auto text-2xl font-bold">
+                1
+              </div>
+              <h3 className="text-xl font-semibold">Create Your Account</h3>
+              <p className="text-muted-foreground">
+                Enter your name, email, and IRATA or SPRAT certification number. Your cert number becomes your permanent identifier. 60 seconds.
+              </p>
+            </div>
+            
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 rounded-full bg-[#AB4521] text-white flex items-center justify-center mx-auto text-2xl font-bold">
+                2
+              </div>
+              <h3 className="text-xl font-semibold">Complete Your Profile</h3>
+              <p className="text-muted-foreground">
+                Add your certifications, experience, expected pay rate, and upload your resume. This information auto-attaches to every application. Do it once.
+              </p>
+            </div>
+            
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 rounded-full bg-[#AB4521] text-white flex items-center justify-center mx-auto text-2xl font-bold">
+                3
+              </div>
+              <h3 className="text-xl font-semibold">Browse and Apply (or Get Found)</h3>
+              <p className="text-muted-foreground">
+                Search jobs filtered by your city and certification level. Apply with one tap. Or toggle your profile visible and let employers come to you.
+              </p>
+            </div>
+          </div>
+          
+          <div className="text-center mt-12">
+            <Button size="lg" className="bg-[#AB4521] hover:bg-[#8B371A] text-white" asChild data-testid="button-how-create-account">
+              <Link href="/technician-login?register=true">
+                Create Your Free Account Now
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Link>
             </Button>
           </div>
-
-          {/* For Technicians */}
-          <div className="space-y-6">
-            <div className="flex items-center gap-3 pb-2 border-b">
-              <HardHat className="w-5 h-5 text-amber-500" />
-              <h3 className="text-xl md:text-2xl font-semibold">{t('modules.technicianJobBoard.problemsSolved.forTechnicians', 'For Technicians')}</h3>
-            </div>
-
-            <Accordion type="multiple" value={openItems} onValueChange={setOpenItems} className="space-y-3">
-              <AccordionItem value="tech-1" className="border rounded-lg px-4 data-[state=open]:bg-white dark:data-[state=open]:bg-white/10">
-                <AccordionTrigger className="text-left font-medium" data-testid="accordion-tech-1">
-                  {t('modules.technicianJobBoard.problemsSolved.tech1.question', '"I search \'rope access\' on Indeed and get pipe fitter and offshore oil jobs."')}
-                </AccordionTrigger>
-                <AccordionContent className="space-y-4 text-muted-foreground pb-4">
-                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.thePain', 'The Pain:')}</span> {t('modules.technicianJobBoard.problemsSolved.tech1.pain', 'You want rope access building maintenance work. You search Indeed. Results: industrial access at refineries, offshore platforms, general construction that mentions "heights."')}</p>
-                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.realExample', 'Real Example:')}</span> {t('modules.technicianJobBoard.problemsSolved.tech1.example', 'You scroll for 30 minutes to find 2-3 maybe-relevant postings. Most are offshore rigs or industrial sites, not buildings.')}</p>
-                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.solution', 'Solution:')}</span> {t('modules.technicianJobBoard.problemsSolved.tech1.solution', "OnRopePro's Job Board is exclusively for rope access building maintenance. Every job is window washing, caulking, pressure washing, gutter cleaning, painting, or visual inspection on buildings.")}</p>
-                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.benefit', 'Benefit:')}</span> {t('modules.technicianJobBoard.problemsSolved.tech1.benefit', '100% relevant listings. Zero scrolling through irrelevant postings. Find what you\'re looking for immediately.')}</p>
-                </AccordionContent>
-              </AccordionItem>
-
-              <AccordionItem value="tech-2" className="border rounded-lg px-4 data-[state=open]:bg-white dark:data-[state=open]:bg-white/10">
-                <AccordionTrigger className="text-left font-medium" data-testid="accordion-tech-2">
-                  {t('modules.technicianJobBoard.problemsSolved.tech2.question', '"I apply to jobs and manually enter my IRATA number every single time."')}
-                </AccordionTrigger>
-                <AccordionContent className="space-y-4 text-muted-foreground pb-4">
-                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.thePain', 'The Pain:')}</span> {t('modules.technicianJobBoard.problemsSolved.tech2.pain', "Indeed doesn't have a field for IRATA certification. Neither does LinkedIn. You upload your resume, then manually type your cert number into a notes field.")}</p>
-                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.realExample', 'Real Example:')}</span> {t('modules.technicianJobBoard.problemsSolved.tech2.example', "Sometimes you forget. Sometimes they don't even read it. You've typed your IRATA number into 50+ job applications this year.")}</p>
-                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.solution', 'Solution:')}</span> {t('modules.technicianJobBoard.problemsSolved.tech2.solution', 'On OnRopePro, your IRATA/SPRAT certification is part of your profile. It attaches to every application automatically.')}</p>
-                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.benefit', 'Benefit:')}</span> {t('modules.technicianJobBoard.problemsSolved.tech2.benefit', 'Employers see your cert level, your number, your expiration date. No manual entry. No forgotten information. Apply in 30 seconds instead of 15-20 minutes.')}</p>
-                </AccordionContent>
-              </AccordionItem>
-
-              <AccordionItem value="tech-3" className="border rounded-lg px-4 data-[state=open]:bg-white dark:data-[state=open]:bg-white/10">
-                <AccordionTrigger className="text-left font-medium" data-testid="accordion-tech-3">
-                  {t('modules.technicianJobBoard.problemsSolved.tech3.question', '"I don\'t want my current employer to know I\'m looking for work."')}
-                </AccordionTrigger>
-                <AccordionContent className="space-y-4 text-muted-foreground pb-4">
-                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.thePain', 'The Pain:')}</span> {t('modules.technicianJobBoard.problemsSolved.tech3.pain', "You're employed. It's fine. But you wouldn't mind seeing what else is out there. Problem: if you make yourself visible on a job board, your boss might find out.")}</p>
-                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.realExample', 'Real Example:')}</span> {t('modules.technicianJobBoard.problemsSolved.tech3.example', 'You set your LinkedIn to "Open to Work" and your supervisor asks about it the next day. Awkward conversation ahead.')}</p>
-                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.solution', 'Solution:')}</span> {t('modules.technicianJobBoard.problemsSolved.tech3.solution', "Profile visibility is opt-in. Keep it toggled off: you can browse jobs, apply to postings, and stay invisible to the Talent Browser.")}</p>
-                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.benefit', 'Benefit:')}</span> {t('modules.technicianJobBoard.problemsSolved.tech3.benefit', "Your current employer can't stumble across your profile. Toggle it on only when you're ready to be found.")}</p>
-                </AccordionContent>
-              </AccordionItem>
-
-              <AccordionItem value="tech-4" className="border rounded-lg px-4 data-[state=open]:bg-white dark:data-[state=open]:bg-white/10">
-                <AccordionTrigger className="text-left font-medium" data-testid="accordion-tech-4">
-                  {t('modules.technicianJobBoard.problemsSolved.tech4.question', '"I spent an hour interviewing for a job that pays $15/hour less than I need."')}
-                </AccordionTrigger>
-                <AccordionContent className="space-y-4 text-muted-foreground pb-4">
-                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.thePain', 'The Pain:')}</span> {t('modules.technicianJobBoard.problemsSolved.tech4.pain', "The listing didn't show pay. You applied, interviewed, got along great with the owner. Then they offered $45/hour. You need $60 to make the numbers work.")}</p>
-                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.realExample', 'Real Example:')}</span> {t('modules.technicianJobBoard.problemsSolved.tech4.example', "An hour of your time wasted. An hour of their time wasted. You're back to scrolling Indeed.")}</p>
-                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.solution', 'Solution:')}</span> {t('modules.technicianJobBoard.problemsSolved.tech4.solution', "Set your expected pay rate in your profile. Employers see it in the Talent Browser. If they can't meet your number, they won't reach out.")}</p>
-                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.benefit', 'Benefit:')}</span> {t('modules.technicianJobBoard.problemsSolved.tech4.benefit', "Compensation mismatches get filtered before the interview, not during. No more wasted interviews on jobs that can't meet your rate.")}</p>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-
-            {/* For Currently Employed Technicians */}
-            <div className="flex items-center gap-3 pb-2 border-b mt-12">
-              <Briefcase className="w-5 h-5 text-blue-500" />
-              <h3 className="text-xl md:text-2xl font-semibold">{t('modules.technicianJobBoard.problemsSolved.forEmployed', 'For Currently Employed Technicians')}</h3>
-            </div>
-
-            <Accordion type="multiple" value={openItems} onValueChange={setOpenItems} className="space-y-3">
-              <AccordionItem value="employed-1" className="border rounded-lg px-4 data-[state=open]:bg-white dark:data-[state=open]:bg-white/10">
-                <AccordionTrigger className="text-left font-medium" data-testid="accordion-employed-1">
-                  {t('modules.technicianJobBoard.problemsSolved.employed1.question', '"I want to know what\'s out there without broadcasting that I\'m looking."')}
-                </AccordionTrigger>
-                <AccordionContent className="space-y-4 text-muted-foreground pb-4">
-                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.thePain', 'The Pain:')}</span> {t('modules.technicianJobBoard.problemsSolved.employed1.pain', "You're not unhappy at your current job. But opportunities come and go. You'd like to see what companies are hiring without announcing to the industry that you're on the market.")}</p>
-                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.realExample', 'Real Example:')}</span> {t('modules.technicianJobBoard.problemsSolved.employed1.example', "You check LinkedIn's job section but worry that your activity is visible. Rope access is a small industry. Word gets around.")}</p>
-                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.solution', 'Solution:')}</span> {t('modules.technicianJobBoard.problemsSolved.employed1.solution', 'Keep profile visibility off. Browse job postings anonymously. Apply selectively to positions that genuinely interest you.')}</p>
-                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.benefit', 'Benefit:')}</span> {t('modules.technicianJobBoard.problemsSolved.employed1.benefit', 'No one knows you\'re looking unless you tell them. Stay informed about the market without risking your current position.')}</p>
-                </AccordionContent>
-              </AccordionItem>
-
-              <AccordionItem value="employed-2" className="border rounded-lg px-4 data-[state=open]:bg-white dark:data-[state=open]:bg-white/10">
-                <AccordionTrigger className="text-left font-medium" data-testid="accordion-employed-2">
-                  {t('modules.technicianJobBoard.problemsSolved.employed2.question', '"I have no way to build a reputation that follows me between employers."')}
-                </AccordionTrigger>
-                <AccordionContent className="space-y-4 text-muted-foreground pb-4">
-                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.thePain', 'The Pain:')}</span> {t('modules.technicianJobBoard.problemsSolved.employed2.pain', "You've worked safely for five years. Never had an incident. Your current employer knows it. But when you apply to a new company, you start from zero.")}</p>
-                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.realExample', 'Real Example:')}</span> {t('modules.technicianJobBoard.problemsSolved.employed2.example', 'No documented track record. Just your word. The new employer has no way to verify your safety history.')}</p>
-                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.solution', 'Solution:')}</span> {t('modules.technicianJobBoard.problemsSolved.employed2.solution', 'Your Individual Safety Rating travels with you. Built from harness inspections, toolbox talks, near-miss reports, safety quizzes.')}</p>
-                  <p><span className="font-medium text-foreground">{t('modules.technicianJobBoard.problemsSolved.benefit', 'Benefit:')}</span> {t('modules.technicianJobBoard.problemsSolved.employed2.benefit', 'When you apply to a new job, employers see your score. Five years of safe work becomes a competitive advantage, not just a claim on your resume.')}</p>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          </div>
         </div>
       </section>
 
-      <Separator className="my-0" />
+      <Separator />
 
-      {/* Connected Modules Section */}
+      {/* Comparison Table Section */}
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            {t('modules.technicianJobBoard.connectedModules.title', 'Connected Modules')}
-          </h2>
-          <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-            {t('modules.technicianJobBoard.connectedModules.subtitle', 'The Job Board connects to your professional profile across the platform')}
-          </p>
+          <div className="text-center space-y-4 mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold">
+              Not Indeed. Not Craigslist. Not a Facebook Group.
+            </h2>
+          </div>
+          
+          <Card className="overflow-hidden border bg-white dark:bg-slate-950">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b bg-slate-50 dark:bg-slate-900">
+                    <th className="text-left p-4 font-semibold"></th>
+                    <th className="text-center p-4 font-semibold text-[#AB4521]">OnRopePro</th>
+                    <th className="text-center p-4 font-semibold text-muted-foreground">Indeed/LinkedIn/Craigslist</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b">
+                    <td className="p-4 font-medium">Job Relevance</td>
+                    <td className="p-4 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                        <span>100% rope access building maintenance</span>
+                      </div>
+                    </td>
+                    <td className="p-4 text-center text-muted-foreground">
+                      <div className="flex items-center justify-center gap-2">
+                        <XCircle className="w-5 h-5 text-rose-500" />
+                        <span>2-5% relevant listings</span>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr className="border-b bg-slate-50/50 dark:bg-slate-900/50">
+                    <td className="p-4 font-medium">Employer Verification</td>
+                    <td className="p-4 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                        <span>Every employer verified</span>
+                      </div>
+                    </td>
+                    <td className="p-4 text-center text-muted-foreground">
+                      <div className="flex items-center justify-center gap-2">
+                        <XCircle className="w-5 h-5 text-rose-500" />
+                        <span>Anyone can post</span>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="p-4 font-medium">Application Time</td>
+                    <td className="p-4 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                        <span>30 seconds</span>
+                      </div>
+                    </td>
+                    <td className="p-4 text-center text-muted-foreground">
+                      <div className="flex items-center justify-center gap-2">
+                        <XCircle className="w-5 h-5 text-rose-500" />
+                        <span>15-20 minutes each</span>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr className="border-b bg-slate-50/50 dark:bg-slate-900/50">
+                    <td className="p-4 font-medium">Profile Portability</td>
+                    <td className="p-4 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                        <span>Follows you forever</span>
+                      </div>
+                    </td>
+                    <td className="p-4 text-center text-muted-foreground">
+                      <div className="flex items-center justify-center gap-2">
+                        <XCircle className="w-5 h-5 text-rose-500" />
+                        <span>Start over each job</span>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="p-4 font-medium">Application Status</td>
+                    <td className="p-4 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                        <span>Real-time tracking</span>
+                      </div>
+                    </td>
+                    <td className="p-4 text-center text-muted-foreground">
+                      <div className="flex items-center justify-center gap-2">
+                        <XCircle className="w-5 h-5 text-rose-500" />
+                        <span>Black hole submissions</span>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr className="border-b bg-slate-50/50 dark:bg-slate-900/50">
+                    <td className="p-4 font-medium">Expected Pay Rate</td>
+                    <td className="p-4 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                        <span>Visible upfront</span>
+                      </div>
+                    </td>
+                    <td className="p-4 text-center text-muted-foreground">
+                      <div className="flex items-center justify-center gap-2">
+                        <XCircle className="w-5 h-5 text-rose-500" />
+                        <span>Surprise salary talks</span>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="p-4 font-medium">Employer Cost</td>
+                    <td className="p-4 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                        <span>No per-application fees</span>
+                      </div>
+                    </td>
+                    <td className="p-4 text-center text-muted-foreground">
+                      <div className="flex items-center justify-center gap-2">
+                        <XCircle className="w-5 h-5 text-rose-500" />
+                        <span>$22+ per application</span>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </Card>
+          
+          <Card className="mt-8 border-2 border-[#AB4521]/30 bg-[#AB4521]/5">
+            <CardContent className="p-6 text-center">
+              <h3 className="text-xl font-semibold text-foreground mb-2">The Network Effect</h3>
+              <p className="text-muted-foreground">
+                More techs on the platform = more employers posting jobs = more opportunities for you.
+              </p>
+              <p className="text-[#AB4521] font-medium mt-2">
+                You're not just signing up. You're building the only job board that actually understands rope access.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
 
-          <div className="grid md:grid-cols-2 gap-6">
-            <Card>
+      <Separator />
+
+      {/* For Every Type of Tech Section */}
+      <section className="py-16 md:py-20 px-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center space-y-4 mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold">
+              Whether You're Climbing the Ladder or Chasing Freedom
+            </h2>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Career Climbers */}
+            <Card className="border bg-white dark:bg-slate-950">
               <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center">
-                    <FileText className="w-5 h-5 text-violet-600" />
-                  </div>
-                  <CardTitle className="text-lg">{t('modules.technicianJobBoard.connectedModules.documentVault.title', 'Document Vault')}</CardTitle>
+                <div className="w-12 h-12 rounded-lg bg-[#AB4521]/10 flex items-center justify-center mb-3">
+                  <TrendingUp className="w-6 h-6 text-[#AB4521]" />
                 </div>
+                <CardTitle className="text-xl">Career Climbers</CardTitle>
+                <p className="text-sm text-muted-foreground">L1/L2 Working Toward L3</p>
               </CardHeader>
-              <CardContent className="text-base text-muted-foreground">
-                <p>{t('modules.technicianJobBoard.connectedModules.documentVault.desc1', 'Your certifications, resume, banking info, and emergency contacts are stored securely.')}</p>
-                <p className="mt-2">{t('modules.technicianJobBoard.connectedModules.documentVault.desc2', 'When you accept a job offer, share them with your new employer in one click. No hunting for void cheques.')}</p>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Your hours are tracked. Your certifications are visible. When you hit 1,000 hours and apply for that L2, your documentation is organized and exportable. No scrambling.
+                </p>
               </CardContent>
             </Card>
 
-            <Card>
+            {/* Multi-Employer Hustlers */}
+            <Card className="border bg-white dark:bg-slate-950">
               <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-sky-100 dark:bg-sky-900 flex items-center justify-center">
-                    <Shield className="w-5 h-5 text-sky-600" />
-                  </div>
-                  <CardTitle className="text-lg">{t('modules.technicianJobBoard.connectedModules.safetyCompliance.title', 'Safety & Compliance')}</CardTitle>
+                <div className="w-12 h-12 rounded-lg bg-[#AB4521]/10 flex items-center justify-center mb-3">
+                  <Users className="w-6 h-6 text-[#AB4521]" />
                 </div>
+                <CardTitle className="text-xl">Multi-Employer Hustlers</CardTitle>
+                <p className="text-sm text-muted-foreground">Managing 2-4 Companies</p>
               </CardHeader>
-              <CardContent className="text-base text-muted-foreground">
-                <p>{t('modules.technicianJobBoard.connectedModules.safetyCompliance.desc1', 'Your Individual Safety Rating builds from real activity: daily harness inspections, toolbox talk participation, safety quizzes.')}</p>
-                <p className="mt-2">{t('modules.technicianJobBoard.connectedModules.safetyCompliance.desc2', 'Employers see a number you earned, not a number you claimed.')}</p>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  One dashboard for all your employers. See your total hours across all jobs. Never double-book. Never lose track of which company owes you what.
+                </p>
               </CardContent>
             </Card>
 
-            <Card>
+            {/* Freedom Seekers */}
+            <Card className="border bg-white dark:bg-slate-950">
               <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-cyan-100 dark:bg-cyan-900 flex items-center justify-center">
-                    <ClipboardList className="w-5 h-5 text-cyan-600" />
-                  </div>
-                  <CardTitle className="text-lg">{t('modules.technicianJobBoard.connectedModules.logbook.title', 'Logbook')}</CardTitle>
+                <div className="w-12 h-12 rounded-lg bg-[#AB4521]/10 flex items-center justify-center mb-3">
+                  <Globe className="w-6 h-6 text-[#AB4521]" />
                 </div>
+                <CardTitle className="text-xl">Freedom Seekers</CardTitle>
+                <p className="text-sm text-muted-foreground">Moving City to City</p>
               </CardHeader>
-              <CardContent className="text-base text-muted-foreground">
-                <p>{t('modules.technicianJobBoard.connectedModules.logbook.desc1', 'Your work history, hours logged, buildings completed, and tasks performed.')}</p>
-                <p className="mt-2">{t('modules.technicianJobBoard.connectedModules.logbook.desc2', 'Accepting a new job? Your track record travels with you.')}</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                    <Users className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <CardTitle className="text-lg">{t('modules.technicianJobBoard.connectedModules.employeeManagement.title', 'Employee Management')}</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="text-base text-muted-foreground">
-                <p>{t('modules.technicianJobBoard.connectedModules.employeeManagement.desc1', "When you accept an offer, your profile data flows to your new employer's system.")}</p>
-                <p className="mt-2">{t('modules.technicianJobBoard.connectedModules.employeeManagement.desc2', 'IRATA number, certifications, contact details. Day-one ready without the paperwork.')}</p>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Your profile is portable. Work in Vancouver this spring, Toronto this summer, Seattle in the fall. Your professional identity travels with you. 10-second onboarding at every new employer who uses OnRopePro.
+                </p>
               </CardContent>
             </Card>
           </div>
         </div>
       </section>
 
-      <Separator className="my-0" />
+      <Separator />
 
-      {/* FAQs Section */}
-      <section id="faqs" className="py-16 md:py-20 px-4">
+      {/* FAQ Section */}
+      <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-            {t('modules.technicianJobBoard.faqs.title', 'Frequently Asked Questions')}
-          </h2>
-
-          <Accordion type="multiple" value={faqOpenItems} onValueChange={setFaqOpenItems} className="space-y-3">
-            <AccordionItem value="faq-1" className="border rounded-lg px-4">
-              <AccordionTrigger className="text-left font-medium" data-testid="accordion-faq-1">
-                {t('modules.technicianJobBoard.faqs.faq1.question', 'Do I need to pay to access the job board?')}
+          <div className="text-center space-y-4 mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold">
+              Frequently Asked Questions
+            </h2>
+          </div>
+          
+          <Accordion 
+            type="multiple" 
+            value={faqOpen} 
+            onValueChange={setFaqOpen}
+            className="space-y-3"
+          >
+            <AccordionItem value="faq-1" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
+              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-1">
+                Is there a cost to sign up?
               </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground pb-4">
-                {t('modules.technicianJobBoard.faqs.faq1.answer', 'Free tier accounts can browse job postings. Plus accounts get full job board access including profile visibility options and the ability to receive direct offers from employers.')}
+              <AccordionContent className="text-base text-muted-foreground pb-4">
+                No. FREE tier is free forever. PLUS tier is free during our technician launch.
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="faq-2" className="border rounded-lg px-4">
-              <AccordionTrigger className="text-left font-medium" data-testid="accordion-faq-2">
-                {t('modules.technicianJobBoard.faqs.faq2.question', 'Can my current employer see that I\'m looking for work?')}
+            <AccordionItem value="faq-2" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
+              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-2">
+                What's the catch with PLUS being free?
               </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground pb-4">
-                {t('modules.technicianJobBoard.faqs.faq2.answer', 'Only if you toggle profile visibility on. Keep it off and you\'re invisible to the Talent Browser. You can still browse and apply to jobs without anyone knowing.')}
+              <AccordionContent className="text-base text-muted-foreground pb-4">
+                No catch. We're launching to technicians first. We want 500+ rope access professionals on the platform before we start charging employers. Early adopters get PLUS free.
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="faq-3" className="border rounded-lg px-4">
-              <AccordionTrigger className="text-left font-medium" data-testid="accordion-faq-3">
-                {t('modules.technicianJobBoard.faqs.faq3.question', 'What if I\'m not employed right now?')}
+            <AccordionItem value="faq-3" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
+              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-3">
+                Will you spam me?
               </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground pb-4">
-                {t('modules.technicianJobBoard.faqs.faq3.answer', 'You can still create an account, upload your certifications, and apply to jobs. Your safety rating will build once you\'re connected to an employer on the platform.')}
+              <AccordionContent className="text-base text-muted-foreground pb-4">
+                No. You'll get job offer notifications (if you enable visibility) and application status updates. No marketing emails unless you opt in.
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="faq-4" className="border rounded-lg px-4">
-              <AccordionTrigger className="text-left font-medium" data-testid="accordion-faq-4">
-                {t('modules.technicianJobBoard.faqs.faq4.question', 'How does the expected pay rate work?')}
+            <AccordionItem value="faq-4" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
+              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-4">
+                Can my current employer see that I'm on here?
               </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground pb-4">
-                {t('modules.technicianJobBoard.faqs.faq4.answer', "You set what you want to earn per hour. Employers see this when they browse the Talent Browser. If your rate is $55/hour and they're offering $40, they can choose not to reach out. Saves everyone time.")}
+              <AccordionContent className="text-base text-muted-foreground pb-4">
+                Not unless you toggle your profile visible. You can browse and apply to jobs completely privately.
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="faq-5" className="border rounded-lg px-4">
-              <AccordionTrigger className="text-left font-medium" data-testid="accordion-faq-5">
-                {t('modules.technicianJobBoard.faqs.faq5.question', 'What happens when I accept a job offer?')}
+            <AccordionItem value="faq-5" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
+              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-5">
+                What if the employer I apply to isn't on OnRopePro?
               </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground pb-4">
-                {t('modules.technicianJobBoard.faqs.faq5.answer', "If the employer uses OnRopePro, onboarding is nearly instant. Your profile data flows to their system. They enter your pay rate and permissions. You're ready to work on day one without re-entering your information.")}
+              <AccordionContent className="text-base text-muted-foreground pb-4">
+                Then they don't have access to this talent pool. All employers on the platform are verified rope access building maintenance companies.
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="faq-6" className="border rounded-lg px-4">
-              <AccordionTrigger className="text-left font-medium" data-testid="accordion-faq-6">
-                {t('modules.technicianJobBoard.faqs.faq6.question', 'What certifications do I need to use the job board?')}
+            <AccordionItem value="faq-6" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
+              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-6">
+                How is this different from Facebook groups or word of mouth?
               </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground pb-4">
-                {t('modules.technicianJobBoard.faqs.faq6.answer', 'The job board is for rope access building maintenance professionals. Most employers will require IRATA or SPRAT certification. You can list your certification level and number in your profile.')}
+              <AccordionContent className="text-base text-muted-foreground pb-4">
+                Facebook posts disappear. Word of mouth is unreliable. OnRopePro is permanent, searchable, and organized. Your profile stays updated. Your applications are tracked. Your career history is documented.
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="faq-7" className="border rounded-lg px-4">
-              <AccordionTrigger className="text-left font-medium" data-testid="accordion-faq-7">
-                {t('modules.technicianJobBoard.faqs.faq7.question', 'Can I apply to multiple jobs at the same time?')}
+            <AccordionItem value="faq-7" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
+              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-7">
+                Can I use this if I'm not IRATA or SPRAT certified?
               </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground pb-4">
-                {t('modules.technicianJobBoard.faqs.faq7.answer', "Yes. Apply to as many jobs as interest you. Track each application's status from your dashboard.")}
+              <AccordionContent className="text-base text-muted-foreground pb-4">
+                Yes. We support both IRATA and SPRAT certifications, plus non-certified building maintenance workers. Your certification level (or lack of it) is visible to employers, so they know what they're getting.
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="faq-8" className="border rounded-lg px-4">
-              <AccordionTrigger className="text-left font-medium" data-testid="accordion-faq-8">
-                {t('modules.technicianJobBoard.faqs.faq8.question', 'What if an employer sends me an offer but I\'m not interested?')}
+            <AccordionItem value="faq-8" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
+              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-8">
+                What happens to my data if I delete my account?
               </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground pb-4">
-                {t('modules.technicianJobBoard.faqs.faq8.answer', 'Decline it with one tap. The employer gets notified. No awkward phone calls required.')}
+              <AccordionContent className="text-base text-muted-foreground pb-4">
+                You own your data. Delete your account anytime and your profile is removed from employer searches. Any employer connections are severed.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="faq-9" className="border rounded-lg px-4 bg-white dark:bg-slate-950">
+              <AccordionTrigger className="text-left text-base font-medium py-4" data-testid="accordion-faq-9">
+                How do I upgrade to PLUS?
+              </AccordionTrigger>
+              <AccordionContent className="text-base text-muted-foreground pb-4">
+                Toggle it in your settings. During the technician launch, the upgrade is immediate and free. No credit card required.
               </AccordionContent>
             </AccordionItem>
           </Accordion>
         </div>
       </section>
 
-      <Separator className="my-0" />
-
-      {/* Access Requirements Section */}
-      <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-            {t('modules.technicianJobBoard.accessRequirements.title', 'Access Requirements')}
+      {/* Final CTA Section - Stakeholder Colored */}
+      <section className="py-16 md:py-20 px-4 text-white" style={{backgroundImage: `linear-gradient(135deg, ${TECHNICIAN_COLOR} 0%, ${TECHNICIAN_GRADIENT_END} 100%)`}}>
+        <div className="max-w-3xl mx-auto text-center space-y-6">
+          <h2 className="text-3xl md:text-4xl font-bold">
+            Your Next Gig is Already Posted
           </h2>
-
-          <Card>
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b bg-muted/50">
-                      <th className="text-left p-4 font-semibold">{t('modules.technicianJobBoard.accessRequirements.feature', 'Feature')}</th>
-                      <th className="text-center p-4 font-semibold">{t('modules.technicianJobBoard.accessRequirements.freeTier', 'Free Tier')}</th>
-                      <th className="text-center p-4 font-semibold">
-                        <span className="flex items-center justify-center gap-2">
-                          <Star className="w-4 h-4 text-amber-500" />
-                          {t('modules.technicianJobBoard.accessRequirements.plusAccount', 'Plus Account')}
-                        </span>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="border-b">
-                      <td className="p-4">{t('modules.technicianJobBoard.accessRequirements.browseJobs', 'Browse Job Postings')}</td>
-                      <td className="p-4 text-center"><CheckCircle2 className="w-5 h-5 text-emerald-600 mx-auto" /></td>
-                      <td className="p-4 text-center"><CheckCircle2 className="w-5 h-5 text-emerald-600 mx-auto" /></td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="p-4">{t('modules.technicianJobBoard.accessRequirements.applyToJobs', 'Apply to Jobs')}</td>
-                      <td className="p-4 text-center text-muted-foreground">{t('modules.technicianJobBoard.accessRequirements.limited', 'Limited')}</td>
-                      <td className="p-4 text-center"><CheckCircle2 className="w-5 h-5 text-emerald-600 mx-auto" /></td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="p-4">{t('modules.technicianJobBoard.accessRequirements.profileVisibility', 'Profile Visibility Toggle')}</td>
-                      <td className="p-4 text-center text-muted-foreground">-</td>
-                      <td className="p-4 text-center"><CheckCircle2 className="w-5 h-5 text-emerald-600 mx-auto" /></td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="p-4">{t('modules.technicianJobBoard.accessRequirements.receiveOffers', 'Receive Direct Offers')}</td>
-                      <td className="p-4 text-center text-muted-foreground">-</td>
-                      <td className="p-4 text-center"><CheckCircle2 className="w-5 h-5 text-emerald-600 mx-auto" /></td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="p-4">{t('modules.technicianJobBoard.accessRequirements.setPayRate', 'Set Expected Pay Rate')}</td>
-                      <td className="p-4 text-center text-muted-foreground">-</td>
-                      <td className="p-4 text-center"><CheckCircle2 className="w-5 h-5 text-emerald-600 mx-auto" /></td>
-                    </tr>
-                    <tr>
-                      <td className="p-4">{t('modules.technicianJobBoard.accessRequirements.safetyRatingDisplay', 'Safety Rating Display')}</td>
-                      <td className="p-4 text-center text-sm text-muted-foreground">{t('modules.technicianJobBoard.accessRequirements.requiresEmployer', 'Requires employer')}</td>
-                      <td className="p-4 text-center text-sm text-muted-foreground">{t('modules.technicianJobBoard.accessRequirements.requiresEmployer', 'Requires employer')}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      <Separator className="my-0" />
-
-      {/* Final CTA Section */}
-      <section className="py-20 md:py-28 px-4" style={{backgroundImage: 'linear-gradient(135deg, #0B64A3 0%, #0369A1 100%)'}}>
-        <div className="max-w-4xl mx-auto text-center text-white">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
-            {t('modules.technicianJobBoard.finalCta.title', 'Every Job Here Is Rope Access.')}<br />
-            <span className="text-blue-100">{t('modules.technicianJobBoard.finalCta.subtitle', 'No Exceptions.')}</span>
-          </h2>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            {t('modules.technicianJobBoard.finalCta.description', "Stop scrolling through pipe fitter listings and offshore rigs. OnRopePro's Job Board is built for techs who do rope access building maintenance. Browse jobs, apply in seconds, control who finds you.")}
+          <p className="text-lg text-white/90">
+            Somewhere on this platform, an employer is looking for exactly your certification level, in exactly your city, at exactly your expected pay rate.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-cta-browse">
-              <Link href="/technician-login">
-                {t('modules.technicianJobBoard.finalCta.browseJobs', 'Browse Jobs Free')}
+          <p className="font-medium text-white">
+            You just need to show up. Create your account. Complete your profile. Start browsing or get found.
+          </p>
+          <p className="text-orange-100 italic">
+            The only job board built exclusively for rope access technicians.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+            <Button size="lg" className="bg-white hover:bg-orange-50" style={{color: TECHNICIAN_COLOR}} asChild data-testid="button-final-create-account">
+              <Link href="/technician-login?register=true">
+                Create Your Free Account
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-cta-plus">
-              <Link href="/technician-login">
-                {t('modules.technicianJobBoard.finalCta.upgradePlus', 'Upgrade to Plus for Full Access')}
-                <Star className="ml-2 w-5 h-5" />
+            <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-final-upgrade-plus">
+              <Link href="/technician-login?register=true&plus=true">
+                Upgrade to PLUS Free
+                <Award className="ml-2 w-5 h-5" />
               </Link>
             </Button>
           </div>
+          <p className="text-sm text-white/80 pt-2">
+            First 500 technicians only
+          </p>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-8 px-4 bg-slate-900 text-slate-400">
-        <div className="max-w-6xl mx-auto text-center">
-          <img src={onRopeProLogo} alt="OnRopePro" className="h-8 mx-auto mb-4 opacity-60" />
-          <p className="text-sm">{t('modules.technicianJobBoard.footer.tagline', 'The platform built for rope access building maintenance.')}</p>
+      {/* Footer - Dark Slate */}
+      <footer className="bg-slate-900 text-slate-300 py-12 px-4">
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <img src={onRopeProLogo} alt="OnRopePro" className="h-8 object-contain brightness-0 invert" />
+            <span className="text-sm">Management Software for Rope Access</span>
+          </div>
+          <div className="flex items-center gap-6 text-sm">
+            <Link href="/privacy" className="hover:text-white transition-colors" data-testid="link-footer-privacy">
+              Privacy Policy
+            </Link>
+            <Link href="/terms" className="hover:text-white transition-colors" data-testid="link-footer-terms">
+              Terms of Service
+            </Link>
+          </div>
         </div>
       </footer>
     </div>
