@@ -373,7 +373,7 @@ export default function SuperUser() {
                     });
                     const result = await response.json();
                     if (response.ok) {
-                      window.location.href = "/property-manager";
+                      window.location.href = "/pm-dashboard";
                     } else {
                       toast({ title: "Failed", description: result.message, variant: "destructive" });
                     }
