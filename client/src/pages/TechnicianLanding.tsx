@@ -67,13 +67,13 @@ export default function TechnicianLanding() {
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button size="lg" className="bg-white hover:bg-orange-50" style={{color: TECHNICIAN_COLOR}} asChild data-testid="button-hero-create-account">
-                <Link href="/register">
+                <Link href="/technician-login?register=true">
                   Create Free Account
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-hero-login">
-                <Link href="/login">
+                <Link href="/technician-login">
                   Sign In
                 </Link>
               </Button>
@@ -538,7 +538,7 @@ export default function TechnicianLanding() {
               
               <div className="flex justify-center">
                 <Button className="bg-[#AB4521] hover:bg-[#8B371A] text-white" asChild data-testid="button-career-climbers-cta">
-                  <Link href="/register">
+                  <Link href="/technician-login?register=true">
                     Create Free Account
                     <ArrowRight className="ml-2 w-4 h-4" />
                   </Link>
@@ -600,13 +600,13 @@ export default function TechnicianLanding() {
               
               <div className="flex flex-wrap justify-center gap-4">
                 <Button className="bg-[#AB4521] hover:bg-[#8B371A] text-white" asChild data-testid="button-hustlers-cta">
-                  <Link href="/register">
+                  <Link href="/technician-login?register=true">
                     Create Free Account
                     <ArrowRight className="ml-2 w-4 h-4" />
                   </Link>
                 </Button>
                 <Button variant="outline" asChild data-testid="button-hustlers-plus">
-                  <Link href="/register">
+                  <Link href="/technician-login?register=true">
                     Upgrade to PLUS with 1 Referral
                     <Share2 className="ml-2 w-4 h-4" />
                   </Link>
@@ -668,7 +668,7 @@ export default function TechnicianLanding() {
               
               <div className="flex justify-center">
                 <Button className="bg-[#AB4521] hover:bg-[#8B371A] text-white" asChild data-testid="button-freedom-seekers-cta">
-                  <Link href="/register">
+                  <Link href="/technician-login?register=true">
                     Create Free Account
                     <ArrowRight className="ml-2 w-4 h-4" />
                   </Link>
@@ -1062,13 +1062,13 @@ export default function TechnicianLanding() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
             <Button size="lg" className="bg-white hover:bg-orange-50" style={{color: TECHNICIAN_COLOR}} asChild data-testid="button-final-create-account">
-              <Link href="/register">
+              <Link href="/technician-login?register=true">
                 Create Free Account
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>
             <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-final-refer">
-              <Link href="/login">
+              <Link href="/technician-login?register=true">
                 Refer a tech and unlock PLUS
                 <UserPlus className="ml-2 w-5 h-5" />
               </Link>
