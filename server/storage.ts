@@ -3221,7 +3221,13 @@ export class Storage {
       });
       
       for (const project of matchingProjects) {
-        if (!project.latitude || !project.longitude) continue;
+        // Safely convert date to ISO string
+        const toISOString = (date: Date | string | null | undefined): string | null => {
+          if (!date) return null;
+          if (typeof date === 'string') return date;
+          if (date instanceof Date) return date.toISOString();
+          return null;
+        };
         
         buildingsForMap.push({
           projectId: project.id,
@@ -3233,8 +3239,8 @@ export class Storage {
           status: project.status || 'active',
           jobType: project.jobType || '',
           customJobType: project.customJobType,
-          startDate: project.startDate ? project.startDate.toISOString() : null,
-          endDate: project.endDate ? project.endDate.toISOString() : null,
+          startDate: toISOString(project.startDate),
+          endDate: toISOString(project.endDate),
           vendorLinkId: link.id,
           vendorName: company.companyName || company.email || 'Unknown Vendor',
           vendorLogo: company.whitelabelBrandingActive && company.brandingLogoUrl 
