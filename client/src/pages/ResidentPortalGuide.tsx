@@ -1156,6 +1156,220 @@ export default function ResidentPortalGuide() {
 
         <Separator />
 
+        {/* User Guide Section */}
+        <section id="user-guide" className="space-y-6">
+          <div className="flex items-center gap-3 mb-4">
+            <Home className="w-6 h-6 text-[#86A59C]" />
+            <h2 className="text-xl md:text-2xl font-semibold">Resident Portal User Guide</h2>
+          </div>
+
+          <Card className="border-[#86A59C]/30 bg-[#86A59C]/5">
+            <CardContent className="pt-6 space-y-6">
+              <p className="text-base leading-relaxed">
+                The Resident Portal gives you direct access to view maintenance work progress on your building and communicate directly with the service company. No more wondering when work will be done or whether your concerns were received.
+              </p>
+
+              {/* Getting Started */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <ArrowRight className="w-5 h-5 text-[#86A59C]" />
+                  Getting Started
+                </h3>
+                
+                <div className="bg-white dark:bg-slate-900 rounded-lg p-4 space-y-4">
+                  <div>
+                    <h4 className="font-medium mb-2">Creating Your Account</h4>
+                    <p className="text-base text-muted-foreground mb-2">
+                      To sign up for an account, go to: <a href="/resident" className="text-[#86A59C] underline">onrope.pro/resident</a>
+                    </p>
+                    <p className="text-base text-muted-foreground mb-2">You'll need to provide:</p>
+                    <ul className="list-disc list-inside space-y-1 ml-2 text-base text-muted-foreground">
+                      <li><strong>Full name</strong></li>
+                      <li><strong>Email</strong></li>
+                      <li><strong>Phone number</strong></li>
+                      <li><strong>Strata plan / HOA / LMS number</strong> - Your building's strata plan identifier</li>
+                      <li><strong>Unit number</strong> - Your apartment or suite number</li>
+                      <li><strong>Parking stall</strong> (optional)</li>
+                      <li><strong>Password</strong> - Create a secure password for your account</li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
+                    <p className="text-base text-amber-800 dark:text-amber-200">
+                      <strong>Note:</strong> If you move to a different unit or building, you can easily update your account by changing your strata plan number and unit number. Your account stays with you.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="bg-white dark:bg-slate-900 rounded-lg p-4 space-y-4">
+                  <h4 className="font-medium">Entering Your Company Code</h4>
+                  <p className="text-base text-muted-foreground">
+                    After logging in for the first time, you'll need to enter a <strong>10-character Company Code</strong> to complete your portal setup.
+                  </p>
+                  <p className="text-base text-muted-foreground">The company code:</p>
+                  <ul className="list-disc list-inside space-y-1 ml-2 text-base text-muted-foreground">
+                    <li><strong>Binds your account to the company</strong> working on your building</li>
+                    <li><strong>Enables you to see active work</strong> - without it, your control panel will be empty</li>
+                    <li>Is a 10-character code provided by your building manager or the service company</li>
+                  </ul>
+                  
+                  <div className="border rounded-lg overflow-hidden">
+                    <img 
+                      src="/attached_assets/residents_company_code.png" 
+                      alt="Where to add your company code" 
+                      className="w-full"
+                    />
+                    <p className="text-sm text-center text-muted-foreground py-2 bg-muted/30">Where to add your company code</p>
+                  </div>
+
+                  <div className="bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                    <p className="text-base text-blue-800 dark:text-blue-200">
+                      <strong>Important:</strong> Active work and building information won't appear in your control panel until you've entered the company code.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* What You Can Do */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-[#86A59C]" />
+                  What You Can Do
+                </h3>
+                
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="bg-white dark:bg-slate-900 rounded-lg p-4">
+                    <h4 className="font-medium mb-2 flex items-center gap-2">
+                      <Eye className="w-4 h-4 text-[#86A59C]" />
+                      View Project Progress
+                    </h4>
+                    <ul className="list-disc list-inside space-y-1 text-base text-muted-foreground">
+                      <li>Real-time progress updates showing which elevations are complete</li>
+                      <li>Project schedules with expected completion dates</li>
+                      <li>Progress bars for each elevation</li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-white dark:bg-slate-900 rounded-lg p-4">
+                    <h4 className="font-medium mb-2 flex items-center gap-2">
+                      <MessageSquare className="w-4 h-4 text-[#86A59C]" />
+                      Submit Feedback
+                    </h4>
+                    <ul className="list-disc list-inside space-y-1 text-base text-muted-foreground">
+                      <li>Report issues, concerns, or compliments</li>
+                      <li>Attach photos for visual issues</li>
+                      <li>Automatically timestamped and tracked</li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-white dark:bg-slate-900 rounded-lg p-4">
+                    <h4 className="font-medium mb-2 flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-[#86A59C]" />
+                      Track Your Feedback
+                    </h4>
+                    <ul className="list-disc list-inside space-y-1 text-base text-muted-foreground">
+                      <li>View all your submitted feedback in one place</li>
+                      <li>See current status (Open, In Progress, or Closed)</li>
+                      <li>View management responses and updates</li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-white dark:bg-slate-900 rounded-lg p-4">
+                    <h4 className="font-medium mb-2 flex items-center gap-2">
+                      <Camera className="w-4 h-4 text-[#86A59C]" />
+                      Photo Evidence
+                    </h4>
+                    <p className="text-base text-muted-foreground">
+                      Clear photos help the team understand and resolve issues faster. Include photos showing the specific area of concern from multiple angles if possible.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Understanding Feedback Status */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Understanding Feedback Status</h3>
+                <div className="flex flex-wrap gap-3">
+                  <div className="flex items-center gap-2 bg-white dark:bg-slate-900 rounded-lg px-4 py-2">
+                    <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                    <span className="font-medium">Open</span>
+                    <span className="text-muted-foreground text-sm">- Awaiting review</span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-white dark:bg-slate-900 rounded-lg px-4 py-2">
+                    <div className="w-3 h-3 rounded-full bg-amber-500"></div>
+                    <span className="font-medium">In Progress</span>
+                    <span className="text-muted-foreground text-sm">- Being resolved</span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-white dark:bg-slate-900 rounded-lg px-4 py-2">
+                    <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
+                    <span className="font-medium">Closed</span>
+                    <span className="text-muted-foreground text-sm">- Issue resolved</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Key Benefits */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Key Benefits</h3>
+                <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0" />
+                    <div>
+                      <p className="font-medium">Transparency</p>
+                      <p className="text-sm text-muted-foreground">Everything is visible, timestamped, and tracked</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0" />
+                    <div>
+                      <p className="font-medium">Faster Resolution</p>
+                      <p className="text-sm text-muted-foreground">Average resolution time drops from 3-5 days to 24 hours</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0" />
+                    <div>
+                      <p className="font-medium">Visual Proof</p>
+                      <p className="text-sm text-muted-foreground">Photo attachments provide clear evidence</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0" />
+                    <div>
+                      <p className="font-medium">Better Communication</p>
+                      <p className="text-sm text-muted-foreground">Direct channel eliminates the telephone game</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0" />
+                    <div>
+                      <p className="font-medium">Reduced Frustration</p>
+                      <p className="text-sm text-muted-foreground">Real-time progress instead of guessing</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Privacy & Security */}
+              <div className="bg-white dark:bg-slate-900 rounded-lg p-4">
+                <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                  <Lock className="w-5 h-5 text-[#86A59C]" />
+                  Privacy & Security
+                </h3>
+                <p className="text-base text-muted-foreground mb-2">Your account and data are protected with:</p>
+                <ul className="list-disc list-inside space-y-1 text-base text-muted-foreground">
+                  <li><strong>Encrypted passwords</strong> using industry-standard security</li>
+                  <li><strong>Secure sessions</strong> with bank-level HTTPS encryption</li>
+                  <li><strong>Private feedback</strong> visible only to you and authorized management</li>
+                  <li><strong>Data isolation</strong> keeping your information separate and secure</li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        <Separator />
+
         {/* Summary */}
         <section className="space-y-4">
           <Card className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
