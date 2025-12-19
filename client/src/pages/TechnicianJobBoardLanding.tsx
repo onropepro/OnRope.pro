@@ -52,7 +52,7 @@ export default function TechnicianJobBoardLanding() {
             
             <p className="text-xl md:text-2xl text-orange-100 max-w-3xl mx-auto leading-relaxed">
               Search "rope access" on Indeed and get oil rigs, pipe fitting, and random construction gigs.<br />
-              <strong>OnRopePro's Job Board shows only rope access building maintenance jobs. Every employer is verified. Every listing is relevant.</strong>
+              <strong>OnRopePro's Job Board shows only urban rope access building maintenance jobs. Every employer is verified. Every listing is relevant.</strong>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
