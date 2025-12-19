@@ -10144,6 +10144,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             totalFloors: project.totalFloors,
             buildingFloors: project.buildingFloors,
             dailyDropTarget: project.dailyDropTarget,
+            latitude: project.latitude,
+            longitude: project.longitude,
           });
         } catch (buildingError) {
           // Log but don't fail project creation if building creation fails

@@ -4040,6 +4040,8 @@ export class Storage {
     dailyDropTarget?: number | null;
     totalFloors?: number | null;
     buildingFloors?: number | null;
+    latitude?: string | null;
+    longitude?: string | null;
   }): Promise<Building> {
     if (!projectData.strataPlanNumber) {
       throw new Error("Strata plan number is required to track building");
@@ -4081,6 +4083,13 @@ export class Storage {
       if (existing.dropsWest === 0 && projectData.totalDropsWest && projectData.totalDropsWest > 0) {
         updates.dropsWest = projectData.totalDropsWest;
       }
+      // Update coordinates if existing are null and new data provided
+      if (!existing.latitude && projectData.latitude) {
+        updates.latitude = projectData.latitude;
+      }
+      if (!existing.longitude && projectData.longitude) {
+        updates.longitude = projectData.longitude;
+      }
       
       // If we have updates, apply them
       if (Object.keys(updates).length > 0) {
@@ -4107,6 +4116,8 @@ export class Storage {
       dropsEast: projectData.totalDropsEast || 0,
       dropsSouth: projectData.totalDropsSouth || 0,
       dropsWest: projectData.totalDropsWest || 0,
+      latitude: projectData.latitude || undefined,
+      longitude: projectData.longitude || undefined,
     });
 
     console.log(`[Buildings] Created new building: ${normalized} - ${projectData.buildingName || 'Unnamed'}`);
