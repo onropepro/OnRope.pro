@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import HelpArticleCard from '@/components/help/HelpArticleCard';
 import HelpChatWidget from '@/components/help/HelpChatWidget';
+import HelpSearchBar from '@/components/help/HelpSearchBar';
 
 interface HelpArticle {
   id: string;
@@ -83,6 +84,13 @@ export default function ForBuildingManagers() {
                 Monitor work, compliance, and communicate with residents
               </p>
             </div>
+          </div>
+          
+          <div className="max-w-xl mt-6">
+            <HelpSearchBar 
+              size="large" 
+              placeholder="Ask about safety ratings, compliance, work progress..."
+            />
           </div>
         </div>
         <div className="absolute bottom-0 left-0 right-0 z-10">
