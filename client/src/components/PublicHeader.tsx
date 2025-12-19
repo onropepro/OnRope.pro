@@ -129,12 +129,12 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
             {t('login.header.signIn', 'Sign In')}
           </Button>
           <Button 
+            variant="ghost"
             size="sm"
             onClick={() => setLocation("/pricing")}
-            className="bg-action-600 hover:bg-action-500"
-            data-testid="button-get-started-header"
+            data-testid="link-pricing-header"
           >
-            {t('login.header.getStarted', 'Get Started')}
+            {t('login.header.pricing', 'Pricing')}
           </Button>
         </div>
       </div>
