@@ -62,7 +62,7 @@ export default function TechnicianLanding() {
             
             <p className="text-xl md:text-2xl text-orange-100 max-w-3xl mx-auto leading-relaxed">
               The portable work passport for rope access technicians.<br />
-              <strong>Every building. Every drop. Every hour-logged, protected, and owned by you.</strong>
+              <strong>Every building. Every drop. Every hour-logged,<br />protected, and owned by you.</strong>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
