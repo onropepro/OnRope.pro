@@ -180,7 +180,6 @@ export default function TechnicianLanding() {
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
       <PublicHeader activeNav="technician" onSignInClick={handleToggleSignIn} />
-      
       {/* Hero Section - Rust Brown Gradient */}
       <section className="relative text-white pb-[120px]" style={{backgroundImage: `linear-gradient(135deg, ${TECHNICIAN_COLOR} 0%, ${TECHNICIAN_GRADIENT_END} 100%)`}}>
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMtOS45NDEgMC0xOCA4LjA1OS0xOCAxOHM4LjA1OSAxOCAxOCAxOGM5Ljk0MSAwIDE4LTguMDU5IDE4LTE4cy04LjA1OS0xOC0xOC0xOHptMCAzMmMtNy43MzIgMC0xNC02LjI2OC0xNC0xNHM2LjI2OC0xNCAxNC0xNHMxNCA2LjI2OCAxNCAxNC02LjI2OCAxNC0xNCAxNHoiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wMykiLz48L2c+PC9zdmc+')] opacity-30"></div>
@@ -189,8 +188,8 @@ export default function TechnicianLanding() {
           <div className="text-center space-y-6 pt-16">
             <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-technician-portal">
               <div className="flex flex-col items-center gap-1">
-                <span>Urban Rope Tech Passport</span>
-                <span className="text-xs opacity-90">Built by a Level 3 IRATA Tech</span>
+                <span>For Rope Access Techs</span>
+                <span className="text-xs opacity-90">Urban Rope Tech Passport - Built by a Level 3 IRATA Tech</span>
               </div>
             </Badge>
             
@@ -434,7 +433,6 @@ export default function TechnicianLanding() {
           </svg>
         </div>
       </section>
-
       {/* Problem Validation Section */}
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
@@ -471,9 +469,7 @@ export default function TechnicianLanding() {
           </Card>
         </div>
       </section>
-
       <Separator />
-
       {/* Value Proposition Section */}
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-4xl mx-auto">
@@ -507,7 +503,6 @@ export default function TechnicianLanding() {
           </Card>
         </div>
       </section>
-
       {/* Free vs PLUS Section */}
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-5xl mx-auto">
@@ -656,9 +651,7 @@ export default function TechnicianLanding() {
           </div>
         </div>
       </section>
-
       <Separator />
-
       {/* When Your Employer Also Uses OnRopePro */}
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-4xl mx-auto">
@@ -762,9 +755,7 @@ export default function TechnicianLanding() {
           </div>
         </div>
       </section>
-
       <Separator />
-
       {/* Import Your Existing Logbook */}
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
@@ -820,9 +811,7 @@ export default function TechnicianLanding() {
           </p>
         </div>
       </section>
-
       <Separator />
-
       {/* Segment-Specific Value Blocks */}
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-5xl mx-auto space-y-12">
@@ -1028,7 +1017,6 @@ export default function TechnicianLanding() {
           </Card>
         </div>
       </section>
-
       {/* How It Works Section */}
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
@@ -1104,9 +1092,7 @@ export default function TechnicianLanding() {
           </Card>
         </div>
       </section>
-
       <Separator />
-
       {/* Important Clarifications Section */}
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-4xl mx-auto">
@@ -1192,7 +1178,6 @@ export default function TechnicianLanding() {
           </div>
         </div>
       </section>
-
       {/* Social Proof Section */}
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-5xl mx-auto">
@@ -1241,9 +1226,7 @@ export default function TechnicianLanding() {
           </div>
         </div>
       </section>
-
       <Separator />
-
       {/* PLUS Upgrade Path Section */}
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-4xl mx-auto">
@@ -1294,7 +1277,6 @@ export default function TechnicianLanding() {
           </Card>
         </div>
       </section>
-
       {/* FAQ Section */}
       <section id="faqs" className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
@@ -1396,7 +1378,6 @@ export default function TechnicianLanding() {
           </Accordion>
         </div>
       </section>
-
       {/* Final CTA Section - Stakeholder Colored */}
       <section className="py-16 md:py-20 px-4 text-white" style={{backgroundImage: `linear-gradient(135deg, ${TECHNICIAN_COLOR} 0%, ${TECHNICIAN_GRADIENT_END} 100%)`}}>
         <div className="max-w-3xl mx-auto text-center space-y-6">
@@ -1437,7 +1418,6 @@ export default function TechnicianLanding() {
           </p>
         </div>
       </section>
-
       {/* Footer - Dark Slate */}
       <footer className="bg-slate-900 text-slate-300 py-12 px-4">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
@@ -1455,7 +1435,6 @@ export default function TechnicianLanding() {
           </div>
         </div>
       </footer>
-
       {/* Registration Modal */}
       <TechnicianRegistration 
         open={showRegistration} 

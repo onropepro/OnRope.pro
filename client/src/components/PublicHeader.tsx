@@ -249,7 +249,11 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                 <ChevronDown className="w-3 h-3" />
               </Button>
               {showModulesMenu && (
-                <div className="fixed top-[104px] left-1/2 -translate-x-1/2 pt-2 z-50">
+                <div 
+                  className="fixed top-[88px] left-1/2 -translate-x-1/2 pt-4 z-50"
+                  onMouseEnter={() => setShowModulesMenu(true)}
+                  onMouseLeave={() => setShowModulesMenu(false)}
+                >
                   <div className="bg-card border border-border rounded-xl shadow-xl p-4 w-[960px] max-w-[calc(100vw-2rem)]">
                   <div className="flex gap-3">
                     {/* Column 1: Safety & Operations (4 items, Document Management at bottom) */}

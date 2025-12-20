@@ -23,7 +23,9 @@ import {
   PenTool,
   Shield,
   Clock,
-  Briefcase
+  Briefcase,
+  Smartphone,
+  BookOpen
 } from "lucide-react";
 
 export type SoftwareKey =
@@ -53,7 +55,10 @@ export type SoftwareKey =
   | "jobnimbus"
   | "buildium"
   | "appfolio"
-  | "whenIWork";
+  | "whenIWork"
+  | "vericlock"
+  | "notesApp"
+  | "notebook";
 
 interface SoftwareInfo {
   name: string;
@@ -88,6 +93,9 @@ const softwareData: Record<SoftwareKey, SoftwareInfo> = {
   buildium: { name: "Buildium", icon: <Building2 className="w-5 h-5" /> },
   appfolio: { name: "AppFolio", icon: <Building2 className="w-5 h-5" /> },
   whenIWork: { name: "When I Work", icon: <Clock className="w-5 h-5" /> },
+  vericlock: { name: "Vericlock", icon: <Clock className="w-5 h-5" /> },
+  notesApp: { name: "Notes App", icon: <Smartphone className="w-5 h-5" /> },
+  notebook: { name: "Notebook", icon: <BookOpen className="w-5 h-5" /> },
 };
 
 interface SoftwareReplacesProps {
@@ -125,11 +133,11 @@ export function SoftwareReplaces({ software, className = "" }: SoftwareReplacesP
 
 export const MODULE_SOFTWARE_MAPPING: Record<string, SoftwareKey[]> = {
   "technician-passport": ["bamboohr", "docusign", "paper"],
-  "safety-compliance": ["safetyculture", "paper"],
+  "safety-compliance": ["safetyculture", "paper", "notesApp", "notebook"],
   "project-management": ["monday", "asana", "trello"],
-  "work-session-time-tracking": ["deputy", "clockify"],
+  "work-session-time-tracking": ["deputy", "clockify", "vericlock", "notesApp", "notebook"],
   "company-safety-rating": ["excel", "spreadsheets"],
-  "irata-sprat-task-logging": ["excel", "paper"],
+  "irata-sprat-task-logging": ["excel", "paper", "notesApp"],
   "document-management": ["docusign", "dropbox", "sharepoint"],
   "employee-management": ["bamboohr", "gusto", "paper"],
   "technician-job-board": ["indeed", "linkedin"],
@@ -139,7 +147,7 @@ export const MODULE_SOFTWARE_MAPPING: Record<string, SoftwareKey[]> = {
   "payroll-financial": ["quickbooks", "xero", "excel"],
   "quoting-sales-pipeline": ["hubspot", "pipedrive", "jobnimbus"],
   "white-label-branding": [],
-  "resident-portal": ["zendesk", "freshdesk"],
+  "resident-portal": ["zendesk", "freshdesk", "notesApp", "notebook"],
   "property-manager-interface": ["buildium", "appfolio"],
   "user-access-authentication": [],
 };

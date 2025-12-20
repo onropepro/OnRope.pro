@@ -35,12 +35,15 @@ export default function CRMGuide() {
     <ChangelogGuideLayout 
       title="Client Relationship Management Guide"
       version="2.0"
-      lastUpdated="December 5, 2025"
+      lastUpdated="December 17, 2025"
     >
       <div className="space-y-8">
         <section className="space-y-4">
           <p className="text-muted-foreground leading-relaxed text-base">
             The CRM system provides centralized management of property managers, strata companies, and building owners. Each client can have multiple <strong>LMS (Land Management System) numbers</strong> representing different buildings they manage. Access it from the Clients section in your dashboard.
+          </p>
+          <p className="text-sm text-muted-foreground italic mt-2">
+            Note: Building IDs vary by region (LMS/EMS in Vancouver, VIS on Vancouver Island). OnRopePro uses "LMS" as a generic term for all strata/building identifiers.
           </p>
         </section>
 
@@ -98,38 +101,143 @@ export default function CRMGuide() {
           </Card>
         </section>
 
-        {/* Problems Solved */}
+        {/* Problems Solved - Stakeholder Segmented */}
         <section className="space-y-4">
-          <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2 text-green-900 dark:text-green-100">
-                <CheckCircle2 className="w-5 h-5" />
-                Problems Solved
-              </CardTitle>
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
+            <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />
+            Problems Solved
+          </h2>
+          <p className="text-base text-muted-foreground">The CRM module solves different problems for different stakeholders:</p>
+
+          {/* Company Owners - 5 Problems */}
+          <Card className="overflow-hidden">
+            <CardHeader className="bg-blue-50 dark:bg-blue-950 border-b">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                  <Briefcase className="w-5 h-5 text-blue-600" />
+                </div>
+                <CardTitle className="text-xl">For Rope Access Company Owners</CardTitle>
+              </div>
             </CardHeader>
-            <CardContent className="text-green-900 dark:text-green-100">
-              <ul className="space-y-2 text-sm">
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span><strong>Repeated data entry:</strong> Building specs auto-fill into new projects from client LMS records</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span><strong>Scattered client information:</strong> Centralized database of clients with multiple building portfolios</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span><strong>Lost building specifications:</strong> Floor counts, strata plans, and drop targets stored permanently</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span><strong>Billing address confusion:</strong> Separate billing vs. service addresses per client</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span><strong>Inconsistent project setup:</strong> Client selection populates correct building data automatically</span>
-                </li>
-              </ul>
+            <CardContent className="p-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <h4 className="font-semibold flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600" />
+                    Repeated Data Entry Eliminated
+                  </h4>
+                  <p className="text-base text-muted-foreground">Building specs auto-fill into new projects from client LMS records. One-time entry, permanent records.</p>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="font-semibold flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600" />
+                    Scattered Information Centralized
+                  </h4>
+                  <p className="text-base text-muted-foreground">All contact details, building specs, and related data organized in one digital space instead of Excel, texts, and paper.</p>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="font-semibold flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600" />
+                    Data Entry Errors Prevented
+                  </h4>
+                  <p className="text-base text-muted-foreground">Autofill intelligence eliminates manual entry. No more transposing floor counts or misspelling addresses.</p>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="font-semibold flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600" />
+                    Faster Project Setup
+                  </h4>
+                  <p className="text-base text-muted-foreground">Project creation in under 2 minutes instead of 15. Select client, select building, all fields auto-populate.</p>
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <h4 className="font-semibold flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600" />
+                    Clear ROI
+                  </h4>
+                  <p className="text-base text-muted-foreground">System pays for itself with 20+ hours saved monthly per employee. Net positive ROI from day one.</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Operations Managers - 2 Problems */}
+          <Card className="overflow-hidden">
+            <CardHeader className="bg-purple-50 dark:bg-purple-950 border-b">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
+                  <Settings className="w-5 h-5 text-purple-600" />
+                </div>
+                <CardTitle className="text-xl">For Operations Managers</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <h4 className="font-semibold flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600" />
+                    Building Specs for Equipment Planning
+                  </h4>
+                  <p className="text-base text-muted-foreground">Floor count and parking stalls accessible to anyone with view permissions. Right gear, right building, every time.</p>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="font-semibold flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600" />
+                    Accurate Job Duration Estimates
+                  </h4>
+                  <p className="text-base text-muted-foreground">Floor count and drop targets stored per building. Stories field determines how long drops take on 10-story vs. 50-story buildings.</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Building/Property Managers - 2 Problems */}
+          <Card className="overflow-hidden">
+            <CardHeader className="bg-[#6E9075]/10 dark:bg-[#6E9075]/20 border-b">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-[#6E9075]/20 dark:bg-[#6E9075]/30 flex items-center justify-center">
+                  <Building2 className="w-5 h-5 text-[#6E9075]" />
+                </div>
+                <CardTitle className="text-xl">For Building/Property Managers</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <h4 className="font-semibold flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600" />
+                    Contractors Remember Your Buildings
+                  </h4>
+                  <p className="text-base text-muted-foreground">No more annual questions about floor counts and parking. One conversation, permanent record. Professional service.</p>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="font-semibold flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600" />
+                    No Building Mix-Ups
+                  </h4>
+                  <p className="text-base text-muted-foreground">Each client record supports multiple buildings with unique LMS numbers. No more confusion between Building A and Building C specs.</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Technicians - 1 Problem */}
+          <Card className="overflow-hidden">
+            <CardHeader className="bg-[#AB4521]/10 dark:bg-[#AB4521]/20 border-b">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-[#AB4521]/20 dark:bg-[#AB4521]/30 flex items-center justify-center">
+                  <Users className="w-5 h-5 text-[#AB4521]" />
+                </div>
+                <CardTitle className="text-xl">For Technicians</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="space-y-2">
+                <h4 className="font-semibold flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-600" />
+                  Know What to Expect Before Arrival
+                </h4>
+                <p className="text-base text-muted-foreground">Building specs accessible through project details. Floor count, parking stalls, and drop targets visible for any assigned project. Arrive prepared with professional confidence.</p>
+              </div>
             </CardContent>
           </Card>
         </section>
@@ -168,6 +276,10 @@ export default function CRMGuide() {
                     <div className="flex items-center gap-2">
                       <Phone className="w-3 h-3" />
                       <span>Phone Number</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-3 h-3" />
+                      <span>Email Address</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <MapPin className="w-3 h-3" />
@@ -289,6 +401,46 @@ export default function CRMGuide() {
               </CardContent>
             </Card>
           </div>
+
+          {/* Reverse Client Creation */}
+          <Card className="border-cyan-200 bg-cyan-50 dark:bg-cyan-950 mt-6">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-xl font-semibold flex items-center gap-2 text-cyan-900 dark:text-cyan-100">
+                <Zap className="w-5 h-5 text-cyan-600" />
+                Streamlined: Create Project + Client Together
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-cyan-900 dark:text-cyan-100">
+              <p className="text-base">
+                Creating a project for a brand new client? No need to add the client first. Enter the details directly in the project form. After saving, the system prompts: <strong>"Save as new client?"</strong> One click creates both the project AND the client record.
+              </p>
+              <div className="mt-4 bg-white dark:bg-cyan-900 rounded-lg p-4">
+                <p className="font-semibold text-sm">How It Works:</p>
+                <ol className="mt-2 space-y-2 text-sm">
+                  <li className="flex items-start gap-2">
+                    <span className="bg-cyan-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shrink-0">1</span>
+                    <span>Start creating a new project</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="bg-cyan-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shrink-0">2</span>
+                    <span>Enter client and building details directly in the form</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="bg-cyan-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shrink-0">3</span>
+                    <span>Save the project</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="bg-cyan-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shrink-0">4</span>
+                    <span>System prompts "Do you want to save this as a new client?"</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="bg-cyan-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shrink-0">5</span>
+                    <span>Click Yes to create both records in one action</span>
+                  </li>
+                </ol>
+              </div>
+            </CardContent>
+          </Card>
         </section>
 
         <Separator />
@@ -451,7 +603,7 @@ export default function CRMGuide() {
                     <tr className="border-b">
                       <td className="py-2">Stories</td>
                       <td className="py-2">Floor count</td>
-                      <td className="py-2">Dryer vent scheduling</td>
+                      <td className="py-2">Drop duration calculation, equipment selection</td>
                     </tr>
                     <tr className="border-b">
                       <td className="py-2">Daily Drop Target</td>
@@ -573,6 +725,226 @@ export default function CRMGuide() {
 
         <Separator />
 
+        {/* Central Hub Integration */}
+        <section className="space-y-4">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
+            <Database className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            Central Hub Integration
+          </h2>
+          <p className="text-base text-muted-foreground">
+            The CRM is the <strong>glue that holds everything together</strong>. It connects all operational modules:
+          </p>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <Card className="bg-indigo-50 dark:bg-indigo-950 border-indigo-200 dark:border-indigo-800">
+              <CardContent className="pt-4">
+                <div className="space-y-3 text-sm">
+                  <div className="flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-indigo-600" />
+                    <span><strong>Project Management</strong> - Client/building selection auto-populates project details</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4 text-indigo-600" />
+                    <span><strong>Billing</strong> - Separate service and billing addresses per client</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Settings className="w-4 h-4 text-indigo-600" />
+                    <span><strong>Work Sessions</strong> - Building specs flow to daily work tracking</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-indigo-50 dark:bg-indigo-950 border-indigo-200 dark:border-indigo-800">
+              <CardContent className="pt-4">
+                <div className="space-y-3 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Layers className="w-4 h-4 text-indigo-600" />
+                    <span><strong>Gear Inventory</strong> - Floor count determines equipment requirements</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-indigo-600" />
+                    <span><strong>Quoting/Sales</strong> - Building specs enable accurate quotes</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Building2 className="w-4 h-4 text-indigo-600" />
+                    <span><strong>Resident Portal</strong> - Client-building relationships enable resident access</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        <Separator />
+
+        {/* Static Building Data */}
+        <section className="space-y-4">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
+            <Lock className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+            Static Building Data
+          </h2>
+          
+          <Card className="border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950">
+            <CardContent className="pt-6">
+              <div className="space-y-4">
+                <p className="text-base">
+                  <strong>Key Principle:</strong> Building specifications are <strong>static</strong>. They never change once entered.
+                </p>
+                
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="bg-white dark:bg-slate-900 rounded-lg p-4">
+                    <p className="font-semibold text-sm mb-2 text-slate-900 dark:text-slate-100">Fixed Building Data:</p>
+                    <ul className="space-y-1 text-sm text-muted-foreground">
+                      <li className="flex items-center gap-2">
+                        <Lock className="w-3 h-3" />
+                        Number of floors
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Lock className="w-3 h-3" />
+                        Number of drops per elevation
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Lock className="w-3 h-3" />
+                        Parking stalls count
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Lock className="w-3 h-3" />
+                        Unit counts
+                      </li>
+                    </ul>
+                  </div>
+                  <div className="bg-white dark:bg-slate-900 rounded-lg p-4">
+                    <p className="font-semibold text-sm mb-2 text-slate-900 dark:text-slate-100">What CAN Change:</p>
+                    <ul className="space-y-1 text-sm text-muted-foreground">
+                      <li className="flex items-center gap-2">
+                        <Users className="w-3 h-3" />
+                        Property manager contact info
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Phone className="w-3 h-3" />
+                        Phone numbers for building access
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <FileText className="w-3 h-3" />
+                        Billing arrangements
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="bg-emerald-50 dark:bg-emerald-950 rounded-lg p-4 border border-emerald-200 dark:border-emerald-800">
+                  <p className="text-sm text-emerald-900 dark:text-emerald-100">
+                    <strong>Why This Matters:</strong> Once building data is entered, it's permanent. No re-entry needed for future projects. Building specs entered in 2025 auto-populate in 2026 and beyond.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        <Separator />
+
+        {/* ROI Messaging */}
+        <section className="space-y-4">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
+            <Briefcase className="w-5 h-5 text-green-600 dark:text-green-400" />
+            Cost Efficiency
+          </h2>
+
+          <Card className="border-green-200 bg-green-50 dark:bg-green-950">
+            <CardContent className="pt-6">
+              <div className="text-center space-y-4">
+                <div className="bg-white dark:bg-green-900 rounded-lg p-6">
+                  <p className="text-4xl font-bold text-green-700 dark:text-green-300">
+                    $34/seat = 1 technician hour
+                  </p>
+                  <p className="text-lg text-green-600 dark:text-green-400 mt-2">
+                    Save 20+ hours monthly per employee
+                  </p>
+                </div>
+                
+                <div className="grid md:grid-cols-3 gap-4 text-sm">
+                  <div className="bg-white dark:bg-green-900 rounded-lg p-4">
+                    <p className="text-2xl font-bold text-green-700 dark:text-green-300">3 hrs</p>
+                    <p className="text-muted-foreground mt-1">Monthly cost (at L2 pay)</p>
+                  </div>
+                  <div className="bg-white dark:bg-green-900 rounded-lg p-4">
+                    <p className="text-2xl font-bold text-green-700 dark:text-green-300">20+ hrs</p>
+                    <p className="text-muted-foreground mt-1">Monthly savings</p>
+                  </div>
+                  <div className="bg-white dark:bg-green-900 rounded-lg p-4">
+                    <p className="text-2xl font-bold text-green-700 dark:text-green-300">6-7x</p>
+                    <p className="text-muted-foreground mt-1">Return on investment</p>
+                  </div>
+                </div>
+                
+                <p className="text-base text-green-800 dark:text-green-200">
+                  The system pays for itself with your first project setup. You're not paying for software - you're paying for time.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        <Separator />
+
+        {/* FAQ Section */}
+        <section className="space-y-4">
+          <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
+            <Info className="w-5 h-5 text-action-600 dark:text-action-400" />
+            Frequently Asked Questions
+          </h2>
+
+          <div className="space-y-4">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg font-semibold">Can one client have multiple buildings?</CardTitle>
+              </CardHeader>
+              <CardContent className="text-base text-muted-foreground">
+                Yes - this is the core design. One client (property management company or strata) can have unlimited buildings, each with their own LMS number and specifications. Example: Strata Corp Ltd manages 3 buildings: LMS-1234, LMS-5678, and LMS-9012.
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg font-semibold">What happens if I create a project without selecting an existing client?</CardTitle>
+              </CardHeader>
+              <CardContent className="text-base text-muted-foreground">
+                The system prompts you to save the entered details as a new client after project creation. You don't need to create the client first - one workflow handles both.
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg font-semibold">Is my building data shared with other companies?</CardTitle>
+              </CardHeader>
+              <CardContent className="text-base text-muted-foreground">
+                No. Currently, building data is private to your company. Each company maintains its own client/building database.
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg font-semibold">What's the difference between LMS, EMS, and VIS?</CardTitle>
+              </CardHeader>
+              <CardContent className="text-base text-muted-foreground">
+                These are regional naming conventions for building identifiers. LMS and EMS are used in Vancouver, while VIS (Vancouver Island Strata) is used on Vancouver Island. OnRopePro accepts any format - the "LMS" label is generic.
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg font-semibold">Why store parking stall counts?</CardTitle>
+              </CardHeader>
+              <CardContent className="text-base text-muted-foreground">
+                Parking directly impacts operations. Crews need to know: Is there loading zone access? How many vehicles can park? This affects equipment delivery and crew logistics.
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        <Separator />
+
         {/* Quick Links */}
         <section className="space-y-4">
           <h2 className="text-3xl md:text-4xl font-bold">Quick Links</h2>
@@ -609,7 +981,7 @@ export default function CRMGuide() {
         {/* Footer */}
         <Card className="border-muted bg-muted/50">
           <CardContent className="pt-6 text-base text-muted-foreground">
-            <p><strong>Last updated:</strong> December 3, 2024 | <strong>Version:</strong> 1.0</p>
+            <p><strong>Last updated:</strong> December 17, 2025 | <strong>Version:</strong> 2.0</p>
             <p className="mt-1">This document serves as the authoritative reference for the Client Relationship Management System.</p>
           </CardContent>
         </Card>
