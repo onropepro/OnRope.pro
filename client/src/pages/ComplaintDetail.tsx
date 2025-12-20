@@ -17,6 +17,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { formatTimestampDate, formatTime } from "@/lib/dateUtils";
 
+// Official Resident color from stakeholder palette
+const RESIDENT_COLOR = "#86A59C";
+
 const noteSchema = z.object({
   note: z.string().min(1, "Note cannot be empty"),
   visibleToResident: z.boolean().default(false),
@@ -367,6 +370,7 @@ export default function ComplaintDetail() {
                   <Button 
                     type="submit" 
                     className="w-full h-12" 
+                    style={{ backgroundColor: RESIDENT_COLOR }}
                     data-testid="button-send-reply" 
                     disabled={addResidentReplyMutation.isPending}
                   >

@@ -620,18 +620,16 @@ export default function ResidentDashboard() {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-primary/5 via-background to-primary/10">
       {/* Inject custom brand color styles */}
-      {hasCustomBranding && primaryColor && (
-        <style>{`
-          [data-state="active"][style*="--custom-primary"] {
-            background-color: ${primaryColor}20 !important;
-            color: ${primaryColor} !important;
-            border-bottom: 2px solid ${primaryColor} !important;
-          }
-          [data-state="active"][style*="--custom-primary"]:hover {
-            background-color: ${primaryColor}30 !important;
-          }
-        `}</style>
-      )}
+      <style>{`
+        [data-state="active"][style*="--custom-primary"] {
+          background-color: ${hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR}20 !important;
+          color: ${hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR} !important;
+          border-bottom: 2px solid ${hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR} !important;
+        }
+        [data-state="active"][style*="--custom-primary"]:hover {
+          background-color: ${hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR}30 !important;
+        }
+      `}</style>
       {/* Modern Header */}
       <header 
         className="sticky top-0 z-[100] bg-card/80 backdrop-blur-xl border-b border-border/50 shadow-lg"
