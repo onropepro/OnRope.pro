@@ -35,7 +35,10 @@ import {
   DollarSign,
   HelpCircle,
   ArrowRight,
-  Briefcase
+  Briefcase,
+  UserCircle,
+  RefreshCw,
+  Link2Off
 } from "lucide-react";
 
 const ALL_PROBLEM_IDS = [
@@ -72,8 +75,8 @@ export default function ResidentPortalGuide() {
   return (
     <ChangelogGuideLayout 
       title="Resident Portal Guide"
-      version="2.0"
-      lastUpdated="December 17, 2025"
+      version="2.1"
+      lastUpdated="December 20, 2025"
     >
       <div className="space-y-8">
         {/* Introduction Section */}
@@ -1347,6 +1350,69 @@ export default function ResidentPortalGuide() {
                       <p className="text-sm text-muted-foreground">Real-time progress instead of guessing</p>
                     </div>
                   </div>
+                </div>
+              </div>
+
+              {/* Managing Your Profile */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <UserCircle className="w-5 h-5 text-[#86A59C]" />
+                  Managing Your Profile
+                </h3>
+                
+                <p className="text-base text-muted-foreground">
+                  Your OnRopePro account is fully portable. If you move to a new building or need to update your information, use the <strong>Profile</strong> tab in your dashboard.
+                </p>
+                
+                <div className="border rounded-lg overflow-hidden">
+                  <img 
+                    src="/attached_assets/resident-profile-tab.png" 
+                    alt="Resident Profile tab showing personal and building information" 
+                    className="w-full"
+                  />
+                  <p className="text-sm text-center text-muted-foreground py-2 bg-muted/30">The Profile tab lets you update your information and manage vendor connections</p>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="bg-white dark:bg-slate-900 rounded-lg p-4">
+                    <h4 className="font-medium mb-2 flex items-center gap-2">
+                      <ArrowRight className="w-4 h-4 text-[#86A59C]" />
+                      Moving to a New Building
+                    </h4>
+                    <ol className="list-decimal list-inside space-y-1 text-base text-muted-foreground">
+                      <li>Go to the <strong>Profile</strong> tab</li>
+                      <li>Update your <strong>Strata/HOA/LMS Number</strong></li>
+                      <li>Update your <strong>Unit Number</strong></li>
+                      <li>Click <strong>Save</strong></li>
+                      <li>If different vendor: click <strong>Switch</strong> and enter new code</li>
+                    </ol>
+                    <p className="text-sm text-muted-foreground mt-2 italic">
+                      Your old feedback history stays with the previous building.
+                    </p>
+                  </div>
+
+                  <div className="bg-white dark:bg-slate-900 rounded-lg p-4">
+                    <h4 className="font-medium mb-2 flex items-center gap-2">
+                      <RefreshCw className="w-4 h-4 text-[#86A59C]" />
+                      Switching Vendors
+                    </h4>
+                    <p className="text-base text-muted-foreground mb-2">
+                      If your building changes service providers:
+                    </p>
+                    <ol className="list-decimal list-inside space-y-1 text-base text-muted-foreground">
+                      <li>Go to the <strong>Profile</strong> tab</li>
+                      <li>In <strong>Vendor Connection</strong>, click <strong>Switch</strong></li>
+                      <li>Enter the new vendor's 10-character code</li>
+                      <li>Click <strong>Link Account</strong></li>
+                    </ol>
+                  </div>
+                </div>
+
+                <div className="bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
+                  <p className="text-base text-amber-800 dark:text-amber-200 flex items-start gap-2">
+                    <Link2Off className="w-4 h-4 mt-1 shrink-0" />
+                    <span><strong>Unlinking:</strong> If you no longer need updates from your current vendor, click <strong>Unlink</strong> in the Vendor Connection section. You can always link to a new vendor later.</span>
+                  </p>
                 </div>
               </div>
 
