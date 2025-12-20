@@ -188,7 +188,7 @@ export default function TechnicianLanding() {
           <div className="text-center space-y-6 pt-16">
             <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-technician-portal">
               <div className="flex flex-col items-center gap-1">
-                <span>Urban Rope Tech Passport</span>
+                <span>For Rope Access Techs</span>
                 <span className="text-xs opacity-90">Urban Rope Tech Passport - Built by a Level 3 IRATA Tech</span>
               </div>
             </Badge>
