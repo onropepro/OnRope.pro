@@ -46,7 +46,11 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
   // Determine stakeholder color based on current path
   const getStakeholderColor = (): string | null => {
     const path = location.toLowerCase();
-    if (path.startsWith('/technician') || path.includes('/modules/technician')) {
+    // All /modules/ pages use employer blue regardless of module name
+    if (path.startsWith('/modules/') || path.startsWith('/employer')) {
+      return STAKEHOLDER_COLORS.employer;
+    }
+    if (path.startsWith('/technician')) {
       return STAKEHOLDER_COLORS.technician;
     }
     if (path.startsWith('/property-manager')) {
@@ -57,9 +61,6 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
     }
     if (path.startsWith('/building-portal') || path.startsWith('/building-manager')) {
       return STAKEHOLDER_COLORS["building-manager"];
-    }
-    if (path.startsWith('/employer') || path.startsWith('/modules/')) {
-      return STAKEHOLDER_COLORS.employer;
     }
     return null;
   };
