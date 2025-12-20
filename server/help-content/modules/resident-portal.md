@@ -172,6 +172,71 @@ See real-time project progress instead of guessing when work will reach your uni
 
 ---
 
+## Managing Your Profile
+
+Your OnRopePro account is fully portable. If you move to a new building or need to update your information, use the Profile tab in your dashboard.
+
+![Resident Profile Tab](/assets/help/resident-profile-tab.png)
+
+### Accessing Your Profile
+
+1. Log in to the Resident Portal
+2. Click the **Profile** tab (rightmost tab)
+3. View your Personal Information and Building Information
+
+### Updating Your Information
+
+1. Click the **Edit** button
+2. Update any of these fields:
+   - **Full Name**: Your display name
+   - **Phone Number**: Contact number
+   - **Strata/HOA/LMS Number**: Your building's identifier
+   - **Unit Number**: Your unit within the building
+3. Click **Save** to confirm changes
+
+### Moving to a New Building
+
+If you're moving to a different building:
+
+1. Go to the **Profile** tab
+2. Update your **Strata/HOA/LMS Number** to match your new building
+3. Update your **Unit Number**
+4. Click **Save**
+
+**Important**: If your new building uses a different service vendor:
+
+1. Click **Switch** in the Vendor Connection section
+2. Enter the new vendor's 10-character code
+3. Your old feedback history stays with the previous building
+
+### Switching Vendors
+
+If your building changes service providers:
+
+1. Go to the **Profile** tab
+2. In the **Vendor Connection** section, click **Switch**
+3. A dialog will appear - enter the new vendor's 10-character code
+4. Click **Link Account** to confirm
+
+Your account remains active - you're just connecting to a different service company. Your previous feedback history stays with the old vendor.
+
+### Unlinking from a Vendor
+
+If you no longer need to receive updates from your current vendor:
+
+1. Go to the **Profile** tab
+2. In the **Vendor Connection** section, click **Unlink**
+3. A warning dialog will appear explaining the consequences
+4. Click **Unlink** to confirm
+
+**Note**: Unlinking means you won't see active projects or be able to submit feedback until you link to a vendor again. You can always re-link later by entering a new vendor code.
+
+### Duplicate Unit Protection
+
+If you try to register a strata/unit combination that's already registered by another resident, the system will display an error. This prevents duplicate claims to the same unit. Contact your building manager if you believe there's an error.
+
+---
+
 ## Frequently Asked Questions
 
 **Q: What if I don't have the building code?**
@@ -184,7 +249,10 @@ A: Yes! The portal is accessible from any device with internet access - phone, t
 A: Simply update your unit number in your account settings. Your building code and strata plan number stay the same.
 
 **Q: What if I move to a different building?**
-A: Update both your unit number and strata plan number in your account settings to link to your new building.
+A: Go to the Profile tab and update your Strata/LMS number and unit number. If your new building uses a different vendor, click "Switch" in the Vendor Connection section and enter the new vendor's code. Your previous feedback stays with the old building.
+
+**Q: Can I keep my account if I move to a different city?**
+A: Yes! Your OnRopePro account works everywhere. Just update your building information in the Profile tab. If your new building's vendor uses OnRopePro, enter their vendor code to connect.
 
 **Q: Can other residents see my feedback?**
 A: No. You can only see feedback that you've submitted. Building managers and the service company can see all feedback for the building, but other residents cannot.
