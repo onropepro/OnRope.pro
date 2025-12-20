@@ -384,9 +384,9 @@ export default function HomePage() {
       <section className="bg-white dark:bg-slate-950 py-16 md:py-24 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">16 Modules. One Platform. No Add-Ons.</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">16 Modules. One Platform. All Connected. All Included.</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Everything you need to run a rope access company, from first quote to final payment.
+              Everything you need to run a profitable rope access company, from first quote to final payment and every drop inbetween.
             </p>
           </div>
 
