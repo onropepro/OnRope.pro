@@ -621,12 +621,12 @@ export default function ResidentDashboard() {
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-primary/5 via-background to-primary/10">
       {/* Inject custom brand color styles */}
       <style>{`
-        [data-state="active"][style*="--custom-primary"] {
+        .resident-tab[data-state="active"] {
           background-color: ${hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR}20 !important;
           color: ${hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR} !important;
           border-bottom: 2px solid ${hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR} !important;
         }
-        [data-state="active"][style*="--custom-primary"]:hover {
+        .resident-tab[data-state="active"]:hover {
           background-color: ${hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR}30 !important;
         }
       `}</style>
@@ -768,28 +768,21 @@ export default function ResidentDashboard() {
             <TabsTrigger 
               value="building" 
               data-testid="tab-building"
-              style={{
-                '--custom-primary': hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR
-              } as React.CSSProperties}
+              className="resident-tab"
             >
               {t('residentPortal.tabs.progress', 'Progress')}
             </TabsTrigger>
             <TabsTrigger 
               value="submit" 
               data-testid="tab-submit"
-              style={{
-                '--custom-primary': hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR
-              } as React.CSSProperties}
+              className="resident-tab"
             >
               {t('residentPortal.tabs.submit', 'Submit')}
             </TabsTrigger>
             <TabsTrigger 
               value="history" 
               data-testid="tab-history"
-              className="relative"
-              style={{
-                '--custom-primary': hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR
-              } as React.CSSProperties}
+              className="relative resident-tab"
             >
               {t('residentPortal.tabs.feedback', 'Feedback')}
               {newResponsesCount > 0 && (
@@ -805,10 +798,7 @@ export default function ResidentDashboard() {
             <TabsTrigger 
               value="notices" 
               data-testid="tab-notices"
-              className="relative"
-              style={{
-                '--custom-primary': hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR
-              } as React.CSSProperties}
+              className="relative resident-tab"
             >
               {t('residentPortal.tabs.notices', 'Notices')}
               {(workNoticesData?.notices?.length || 0) > 0 && (
@@ -824,9 +814,7 @@ export default function ResidentDashboard() {
             <TabsTrigger 
               value="profile" 
               data-testid="tab-profile"
-              style={{
-                '--custom-primary': hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR
-              } as React.CSSProperties}
+              className="resident-tab"
             >
               {t('residentPortal.tabs.profile', 'Profile')}
             </TabsTrigger>
