@@ -41,6 +41,12 @@ export function LanguageDropdown({
     i18n.changeLanguage(lang);
   };
 
+  const languageNames: Record<'en' | 'fr' | 'es', string> = {
+    en: 'English',
+    fr: 'Français',
+    es: 'Español',
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -51,7 +57,7 @@ export function LanguageDropdown({
           data-testid="button-language-dropdown"
         >
           <Globe className="w-4 h-4 mr-1" />
-          {t('navigation.language', 'Language')}
+          {languageNames[currentLanguage]}
           <ChevronDown className="w-3 h-3 ml-1" />
         </Button>
       </DropdownMenuTrigger>
