@@ -39,7 +39,29 @@
     "done": "Listo",
     "close": "Cerrar",
     "healthSafetyManual": "Manual de Salud y Seguridad",
-    "companyPolicy": "Politica de la Empresa"
+    "companyPolicy": "Politica de la Empresa",
+    "titles": {
+      "irata_level_1_a": "Cuestionario de Acceso con Cuerdas - Nivel 1 (Set A)",
+      "irata_level_1_b": "Cuestionario de Acceso con Cuerdas - Nivel 1 (Set B)",
+      "irata_level_2_a": "Cuestionario de Acceso con Cuerdas - Nivel 2 (Set A)",
+      "irata_level_2_b": "Cuestionario de Acceso con Cuerdas - Nivel 2 (Set B)",
+      "irata_level_3_a": "Cuestionario de Acceso con Cuerdas - Nivel 3 (Set A)",
+      "irata_level_3_b": "Cuestionario de Acceso con Cuerdas - Nivel 3 (Set B)",
+      "sprat_level_1_a": "Cuestionario de Acceso con Cuerdas - Nivel 1 (Set A)",
+      "sprat_level_1_b": "Cuestionario de Acceso con Cuerdas - Nivel 1 (Set B)",
+      "sprat_level_2_a": "Cuestionario de Acceso con Cuerdas - Nivel 2 (Set A)",
+      "sprat_level_2_b": "Cuestionario de Acceso con Cuerdas - Nivel 2 (Set B)",
+      "sprat_level_3_a": "Cuestionario de Acceso con Cuerdas - Nivel 3 (Set A)",
+      "sprat_level_3_b": "Cuestionario de Acceso con Cuerdas - Nivel 3 (Set B)",
+      "swp_window_cleaning": "Procedimiento de Trabajo Seguro - Limpieza de Ventanas",
+      "swp_dryer_vent_cleaning": "Procedimiento de Trabajo Seguro - Limpieza de Ductos de Secadora",
+      "swp_building_wash": "Procedimiento de Trabajo Seguro - Lavado de Edificios",
+      "swp_in_suite_dryer_vent": "Procedimiento de Trabajo Seguro - Limpieza de Ductos de Secadora en Suite",
+      "swp_parkade_pressure_cleaning": "Procedimiento de Trabajo Seguro - Limpieza a Presion de Estacionamiento",
+      "swp_ground_window_cleaning": "Procedimiento de Trabajo Seguro - Limpieza de Ventanas a Nivel de Suelo",
+      "swp_general_pressure_washing": "Procedimiento de Trabajo Seguro - Lavado a Presion General",
+      "flha_assessment": "Evaluacion de Peligros a Nivel de Campo (FLHA)"
+    }
   },
   "login": {
     "header": {

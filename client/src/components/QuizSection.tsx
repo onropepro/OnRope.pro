@@ -77,9 +77,12 @@ export function QuizSection() {
   const safetyQuizzes = quizzes.filter(q => q.quizCategory === 'safety');
 
   const getQuizTitle = (quiz: Quiz) => {
-    // Certification and safety quizzes have title field
-    if ((quiz.quizCategory === 'certification' || quiz.quizCategory === 'safety') && quiz.title) {
-      return quiz.title;
+    // For certification and safety quizzes, use translated titles based on documentType
+    if ((quiz.quizCategory === 'certification' || quiz.quizCategory === 'safety') && quiz.documentType) {
+      // Look up translation key based on documentType (e.g., irata_level_1_a, swp_window_cleaning)
+      const translationKey = `quiz.titles.${quiz.documentType}`;
+      const translated = t(translationKey, quiz.title || quiz.documentType);
+      return translated;
     }
     // Company quizzes use documentType
     if (quiz.documentType) {
@@ -89,7 +92,7 @@ export function QuizSection() {
     if (quiz.title) {
       return quiz.title;
     }
-    return 'Quiz';
+    return t('quiz.quiz', 'Quiz');
   };
 
   const getDocumentTypeLabel = (type: string) => {
