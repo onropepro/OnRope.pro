@@ -40,6 +40,7 @@ import projectProgressImg from "@assets/residents-project-progress_1766199096691
 import workNoticesImg from "@assets/residents-notices_1766199096691.png";
 import submitFeedbackImg from "@assets/residents-submit-feedback_1766199096691.png";
 import feedbackHistoryImg from "@assets/residents-feedback-history_1766199096691.png";
+import residentProfileImg from "@assets/resident-profile-tab.png";
 
 // Official Resident color from stakeholder palette
 const RESIDENT_COLOR = "#86A59C";
@@ -661,6 +662,20 @@ export default function ResidentLanding() {
             </div>
             <p className="text-sm text-muted-foreground text-center">
               Feedback history view showing submitted feedback with status and date
+            </p>
+          </div>
+          
+          <div className="space-y-3 md:col-span-2 max-w-xl mx-auto">
+            <div className="rounded-lg overflow-hidden border shadow-sm">
+              <img 
+                src={residentProfileImg} 
+                alt="Resident profile tab" 
+                className="w-full h-auto"
+                data-testid="img-resident-profile"
+              />
+            </div>
+            <p className="text-sm text-muted-foreground text-center">
+              Profile tab where you manage your account details and enter your company code
             </p>
           </div>
         </div>
