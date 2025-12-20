@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Link } from "wouter";
 import { PublicHeader } from "@/components/PublicHeader";
+import { SoftwareReplaces, MODULE_SOFTWARE_MAPPING } from "@/components/SoftwareReplaces";
 import {
   ArrowRight,
   BookOpen,
@@ -75,6 +76,11 @@ export default function EmployeeManagementLanding() {
                 </Link>
               </Button>
             </div>
+
+            <SoftwareReplaces 
+              software={MODULE_SOFTWARE_MAPPING["employee-management"]} 
+              className="mt-8 bg-white/5 rounded-lg mx-auto max-w-2xl [&_span]:text-blue-100 [&_svg]:text-blue-200"
+            />
           </div>
         </div>
         

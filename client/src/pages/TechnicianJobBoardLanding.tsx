@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Separator } from "@/components/ui/separator";
 import { PublicHeader } from "@/components/PublicHeader";
+import { SoftwareReplaces, MODULE_SOFTWARE_MAPPING } from "@/components/SoftwareReplaces";
 import {
   ArrowRight,
   Search,
@@ -68,6 +69,11 @@ export default function TechnicianJobBoardLanding() {
             <p className="text-sm text-orange-100/80">
               (No credit card. No spam. Takes 60 seconds.)
             </p>
+
+            <SoftwareReplaces 
+              software={MODULE_SOFTWARE_MAPPING["technician-job-board"]} 
+              className="mt-8 bg-white/5 rounded-lg mx-auto max-w-2xl [&_span]:text-orange-100 [&_svg]:text-orange-200"
+            />
           </div>
         </div>
         
