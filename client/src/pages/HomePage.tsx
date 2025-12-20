@@ -186,7 +186,6 @@ export default function HomePage() {
     <div className="min-h-screen bg-background">
       {/* Header Navigation */}
       <PublicHeader />
-
       {/* Hero Section */}
       <section 
         className="relative text-white pb-[120px]" 
@@ -209,9 +208,7 @@ export default function HomePage() {
             </h1>
 
             {/* Subheadline */}
-            <p className="text-xl md:text-2xl text-blue-100 max-w-4xl mx-auto leading-relaxed">
-              Projects. Payroll. Safety. Scheduling. Compliance. All in one place. Built by a Level 3 technician who got tired of watching good companies drown in paperwork and stress.
-            </p>
+            <p className="text-xl md:text-2xl text-blue-100 max-w-4xl mx-auto leading-relaxed">Projects. Payroll. Safety. Scheduling. Compliance. All in one place. Built by a Level 3 technician and Operations Manager who got tired of watching good companies drown in paperwork and stress.</p>
 
             {/* Segment Selector */}
             <div className="pt-8">
@@ -299,7 +296,6 @@ export default function HomePage() {
           </svg>
         </div>
       </section>
-
       {/* Social Proof Section */}
       <section className="bg-white dark:bg-slate-950 py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
@@ -311,7 +307,6 @@ export default function HomePage() {
           </p>
         </div>
       </section>
-
       {/* Problem/Solution Section */}
       <section className="bg-muted/30 py-16 md:py-24 px-4">
         <div className="max-w-6xl mx-auto">
@@ -379,7 +374,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
       {/* Features Section - 16 Modules */}
       <section className="bg-white dark:bg-slate-950 py-16 md:py-24 px-4">
         <div className="max-w-6xl mx-auto">
@@ -418,7 +412,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
       {/* ROI Section */}
       <section className="bg-muted/30 py-16 md:py-24 px-4">
         <div className="max-w-5xl mx-auto">
@@ -491,7 +484,6 @@ export default function HomePage() {
           </Card>
         </div>
       </section>
-
       {/* Trust Section */}
       <section className="bg-white dark:bg-slate-950 py-16 md:py-24 px-4">
         <div className="max-w-5xl mx-auto">
@@ -536,7 +528,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
       {/* Final CTA Section */}
       <section 
         className="relative text-white py-16 md:py-24 px-4"
@@ -562,7 +553,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
       {/* Footer Value Props */}
       <section className="bg-slate-900 text-slate-300 py-12 px-4">
         <div className="max-w-5xl mx-auto">
