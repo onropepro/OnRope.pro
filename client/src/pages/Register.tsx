@@ -74,7 +74,7 @@ type PropertyManagerFormData = z.infer<typeof propertyManagerSchema>;
 
 export default function Register() {
   const { t, i18n } = useTranslation();
-  const [activeTab, setActiveTab] = useState<"resident" | "company" | "property_manager">("resident");
+  const [activeTab, setActiveTab] = useState<"resident" | "employer" | "property_manager">("resident");
   const [, setLocation] = useLocation();
   // Unit conflict dialog state
   const [showUnitConflictDialog, setShowUnitConflictDialog] = useState(false);
@@ -297,9 +297,10 @@ export default function Register() {
           <CardDescription className="text-center">{t('register.subtitle', 'Choose your account type to get started')}</CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "resident" | "property_manager")}>
-            <TabsList className="grid w-full grid-cols-2 mb-6">
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "resident" | "employer" | "property_manager")}>
+            <TabsList className="grid w-full grid-cols-3 mb-6">
               <TabsTrigger value="resident" data-testid="tab-resident">{t('register.tabs.resident', 'Resident')}</TabsTrigger>
+              <TabsTrigger value="employer" data-testid="tab-employer">{t('register.tabs.employer', 'Employer')}</TabsTrigger>
               <TabsTrigger value="property_manager" data-testid="tab-property-manager">{t('register.tabs.propertyManager', 'Property Manager')}</TabsTrigger>
             </TabsList>
 
@@ -420,6 +421,158 @@ export default function Register() {
 
                   <Button type="submit" className="w-full h-12" data-testid="button-register-resident">
                     {t('register.resident.submit', 'Create Resident Account')}
+                  </Button>
+                </form>
+              </Form>
+            </TabsContent>
+
+            <TabsContent value="employer">
+              <Form {...companyForm}>
+                <form onSubmit={companyForm.handleSubmit(onCompanySubmit)} className="space-y-4">
+                  <FormField
+                    control={companyForm.control}
+                    name="companyName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('register.employer.companyName', 'Company Name')}</FormLabel>
+                        <FormControl>
+                          <Input placeholder={t('register.employer.companyNamePlaceholder', 'ABC Rope Access Ltd.')} {...field} data-testid="input-company-name" className="h-12" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={companyForm.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('register.employer.ownerName', 'Owner Name')}</FormLabel>
+                        <FormControl>
+                          <Input placeholder={t('register.employer.ownerNamePlaceholder', 'John Smith')} {...field} data-testid="input-owner-name" className="h-12" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={companyForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('register.employer.email', 'Email')}</FormLabel>
+                        <FormControl>
+                          <Input type="email" placeholder={t('register.employer.emailPlaceholder', 'you@company.com')} {...field} data-testid="input-employer-email" className="h-12" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={companyForm.control}
+                    name="streetAddress"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('register.employer.streetAddress', 'Street Address')}</FormLabel>
+                        <FormControl>
+                          <Input placeholder={t('register.employer.streetAddressPlaceholder', '123 Main Street')} {...field} data-testid="input-street-address" className="h-12" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={companyForm.control}
+                      name="province"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('register.employer.province', 'Province/State')}</FormLabel>
+                          <FormControl>
+                            <Input placeholder={t('register.employer.provincePlaceholder', 'BC')} {...field} data-testid="input-province" className="h-12" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={companyForm.control}
+                      name="country"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('register.employer.country', 'Country')}</FormLabel>
+                          <FormControl>
+                            <Input placeholder={t('register.employer.countryPlaceholder', 'Canada')} {...field} data-testid="input-country" className="h-12" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={companyForm.control}
+                    name="zipCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('register.employer.zipCode', 'Postal/Zip Code')}</FormLabel>
+                        <FormControl>
+                          <Input placeholder={t('register.employer.zipCodePlaceholder', 'V6B 1A1')} {...field} data-testid="input-zip-code" className="h-12" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={companyForm.control}
+                    name="licenseKey"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('register.employer.licenseKey', 'License Key (Optional)')}</FormLabel>
+                        <FormControl>
+                          <Input placeholder={t('register.employer.licenseKeyPlaceholder', 'Enter license key if you have one')} {...field} data-testid="input-license-key" className="h-12" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={companyForm.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('register.employer.password', 'Password')}</FormLabel>
+                        <FormControl>
+                          <Input type="password" placeholder="••••••••" {...field} data-testid="input-employer-password" className="h-12" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={companyForm.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('register.employer.confirmPassword', 'Confirm Password')}</FormLabel>
+                        <FormControl>
+                          <Input type="password" placeholder="••••••••" {...field} data-testid="input-employer-confirm-password" className="h-12" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button type="submit" className="w-full h-12" data-testid="button-register-employer">
+                    {t('register.employer.submit', 'Create Employer Account')}
                   </Button>
                 </form>
               </Form>
