@@ -92,6 +92,7 @@ export default function ForBuildingManagers() {
             <HelpSearchBar 
               size="large" 
               placeholder="Ask about safety ratings, compliance, work progress..."
+              stakeholderColor="#B89685"
             />
           </div>
         </div>
