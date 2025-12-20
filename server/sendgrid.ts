@@ -53,7 +53,12 @@ export async function sendPasswordResetEmail(
   try {
     const { client, fromEmail } = await getUncachableSendGridClient();
     
-    await client.send({
+    console.log('[SendGrid] Attempting to send email:');
+    console.log('[SendGrid] - From:', fromEmail);
+    console.log('[SendGrid] - To:', toEmail);
+    console.log('[SendGrid] - Subject: Reset Your Password - OnRopePro');
+    
+    const response = await client.send({
       to: toEmail,
       from: fromEmail,
       subject: 'Reset Your Password - OnRopePro',
@@ -116,9 +121,17 @@ export async function sendPasswordResetEmail(
       `,
     });
     
+    console.log('[SendGrid] API Response status code:', response?.[0]?.statusCode);
+    console.log('[SendGrid] API Response headers:', JSON.stringify(response?.[0]?.headers || {}));
+    
     return { success: true };
   } catch (error: any) {
     console.error('[SendGrid] Failed to send email:', error);
+    // Log more details for SendGrid errors
+    if (error.response) {
+      console.error('[SendGrid] Response status:', error.response.statusCode);
+      console.error('[SendGrid] Response body:', JSON.stringify(error.response.body));
+    }
     return { success: false, error: error.message };
   }
 }
