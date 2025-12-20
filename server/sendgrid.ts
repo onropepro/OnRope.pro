@@ -1,35 +1,68 @@
-// SendGrid email client using Replit connector
-// Integration: connection:conn_sendgrid_01KC2MWF0BENKQQK4Q03RQC80D
+// SendGrid email client with direct API key fallback
+// Tries Replit connector first, falls back to SENDGRID_API_KEY secret
 import sgMail from '@sendgrid/mail';
 
 let connectionSettings: any;
 
-async function getCredentials() {
-  const hostname = process.env.REPLIT_CONNECTORS_HOSTNAME;
-  const xReplitToken = process.env.REPL_IDENTITY 
-    ? 'repl ' + process.env.REPL_IDENTITY 
-    : process.env.WEB_REPL_RENEWAL 
-    ? 'depl ' + process.env.WEB_REPL_RENEWAL 
-    : null;
-
-  if (!xReplitToken) {
-    throw new Error('X_REPLIT_TOKEN not found for repl/depl');
-  }
-
-  connectionSettings = await fetch(
-    'https://' + hostname + '/api/v2/connection?include_secrets=true&connector_names=sendgrid',
-    {
-      headers: {
-        'Accept': 'application/json',
-        'X_REPLIT_TOKEN': xReplitToken
-      }
+async function getCredentialsFromConnector(): Promise<{ apiKey: string; email: string } | null> {
+  try {
+    const hostname = process.env.REPLIT_CONNECTORS_HOSTNAME;
+    if (!hostname) {
+      console.log('[SendGrid] No REPLIT_CONNECTORS_HOSTNAME, skipping connector');
+      return null;
     }
-  ).then(res => res.json()).then(data => data.items?.[0]);
 
-  if (!connectionSettings || (!connectionSettings.settings.api_key || !connectionSettings.settings.from_email)) {
-    throw new Error('SendGrid not connected');
+    const xReplitToken = process.env.REPL_IDENTITY 
+      ? 'repl ' + process.env.REPL_IDENTITY 
+      : process.env.WEB_REPL_RENEWAL 
+      ? 'depl ' + process.env.WEB_REPL_RENEWAL 
+      : null;
+
+    if (!xReplitToken) {
+      console.log('[SendGrid] No X_REPLIT_TOKEN, skipping connector');
+      return null;
+    }
+
+    connectionSettings = await fetch(
+      'https://' + hostname + '/api/v2/connection?include_secrets=true&connector_names=sendgrid',
+      {
+        headers: {
+          'Accept': 'application/json',
+          'X_REPLIT_TOKEN': xReplitToken
+        }
+      }
+    ).then(res => res.json()).then(data => data.items?.[0]);
+
+    if (!connectionSettings || !connectionSettings.settings?.api_key || !connectionSettings.settings?.from_email) {
+      console.log('[SendGrid] Connector not configured properly');
+      return null;
+    }
+
+    console.log('[SendGrid] Using Replit connector credentials');
+    return { apiKey: connectionSettings.settings.api_key, email: connectionSettings.settings.from_email };
+  } catch (error) {
+    console.log('[SendGrid] Connector error, will try fallback:', error);
+    return null;
   }
-  return { apiKey: connectionSettings.settings.api_key, email: connectionSettings.settings.from_email };
+}
+
+async function getCredentials(): Promise<{ apiKey: string; email: string }> {
+  // Try Replit connector first
+  const connectorCreds = await getCredentialsFromConnector();
+  if (connectorCreds) {
+    return connectorCreds;
+  }
+
+  // Fallback to direct API key secrets
+  const apiKey = process.env.SENDGRID_API_KEY;
+  const fromEmail = process.env.SENDGRID_FROM_EMAIL;
+
+  if (apiKey && fromEmail) {
+    console.log('[SendGrid] Using direct API key from secrets');
+    return { apiKey, email: fromEmail };
+  }
+
+  throw new Error('SendGrid not configured: Add SENDGRID_API_KEY and SENDGRID_FROM_EMAIL secrets, or connect via Replit integration');
 }
 
 // WARNING: Never cache this client.
