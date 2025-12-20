@@ -206,7 +206,7 @@ export default function HomePage() {
             </h1>
 
             {/* Subheadline */}
-            <p className="text-xl md:text-2xl text-blue-100 max-w-4xl mx-auto leading-relaxed">Projects. Payroll. Safety. Scheduling. Compliance. All in one place. Built by a Level 3 technician and Operations Manager who got tired of watching good companies drown in paperwork and stress.</p>
+            <p className="text-xl md:text-2xl text-blue-100 max-w-4xl mx-auto leading-relaxed">Projects. Payroll. Safety. Scheduling. Compliance. Logging. All in one place. Built by a Level 3 technician and Operations Manager who got tired of watching good companies drown in paperwork and stress.</p>
 
             {/* Segment Selector */}
             <div className="pt-8">
