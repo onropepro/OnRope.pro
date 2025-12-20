@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { 
   Briefcase, ArrowRight, ArrowLeft, Loader2, 
   Check, Shield, Clock, DollarSign, Users,
-  BarChart3, FileText, Eye, EyeOff, Building2
+  BarChart3, FileText, Eye, EyeOff, Building2, Lock
 } from "lucide-react";
 
 type RegistrationStep = "welcome" | "companyDetails" | "addressDetails" | "success";
@@ -201,15 +201,17 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
   };
 
   const sidebarBenefits = [
+    { icon: Users, text: "Access our job board and reach 1000's of qualified techs" },
     { icon: BarChart3, text: "Real-time project tracking and budget monitoring" },
     { icon: Clock, text: "Eliminate 4-8 hours of payroll processing per pay period" },
     { icon: Shield, text: "Digital safety documentation for audits and compliance" },
-    { icon: Users, text: "44 individual permission levels for complete access control" },
+    { icon: Lock, text: "44 individual permission levels for complete access control" },
     { icon: DollarSign, text: "15-20% improvement in quote accuracy" },
   ];
 
   const welcomeBenefits = [
-    "Track every project in one central dashboard",
+    "Post jobs on our Rope Access Only Job Board",
+    "Track every project and every drop in one central dashboard",
     "Clock in/out flows directly to payroll",
     "Complete audit trail for safety compliance",
     "Real-time budget vs. actual monitoring",
@@ -229,7 +231,7 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
           {/* Left Panel - Ocean Blue sidebar (Employer color) */}
           <div className="hidden lg:flex lg:w-[320px] bg-[#0B64A3] text-white p-8 flex-col">
             <div className="mb-8">
-              <Briefcase className="w-10 h-10 mb-4" />
+              <Building2 className="w-10 h-10 mb-4" />
               <h2 className="text-xl font-bold mb-2">Rope Access Business Management</h2>
               <p className="text-white/80 text-sm">Everything connected. Nothing lost.</p>
             </div>
