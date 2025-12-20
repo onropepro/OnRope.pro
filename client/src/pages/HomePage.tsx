@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { PublicHeader } from "@/components/PublicHeader";
 import { 
   ArrowRight, 
   Clock, 
@@ -182,6 +183,9 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Header Navigation */}
+      <PublicHeader />
+
       {/* Hero Section */}
       <section 
         className="relative text-white pb-[120px]" 
