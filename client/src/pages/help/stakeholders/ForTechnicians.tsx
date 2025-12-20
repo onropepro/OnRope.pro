@@ -92,6 +92,7 @@ export default function ForTechnicians() {
             <HelpSearchBar 
               size="large" 
               placeholder="Ask about time tracking, IRATA logging, safety docs..."
+              stakeholderColor="#AB4521"
             />
           </div>
         </div>

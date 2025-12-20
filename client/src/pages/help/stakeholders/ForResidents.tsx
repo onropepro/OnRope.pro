@@ -94,6 +94,7 @@ export default function ForResidents() {
             <HelpSearchBar 
               size="large" 
               placeholder="Ask about submitting feedback, tracking issues..."
+              stakeholderColor="#86A59C"
             />
           </div>
         </div>
