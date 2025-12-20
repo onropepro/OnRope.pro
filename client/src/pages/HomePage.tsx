@@ -429,8 +429,11 @@ export default function HomePage() {
                 </div>
                 <p className="text-base text-muted-foreground">
                   $34.95 is what you pay a technician for <strong>one hour</strong> of work.<br />
-                  This platform saves each tech <strong>10+ hours</strong> per month.<br />
-                  <strong>You do the math.</strong>
+                  This platform saves each tech <strong>10+ hours</strong> per month.
+                </p>
+                <p className="text-base text-muted-foreground mt-4">
+                  <strong>The math is simple.</strong><br />
+                  Stress elimination? Priceless.
                 </p>
               </CardContent>
             </Card>
