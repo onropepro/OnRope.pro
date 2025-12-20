@@ -295,14 +295,14 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
     t('techReg.welcome.benefit1', 'Never lose hours when companies fold'),
     t('techReg.welcome.benefit2', 'Import your logbook history via photo'),
     t('techReg.welcome.benefit3', 'Skip onboarding paperwork at every new job'),
-    t('techReg.welcome.benefit4', 'Refer one tech - unlock PLUS free'),
+    t('techReg.welcome.benefit4', 'Automatic logging when your employer joins'),
   ];
 
   const plusBenefits = [
-    t('techReg.plusBenefits.unlimitedEmployers', 'Unlimited employer connections'),
-    t('techReg.plusBenefits.exportablePdf', 'Exportable work history PDF'),
-    t('techReg.plusBenefits.expiryAlerts', '30-day certification expiry alerts'),
+    t('techReg.plusBenefits.expiryAlerts', 'Certification expiry alerts (60 & 30 day warnings)'),
+    t('techReg.plusBenefits.multiEmployers', 'Connect with multiple employers at once'),
     t('techReg.plusBenefits.jobBoard', 'Job board access'),
+    t('techReg.plusBenefits.priorityVisibility', 'Priority profile visibility to employers'),
   ];
 
   return (
@@ -371,15 +371,36 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                     <p className="text-muted-foreground">{t('techReg.welcome.subtitle', '60 seconds to set up. Protected forever.')}</p>
                   </div>
 
-                  <div className="space-y-4 mb-8">
+                  {/* FREE benefits section */}
+                  <div className="space-y-3 mb-6">
                     {welcomeBenefits.map((benefit, i) => (
                       <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                        <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
                           <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
                         </div>
                         <span className="font-medium">{benefit}</span>
                       </div>
                     ))}
+                  </div>
+
+                  {/* PLUS benefits section - locked/grayed */}
+                  <div className="mb-6">
+                    <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2 font-medium">
+                      {t('techReg.plusSection.header', 'Unlock with 1 referral:')}
+                    </p>
+                    <div className="space-y-2">
+                      {plusBenefits.map((benefit, i) => (
+                        <div key={i} className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/30 border border-dashed border-muted-foreground/20">
+                          <div className="w-6 h-6 rounded-full border-2 border-muted-foreground/30 flex items-center justify-center shrink-0">
+                            {/* Empty circle */}
+                          </div>
+                          <span className="text-sm text-muted-foreground">{benefit}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2 text-center">
+                      {t('techReg.plusSection.hint', 'Refer one tech after signup to unlock instantly')}
+                    </p>
                   </div>
 
                   {/* Referral Code Input */}
