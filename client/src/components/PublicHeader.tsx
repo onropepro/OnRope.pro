@@ -214,12 +214,13 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
               onMouseLeave={() => setShowModulesMenu(false)}
             >
               <Button
-                variant={activeNav === "employer" || activeNav === "modules" ? "default" : "ghost"}
-                className="text-sm font-medium"
+                variant="ghost"
+                className={`text-sm font-medium gap-1 ${activeNav === "employer" || activeNav === "modules" ? "text-primary" : ""}`}
                 onClick={() => setLocation("/employer")}
                 data-testid="nav-employer"
               >
                 {t('navigation.employer', 'Employer')}
+                <ChevronDown className="w-3 h-3" />
               </Button>
               {showModulesMenu && (
                 <div className="absolute top-full right-0 pt-2 z-50">
@@ -523,12 +524,13 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
               onMouseLeave={() => setShowTechnicianMenu(false)}
             >
               <Button
-                variant={activeNav === "technician" ? "default" : "ghost"}
-                className="text-sm font-medium"
+                variant="ghost"
+                className={`text-sm font-medium gap-1 ${activeNav === "technician" ? "text-primary" : ""}`}
                 onClick={() => setLocation("/technician")}
                 data-testid="nav-technician"
               >
                 {t('navigation.technician', 'Technician')}
+                <ChevronDown className="w-3 h-3" />
               </Button>
               {showTechnicianMenu && (
                 <div className="absolute top-full left-0 pt-2 z-50">
@@ -576,8 +578,8 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
             {navItems.filter(item => item.id !== "employer" && item.id !== "technician").map((item) => (
               <Button
                 key={item.id}
-                variant={activeNav === item.id ? "default" : "ghost"}
-                className="text-sm font-medium"
+                variant="ghost"
+                className={`text-sm font-medium ${activeNav === item.id ? "text-primary" : ""}`}
                 onClick={() => setLocation(item.href)}
                 data-testid={`nav-${item.id}`}
               >
@@ -595,10 +597,10 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
             {/* Employer with expandable modules */}
             <div>
               <button
-                className={`w-full flex items-center justify-between px-4 py-3 rounded-lg text-left font-medium transition-colors ${
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-lg text-left font-medium transition-colors hover-elevate ${
                   activeNav === "employer" || activeNav === "modules" 
-                    ? "bg-primary text-primary-foreground" 
-                    : "hover-elevate"
+                    ? "text-primary" 
+                    : ""
                 }`}
                 onClick={() => setMobileModulesExpanded(!mobileModulesExpanded)}
                 data-testid="nav-mobile-employer"
@@ -803,10 +805,10 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
             {/* Technician with expandable modules */}
             <div>
               <button
-                className={`w-full flex items-center justify-between px-4 py-3 rounded-lg text-left font-medium transition-colors ${
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-lg text-left font-medium transition-colors hover-elevate ${
                   activeNav === "technician" 
-                    ? "bg-primary text-primary-foreground" 
-                    : "hover-elevate"
+                    ? "text-primary" 
+                    : ""
                 }`}
                 onClick={() => setMobileTechnicianExpanded(!mobileTechnicianExpanded)}
                 data-testid="nav-mobile-technician"
@@ -847,10 +849,10 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
             {navItems.filter(item => item.id !== "employer" && item.id !== "technician").map((item) => (
               <button
                 key={item.id}
-                className={`w-full px-4 py-3 rounded-lg text-left font-medium transition-colors ${
+                className={`w-full px-4 py-3 rounded-lg text-left font-medium transition-colors hover-elevate ${
                   activeNav === item.id 
-                    ? "bg-primary text-primary-foreground" 
-                    : "hover-elevate"
+                    ? "text-primary" 
+                    : ""
                 }`}
                 onClick={() => {
                   setLocation(item.href);
