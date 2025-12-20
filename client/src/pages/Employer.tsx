@@ -190,13 +190,13 @@ export default function Employer() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild>
+              <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-hero-start-trial">
                 <Link href="/register">
                   Start Free Trial
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild>
+              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-hero-see-how">
                 <Link href="#how-it-works">
                   See How It Works
                 </Link>
@@ -323,7 +323,7 @@ export default function Employer() {
               <Button 
                 size="lg"
                 onClick={() => setLocation(`/roi-calculator?employees=${roiEmployeeCount}&step=2`)}
-                className="w-full gap-2 bg-[#0B64A3] hover:bg-[#0369A1]"
+                className="w-full gap-2 focus:ring-4 focus:ring-action-500/50"
                 data-testid="button-roi-calculator-next"
               >
                 Next
@@ -732,13 +732,13 @@ export default function Employer() {
             30-day free trial. No credit card required. Full access to every feature.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild>
+            <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-cta-start-trial">
               <Link href="/register">
                 Start Your Free Trial
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild>
+            <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-cta-view-pricing">
               <Link href="/pricing">
                 View Full Pricing
               </Link>
