@@ -362,7 +362,10 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                   <div className="text-center mb-8">
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
                       <HardHat className="w-4 h-4 text-primary" />
-                      <span className="text-sm font-medium text-primary">{t('techReg.welcome.badge', 'For IRATA & SPRAT Technicians')}</span>
+                      <span className="text-sm font-medium text-primary text-center leading-tight">
+                        For IRATA &amp; SPRAT Technicians<br />
+                        or Rope Access Employees
+                      </span>
                     </div>
                     <h1 className="text-3xl font-bold mb-3">{t('techReg.welcome.title', 'Create your free account')}</h1>
                     <p className="text-muted-foreground">{t('techReg.welcome.subtitle', '60 seconds to set up. Protected forever.')}</p>
