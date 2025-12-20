@@ -54,6 +54,22 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
     if (path.startsWith('/modules/') || path.startsWith('/employer')) {
       return STAKEHOLDER_COLORS.employer;
     }
+    // Help pages follow stakeholder color logic based on their audience
+    if (path.startsWith('/help/for-technicians') || path.startsWith('/help/technician')) {
+      return STAKEHOLDER_COLORS.technician;
+    }
+    if (path.startsWith('/help/for-employers') || path.startsWith('/help/employer')) {
+      return STAKEHOLDER_COLORS.employer;
+    }
+    if (path.startsWith('/help/for-property-managers') || path.startsWith('/help/property-manager')) {
+      return STAKEHOLDER_COLORS["property-manager"];
+    }
+    if (path.startsWith('/help/for-residents') || path.startsWith('/help/resident')) {
+      return STAKEHOLDER_COLORS.resident;
+    }
+    if (path.startsWith('/help/for-building-managers') || path.startsWith('/help/building-manager')) {
+      return STAKEHOLDER_COLORS["building-manager"];
+    }
     if (path.startsWith('/technician')) {
       return STAKEHOLDER_COLORS.technician;
     }
