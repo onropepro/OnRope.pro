@@ -304,7 +304,7 @@ export default function HomePage() {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">Built by Rope Access. For Rope Access.</h2>
           <p className="text-lg text-muted-foreground leading-relaxed">
-            OnRopePro was created by a Level 3 IRATA technician who spent years watching good companies drown in administrative chaos. 
+            OnRopePro was created by a Level 3 IRATA technician and Operations Manager who spent years watching good companies drown in administrative chaos. 
             Every feature exists because rope access operators asked for it. Every workflow was tested on actual job sites. 
             This isn't adapted HR software. It's the system we wished existed when we were running crews.
           </p>
