@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "wouter";
 import { PublicHeader } from "@/components/PublicHeader";
+import { SoftwareReplaces, MODULE_SOFTWARE_MAPPING } from "@/components/SoftwareReplaces";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import {
   ArrowRight,
@@ -113,6 +114,11 @@ export default function TechnicianPassportLanding() {
                 </Link>
               </Button>
             </div>
+            
+            <SoftwareReplaces 
+              software={MODULE_SOFTWARE_MAPPING["technician-passport"]} 
+              className="mt-8 bg-white/5 rounded-lg mx-auto max-w-2xl [&_span]:text-blue-100 [&_svg]:text-blue-200"
+            />
           </div>
         </div>
         
