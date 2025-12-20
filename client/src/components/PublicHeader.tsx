@@ -490,6 +490,22 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                       <button
                         className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
                         onClick={() => {
+                          setLocation("/modules/client-relationship-management");
+                          setShowModulesMenu(false);
+                        }}
+                        data-testid="nav-client-relationship-management"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-cyan-100 dark:bg-cyan-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <Users className="w-5 h-5 text-cyan-600" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-sm">Client Relationship Management</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Client portfolios, building specs, autofill intelligence</div>
+                        </div>
+                      </button>
+                      <button
+                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                        onClick={() => {
                           setLocation("/modules/white-label-branding");
                           setShowModulesMenu(false);
                         }}

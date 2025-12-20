@@ -93,6 +93,7 @@ import PayrollFinancialLanding from "@/pages/PayrollFinancialLanding";
 import QuotingSalesLanding from "@/pages/QuotingSalesLanding";
 import WhiteLabelBrandingLanding from "@/pages/WhiteLabelBrandingLanding";
 import ResidentPortalLanding from "@/pages/ResidentPortalLanding";
+import CRMLanding from "@/pages/CRMLanding";
 import ResidentLanding from "@/pages/ResidentLanding";
 import ResetPassword from "@/pages/ResetPassword";
 import PropertyManagerLanding from "@/pages/PropertyManagerLanding";
@@ -395,6 +396,7 @@ function Router() {
       <Route path="/modules/white-label-branding" component={WhiteLabelBrandingLanding} />
       <Route path="/modules/resident-portal" component={ResidentPortalLanding} />
       <Route path="/modules/property-manager-interface" component={PropertyManagerInterfaceLanding} />
+      <Route path="/modules/client-relationship-management" component={CRMLanding} />
       <Route path="/changelog/user-access" component={UserAccessGuide} />
       <Route path="/changelog/projects" component={ProjectsGuide} />
       <Route path="/changelog/time-tracking" component={TimeTrackingGuide} />
