@@ -12,6 +12,7 @@ import {
   SiDropbox,
   SiGooglecalendar,
   SiGusto,
+  SiFacebook,
 } from "react-icons/si";
 import { 
   FileSpreadsheet, 
@@ -25,7 +26,8 @@ import {
   Clock,
   Briefcase,
   Smartphone,
-  BookOpen
+  BookOpen,
+  Newspaper
 } from "lucide-react";
 
 export type SoftwareKey =
@@ -60,7 +62,9 @@ export type SoftwareKey =
   | "notesApp"
   | "notebook"
   | "jobber"
-  | "housecallpro";
+  | "housecallpro"
+  | "facebook"
+  | "craigslist";
 
 interface SoftwareInfo {
   name: string;
@@ -100,6 +104,8 @@ const softwareData: Record<SoftwareKey, SoftwareInfo> = {
   notebook: { name: "Notebook", icon: <BookOpen className="w-5 h-5" /> },
   jobber: { name: "Jobber", icon: <ClipboardList className="w-5 h-5" /> },
   housecallpro: { name: "Housecall Pro", icon: <Briefcase className="w-5 h-5" /> },
+  facebook: { name: "Facebook", icon: <SiFacebook className="w-5 h-5" /> },
+  craigslist: { name: "Craigslist", icon: <Newspaper className="w-5 h-5" /> },
 };
 
 interface SoftwareReplacesProps {
@@ -145,7 +151,7 @@ export const MODULE_SOFTWARE_MAPPING: Record<string, SoftwareKey[]> = {
   "document-management": ["docusign", "dropbox", "sharepoint"],
   "employee-management": ["bamboohr", "gusto", "paper"],
   "technician-job-board": ["indeed", "linkedin"],
-  "employer-job-board": ["indeed", "linkedin"],
+  "employer-job-board": ["indeed", "linkedin", "facebook", "craigslist"],
   "gear-inventory": ["excel", "spreadsheets"],
   "scheduling-calendar": ["deputy", "whenIWork", "googlecalendar"],
   "payroll-financial": ["quickbooks", "xero", "excel"],
