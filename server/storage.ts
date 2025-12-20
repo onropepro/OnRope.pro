@@ -24,6 +24,29 @@ export class Storage {
     return result[0] ? decryptSensitiveFields(result[0]) : undefined;
   }
 
+  async getResidentByStrataAndUnit(strataPlanNumber: string, unitNumber: string, excludeUserId?: number): Promise<User | undefined> {
+    // Normalize inputs for consistent matching
+    const normalizedStrata = strataPlanNumber.trim().toUpperCase().replace(/[-\s]+/g, '');
+    const normalizedUnit = unitNumber.trim().toUpperCase();
+    
+    // Get all residents (need to normalize DB values too)
+    const allResidents = await db.select().from(users).where(eq(users.role, 'resident'));
+    
+    for (const resident of allResidents) {
+      // Skip the current user if excludeUserId is provided
+      if (excludeUserId && resident.id === excludeUserId) continue;
+      
+      // Normalize database values
+      const dbStrata = (resident.strataPlanNumber || '').trim().toUpperCase().replace(/[-\s]+/g, '');
+      const dbUnit = (resident.unitNumber || '').trim().toUpperCase();
+      
+      if (dbStrata === normalizedStrata && dbUnit === normalizedUnit) {
+        return decryptSensitiveFields(resident);
+      }
+    }
+    return undefined;
+  }
+
   async getUserByPropertyManagerCode(propertyManagerCode: string): Promise<User | undefined> {
     const result = await db.select().from(users).where(eq(users.propertyManagerCode, propertyManagerCode)).limit(1);
     return result[0] ? decryptSensitiveFields(result[0]) : undefined;

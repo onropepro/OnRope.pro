@@ -47,10 +47,6 @@ export default function ResidentDashboard() {
   const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [selectedNotice, setSelectedNotice] = useState<any | null>(null);
-  const [lastPhotoViewTime, setLastPhotoViewTime] = useState<number>(() => {
-    const stored = localStorage.getItem('lastPhotoViewTime');
-    return stored ? parseInt(stored) : 0;
-  });
   const [lastComplaintsViewTime, setLastComplaintsViewTime] = useState<number>(() => {
     const stored = localStorage.getItem('lastComplaintsViewTime');
     return stored ? parseInt(stored) : 0;
@@ -325,18 +321,6 @@ export default function ResidentDashboard() {
     });
   };
 
-  // Fetch photos tagged with resident's unit number
-  const { data: unitPhotosData } = useQuery<{ photos: any[] }>({
-    queryKey: ["/api/my-unit-photos"],
-    enabled: !!currentUser?.unitNumber,
-  });
-
-  // Calculate new photos count
-  const newPhotosCount = unitPhotosData?.photos?.filter((photo: any) => {
-    const photoTime = new Date(photo.createdAt).getTime();
-    return photoTime > lastPhotoViewTime;
-  }).length || 0;
-
   // Calculate complaints with new responses (notes visible to resident created after last view)
   const newResponsesCount = complaintsData?.complaints?.filter((complaint: any) => {
     // Check if complaint has any notes visible to resident
@@ -349,13 +333,6 @@ export default function ResidentDashboard() {
       return noteTime > lastComplaintsViewTime;
     });
   }).length || 0;
-
-  // Mark photos as viewed when user opens the tab
-  const handlePhotoTabOpen = () => {
-    const now = Date.now();
-    setLastPhotoViewTime(now);
-    localStorage.setItem('lastPhotoViewTime', now.toString());
-  };
 
   // Mark complaints as viewed when user opens the tab
   const handleComplaintsTabOpen = () => {
@@ -643,18 +620,16 @@ export default function ResidentDashboard() {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-primary/5 via-background to-primary/10">
       {/* Inject custom brand color styles */}
-      {hasCustomBranding && primaryColor && (
-        <style>{`
-          [data-state="active"][style*="--custom-primary"] {
-            background-color: ${primaryColor}20 !important;
-            color: ${primaryColor} !important;
-            border-bottom: 2px solid ${primaryColor} !important;
-          }
-          [data-state="active"][style*="--custom-primary"]:hover {
-            background-color: ${primaryColor}30 !important;
-          }
-        `}</style>
-      )}
+      <style>{`
+        .resident-tab[data-state="active"] {
+          background-color: ${hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR}20 !important;
+          color: ${hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR} !important;
+          border-bottom: 2px solid ${hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR} !important;
+        }
+        .resident-tab[data-state="active"]:hover {
+          background-color: ${hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR}30 !important;
+        }
+      `}</style>
       {/* Modern Header */}
       <header 
         className="sticky top-0 z-[100] bg-card/80 backdrop-blur-xl border-b border-border/50 shadow-lg"
@@ -780,9 +755,6 @@ export default function ResidentDashboard() {
 
         <Tabs value={activeTab} onValueChange={(value) => {
           setActiveTab(value);
-          if (value === "photos") {
-            handlePhotoTabOpen();
-          }
           if (value === "history") {
             handleComplaintsTabOpen();
           }
@@ -796,47 +768,21 @@ export default function ResidentDashboard() {
             <TabsTrigger 
               value="building" 
               data-testid="tab-building"
-              style={{
-                '--custom-primary': hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR
-              } as React.CSSProperties}
+              className="resident-tab"
             >
               {t('residentPortal.tabs.progress', 'Progress')}
             </TabsTrigger>
             <TabsTrigger 
-              value="photos" 
-              data-testid="tab-photos"
-              className="relative"
-              style={{
-                '--custom-primary': hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR
-              } as React.CSSProperties}
-            >
-              {t('residentPortal.tabs.myPhotos', 'My Photos')}
-              {newPhotosCount > 0 && (
-                <Badge 
-                  variant="destructive" 
-                  className="absolute -top-1 -right-1 h-4 min-w-[16px] flex items-center justify-center px-1 text-[10px] font-bold"
-                  data-testid="badge-new-photos"
-                >
-                  {newPhotosCount}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger 
               value="submit" 
               data-testid="tab-submit"
-              style={{
-                '--custom-primary': hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR
-              } as React.CSSProperties}
+              className="resident-tab"
             >
               {t('residentPortal.tabs.submit', 'Submit')}
             </TabsTrigger>
             <TabsTrigger 
               value="history" 
               data-testid="tab-history"
-              className="relative"
-              style={{
-                '--custom-primary': hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR
-              } as React.CSSProperties}
+              className="relative resident-tab"
             >
               {t('residentPortal.tabs.feedback', 'Feedback')}
               {newResponsesCount > 0 && (
@@ -852,10 +798,7 @@ export default function ResidentDashboard() {
             <TabsTrigger 
               value="notices" 
               data-testid="tab-notices"
-              className="relative"
-              style={{
-                '--custom-primary': hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR
-              } as React.CSSProperties}
+              className="relative resident-tab"
             >
               {t('residentPortal.tabs.notices', 'Notices')}
               {(workNoticesData?.notices?.length || 0) > 0 && (
@@ -867,6 +810,13 @@ export default function ResidentDashboard() {
                   {workNoticesData?.notices?.length || 0}
                 </Badge>
               )}
+            </TabsTrigger>
+            <TabsTrigger 
+              value="profile" 
+              data-testid="tab-profile"
+              className="resident-tab"
+            >
+              {t('residentPortal.tabs.profile', 'Profile')}
             </TabsTrigger>
           </TabsList>
 
@@ -1031,81 +981,6 @@ export default function ResidentDashboard() {
                 </div>
               )}
             </div>
-          </TabsContent>
-
-          <TabsContent value="photos" className="mt-6">
-            <Card className="shadow-xl border-border/50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <span 
-                    className="material-icons"
-                    style={{ color: hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR }}
-                  >
-                    photo_library
-                  </span>
-                  {t('residentPortal.photos.title', 'My Unit Photos')}
-                </CardTitle>
-                <CardDescription>
-                  {t('residentPortal.photos.taggedForUnit', 'Photos tagged for unit')} {currentUser?.unitNumber || "—"}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {!currentUser?.unitNumber ? (
-                  <div className="text-center py-12 text-muted-foreground">
-                    <span className="material-icons text-5xl mb-3 opacity-50">image_not_supported</span>
-                    <p>{t('residentPortal.photos.noUnitNumber', 'No unit number found in your profile.')}</p>
-                  </div>
-                ) : unitPhotosData?.photos?.length === 0 ? (
-                  <div className="text-center py-12 text-muted-foreground">
-                    <span className="material-icons text-5xl mb-3 opacity-50">photo_library</span>
-                    <p className="text-lg mb-2">{t('residentPortal.photos.noPhotosYet', 'No photos yet')}</p>
-                    <p className="text-sm">{t('residentPortal.photos.photosWillAppear', 'Photos tagged for your unit will appear here.')}</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {unitPhotosData?.photos?.map((photo: any) => (
-                      <div key={photo.id} className="bg-card rounded-lg overflow-hidden border hover-elevate group">
-                        <div className="aspect-video relative overflow-hidden">
-                          <img
-                            src={photo.imageUrl}
-                            alt={photo.comment || t('residentPortal.photos.unitPhoto', 'Unit photo')}
-                            className="w-full h-full object-cover"
-                            data-testid={`unit-photo-${photo.id}`}
-                          />
-                        </div>
-                        <div className="p-3 space-y-2">
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="flex-1 min-w-0">
-                              {photo.buildingName && (
-                                <div className="text-sm font-medium truncate">
-                                  {photo.buildingName}
-                                </div>
-                              )}
-                              {photo.buildingAddress && (
-                                <div className="text-xs text-muted-foreground truncate">
-                                  {photo.buildingAddress}
-                                </div>
-                              )}
-                            </div>
-                            <Badge variant="secondary" className="text-xs shrink-0">
-                              {t('residentPortal.photos.unit', 'Unit')} {photo.unitNumber || photo.missedUnitNumber}
-                            </Badge>
-                          </div>
-                          {photo.comment && (
-                            <div className="text-sm text-muted-foreground border-t pt-2">
-                              {photo.comment}
-                            </div>
-                          )}
-                          <div className="text-xs text-muted-foreground border-t pt-2">
-                            {formatTimestampDate(photo.createdAt)}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
           </TabsContent>
 
           <TabsContent value="submit" className="mt-6">
@@ -1512,6 +1387,13 @@ export default function ResidentDashboard() {
               )}
             </div>
           </TabsContent>
+
+          <TabsContent value="profile" className="mt-6">
+            <ResidentProfileTab 
+              currentUser={currentUser} 
+              primaryColor={hasCustomBranding && primaryColor ? primaryColor : RESIDENT_COLOR}
+            />
+          </TabsContent>
         </Tabs>
       </div>
 
@@ -1793,5 +1675,415 @@ function CompanyLinkedCard({ companyId }: { companyId: string }) {
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+// Resident Profile Tab - Compact two-column layout
+function ResidentProfileTab({ currentUser, primaryColor }: { currentUser: any; primaryColor: string }) {
+  const { t } = useTranslation();
+  const { toast } = useToast();
+  const [isEditing, setIsEditing] = useState(false);
+  const [showUnlinkDialog, setShowUnlinkDialog] = useState(false);
+  const [showLinkDialog, setShowLinkDialog] = useState(false);
+  const [newVendorCode, setNewVendorCode] = useState("");
+  
+  // Form state
+  const [formData, setFormData] = useState({
+    name: currentUser?.name || "",
+    strataPlanNumber: currentUser?.strataPlanNumber || "",
+    unitNumber: currentUser?.unitNumber || "",
+    phoneNumber: currentUser?.phoneNumber || "",
+  });
+
+  // Update form when user data changes
+  useEffect(() => {
+    if (currentUser) {
+      setFormData({
+        name: currentUser.name || "",
+        strataPlanNumber: currentUser.strataPlanNumber || "",
+        unitNumber: currentUser.unitNumber || "",
+        phoneNumber: currentUser.phoneNumber || "",
+      });
+    }
+  }, [currentUser]);
+
+  // Fetch linked company info
+  const { data: companyData } = useQuery<{ company: any }>({
+    queryKey: ["/api/companies", currentUser?.companyId],
+    enabled: !!currentUser?.companyId,
+  });
+
+  // Update profile mutation
+  const updateProfileMutation = useMutation({
+    mutationFn: async (data: typeof formData) => {
+      const response = await fetch("/api/resident/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to update profile");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({ title: t('residentPortal.profile.updateSuccess', 'Profile updated successfully') });
+      setIsEditing(false);
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+    },
+    onError: (error: Error) => {
+      toast({ title: t('residentPortal.error', 'Error'), description: error.message, variant: "destructive" });
+    },
+  });
+
+  // Unlink from company mutation
+  const unlinkMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch("/api/unlink-resident", {
+        method: "POST",
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to unlink account");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({ title: t('residentPortal.profile.unlinkSuccess', 'Account unlinked successfully') });
+      setShowUnlinkDialog(false);
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      window.location.reload();
+    },
+    onError: (error: Error) => {
+      toast({ title: t('residentPortal.error', 'Error'), description: error.message, variant: "destructive" });
+    },
+  });
+
+  // Link to new company mutation
+  const linkCodeMutation = useMutation({
+    mutationFn: async (code: string) => {
+      const response = await fetch("/api/link-resident-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ residentCode: code }),
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to link account");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({ title: t('residentPortal.profile.linkSuccess', 'Account linked successfully') });
+      setShowLinkDialog(false);
+      setNewVendorCode("");
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      window.location.reload();
+    },
+    onError: (error: Error) => {
+      toast({ title: t('residentPortal.error', 'Error'), description: error.message, variant: "destructive" });
+    },
+  });
+
+  const handleSave = () => {
+    updateProfileMutation.mutate(formData);
+  };
+
+  const handleLinkSubmit = () => {
+    const code = newVendorCode.trim().toUpperCase();
+    if (code.length !== 10) {
+      toast({ title: t('residentPortal.linkCode.invalidCode', 'Invalid Code'), description: t('residentPortal.linkCode.codeLength', 'Company code must be 10 characters'), variant: "destructive" });
+      return;
+    }
+    linkCodeMutation.mutate(code);
+  };
+
+  return (
+    <div className="bg-card/60 backdrop-blur-sm rounded-2xl border border-border/50 shadow-xl p-6">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <div 
+            className="h-12 w-12 rounded-full flex items-center justify-center text-white"
+            style={{ backgroundColor: primaryColor }}
+          >
+            <span className="material-icons text-2xl">person</span>
+          </div>
+          <div>
+            <h2 className="text-xl font-bold">{t('residentPortal.profile.title', 'My Profile')}</h2>
+            <p className="text-sm text-muted-foreground">{t('residentPortal.profile.subtitle', 'Manage your account settings')}</p>
+          </div>
+        </div>
+        {!isEditing ? (
+          <Button 
+            variant="outline" 
+            onClick={() => setIsEditing(true)}
+            data-testid="button-edit-profile"
+          >
+            <span className="material-icons mr-2 text-sm">edit</span>
+            {t('residentPortal.profile.edit', 'Edit')}
+          </Button>
+        ) : (
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setIsEditing(false);
+                setFormData({
+                  name: currentUser?.name || "",
+                  strataPlanNumber: currentUser?.strataPlanNumber || "",
+                  unitNumber: currentUser?.unitNumber || "",
+                  phoneNumber: currentUser?.phoneNumber || "",
+                });
+              }}
+              data-testid="button-cancel-edit"
+            >
+              {t('residentPortal.profile.cancel', 'Cancel')}
+            </Button>
+            <Button 
+              onClick={handleSave}
+              disabled={updateProfileMutation.isPending}
+              style={{ backgroundColor: primaryColor, borderColor: primaryColor }}
+              className="text-white"
+              data-testid="button-save-profile"
+            >
+              {updateProfileMutation.isPending ? t('residentPortal.profile.saving', 'Saving...') : t('residentPortal.profile.save', 'Save')}
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {/* Two-column layout */}
+      <div className="grid md:grid-cols-2 gap-6">
+        {/* Left Column - Personal Info */}
+        <div className="space-y-4">
+          <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
+            {t('residentPortal.profile.personalInfo', 'Personal Information')}
+          </h3>
+          
+          <div className="space-y-3">
+            <div>
+              <label className="text-xs text-muted-foreground">{t('residentPortal.profile.fullName', 'Full Name')}</label>
+              {isEditing ? (
+                <Input
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="mt-1"
+                  data-testid="input-profile-name"
+                />
+              ) : (
+                <p className="font-medium" data-testid="text-profile-name">{currentUser?.name || "-"}</p>
+              )}
+            </div>
+            
+            <div>
+              <label className="text-xs text-muted-foreground">{t('residentPortal.profile.email', 'Email')}</label>
+              <p className="font-medium text-muted-foreground" data-testid="text-profile-email">{currentUser?.email || "-"}</p>
+            </div>
+            
+            <div>
+              <label className="text-xs text-muted-foreground">{t('residentPortal.profile.phone', 'Phone Number')}</label>
+              {isEditing ? (
+                <Input
+                  value={formData.phoneNumber}
+                  onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                  className="mt-1"
+                  data-testid="input-profile-phone"
+                />
+              ) : (
+                <p className="font-medium" data-testid="text-profile-phone">{currentUser?.phoneNumber || "-"}</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column - Building Info */}
+        <div className="space-y-4">
+          <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
+            {t('residentPortal.profile.buildingInfo', 'Building Information')}
+          </h3>
+          
+          <div className="space-y-3">
+            <div>
+              <label className="text-xs text-muted-foreground">{t('residentPortal.profile.strataNumber', 'Strata/HOA/LMS Number')}</label>
+              {isEditing ? (
+                <Input
+                  value={formData.strataPlanNumber}
+                  onChange={(e) => setFormData({ ...formData, strataPlanNumber: e.target.value })}
+                  className="mt-1"
+                  data-testid="input-profile-strata"
+                />
+              ) : (
+                <p className="font-medium" data-testid="text-profile-strata">{currentUser?.strataPlanNumber || "-"}</p>
+              )}
+            </div>
+            
+            <div>
+              <label className="text-xs text-muted-foreground">{t('residentPortal.profile.unitNumber', 'Unit Number')}</label>
+              {isEditing ? (
+                <Input
+                  value={formData.unitNumber}
+                  onChange={(e) => setFormData({ ...formData, unitNumber: e.target.value })}
+                  className="mt-1"
+                  data-testid="input-profile-unit"
+                />
+              ) : (
+                <p className="font-medium" data-testid="text-profile-unit">{currentUser?.unitNumber || "-"}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Company Link Section */}
+      <div className="mt-6 pt-6 border-t">
+        <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide mb-4">
+          {t('residentPortal.profile.vendorConnection', 'Vendor Connection')}
+        </h3>
+        
+        {currentUser?.companyId && companyData?.company ? (
+          <div className="flex items-center justify-between p-4 rounded-lg bg-success/10 border border-success/20">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-success/20 flex items-center justify-center">
+                <span className="material-icons text-success">check_circle</span>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">{t('residentPortal.profile.linkedTo', 'Linked to')}</p>
+                <p className="font-semibold">{companyData.company.companyName}</p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowLinkDialog(true)}
+                data-testid="button-switch-vendor"
+              >
+                <span className="material-icons mr-1 text-sm">swap_horiz</span>
+                {t('residentPortal.profile.switchVendor', 'Switch')}
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowUnlinkDialog(true)}
+                className="text-destructive border-destructive/50 hover:bg-destructive/10"
+                data-testid="button-unlink-vendor"
+              >
+                <span className="material-icons mr-1 text-sm">link_off</span>
+                {t('residentPortal.profile.unlink', 'Unlink')}
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="p-4 rounded-lg bg-muted/50 border border-border">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+                  <span className="material-icons text-muted-foreground">link_off</span>
+                </div>
+                <div>
+                  <p className="font-medium">{t('residentPortal.profile.notLinked', 'Not linked to a vendor')}</p>
+                  <p className="text-sm text-muted-foreground">{t('residentPortal.profile.linkDescription', 'Enter your vendor code to connect')}</p>
+                </div>
+              </div>
+              <Button 
+                onClick={() => setShowLinkDialog(true)}
+                style={{ backgroundColor: primaryColor, borderColor: primaryColor }}
+                className="text-white"
+                data-testid="button-link-vendor"
+              >
+                <span className="material-icons mr-2 text-sm">link</span>
+                {t('residentPortal.profile.linkAccount', 'Link Account')}
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Unlink Confirmation Dialog */}
+      <AlertDialog open={showUnlinkDialog} onOpenChange={setShowUnlinkDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('residentPortal.profile.unlinkTitle', 'Unlink from Vendor?')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('residentPortal.profile.unlinkWarning', 'You will lose access to project progress, work notices, and your feedback history from this vendor. You can link to a new vendor at any time.')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('residentPortal.profile.cancel', 'Cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => unlinkMutation.mutate()}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={unlinkMutation.isPending}
+            >
+              {unlinkMutation.isPending ? t('residentPortal.profile.unlinking', 'Unlinking...') : t('residentPortal.profile.unlinkConfirm', 'Yes, Unlink')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Link/Switch Vendor Dialog */}
+      <Dialog open={showLinkDialog} onOpenChange={setShowLinkDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {currentUser?.companyId 
+                ? t('residentPortal.profile.switchVendorTitle', 'Switch to a Different Vendor')
+                : t('residentPortal.profile.linkVendorTitle', 'Link to a Vendor')
+              }
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            {currentUser?.companyId && (
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>{t('residentPortal.profile.switchWarningTitle', 'Switching Vendors')}</AlertTitle>
+                <AlertDescription>
+                  {t('residentPortal.profile.switchWarning', 'You will be disconnected from your current vendor and lose access to their project updates.')}
+                </AlertDescription>
+              </Alert>
+            )}
+            <div>
+              <label className="text-sm font-medium mb-2 block">{t('residentPortal.profile.vendorCode', 'Vendor Code')}</label>
+              <Input
+                value={newVendorCode}
+                onChange={(e) => setNewVendorCode(e.target.value.toUpperCase())}
+                placeholder={t('residentPortal.profile.vendorCodePlaceholder', 'Enter 10-character code')}
+                maxLength={10}
+                className="font-mono"
+                data-testid="input-new-vendor-code"
+              />
+              <p className="text-xs text-muted-foreground mt-2">
+                {t('residentPortal.profile.vendorCodeHelp', 'Your property manager or the maintenance company can provide this code.')}
+              </p>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setShowLinkDialog(false)}>
+              {t('residentPortal.profile.cancel', 'Cancel')}
+            </Button>
+            <Button
+              onClick={handleLinkSubmit}
+              disabled={linkCodeMutation.isPending || newVendorCode.length !== 10}
+              style={{ backgroundColor: primaryColor, borderColor: primaryColor }}
+              className="text-white"
+              data-testid="button-confirm-link"
+            >
+              {linkCodeMutation.isPending 
+                ? t('residentPortal.profile.linking', 'Linking...') 
+                : t('residentPortal.profile.linkConfirm', 'Link Account')
+              }
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }

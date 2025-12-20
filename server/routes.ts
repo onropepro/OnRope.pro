@@ -22,6 +22,7 @@ import OpenAI from "openai";
 import { generateQuizFromDocument } from "./gemini";
 import helpRouter from "./routes/help";
 import { startPhotoUploadWorker, runBucketHealthCheck } from "./residentPhotoWorker";
+import convert from "heic-convert";
 
 // SECURITY: Rate limiting for login endpoint to prevent brute force attacks
 const loginRateLimiter = rateLimit({
@@ -1884,6 +1885,97 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Link resident code error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Unlink resident from company
+  app.post("/api/unlink-resident", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (currentUser.role !== 'resident') {
+        return res.status(403).json({ message: "Only residents can unlink their account" });
+      }
+      
+      console.log(`[unlink-resident] Resident ${currentUser.email} unlinking from company ${currentUser.companyId}`);
+      
+      await storage.updateUser(currentUser.id, { 
+        companyId: null,
+        linkedResidentCode: null
+      });
+      
+      res.json({ message: "Account unlinked successfully" });
+    } catch (error) {
+      console.error("Unlink resident error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Update resident profile (strata/HOA/LMS number, unit number, phone)
+  app.patch("/api/resident/profile", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (currentUser.role !== 'resident') {
+        return res.status(403).json({ message: "Only residents can update their profile" });
+      }
+      
+      const { strataPlanNumber, unitNumber, phoneNumber, name } = req.body;
+      
+      // Validate that at least one field is provided
+      if (!strataPlanNumber && !unitNumber && !phoneNumber && !name) {
+        return res.status(400).json({ message: "At least one field to update is required" });
+      }
+      
+      // If changing strata+unit, check for duplicates (excludes current user)
+      if (strataPlanNumber && unitNumber) {
+        // Check if another resident already claims this strata+unit (with normalization)
+        const existingResident = await storage.getResidentByStrataAndUnit(
+          strataPlanNumber, 
+          unitNumber,
+          currentUser.id  // Exclude current user from duplicate check
+        );
+        
+        if (existingResident) {
+          return res.status(409).json({ 
+            message: "This unit is already registered to another resident account",
+            conflict: true
+          });
+        }
+      }
+      
+      const updates: Partial<typeof currentUser> = {};
+      if (strataPlanNumber !== undefined) updates.strataPlanNumber = strataPlanNumber;
+      if (unitNumber !== undefined) updates.unitNumber = unitNumber;
+      if (phoneNumber !== undefined) updates.phoneNumber = phoneNumber;
+      if (name !== undefined) updates.name = name;
+      
+      console.log(`[resident-profile] Updating profile for ${currentUser.email}:`, updates);
+      
+      await storage.updateUser(currentUser.id, updates);
+      
+      const updatedUser = await storage.getUserById(currentUser.id);
+      
+      res.json({ 
+        message: "Profile updated successfully",
+        user: {
+          strataPlanNumber: updatedUser?.strataPlanNumber,
+          unitNumber: updatedUser?.unitNumber,
+          phoneNumber: updatedUser?.phoneNumber,
+          name: updatedUser?.name
+        }
+      });
+    } catch (error) {
+      console.error("Update resident profile error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
@@ -13081,22 +13173,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Serve resident photos from dedicated bucket
-  app.get("/api/resident-photos/:fileName", async (req: Request, res: Response) => {
+  // Serve resident photos from dedicated bucket (supports nested path with complaintId folder)
+  // Converts HEIC/HEIF to JPEG on-the-fly for browser compatibility
+  app.get("/api/resident-photos/:folderId/:fileName", async (req: Request, res: Response) => {
     try {
       const objectStorageService = new ObjectStorageService();
-      const file = await objectStorageService.getResidentPhoto(req.params.fileName);
+      const fullPath = `${req.params.folderId}/${req.params.fileName}`;
+      const file = await objectStorageService.getResidentPhoto(fullPath);
       
       if (!file) {
         return res.status(404).json({ message: "Photo not found" });
       }
       
       const [metadata] = await file.getMetadata();
-      res.setHeader("Content-Type", metadata.contentType || "image/jpeg");
-      res.setHeader("Cache-Control", "public, max-age=31536000");
+      const contentType = metadata.contentType || "image/jpeg";
+      const fileName = req.params.fileName.toLowerCase();
+      const isHeic = fileName.endsWith(".heic") || fileName.endsWith(".heif");
       
-      const stream = file.createReadStream();
-      stream.pipe(res);
+      // If HEIC/HEIF, convert to JPEG for browser compatibility
+      if (isHeic) {
+        const chunks: Buffer[] = [];
+        const stream = file.createReadStream();
+        
+        stream.on("data", (chunk: Buffer) => chunks.push(chunk));
+        stream.on("end", async () => {
+          try {
+            const heicBuffer = Buffer.concat(chunks);
+            const jpegBuffer = await convert({
+              buffer: heicBuffer,
+              format: "JPEG",
+              quality: 0.9,
+            });
+            
+            res.setHeader("Content-Type", "image/jpeg");
+            res.setHeader("Cache-Control", "public, max-age=31536000");
+            res.send(jpegBuffer);
+          } catch (conversionError) {
+            console.error("HEIC conversion error:", conversionError);
+            // Fallback: send original HEIC (won't display in most browsers but won't error)
+            res.setHeader("Content-Type", contentType);
+            res.setHeader("Cache-Control", "public, max-age=31536000");
+            res.send(Buffer.concat(chunks));
+          }
+        });
+        stream.on("error", (err: Error) => {
+          console.error("Stream error:", err);
+          res.status(500).json({ message: "Error reading photo" });
+        });
+      } else {
+        // Non-HEIC: stream directly
+        res.setHeader("Content-Type", contentType);
+        res.setHeader("Cache-Control", "public, max-age=31536000");
+        const stream = file.createReadStream();
+        stream.pipe(res);
+      }
     } catch (error) {
       console.error("Get resident photo error:", error);
       res.status(500).json({ message: "Internal server error" });

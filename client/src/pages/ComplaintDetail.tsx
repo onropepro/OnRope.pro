@@ -17,6 +17,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { formatTimestampDate, formatTime } from "@/lib/dateUtils";
 
+// Official Resident color from stakeholder palette
+const RESIDENT_COLOR = "#86A59C";
+
 const noteSchema = z.object({
   note: z.string().min(1, "Note cannot be empty"),
   visibleToResident: z.boolean().default(false),
@@ -214,8 +217,15 @@ export default function ComplaintDetail() {
             <span className="material-icons">arrow_back</span>
           </Button>
           <h1 className="text-lg font-bold flex-1">{t('feedbackDetail.feedbackDetails', 'Feedback Details')}</h1>
-          <Badge variant={complaint.status === "open" ? "default" : "secondary"} data-testid="badge-status">
-            {complaint.status}
+          <Badge 
+            variant="secondary" 
+            className={complaint.status === "open" 
+              ? "bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20" 
+              : "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20"
+            }
+            data-testid="badge-status"
+          >
+            {complaint.status === "open" ? t('feedbackDetail.statusOpen', 'Open') : t('feedbackDetail.statusClosed', 'Closed')}
           </Badge>
         </div>
       </header>
@@ -360,6 +370,7 @@ export default function ComplaintDetail() {
                   <Button 
                     type="submit" 
                     className="w-full h-12" 
+                    style={{ backgroundColor: RESIDENT_COLOR }}
                     data-testid="button-send-reply" 
                     disabled={addResidentReplyMutation.isPending}
                   >
