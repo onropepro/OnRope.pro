@@ -379,17 +379,18 @@ export default function HomePage() {
 
             {/* Primary Headline */}
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              One Platform. Everyone Connected.
+              One Unified Platform.
+              <br />
+              Everyone Connected.
               <br />
               <span className="text-blue-100">Zero Chaos.</span>
             </h1>
 
             {/* Subheadline */}
             <p className="text-xl md:text-2xl text-blue-100 max-w-4xl mx-auto leading-relaxed">
-              Projects. Payroll. Safety. Scheduling. Compliance. Logging. All in
-              one place. Built by a Level 3 technician and Operations Manager
-              who got tired of watching good companies drown in paperwork and
-              stress.
+              Projects. Payroll. Safety. Scheduling. Compliance. Logging. All in one place.
+              <br /><br />
+              Built by a Level 3 technician and Operations Manager who got tired of watching good companies drown in paperwork and stress.
             </p>
 
             {/* Segment Selector */}
