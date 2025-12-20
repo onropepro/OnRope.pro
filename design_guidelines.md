@@ -285,7 +285,48 @@ All module landing pages MUST follow this exact hero structure. Copy from UserAc
 ```
 - Value: `text-3xl md:text-4xl font-bold` + accent color
 - Label: `text-sm text-muted-foreground mt-1`
-- Accent colors vary by stat meaning (blue, rose, amber, emerald)
+- **CRITICAL: Use standard stats colors (see below) - NOT stakeholder colors**
+
+---
+
+### Standard Stats Panel Colors (Universal across all stakeholder pages)
+
+These colors MUST be used on all stats panels, regardless of stakeholder type or page hero color:
+
+| Position | Color | Tailwind Class | Hex Value | Usage |
+|----------|-------|---|----------|-------|
+| 1st Stat | Ocean Blue | `text-blue-700` | #1D4ED8 | Primary metric, percentage, primary benefit |
+| 2nd Stat | Emerald | `text-emerald-600` | #10B981 | Success, financial value, positive outcome |
+| 3rd Stat | Orange | `text-orange-600` | #EA580C | Quantity, hours saved, volume metric |
+| 4th Stat | Violet | `text-violet-600` | #7C3AED | Secondary benefit, advanced feature, count |
+
+**Implementation Example (Resident Portal):**
+```tsx
+<div className="grid grid-cols-2 gap-6 md:gap-8">
+  {/* Blue - Primary */}
+  <div className="text-center">
+    <div className="text-2xl md:text-3xl font-bold text-blue-700">1 Submission</div>
+    <div className="text-sm text-muted-foreground mt-1">(Not 3 Calls)</div>
+  </div>
+  {/* Emerald - Success */}
+  <div className="text-center">
+    <div className="text-2xl md:text-3xl font-bold text-emerald-600">Proof They Saw It</div>
+    <div className="text-sm text-muted-foreground mt-1">Viewed Timestamp</div>
+  </div>
+  {/* Orange - Quantity */}
+  <div className="text-center">
+    <div className="text-2xl md:text-3xl font-bold text-orange-600">0 Lost</div>
+    <div className="text-sm text-muted-foreground mt-1">Complaints</div>
+  </div>
+  {/* Violet - Secondary */}
+  <div className="text-center">
+    <div className="text-2xl md:text-3xl font-bold text-violet-600">24hr Resolution</div>
+    <div className="text-sm text-muted-foreground mt-1">(Not 5 Days)</div>
+  </div>
+</div>
+```
+
+**Key Principle:** Stats colors are brand-wide and consistent. Hero gradients and page-specific branding can vary by stakeholder, but stats always use this same color sequence.
 
 ---
 
