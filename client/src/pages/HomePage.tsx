@@ -170,8 +170,8 @@ const roiExample = [
 ];
 
 export default function HomePage() {
-  const [activeSegment, setActiveSegment] = useState<Segment>("employer");
-  const content = segmentContent[activeSegment];
+  const [activeSegment, setActiveSegment] = useState<Segment | null>(null);
+  const content = activeSegment ? segmentContent[activeSegment] : null;
 
   const segmentButtons: { id: Segment; label: string; icon: typeof Briefcase }[] = [
     { id: "employer", label: "Rope Access Company", icon: Briefcase },
@@ -222,7 +222,7 @@ export default function HomePage() {
                     variant={activeSegment === btn.id ? "default" : "outline"}
                     className={activeSegment === btn.id 
                       ? "bg-white text-[#0B64A3] hover:bg-blue-50" 
-                      : "border-white/40 text-white hover:bg-white/10"
+                      : "border-white/40 text-white hover:bg-white hover:text-[#0B64A3] transition-colors"
                     }
                     onClick={() => setActiveSegment(btn.id)}
                     data-testid={`button-segment-${btn.id}`}
@@ -235,58 +235,60 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Segment-specific content */}
-          <div className="mt-12 text-center max-w-4xl mx-auto space-y-8">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-4" data-testid="text-segment-headline">
-                {content.headline}
-              </h2>
-              <p className="text-lg md:text-xl text-blue-100 leading-relaxed">
-                {content.subheadline}
-              </p>
-            </div>
-
-            {/* Value Pillars */}
-            <div className="grid md:grid-cols-3 gap-6 pt-4">
-              {content.pillars.map((pillar, i) => (
-                <Card key={i} className="bg-white/10 border-white/20 backdrop-blur-sm">
-                  <CardContent className="p-6 text-center">
-                    <pillar.icon className="w-10 h-10 mx-auto mb-4 text-white" />
-                    <h3 className="text-lg font-bold text-white mb-2">{pillar.headline}</h3>
-                    <p className="text-blue-100 text-base">{pillar.text}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            {/* CTAs */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <div className="flex flex-col items-center gap-1">
-                <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild>
-                  <Link href={content.primaryCta.href}>
-                    {content.primaryCta.text}
-                    <ArrowRight className="ml-2 w-5 h-5" />
-                  </Link>
-                </Button>
-                {'subtext' in content.primaryCta && content.primaryCta.subtext && (
-                  <span className="text-xs text-blue-100">{content.primaryCta.subtext}</span>
-                )}
+          {/* Segment-specific content - only shown when a segment is selected */}
+          {content && (
+            <div className="mt-12 text-center max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+              <div>
+                <h2 className="text-3xl md:text-4xl font-bold mb-4" data-testid="text-segment-headline">
+                  {content.headline}
+                </h2>
+                <p className="text-lg md:text-xl text-blue-100 leading-relaxed">
+                  {content.subheadline}
+                </p>
               </div>
-              <div className="flex flex-col items-center gap-1">
-                <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild>
-                  <Link href={content.secondaryCta.href}>
-                    {content.secondaryCta.text}
-                  </Link>
-                </Button>
-                {'secondarySubtext' in content && content.secondarySubtext && (
-                  <span className="text-xs text-blue-100">{content.secondarySubtext}</span>
-                )}
-              </div>
-            </div>
 
-            {/* Trust Signal */}
-            <p className="text-sm text-blue-100 italic">{content.trustSignal}</p>
-          </div>
+              {/* Value Pillars */}
+              <div className="grid md:grid-cols-3 gap-6 pt-4">
+                {content.pillars.map((pillar, i) => (
+                  <Card key={i} className="bg-white/10 border-white/20 backdrop-blur-sm">
+                    <CardContent className="p-6 text-center">
+                      <pillar.icon className="w-10 h-10 mx-auto mb-4 text-white" />
+                      <h3 className="text-lg font-bold text-white mb-2">{pillar.headline}</h3>
+                      <p className="text-blue-100 text-base">{pillar.text}</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              {/* CTAs */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                <div className="flex flex-col items-center gap-1">
+                  <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild>
+                    <Link href={content.primaryCta.href}>
+                      {content.primaryCta.text}
+                      <ArrowRight className="ml-2 w-5 h-5" />
+                    </Link>
+                  </Button>
+                  {'subtext' in content.primaryCta && content.primaryCta.subtext && (
+                    <span className="text-xs text-blue-100">{content.primaryCta.subtext}</span>
+                  )}
+                </div>
+                <div className="flex flex-col items-center gap-1">
+                  <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild>
+                    <Link href={content.secondaryCta.href}>
+                      {content.secondaryCta.text}
+                    </Link>
+                  </Button>
+                  {'secondarySubtext' in content && content.secondarySubtext && (
+                    <span className="text-xs text-blue-100">{content.secondarySubtext}</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Trust Signal */}
+              <p className="text-sm text-blue-100 italic">{content.trustSignal}</p>
+            </div>
+          )}
         </div>
 
         {/* Wave separator */}
