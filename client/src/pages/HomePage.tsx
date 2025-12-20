@@ -203,7 +203,7 @@ export default function HomePage() {
 
             {/* Primary Headline */}
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              One Platform. Every Stakeholder.<br />
+              One Platform. Everyone Connected.<br />
               <span className="text-blue-100">Zero Chaos.</span>
             </h1>
 

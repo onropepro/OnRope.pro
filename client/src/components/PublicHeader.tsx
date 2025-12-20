@@ -23,7 +23,7 @@ const STAKEHOLDER_COLORS = {
   "property-manager": "#6E9075", 
   resident: "#86A59C",
   "building-manager": "#4A6C8C",
-  employer: "#1e40af", // Blue for employer
+  employer: "#0B64A3", // Ocean Blue for employer
 } as const;
 
 export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
