@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { motion, AnimatePresence } from "framer-motion";
 import { TechnicianRegistration } from "@/components/TechnicianRegistration";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,11 +12,11 @@ import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Separator } from "@/components/ui/separator";
 import { PublicHeader } from "@/components/PublicHeader";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { queryClient } from "@/lib/queryClient";
+import { queryClient, apiRequest } from "@/lib/queryClient";
 import {
   ArrowRight,
   HardHat,
@@ -43,7 +44,8 @@ import {
   XCircle,
   Calculator,
   CreditCard,
-  Mail
+  Mail,
+  Loader2
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
@@ -63,7 +65,11 @@ export default function TechnicianLanding() {
   const [, setLocation] = useLocation();
   const [faqOpen, setFaqOpen] = useState<string[]>([]);
   const [showRegistration, setShowRegistration] = useState(false);
-  const [showLoginDialog, setShowLoginDialog] = useState(false);
+  const [showSignIn, setShowSignIn] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
+  const [resetSuccess, setResetSuccess] = useState(false);
   const [loginMethod, setLoginMethod] = useState<"license" | "email">("license");
 
   const form = useForm<LoginFormData>({
@@ -135,9 +141,45 @@ export default function TechnicianLanding() {
     }
   }, []);
 
+  // Toggle sign-in form visibility
+  const handleToggleSignIn = () => {
+    setShowSignIn(!showSignIn);
+    setShowForgotPassword(false);
+    setResetSuccess(false);
+    form.reset();
+  };
+
+  // Handle forgot password submission
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsResettingPassword(true);
+    
+    try {
+      const response = await apiRequest("POST", "/api/forgot-password", {
+        email: forgotPasswordEmail,
+      });
+      
+      // Always show success for security (don't reveal if email exists)
+      setResetSuccess(true);
+      toast({
+        title: "Check your email",
+        description: "If an account exists with that email, you will receive password reset instructions.",
+      });
+    } catch (error) {
+      // Still show success for security
+      setResetSuccess(true);
+      toast({
+        title: "Check your email",
+        description: "If an account exists with that email, you will receive password reset instructions.",
+      });
+    } finally {
+      setIsResettingPassword(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
-      <PublicHeader activeNav="technician" onSignInClick={() => setShowLoginDialog(true)} />
+      <PublicHeader activeNav="technician" onSignInClick={handleToggleSignIn} />
       
       {/* Hero Section - Rust Brown Gradient */}
       <section className="relative text-white pb-[120px]" style={{backgroundImage: `linear-gradient(135deg, ${TECHNICIAN_COLOR} 0%, ${TECHNICIAN_GRADIENT_END} 100%)`}}>
@@ -177,7 +219,7 @@ export default function TechnicianLanding() {
                 size="lg" 
                 variant="outline" 
                 className="border-white/40 text-white hover:bg-white/10" 
-                onClick={() => setShowLoginDialog(true)}
+                onClick={handleToggleSignIn}
                 data-testid="button-hero-login"
               >
                 {t('techLogin.hero.signIn', 'Sign In')}
@@ -187,6 +229,201 @@ export default function TechnicianLanding() {
             <p className="text-sm text-orange-100/80">
               No credit card, ever.
             </p>
+
+            {/* Inline Sign In Form */}
+            <AnimatePresence>
+              {showSignIn && (
+                <motion.div
+                  initial={{ opacity: 0, y: -20, height: 0 }}
+                  animate={{ opacity: 1, y: 0, height: "auto" }}
+                  exit={{ opacity: 0, y: -20, height: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="max-w-md mx-auto pt-6"
+                >
+                  <Card className="shadow-xl">
+                    <CardContent className="p-6">
+                      {!showForgotPassword ? (
+                        <div className="space-y-4">
+                          {/* Login Method Toggle */}
+                          <div className="flex gap-2">
+                            <Button
+                              type="button"
+                              variant={loginMethod === "license" ? "default" : "outline"}
+                              className="flex-1 gap-2"
+                              onClick={() => {
+                                setLoginMethod("license");
+                                form.setValue("identifier", "");
+                              }}
+                              data-testid="button-login-license"
+                            >
+                              <CreditCard className="w-4 h-4" />
+                              License Number
+                            </Button>
+                            <Button
+                              type="button"
+                              variant={loginMethod === "email" ? "default" : "outline"}
+                              className="flex-1 gap-2"
+                              onClick={() => {
+                                setLoginMethod("email");
+                                form.setValue("identifier", "");
+                              }}
+                              data-testid="button-login-email"
+                            >
+                              <Mail className="w-4 h-4" />
+                              Email
+                            </Button>
+                          </div>
+
+                          <Form {...form}>
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                              <FormField
+                                control={form.control}
+                                name="identifier"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>
+                                      {loginMethod === "license" ? "IRATA or SPRAT License Number" : "Email Address"}
+                                    </FormLabel>
+                                    <FormControl>
+                                      <Input
+                                        {...field}
+                                        type={loginMethod === "email" ? "email" : "text"}
+                                        placeholder={loginMethod === "license" ? "e.g., 123456 (without /1, /2, /3)" : "you@example.com"}
+                                        data-testid="input-identifier"
+                                      />
+                                    </FormControl>
+                                    {loginMethod === "license" && (
+                                      <p className="text-xs text-muted-foreground">
+                                        Enter just the number without the level prefix (e.g., 123456 not 1/123456)
+                                      </p>
+                                    )}
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              <FormField
+                                control={form.control}
+                                name="password"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Password</FormLabel>
+                                    <FormControl>
+                                      <Input
+                                        {...field}
+                                        type="password"
+                                        placeholder="Enter your password"
+                                        data-testid="input-password"
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              
+                              <Button 
+                                type="submit" 
+                                className="w-full"
+                                style={{ backgroundColor: TECHNICIAN_COLOR }}
+                                disabled={form.formState.isSubmitting}
+                                data-testid="button-login-submit"
+                              >
+                                {form.formState.isSubmitting ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  "Sign In"
+                                )}
+                              </Button>
+                            </form>
+                          </Form>
+
+                          <div className="text-center">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowForgotPassword(true);
+                                setForgotPasswordEmail(loginMethod === "email" ? form.getValues("identifier") : "");
+                                setResetSuccess(false);
+                              }}
+                              className="text-sm text-muted-foreground hover:underline"
+                              data-testid="link-forgot-password"
+                            >
+                              Forgot Password?
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {!resetSuccess ? (
+                            <form onSubmit={handleForgotPassword} className="space-y-4">
+                              <div className="text-center mb-4">
+                                <h3 className="text-lg font-semibold text-foreground">Reset Your Password</h3>
+                                <p className="text-sm text-muted-foreground">Enter your email and we will send you reset instructions.</p>
+                              </div>
+                              <div className="space-y-2">
+                                <Label htmlFor="forgot-email" className="text-sm font-medium text-foreground">Email Address</Label>
+                                <Input
+                                  id="forgot-email"
+                                  type="email"
+                                  placeholder="you@example.com"
+                                  value={forgotPasswordEmail}
+                                  onChange={(e) => setForgotPasswordEmail(e.target.value)}
+                                  required
+                                  data-testid="input-forgot-email"
+                                />
+                              </div>
+                              
+                              <Button
+                                type="submit"
+                                className="w-full"
+                                style={{ backgroundColor: TECHNICIAN_COLOR }}
+                                disabled={isResettingPassword}
+                                data-testid="button-submit-reset"
+                              >
+                                {isResettingPassword ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  "Send Reset Link"
+                                )}
+                              </Button>
+                              
+                              <div className="text-center">
+                                <button
+                                  type="button"
+                                  onClick={() => setShowForgotPassword(false)}
+                                  className="text-sm text-muted-foreground hover:underline"
+                                  data-testid="link-back-to-signin"
+                                >
+                                  Back to Sign In
+                                </button>
+                              </div>
+                            </form>
+                          ) : (
+                            <div className="text-center space-y-4">
+                              <CheckCircle2 className="w-12 h-12 mx-auto" style={{ color: TECHNICIAN_COLOR }} />
+                              <h3 className="text-lg font-semibold text-foreground">Check Your Email</h3>
+                              <p className="text-sm text-muted-foreground">
+                                If an account exists with that email, you will receive password reset instructions.
+                              </p>
+                              <Button
+                                onClick={() => {
+                                  setShowForgotPassword(false);
+                                  setResetSuccess(false);
+                                }}
+                                variant="outline"
+                                className="w-full"
+                                data-testid="button-back-signin-after-reset"
+                              >
+                                Back to Sign In
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
         
@@ -1218,132 +1455,6 @@ export default function TechnicianLanding() {
           </div>
         </div>
       </footer>
-
-      {/* Login Dialog */}
-      <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
-        <DialogContent className="sm:max-w-md" data-testid="dialog-login">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <HardHat className="w-5 h-5 text-primary" />
-              {t('techLogin.dialog.title', 'Technician Sign In')}
-            </DialogTitle>
-            <DialogDescription>
-              {t('techLogin.dialog.subtitle', 'Sign in with your IRATA/SPRAT license number or email')}
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4">
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant={loginMethod === "license" ? "default" : "outline"}
-                className="flex-1 gap-2"
-                onClick={() => {
-                  setLoginMethod("license");
-                  form.setValue("identifier", "");
-                }}
-                data-testid="button-login-license"
-              >
-                <CreditCard className="w-4 h-4" />
-                {t('techLogin.dialog.licenseNumber', 'License Number')}
-              </Button>
-              <Button
-                type="button"
-                variant={loginMethod === "email" ? "default" : "outline"}
-                className="flex-1 gap-2"
-                onClick={() => {
-                  setLoginMethod("email");
-                  form.setValue("identifier", "");
-                }}
-                data-testid="button-login-email"
-              >
-                <Mail className="w-4 h-4" />
-                {t('techLogin.dialog.email', 'Email')}
-              </Button>
-            </div>
-
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="identifier"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        {loginMethod === "license" ? t('techLogin.dialog.licenseLabel', 'IRATA or SPRAT License Number') : t('techLogin.dialog.emailLabel', 'Email Address')}
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          type={loginMethod === "email" ? "email" : "text"}
-                          placeholder={loginMethod === "license" ? "e.g., 123456 (without /1, /2, /3)" : "you@example.com"}
-                          data-testid="input-identifier"
-                        />
-                      </FormControl>
-                      {loginMethod === "license" && (
-                        <p className="text-xs text-muted-foreground">
-                          {t('techLogin.dialog.licenseHint', 'Enter just the number without the level prefix (e.g., 123456 not 1/123456)')}
-                        </p>
-                      )}
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('techLogin.dialog.password', 'Password')}</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          type="password"
-                          placeholder={t('techLogin.dialog.passwordPlaceholder', 'Enter your password')}
-                          data-testid="input-password"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button 
-                  type="submit" 
-                  className="w-full"
-                  disabled={form.formState.isSubmitting}
-                  data-testid="button-login-submit"
-                >
-                  {form.formState.isSubmitting ? t('techLogin.dialog.signingIn', 'Signing in...') : t('techLogin.dialog.signIn', 'Sign In')}
-                </Button>
-              </form>
-            </Form>
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
-                  {t('techLogin.dialog.newTechnician', 'New technician?')}
-                </span>
-              </div>
-            </div>
-
-            <Button
-              variant="outline"
-              className="w-full gap-2"
-              onClick={() => {
-                setShowLoginDialog(false);
-                setShowRegistration(true);
-              }}
-              data-testid="button-register"
-            >
-              <HardHat className="w-4 h-4" />
-              {t('techLogin.dialog.register', 'Register as a Technician')}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {/* Registration Modal */}
       <TechnicianRegistration 
