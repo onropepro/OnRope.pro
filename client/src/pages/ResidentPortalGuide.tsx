@@ -1234,57 +1234,100 @@ export default function ResidentPortalGuide() {
               </div>
 
               {/* What You Can Do */}
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <h3 className="text-lg font-semibold flex items-center gap-2">
                   <CheckCircle2 className="w-5 h-5 text-[#86A59C]" />
                   What You Can Do
                 </h3>
                 
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="bg-white dark:bg-slate-900 rounded-lg p-4">
-                    <h4 className="font-medium mb-2 flex items-center gap-2">
-                      <Eye className="w-4 h-4 text-[#86A59C]" />
-                      View Project Progress
-                    </h4>
-                    <ul className="list-disc list-inside space-y-1 text-base text-muted-foreground">
-                      <li>Real-time progress updates showing which elevations are complete</li>
-                      <li>Project schedules with expected completion dates</li>
-                      <li>Progress bars for each elevation</li>
-                    </ul>
+                {/* View Project Progress */}
+                <div className="bg-white dark:bg-slate-900 rounded-lg p-4 space-y-3">
+                  <h4 className="font-medium flex items-center gap-2">
+                    <Eye className="w-4 h-4 text-[#86A59C]" />
+                    View Project Progress
+                  </h4>
+                  <ul className="list-disc list-inside space-y-1 text-base text-muted-foreground">
+                    <li>Real-time progress updates showing which elevations are complete</li>
+                    <li>Project schedules with expected completion dates</li>
+                    <li>Progress bars for each elevation so you know when work is approaching your side</li>
+                  </ul>
+                  <div className="border rounded-lg overflow-hidden">
+                    <img 
+                      src="/assets/help/residents-project-progress.png" 
+                      alt="Project progress view showing completion status for each building elevation" 
+                      className="w-full"
+                    />
+                    <p className="text-sm text-center text-muted-foreground py-2 bg-muted/30">Project Progress View</p>
                   </div>
+                </div>
 
-                  <div className="bg-white dark:bg-slate-900 rounded-lg p-4">
-                    <h4 className="font-medium mb-2 flex items-center gap-2">
-                      <MessageSquare className="w-4 h-4 text-[#86A59C]" />
-                      Submit Feedback
-                    </h4>
-                    <ul className="list-disc list-inside space-y-1 text-base text-muted-foreground">
-                      <li>Report issues, concerns, or compliments</li>
-                      <li>Attach photos for visual issues</li>
-                      <li>Automatically timestamped and tracked</li>
-                    </ul>
+                {/* View Work Notices */}
+                <div className="bg-white dark:bg-slate-900 rounded-lg p-4 space-y-3">
+                  <h4 className="font-medium flex items-center gap-2">
+                    <Info className="w-4 h-4 text-[#86A59C]" />
+                    View Work Notices
+                  </h4>
+                  <ul className="list-disc list-inside space-y-1 text-base text-muted-foreground">
+                    <li>Official notices about scheduled maintenance work</li>
+                    <li>Work period dates so you know exactly when crews will be on site</li>
+                    <li>Privacy advisories and safety requirements</li>
+                    <li>Downloadable PDFs of notices for your records</li>
+                  </ul>
+                  <div className="border rounded-lg overflow-hidden">
+                    <img 
+                      src="/assets/help/residents-notices.png" 
+                      alt="Work notices screen showing scheduled window cleaning with privacy advisory" 
+                      className="w-full"
+                    />
+                    <p className="text-sm text-center text-muted-foreground py-2 bg-muted/30">Work Notices Screen</p>
                   </div>
+                </div>
 
-                  <div className="bg-white dark:bg-slate-900 rounded-lg p-4">
-                    <h4 className="font-medium mb-2 flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-[#86A59C]" />
-                      Track Your Feedback
-                    </h4>
-                    <ul className="list-disc list-inside space-y-1 text-base text-muted-foreground">
-                      <li>View all your submitted feedback in one place</li>
-                      <li>See current status (Open, In Progress, or Closed)</li>
-                      <li>View management responses and updates</li>
-                    </ul>
+                {/* Submit Feedback */}
+                <div className="bg-white dark:bg-slate-900 rounded-lg p-4 space-y-3">
+                  <h4 className="font-medium flex items-center gap-2">
+                    <MessageSquare className="w-4 h-4 text-[#86A59C]" />
+                    Submit Feedback
+                  </h4>
+                  <ul className="list-disc list-inside space-y-1 text-base text-muted-foreground">
+                    <li>Report issues, concerns, or compliments directly through the portal</li>
+                    <li>Attach photos for visual issues (highly recommended)</li>
+                    <li>Automatically timestamped and tracked through to resolution</li>
+                  </ul>
+                  <div className="border rounded-lg overflow-hidden">
+                    <img 
+                      src="/assets/help/residents-submit-feedback.png" 
+                      alt="Submit feedback form with fields for name, phone, unit number, project selection, and message" 
+                      className="w-full"
+                    />
+                    <p className="text-sm text-center text-muted-foreground py-2 bg-muted/30">Submit Feedback Form</p>
                   </div>
-
-                  <div className="bg-white dark:bg-slate-900 rounded-lg p-4">
-                    <h4 className="font-medium mb-2 flex items-center gap-2">
-                      <Camera className="w-4 h-4 text-[#86A59C]" />
-                      Photo Evidence
-                    </h4>
-                    <p className="text-base text-muted-foreground">
-                      Clear photos help the team understand and resolve issues faster. Include photos showing the specific area of concern from multiple angles if possible.
+                  <div className="bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                    <p className="text-base text-blue-800 dark:text-blue-200">
+                      <strong>Photo Tips:</strong> Clear photos help the team understand and resolve issues faster. Include photos showing the specific area of concern from multiple angles if possible.
                     </p>
+                  </div>
+                </div>
+
+                {/* Track Your Feedback */}
+                <div className="bg-white dark:bg-slate-900 rounded-lg p-4 space-y-3">
+                  <h4 className="font-medium flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-[#86A59C]" />
+                    Track Your Feedback
+                  </h4>
+                  <ul className="list-disc list-inside space-y-1 text-base text-muted-foreground">
+                    <li>View all your submitted feedback in one place</li>
+                    <li>See current status (Open, In Progress, or Closed)</li>
+                    <li>Track response time from submission to resolution</li>
+                    <li>View management responses and updates</li>
+                  </ul>
+                  <div className="border rounded-lg overflow-hidden">
+                    <img 
+                      src="/assets/help/residents-feedback-history.png" 
+                      alt="Feedback history view showing submitted feedback with status and date" 
+                      className="w-full"
+                    />
+                    <p className="text-sm text-center text-muted-foreground py-2 bg-muted/30">Feedback History View</p>
                   </div>
                 </div>
               </div>
@@ -1356,29 +1399,44 @@ export default function ResidentPortalGuide() {
               {/* Managing Your Profile */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold flex items-center gap-2">
-                  <UserCircle className="w-5 h-5 text-[#86A59C]" />
+                  <Users className="w-5 h-5 text-[#86A59C]" />
                   Managing Your Profile
                 </h3>
                 
                 <p className="text-base text-muted-foreground">
                   Your OnRopePro account is fully portable. If you move to a new building or need to update your information, use the <strong>Profile</strong> tab in your dashboard.
                 </p>
-                
+
                 <div className="border rounded-lg overflow-hidden">
                   <img 
-                    src="/attached_assets/resident-profile-tab.png" 
-                    alt="Resident Profile tab showing personal and building information" 
+                    src="/assets/help/resident-profile-tab.png" 
+                    alt="Resident Profile Tab showing personal information, building information, and vendor connection" 
                     className="w-full"
                   />
-                  <p className="text-sm text-center text-muted-foreground py-2 bg-muted/30">The Profile tab lets you update your information and manage vendor connections</p>
+                  <p className="text-sm text-center text-muted-foreground py-2 bg-muted/30">Resident Profile Tab</p>
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="bg-white dark:bg-slate-900 rounded-lg p-4">
-                    <h4 className="font-medium mb-2 flex items-center gap-2">
-                      <ArrowRight className="w-4 h-4 text-[#86A59C]" />
-                      Moving to a New Building
-                    </h4>
+                    <h4 className="font-medium mb-2">Accessing Your Profile</h4>
+                    <ol className="list-decimal list-inside space-y-1 text-base text-muted-foreground">
+                      <li>Log in to the Resident Portal</li>
+                      <li>Click the <strong>Profile</strong> tab (rightmost tab)</li>
+                      <li>View your Personal Information and Building Information</li>
+                    </ol>
+                  </div>
+
+                  <div className="bg-white dark:bg-slate-900 rounded-lg p-4">
+                    <h4 className="font-medium mb-2">Updating Your Information</h4>
+                    <ol className="list-decimal list-inside space-y-1 text-base text-muted-foreground">
+                      <li>Click the <strong>Edit</strong> button</li>
+                      <li>Update your name, phone, Strata/LMS number, or unit</li>
+                      <li>Click <strong>Save</strong> to confirm changes</li>
+                    </ol>
+                  </div>
+
+                  <div className="bg-white dark:bg-slate-900 rounded-lg p-4">
+                    <h4 className="font-medium mb-2">Moving to a New Building</h4>
                     <ol className="list-decimal list-inside space-y-1 text-base text-muted-foreground">
                       <li>Go to the <strong>Profile</strong> tab</li>
                       <li>Update your <strong>Strata/HOA/LMS Number</strong></li>
@@ -1392,10 +1450,7 @@ export default function ResidentPortalGuide() {
                   </div>
 
                   <div className="bg-white dark:bg-slate-900 rounded-lg p-4">
-                    <h4 className="font-medium mb-2 flex items-center gap-2">
-                      <RefreshCw className="w-4 h-4 text-[#86A59C]" />
-                      Switching Vendors
-                    </h4>
+                    <h4 className="font-medium mb-2">Switching Vendors</h4>
                     <p className="text-base text-muted-foreground mb-2">
                       If your building changes service providers:
                     </p>

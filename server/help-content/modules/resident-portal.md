@@ -176,15 +176,17 @@ See real-time project progress instead of guessing when work will reach your uni
 
 Your OnRopePro account is fully portable. If you move to a new building or need to update your information, use the Profile tab in your dashboard.
 
-![Resident Profile Tab](resident-profile-tab.png)
+![Resident Profile Tab](/assets/help/resident-profile-tab.png)
 
 ### Accessing Your Profile
+
 1. Log in to the Resident Portal
 2. Click the **Profile** tab (rightmost tab)
 3. View your Personal Information and Building Information
 
 ### Updating Your Information
-1. Click the **Edit** button (or fields become editable automatically)
+
+1. Click the **Edit** button
 2. Update any of these fields:
    - **Full Name**: Your display name
    - **Phone Number**: Contact number
@@ -202,6 +204,7 @@ If you're moving to a different building:
 4. Click **Save**
 
 **Important**: If your new building uses a different service vendor:
+
 1. Click **Switch** in the Vendor Connection section
 2. Enter the new vendor's 10-character code
 3. Your old feedback history stays with the previous building
