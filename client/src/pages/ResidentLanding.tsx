@@ -36,6 +36,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { PublicHeader } from "@/components/PublicHeader";
 import { ResidentSlidingSignup } from "@/components/ResidentSlidingSignup";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
+import projectProgressImg from "@assets/residents-project-progress_1766199096691.png";
+import workNoticesImg from "@assets/residents-notices_1766199096691.png";
+import submitFeedbackImg from "@assets/residents-submit-feedback_1766199096691.png";
+import feedbackHistoryImg from "@assets/residents-feedback-history_1766199096691.png";
 
 // Official Resident color from stakeholder palette
 const RESIDENT_COLOR = "#86A59C";
@@ -589,6 +593,76 @@ export default function ResidentLanding() {
               </div>
             </CardContent>
           </Card>
+        </div>
+      </section>
+
+      <Separator className="max-w-4xl mx-auto" />
+
+      {/* Screenshot Gallery Section */}
+      <section className="py-12 md:py-20 px-4 md:px-8 max-w-6xl mx-auto">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+          See It In Action
+        </h2>
+        <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
+          Here's what you'll see when you log into your Resident Portal.
+        </p>
+        
+        <div className="grid md:grid-cols-2 gap-8">
+          <div className="space-y-3">
+            <div className="rounded-lg overflow-hidden border shadow-sm">
+              <img 
+                src={projectProgressImg} 
+                alt="Project progress view" 
+                className="w-full h-auto"
+                data-testid="img-project-progress"
+              />
+            </div>
+            <p className="text-sm text-muted-foreground text-center">
+              Project progress view showing completion status for each building elevation
+            </p>
+          </div>
+          
+          <div className="space-y-3">
+            <div className="rounded-lg overflow-hidden border shadow-sm">
+              <img 
+                src={workNoticesImg} 
+                alt="Work notices screen" 
+                className="w-full h-auto"
+                data-testid="img-work-notices"
+              />
+            </div>
+            <p className="text-sm text-muted-foreground text-center">
+              Work notices screen showing scheduled window cleaning with privacy advisory
+            </p>
+          </div>
+          
+          <div className="space-y-3">
+            <div className="rounded-lg overflow-hidden border shadow-sm">
+              <img 
+                src={submitFeedbackImg} 
+                alt="Submit feedback form" 
+                className="w-full h-auto"
+                data-testid="img-submit-feedback"
+              />
+            </div>
+            <p className="text-sm text-muted-foreground text-center">
+              Submit feedback form with fields for name, phone, unit number, project selection, and message
+            </p>
+          </div>
+          
+          <div className="space-y-3">
+            <div className="rounded-lg overflow-hidden border shadow-sm">
+              <img 
+                src={feedbackHistoryImg} 
+                alt="Feedback history view" 
+                className="w-full h-auto"
+                data-testid="img-feedback-history"
+              />
+            </div>
+            <p className="text-sm text-muted-foreground text-center">
+              Feedback history view showing submitted feedback with status and date
+            </p>
+          </div>
         </div>
       </section>
 
