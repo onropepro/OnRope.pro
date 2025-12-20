@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { PublicHeader } from "@/components/PublicHeader";
+import { SoftwareReplaces, MODULE_SOFTWARE_MAPPING } from "@/components/SoftwareReplaces";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import {
   Shield,
@@ -116,6 +117,11 @@ export default function UserAccessLanding() {
                 </Link>
               </Button>
             </div>
+
+            <SoftwareReplaces 
+              software={MODULE_SOFTWARE_MAPPING["user-access-authentication"]} 
+              className="mt-8 bg-white/5 rounded-lg mx-auto max-w-2xl [&_span]:text-blue-100 [&_svg]:text-blue-200"
+            />
           </div>
         </div>
         
