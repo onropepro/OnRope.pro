@@ -127,6 +127,7 @@ export default function HelpCenter() {
                 size="large" 
                 placeholder="Ask a question or search for help with projects, safety, scheduling..."
                 autoFocus
+                stakeholderColor="#0B64A3"
               />
             </div>
           </div>

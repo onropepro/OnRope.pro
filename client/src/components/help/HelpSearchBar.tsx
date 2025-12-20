@@ -365,13 +365,16 @@ export default function HelpSearchBar({
                   className={cn(
                     'max-w-[85%] rounded-2xl px-4 py-3',
                     message.role === 'user'
-                      ? `${stakeholderColor ? '' : 'bg-blue-600'} text-white rounded-br-md`
+                      ? 'bg-blue-600 text-white rounded-br-md'
                       : 'bg-muted text-foreground rounded-bl-md'
                   )}
                   style={message.role === 'user' && stakeholderColor ? { backgroundColor: stakeholderColor } : undefined}
                   data-testid={`chat-message-${message.role}-${message.id}`}
                 >
-                  <p className="text-sm whitespace-pre-wrap text-foreground text-left">{message.content}</p>
+                  <p className={cn(
+                    "text-sm whitespace-pre-wrap text-left",
+                    message.role === 'user' ? 'text-white' : 'text-foreground'
+                  )}>{message.content}</p>
                   
                   {message.sources && message.sources.length > 0 && (
                     <div className="mt-3 pt-3 border-t border-border/30">
