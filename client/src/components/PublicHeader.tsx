@@ -249,8 +249,8 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                 <ChevronDown className="w-3 h-3" />
               </Button>
               {showModulesMenu && (
-                <div className="absolute top-full right-0 pt-2 z-50">
-                  <div className="bg-card border border-border rounded-xl shadow-xl p-4 w-[960px]">
+                <div className="fixed top-[104px] left-1/2 -translate-x-1/2 pt-2 z-50">
+                  <div className="bg-card border border-border rounded-xl shadow-xl p-4 w-[960px] max-w-[calc(100vw-2rem)]">
                   <div className="flex gap-3">
                     {/* Column 1: Safety & Operations (4 items, Document Management at bottom) */}
                     <div className="flex-1 flex flex-col gap-2">
