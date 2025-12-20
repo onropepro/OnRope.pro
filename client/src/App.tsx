@@ -141,7 +141,7 @@ function Router() {
       <Route path="/reset-password" component={ResetPassword} />
       <Route path="/property-manager" component={PropertyManagerLanding} />
       <Route path="/technician" component={TechnicianLanding} />
-      <Route path="/pricing" component={GetLicense} />
+      <Route path="/pricing" component={Pricing} />
       <Route path="/get-license" component={GetLicense} />
       <Route path="/complete-registration" component={CompleteRegistration} />
       <Route path="/link" component={ResidentLink} />
