@@ -16,6 +16,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import HelpBreadcrumb from '@/components/help/HelpBreadcrumb';
 import HelpArticleCard from '@/components/help/HelpArticleCard';
 import HelpChatWidget from '@/components/help/HelpChatWidget';
+import HelpSearchBar from '@/components/help/HelpSearchBar';
 import { PublicHeader } from '@/components/PublicHeader';
 
 interface HelpArticle {
@@ -89,6 +90,14 @@ export default function ForCompanyOwners() {
                 Manage your business, team, and grow efficiently
               </p>
             </div>
+          </div>
+          
+          <div className="max-w-xl mt-6">
+            <HelpSearchBar 
+              size="large" 
+              placeholder="Ask about team management, financials, analytics..."
+              stakeholderColor="#0B64A3"
+            />
           </div>
         </div>
         <div className="absolute bottom-0 left-0 right-0 z-10 translate-y-[10px]">

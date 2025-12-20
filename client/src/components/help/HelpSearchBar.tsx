@@ -25,6 +25,7 @@ interface HelpSearchBarProps {
   placeholder?: string;
   size?: 'default' | 'large';
   autoFocus?: boolean;
+  stakeholderColor?: string;
 }
 
 const QUESTION_PATTERNS = [
@@ -45,6 +46,7 @@ export default function HelpSearchBar({
   placeholder = 'Ask a question or search for help with projects, safety, scheduling...', 
   size = 'default',
   autoFocus = false,
+  stakeholderColor,
 }: HelpSearchBarProps) {
   const [query, setQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
@@ -366,9 +368,13 @@ export default function HelpSearchBar({
                       ? 'bg-blue-600 text-white rounded-br-md'
                       : 'bg-muted text-foreground rounded-bl-md'
                   )}
+                  style={message.role === 'user' && stakeholderColor ? { backgroundColor: stakeholderColor } : undefined}
                   data-testid={`chat-message-${message.role}-${message.id}`}
                 >
-                  <p className="text-sm whitespace-pre-wrap text-foreground text-left">{message.content}</p>
+                  <p className={cn(
+                    "text-sm whitespace-pre-wrap text-left",
+                    message.role === 'user' ? 'text-white' : 'text-foreground'
+                  )}>{message.content}</p>
                   
                   {message.sources && message.sources.length > 0 && (
                     <div className="mt-3 pt-3 border-t border-border/30">

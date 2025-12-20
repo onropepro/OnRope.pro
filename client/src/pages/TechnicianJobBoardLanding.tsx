@@ -46,7 +46,8 @@ export default function TechnicianJobBoardLanding() {
             </Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              One Job Board. Every Rope Access Gig.<br />
+              One Job Board.<br />
+              Every Urban Rope Access Gig.<br />
               <span className="text-orange-100">Zero Pipe Fitter Listings.</span>
             </h1>
             

@@ -92,6 +92,7 @@ export default function ForPropertyManagers() {
             <HelpSearchBar 
               size="large" 
               placeholder="Ask about vendor management, portfolio oversight..."
+              stakeholderColor="#6E9075"
             />
           </div>
         </div>

@@ -23,7 +23,7 @@ const STAKEHOLDER_COLORS = {
   "property-manager": "#6E9075", 
   resident: "#86A59C",
   "building-manager": "#4A6C8C",
-  employer: "#0B64A3", // Ocean Blue for employer
+  employer: "#0B64A3", // Ocean Blue for employer - matches hero gradients
 } as const;
 
 export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
@@ -46,10 +46,36 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
   // Determine stakeholder color based on current path
   const getStakeholderColor = (): string | null => {
     const path = location.toLowerCase();
+    // Homepage uses employer Ocean Blue
     if (path === '/') {
       return STAKEHOLDER_COLORS.employer;
     }
-    if (path.startsWith('/technician') || path.includes('/modules/technician')) {
+    // Technician job board module uses technician rust color to match its hero
+    if (path === '/modules/technician-job-board') {
+      return STAKEHOLDER_COLORS.technician;
+    }
+    // Other /modules/ pages and /employer use employer blue
+    if (path.startsWith('/modules/') || path.startsWith('/employer')) {
+      return STAKEHOLDER_COLORS.employer;
+    }
+    // Help pages follow stakeholder color logic based on their audience
+    if (path.startsWith('/help/for-technicians') || path.startsWith('/help/technician')) {
+      return STAKEHOLDER_COLORS.technician;
+    }
+    if (path.startsWith('/help/for-employers') || path.startsWith('/help/employer')) {
+      return STAKEHOLDER_COLORS.employer;
+    }
+    if (path.startsWith('/help/for-property-managers') || path.startsWith('/help/property-manager')) {
+      return STAKEHOLDER_COLORS["property-manager"];
+    }
+    if (path.startsWith('/help/for-residents') || path.startsWith('/help/resident')) {
+      return STAKEHOLDER_COLORS.resident;
+    }
+    if (path.startsWith('/help/for-building-managers') || path.startsWith('/help/building-manager')) {
+      return STAKEHOLDER_COLORS["building-manager"];
+    }
+    // Standard technician paths
+    if (path.startsWith('/technician')) {
       return STAKEHOLDER_COLORS.technician;
     }
     if (path.startsWith('/property-manager')) {
@@ -60,9 +86,6 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
     }
     if (path.startsWith('/building-portal') || path.startsWith('/building-manager')) {
       return STAKEHOLDER_COLORS["building-manager"];
-    }
-    if (path.startsWith('/employer') || path.startsWith('/modules/')) {
-      return STAKEHOLDER_COLORS.employer;
     }
     return null;
   };
@@ -217,12 +240,13 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
               onMouseLeave={() => setShowModulesMenu(false)}
             >
               <Button
-                variant={activeNav === "employer" || activeNav === "modules" ? "default" : "ghost"}
-                className="text-sm font-medium"
+                variant="ghost"
+                className={`text-sm font-medium gap-1 ${activeNav === "employer" || activeNav === "modules" ? "text-primary" : ""}`}
                 onClick={() => setLocation("/employer")}
                 data-testid="nav-employer"
               >
                 {t('navigation.employer', 'Employer')}
+                <ChevronDown className="w-3 h-3" />
               </Button>
               {showModulesMenu && (
                 <div className="absolute top-full right-0 pt-2 z-50">
@@ -526,12 +550,13 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
               onMouseLeave={() => setShowTechnicianMenu(false)}
             >
               <Button
-                variant={activeNav === "technician" ? "default" : "ghost"}
-                className="text-sm font-medium"
+                variant="ghost"
+                className={`text-sm font-medium gap-1 ${activeNav === "technician" ? "text-primary" : ""}`}
                 onClick={() => setLocation("/technician")}
                 data-testid="nav-technician"
               >
                 {t('navigation.technician', 'Technician')}
+                <ChevronDown className="w-3 h-3" />
               </Button>
               {showTechnicianMenu && (
                 <div className="absolute top-full left-0 pt-2 z-50">
@@ -579,8 +604,8 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
             {navItems.filter(item => item.id !== "employer" && item.id !== "technician").map((item) => (
               <Button
                 key={item.id}
-                variant={activeNav === item.id ? "default" : "ghost"}
-                className="text-sm font-medium"
+                variant="ghost"
+                className={`text-sm font-medium ${activeNav === item.id ? "text-primary" : ""}`}
                 onClick={() => setLocation(item.href)}
                 data-testid={`nav-${item.id}`}
               >
@@ -598,10 +623,10 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
             {/* Employer with expandable modules */}
             <div>
               <button
-                className={`w-full flex items-center justify-between px-4 py-3 rounded-lg text-left font-medium transition-colors ${
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-lg text-left font-medium transition-colors hover-elevate ${
                   activeNav === "employer" || activeNav === "modules" 
-                    ? "bg-primary text-primary-foreground" 
-                    : "hover-elevate"
+                    ? "text-primary" 
+                    : ""
                 }`}
                 onClick={() => setMobileModulesExpanded(!mobileModulesExpanded)}
                 data-testid="nav-mobile-employer"
@@ -806,10 +831,10 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
             {/* Technician with expandable modules */}
             <div>
               <button
-                className={`w-full flex items-center justify-between px-4 py-3 rounded-lg text-left font-medium transition-colors ${
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-lg text-left font-medium transition-colors hover-elevate ${
                   activeNav === "technician" 
-                    ? "bg-primary text-primary-foreground" 
-                    : "hover-elevate"
+                    ? "text-primary" 
+                    : ""
                 }`}
                 onClick={() => setMobileTechnicianExpanded(!mobileTechnicianExpanded)}
                 data-testid="nav-mobile-technician"
@@ -850,10 +875,10 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
             {navItems.filter(item => item.id !== "employer" && item.id !== "technician").map((item) => (
               <button
                 key={item.id}
-                className={`w-full px-4 py-3 rounded-lg text-left font-medium transition-colors ${
+                className={`w-full px-4 py-3 rounded-lg text-left font-medium transition-colors hover-elevate ${
                   activeNav === item.id 
-                    ? "bg-primary text-primary-foreground" 
-                    : "hover-elevate"
+                    ? "text-primary" 
+                    : ""
                 }`}
                 onClick={() => {
                   setLocation(item.href);
