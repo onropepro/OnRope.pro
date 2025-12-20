@@ -175,6 +175,61 @@ As more buildings connect through the same vendor code:
 - Vendors build reputation across properties
 - Network value increases for everyone
 
+## Managing Your Profile
+
+Your OnRopePro account is fully portable. If you move to a new building or need to update your information, use the Profile tab in your dashboard.
+
+![Resident Profile Tab](resident-profile-tab.png)
+
+### Accessing Your Profile
+1. Log in to the Resident Portal
+2. Click the **Profile** tab (rightmost tab)
+3. View your Personal Information and Building Information
+
+### Updating Your Information
+1. Click the **Edit** button (or fields become editable automatically)
+2. Update any of these fields:
+   - **Full Name**: Your display name
+   - **Phone Number**: Contact number
+   - **Strata/HOA/LMS Number**: Your building's identifier
+   - **Unit Number**: Your unit within the building
+3. Click **Save** to confirm changes
+
+### Moving to a New Building
+
+If you're moving to a different building:
+
+1. Go to the **Profile** tab
+2. Update your **Strata/HOA/LMS Number** to match your new building
+3. Update your **Unit Number**
+4. Click **Save**
+
+**Important**: If your new building uses a different service vendor:
+1. Click **Switch** in the Vendor Connection section
+2. Enter the new vendor's 10-character code
+3. Your old feedback history stays with the previous building
+
+### Switching Vendors
+
+If your building changes service providers:
+
+1. Go to the **Profile** tab
+2. In the **Vendor Connection** section, click **Switch**
+3. Enter the new vendor's 10-character code
+4. Click **Link Account**
+
+Your account remains active - you're just connecting to a different service company.
+
+### Unlinking from a Vendor
+
+If you no longer need to receive updates from your current vendor:
+
+1. Go to the **Profile** tab
+2. In the **Vendor Connection** section, click **Unlink**
+3. Confirm the action in the warning dialog
+
+**Note**: Unlinking means you won't see active projects or be able to submit feedback until you link to a vendor again.
+
 ## Common Questions
 
 **Q: How do residents get the vendor code?**
@@ -194,6 +249,12 @@ A: Your feedback is saved immediately regardless of photo status. The system aut
 
 **Q: How long does photo upload take?**
 A: Photos typically upload within 30 seconds. You can check status in your feedback history.
+
+**Q: What happens when I move to a new building?**
+A: Your account is fully portable. Go to the Profile tab and update your Strata/LMS number and unit number. If your new building uses a different vendor, click "Switch" in the Vendor Connection section and enter the new vendor's code. Your previous feedback stays with the old building.
+
+**Q: Can I keep my account if I move to a different city?**
+A: Yes! Your OnRopePro account works everywhere. Just update your building information in the Profile tab. If your new building's vendor uses OnRopePro, enter their vendor code to connect.
 
 ## Related Modules
 
