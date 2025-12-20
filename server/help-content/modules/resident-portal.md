@@ -50,6 +50,14 @@ Your building manager or property manager can provide the company code. Usually 
 
 **Important:** Active work and building information won't appear in your control panel until you've entered the company code.
 
+![Where to enter your company code](/assets/help/residents-company-code-input.png)
+
+![Company code entered and ready to link](/assets/help/residents-company-code-filled.png)
+
+Once linked, you'll see your vendor connection confirmed:
+
+![Portal view when linked but no active projects](/assets/help/residents-linked-no-projects.png)
+
 ---
 
 ## What You Can Do
@@ -68,6 +76,8 @@ See exactly what work is being done on your building and when:
 - Know when to move plants or prepare for window access
 - No surprises about when crews will be working on your side
 
+![Project progress view showing completion status for each building elevation](/assets/help/residents-project-progress.png)
+
 ### View Work Notices
 
 Stay informed about upcoming and ongoing work at your building:
@@ -83,6 +93,8 @@ Stay informed about upcoming and ongoing work at your building:
 - Specific details about the type of work being performed
 - Important privacy and safety instructions
 - View and download options for each notice
+
+![Work notices screen showing scheduled window cleaning with privacy advisory](/assets/help/residents-notices.png)
 
 **Benefits:**
 
@@ -101,6 +113,8 @@ Report issues, concerns, or compliments directly through the portal:
 2. Describe the issue or concern in detail
 3. **Attach photos** if relevant (highly recommended for visual issues)
 4. Submit
+
+![Submit feedback form with fields for name, phone, unit number, project selection, and message](/assets/help/residents-submit-feedback.png)
 
 Your feedback is automatically timestamped and tracked through to resolution.
 
@@ -127,6 +141,8 @@ Every piece of feedback you submit is tracked:
 - That your concern was received (no more wondering if anyone saw it)
 - Progress on resolution
 - When the issue has been addressed
+
+![Feedback history view showing submitted feedback with status and date](/assets/help/residents-feedback-history.png)
 
 **Note:** Once feedback is marked as "Closed," only the management team can reopen it. If you feel an issue wasn't fully resolved, submit new feedback referencing the original concern.
 
