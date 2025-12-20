@@ -73,6 +73,7 @@ import GPSGuide from "@/pages/GPSGuide";
 import PropertyManagerGuide from "@/pages/PropertyManagerGuide";
 import CSRGuide from "@/pages/CSRGuide";
 import TechnicianRegistrationGuide from "@/pages/TechnicianRegistrationGuide";
+import HomePage from "@/pages/HomePage";
 import PayrollGuide from "@/pages/PayrollGuide";
 import MobileDesignGuide from "@/pages/MobileDesignGuide";
 import SafetyComplianceLanding from "@/pages/SafetyComplianceLanding";
@@ -133,7 +134,7 @@ function Router() {
   
   return (
     <Switch>
-      <Route path="/" component={Login} />
+      <Route path="/" component={HomePage} />
       <Route path="/register" component={Register} />
       <Route path="/login" component={Login} />
       <Route path="/employer" component={Employer} />

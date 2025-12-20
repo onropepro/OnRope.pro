@@ -54,6 +54,7 @@ const segmentContent = {
     ],
     primaryCta: { text: "Start Free Trial", href: "/register" },
     secondaryCta: { text: "See How It Works", href: "/pricing" },
+    secondarySubtext: "15-minute demo with someone who's been on the ropes",
     trustSignal: "30 days free. No credit card."
   },
   technician: {
@@ -76,7 +77,7 @@ const segmentContent = {
       { icon: Scale, headline: "Liability Protection", text: 'Documented vendor vetting. When insurance asks "what due diligence did you perform?"—you have the answer.' },
       { icon: ClipboardList, headline: "Portfolio Dashboard", text: "All your buildings. All your vendors. All their safety data. One screen." }
     ],
-    primaryCta: { text: "Create Free Account", href: "/property-manager" },
+    primaryCta: { text: "Create Free Account", href: "/property-manager", subtext: "Free for property managers" },
     secondaryCta: { text: "See Vendor Comparison Demo", href: "/property-manager" },
     trustSignal: "Join 50+ property managers already using OnRopePro for vendor oversight"
   },
@@ -256,17 +257,27 @@ export default function HomePage() {
 
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild>
-                <Link href={content.primaryCta.href}>
-                  {content.primaryCta.text}
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
-              </Button>
-              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild>
-                <Link href={content.secondaryCta.href}>
-                  {content.secondaryCta.text}
-                </Link>
-              </Button>
+              <div className="flex flex-col items-center gap-1">
+                <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild>
+                  <Link href={content.primaryCta.href}>
+                    {content.primaryCta.text}
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </Link>
+                </Button>
+                {'subtext' in content.primaryCta && content.primaryCta.subtext && (
+                  <span className="text-xs text-blue-100">{content.primaryCta.subtext}</span>
+                )}
+              </div>
+              <div className="flex flex-col items-center gap-1">
+                <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild>
+                  <Link href={content.secondaryCta.href}>
+                    {content.secondaryCta.text}
+                  </Link>
+                </Button>
+                {'secondarySubtext' in content && content.secondarySubtext && (
+                  <span className="text-xs text-blue-100">{content.secondarySubtext}</span>
+                )}
+              </div>
             </div>
 
             {/* Trust Signal */}
