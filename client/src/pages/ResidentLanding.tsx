@@ -424,20 +424,20 @@ export default function ResidentLanding() {
             <CardContent className="p-8">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold" style={{color: RESIDENT_COLOR}}>24hr</div>
-                  <div className="text-sm text-muted-foreground mt-1">Avg Response</div>
+                  <div className="text-2xl md:text-3xl font-bold" style={{color: RESIDENT_COLOR}}>Proof They Saw It</div>
+                  <div className="text-sm text-muted-foreground mt-1">Viewed Timestamp</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-emerald-600">100%</div>
-                  <div className="text-sm text-muted-foreground mt-1">Tracked</div>
+                  <div className="text-2xl md:text-3xl font-bold text-emerald-600">1 Submission</div>
+                  <div className="text-sm text-muted-foreground mt-1">(Not 3 Calls)</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-amber-600">0</div>
-                  <div className="text-sm text-muted-foreground mt-1">Lost Complaints</div>
+                  <div className="text-2xl md:text-3xl font-bold text-amber-600">0 Lost</div>
+                  <div className="text-sm text-muted-foreground mt-1">Complaints</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold" style={{color: RESIDENT_COLOR}}>Real-Time</div>
-                  <div className="text-sm text-muted-foreground mt-1">Updates</div>
+                  <div className="text-2xl md:text-3xl font-bold" style={{color: RESIDENT_COLOR}}>24hr Resolution</div>
+                  <div className="text-sm text-muted-foreground mt-1">(Not 5 Days)</div>
                 </div>
               </div>
             </CardContent>
