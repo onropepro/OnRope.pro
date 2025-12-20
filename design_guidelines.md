@@ -6,6 +6,16 @@
 - **Official Stakeholder Colors:** `attached_assets/OnRope.Pro_-_Official_colours_of_all_stakeholders_1766080018346.pdf` — Complete 10-color palette including all stakeholder-specific brand colors
 - **Color Variations Reference:** `attached_assets/OnRope.Pro_Official_Colour_Variations_1766080072011.pdf` — Extended variations for UI states and gradients
 
+### Color Variation Charts
+These charts provide extended color variations for different use cases and accessibility considerations:
+
+- **Shade Variations:** `attached_assets/onropepro_-_colour_palette_-_variations_-_shade_1766263055638.png` — Lightness/darkness variations from +90% to -90% for all brand colors
+- **Saturation Variations:** `attached_assets/onropepro_-_colour_palette_-_variations_-_saturation_1766263055638.png` — Saturation adjustments from +90% to -90% for muted/vibrant options
+- **Hue Variations:** `attached_assets/onropepro_-_colour_palette_-_variations_-_hue_1766263055638.png` — Hue shifts from +36° to -36° for harmonious color alternatives
+- **Color Blindness Reference:** `attached_assets/onropepro_-_colour_palette_-_variations_-_blindness_1766263055638.png` — How brand colors appear under Protanopia, Deuteranopia, Tritanopia, and Achromatopsia
+- **Gradient Reference:** `attached_assets/onropepro_-_colour_palette_-_variations_-_gradient_1766263055638.png` — Smooth gradient blends between all brand colors
+- **Theme Variations:** `attached_assets/onropepro_-_colour_palette_-_variations_-_theme_1766263055638.png` — Light and dark theme color adaptations
+
 ## Design Approach
 
 **Reference Systems:** Linear (clean hierarchy, refined spacing), Notion (sophisticated neutrals, data density), Monday.com (vibrant accents, dashboard polish)  
@@ -55,6 +65,58 @@
 - Primary (Hero): linear-gradient(135deg, #0B64A3 0%, #0369A1 100%)
 - Accent: linear-gradient(135deg, #0369A1 0%, #0B64A3 100%)
 - Subtle: linear-gradient(180deg, #F3F3F3 0%, #FFFFFF 100%)
+
+### Color Variation Usage Guide
+
+Reference the color variation charts in the Resources section for extended color options. Below is guidance on when and how to use each variation type:
+
+**Shade Variations (+90% to -90%):**
+Use shade variations for:
+- Hover states: Use -10% to -20% darker shade for interactive element hover
+- Pressed/active states: Use -20% to -30% darker shade
+- Disabled states: Use +40% to +60% lighter shade
+- Background layering: Use +70% to +90% for subtle background tints
+- Text on colored backgrounds: Use -50% to -70% for darker text variants
+
+**Saturation Variations (+90% to -90%):**
+Use saturation adjustments for:
+- Muted/subtle accents: -20% to -40% saturation for less prominent elements
+- Disabled states: -50% to -70% saturation combined with lighter shade
+- Emphasis: +10% to +20% for drawing attention (use sparingly)
+- Dark mode adaptations: Often reduce saturation by 10-20% in dark themes
+
+**Hue Variations (+36° to -36°):**
+Use hue shifts for:
+- Harmonious color pairings: Adjacent hues (±4° to ±12°) create subtle variety
+- Gradient endpoints: Use ±8° to ±16° hue shift for smooth color transitions
+- Seasonal/themed variations: Larger shifts for campaign-specific adaptations
+
+**Theme Variations (Light/Dark):**
+The theme chart shows optimized color values for:
+- **Light Theme Row:** Original brand colors optimized for light backgrounds
+- **Dark Theme Row:** Adjusted colors that maintain vibrancy on dark backgrounds
+- Key dark theme hex values from the chart:
+  - Navy Dark → #D8DDF0 (inverted for dark bg text)
+  - Ocean Blue → #5D85F4 (brighter for dark bg visibility)
+  - Rust Brown → #DE7954 (warmer for dark bg contrast)
+  - Sage Green → #6F907B (maintained with slight adjustment)
+
+**Accessibility & Color Blindness:**
+The blindness variation chart shows how brand colors appear under different color vision conditions:
+
+| Condition | Description | Design Considerations |
+|-----------|-------------|----------------------|
+| Protanopia | Red-blind (~1% males) | Blues appear preserved; rust/orange may look yellow-brown |
+| Deuteranopia | Green-blind (~1% males) | Similar to protanopia; greens shift toward browns |
+| Tritanopia | Blue-blind (rare, ~0.01%) | Blues shift toward greens; reds appear more vibrant |
+| Achromatopsia | Complete color blindness | All colors appear as grayscale; rely on contrast and patterns |
+
+**Accessibility Guidelines:**
+- Never rely solely on color to convey information (use icons, labels, patterns)
+- Ensure minimum 4.5:1 contrast ratio for text (7:1 for AAA compliance)
+- For status indicators, combine color with shape (checkmarks, X icons, warning triangles)
+- Test UI mockups through colorblind simulation tools
+- When using Ocean Blue (#0B64A3) with Sage Green (#6E9075), add distinguishing icons since these may be confused under deuteranopia
 
 ## Typography (Outfit via Tailwind Config)
 
