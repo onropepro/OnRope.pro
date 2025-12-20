@@ -60,7 +60,7 @@ const segmentContent = {
   },
   technician: {
     headline: "Your Career. Your Data. Your Platform.",
-    subheadline: "Your IRATA/SPRAT hours are yours—not your employer's. Build a portable professional identity that follows you from company to company, job to job, for your entire career.",
+    subheadline: "Your IRATA/SPRAT hours are yours, not your employer's. Build a portable professional identity that follows you from company to company, job to job, for your entire career.",
     pillars: [
       { icon: Ticket, headline: "Portable Work Passport", text: "Your hours, certifications, and work history travel with you. Change jobs without losing your record." },
       { icon: BarChart3, headline: "Automatic Hour Logging", text: "Connected to an employer? Hours, drops, and tasks log automatically. No more end-of-week paperwork." },
@@ -71,11 +71,11 @@ const segmentContent = {
     trustSignal: "PLUS features unlock free when you refer one other technician"
   },
   "property-manager": {
-    headline: "Know Your Vendors Before the Incident—Not After.",
+    headline: "Know Your Vendors Before the Incident, Not After.",
     subheadline: "Stop accepting vendor safety claims at face value. See real compliance data. Compare vendors objectively. Protect your portfolio with documented due diligence.",
     pillars: [
       { icon: BarChart3, headline: "Company Safety Ratings", text: "Three compliance percentages: documentation, toolbox meetings, harness inspections. At a glance." },
-      { icon: Scale, headline: "Liability Protection", text: 'Documented vendor vetting. When insurance asks "what due diligence did you perform?"—you have the answer.' },
+      { icon: Scale, headline: "Liability Protection", text: 'Documented vendor vetting. When insurance asks "what due diligence did you perform?" You have the answer.' },
       { icon: ClipboardList, headline: "Portfolio Dashboard", text: "All your buildings. All your vendors. All their safety data. One screen." }
     ],
     primaryCta: { text: "Create Free Account", href: "/property-manager", subtext: "Free for property managers" },
@@ -133,7 +133,8 @@ const chaosItems = [
   "2-3 hours per quote because you're guessing at historical costs",
   "Endless text threads tracking who's where and when",
   "Spreadsheets for certifications that nobody actually updates",
-  "Paper inspection forms that live in filing cabinets (maybe)"
+  "Paper inspection forms that live in filing cabinets (maybe)",
+  "Phone ringing all day with complaints you're tracking in a notebook (or written on your hand while driving)"
 ];
 
 const leakItems = [
@@ -148,7 +149,7 @@ const fixItems = [
   "Payroll prep in 30-45 minutes (not 6-10 hours)",
   "Every document searchable and exportable in seconds",
   "Historical job costing per building eliminates underbidding",
-  "Scheduling, time tracking, and projects—all linked",
+  "Scheduling, time tracking, and projects: all linked",
   "Equipment inventory with service life alerts",
   "Safety documentation that impresses building managers"
 ];
@@ -185,7 +186,6 @@ export default function HomePage() {
     <div className="min-h-screen bg-background">
       {/* Header Navigation */}
       <PublicHeader />
-
       {/* Hero Section */}
       <section 
         className="relative text-white pb-[120px]" 
@@ -208,9 +208,7 @@ export default function HomePage() {
             </h1>
 
             {/* Subheadline */}
-            <p className="text-xl md:text-2xl text-blue-100 max-w-4xl mx-auto leading-relaxed">
-              Projects. Payroll. Safety. Scheduling. Compliance. All in one place—built by a Level 3 technician who got tired of watching good companies drown in paperwork.
-            </p>
+            <p className="text-xl md:text-2xl text-blue-100 max-w-4xl mx-auto leading-relaxed">Projects. Payroll. Safety. Scheduling. Compliance. All in one place. Built by a Level 3 technician and Operations Manager who got tired of watching good companies drown in paperwork and stress.</p>
 
             {/* Segment Selector */}
             <div className="pt-8">
@@ -294,23 +292,21 @@ export default function HomePage() {
         {/* Wave separator */}
         <div className="absolute -bottom-[1px] left-0 right-0 z-10">
           <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto block" preserveAspectRatio="none">
-            <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" className="fill-background"/>
+            <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" className="fill-white dark:fill-slate-950"/>
           </svg>
         </div>
       </section>
-
       {/* Social Proof Section */}
       <section className="bg-white dark:bg-slate-950 py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">Built by Rope Access. For Rope Access.</h2>
           <p className="text-lg text-muted-foreground leading-relaxed">
-            OnRopePro was created by a Level 3 IRATA technician who spent years watching good companies drown in administrative chaos. 
+            OnRopePro was created by a Level 3 IRATA technician and Operations Manager who spent years watching good companies drown in administrative chaos. 
             Every feature exists because rope access operators asked for it. Every workflow was tested on actual job sites. 
             This isn't adapted HR software. It's the system we wished existed when we were running crews.
           </p>
         </div>
       </section>
-
       {/* Problem/Solution Section */}
       <section className="bg-muted/30 py-16 md:py-24 px-4">
         <div className="max-w-6xl mx-auto">
@@ -378,14 +374,13 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
       {/* Features Section - 16 Modules */}
       <section className="bg-white dark:bg-slate-950 py-16 md:py-24 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">16 Modules. One Platform. No Add-Ons.</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">16 Modules. One Platform. All Connected. All Included.</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Everything you need to run a rope access company—from first quote to final payment.
+              Everything you need to run a profitable rope access company, from first quote to final payment and every drop inbetween.
             </p>
           </div>
 
@@ -417,7 +412,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
       {/* ROI Section */}
       <section className="bg-muted/30 py-16 md:py-24 px-4">
         <div className="max-w-5xl mx-auto">
@@ -435,8 +429,11 @@ export default function HomePage() {
                 </div>
                 <p className="text-base text-muted-foreground">
                   $34.95 is what you pay a technician for <strong>one hour</strong> of work.<br />
-                  This platform saves each tech <strong>10+ hours</strong> per month.<br />
-                  <strong>You do the math.</strong>
+                  This platform saves each tech <strong>10+ hours</strong> per month.
+                </p>
+                <p className="text-base text-muted-foreground mt-4">
+                  <strong>The math is simple.</strong><br />
+                  Stress elimination? Priceless.
                 </p>
               </CardContent>
             </Card>
@@ -490,7 +487,6 @@ export default function HomePage() {
           </Card>
         </div>
       </section>
-
       {/* Trust Section */}
       <section className="bg-white dark:bg-slate-950 py-16 md:py-24 px-4">
         <div className="max-w-5xl mx-auto">
@@ -504,7 +500,7 @@ export default function HomePage() {
                 </div>
                 <h3 className="text-xl font-bold mb-3">Built by Rope Access</h3>
                 <p className="text-base text-muted-foreground">
-                  Created by a Level 3 IRATA technician. Every feature designed for how rope access companies actually work—not adapted from generic field service software.
+                  Created by a Level 3 IRATA technician. Every feature designed for how rope access companies actually work, not adapted from generic field service software.
                 </p>
               </CardContent>
             </Card>
@@ -535,7 +531,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
       {/* Final CTA Section */}
       <section 
         className="relative text-white py-16 md:py-24 px-4"
@@ -561,7 +556,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
       {/* Footer Value Props */}
       <section className="bg-slate-900 text-slate-300 py-12 px-4">
         <div className="max-w-5xl mx-auto">
