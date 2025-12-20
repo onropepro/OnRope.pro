@@ -14,6 +14,7 @@ import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/ca
 import HelpArticleCard from '@/components/help/HelpArticleCard';
 import HelpChatWidget from '@/components/help/HelpChatWidget';
 import HelpSearchBar from '@/components/help/HelpSearchBar';
+import { PublicHeader } from '@/components/PublicHeader';
 
 interface HelpArticle {
   id: string;
@@ -60,7 +61,8 @@ export default function ForTechnicians() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="relative text-white pb-[120px]" style={{backgroundImage: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)'}}>
+      <PublicHeader activeNav="technician" />
+      <div className="relative text-white pb-[120px]" style={{backgroundImage: 'linear-gradient(135deg, #AB4521 0%, #8B371A 100%)'}}>
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIwOS0xLjc5MS00LTQtNHMtNCAxLjc5MS00IDQgMS43OTEgNCA0IDQgNC0xLjc5MSA0LTR6bTAtMThjMC0yLjIwOS0xLjc5MS00LTQtNHMtNCAxLjc5MS00IDQgMS43OTEgNCA0IDQgNC0xLjc5MSA0LTR6bTE4IDBjMC0yLjIwOS0xLjc5MS00LTQtNHMtNCAxLjc5MS00IDQgMS43OTEgNCA0IDQgNC0xLjc5MSA0LTR6bS0xOCAxOGMwLTIuMjA5LTEuNzkxLTQtNC00cy00IDEuNzkxLTQgNCAxLjc5MSA0IDQgNCA0LTEuNzkxIDQtNHptMTggMGMwLTIuMjA5LTEuNzkxLTQtNC00cy00IDEuNzkxLTQgNCAxLjc5MSA0IDQgNCA0LTEuNzkxIDQtNHptMC0xOGMwLTIuMjA5LTEuNzkxLTQtNC00cy00IDEuNzkxLTQgNCAxLjc5MSA0IDQgNCA0LTEuNzkxIDQtNHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-30"></div>
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
           <div className="flex items-center gap-4 mb-6 flex-wrap">
@@ -80,7 +82,7 @@ export default function ForTechnicians() {
               <h1 className="text-4xl font-bold tracking-tight" data-testid="text-stakeholder-title">
                 For Technicians
               </h1>
-              <p className="text-xl text-amber-100">
+              <p className="text-xl text-white/80">
                 Track your time, certifications, and career progression
               </p>
             </div>
@@ -107,7 +109,7 @@ export default function ForTechnicians() {
             {keyFeatures.map((feature, index) => (
               <Card key={index}>
                 <CardHeader className="flex flex-col gap-3">
-                  <div className="w-10 h-10 bg-amber-100 dark:bg-amber-900/30 rounded-lg flex items-center justify-center text-amber-600 dark:text-amber-400">
+                  <div className="w-10 h-10 bg-[#AB4521]/10 dark:bg-[#AB4521]/20 rounded-lg flex items-center justify-center text-[#AB4521]">
                     <feature.icon className="h-5 w-5" />
                   </div>
                   <div>

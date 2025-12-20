@@ -8,6 +8,7 @@ import HelpSearchBar from '@/components/help/HelpSearchBar';
 import HelpArticleCard from '@/components/help/HelpArticleCard';
 import HelpBreadcrumb from '@/components/help/HelpBreadcrumb';
 import HelpChatWidget from '@/components/help/HelpChatWidget';
+import { PublicHeader } from '@/components/PublicHeader';
 
 interface SearchResult {
   id: string;
@@ -43,6 +44,7 @@ export default function HelpSearch() {
 
   return (
     <div className="min-h-screen bg-background">
+      <PublicHeader />
       <div className="bg-muted/50 border-b">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center gap-4 mb-4 flex-wrap">

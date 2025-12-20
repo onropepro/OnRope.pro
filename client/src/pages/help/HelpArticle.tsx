@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import HelpBreadcrumb from '@/components/help/HelpBreadcrumb';
 import HelpChatWidget from '@/components/help/HelpChatWidget';
+import { PublicHeader } from '@/components/PublicHeader';
 
 interface HelpArticle {
   id: string;
@@ -85,6 +86,7 @@ export default function HelpArticle() {
 
   return (
     <div className="min-h-screen bg-background">
+      <PublicHeader />
       <div className="bg-muted/50 border-b">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center gap-4 mb-4 flex-wrap">

@@ -15,6 +15,7 @@ import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import HelpBreadcrumb from '@/components/help/HelpBreadcrumb';
 import HelpChatWidget from '@/components/help/HelpChatWidget';
+import { PublicHeader } from '@/components/PublicHeader';
 
 export default function ROICalculator() {
   const [technicians, setTechnicians] = useState(5);
@@ -26,6 +27,7 @@ export default function ROICalculator() {
 
   return (
     <div className="min-h-screen bg-background">
+      <PublicHeader />
       <div className="bg-muted/50 border-b">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center gap-4 mb-4 flex-wrap">

@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import HelpNav from '@/components/help/HelpNav';
 import HelpBreadcrumb from '@/components/help/HelpBreadcrumb';
 import { useQuery } from '@tanstack/react-query';
+import { PublicHeader } from '@/components/PublicHeader';
 
 interface FoundFeature {
   slug: string;
@@ -85,6 +86,7 @@ export default function FeatureFinder() {
 
   return (
     <div className="min-h-screen bg-background">
+      <PublicHeader />
       <HelpNav currentSection="module" showBackButton backHref="/help" backLabel="Help Center" />
       
       <div className="container mx-auto px-4 py-8">

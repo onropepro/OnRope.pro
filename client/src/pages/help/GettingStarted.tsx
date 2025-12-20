@@ -11,10 +11,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import HelpBreadcrumb from '@/components/help/HelpBreadcrumb';
 import HelpChatWidget from '@/components/help/HelpChatWidget';
+import { PublicHeader } from '@/components/PublicHeader';
 
 export default function GettingStarted() {
   return (
     <div className="min-h-screen bg-background">
+      <PublicHeader />
       <div className="bg-muted/50 border-b">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center gap-4 mb-4 flex-wrap">

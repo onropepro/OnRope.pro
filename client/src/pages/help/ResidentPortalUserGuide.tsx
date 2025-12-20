@@ -13,10 +13,12 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import companyCodeImage from '@assets/residents_company_code.png';
+import { PublicHeader } from '@/components/PublicHeader';
 
 export default function ResidentPortalUserGuide() {
   return (
     <div className="min-h-screen bg-background">
+      <PublicHeader activeNav="resident" />
       <div className="bg-gradient-to-br from-[#86A59C] to-[#6B8A80] text-white">
         <div className="container mx-auto px-4 py-8">
           <Link href="/help/for-residents">

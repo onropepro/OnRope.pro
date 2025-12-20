@@ -14,6 +14,7 @@ import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/ca
 import HelpArticleCard from '@/components/help/HelpArticleCard';
 import HelpChatWidget from '@/components/help/HelpChatWidget';
 import HelpSearchBar from '@/components/help/HelpSearchBar';
+import { PublicHeader } from '@/components/PublicHeader';
 
 interface HelpArticle {
   id: string;
@@ -60,7 +61,8 @@ export default function ForBuildingManagers() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="relative text-white pb-[120px]" style={{backgroundImage: 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)'}}>
+      <PublicHeader activeNav="building-manager" />
+      <div className="relative text-white pb-[120px]" style={{backgroundImage: 'linear-gradient(135deg, #B89685 0%, #9A7B6C 100%)'}}>
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIwOS0xLjc5MS00LTQtNHMtNCAxLjc5MS00IDQgMS43OTEgNCA0IDQgNC0xLjc5MSA0LTR6bTAtMThjMC0yLjIwOS0xLjc5MS00LTQtNHMtNCAxLjc5MS00IDQgMS43OTEgNCA0IDQgNC0xLjc5MSA0LTR6bTE4IDBjMC0yLjIwOS0xLjc5MS00LTQtNHMtNCAxLjc5MS00IDQgMS43OTEgNCA0IDQgNC0xLjc5MSA0LTR6bS0xOCAxOGMwLTIuMjA5LTEuNzkxLTQtNC00cy00IDEuNzkxLTQgNCAxLjc5MSA0IDQgNCA0LTEuNzkxIDQtNHptMTggMGMwLTIuMjA5LTEuNzkxLTQtNC00cy00IDEuNzkxLTQgNCAxLjc5MSA0IDQgNCA0LTEuNzkxIDQtNHptMC0xOGMwLTIuMjA5LTEuNzkxLTQtNC00cy00IDEuNzkxLTQgNCAxLjc5MSA0IDQgNCA0LTEuNzkxIDQtNHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-30"></div>
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
           <div className="flex items-center gap-4 mb-6 flex-wrap">
@@ -80,7 +82,7 @@ export default function ForBuildingManagers() {
               <h1 className="text-4xl font-bold tracking-tight" data-testid="text-stakeholder-title">
                 For Building Managers
               </h1>
-              <p className="text-xl text-violet-100">
+              <p className="text-xl text-white/80">
                 Monitor work, compliance, and communicate with residents
               </p>
             </div>
@@ -107,7 +109,7 @@ export default function ForBuildingManagers() {
             {keyFeatures.map((feature, index) => (
               <Card key={index}>
                 <CardHeader className="flex flex-col gap-3">
-                  <div className="w-10 h-10 bg-violet-100 dark:bg-violet-900/30 rounded-lg flex items-center justify-center text-violet-600 dark:text-violet-400">
+                  <div className="w-10 h-10 bg-[#B89685]/10 dark:bg-[#B89685]/20 rounded-lg flex items-center justify-center text-[#B89685]">
                     <feature.icon className="h-5 w-5" />
                   </div>
                   <div>
@@ -141,29 +143,29 @@ export default function ForBuildingManagers() {
           )}
         </section>
         
-        <section className="bg-violet-50 dark:bg-violet-900/20 rounded-lg p-8">
+        <section className="bg-[#B89685]/10 dark:bg-[#B89685]/20 rounded-lg p-8">
           <h2 className="text-xl font-semibold mb-4">Getting Started as a Building Manager</h2>
           <div className="space-y-3">
             <div className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-full bg-violet-600 text-white flex items-center justify-center text-sm shrink-0">1</div>
+              <div className="w-6 h-6 rounded-full bg-[#B89685] text-white flex items-center justify-center text-sm shrink-0">1</div>
               <p>Create your free Building Manager account</p>
             </div>
             <div className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-full bg-violet-600 text-white flex items-center justify-center text-sm shrink-0">2</div>
+              <div className="w-6 h-6 rounded-full bg-[#B89685] text-white flex items-center justify-center text-sm shrink-0">2</div>
               <p>Connect to your building using the unique building code</p>
             </div>
             <div className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-full bg-violet-600 text-white flex items-center justify-center text-sm shrink-0">3</div>
+              <div className="w-6 h-6 rounded-full bg-[#B89685] text-white flex items-center justify-center text-sm shrink-0">3</div>
               <p>View vendor safety ratings and work history</p>
             </div>
             <div className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-full bg-violet-600 text-white flex items-center justify-center text-sm shrink-0">4</div>
+              <div className="w-6 h-6 rounded-full bg-[#B89685] text-white flex items-center justify-center text-sm shrink-0">4</div>
               <p>Set up resident communication for upcoming work</p>
             </div>
           </div>
           <div className="mt-6">
             <Link href="/help/getting-started">
-              <Button className="bg-violet-600">View Full Getting Started Guide</Button>
+              <Button className="bg-[#B89685]">View Full Getting Started Guide</Button>
             </Link>
           </div>
         </section>
