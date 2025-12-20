@@ -335,9 +335,9 @@ export default function Employer() {
                   <Card className="shadow-xl">
                     <CardContent className="p-6">
                       {!showForgotPassword ? (
-                        <div className="space-y-4">
-                          <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                        <Form {...form}>
+                          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                            <div className="grid grid-cols-2 gap-3">
                               <FormField
                                 control={form.control}
                                 name="identifier"
@@ -348,7 +348,7 @@ export default function Employer() {
                                       <Input
                                         {...field}
                                         type="email"
-                                        placeholder="you@company.com"
+                                        placeholder="you@example.com"
                                         data-testid="input-identifier"
                                       />
                                     </FormControl>
@@ -366,7 +366,7 @@ export default function Employer() {
                                       <Input
                                         {...field}
                                         type="password"
-                                        placeholder="Enter your password"
+                                        placeholder="Your password"
                                         data-testid="input-password"
                                       />
                                     </FormControl>
@@ -374,38 +374,54 @@ export default function Employer() {
                                   </FormItem>
                                 )}
                               />
-                              
-                              <Button 
-                                type="submit" 
-                                className="w-full"
-                                style={{ backgroundColor: EMPLOYER_COLOR }}
-                                disabled={form.formState.isSubmitting}
-                                data-testid="button-login-submit"
-                              >
-                                {form.formState.isSubmitting ? (
-                                  <Loader2 className="w-4 h-4 animate-spin" />
-                                ) : (
-                                  "Sign In"
-                                )}
-                              </Button>
-                            </form>
-                          </Form>
-
-                          <div className="text-center">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setShowForgotPassword(true);
-                                setForgotPasswordEmail(form.getValues("identifier"));
-                                setResetSuccess(false);
-                              }}
-                              className="text-sm text-muted-foreground hover:underline"
-                              data-testid="link-forgot-password"
+                            </div>
+                            
+                            <Button 
+                              type="submit" 
+                              className="w-full"
+                              style={{ backgroundColor: EMPLOYER_COLOR }}
+                              disabled={form.formState.isSubmitting}
+                              data-testid="button-login-submit"
                             >
-                              Forgot Password?
-                            </button>
-                          </div>
-                        </div>
+                              {form.formState.isSubmitting ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                <>
+                                  Sign In
+                                  <ArrowRight className="ml-2 w-4 h-4" />
+                                </>
+                              )}
+                            </Button>
+
+                            <div className="text-center">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setShowForgotPassword(true);
+                                  setForgotPasswordEmail(form.getValues("identifier"));
+                                  setResetSuccess(false);
+                                }}
+                                className="text-sm text-muted-foreground hover:underline"
+                                data-testid="link-forgot-password"
+                              >
+                                Forgot Password?
+                              </button>
+                            </div>
+                            
+                            <div className="text-center text-sm text-muted-foreground">
+                              Do not have an account?{" "}
+                              <button
+                                type="button"
+                                onClick={() => setShowRegistration(true)}
+                                className="font-medium hover:underline"
+                                style={{ color: EMPLOYER_COLOR }}
+                                data-testid="link-create-account"
+                              >
+                                Create Account
+                              </button>
+                            </div>
+                          </form>
+                        </Form>
                       ) : (
                         <div className="space-y-4">
                           {!resetSuccess ? (
