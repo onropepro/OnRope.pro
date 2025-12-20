@@ -133,7 +133,8 @@ const chaosItems = [
   "2-3 hours per quote because you're guessing at historical costs",
   "Endless text threads tracking who's where and when",
   "Spreadsheets for certifications that nobody actually updates",
-  "Paper inspection forms that live in filing cabinets (maybe)"
+  "Paper inspection forms that live in filing cabinets (maybe)",
+  "Phone ringing all day with complaints you're tracking in a notebook (or written on your hand while driving)"
 ];
 
 const leakItems = [
