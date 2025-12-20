@@ -1711,10 +1711,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         passwordResetExpires: resetExpires,
       });
       
-      // Get the base URL for the reset link
-      const baseUrl = process.env.REPLIT_DEPLOYMENT_URL || process.env.REPL_SLUG 
-        ? `https://${process.env.REPLIT_DEPLOYMENT_URL || process.env.REPL_SLUG}.replit.app`
-        : 'http://localhost:5000';
+      // Get the base URL for the reset link - prioritize custom domain
+      const baseUrl = process.env.APP_URL 
+        || (process.env.REPLIT_DEPLOYMENT_URL ? `https://${process.env.REPLIT_DEPLOYMENT_URL}` : null)
+        || (process.env.REPL_SLUG ? `https://${process.env.REPL_SLUG}.replit.app` : null)
+        || 'http://localhost:5000';
       
       const resetLink = `${baseUrl}/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
       
