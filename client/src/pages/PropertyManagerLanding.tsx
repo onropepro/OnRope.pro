@@ -47,16 +47,13 @@ export default function PropertyManagerLanding() {
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
       <PublicHeader />
-      
       {/* Hero Section */}
       <section className="relative text-white pb-[120px]" style={{backgroundImage: PM_GRADIENT}}>
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMtNi42MjcgMC0xMiA1LjM3My0xMiAxMnM1LjM3MyAxMiAxMiAxMiAxMi01LjM3MyAxMi0xMi01LjM3My0xMi0xMi0xMnoiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLW9wYWNpdHk9Ii4xIiBzdHJva2Utd2lkdGg9IjIiLz48L2c+PC9zdmc+')] opacity-30"></div>
         
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
           <div className="text-center space-y-6 pt-16">
-            <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-pm-module">
-              Property Manager Portal
-            </Badge>
+            <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-pm-module">For Property Managers</Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
               Stop Being the Complaint Department.<br />
@@ -91,7 +88,6 @@ export default function PropertyManagerLanding() {
           </svg>
         </div>
       </section>
-
       {/* Opening Hook Section - Complaint Elimination */}
       <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto">
         <div className="space-y-6 text-lg leading-relaxed">
@@ -121,9 +117,7 @@ export default function PropertyManagerLanding() {
           </Button>
         </div>
       </section>
-
       <Separator className="max-w-4xl mx-auto" />
-
       {/* What You Get Section */}
       <section className="py-12 md:py-20 px-4 md:px-8 max-w-5xl mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
@@ -267,9 +261,7 @@ export default function PropertyManagerLanding() {
           </Card>
         </div>
       </section>
-
       <Separator className="max-w-4xl mx-auto" />
-
       {/* Complaint Flow Transformation Section */}
       <section className="py-12 md:py-20 px-4 md:px-8 max-w-5xl mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
@@ -369,9 +361,7 @@ export default function PropertyManagerLanding() {
           </Card>
         </div>
       </section>
-
       <Separator className="max-w-4xl mx-auto" />
-
       {/* How It Works Section */}
       <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto" id="how-it-works">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
@@ -423,9 +413,7 @@ export default function PropertyManagerLanding() {
           </Button>
         </div>
       </section>
-
       <Separator className="max-w-4xl mx-auto" />
-
       {/* Why It's Free Section */}
       <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
@@ -456,9 +444,7 @@ export default function PropertyManagerLanding() {
           </Button>
         </div>
       </section>
-
       <Separator className="max-w-4xl mx-auto" />
-
       {/* Risk Mitigation Section */}
       <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
@@ -490,9 +476,7 @@ export default function PropertyManagerLanding() {
           </CardContent>
         </Card>
       </section>
-
       <Separator className="max-w-4xl mx-auto" />
-
       {/* The Real Value: Your Time Back Section */}
       <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
@@ -529,9 +513,7 @@ export default function PropertyManagerLanding() {
           </Button>
         </div>
       </section>
-
       <Separator className="max-w-4xl mx-auto" />
-
       {/* Vendor Accountability Section */}
       <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
@@ -559,9 +541,7 @@ export default function PropertyManagerLanding() {
           </p>
         </div>
       </section>
-
       <Separator className="max-w-4xl mx-auto" />
-
       {/* Objection Handling Section */}
       <section className="py-12 md:py-20 px-4 md:px-8 max-w-4xl mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
@@ -678,7 +658,6 @@ export default function PropertyManagerLanding() {
           </Card>
         </div>
       </section>
-
       {/* CTA Section - Stakeholder Colored */}
       <section className="py-16 md:py-20 px-4 text-white" style={{backgroundImage: `linear-gradient(135deg, ${PM_COLOR} 0%, #5A7A60 100%)`}}>
         <div className="max-w-3xl mx-auto text-center space-y-6">
@@ -711,7 +690,6 @@ export default function PropertyManagerLanding() {
           </p>
         </div>
       </section>
-
       {/* Footer */}
       <footer className="py-8 px-4 border-t">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
