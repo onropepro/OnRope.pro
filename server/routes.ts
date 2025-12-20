@@ -1936,24 +1936,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "At least one field to update is required" });
       }
       
-      // If changing strata+unit, check for duplicates (unless same as current)
+      // If changing strata+unit, check for duplicates (excludes current user)
       if (strataPlanNumber && unitNumber) {
-        const isDifferent = strataPlanNumber !== currentUser.strataPlanNumber || 
-                           unitNumber !== currentUser.unitNumber;
+        // Check if another resident already claims this strata+unit (with normalization)
+        const existingResident = await storage.getResidentByStrataAndUnit(
+          strataPlanNumber, 
+          unitNumber,
+          currentUser.id  // Exclude current user from duplicate check
+        );
         
-        if (isDifferent) {
-          // Check if another resident already claims this strata+unit
-          const existingResident = await storage.getResidentByStrataAndUnit(
-            strataPlanNumber, 
-            unitNumber
-          );
-          
-          if (existingResident && existingResident.id !== currentUser.id) {
-            return res.status(409).json({ 
-              message: "This unit is already registered to another resident account",
-              conflict: true
-            });
-          }
+        if (existingResident) {
+          return res.status(409).json({ 
+            message: "This unit is already registered to another resident account",
+            conflict: true
+          });
         }
       }
       
