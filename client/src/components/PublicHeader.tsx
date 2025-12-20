@@ -46,7 +46,11 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
   // Determine stakeholder color based on current path
   const getStakeholderColor = (): string | null => {
     const path = location.toLowerCase();
-    // All /modules/ pages use employer blue regardless of module name
+    // Technician job board module uses technician rust color to match its hero
+    if (path === '/modules/technician-job-board') {
+      return STAKEHOLDER_COLORS.technician;
+    }
+    // Other /modules/ pages and /employer use employer blue
     if (path.startsWith('/modules/') || path.startsWith('/employer')) {
       return STAKEHOLDER_COLORS.employer;
     }
