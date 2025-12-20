@@ -153,7 +153,7 @@ export default function ForResidents() {
                   <CardDescription className="mt-1">
                     Complete step-by-step guide for setting up your account, entering your company code, submitting feedback, and tracking your issues.
                   </CardDescription>
-                  <Link href="/help/resident-portal-guide">
+                  <Link href="/help/modules/resident-portal">
                     <Button className="bg-[#86A59C] hover:bg-[#6B8A80] gap-2 mt-3" size="sm" data-testid="button-user-guide">
                       View User Guide
                       <ExternalLink className="h-4 w-4" />

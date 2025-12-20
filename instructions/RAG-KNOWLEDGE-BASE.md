@@ -403,7 +403,6 @@ Manually trigger full reindex.
 | job-board | Job Board | hr | Yes |
 | quoting-sales | Quoting & Sales | financial | Yes |
 | resident-portal | Resident Portal | communication | Yes |
-| resident-portal-user-guide | Resident Portal User Guide | communication | Yes |
 | property-manager-interface | Property Manager Interface | communication | Yes |
 | white-label-branding | White-Label Branding | customization | Yes |
 | analytics-reporting | Analytics & Reporting | operations | Yes |

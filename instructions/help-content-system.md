@@ -106,6 +106,16 @@ export const guideRegistry = [
 | `building-manager` | Building Managers |
 | `property-manager` | Property Managers |
 
+### IMPORTANT: One Entry Per Module
+
+**Each module should have exactly ONE entry in guideRegistry.** Do not create duplicate entries for the same conceptual feature (e.g., do NOT have both `resident-portal` and `resident-portal-user-guide`).
+
+The two-tier content system works as follows:
+- **Backend SSOT (`/changelog/*`):** TSX Guide files contain comprehensive information for internal use, landing pages, copy writing, and support
+- **Frontend Help (`/help/modules/*`):** Markdown files in `server/help-content/modules/*.md` contain polished, customer-facing content
+
+The guideRegistry entry should point to the TSX file, but if a markdown file with the same slug exists, the markdown takes priority for the `/help/modules/*` route. This prevents duplicates in the help section.
+
 ---
 
 ## Content Sources (In Priority Order)
@@ -172,23 +182,25 @@ If no markdown file exists, the system attempts to extract content from the TSX 
 | Slug | Title | Category | Has Markdown? | Status |
 |------|-------|----------|---------------|--------|
 | `project-management` | Project Management | operations | YES | Complete |
-| `time-tracking` | Time Tracking & GPS | operations | NO | Needs content |
-| `safety-compliance` | Safety & Compliance | safety | NO | Needs content |
-| `irata-sprat-logging` | IRATA/SPRAT Logging | hr | NO | Needs content |
-| `employee-management` | Employee Management | hr | NO | Needs content |
-| `document-management` | Document Management | operations | NO | Needs content |
-| `gear-inventory` | Gear Inventory | safety | NO | Needs content |
-| `scheduling` | Scheduling & Calendar | operations | NO | Needs content |
-| `payroll` | Payroll Management | financial | NO | Needs content |
-| `company-safety-rating` | Company Safety Rating | safety | NO | Needs content |
-| `job-board` | Job Board | hr | NO | Needs content |
-| `quoting-sales` | Quoting & Sales | financial | NO | Needs content |
-| `resident-portal` | Resident Portal | communication | NO | Needs content |
-| `property-manager-interface` | Property Manager Interface | communication | NO | Needs content |
-| `white-label-branding` | White-Label Branding | customization | NO | Needs content |
-| `analytics-reporting` | Analytics & Reporting | operations | NO | Needs content |
+| `time-tracking` | Time Tracking & GPS | operations | YES | Complete |
+| `safety-compliance` | Safety & Compliance | safety | YES | Complete |
+| `irata-sprat-logging` | IRATA/SPRAT Logging | hr | YES | Complete |
+| `employee-management` | Employee Management | hr | YES | Complete |
+| `document-management` | Document Management | operations | YES | Complete |
+| `gear-inventory` | Gear Inventory | safety | YES | Complete |
+| `scheduling` | Scheduling & Calendar | operations | YES | Complete |
+| `payroll` | Payroll Management | financial | YES | Complete |
+| `company-safety-rating` | Company Safety Rating | safety | YES | Complete |
+| `job-board` | Job Board | hr | YES | Complete |
+| `quoting-sales` | Quoting & Sales | financial | YES | Complete |
+| `resident-portal` | Resident Portal | communication | YES | Complete |
+| `property-manager-interface` | Property Manager Interface | communication | YES | Complete |
+| `white-label-branding` | White-Label Branding | customization | YES | Complete |
+| `analytics-reporting` | Analytics & Reporting | operations | YES | Complete |
 
-**Summary:** 1 of 16 modules has proper markdown content.
+**Summary:** 16 of 16 modules have dedicated markdown content in `server/help-content/modules/`.
+
+**Note:** There should be exactly ONE entry per module in guideRegistry. The previous duplicate `resident-portal-user-guide` entry was removed in December 2025.
 
 ---
 
