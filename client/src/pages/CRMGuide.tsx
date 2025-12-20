@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-
+import { SoftwareReplaces, MODULE_SOFTWARE_MAPPING } from "@/components/SoftwareReplaces";
 
 import ChangelogGuideLayout from "@/components/ChangelogGuideLayout";
 import {
@@ -45,6 +45,11 @@ export default function CRMGuide() {
           <p className="text-sm text-muted-foreground italic mt-2">
             Note: Building IDs vary by region (LMS/EMS in Vancouver, VIS on Vancouver Island). OnRopePro uses "LMS" as a generic term for all strata/building identifiers.
           </p>
+          
+          <SoftwareReplaces 
+            software={MODULE_SOFTWARE_MAPPING["client-relationship-management"]} 
+            className="mt-6 bg-muted/50 rounded-lg"
+          />
         </section>
 
         {/* THE GOLDEN RULE */}

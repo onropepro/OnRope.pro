@@ -58,7 +58,9 @@ export type SoftwareKey =
   | "whenIWork"
   | "vericlock"
   | "notesApp"
-  | "notebook";
+  | "notebook"
+  | "jobber"
+  | "housecallpro";
 
 interface SoftwareInfo {
   name: string;
@@ -96,6 +98,8 @@ const softwareData: Record<SoftwareKey, SoftwareInfo> = {
   vericlock: { name: "Vericlock", icon: <Clock className="w-5 h-5" /> },
   notesApp: { name: "Notes App", icon: <Smartphone className="w-5 h-5" /> },
   notebook: { name: "Notebook", icon: <BookOpen className="w-5 h-5" /> },
+  jobber: { name: "Jobber", icon: <ClipboardList className="w-5 h-5" /> },
+  housecallpro: { name: "Housecall Pro", icon: <Briefcase className="w-5 h-5" /> },
 };
 
 interface SoftwareReplacesProps {
@@ -150,4 +154,5 @@ export const MODULE_SOFTWARE_MAPPING: Record<string, SoftwareKey[]> = {
   "resident-portal": ["zendesk", "freshdesk", "notesApp", "notebook"],
   "property-manager-interface": ["buildium", "appfolio"],
   "user-access-authentication": [],
+  "client-relationship-management": ["pipedrive", "hubspot", "jobber", "housecallpro"],
 };
