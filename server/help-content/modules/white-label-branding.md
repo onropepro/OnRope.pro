@@ -47,15 +47,11 @@ When exporting documents:
 - Enter hex color code or use color picker
 - Preview shows how color appears
 - Colors applied to buttons, accents, highlights
-- Dark/light mode variations handled automatically
+- Two-color limit ensures consistent, professional appearance
 
 ## Subscription Requirement
 
-White Label Branding is available on:
-- Business tier subscriptions
-- Enterprise tier subscriptions
-
-Starter tier accounts use default OnRopePro branding.
+White Label Branding is a $49/month add-on available to all paying subscribers. When your subscription expires or is cancelled, branding automatically reverts to default OnRopePro styling (your configuration is preserved for easy reactivation).
 
 ## Benefits
 
