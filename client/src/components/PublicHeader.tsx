@@ -46,6 +46,9 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
   // Determine stakeholder color based on current path
   const getStakeholderColor = (): string | null => {
     const path = location.toLowerCase();
+    if (path === '/') {
+      return STAKEHOLDER_COLORS.employer;
+    }
     if (path.startsWith('/technician') || path.includes('/modules/technician')) {
       return STAKEHOLDER_COLORS.technician;
     }
