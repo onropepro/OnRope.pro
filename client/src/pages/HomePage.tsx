@@ -210,7 +210,7 @@ export default function HomePage() {
 
             {/* Subheadline */}
             <p className="text-xl md:text-2xl text-blue-100 max-w-4xl mx-auto leading-relaxed">
-              Projects. Payroll. Safety. Scheduling. Compliance. All in one place. Built by a Level 3 technician who got tired of watching good companies drown in paperwork.
+              Projects. Payroll. Safety. Scheduling. Compliance. All in one place. Built by a Level 3 technician who got tired of watching good companies drown in paperwork and stress.
             </p>
 
             {/* Segment Selector */}
