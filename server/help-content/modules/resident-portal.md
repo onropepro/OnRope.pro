@@ -215,10 +215,10 @@ If your building changes service providers:
 
 1. Go to the **Profile** tab
 2. In the **Vendor Connection** section, click **Switch**
-3. Enter the new vendor's 10-character code
-4. Click **Link Account**
+3. A dialog will appear - enter the new vendor's 10-character code
+4. Click **Link Account** to confirm
 
-Your account remains active - you're just connecting to a different service company.
+Your account remains active - you're just connecting to a different service company. Your previous feedback history stays with the old vendor.
 
 ### Unlinking from a Vendor
 
@@ -226,9 +226,14 @@ If you no longer need to receive updates from your current vendor:
 
 1. Go to the **Profile** tab
 2. In the **Vendor Connection** section, click **Unlink**
-3. Confirm the action in the warning dialog
+3. A warning dialog will appear explaining the consequences
+4. Click **Unlink** to confirm
 
-**Note**: Unlinking means you won't see active projects or be able to submit feedback until you link to a vendor again.
+**Note**: Unlinking means you won't see active projects or be able to submit feedback until you link to a vendor again. You can always re-link later by entering a new vendor code.
+
+### Duplicate Unit Protection
+
+If you try to register a strata/unit combination that's already registered by another resident, the system will display an error. This prevents duplicate claims to the same unit. Contact your building manager if you believe there's an error.
 
 ## Common Questions
 

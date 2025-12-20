@@ -1402,16 +1402,25 @@ export default function ResidentPortalGuide() {
                     <ol className="list-decimal list-inside space-y-1 text-base text-muted-foreground">
                       <li>Go to the <strong>Profile</strong> tab</li>
                       <li>In <strong>Vendor Connection</strong>, click <strong>Switch</strong></li>
-                      <li>Enter the new vendor's 10-character code</li>
-                      <li>Click <strong>Link Account</strong></li>
+                      <li>A dialog will appear - enter the new code</li>
+                      <li>Click <strong>Link Account</strong> to confirm</li>
                     </ol>
+                    <p className="text-sm text-muted-foreground mt-2 italic">
+                      Your previous feedback history stays with the old vendor.
+                    </p>
                   </div>
                 </div>
 
                 <div className="bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
                   <p className="text-base text-amber-800 dark:text-amber-200 flex items-start gap-2">
                     <Link2Off className="w-4 h-4 mt-1 shrink-0" />
-                    <span><strong>Unlinking:</strong> If you no longer need updates from your current vendor, click <strong>Unlink</strong> in the Vendor Connection section. You can always link to a new vendor later.</span>
+                    <span><strong>Unlinking:</strong> Click <strong>Unlink</strong> in the Vendor Connection section. A warning dialog will explain the consequences. You can always link to a new vendor later.</span>
+                  </p>
+                </div>
+
+                <div className="bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                  <p className="text-base text-blue-800 dark:text-blue-200">
+                    <strong>Duplicate Protection:</strong> If you try to register a unit already claimed by another resident, the system will show an error. Contact your building manager if you believe there's an issue.
                   </p>
                 </div>
               </div>
