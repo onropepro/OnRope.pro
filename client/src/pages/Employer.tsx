@@ -1,10 +1,20 @@
 import { useState } from "react";
 import { useLocation, Link } from "wouter";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { PublicHeader } from "@/components/PublicHeader";
+import { Label } from "@/components/ui/label";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/queryClient";
+import { EmployerRegistration } from "@/components/EmployerRegistration";
 import { 
   ArrowRight, 
   Users, 
@@ -27,12 +37,110 @@ import {
   HardHat,
   Briefcase,
   Home,
-  TrendingUp
+  TrendingUp,
+  Loader2
 } from "lucide-react";
 
+const loginSchema = z.object({
+  identifier: z.string().min(1, "Email is required"),
+  password: z.string().min(1, "Password is required"),
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
+
+const EMPLOYER_COLOR = "#0B64A3";
+
 export default function Employer() {
+  const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [roiEmployeeCount, setRoiEmployeeCount] = useState(12);
+  const [showRegistration, setShowRegistration] = useState(false);
+  const [showSignIn, setShowSignIn] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
+  const [resetSuccess, setResetSuccess] = useState(false);
+
+  const form = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      identifier: "",
+      password: "",
+    },
+  });
+
+  const handleToggleSignIn = () => {
+    setShowSignIn(!showSignIn);
+    setShowForgotPassword(false);
+    setResetSuccess(false);
+  };
+
+  const onSubmit = async (data: LoginFormData) => {
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+        credentials: "include",
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        form.setError("identifier", { message: result.message || "Login failed" });
+        return;
+      }
+
+      await queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      
+      const userResponse = await fetch("/api/user", {
+        credentials: "include",
+      });
+      
+      if (!userResponse.ok) {
+        form.setError("identifier", { 
+          message: "Failed to verify account status. Please try again." 
+        });
+        return;
+      }
+      
+      const userDataResult = await userResponse.json();
+      const user = userDataResult.user;
+      
+      toast({
+        title: "Welcome back!",
+        description: `Logged in as ${user.name || user.companyName}`,
+      });
+      
+      setLocation("/dashboard");
+    } catch (error) {
+      form.setError("identifier", { message: "An error occurred. Please try again." });
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!forgotPasswordEmail.trim()) return;
+    
+    setIsResettingPassword(true);
+    try {
+      const response = await fetch("/api/password-reset-request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: forgotPasswordEmail }),
+      });
+      
+      if (response.ok) {
+        setResetSuccess(true);
+      } else {
+        setResetSuccess(true);
+      }
+    } catch (error) {
+      setResetSuccess(true);
+    } finally {
+      setIsResettingPassword(false);
+    }
+  };
 
   const whatWeDoCards = [
     {
@@ -190,18 +298,187 @@ export default function Employer() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-hero-start-trial">
-                <Link href="/register">
-                  Start Free Trial
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
+              <Button 
+                size="lg" 
+                className="bg-white text-[#0B64A3] hover:bg-blue-50" 
+                onClick={() => setShowRegistration(true)}
+                data-testid="button-hero-start-trial"
+              >
+                Start Free Trial
+                <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
-              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-hero-see-how">
-                <Link href="#how-it-works">
-                  See How It Works
-                </Link>
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="border-white/40 text-white hover:bg-white/10" 
+                onClick={handleToggleSignIn}
+                data-testid="button-hero-sign-in"
+              >
+                Sign In
               </Button>
             </div>
+
+            <p className="text-sm text-blue-100/80">
+              60-day free trial. No credit card required.
+            </p>
+
+            {/* Inline Sign In Form */}
+            <AnimatePresence>
+              {showSignIn && (
+                <motion.div
+                  initial={{ opacity: 0, y: -20, height: 0 }}
+                  animate={{ opacity: 1, y: 0, height: "auto" }}
+                  exit={{ opacity: 0, y: -20, height: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="max-w-md mx-auto pt-6"
+                >
+                  <Card className="shadow-xl">
+                    <CardContent className="p-6">
+                      {!showForgotPassword ? (
+                        <div className="space-y-4">
+                          <Form {...form}>
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                              <FormField
+                                control={form.control}
+                                name="identifier"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Email Address</FormLabel>
+                                    <FormControl>
+                                      <Input
+                                        {...field}
+                                        type="email"
+                                        placeholder="you@company.com"
+                                        data-testid="input-identifier"
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              <FormField
+                                control={form.control}
+                                name="password"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Password</FormLabel>
+                                    <FormControl>
+                                      <Input
+                                        {...field}
+                                        type="password"
+                                        placeholder="Enter your password"
+                                        data-testid="input-password"
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              
+                              <Button 
+                                type="submit" 
+                                className="w-full"
+                                style={{ backgroundColor: EMPLOYER_COLOR }}
+                                disabled={form.formState.isSubmitting}
+                                data-testid="button-login-submit"
+                              >
+                                {form.formState.isSubmitting ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  "Sign In"
+                                )}
+                              </Button>
+                            </form>
+                          </Form>
+
+                          <div className="text-center">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowForgotPassword(true);
+                                setForgotPasswordEmail(form.getValues("identifier"));
+                                setResetSuccess(false);
+                              }}
+                              className="text-sm text-muted-foreground hover:underline"
+                              data-testid="link-forgot-password"
+                            >
+                              Forgot Password?
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {!resetSuccess ? (
+                            <form onSubmit={handleForgotPassword} className="space-y-4">
+                              <div className="text-center mb-4">
+                                <h3 className="text-lg font-semibold text-foreground">Reset Your Password</h3>
+                                <p className="text-sm text-muted-foreground">Enter your email and we will send you reset instructions.</p>
+                              </div>
+                              <div className="space-y-2">
+                                <Label htmlFor="forgot-email" className="text-sm font-medium text-foreground">Email Address</Label>
+                                <Input
+                                  id="forgot-email"
+                                  type="email"
+                                  placeholder="you@company.com"
+                                  value={forgotPasswordEmail}
+                                  onChange={(e) => setForgotPasswordEmail(e.target.value)}
+                                  required
+                                  data-testid="input-forgot-email"
+                                />
+                              </div>
+                              
+                              <Button
+                                type="submit"
+                                className="w-full"
+                                style={{ backgroundColor: EMPLOYER_COLOR }}
+                                disabled={isResettingPassword}
+                                data-testid="button-submit-reset"
+                              >
+                                {isResettingPassword ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  "Send Reset Link"
+                                )}
+                              </Button>
+                              
+                              <div className="text-center">
+                                <button
+                                  type="button"
+                                  onClick={() => setShowForgotPassword(false)}
+                                  className="text-sm text-muted-foreground hover:underline"
+                                  data-testid="link-back-to-signin"
+                                >
+                                  Back to Sign In
+                                </button>
+                              </div>
+                            </form>
+                          ) : (
+                            <div className="text-center space-y-4">
+                              <CheckCircle2 className="w-12 h-12 mx-auto" style={{ color: EMPLOYER_COLOR }} />
+                              <h3 className="text-lg font-semibold text-foreground">Check Your Email</h3>
+                              <p className="text-sm text-muted-foreground">
+                                If an account exists with that email, you will receive password reset instructions.
+                              </p>
+                              <Button
+                                onClick={() => {
+                                  setShowForgotPassword(false);
+                                  setResetSuccess(false);
+                                }}
+                                variant="outline"
+                                className="w-full"
+                                data-testid="button-back-signin-after-reset"
+                              >
+                                Back to Sign In
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
 
@@ -729,14 +1006,17 @@ export default function Employer() {
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Stop Wrestling Spreadsheets</h2>
           <p className="text-xl text-blue-100 mb-8">
-            30-day free trial. No credit card required. Full access to every feature.
+            60-day free trial. No credit card required. Full access to every feature.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-cta-start-trial">
-              <Link href="/register">
-                Start Your Free Trial
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Link>
+            <Button 
+              size="lg" 
+              className="bg-white text-[#0B64A3] hover:bg-blue-50" 
+              onClick={() => setShowRegistration(true)}
+              data-testid="button-cta-start-trial"
+            >
+              Start Your Free Trial
+              <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
             <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-cta-view-pricing">
               <Link href="/pricing">
@@ -772,6 +1052,12 @@ export default function Employer() {
           </div>
         </div>
       </section>
+
+      {/* Employer Registration Modal */}
+      <EmployerRegistration 
+        open={showRegistration} 
+        onOpenChange={setShowRegistration} 
+      />
     </div>
   );
 }
