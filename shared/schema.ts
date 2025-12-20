@@ -404,6 +404,10 @@ export const projects = pgTable("projects", {
   deleted: boolean("deleted").notNull().default(false), // Soft delete flag
   calendarColor: varchar("calendar_color").default('#3b82f6'), // Color for calendar display
   
+  // Geolocation for map display (captured from address autocomplete)
+  latitude: numeric("latitude", { precision: 10, scale: 7 }),
+  longitude: numeric("longitude", { precision: 10, scale: 7 }),
+  
   // Service-specific expectation fields
   suitesPerDay: integer("suites_per_day"), // For in_suite_dryer_vent_cleaning
   totalFloors: integer("total_floors"), // For in_suite_dryer_vent_cleaning - total floors to clean

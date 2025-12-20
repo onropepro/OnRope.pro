@@ -91,7 +91,7 @@ export default function ForResidents() {
           <div className="max-w-xl mt-6">
             <HelpSearchBar 
               size="large" 
-              placeholder="Ask a question about submitting feedback, tracking issues..."
+              placeholder="Ask about submitting feedback, tracking issues..."
             />
           </div>
         </div>
@@ -192,6 +192,8 @@ export default function ForResidents() {
 
       </div>
       </div>
+      
+      <HelpChatWidget />
     </div>
   );
 }

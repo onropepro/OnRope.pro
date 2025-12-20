@@ -39,7 +39,29 @@
     "done": "Termine",
     "close": "Fermer",
     "healthSafetyManual": "Manuel de Sante et Securite",
-    "companyPolicy": "Politique d'Entreprise"
+    "companyPolicy": "Politique d'Entreprise",
+    "titles": {
+      "irata_level_1_a": "Questionnaire d'Acces sur Corde - Niveau 1 (Serie A)",
+      "irata_level_1_b": "Questionnaire d'Acces sur Corde - Niveau 1 (Serie B)",
+      "irata_level_2_a": "Questionnaire d'Acces sur Corde - Niveau 2 (Serie A)",
+      "irata_level_2_b": "Questionnaire d'Acces sur Corde - Niveau 2 (Serie B)",
+      "irata_level_3_a": "Questionnaire d'Acces sur Corde - Niveau 3 (Serie A)",
+      "irata_level_3_b": "Questionnaire d'Acces sur Corde - Niveau 3 (Serie B)",
+      "sprat_level_1_a": "Questionnaire d'Acces sur Corde - Niveau 1 (Serie A)",
+      "sprat_level_1_b": "Questionnaire d'Acces sur Corde - Niveau 1 (Serie B)",
+      "sprat_level_2_a": "Questionnaire d'Acces sur Corde - Niveau 2 (Serie A)",
+      "sprat_level_2_b": "Questionnaire d'Acces sur Corde - Niveau 2 (Serie B)",
+      "sprat_level_3_a": "Questionnaire d'Acces sur Corde - Niveau 3 (Serie A)",
+      "sprat_level_3_b": "Questionnaire d'Acces sur Corde - Niveau 3 (Serie B)",
+      "swp_window_cleaning": "Procedure de Travail Securitaire - Nettoyage de Fenetres",
+      "swp_dryer_vent_cleaning": "Procedure de Travail Securitaire - Nettoyage de Conduits de Secheuse",
+      "swp_building_wash": "Procedure de Travail Securitaire - Lavage de Batiments",
+      "swp_in_suite_dryer_vent": "Procedure de Travail Securitaire - Nettoyage de Conduits de Secheuse en Suite",
+      "swp_parkade_pressure_cleaning": "Procedure de Travail Securitaire - Nettoyage a Pression du Stationnement",
+      "swp_ground_window_cleaning": "Procedure de Travail Securitaire - Nettoyage de Fenetres au Sol",
+      "swp_general_pressure_washing": "Procedure de Travail Securitaire - Lavage a Pression General",
+      "flha_assessment": "Evaluation des Risques au Niveau du Terrain (FLHA)"
+    }
   },
   "login": {
     "header": {

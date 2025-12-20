@@ -144,11 +144,14 @@ export default function HelpArticle() {
             <CardContent className="pt-6">
               <div className="prose dark:prose-invert max-w-none prose-headings:text-foreground prose-p:text-foreground/90 prose-strong:text-foreground prose-li:text-foreground/90">
                 {(() => {
+                  try {
                   // Helper function to render inline formatting (bold, links)
                   const renderInlineFormatting = (text: string) => {
+                    if (!text) return null;
                     const parts = text.split(/(\*\*[^*]+\*\*|\[[^\]]+\]\([^)]+\))/g);
                     return parts.map((part, i) => {
-                      if (part.startsWith('**') && part.endsWith('**')) {
+                      if (!part) return null;
+                      if (part.startsWith('**') && part.endsWith('**') && part.length > 4) {
                         return <strong key={i} className="font-semibold">{part.slice(2, -2)}</strong>;
                       }
                       const linkMatch = part.match(/\[([^\]]+)\]\(([^)]+)\)/);
@@ -195,7 +198,7 @@ export default function HelpArticle() {
                     }
                     
                     // h3 headings
-                    if (line.startsWith('### ')) {
+                    if (line.startsWith('### ') && !line.startsWith('#### ')) {
                       elements.push(
                         <h3 key={`h3-${i}`} className="text-lg font-medium mt-6 mb-3">
                           {line.slice(4)}
@@ -205,9 +208,60 @@ export default function HelpArticle() {
                       continue;
                     }
                     
+                    // h4 headings
+                    if (line.startsWith('#### ')) {
+                      elements.push(
+                        <h4 key={`h4-${i}`} className="text-base font-medium mt-4 mb-2">
+                          {line.slice(5)}
+                        </h4>
+                      );
+                      i++;
+                      continue;
+                    }
+                    
+                    // Code blocks
+                    if (line.startsWith('```')) {
+                      const codeLines: string[] = [];
+                      i++; // Skip opening ```
+                      while (i < lines.length && !lines[i].trim().startsWith('```')) {
+                        codeLines.push(lines[i]);
+                        i++;
+                      }
+                      if (i < lines.length) i++; // Skip closing ``` if it exists
+                      elements.push(
+                        <pre key={`code-${i}`} className="bg-muted p-4 rounded-lg overflow-x-auto my-4">
+                          <code className="text-sm">{codeLines.join('\n')}</code>
+                        </pre>
+                      );
+                      continue;
+                    }
+                    
                     // Horizontal rules
                     if (line === '---') {
                       elements.push(<hr key={`hr-${i}`} className="my-6 border-border" />);
+                      i++;
+                      continue;
+                    }
+                    
+                    // Images - ![alt text](src)
+                    const imageMatch = line.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+                    if (imageMatch) {
+                      const altText = imageMatch[1];
+                      const imageSrc = imageMatch[2];
+                      elements.push(
+                        <figure key={`img-${i}`} className="my-6">
+                          <img 
+                            src={imageSrc} 
+                            alt={altText}
+                            className="rounded-lg border shadow-sm w-full"
+                          />
+                          {altText && (
+                            <figcaption className="text-sm text-muted-foreground text-center mt-2 italic">
+                              {altText}
+                            </figcaption>
+                          )}
+                        </figure>
+                      );
                       i++;
                       continue;
                     }
@@ -281,6 +335,9 @@ export default function HelpArticle() {
                            lines[i].trim() && 
                            !lines[i].trim().startsWith('#') && 
                            !lines[i].trim().startsWith('- ') &&
+                           !lines[i].trim().startsWith('```') &&
+                           !lines[i].trim().startsWith('**Q:') &&
+                           !lines[i].trim().startsWith('![') &&
                            !/^\d+\.\s/.test(lines[i].trim()) &&
                            lines[i].trim() !== '---') {
                       paragraphLines.push(lines[i].trim());
@@ -292,10 +349,17 @@ export default function HelpArticle() {
                           {renderInlineFormatting(paragraphLines.join(' '))}
                         </p>
                       );
+                    } else {
+                      // Safety fallback - if nothing matched, skip this line to prevent infinite loop
+                      i++;
                     }
                   }
                   
                   return elements;
+                  } catch (error) {
+                    console.error('Error parsing markdown:', error);
+                    return <p className="text-destructive">Error rendering content. Please try refreshing the page.</p>;
+                  }
                 })()}
               </div>
             </CardContent>
