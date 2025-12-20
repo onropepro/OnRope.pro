@@ -20,6 +20,12 @@ export function log(message: string, source = "express") {
 }
 
 export async function setupVite(app: Express, server: Server) {
+  // Serve static files from public folder (for help images, etc.)
+  const publicPath = path.resolve(import.meta.dirname, "..", "public");
+  if (fs.existsSync(publicPath)) {
+    app.use(express.static(publicPath));
+  }
+
   const serverOptions = {
     middlewareMode: true,
     hmr: { server },
