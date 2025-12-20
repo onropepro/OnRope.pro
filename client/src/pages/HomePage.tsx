@@ -197,9 +197,7 @@ export default function HomePage() {
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
           <div className="text-center space-y-6 pt-16">
             {/* Pre-headline badge */}
-            <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-preheadline">
-              The rope access industry's only purpose-built platform
-            </Badge>
+            <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-preheadline">The rope access industry's only purpose-built software</Badge>
 
             {/* Primary Headline */}
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
