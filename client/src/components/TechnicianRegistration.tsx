@@ -359,53 +359,52 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
               {/* Welcome Screen */}
               {step === "welcome" && (
                 <div className="h-full flex flex-col justify-center max-w-md mx-auto">
-                  <div className="text-center mb-8">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
+                  <div className="text-center mb-4">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-3">
                       <HardHat className="w-4 h-4 text-primary" />
-                      <span className="text-sm font-medium text-primary text-center leading-tight">
-                        For IRATA &amp; SPRAT Technicians<br />
-                        or Rope Access Employees
+                      <span className="text-xs font-medium text-primary text-center leading-tight">
+                        For IRATA &amp; SPRAT Technicians or Rope Access Employees
                       </span>
                     </div>
-                    <h1 className="text-3xl font-bold mb-3">{t('techReg.welcome.title', 'Create your free account')}</h1>
-                    <p className="text-muted-foreground">{t('techReg.welcome.subtitle', '60 seconds to set up. Protected forever.')}</p>
+                    <h1 className="text-2xl font-bold mb-1">{t('techReg.welcome.title', 'Create your free account')}</h1>
+                    <p className="text-sm text-muted-foreground">{t('techReg.welcome.subtitle', '60 seconds to set up. Protected forever.')}</p>
                   </div>
 
                   {/* FREE benefits section */}
-                  <div className="space-y-3 mb-6">
+                  <div className="space-y-1.5 mb-4">
                     {welcomeBenefits.map((benefit, i) => (
-                      <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                        <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
-                          <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
+                      <div key={i} className="flex items-center gap-2 py-1.5 px-2 rounded-md bg-muted/50">
+                        <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
+                          <Check className="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
                         </div>
-                        <span className="font-medium">{benefit}</span>
+                        <span className="text-sm font-medium">{benefit}</span>
                       </div>
                     ))}
                   </div>
 
                   {/* PLUS benefits section - locked/grayed */}
-                  <div className="mb-6">
-                    <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2 font-medium">
+                  <div className="mb-4">
+                    <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 font-medium">
                       {t('techReg.plusSection.header', 'Unlock with 1 referral:')}
                     </p>
-                    <div className="space-y-2">
+                    <div className="space-y-1">
                       {plusBenefits.map((benefit, i) => (
-                        <div key={i} className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/30 border border-dashed border-muted-foreground/20">
-                          <div className="w-6 h-6 rounded-full border-2 border-muted-foreground/30 flex items-center justify-center shrink-0">
+                        <div key={i} className="flex items-center gap-2 py-1 px-2 rounded-md bg-muted/30 border border-dashed border-muted-foreground/20">
+                          <div className="w-5 h-5 rounded-full border-2 border-muted-foreground/30 flex items-center justify-center shrink-0">
                             {/* Empty circle */}
                           </div>
-                          <span className="text-sm text-muted-foreground">{benefit}</span>
+                          <span className="text-xs text-muted-foreground">{benefit}</span>
                         </div>
                       ))}
                     </div>
-                    <p className="text-xs text-muted-foreground mt-2 text-center">
+                    <p className="text-xs text-muted-foreground mt-1.5 text-center">
                       {t('techReg.plusSection.hint', 'Refer one tech after signup to unlock instantly')}
                     </p>
                   </div>
 
                   {/* Referral Code Input */}
-                  <div className="mb-6">
-                    <Label className="text-sm text-muted-foreground mb-2 block">{t('techReg.welcome.referralLabel', 'Got a referral code from a friend? (optional)')}</Label>
+                  <div className="mb-4">
+                    <Label className="text-sm text-muted-foreground mb-1 block">{t('techReg.welcome.referralLabel', 'Got a referral code from a friend? (optional)')}</Label>
                     <Input
                       placeholder={t('techReg.welcome.referralPlaceholder', 'Enter referral code')}
                       value={data.referralCodeInput}
@@ -425,7 +424,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                     <ArrowRight className="w-5 h-5" />
                   </Button>
                   
-                  <p className="text-center text-sm text-muted-foreground mt-4">
+                  <p className="text-center text-sm text-muted-foreground mt-2">
                     {t('techReg.welcome.haveAccount', 'Already have an account?')}{" "}
                     <button 
                       className="text-primary font-medium hover:underline"
