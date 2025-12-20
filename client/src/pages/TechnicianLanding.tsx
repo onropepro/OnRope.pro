@@ -146,7 +146,10 @@ export default function TechnicianLanding() {
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
           <div className="text-center space-y-6 pt-16">
             <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-technician-portal">
-              Urban Rope Tech Passport
+              <div className="flex flex-col items-center gap-1">
+                <span>Urban Rope Tech Passport</span>
+                <span className="text-xs opacity-90">Built by a Level 3 IRATA Tech</span>
+              </div>
             </Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
