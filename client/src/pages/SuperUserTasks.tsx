@@ -103,6 +103,9 @@ const SECTIONS = [
   "Mobile-First Design",
   "GPS & Location Services",
   "Job Board Ecosystem",
+  "Infrastructure",
+  "Platform Metrics",
+  "Goals & KPIs",
 ];
 
 const ASSIGNEE_COLORS: Record<string, string> = {
