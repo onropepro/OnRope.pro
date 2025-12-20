@@ -60,7 +60,7 @@ const segmentContent = {
   },
   technician: {
     headline: "Your Career. Your Data. Your Platform.",
-    subheadline: "Your IRATA/SPRAT hours are yours—not your employer's. Build a portable professional identity that follows you from company to company, job to job, for your entire career.",
+    subheadline: "Your IRATA/SPRAT hours are yours, not your employer's. Build a portable professional identity that follows you from company to company, job to job, for your entire career.",
     pillars: [
       { icon: Ticket, headline: "Portable Work Passport", text: "Your hours, certifications, and work history travel with you. Change jobs without losing your record." },
       { icon: BarChart3, headline: "Automatic Hour Logging", text: "Connected to an employer? Hours, drops, and tasks log automatically. No more end-of-week paperwork." },
@@ -71,11 +71,11 @@ const segmentContent = {
     trustSignal: "PLUS features unlock free when you refer one other technician"
   },
   "property-manager": {
-    headline: "Know Your Vendors Before the Incident—Not After.",
+    headline: "Know Your Vendors Before the Incident, Not After.",
     subheadline: "Stop accepting vendor safety claims at face value. See real compliance data. Compare vendors objectively. Protect your portfolio with documented due diligence.",
     pillars: [
       { icon: BarChart3, headline: "Company Safety Ratings", text: "Three compliance percentages: documentation, toolbox meetings, harness inspections. At a glance." },
-      { icon: Scale, headline: "Liability Protection", text: 'Documented vendor vetting. When insurance asks "what due diligence did you perform?"—you have the answer.' },
+      { icon: Scale, headline: "Liability Protection", text: 'Documented vendor vetting. When insurance asks "what due diligence did you perform?" You have the answer.' },
       { icon: ClipboardList, headline: "Portfolio Dashboard", text: "All your buildings. All your vendors. All their safety data. One screen." }
     ],
     primaryCta: { text: "Create Free Account", href: "/property-manager", subtext: "Free for property managers" },
@@ -148,7 +148,7 @@ const fixItems = [
   "Payroll prep in 30-45 minutes (not 6-10 hours)",
   "Every document searchable and exportable in seconds",
   "Historical job costing per building eliminates underbidding",
-  "Scheduling, time tracking, and projects—all linked",
+  "Scheduling, time tracking, and projects: all linked",
   "Equipment inventory with service life alerts",
   "Safety documentation that impresses building managers"
 ];
@@ -209,7 +209,7 @@ export default function HomePage() {
 
             {/* Subheadline */}
             <p className="text-xl md:text-2xl text-blue-100 max-w-4xl mx-auto leading-relaxed">
-              Projects. Payroll. Safety. Scheduling. Compliance. All in one place—built by a Level 3 technician who got tired of watching good companies drown in paperwork.
+              Projects. Payroll. Safety. Scheduling. Compliance. All in one place. Built by a Level 3 technician who got tired of watching good companies drown in paperwork.
             </p>
 
             {/* Segment Selector */}
@@ -385,7 +385,7 @@ export default function HomePage() {
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">16 Modules. One Platform. No Add-Ons.</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Everything you need to run a rope access company—from first quote to final payment.
+              Everything you need to run a rope access company, from first quote to final payment.
             </p>
           </div>
 
@@ -504,7 +504,7 @@ export default function HomePage() {
                 </div>
                 <h3 className="text-xl font-bold mb-3">Built by Rope Access</h3>
                 <p className="text-base text-muted-foreground">
-                  Created by a Level 3 IRATA technician. Every feature designed for how rope access companies actually work—not adapted from generic field service software.
+                  Created by a Level 3 IRATA technician. Every feature designed for how rope access companies actually work, not adapted from generic field service software.
                 </p>
               </CardContent>
             </Card>
