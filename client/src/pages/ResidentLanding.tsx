@@ -663,20 +663,20 @@ export default function ResidentLanding() {
             <p className="text-sm text-muted-foreground text-center">
               Feedback history view showing submitted feedback with status and date
             </p>
-          </div>
-          
-          <div className="space-y-3 md:col-span-2 max-w-xl mx-auto">
-            <div className="rounded-lg overflow-hidden border shadow-sm">
-              <img 
-                src={residentProfileImg} 
-                alt="Resident profile tab" 
-                className="w-full h-auto"
-                data-testid="img-resident-profile"
-              />
+            
+            <div className="mt-5 space-y-3">
+              <div className="rounded-lg overflow-hidden border shadow-sm">
+                <img 
+                  src={residentProfileImg} 
+                  alt="Resident profile tab" 
+                  className="w-full h-auto"
+                  data-testid="img-resident-profile"
+                />
+              </div>
+              <p className="text-sm text-muted-foreground text-center">
+                Profile tab where you change your account details if you move, and enter your company code to view ongoing work
+              </p>
             </div>
-            <p className="text-sm text-muted-foreground text-center">
-              Profile tab where you manage your account details and enter your company code
-            </p>
           </div>
         </div>
       </section>
