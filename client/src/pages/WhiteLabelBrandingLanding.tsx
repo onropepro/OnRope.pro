@@ -107,11 +107,9 @@ export default function WhiteLabelBrandingLanding() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-hero-trial">
-                <Link href="/register">
-                  {t('modules.whiteLabel.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
+              <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" onClick={() => setShowSignIn(true)} data-testid="button-hero-trial">
+                {t('modules.whiteLabel.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
+                <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={() => setShowSignIn(true)} data-testid="button-hero-signin">
                 Sign In

@@ -82,11 +82,9 @@ export default function CRMLanding() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" className="bg-white text-[#0B64A3] border-white" asChild data-testid="button-cta-trial">
-                <Link href="/register">
-                  Start Your Free 60-Day Trial
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
+              <Button size="lg" className="bg-white text-[#0B64A3] border-white" onClick={() => setShowSignIn(true)} data-testid="button-cta-trial">
+                Start Your Free 60-Day Trial
+                <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white bg-white/10" onClick={() => setShowSignIn(true)} data-testid="button-cta-signin">
                 Sign In
