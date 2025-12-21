@@ -3628,6 +3628,8 @@ export default function Dashboard() {
           onTabChange={handleTabChange}
           brandingLogoUrl={currentUser?.brandingLogoUrl}
           whitelabelBrandingActive={currentUser?.whitelabelBrandingActive}
+          companyName={companyName}
+          employeeCount={employees?.length || 0}
           alertCounts={alertCounts}
         />
         

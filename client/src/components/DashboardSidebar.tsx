@@ -1,5 +1,6 @@
 import { useLocation } from "wouter";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   Sidebar,
   SidebarContent,
@@ -27,9 +28,13 @@ import {
   FileCheck,
   Package,
   ClipboardList,
-  Home,
+  LayoutDashboard,
   Settings,
   HelpCircle,
+  ChevronRight,
+  Award,
+  Wrench,
+  ClipboardCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
@@ -65,6 +70,8 @@ interface DashboardSidebarProps {
   onTabChange: (tab: string) => void;
   brandingLogoUrl?: string | null;
   whitelabelBrandingActive?: boolean;
+  companyName?: string;
+  employeeCount?: number;
   alertCounts?: {
     expiringCerts?: number;
     overdueInspections?: number;
@@ -80,23 +87,28 @@ export function DashboardSidebar({
   onTabChange,
   brandingLogoUrl,
   whitelabelBrandingActive = false,
+  companyName,
+  employeeCount = 0,
   alertCounts = {},
 }: DashboardSidebarProps) {
   const { t } = useTranslation();
   const [location, setLocation] = useLocation();
 
+  // Get company initials for avatar
+  const getInitials = (name: string | undefined): string => {
+    if (!name) return "CO";
+    const words = name.split(" ").filter(Boolean);
+    if (words.length >= 2) {
+      return (words[0][0] + words[1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  };
+
   const navigationGroups: NavGroup[] = [
     {
       id: "operations",
-      label: t("dashboard.categories.operations", "Operations"),
+      label: t("dashboard.categories.operations", "OPERATIONS"),
       items: [
-        {
-          id: "home",
-          label: t("dashboard.sidebar.overview", "Overview"),
-          icon: Home,
-          onClick: () => onTabChange("home"),
-          isVisible: () => true,
-        },
         {
           id: "projects",
           label: t("dashboard.cards.projects.label", "Projects"),
@@ -112,17 +124,19 @@ export function DashboardSidebar({
           isVisible: () => true,
         },
         {
-          id: "non-billable",
-          label: t("dashboard.cards.nonBillableHours.label", "Non-Billable Hours"),
+          id: "timesheets",
+          label: t("dashboard.sidebar.timesheets", "Timesheets"),
           icon: Clock,
           href: "/non-billable-hours",
+          badge: alertCounts.pendingTimesheets,
+          badgeVariant: alertCounts.pendingTimesheets ? "destructive" : undefined,
           isVisible: () => true,
         },
       ],
     },
     {
       id: "team",
-      label: t("dashboard.categories.team", "Team"),
+      label: t("dashboard.categories.team", "TEAM"),
       items: [
         {
           id: "employees",
@@ -134,11 +148,11 @@ export function DashboardSidebar({
           isVisible: (user) => canManageEmployees(user),
         },
         {
-          id: "performance",
-          label: t("dashboard.cards.performance.label", "Performance"),
-          icon: BarChart3,
-          onClick: () => onTabChange("performance"),
-          isVisible: (user) => canViewPerformance(user),
+          id: "certifications",
+          label: t("dashboard.sidebar.certifications", "Certifications"),
+          icon: Award,
+          onClick: () => onTabChange("employees"),
+          isVisible: (user) => canManageEmployees(user),
         },
         {
           id: "job-board",
@@ -153,43 +167,71 @@ export function DashboardSidebar({
     },
     {
       id: "equipment",
-      label: t("dashboard.sidebar.equipment", "Equipment"),
+      label: t("dashboard.sidebar.equipment", "EQUIPMENT"),
       items: [
         {
           id: "inventory",
           label: t("dashboard.cards.inventory.label", "Inventory"),
           icon: Package,
           href: "/inventory",
+          isVisible: () => true,
+        },
+        {
+          id: "inspections",
+          label: t("dashboard.sidebar.inspections", "Inspections"),
+          icon: ClipboardCheck,
+          href: "/inventory",
           badge: alertCounts.overdueInspections,
           badgeVariant: alertCounts.overdueInspections ? "destructive" : undefined,
+          isVisible: () => true,
+        },
+        {
+          id: "gear-management",
+          label: t("dashboard.sidebar.gearManagement", "Gear Management"),
+          icon: Wrench,
+          href: "/inventory",
           isVisible: () => true,
         },
       ],
     },
     {
       id: "safety",
-      label: t("dashboard.categories.safety", "Safety"),
+      label: t("dashboard.categories.safety", "SAFETY"),
       items: [
         {
           id: "safety-forms",
           label: t("dashboard.cards.safetyForms.label", "Safety Forms"),
           icon: Shield,
           href: "/safety-forms",
+          badge: alertCounts.unsignedDocs,
+          badgeVariant: alertCounts.unsignedDocs ? "destructive" : undefined,
+          isVisible: () => true,
+        },
+        {
+          id: "documents",
+          label: t("dashboard.cards.documents.label", "Documents"),
+          icon: FileText,
+          href: "/documents",
+          isVisible: () => true,
+        },
+        {
+          id: "training",
+          label: t("dashboard.sidebar.training", "Training"),
+          icon: Award,
+          href: "/help",
           isVisible: () => true,
         },
       ],
     },
     {
       id: "financial",
-      label: t("dashboard.categories.financial", "Financial"),
+      label: t("dashboard.categories.financial", "FINANCIAL"),
       items: [
         {
           id: "payroll",
           label: t("dashboard.cards.payroll.label", "Payroll"),
           icon: Wallet,
           href: "/payroll",
-          badge: alertCounts.pendingTimesheets,
-          badgeVariant: alertCounts.pendingTimesheets ? "destructive" : undefined,
           isVisible: (user) => hasFinancialAccess(user),
         },
         {
@@ -201,49 +243,13 @@ export function DashboardSidebar({
         },
       ],
     },
-    {
-      id: "communication",
-      label: t("dashboard.categories.communication", "Communication"),
-      items: [
-        {
-          id: "clients",
-          label: t("dashboard.cards.clients.label", "Clients"),
-          icon: ClipboardList,
-          onClick: () => onTabChange("clients"),
-          isVisible: (user) => hasPermission(user, "view_clients"),
-        },
-        {
-          id: "feedback",
-          label: t("dashboard.cards.feedback.label", "Feedback"),
-          icon: MessageSquare,
-          onClick: () => onTabChange("complaints"),
-          isVisible: () => true,
-        },
-        {
-          id: "documents",
-          label: t("dashboard.cards.documents.label", "Documents"),
-          icon: FileText,
-          href: "/documents",
-          badge: alertCounts.unsignedDocs,
-          badgeVariant: alertCounts.unsignedDocs ? "destructive" : undefined,
-          isVisible: () => true,
-        },
-        {
-          id: "residents",
-          label: t("dashboard.cards.residents.label", "Residents"),
-          icon: Users,
-          href: "/residents",
-          isVisible: (user) => isManagement(user),
-        },
-      ],
-    },
   ];
 
   const isActiveItem = (item: NavItem): boolean => {
     if (item.href) {
       return location === item.href;
     }
-    if (item.id === "home") {
+    if (item.id === "dashboard") {
       return activeTab === "home" || activeTab === "" || !activeTab;
     }
     return activeTab === item.id || 
@@ -265,40 +271,91 @@ export function DashboardSidebar({
     }))
     .filter((group) => group.items.length > 0);
 
+  const displayCompanyName = companyName || "My Company";
+
   return (
-    <Sidebar collapsible="icon" className="border-r">
-      <SidebarHeader className="p-4">
-        <div className="flex items-center gap-3">
+    <Sidebar 
+      collapsible="icon" 
+      className="border-r bg-white dark:bg-sidebar"
+    >
+      {/* Logo Header */}
+      <SidebarHeader className="px-5 py-4">
+        <div className="flex items-center gap-2.5">
           {whitelabelBrandingActive && brandingLogoUrl ? (
             <img
               src={brandingLogoUrl}
               alt="Company Logo"
-              className="h-8 w-auto max-w-[140px] object-contain"
+              className="h-8 w-auto max-w-[160px] object-contain"
               data-testid="img-sidebar-logo"
             />
           ) : (
-            <div className="flex items-center gap-2" data-testid="sidebar-default-logo">
-              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
-                <Building2 className="h-5 w-5" />
+            <div className="flex items-center gap-2.5" data-testid="sidebar-default-logo">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[hsl(var(--sidebar-primary))] text-white font-semibold text-sm">
+                OR
               </div>
-              <span className="font-semibold text-foreground group-data-[collapsible=icon]:hidden">
-                OnRope.Pro
+              <span className="font-semibold text-base text-foreground group-data-[collapsible=icon]:hidden">
+                OnRopePro
               </span>
             </div>
           )}
         </div>
       </SidebarHeader>
 
-      <SidebarSeparator />
+      {/* Company Selector Card */}
+      <div className="px-4 pb-3 group-data-[collapsible=icon]:hidden">
+        <button
+          className="w-full flex items-center gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+          data-testid="button-company-selector"
+        >
+          <Avatar className="h-9 w-9 rounded-md">
+            <AvatarFallback className="rounded-md bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-sm font-medium">
+              {getInitials(displayCompanyName)}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1 text-left min-w-0">
+            <div className="font-medium text-sm text-foreground truncate">
+              {displayCompanyName}
+            </div>
+            <div className="text-xs text-muted-foreground">
+              {employeeCount} {employeeCount === 1 ? 'employee' : 'employees'}
+            </div>
+          </div>
+          <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+        </button>
+      </div>
 
-      <SidebarContent className="px-2">
+      {/* Dashboard Item - Always Visible */}
+      <div className="px-3 pb-1">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={() => onTabChange("home")}
+              isActive={activeTab === "home" || activeTab === "" || !activeTab}
+              tooltip={t("dashboard.sidebar.dashboard", "Dashboard")}
+              data-testid="sidebar-nav-dashboard"
+              className={cn(
+                "w-full justify-start gap-3 py-2.5 px-3.5 rounded-lg font-medium",
+                (activeTab === "home" || activeTab === "" || !activeTab) && 
+                  "bg-[hsl(var(--sidebar-primary))] text-white hover:bg-[hsl(var(--sidebar-primary))]/90"
+              )}
+            >
+              <LayoutDashboard className="h-4 w-4 shrink-0" />
+              <span className="truncate group-data-[collapsible=icon]:hidden">
+                {t("dashboard.sidebar.dashboard", "Dashboard")}
+              </span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </div>
+
+      <SidebarContent className="px-3 pt-2">
         {filteredGroups.map((group, groupIndex) => (
-          <SidebarGroup key={group.id}>
-            <SidebarGroupLabel className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-2">
+          <SidebarGroup key={group.id} className="py-2">
+            <SidebarGroupLabel className="text-[11px] font-semibold text-muted-foreground/70 uppercase tracking-[0.15em] px-3.5 pb-2">
               {group.label}
             </SidebarGroupLabel>
             <SidebarGroupContent>
-              <SidebarMenu>
+              <SidebarMenu className="gap-0.5">
                 {group.items.map((item) => {
                   const Icon = item.icon;
                   const isActive = isActiveItem(item);
@@ -311,8 +368,10 @@ export function DashboardSidebar({
                         tooltip={item.label}
                         data-testid={`sidebar-nav-${item.id}`}
                         className={cn(
-                          "w-full justify-start gap-3",
-                          isActive && "bg-sidebar-accent text-sidebar-accent-foreground"
+                          "w-full justify-start gap-3 py-2.5 px-3.5 rounded-lg font-medium text-[14px]",
+                          isActive 
+                            ? "bg-[hsl(var(--sidebar-primary))] text-white hover:bg-[hsl(var(--sidebar-primary))]/90"
+                            : "text-foreground/80 hover:bg-muted"
                         )}
                       >
                         <Icon className="h-4 w-4 shrink-0" />
@@ -322,7 +381,7 @@ export function DashboardSidebar({
                         {item.badge !== undefined && item.badge > 0 && (
                           <Badge
                             variant={item.badgeVariant || "secondary"}
-                            className="ml-auto text-xs tabular-nums group-data-[collapsible=icon]:hidden"
+                            className="ml-auto rounded-full px-2 py-0.5 text-[11px] font-medium tabular-nums group-data-[collapsible=icon]:hidden min-w-[22px] justify-center"
                             data-testid={`badge-${item.id}-count`}
                           >
                             {item.badge}
@@ -338,14 +397,14 @@ export function DashboardSidebar({
         ))}
       </SidebarContent>
 
-      <SidebarFooter className="p-2">
-        <SidebarMenu>
+      <SidebarFooter className="px-3 py-4">
+        <SidebarMenu className="gap-0.5">
           <SidebarMenuItem>
             <SidebarMenuButton
               onClick={() => setLocation("/profile")}
               tooltip={t("dashboard.sidebar.settings", "Settings")}
               data-testid="sidebar-nav-settings"
-              className="w-full justify-start gap-3"
+              className="w-full justify-start gap-3 py-2.5 px-3.5 rounded-lg font-medium text-foreground/80 hover:bg-muted"
             >
               <Settings className="h-4 w-4 shrink-0" />
               <span className="truncate group-data-[collapsible=icon]:hidden">
@@ -358,7 +417,7 @@ export function DashboardSidebar({
               onClick={() => setLocation("/help")}
               tooltip={t("dashboard.sidebar.help", "Help Center")}
               data-testid="sidebar-nav-help"
-              className="w-full justify-start gap-3"
+              className="w-full justify-start gap-3 py-2.5 px-3.5 rounded-lg font-medium text-foreground/80 hover:bg-muted"
             >
               <HelpCircle className="h-4 w-4 shrink-0" />
               <span className="truncate group-data-[collapsible=icon]:hidden">
