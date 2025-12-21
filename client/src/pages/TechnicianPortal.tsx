@@ -2640,57 +2640,48 @@ export default function TechnicianPortal() {
               {t.backToHome}
             </Button>
 
-            {/* Header with edit button - for technicians and company owners (who often work as techs) */}
+            {/* Employer Profile - Glass-morphism container matching Resident Profile style */}
             {(user.role === 'rope_access_tech' || user.role === 'company') && (
-              <>
-              <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-full bg-primary/20">
-                        <Eye className="w-5 h-5 text-primary" />
-                      </div>
-                      <div>
-                        <CardTitle className="text-lg">{t.employerProfileTitle}</CardTitle>
-                        <p className="text-sm text-muted-foreground">{t.employerProfileDesc}</p>
-                      </div>
-                    </div>
-                    {!isEditingEmployerProfile ? (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setIsEditingEmployerProfile(true)}
-                        data-testid="button-edit-employer-profile"
-                      >
-                        <Pencil className="w-4 h-4 mr-1" />
-                        {t.editEmployerProfile}
-                      </Button>
-                    ) : (
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setIsEditingEmployerProfile(false)}
-                          data-testid="button-cancel-employer-edit"
-                        >
-                          {t.cancelEdit}
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </CardHeader>
-              </Card>
-
-            {/* Visibility Status Card */}
-            <Card className={user.isVisibleToEmployers ? "border-green-500/50 bg-green-500/5" : "border-amber-500/50 bg-amber-500/5"}>
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between gap-4">
+              <div className="bg-card/60 backdrop-blur-sm rounded-2xl border border-border/50 shadow-xl p-6">
+                {/* Header with title and edit button */}
+                <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
                   <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-full ${user.isVisibleToEmployers ? "bg-green-500/20" : "bg-amber-500/20"}`}>
+                    <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center">
+                      <Eye className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold">{t.employerProfileTitle}</h2>
+                      <p className="text-sm text-muted-foreground">{t.employerProfileDesc}</p>
+                    </div>
+                  </div>
+                  {!isEditingEmployerProfile ? (
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsEditingEmployerProfile(true)}
+                      data-testid="button-edit-employer-profile"
+                    >
+                      <Pencil className="w-4 h-4 mr-2" />
+                      {t.editEmployerProfile}
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsEditingEmployerProfile(false)}
+                      data-testid="button-cancel-employer-edit"
+                    >
+                      {t.cancelEdit}
+                    </Button>
+                  )}
+                </div>
+
+                {/* Visibility Status - Compact inline */}
+                <div className={`flex items-center justify-between p-4 rounded-lg mb-6 ${user.isVisibleToEmployers ? "bg-green-500/10 border border-green-500/20" : "bg-amber-500/10 border border-amber-500/20"}`}>
+                  <div className="flex items-center gap-3">
+                    <div className={`h-10 w-10 rounded-full flex items-center justify-center ${user.isVisibleToEmployers ? "bg-green-500/20" : "bg-amber-500/20"}`}>
                       {user.isVisibleToEmployers ? (
-                        <Eye className="w-5 h-5 text-green-500" />
+                        <Eye className="w-5 h-5 text-green-600 dark:text-green-400" />
                       ) : (
-                        <EyeOff className="w-5 h-5 text-amber-500" />
+                        <EyeOff className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                       )}
                     </div>
                     <div>
@@ -2725,263 +2716,281 @@ export default function TechnicianPortal() {
                     data-testid="switch-employer-visibility"
                   />
                 </div>
-              </CardContent>
-            </Card>
 
-            {/* Profile Preview Card */}
-            <Card>
-              <CardContent className="pt-6 space-y-6">
-                {/* Basic Info */}
-                <div className="flex items-start gap-4">
-                  <Avatar className="w-20 h-20 border-2 border-primary/20">
-                    {user.profilePhotoUrl ? (
-                      <AvatarImage src={user.profilePhotoUrl} alt={user.name || ""} />
-                    ) : (
-                      <AvatarFallback className="text-2xl bg-primary/10 text-primary">
-                        {user.name?.split(" ").map((n: string) => n[0]).join("").toUpperCase() || "?"}
-                      </AvatarFallback>
-                    )}
-                  </Avatar>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="text-xl font-semibold">{user.name}</h3>
-                      {user.hasPlusAccess && (
-                        <Badge className="bg-gradient-to-r from-amber-500 to-yellow-400 text-black font-bold text-xs">
-                          PLUS
-                        </Badge>
+                {/* Profile Info Section */}
+                <div className="space-y-6">
+                  {/* Basic Info with Avatar */}
+                  <div>
+                    <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide mb-4">
+                      {language === 'en' ? 'Profile Preview' : 'Aperçu du profil'}
+                    </h3>
+                    <div className="flex items-start gap-4">
+                      <Avatar className="w-20 h-20 border-2 border-primary/20">
+                        {user.profilePhotoUrl ? (
+                          <AvatarImage src={user.profilePhotoUrl} alt={user.name || ""} />
+                        ) : (
+                          <AvatarFallback className="text-2xl bg-primary/10 text-primary">
+                            {user.name?.split(" ").map((n: string) => n[0]).join("").toUpperCase() || "?"}
+                          </AvatarFallback>
+                        )}
+                      </Avatar>
+                      <div className="flex-1 space-y-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h3 className="text-xl font-semibold" data-testid="text-employer-profile-name">{user.name}</h3>
+                          {user.hasPlusAccess && (
+                            <Badge className="bg-gradient-to-r from-amber-500 to-yellow-400 text-black font-bold text-xs">
+                              PLUS
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-muted-foreground" data-testid="text-employer-profile-location">
+                          {user.city}{user.province ? `, ${user.province}` : ""}
+                        </p>
+                        {user.ropeAccessStartDate && (
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Clock className="w-4 h-4" />
+                            <span data-testid="text-employer-profile-experience">
+                              {(() => {
+                                const start = new Date(user.ropeAccessStartDate);
+                                const now = new Date();
+                                const months = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
+                                const years = Math.floor(months / 12);
+                                const remainingMonths = months % 12;
+                                if (years > 0) {
+                                  return `${years} ${language === 'en' ? 'year(s)' : 'an(s)'}, ${remainingMonths} ${language === 'en' ? 'month(s)' : 'mois'} ${language === 'en' ? 'experience' : "d'expérience"}`;
+                                }
+                                return `${months} ${language === 'en' ? 'month(s) experience' : "mois d'expérience"}`;
+                              })()}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Certifications Section */}
+                  <div className="pt-6 border-t">
+                    <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide mb-4 flex items-center gap-2">
+                      <Award className="w-4 h-4" />
+                      {t.certifications}
+                    </h3>
+                    <div className="space-y-3">
+                      {user.irataLicenseNumber && (
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-xs text-muted-foreground">IRATA</p>
+                            <p className="font-medium" data-testid="text-employer-profile-irata">
+                              Level {user.irataLevel || "?"} - {user.irataLicenseNumber}
+                            </p>
+                          </div>
+                          <Badge variant="secondary">IRATA</Badge>
+                        </div>
+                      )}
+                      {user.spratLicenseNumber && (
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-xs text-muted-foreground">SPRAT</p>
+                            <p className="font-medium" data-testid="text-employer-profile-sprat">
+                              Level {user.spratLevel || "?"} - {user.spratLicenseNumber}
+                            </p>
+                          </div>
+                          <Badge variant="secondary">SPRAT</Badge>
+                        </div>
+                      )}
+                      {user.hasFirstAid && (
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-xs text-muted-foreground">{language === 'en' ? 'Safety' : 'Sécurité'}</p>
+                            <p className="font-medium" data-testid="text-employer-profile-firstaid">{t.firstAid}</p>
+                          </div>
+                          <Badge variant="outline" className="gap-1">
+                            <Heart className="w-3 h-3" />
+                            {language === 'en' ? 'Certified' : 'Certifié'}
+                          </Badge>
+                        </div>
+                      )}
+                      {!user.irataLicenseNumber && !user.spratLicenseNumber && !user.hasFirstAid && (
+                        <p className="text-sm text-muted-foreground italic">
+                          {language === 'en' ? 'No certifications added yet' : 'Aucune certification ajoutée'}
+                        </p>
                       )}
                     </div>
-                    <p className="text-muted-foreground">{user.city}{user.province ? `, ${user.province}` : ""}</p>
+                  </div>
+
+                  {/* Specialties Section - Editable */}
+                  <div className="pt-6 border-t">
+                    <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide mb-4 flex items-center gap-2">
+                      <HardHat className="w-4 h-4" />
+                      {t.yourSpecialties}
+                    </h3>
                     
-                    {/* Experience */}
-                    {user.ropeAccessStartDate && (
-                      <div className="flex items-center gap-2 mt-2 text-sm">
-                        <Clock className="w-4 h-4 text-muted-foreground" />
-                        <span>
-                          {(() => {
-                            const start = new Date(user.ropeAccessStartDate);
-                            const now = new Date();
-                            const months = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
-                            const years = Math.floor(months / 12);
-                            const remainingMonths = months % 12;
-                            if (years > 0) {
-                              return `${years} ${language === 'en' ? 'year(s)' : 'an(s)'}, ${remainingMonths} ${language === 'en' ? 'month(s)' : 'mois'}`;
-                            }
-                            return `${months} ${language === 'en' ? 'month(s)' : 'mois'}`;
-                          })()}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                    {isEditingEmployerProfile ? (
+                      <div className="space-y-4">
+                        {/* Current specialties with remove button */}
+                        <div className="flex flex-wrap gap-2">
+                          {(user.ropeAccessSpecialties || []).map((specialty: string, index: number) => {
+                            const jobType = JOB_TYPES.find(jt => jt.value === specialty);
+                            return (
+                              <Badge 
+                                key={specialty} 
+                                variant="secondary"
+                                className="gap-1 pr-1"
+                                data-testid={`badge-specialty-${index}`}
+                              >
+                                <HardHat className="w-3 h-3" />
+                                {jobType?.label || specialty}
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-5 w-5 ml-1 no-default-hover-elevate no-default-active-elevate"
+                                  onClick={async () => {
+                                    const updated = (user.ropeAccessSpecialties || []).filter((s: string) => s !== specialty);
+                                    try {
+                                      const response = await fetch("/api/technician/specialties", {
+                                        method: "POST",
+                                        headers: { "Content-Type": "application/json" },
+                                        credentials: "include",
+                                        body: JSON.stringify({ specialties: updated }),
+                                      });
+                                      if (!response.ok) throw new Error("Failed to update");
+                                      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+                                    } catch (error) {
+                                      toast({ title: "Error", description: "Failed to remove specialty", variant: "destructive" });
+                                    }
+                                  }}
+                                  data-testid={`button-remove-specialty-${index}`}
+                                >
+                                  <X className="w-3 h-3" />
+                                </Button>
+                              </Badge>
+                            );
+                          })}
+                          {(user.ropeAccessSpecialties || []).length === 0 && (
+                            <p className="text-sm text-muted-foreground italic">{t.addYourFirstSpecialty}</p>
+                          )}
+                        </div>
 
-                <Separator />
-
-                {/* Certifications */}
-                <div>
-                  <h4 className="font-medium mb-3 flex items-center gap-2">
-                    <Award className="w-4 h-4 text-primary" />
-                    {t.certifications}
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {user.irataLicenseNumber && (
-                      <Badge variant="secondary" className="gap-1">
-                        irata Level {user.irataLevel || "?"} - {user.irataLicenseNumber}
-                      </Badge>
-                    )}
-                    {user.spratLicenseNumber && (
-                      <Badge variant="secondary" className="gap-1">
-                        SPRAT Level {user.spratLevel || "?"} - {user.spratLicenseNumber}
-                      </Badge>
-                    )}
-                    {user.hasFirstAid && (
-                      <Badge variant="outline" className="gap-1">
-                        <Heart className="w-3 h-3" /> {t.firstAid}
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-
-                <Separator />
-
-                {/* Specialties Section - Editable */}
-                <div>
-                  <h4 className="font-medium mb-3 flex items-center gap-2">
-                    <HardHat className="w-4 h-4 text-primary" />
-                    {t.yourSpecialties}
-                  </h4>
-                  
-                  {isEditingEmployerProfile ? (
-                    <div className="space-y-4">
-                      {/* Current specialties with remove button */}
-                      <div className="flex flex-wrap gap-2">
-                        {(user.ropeAccessSpecialties || []).map((specialty: string, index: number) => {
-                          const jobType = JOB_TYPES.find(jt => jt.value === specialty);
-                          return (
-                            <Badge 
-                              key={specialty} 
-                              variant="secondary"
-                              className="gap-1 pr-1"
-                              data-testid={`badge-specialty-${index}`}
+                        {/* Add new specialty */}
+                        <div className="flex flex-wrap gap-2 items-end">
+                          <div className="flex-1 min-w-[120px]">
+                            <Label className="text-xs">{t.selectCategory}</Label>
+                            <select
+                              className="w-full mt-1 px-3 py-2 border rounded-md bg-background text-sm"
+                              value={specialtyCategory}
+                              onChange={(e) => {
+                                setSpecialtyCategory(e.target.value as "" | "building_maintenance");
+                                setSelectedSpecialtyJobType("");
+                              }}
+                              data-testid="select-specialty-category"
                             >
-                              <HardHat className="w-3 h-3" />
-                              {jobType?.label || specialty}
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-5 w-5 ml-1 no-default-hover-elevate no-default-active-elevate"
-                                onClick={async () => {
-                                  const updated = (user.ropeAccessSpecialties || []).filter((s: string) => s !== specialty);
+                              <option value="">{t.selectCategory}</option>
+                              {JOB_CATEGORIES.map(cat => (
+                                <option key={cat.value} value={cat.value}>{cat.label}</option>
+                              ))}
+                            </select>
+                          </div>
+                          {specialtyCategory && (
+                            <div className="flex-1 min-w-[150px]">
+                              <Label className="text-xs">{t.selectJobType}</Label>
+                              <select
+                                className="w-full mt-1 px-3 py-2 border rounded-md bg-background text-sm"
+                                value={selectedSpecialtyJobType}
+                                onChange={(e) => setSelectedSpecialtyJobType(e.target.value)}
+                                data-testid="select-specialty-job-type"
+                              >
+                                <option value="">{t.selectJobType}</option>
+                                {getJobTypesByCategory(specialtyCategory)
+                                  .filter(jt => !jt.value.endsWith('_other') && !(user.ropeAccessSpecialties || []).includes(jt.value))
+                                  .map(jt => (
+                                    <option key={jt.value} value={jt.value}>{jt.label}</option>
+                                  ))}
+                              </select>
+                            </div>
+                          )}
+                          <Button
+                            size="sm"
+                            disabled={!selectedSpecialtyJobType}
+                            onClick={async () => {
+                              if (selectedSpecialtyJobType) {
+                                const current = user.ropeAccessSpecialties || [];
+                                if (!current.includes(selectedSpecialtyJobType)) {
                                   try {
                                     const response = await fetch("/api/technician/specialties", {
                                       method: "POST",
                                       headers: { "Content-Type": "application/json" },
                                       credentials: "include",
-                                      body: JSON.stringify({ specialties: updated }),
+                                      body: JSON.stringify({ specialties: [...current, selectedSpecialtyJobType] }),
                                     });
                                     if (!response.ok) throw new Error("Failed to update");
                                     queryClient.invalidateQueries({ queryKey: ["/api/user"] });
                                   } catch (error) {
-                                    toast({ title: "Error", description: "Failed to remove specialty", variant: "destructive" });
+                                    toast({ title: "Error", description: "Failed to add specialty", variant: "destructive" });
                                   }
-                                }}
-                                data-testid={`button-remove-specialty-${index}`}
-                              >
-                                <X className="w-3 h-3" />
-                              </Button>
-                            </Badge>
-                          );
-                        })}
-                        {(user.ropeAccessSpecialties || []).length === 0 && (
-                          <p className="text-sm text-muted-foreground italic">{t.addYourFirstSpecialty}</p>
-                        )}
-                      </div>
-
-                      {/* Add new specialty */}
-                      <div className="flex flex-wrap gap-2 items-end">
-                        <div className="flex-1 min-w-[120px]">
-                          <Label className="text-xs">{t.selectCategory}</Label>
-                          <select
-                            className="w-full mt-1 px-3 py-2 border rounded-md bg-background text-sm"
-                            value={specialtyCategory}
-                            onChange={(e) => {
-                              setSpecialtyCategory(e.target.value as "" | "building_maintenance");
-                              setSelectedSpecialtyJobType("");
-                            }}
-                            data-testid="select-specialty-category"
-                          >
-                            <option value="">{t.selectCategory}</option>
-                            {JOB_CATEGORIES.map(cat => (
-                              <option key={cat.value} value={cat.value}>{cat.label}</option>
-                            ))}
-                          </select>
-                        </div>
-                        {specialtyCategory && (
-                          <div className="flex-1 min-w-[150px]">
-                            <Label className="text-xs">{t.selectJobType}</Label>
-                            <select
-                              className="w-full mt-1 px-3 py-2 border rounded-md bg-background text-sm"
-                              value={selectedSpecialtyJobType}
-                              onChange={(e) => setSelectedSpecialtyJobType(e.target.value)}
-                              data-testid="select-specialty-job-type"
-                            >
-                              <option value="">{t.selectJobType}</option>
-                              {getJobTypesByCategory(specialtyCategory)
-                                .filter(jt => !jt.value.endsWith('_other') && !(user.ropeAccessSpecialties || []).includes(jt.value))
-                                .map(jt => (
-                                  <option key={jt.value} value={jt.value}>{jt.label}</option>
-                                ))}
-                            </select>
-                          </div>
-                        )}
-                        <Button
-                          size="sm"
-                          disabled={!selectedSpecialtyJobType}
-                          onClick={async () => {
-                            if (selectedSpecialtyJobType) {
-                              const current = user.ropeAccessSpecialties || [];
-                              if (!current.includes(selectedSpecialtyJobType)) {
-                                try {
-                                  const response = await fetch("/api/technician/specialties", {
-                                    method: "POST",
-                                    headers: { "Content-Type": "application/json" },
-                                    credentials: "include",
-                                    body: JSON.stringify({ specialties: [...current, selectedSpecialtyJobType] }),
-                                  });
-                                  if (!response.ok) throw new Error("Failed to update");
-                                  queryClient.invalidateQueries({ queryKey: ["/api/user"] });
-                                } catch (error) {
-                                  toast({ title: "Error", description: "Failed to add specialty", variant: "destructive" });
                                 }
+                                setSelectedSpecialtyJobType("");
                               }
-                              setSelectedSpecialtyJobType("");
-                            }
-                          }}
-                          data-testid="button-add-specialty"
-                        >
-                          <Plus className="w-4 h-4 mr-1" />
-                          {t.addSpecialty}
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex flex-wrap gap-2">
-                      {(user.ropeAccessSpecialties || []).length > 0 ? (
-                        (user.ropeAccessSpecialties || []).map((specialty: string, index: number) => {
-                          const jobType = JOB_TYPES.find(jt => jt.value === specialty);
-                          return (
-                            <Badge 
-                              key={specialty} 
-                              variant="secondary"
-                              className="gap-1"
-                              data-testid={`badge-specialty-view-${index}`}
-                            >
-                              <HardHat className="w-3 h-3" />
-                              {jobType?.label || specialty}
-                            </Badge>
-                          );
-                        })
-                      ) : (
-                        <div className="text-center w-full py-4">
-                          <p className="text-sm text-muted-foreground italic mb-2">{t.addYourFirstSpecialty}</p>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setIsEditingEmployerProfile(true)}
-                            data-testid="button-add-first-specialty"
+                            }}
+                            data-testid="button-add-specialty"
                           >
                             <Plus className="w-4 h-4 mr-1" />
                             {t.addSpecialty}
                           </Button>
                         </div>
-                      )}
-                    </div>
-                  )}
-                </div>
+                      </div>
+                    ) : (
+                      <div className="flex flex-wrap gap-2">
+                        {(user.ropeAccessSpecialties || []).length > 0 ? (
+                          (user.ropeAccessSpecialties || []).map((specialty: string, index: number) => {
+                            const jobType = JOB_TYPES.find(jt => jt.value === specialty);
+                            return (
+                              <Badge 
+                                key={specialty} 
+                                variant="secondary"
+                                className="gap-1"
+                                data-testid={`badge-specialty-view-${index}`}
+                              >
+                                <HardHat className="w-3 h-3" />
+                                {jobType?.label || specialty}
+                              </Badge>
+                            );
+                          })
+                        ) : (
+                          <div className="text-center w-full py-4">
+                            <p className="text-sm text-muted-foreground italic mb-2">{t.addYourFirstSpecialty}</p>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setIsEditingEmployerProfile(true)}
+                              data-testid="button-add-first-specialty"
+                            >
+                              <Plus className="w-4 h-4 mr-1" />
+                              {t.addSpecialty}
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
 
-                {/* Resumes */}
-                {user.resumeDocuments && user.resumeDocuments.filter((u: string) => u && u.trim()).length > 0 && (
-                  <>
-                    <Separator />
-                    <div>
-                      <h4 className="font-medium mb-3 flex items-center gap-2">
-                        <FileText className="w-4 h-4 text-primary" />
+                  {/* Resumes Section */}
+                  {user.resumeDocuments && user.resumeDocuments.filter((u: string) => u && u.trim()).length > 0 && (
+                    <div className="pt-6 border-t">
+                      <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide mb-4 flex items-center gap-2">
+                        <FileText className="w-4 h-4" />
                         {t.resume}
-                      </h4>
+                      </h3>
                       <div className="flex flex-wrap gap-2">
                         {user.resumeDocuments.filter((u: string) => u && u.trim()).map((doc: string, index: number) => (
-                          <Badge key={index} variant="outline" className="gap-1">
+                          <Badge key={index} variant="outline" className="gap-1" data-testid={`badge-resume-${index}`}>
                             <FileText className="w-3 h-3" />
                             Resume {index + 1}
                           </Badge>
                         ))}
                       </div>
                     </div>
-                  </>
-                )}
-              </CardContent>
-            </Card>
-              </>
+                  )}
+                </div>
+              </div>
             )}
           </>
         )}
