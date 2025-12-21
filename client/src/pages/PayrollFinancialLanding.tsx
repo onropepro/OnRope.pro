@@ -41,6 +41,7 @@ export default function PayrollFinancialLanding() {
   const [annualValue, setAnnualValue] = useState(0);
   const [hoursSaved, setHoursSaved] = useState(0);
   const [problemsSolved, setProblemsSolved] = useState(0);
+  const [showSignIn, setShowSignIn] = useState(false);
 
   useEffect(() => {
     let currentTimeReduction = 0;
@@ -93,13 +94,12 @@ export default function PayrollFinancialLanding() {
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-hero-faqs">
-                <Link href="#faqs">
-                  {t('modules.payroll.hero.faqButton', 'Find Answers')}
-                  <BookOpen className="ml-2 w-5 h-5" />
-                </Link>
+              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={() => setShowSignIn(true)} data-testid="button-hero-signin">
+                Sign In
               </Button>
             </div>
+            
+            <SignInModal isOpen={showSignIn} onClose={() => setShowSignIn(false)} buttonColor="#0B64A3" />
 
             <SoftwareReplaces 
               software={MODULE_SOFTWARE_MAPPING["payroll-financial"]} 
