@@ -1,6 +1,4 @@
 import { useTranslation } from "react-i18next";
-import deputyLogo from "@assets/Deputy_icon_1766279815503.png";
-import whenIWorkLogo from "@assets/whenIwork-icon_1766280122946.png";
 import {
   SiAsana,
   SiTrello,
@@ -20,6 +18,7 @@ import {
   FileSpreadsheet, 
   ClipboardList, 
   Users, 
+  UserCheck,
   Building2, 
   FileText,
   Calendar,
@@ -80,7 +79,7 @@ const softwareData: Record<SoftwareKey, SoftwareInfo> = {
   asana: { name: "Asana", icon: <SiAsana className="w-5 h-5" /> },
   trello: { name: "Trello", icon: <SiTrello className="w-5 h-5" /> },
   safetyculture: { name: "SafetyCulture", icon: <Shield className="w-5 h-5" /> },
-  deputy: { name: "Deputy", icon: <img src={deputyLogo} alt="Deputy" className="w-5 h-5 object-contain brightness-0 invert opacity-60" /> },
+  deputy: { name: "Deputy", icon: <UserCheck className="w-5 h-5" /> },
   clockify: { name: "Clockify", icon: <SiClockify className="w-5 h-5" /> },
   quickbooks: { name: "QuickBooks", icon: <SiQuickbooks className="w-5 h-5" /> },
   xero: { name: "Xero", icon: <SiXero className="w-5 h-5" /> },
@@ -101,7 +100,7 @@ const softwareData: Record<SoftwareKey, SoftwareInfo> = {
   jobnimbus: { name: "JobNimbus", icon: <ClipboardList className="w-5 h-5" /> },
   buildium: { name: "Buildium", icon: <Building2 className="w-5 h-5" /> },
   appfolio: { name: "AppFolio", icon: <Building2 className="w-5 h-5" /> },
-  whenIWork: { name: "When I Work", icon: <img src={whenIWorkLogo} alt="When I Work" className="w-5 h-5 object-contain brightness-0 invert opacity-60" /> },
+  whenIWork: { name: "When I Work", icon: <Users className="w-5 h-5" /> },
   vericlock: { name: "Vericlock", icon: <Clock className="w-5 h-5" /> },
   notesApp: { name: "Notes App", icon: <Smartphone className="w-5 h-5" /> },
   notebook: { name: "Notebook", icon: <BookOpen className="w-5 h-5" /> },
