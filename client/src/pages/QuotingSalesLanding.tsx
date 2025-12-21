@@ -8,6 +8,7 @@ import { Link } from "wouter";
 import { useTranslation } from "react-i18next";
 import { PublicHeader } from "@/components/PublicHeader";
 import { SignInModal } from "@/components/SignInModal";
+import { EmployerRegistration } from "@/components/EmployerRegistration";
 import { SoftwareReplaces, MODULE_SOFTWARE_MAPPING } from "@/components/SoftwareReplaces";
 import {
   ArrowRight,
@@ -56,6 +57,7 @@ export default function QuotingSalesLanding() {
   const [openProblemItems, setOpenProblemItems] = useState<string[]>([]);
   const [openFaqItems, setOpenFaqItems] = useState<string[]>([]);
   const [showSignIn, setShowSignIn] = useState(false);
+  const [showRegistration, setShowRegistration] = useState(false);
 
   const allProblemsExpanded = openProblemItems.length === ALL_PROBLEM_ITEMS.length;
   const allFaqsExpanded = openFaqItems.length === ALL_FAQ_ITEMS.length;
@@ -113,11 +115,9 @@ export default function QuotingSalesLanding() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" className="bg-white text-[#0B64A3]" asChild data-testid="button-hero-trial">
-                <Link href="/register">
-                  {t('modules.quoting.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
+              <Button size="lg" className="bg-white text-[#0B64A3]" onClick={() => setShowRegistration(true)} data-testid="button-hero-trial">
+                {t('modules.quoting.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
+                <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white" onClick={() => setShowSignIn(true)} data-testid="button-hero-signin">
                 Sign In
@@ -1082,17 +1082,17 @@ export default function QuotingSalesLanding() {
           <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto leading-relaxed">
             {t('modules.quotingSales.finalCta.description2', 'OnRopePro eliminates quote calculation time completely. Same-day quote delivery becomes your standard. Calculator apps get deleted from your phone. You reclaim eight hours per week.')}
           </p>
-          <Button size="lg" className="bg-white text-blue-700" asChild data-testid="button-final-cta">
-            <Link href="/register">
-              {t('modules.quotingSales.finalCta.buttonText', 'Start Your Free 60-Day Trial')}
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Link>
+          <Button size="lg" className="bg-white text-blue-700" onClick={() => setShowRegistration(true)} data-testid="button-final-cta">
+            {t('modules.quotingSales.finalCta.buttonText', 'Start Your Free 60-Day Trial')}
+            <ArrowRight className="ml-2 w-5 h-5" />
           </Button>
         </div>
       </section>
 
       {/* Footer spacing */}
       <div className="h-16"></div>
+
+      <EmployerRegistration open={showRegistration} onOpenChange={setShowRegistration} />
     </div>
   );
 }

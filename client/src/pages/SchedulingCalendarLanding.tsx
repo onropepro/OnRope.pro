@@ -8,6 +8,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Link } from "wouter";
 import { PublicHeader } from "@/components/PublicHeader";
 import { SignInModal } from "@/components/SignInModal";
+import { EmployerRegistration } from "@/components/EmployerRegistration";
 import { SoftwareReplaces, MODULE_SOFTWARE_MAPPING } from "@/components/SoftwareReplaces";
 import {
   ArrowRight,
@@ -47,6 +48,7 @@ export default function SchedulingCalendarLanding() {
   const [openItems, setOpenItems] = useState<string[]>([]);
   const [faqOpenItems, setFaqOpenItems] = useState<string[]>([]);
   const [showSignIn, setShowSignIn] = useState(false);
+  const [showRegistration, setShowRegistration] = useState(false);
   
   const allExpanded = openItems.length === PROBLEM_ACCORDION_ITEMS.length;
   
@@ -84,11 +86,9 @@ export default function SchedulingCalendarLanding() {
             </div>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-hero-trial">
-                <Link href="/register">
-                  {t('modules.scheduling.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
+              <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" onClick={() => setShowRegistration(true)} data-testid="button-hero-trial">
+                {t('modules.scheduling.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
+                <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={() => setShowSignIn(true)} data-testid="button-hero-signin">
                 Sign In
@@ -1048,11 +1048,9 @@ export default function SchedulingCalendarLanding() {
             {t('modules.scheduling.finalCta.description', "Monday mornings become boring. The phone doesn't ring at 6am. Your ops manager enjoys his Sunday barbecue. Your crews show up where they're supposed to. That's what it looks like when scheduling just works.")}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-[#0B64A3] hover:bg-[#0369A1] text-white" asChild data-testid="button-final-cta">
-              <Link href="/register">
-                {t('modules.scheduling.finalCta.ctaTrial', 'Start Your Free 60-Day Trial')}
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Link>
+            <Button size="lg" className="bg-[#0B64A3] hover:bg-[#0369A1] text-white" onClick={() => setShowRegistration(true)} data-testid="button-final-cta">
+              {t('modules.scheduling.finalCta.ctaTrial', 'Start Your Free 60-Day Trial')}
+              <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
             <Button size="lg" variant="outline" asChild data-testid="button-contact">
               <Link href="/contact">
@@ -1062,6 +1060,17 @@ export default function SchedulingCalendarLanding() {
           </div>
         </div>
       </section>
+
+      {/* Modals */}
+      <SignInModal 
+        isOpen={showSignIn} 
+        onClose={() => setShowSignIn(false)} 
+        buttonColor="#0B64A3" 
+      />
+      <EmployerRegistration 
+        open={showRegistration} 
+        onOpenChange={setShowRegistration} 
+      />
     </div>
   );
 }

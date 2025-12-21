@@ -8,6 +8,7 @@ import { Link } from "wouter";
 import { useTranslation } from "react-i18next";
 import { PublicHeader } from "@/components/PublicHeader";
 import { SignInModal } from "@/components/SignInModal";
+import { EmployerRegistration } from "@/components/EmployerRegistration";
 import { SoftwareReplaces, MODULE_SOFTWARE_MAPPING } from "@/components/SoftwareReplaces";
 import {
   Briefcase,
@@ -46,6 +47,7 @@ export default function EmployerJobBoardLanding() {
   const { t } = useTranslation();
   const [openItems, setOpenItems] = useState<string[]>([]);
   const [showSignIn, setShowSignIn] = useState(false);
+  const [showRegistration, setShowRegistration] = useState(false);
 
   const allExpanded = openItems.length === ALL_ACCORDION_ITEMS.length;
 
@@ -78,11 +80,9 @@ export default function EmployerJobBoardLanding() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-hero-start">
-                <Link href="/register">
-                  {t('modules.employerJobBoard.hero.ctaPrimary', 'Start Posting Jobs Free')}
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
+              <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" onClick={() => setShowRegistration(true)} data-testid="button-hero-start">
+                {t('modules.employerJobBoard.hero.ctaPrimary', 'Start Your Free 60-Day Trial')}
+                <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={() => setShowSignIn(true)} data-testid="button-hero-signin">
                 Sign In
@@ -841,11 +841,9 @@ export default function EmployerJobBoardLanding() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-[#0B64A3] text-white hover:bg-[#0369A1]" asChild data-testid="button-cta-start">
-              <Link href="/register">
-                {t('modules.employerJobBoard.cta.ctaPrimary', 'Start Posting Jobs Free')}
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Link>
+            <Button size="lg" className="bg-[#0B64A3] text-white hover:bg-[#0369A1]" onClick={() => setShowRegistration(true)} data-testid="button-cta-start">
+              {t('modules.employerJobBoard.cta.ctaPrimary', 'Start Your Free 60-Day Trial')}
+              <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
             <Button size="lg" variant="outline" asChild data-testid="button-cta-learn">
               <Link href="/changelog/job-board">
@@ -865,6 +863,8 @@ export default function EmployerJobBoardLanding() {
           </p>
         </div>
       </footer>
+
+      <EmployerRegistration open={showRegistration} onOpenChange={setShowRegistration} />
     </div>
   );
 }

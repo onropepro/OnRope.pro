@@ -1,4 +1,6 @@
 import { useTranslation } from "react-i18next";
+import deputyLogo from "@assets/Deputy_icon_1766279815503.png";
+import whenIWorkLogo from "@assets/whenIwork-icon_1766280963068.png";
 import {
   SiAsana,
   SiTrello,
@@ -18,6 +20,7 @@ import {
   FileSpreadsheet, 
   ClipboardList, 
   Users, 
+  UserCheck,
   Building2, 
   FileText,
   Calendar,
@@ -64,7 +67,8 @@ export type SoftwareKey =
   | "jobber"
   | "housecallpro"
   | "facebook"
-  | "craigslist";
+  | "craigslist"
+  | "float";
 
 interface SoftwareInfo {
   name: string;
@@ -77,7 +81,7 @@ const softwareData: Record<SoftwareKey, SoftwareInfo> = {
   asana: { name: "Asana", icon: <SiAsana className="w-5 h-5" /> },
   trello: { name: "Trello", icon: <SiTrello className="w-5 h-5" /> },
   safetyculture: { name: "SafetyCulture", icon: <Shield className="w-5 h-5" /> },
-  deputy: { name: "Deputy", icon: <Clock className="w-5 h-5" /> },
+  deputy: { name: "Deputy", icon: <img src={deputyLogo} alt="Deputy" className="w-5 h-5 object-contain brightness-0 invert opacity-60" /> },
   clockify: { name: "Clockify", icon: <SiClockify className="w-5 h-5" /> },
   quickbooks: { name: "QuickBooks", icon: <SiQuickbooks className="w-5 h-5" /> },
   xero: { name: "Xero", icon: <SiXero className="w-5 h-5" /> },
@@ -98,7 +102,7 @@ const softwareData: Record<SoftwareKey, SoftwareInfo> = {
   jobnimbus: { name: "JobNimbus", icon: <ClipboardList className="w-5 h-5" /> },
   buildium: { name: "Buildium", icon: <Building2 className="w-5 h-5" /> },
   appfolio: { name: "AppFolio", icon: <Building2 className="w-5 h-5" /> },
-  whenIWork: { name: "When I Work", icon: <Clock className="w-5 h-5" /> },
+  whenIWork: { name: "When I Work", icon: <img src={whenIWorkLogo} alt="When I Work" className="w-5 h-5 object-contain brightness-0 invert opacity-60" /> },
   vericlock: { name: "Vericlock", icon: <Clock className="w-5 h-5" /> },
   notesApp: { name: "Notes App", icon: <Smartphone className="w-5 h-5" /> },
   notebook: { name: "Notebook", icon: <BookOpen className="w-5 h-5" /> },
@@ -106,6 +110,7 @@ const softwareData: Record<SoftwareKey, SoftwareInfo> = {
   housecallpro: { name: "Housecall Pro", icon: <Briefcase className="w-5 h-5" /> },
   facebook: { name: "Facebook", icon: <SiFacebook className="w-5 h-5" /> },
   craigslist: { name: "Craigslist", icon: <Newspaper className="w-5 h-5" /> },
+  float: { name: "Float", icon: <Calendar className="w-5 h-5" /> },
 };
 
 interface SoftwareReplacesProps {
@@ -144,7 +149,7 @@ export function SoftwareReplaces({ software, className = "" }: SoftwareReplacesP
 export const MODULE_SOFTWARE_MAPPING: Record<string, SoftwareKey[]> = {
   "technician-passport": ["bamboohr", "docusign", "paper"],
   "safety-compliance": ["safetyculture", "paper", "notesApp", "notebook"],
-  "project-management": ["monday", "asana", "trello"],
+  "project-management": ["monday", "asana", "trello", "notebook", "notesApp"],
   "work-session-time-tracking": ["deputy", "clockify", "vericlock", "notesApp", "notebook"],
   "company-safety-rating": ["excel", "spreadsheets"],
   "irata-sprat-task-logging": ["excel", "paper", "notesApp"],
@@ -153,7 +158,7 @@ export const MODULE_SOFTWARE_MAPPING: Record<string, SoftwareKey[]> = {
   "technician-job-board": ["indeed", "linkedin"],
   "employer-job-board": ["indeed", "linkedin", "facebook", "craigslist"],
   "gear-inventory": ["excel", "spreadsheets"],
-  "scheduling-calendar": ["deputy", "whenIWork", "googlecalendar"],
+  "scheduling-calendar": ["deputy", "whenIWork", "googlecalendar", "float"],
   "payroll-financial": ["quickbooks", "xero", "excel"],
   "quoting-sales-pipeline": ["hubspot", "pipedrive", "jobnimbus"],
   "white-label-branding": [],

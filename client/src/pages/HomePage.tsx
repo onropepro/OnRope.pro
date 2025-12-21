@@ -205,11 +205,26 @@ const segmentContent = {
 // Module categories for filtering
 const moduleCategories = [
   { id: "all", label: "All", icon: LayoutGrid, color: "text-foreground" },
-  { id: "operations", label: "Operations", icon: Settings, color: "text-blue-600" },
+  {
+    id: "operations",
+    label: "Operations",
+    icon: Settings,
+    color: "text-blue-600",
+  },
   { id: "safety", label: "Safety", icon: HeartPulse, color: "text-red-600" },
   { id: "team", label: "Team", icon: Users, color: "text-violet-600" },
-  { id: "financial", label: "Financial & Sales", icon: Wallet, color: "text-emerald-600" },
-  { id: "communication", label: "Communication", icon: MessageSquare, color: "text-rose-600" },
+  {
+    id: "financial",
+    label: "Financial & Sales",
+    icon: Wallet,
+    color: "text-emerald-600",
+  },
+  {
+    id: "communication",
+    label: "Communication",
+    icon: MessageSquare,
+    color: "text-rose-600",
+  },
 ];
 
 const modules = [
@@ -394,13 +409,15 @@ const roiExample = [
 
 export default function HomePage() {
   const [activeSegment, setActiveSegment] = useState<Segment | null>(null);
-  const [selectedModuleCategory, setSelectedModuleCategory] = useState<string>("all");
+  const [selectedModuleCategory, setSelectedModuleCategory] =
+    useState<string>("all");
   const content = activeSegment ? segmentContent[activeSegment] : null;
-  
+
   // Filter modules based on selected category
-  const filteredModules = selectedModuleCategory === "all" 
-    ? modules 
-    : modules.filter(m => m.category === selectedModuleCategory);
+  const filteredModules =
+    selectedModuleCategory === "all"
+      ? modules
+      : modules.filter((m) => m.category === selectedModuleCategory);
 
   const segmentButtons: {
     id: Segment;
@@ -449,9 +466,12 @@ export default function HomePage() {
 
             {/* Subheadline */}
             <p className="text-xl md:text-2xl text-blue-100 max-w-4xl mx-auto leading-relaxed">
-              Projects. Payroll. Safety. Scheduling. Compliance. Logging. All in one place.
-              <br /><br />
-              Built by a Level 3 technician and Operations Manager who got tired of watching good companies drown in paperwork and stress.
+              Projects. Payroll. Safety. Scheduling. Compliance. Logging. All in
+              one place.
+              <br />
+              <br />
+              Built by a Level 3 technician and Operations Manager who got tired
+              of watching good companies drown in paperwork and stress.
             </p>
 
             {/* Segment Selector */}
@@ -693,24 +713,36 @@ export default function HomePage() {
             <ScrollArea className="w-full">
               <div className="flex gap-2 pb-2 justify-center">
                 {moduleCategories.map((category) => {
-                  const modulesInCategory = category.id === "all" 
-                    ? modules.length 
-                    : modules.filter(m => m.category === category.id).length;
+                  const modulesInCategory =
+                    category.id === "all"
+                      ? modules.length
+                      : modules.filter((m) => m.category === category.id)
+                          .length;
                   const isSelected = selectedModuleCategory === category.id;
-                  
+
                   return (
                     <Button
                       key={category.id}
                       variant={isSelected ? "default" : "outline"}
+                      variant={
+                        selectedModuleCategory === category.id
+                          ? "default"
+                          : "outline"
+                      }
                       size="sm"
                       onClick={() => setSelectedModuleCategory(category.id)}
                       className="gap-2 whitespace-nowrap"
                       data-testid={`button-module-category-${category.id}`}
                     >
-                      <category.icon className={`w-4 h-4 ${isSelected ? "" : category.color}`} />
+                      <category.icon
+                        className={`w-4 h-4 ${isSelected ? "" : category.color}`}
+                      />
                       {category.label}
                       {category.id !== "all" && (
-                        <Badge variant="secondary" className="ml-1 min-w-[20px] h-5 text-xs">
+                        <Badge
+                          variant="secondary"
+                          className="ml-1 min-w-[20px] h-5 text-xs"
+                        >
                           {modulesInCategory}
                         </Badge>
                       )}
@@ -722,7 +754,7 @@ export default function HomePage() {
             </ScrollArea>
           </div>
 
-          <motion.div 
+          <motion.div
             className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4"
             layout
           >
@@ -736,7 +768,10 @@ export default function HomePage() {
                   exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ duration: 0.2, ease: "easeOut" }}
                 >
-                  <Card className="hover-elevate h-full" data-testid={`card-module-${module.name.toLowerCase().replace(/\s+/g, '-')}`}>
+                  <Card
+                    className="hover-elevate h-full"
+                    data-testid={`card-module-${module.name.toLowerCase().replace(/\s+/g, "-")}`}
+                  >
                     <CardContent className="p-4">
                       <div className="flex items-start gap-3">
                         <div className="w-10 h-10 rounded-lg bg-[#0B64A3]/10 flex items-center justify-center shrink-0">

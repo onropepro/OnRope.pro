@@ -8,6 +8,7 @@ import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { PublicHeader } from "@/components/PublicHeader";
 import { SignInModal } from "@/components/SignInModal";
+import { EmployerRegistration } from "@/components/EmployerRegistration";
 import { SoftwareReplaces, MODULE_SOFTWARE_MAPPING } from "@/components/SoftwareReplaces";
 import {
   DollarSign,
@@ -42,6 +43,7 @@ export default function PayrollFinancialLanding() {
   const [hoursSaved, setHoursSaved] = useState(0);
   const [problemsSolved, setProblemsSolved] = useState(0);
   const [showSignIn, setShowSignIn] = useState(false);
+  const [showRegistration, setShowRegistration] = useState(false);
 
   useEffect(() => {
     let currentTimeReduction = 0;
@@ -88,11 +90,9 @@ export default function PayrollFinancialLanding() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-hero-trial">
-                <Link href="/register">
-                  {t('modules.payroll.hero.trialButton', 'Start Your Free 60-Day Trial')}
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
+              <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" onClick={() => setShowRegistration(true)} data-testid="button-hero-trial">
+                {t('modules.payroll.hero.trialButton', 'Start Your Free 60-Day Trial')}
+                <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={() => setShowSignIn(true)} data-testid="button-hero-signin">
                 Sign In
@@ -878,11 +878,9 @@ export default function PayrollFinancialLanding() {
             {t('modules.payroll.cta.subtitle', "Join rope access companies who've eliminated the payroll headache. Start your free 60-day trial today.")}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-[#0B64A3] hover:bg-[#0369A1] text-white" asChild data-testid="button-cta-trial">
-              <Link href="/register">
-                {t('modules.payroll.cta.trialButton', 'Start Your Free 60-Day Trial')}
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Link>
+            <Button size="lg" className="bg-[#0B64A3] hover:bg-[#0369A1] text-white" onClick={() => setShowRegistration(true)} data-testid="button-cta-trial">
+              {t('modules.payroll.cta.trialButton', 'Start Your Free 60-Day Trial')}
+              <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
             <Button size="lg" variant="outline" asChild data-testid="button-cta-changelog">
               <Link href="/changelog/payroll">
@@ -893,6 +891,8 @@ export default function PayrollFinancialLanding() {
           </div>
         </div>
       </section>
+
+      <EmployerRegistration open={showRegistration} onOpenChange={setShowRegistration} />
     </div>
   );
 }
