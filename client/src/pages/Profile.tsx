@@ -1200,7 +1200,7 @@ export default function Profile() {
         </div>
       </header>
 
-      <div className="p-4 max-w-2xl mx-auto space-y-4">
+      <div className="p-4 md:p-6 lg:p-8 max-w-6xl mx-auto space-y-6">
         {user?.role === "company" ? (
           <Tabs defaultValue="profile" className="w-full">
             <TabsList className="grid w-full grid-cols-4">
@@ -1232,85 +1232,89 @@ export default function Profile() {
                     <span className="material-icons text-base">badge</span>
                     {t('profile.basicInfo', 'Basic Information')}
                   </h3>
-                  <FormField
-                    control={profileForm.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('common.name', 'Name')}</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder={t('profile.yourName', 'Your name')}
-                            {...field}
-                            data-testid="input-name"
-                            className="h-12"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={profileForm.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('common.name', 'Name')}</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder={t('profile.yourName', 'Your name')}
+                              {...field}
+                              data-testid="input-name"
+                              className="h-12"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                  {user?.role !== "company" && (
-                  <FormField
-                    control={profileForm.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('common.email', 'Email')}</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="email"
-                            placeholder="your.email@example.com"
-                            {...field}
-                            data-testid="input-email"
-                            className="h-12"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
+                    {user?.role !== "company" && (
+                      <FormField
+                        control={profileForm.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t('common.email', 'Email')}</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="email"
+                                placeholder="your.email@example.com"
+                                {...field}
+                                data-testid="input-email"
+                                className="h-12"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     )}
-                  />
-                )}
+                  </div>
 
                 {user?.role === "resident" && (
                   <>
-                    <FormField
-                      control={profileForm.control}
-                      name="unitNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('profile.unitNumber', 'Unit Number')}</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="e.g., 101, 1205"
-                              {...field}
-                              data-testid="input-unit-number"
-                              className="h-12"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={profileForm.control}
-                      name="parkingStallNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('profile.parkingStallNumber', 'Parking Stall Number')}</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="e.g., 42, A-5, P1-23"
-                              {...field}
-                              data-testid="input-parking-stall"
-                              className="h-12"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={profileForm.control}
+                        name="unitNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t('profile.unitNumber', 'Unit Number')}</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="e.g., 101, 1205"
+                                {...field}
+                                data-testid="input-unit-number"
+                                className="h-12"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={profileForm.control}
+                        name="parkingStallNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t('profile.parkingStallNumber', 'Parking Stall Number')}</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="e.g., 42, A-5, P1-23"
+                                {...field}
+                                data-testid="input-parking-stall"
+                                className="h-12"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                     
                     {/* Company Code Linking */}
                     {user?.companyId && companyData?.company ? (
@@ -1361,43 +1365,45 @@ export default function Profile() {
 
                 {user?.role === "company" && (
                   <>
-                    <FormField
-                      control={profileForm.control}
-                      name="companyName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('profile.companyName', 'Company Name')}</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Company name"
-                              {...field}
-                              data-testid="input-company-name"
-                              className="h-12"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={profileForm.control}
-                      name="residentCode"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('profile.residentCode', 'Resident Code')}</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="10-character code for residents"
-                              {...field}
-                              data-testid="input-resident-code"
-                              className="h-12 font-mono"
-                              maxLength={10}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={profileForm.control}
+                        name="companyName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t('profile.companyName', 'Company Name')}</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="Company name"
+                                {...field}
+                                data-testid="input-company-name"
+                                className="h-12"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={profileForm.control}
+                        name="residentCode"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t('profile.residentCode', 'Resident Code')}</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="10-character code for residents"
+                                {...field}
+                                data-testid="input-resident-code"
+                                className="h-12 font-mono"
+                                maxLength={10}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
 
                     {/* Company Information Section */}
                     <div className="pt-6 border-t space-y-4">
