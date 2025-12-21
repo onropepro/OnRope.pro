@@ -64,7 +64,8 @@ export type SoftwareKey =
   | "jobber"
   | "housecallpro"
   | "facebook"
-  | "craigslist";
+  | "craigslist"
+  | "float";
 
 interface SoftwareInfo {
   name: string;
@@ -106,6 +107,7 @@ const softwareData: Record<SoftwareKey, SoftwareInfo> = {
   housecallpro: { name: "Housecall Pro", icon: <Briefcase className="w-5 h-5" /> },
   facebook: { name: "Facebook", icon: <SiFacebook className="w-5 h-5" /> },
   craigslist: { name: "Craigslist", icon: <Newspaper className="w-5 h-5" /> },
+  float: { name: "Float", icon: <Calendar className="w-5 h-5" /> },
 };
 
 interface SoftwareReplacesProps {
@@ -153,7 +155,7 @@ export const MODULE_SOFTWARE_MAPPING: Record<string, SoftwareKey[]> = {
   "technician-job-board": ["indeed", "linkedin"],
   "employer-job-board": ["indeed", "linkedin", "facebook", "craigslist"],
   "gear-inventory": ["excel", "spreadsheets"],
-  "scheduling-calendar": ["deputy", "whenIWork", "googlecalendar"],
+  "scheduling-calendar": ["deputy", "whenIWork", "googlecalendar", "float"],
   "payroll-financial": ["quickbooks", "xero", "excel"],
   "quoting-sales-pipeline": ["hubspot", "pipedrive", "jobnimbus"],
   "white-label-branding": [],
