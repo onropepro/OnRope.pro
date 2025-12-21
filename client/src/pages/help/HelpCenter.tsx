@@ -74,13 +74,43 @@ const stakeholderCards = [
   },
 ];
 
-const categoryIcons: Record<string, React.ReactNode> = {
-  operations: <Briefcase className="h-5 w-5" />,
-  safety: <Shield className="h-5 w-5" />,
-  hr: <Users className="h-5 w-5" />,
-  financial: <DollarSign className="h-5 w-5" />,
-  communication: <MessageSquare className="h-5 w-5" />,
-  customization: <Palette className="h-5 w-5" />,
+// Category configuration matching mega menu colors
+const categoryConfig: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
+  operations: { 
+    icon: <Briefcase className="h-5 w-5" />, 
+    label: 'Operations', 
+    color: 'text-blue-600' 
+  },
+  safety: { 
+    icon: <Shield className="h-5 w-5" />, 
+    label: 'Safety', 
+    color: 'text-red-600' 
+  },
+  hr: { 
+    icon: <Users className="h-5 w-5" />, 
+    label: 'Team', 
+    color: 'text-violet-600' 
+  },
+  team: { 
+    icon: <Users className="h-5 w-5" />, 
+    label: 'Team', 
+    color: 'text-violet-600' 
+  },
+  financial: { 
+    icon: <DollarSign className="h-5 w-5" />, 
+    label: 'Financial & Sales', 
+    color: 'text-emerald-600' 
+  },
+  communication: { 
+    icon: <MessageSquare className="h-5 w-5" />, 
+    label: 'Communication', 
+    color: 'text-rose-600' 
+  },
+  customization: { 
+    icon: <Palette className="h-5 w-5" />, 
+    label: 'Operations', 
+    color: 'text-blue-600' 
+  },
 };
 
 const moduleIcons: Record<string, React.ReactNode> = {
@@ -193,12 +223,12 @@ export default function HelpCenter() {
                     data-testid={`card-module-${module.slug}`}
                   >
                     <CardHeader className="flex flex-row items-center gap-3">
-                      <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center text-muted-foreground shrink-0">
-                        {moduleIcons[module.slug] || categoryIcons[module.category] || <FileText className="h-5 w-5" />}
+                      <div className={`w-10 h-10 bg-muted rounded-lg flex items-center justify-center shrink-0 ${categoryConfig[module.category]?.color || 'text-muted-foreground'}`}>
+                        {moduleIcons[module.slug] || categoryConfig[module.category]?.icon || <FileText className="h-5 w-5" />}
                       </div>
                       <div className="min-w-0">
                         <CardTitle className="text-base truncate">{module.title}</CardTitle>
-                        <CardDescription className="capitalize">{module.category}</CardDescription>
+                        <CardDescription>{categoryConfig[module.category]?.label || module.category}</CardDescription>
                       </div>
                     </CardHeader>
                   </Card>

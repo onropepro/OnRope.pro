@@ -2,12 +2,11 @@ import { Link } from 'wouter';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
-  Briefcase, 
-  Shield, 
+  Settings, 
+  HeartPulse, 
   Users, 
-  DollarSign, 
+  Wallet, 
   MessageSquare, 
-  Palette,
   FileText,
 } from 'lucide-react';
 
@@ -21,22 +20,43 @@ interface HelpArticleCardProps {
   relevance?: number;
 }
 
-const categoryIcons: Record<string, React.ReactNode> = {
-  operations: <Briefcase className="h-4 w-4" />,
-  safety: <Shield className="h-4 w-4" />,
-  hr: <Users className="h-4 w-4" />,
-  financial: <DollarSign className="h-4 w-4" />,
-  communication: <MessageSquare className="h-4 w-4" />,
-  customization: <Palette className="h-4 w-4" />,
-};
-
-const categoryLabels: Record<string, string> = {
-  operations: 'Operations',
-  safety: 'Safety',
-  hr: 'HR & Team',
-  financial: 'Financial',
-  communication: 'Communication',
-  customization: 'Customization',
+// Category configuration matching mega menu colors
+const categoryConfig: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
+  operations: { 
+    icon: <Settings className="h-4 w-4" />, 
+    label: 'Operations', 
+    color: 'text-blue-600' 
+  },
+  safety: { 
+    icon: <HeartPulse className="h-4 w-4" />, 
+    label: 'Safety', 
+    color: 'text-red-600' 
+  },
+  hr: { 
+    icon: <Users className="h-4 w-4" />, 
+    label: 'Team', 
+    color: 'text-violet-600' 
+  },
+  team: { 
+    icon: <Users className="h-4 w-4" />, 
+    label: 'Team', 
+    color: 'text-violet-600' 
+  },
+  financial: { 
+    icon: <Wallet className="h-4 w-4" />, 
+    label: 'Financial & Sales', 
+    color: 'text-emerald-600' 
+  },
+  communication: { 
+    icon: <MessageSquare className="h-4 w-4" />, 
+    label: 'Communication', 
+    color: 'text-rose-600' 
+  },
+  customization: { 
+    icon: <Settings className="h-4 w-4" />, 
+    label: 'Operations', 
+    color: 'text-blue-600' 
+  },
 };
 
 export default function HelpArticleCard({
@@ -48,6 +68,12 @@ export default function HelpArticleCard({
   excerpt,
   relevance,
 }: HelpArticleCardProps) {
+  const config = categoryConfig[category] || { 
+    icon: <FileText className="h-4 w-4" />, 
+    label: category, 
+    color: 'text-muted-foreground' 
+  };
+
   return (
     <Link href={`/help/modules/${slug}`}>
       <Card 
@@ -56,9 +82,9 @@ export default function HelpArticleCard({
       >
         <CardHeader className="flex flex-col gap-2">
           <div className="flex items-center gap-2 flex-wrap">
-            <Badge variant="secondary" className="flex items-center gap-1">
-              {categoryIcons[category] || <FileText className="h-4 w-4" />}
-              <span>{categoryLabels[category] || category}</span>
+            <Badge variant="secondary" className={`flex items-center gap-1 ${config.color}`}>
+              {config.icon}
+              <span>{config.label}</span>
             </Badge>
             {relevance !== undefined && relevance > 0.5 && (
               <Badge variant="outline" className="text-xs">
