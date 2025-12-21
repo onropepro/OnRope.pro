@@ -16,8 +16,7 @@ import {
   DollarSign,
   ShieldCheck,
   ChevronRight,
-  Plus,
-  AlertTriangle
+  Plus
 } from "lucide-react";
 
 interface AttentionItem {
@@ -68,8 +67,6 @@ interface DashboardOverviewProps {
   onNavigate: (tab: string) => void;
   onRouteNavigate: (path: string) => void;
   onQuickAdd: () => void;
-  isLicenseVerified?: boolean;
-  onVerifyLicense?: () => void;
 }
 
 export function DashboardOverview({
@@ -80,8 +77,6 @@ export function DashboardOverview({
   onNavigate,
   onRouteNavigate,
   onQuickAdd,
-  isLicenseVerified = true,
-  onVerifyLicense,
 }: DashboardOverviewProps) {
   const { t } = useTranslation();
 
@@ -241,34 +236,6 @@ export function DashboardOverview({
 
   return (
     <div className="space-y-6">
-      {!isLicenseVerified && onVerifyLicense && (
-        <div 
-          className="flex items-center justify-between gap-4 p-4 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800"
-          data-testid="alert-license-verification"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center">
-              <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-            </div>
-            <div>
-              <p className="font-semibold text-amber-800 dark:text-amber-200">
-                {t("dashboard.overview.accountReadOnly", "Account in read-only mode")}
-              </p>
-              <p className="text-sm text-amber-700 dark:text-amber-300">
-                {t("dashboard.overview.verifyLicense", "Verify your license to enable editing. Your team cannot log hours until verified.")}
-              </p>
-            </div>
-          </div>
-          <Button 
-            onClick={onVerifyLicense}
-            className="bg-amber-600 hover:bg-amber-700 text-white shrink-0"
-            data-testid="button-verify-license"
-          >
-            {t("dashboard.overview.verifyLicenseBtn", "Verify License")}
-          </Button>
-        </div>
-      )}
-
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground" data-testid="text-dashboard-title">

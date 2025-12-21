@@ -33,7 +33,7 @@ import { HighRiseBuilding } from "@/components/HighRiseBuilding";
 import { useToast } from "@/hooks/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, AlertTriangle } from "lucide-react";
 import { useLocation } from "wouter";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -3703,28 +3703,34 @@ export default function Dashboard() {
         </div>
       </header>
 
-      {/* Read-Only Mode Banner */}
+      {/* Read-Only Mode Banner - Shows on all tabs */}
       {currentUser && isReadOnly(currentUser) && (
-        <Alert className="mx-4 mt-4 border-yellow-500/50 bg-yellow-500/10">
-          <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-500" />
-          <div className="flex-1">
-            <AlertTitle className="text-yellow-700 dark:text-yellow-400">{t('dashboard.readOnlyMode.title', 'Read-Only Mode')}</AlertTitle>
-            <AlertDescription className="text-yellow-600 dark:text-yellow-500 mb-3">
-              {t('dashboard.readOnlyMode.description', 'Your account is in read-only mode. Verify your license to create, edit, or delete data.')}
-            </AlertDescription>
-            <Button
-              onClick={() => setLocation("/license-verification")}
-              className="bg-yellow-600 hover:bg-yellow-700 text-white"
-              size="sm"
-              data-testid="button-verify-license"
-            >
-              <span className="material-icons text-sm mr-1">verified_user</span>
-              {t('dashboard.readOnlyMode.verifyLicense', 'Verify License Key')}
-            </Button>
+        <div 
+          className="mx-4 mt-4 flex items-center justify-between gap-4 p-4 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800"
+          data-testid="alert-license-verification"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center">
+              <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+            </div>
+            <div>
+              <p className="font-semibold text-amber-800 dark:text-amber-200">
+                {t("dashboard.readOnlyMode.title", "Account in read-only mode")}
+              </p>
+              <p className="text-sm text-amber-700 dark:text-amber-300">
+                {t("dashboard.readOnlyMode.description", "Verify your license to enable editing. Your team cannot log hours until verified.")}
+              </p>
+            </div>
           </div>
-        </Alert>
+          <Button 
+            onClick={() => setLocation("/license-verification")}
+            className="bg-amber-600 hover:bg-amber-700 text-white shrink-0"
+            data-testid="button-verify-license"
+          >
+            {t("dashboard.readOnlyMode.verifyLicense", "Verify License")}
+          </Button>
+        </div>
       )}
-
 
       <div className="p-6 sm:p-8 max-w-7xl mx-auto">
         {/* Dashboard Overview - Operations Command Center */}
@@ -3737,8 +3743,6 @@ export default function Dashboard() {
             onNavigate={handleTabChange}
             onRouteNavigate={setLocation}
             onQuickAdd={() => setShowProjectDialog(true)}
-            isLicenseVerified={!isReadOnly(currentUser)}
-            onVerifyLicense={() => setLocation("/license-verification")}
           />
         )}
 
