@@ -57,10 +57,11 @@
       "swp_dryer_vent_cleaning": "Dryer Vent Cleaning Safe Work Procedure",
       "swp_building_wash": "Building Wash Safe Work Procedure",
       "swp_in_suite_dryer_vent": "In-Suite Dryer Vent Cleaning Safe Work Procedure",
-      "swp_parkade_pressure_cleaning": "Parkade Pressure Cleaning Safe Work Procedure",
-      "swp_ground_window_cleaning": "Ground Window Cleaning Safe Work Procedure",
-      "swp_general_pressure_washing": "General Pressure Washing Safe Work Procedure",
-      "flha_assessment": "Field Level Hazard Assessment (FLHA)"
+      "swp_parkade_pressure": "Parkade Pressure Cleaning Safe Work Procedure",
+      "swp_ground_window": "Ground Window Cleaning Safe Work Procedure",
+      "swp_general_pressure": "General Pressure Washing Safe Work Procedure",
+      "flha_assessment": "Field Level Hazard Assessment (FLHA)",
+      "harness_inspection": "Harness Inspection Procedures"
     }
   },
   "login": {

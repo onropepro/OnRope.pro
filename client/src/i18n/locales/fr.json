@@ -57,10 +57,11 @@
       "swp_dryer_vent_cleaning": "Procedure de Travail Securitaire - Nettoyage de Conduits de Secheuse",
       "swp_building_wash": "Procedure de Travail Securitaire - Lavage de Batiments",
       "swp_in_suite_dryer_vent": "Procedure de Travail Securitaire - Nettoyage de Conduits de Secheuse en Suite",
-      "swp_parkade_pressure_cleaning": "Procedure de Travail Securitaire - Nettoyage a Pression du Stationnement",
-      "swp_ground_window_cleaning": "Procedure de Travail Securitaire - Nettoyage de Fenetres au Sol",
-      "swp_general_pressure_washing": "Procedure de Travail Securitaire - Lavage a Pression General",
-      "flha_assessment": "Evaluation des Risques au Niveau du Terrain (FLHA)"
+      "swp_parkade_pressure": "Procedure de Travail Securitaire - Nettoyage a Pression du Stationnement",
+      "swp_ground_window": "Procedure de Travail Securitaire - Nettoyage de Fenetres au Sol",
+      "swp_general_pressure": "Procedure de Travail Securitaire - Lavage a Pression General",
+      "flha_assessment": "Evaluation des Risques au Niveau du Terrain (FLHA)",
+      "harness_inspection": "Procedures d'Inspection du Harnais"
     }
   },
   "login": {
