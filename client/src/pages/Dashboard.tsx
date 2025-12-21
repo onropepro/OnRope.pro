@@ -71,6 +71,7 @@ import { BusinessCardScanner } from "@/components/BusinessCardScanner";
 import { DoubleBookingWarningDialog } from "@/components/DoubleBookingWarningDialog";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
+import { DashboardOverview } from "@/components/DashboardOverview";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 
 import { JOB_CATEGORIES, JOB_TYPES, getJobTypesByCategory, getJobTypeConfig, getDefaultElevation, isElevationConfigurable, isDropBasedJobType, getAllJobTypeValues, getProgressType, getCategoryForJobType, type JobCategory } from "@shared/jobTypes";
@@ -3726,108 +3727,19 @@ export default function Dashboard() {
 
 
       <div className="p-6 sm:p-8 max-w-7xl mx-auto">
-        {/* Navigation Grid - Permission-filtered dashboard cards */}
+        {/* Dashboard Overview - Operations Command Center */}
         {activeTab === "" && (
-          <>
-            <div className="mb-8">
-              {/* Category Filter Tabs */}
-              <div className="mb-6">
-                <ScrollArea className="w-full">
-                  <div className="flex gap-2 pb-2">
-                    {cardCategories.map((category) => {
-                      const cardsInCategory = dashboardCards.filter(c => category.id === "all" || c.category === category.id);
-                      if (cardsInCategory.length === 0 && category.id !== "all") return null;
-                      
-                      return (
-                        <Button
-                          key={category.id}
-                          variant={selectedCategory === category.id ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => {
-                            setSelectedCategory(category.id);
-                            if (category.id !== "all") setIsRearranging(false);
-                          }}
-                          className="gap-2 whitespace-nowrap"
-                          data-testid={`button-category-${category.id}`}
-                        >
-                          <span className="material-icons text-base">{category.icon}</span>
-                          {category.label}
-                          {category.id !== "all" && (
-                            <Badge variant="secondary" className="ml-1 min-w-[20px] h-5 text-xs">
-                              {cardsInCategory.length}
-                            </Badge>
-                          )}
-                        </Button>
-                      );
-                    })}
-                  </div>
-                  <ScrollBar orientation="horizontal" />
-                </ScrollArea>
-              </div>
-
-              <div className="flex items-center justify-between mb-6 gap-4">
-                <h2 className={`text-3xl font-bold ${hasCustomBranding ? 'custom-brand-text' : 'gradient-text'}`}>{t('dashboard.quickActions', 'Quick Actions')}</h2>
-                <div className="flex gap-2 flex-shrink-0">
-                  {selectedCategory === "all" && (
-                    <>
-                      <Button
-                        variant={isRearranging ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setIsRearranging(!isRearranging)}
-                        className="gap-2"
-                        data-testid="button-rearrange-cards"
-                      >
-                        <span className="material-icons text-base">
-                          {isRearranging ? "check" : "swap_vert"}
-                        </span>
-                        <span className="hidden sm:inline">{isRearranging ? t('dashboard.done', 'Done') : t('dashboard.rearrangeCards', 'Rearrange Cards')}</span>
-                      </Button>
-                      {isRearranging && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={resetCardOrder}
-                          className="gap-2"
-                          data-testid="button-reset-layout"
-                        >
-                          <span className="material-icons text-base">restart_alt</span>
-                          <span className="hidden sm:inline">{t('dashboard.reset', 'Reset')}</span>
-                        </Button>
-                      )}
-                    </>
-                  )}
-                </div>
-              </div>
-              {/* Only enable drag-and-drop when viewing all cards to prevent order corruption */}
-              {selectedCategory === "all" ? (
-                <DndContext
-                  sensors={sensors}
-                  collisionDetection={closestCenter}
-                  onDragEnd={handleDragEnd}
-                >
-                  <SortableContext
-                    items={sortedDashboardCards.map(c => c.id)}
-                    strategy={rectSortingStrategy}
-                  >
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {sortedDashboardCards.map((card, index) => (
-                        <SortableCard key={card.id} card={card} isRearranging={isRearranging} colorIndex={index} brandColors={brandColors} />
-                      ))}
-                    </div>
-                  </SortableContext>
-                </DndContext>
-              ) : (
-                /* Filtered view: use StaticCard without any drag-and-drop hooks */
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {sortedDashboardCards.map((card, index) => (
-                    <StaticCard key={card.id} card={card} colorIndex={index} brandColors={brandColors} />
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Resident Code Display - Show for all company staff on main dashboard */}
-          </>
+          <DashboardOverview
+            currentUser={currentUser}
+            projects={projects}
+            employees={employees}
+            harnessInspections={harnessInspections}
+            onNavigate={handleTabChange}
+            onRouteNavigate={setLocation}
+            onQuickAdd={() => setShowProjectDialog(true)}
+            isLicenseVerified={!isReadOnly(currentUser)}
+            onVerifyLicense={() => setLocation("/license-verification")}
+          />
         )}
 
         {/* Back Button for all tabs */}

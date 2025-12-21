@@ -371,7 +371,7 @@ export function DashboardSidebar({
                           "w-full justify-start gap-3 py-2.5 px-3.5 rounded-lg font-medium text-[14px]",
                           isActive 
                             ? "bg-[hsl(var(--sidebar-primary))] text-white hover:bg-[hsl(var(--sidebar-primary))]/90"
-                            : "text-foreground/80 hover:bg-muted"
+                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
                         )}
                       >
                         <Icon className="h-4 w-4 shrink-0" />
@@ -404,7 +404,7 @@ export function DashboardSidebar({
               onClick={() => setLocation("/profile")}
               tooltip={t("dashboard.sidebar.settings", "Settings")}
               data-testid="sidebar-nav-settings"
-              className="w-full justify-start gap-3 py-2.5 px-3.5 rounded-lg font-medium text-foreground/80 hover:bg-muted"
+              className="w-full justify-start gap-3 py-2.5 px-3.5 rounded-lg font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
             >
               <Settings className="h-4 w-4 shrink-0" />
               <span className="truncate group-data-[collapsible=icon]:hidden">
@@ -417,7 +417,7 @@ export function DashboardSidebar({
               onClick={() => setLocation("/help")}
               tooltip={t("dashboard.sidebar.help", "Help Center")}
               data-testid="sidebar-nav-help"
-              className="w-full justify-start gap-3 py-2.5 px-3.5 rounded-lg font-medium text-foreground/80 hover:bg-muted"
+              className="w-full justify-start gap-3 py-2.5 px-3.5 rounded-lg font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
             >
               <HelpCircle className="h-4 w-4 shrink-0" />
               <span className="truncate group-data-[collapsible=icon]:hidden">
