@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import deputyLogo from "@assets/deputy-scheduling_1766279422627.png";
+import deputyLogo from "@assets/Deputy_icon_1766279815503.png";
 import whenIWorkLogo from "@assets/when-I-Work_1766279470163.png";
 import {
   SiAsana,
