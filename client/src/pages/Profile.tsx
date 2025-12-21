@@ -1210,35 +1210,48 @@ export default function Profile() {
               <TabsTrigger value="feature-requests" data-testid="tab-feature-requests">{t('profile.feedback', 'Feedback')}</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="profile" className="space-y-4 mt-4">
-              {/* Profile Information */}
-              <Card>
-          <CardHeader>
-            <CardTitle>{t('profile.profileInformation', 'Profile Information')}</CardTitle>
-          </CardHeader>
-          <CardContent>
+            <TabsContent value="profile" className="space-y-6 mt-4">
+              {/* Profile Information - Glass-morphism container */}
+              <div className="bg-card/60 backdrop-blur-sm rounded-2xl border border-border/50 shadow-xl p-6">
+                {/* Header with icon */}
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center">
+                    <span className="material-icons text-primary">person</span>
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold">{t('profile.profileInformation', 'Profile Information')}</h2>
+                    <p className="text-sm text-muted-foreground">{t('profile.manageYourAccount', 'Manage your account details')}</p>
+                  </div>
+                </div>
+
             <Form {...profileForm}>
               <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-4">
-                <FormField
-                  control={profileForm.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('common.name', 'Name')}</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder={t('profile.yourName', 'Your name')}
-                          {...field}
-                          data-testid="input-name"
-                          className="h-12"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {/* Basic Info Section */}
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide flex items-center gap-2">
+                    <span className="material-icons text-base">badge</span>
+                    {t('profile.basicInfo', 'Basic Information')}
+                  </h3>
+                  <FormField
+                    control={profileForm.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('common.name', 'Name')}</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder={t('profile.yourName', 'Your name')}
+                            {...field}
+                            data-testid="input-name"
+                            className="h-12"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                {user?.role !== "company" && (
+                  {user?.role !== "company" && (
                   <FormField
                     control={profileForm.control}
                     name="email"
@@ -1386,10 +1399,12 @@ export default function Profile() {
                       )}
                     />
 
-                    <Separator className="my-4" />
-
-                    <div className="space-y-4">
-                      <h3 className="text-sm font-medium">{t('profile.companyInformation', 'Company Information')}</h3>
+                    {/* Company Information Section */}
+                    <div className="pt-6 border-t space-y-4">
+                      <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide flex items-center gap-2">
+                        <span className="material-icons text-base">business</span>
+                        {t('profile.companyInformation', 'Company Information')}
+                      </h3>
                       
                       <FormField
                         control={profileForm.control}
@@ -1570,7 +1585,14 @@ export default function Profile() {
                     )}
                   </>
                 )}
+                </div>
 
+                {/* Account Info Section */}
+                <div className="pt-6 border-t space-y-4">
+                  <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide flex items-center gap-2">
+                    <span className="material-icons text-base">account_circle</span>
+                    {t('profile.accountInfo', 'Account Information')}
+                  </h3>
                 <div className="pt-2">
                   <div className="text-sm text-muted-foreground mb-2">{t('profile.role', 'Role')}</div>
                   <div className="text-sm font-medium capitalize">
@@ -1584,10 +1606,11 @@ export default function Profile() {
                     <div className="text-sm font-medium">{user.techLevel}</div>
                   </div>
                 )}
+                </div>
 
                 <Button
                   type="submit"
-                  className="w-full h-12"
+                  className="w-full h-12 mt-6"
                   data-testid="button-update-profile"
                   disabled={updateProfileMutation.isPending}
                 >
@@ -1595,17 +1618,21 @@ export default function Profile() {
                 </Button>
               </form>
             </Form>
-          </CardContent>
-        </Card>
+              </div>
 
-        <Separator />
+              {/* Security Section - Glass-morphism container */}
+              <div className="bg-card/60 backdrop-blur-sm rounded-2xl border border-border/50 shadow-xl p-6">
+                {/* Header with icon */}
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="h-12 w-12 rounded-full bg-amber-500/20 flex items-center justify-center">
+                    <span className="material-icons text-amber-500">lock</span>
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold">{t('profile.changePassword', 'Change Password')}</h2>
+                    <p className="text-sm text-muted-foreground">{t('profile.updateYourPassword', 'Update your login credentials')}</p>
+                  </div>
+                </div>
 
-        {/* Change Password */}
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('profile.changePassword', 'Change Password')}</CardTitle>
-          </CardHeader>
-          <CardContent>
             <Form {...passwordForm}>
               <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="space-y-4">
                 <FormField
@@ -1678,59 +1705,74 @@ export default function Profile() {
                 </Button>
               </form>
             </Form>
-          </CardContent>
-        </Card>
+              </div>
 
-              <Separator />
+              {/* Quick Actions - Glass-morphism container */}
+              <div className="bg-card/60 backdrop-blur-sm rounded-2xl border border-border/50 shadow-xl p-6">
+                {/* Header with icon */}
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="h-12 w-12 rounded-full bg-violet-500/20 flex items-center justify-center">
+                    <span className="material-icons text-violet-500">apps</span>
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold">{t('profile.quickActions', 'Quick Actions')}</h2>
+                    <p className="text-sm text-muted-foreground">{t('profile.additionalSettings', 'Additional settings and tools')}</p>
+                  </div>
+                </div>
 
-              {/* My Logged Hours - irata Logbook */}
-              <Card className="hover-elevate active-elevate-2 cursor-pointer" onClick={() => setLocation("/my-logged-hours")} data-testid="card-my-logged-hours">
-                <CardHeader>
-                  <div className="flex items-center gap-4">
+                <div className="space-y-3">
+                  {/* My Logged Hours */}
+                  <div 
+                    className="flex items-center gap-4 p-4 rounded-xl bg-muted/30 hover-elevate active-elevate-2 cursor-pointer border border-border/50" 
+                    onClick={() => setLocation("/my-logged-hours")} 
+                    data-testid="card-my-logged-hours"
+                  >
                     <div className="p-3 bg-violet-500/10 rounded-xl">
                       <span className="material-icons text-violet-500">assignment</span>
                     </div>
                     <div className="flex-1">
-                      <CardTitle className="text-lg">{t('dashboard.cards.myLoggedHours.label', 'My Logged Hours')}</CardTitle>
-                      <CardDescription>{t('dashboard.cards.myLoggedHours.description', 'irata logbook')}</CardDescription>
+                      <p className="font-semibold">{t('dashboard.cards.myLoggedHours.label', 'My Logged Hours')}</p>
+                      <p className="text-sm text-muted-foreground">{t('dashboard.cards.myLoggedHours.description', 'IRATA logbook')}</p>
                     </div>
                     <span className="material-icons text-muted-foreground">chevron_right</span>
                   </div>
-                </CardHeader>
-              </Card>
-              
-              <Separator />
-              
-              {/* Language Preference */}
-              <LanguagePreferenceCard />
 
-              <Separator />
-              
-              {/* Delete Account */}
-              <Card className="border-destructive">
-                <CardHeader>
-                  <CardTitle className="text-destructive">Delete Account</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <p className="text-sm text-muted-foreground">
-                      Permanently delete your company account and all associated data. This action cannot be undone.
-                    </p>
-                    <p className="text-sm text-destructive font-medium">
-                      Warning: This will delete all employees, projects, work sessions, drop logs, and feedback.
-                    </p>
-                    <Button
-                      variant="destructive"
-                      className="w-full h-12"
-                      onClick={() => setShowDeleteDialog(true)}
-                      data-testid="button-delete-account"
-                    >
-                      <span className="material-icons mr-2">delete_forever</span>
-                      Delete Company Account
-                    </Button>
+                  {/* Language Preference */}
+                  <LanguagePreferenceCard />
+                </div>
+              </div>
+
+              {/* Danger Zone - Glass-morphism container */}
+              <div className="bg-red-500/5 backdrop-blur-sm rounded-2xl border border-red-500/20 shadow-xl p-6">
+                {/* Header with icon */}
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="h-12 w-12 rounded-full bg-red-500/20 flex items-center justify-center">
+                    <span className="material-icons text-red-500">warning</span>
                   </div>
-                </CardContent>
-              </Card>
+                  <div>
+                    <h2 className="text-xl font-bold text-red-600 dark:text-red-400">{t('profile.dangerZone', 'Danger Zone')}</h2>
+                    <p className="text-sm text-muted-foreground">{t('profile.irreversibleActions', 'Irreversible account actions')}</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Permanently delete your company account and all associated data. This action cannot be undone.
+                  </p>
+                  <p className="text-sm text-red-600 dark:text-red-400 font-medium">
+                    Warning: This will delete all employees, projects, work sessions, drop logs, and feedback.
+                  </p>
+                  <Button
+                    variant="destructive"
+                    className="w-full h-12"
+                    onClick={() => setShowDeleteDialog(true)}
+                    data-testid="button-delete-account"
+                  >
+                    <span className="material-icons mr-2">delete_forever</span>
+                    Delete Company Account
+                  </Button>
+                </div>
+              </div>
             </TabsContent>
 
             <TabsContent value="subscription" className="space-y-4 mt-4">
