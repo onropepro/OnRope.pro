@@ -273,6 +273,62 @@ export default function CSRLanding() {
 
       <Separator className="my-8" />
 
+      {/* CSR Rating Tiers Visual */}
+      <section className="py-16 md:py-20 px-4">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+            {t('modules.csr.tiers.title', 'Rating Tiers')}
+          </h2>
+          <p className="text-center text-muted-foreground text-lg mb-12 max-w-3xl mx-auto">
+            {t('modules.csr.tiers.subtitle', 'Your CSR score determines your rating tier, displayed as a color-coded badge visible to property managers.')}
+          </p>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            {/* Green - Excellent */}
+            <div className="rounded-xl p-6 text-center bg-green-50 dark:bg-green-950/50 border border-green-200 dark:border-green-800">
+              <div className="mx-auto w-16 h-16 rounded-full bg-green-500 flex items-center justify-center mb-4 ring-4 ring-green-200 dark:ring-green-800">
+                <span className="text-white font-bold text-lg">90+</span>
+              </div>
+              <p className="font-semibold text-green-700 dark:text-green-300">Green</p>
+              <p className="text-sm font-medium text-green-600 dark:text-green-400">Excellent</p>
+              <p className="text-xs text-green-600/80 dark:text-green-400/80 mt-2">Strong safety culture, highly compliant</p>
+            </div>
+
+            {/* Yellow - Good */}
+            <div className="rounded-xl p-6 text-center bg-yellow-50 dark:bg-yellow-950/50 border border-yellow-200 dark:border-yellow-800">
+              <div className="mx-auto w-16 h-16 rounded-full bg-yellow-500 flex items-center justify-center mb-4 ring-4 ring-yellow-200 dark:ring-yellow-800">
+                <span className="text-white font-bold text-lg">70+</span>
+              </div>
+              <p className="font-semibold text-yellow-700 dark:text-yellow-300">Yellow</p>
+              <p className="text-sm font-medium text-yellow-600 dark:text-yellow-400">Good</p>
+              <p className="text-xs text-yellow-600/80 dark:text-yellow-400/80 mt-2">Solid foundation, minor gaps to address</p>
+            </div>
+
+            {/* Orange - Warning */}
+            <div className="rounded-xl p-6 text-center bg-orange-50 dark:bg-orange-950/50 border border-orange-200 dark:border-orange-800">
+              <div className="mx-auto w-16 h-16 rounded-full bg-orange-500 flex items-center justify-center mb-4 ring-4 ring-orange-200 dark:ring-orange-800">
+                <span className="text-white font-bold text-lg">50+</span>
+              </div>
+              <p className="font-semibold text-orange-700 dark:text-orange-300">Orange</p>
+              <p className="text-sm font-medium text-orange-600 dark:text-orange-400">Warning</p>
+              <p className="text-xs text-orange-600/80 dark:text-orange-400/80 mt-2">Significant gaps requiring attention</p>
+            </div>
+
+            {/* Red - Critical */}
+            <div className="rounded-xl p-6 text-center bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800">
+              <div className="mx-auto w-16 h-16 rounded-full bg-red-500 flex items-center justify-center mb-4 ring-4 ring-red-200 dark:ring-red-800">
+                <span className="text-white font-bold text-lg">&lt;50</span>
+              </div>
+              <p className="font-semibold text-red-700 dark:text-red-300">Red</p>
+              <p className="text-sm font-medium text-red-600 dark:text-red-400">Critical</p>
+              <p className="text-xs text-red-600/80 dark:text-red-400/80 mt-2">Serious compliance issues</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <Separator className="my-8" />
+
       {/* Stakeholder Benefits Section */}
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-5xl mx-auto">

@@ -31,10 +31,17 @@ For each project, the CSR monitors:
 4. FLHA (Field Level Hazard Assessment)
 
 ### Color-Coded Badge
-- **Green (90-100%)**: Excellent compliance
-- **Yellow (70-89%)**: Good with room for improvement
-- **Orange (50-69%)**: Needs attention
-- **Red (below 50%)**: Critical compliance gaps
+
+The CSR score determines your rating tier, displayed as a color-coded badge visible to property managers:
+
+| Score | Tier | Status | Description |
+|-------|------|--------|-------------|
+| **90+** | Green | Excellent | Strong safety culture, highly compliant |
+| **70+** | Yellow | Good | Solid foundation, minor gaps to address |
+| **50+** | Orange | Warning | Significant gaps requiring attention |
+| **<50** | Red | Critical | Serious compliance issues |
+
+Each tier is represented by a circular badge with the score range, making it easy for property managers to quickly assess vendor safety at a glance
 
 ### Proportional Impact
 Individual misses have less impact as your work history grows. A company with 100 completed projects won't be devastated by one missed form.
