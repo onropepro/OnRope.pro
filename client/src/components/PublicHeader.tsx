@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown, IdCard, HardHat, Search, Package, Calendar, DollarSign, Calculator, Palette, HelpCircle, MessageSquare, Globe, BookOpen } from "lucide-react";
+import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown, IdCard, HardHat, Search, Package, Calendar, DollarSign, Calculator, Palette, HelpCircle, MessageSquare, Globe, BookOpen, Settings, HeartPulse, Wallet } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 interface PublicHeaderProps {
@@ -254,305 +254,332 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                   onMouseEnter={() => setShowModulesMenu(true)}
                   onMouseLeave={() => setShowModulesMenu(false)}
                 >
-                  <div className="bg-card border border-border rounded-xl shadow-xl p-4 w-[960px] max-w-[calc(100vw-2rem)]">
-                  <div className="flex gap-3">
-                    {/* Column 1: Safety & Operations (4 items, Document Management at bottom) */}
-                    <div className="flex-1 flex flex-col gap-2">
+                  <div className="bg-card border border-border rounded-xl shadow-xl p-5 w-[1100px] max-w-[calc(100vw-2rem)]">
+                  <div className="flex gap-4">
+                    {/* Column 1: Operations (5 items) */}
+                    <div className="flex-1 flex flex-col gap-1">
+                      <div className="flex items-center gap-2 px-3 py-2 mb-1" data-testid="menu-category-operations">
+                        <Settings className="w-4 h-4 text-blue-600" />
+                        <span className="font-semibold text-sm text-foreground">Operations</span>
+                      </div>
                       <button
-                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
-                        onClick={() => {
-                          setLocation("/modules/safety-compliance");
-                          setShowModulesMenu(false);
-                        }}
-                        data-testid="nav-safety-compliance"
-                      >
-                        <div className="w-10 h-10 rounded-lg bg-sky-100 dark:bg-sky-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <Shield className="w-5 h-5 text-sky-600" />
-                        </div>
-                        <div>
-                          <div className="font-semibold text-sm">{t('navigation.modules.safetyCompliance.title', 'Safety & Compliance')}</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.safetyCompliance.description', 'Harness inspections, toolbox meetings, audit-ready exports')}</div>
-                        </div>
-                      </button>
-                      <button
-                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/project-management");
                           setShowModulesMenu(false);
                         }}
                         data-testid="nav-project-management"
                       >
-                        <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <Briefcase className="w-5 h-5 text-emerald-600" />
+                        <div className="w-9 h-9 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <Briefcase className="w-4 h-4 text-emerald-600" />
                         </div>
                         <div>
-                          <div className="font-semibold text-sm">{t('navigation.modules.projectManagement.title', 'Project Management')}</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.projectManagement.description', '4-elevation tracking, real-time dashboards, crew scheduling')}</div>
+                          <div className="font-medium text-sm">{t('navigation.modules.projectManagement.title', 'Project Management')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">4-elevation tracking, dashboards</div>
                         </div>
                       </button>
                       <button
-                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/work-session-time-tracking");
                           setShowModulesMenu(false);
                         }}
                         data-testid="nav-work-session-time-tracking"
                       >
-                        <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <Clock className="w-5 h-5 text-amber-600" />
+                        <div className="w-9 h-9 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <Clock className="w-4 h-4 text-amber-600" />
                         </div>
                         <div>
-                          <div className="font-semibold text-sm">{t('navigation.modules.workSession.title', 'Work Session & Time Tracking')}</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.workSession.description', 'GPS clock-in, drop tracking, automatic payroll aggregation')}</div>
+                          <div className="font-medium text-sm">{t('navigation.modules.workSession.title', 'Work Session & Time Tracking')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">GPS clock-in, drop tracking</div>
                         </div>
                       </button>
                       <button
-                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
-                        onClick={() => {
-                          setLocation("/modules/document-management");
-                          setShowModulesMenu(false);
-                        }}
-                        data-testid="nav-document-management"
-                      >
-                        <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <FileText className="w-5 h-5 text-violet-600" />
-                        </div>
-                        <div>
-                          <div className="font-semibold text-sm">{t('navigation.modules.documentManagement.title', 'Document Management')}</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.documentManagement.description', 'Digital signatures, immutable audit trails, compliance reporting')}</div>
-                        </div>
-                      </button>
-                    </div>
-                    {/* Column 2: Access & People (4 items) */}
-                    <div className="flex-1 flex flex-col gap-2">
-                      <button
-                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
-                        onClick={() => {
-                          setLocation("/modules/user-access-authentication");
-                          setShowModulesMenu(false);
-                        }}
-                        data-testid="nav-user-access"
-                      >
-                        <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <Lock className="w-5 h-5 text-blue-600" />
-                        </div>
-                        <div>
-                          <div className="font-semibold text-sm">{t('navigation.modules.userAccess.title', 'User Access & Authentication')}</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.userAccess.description', 'Granular permissions, role-based access, audit trails')}</div>
-                        </div>
-                      </button>
-                      <button
-                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
-                        onClick={() => {
-                          setLocation("/modules/company-safety-rating");
-                          setShowModulesMenu(false);
-                        }}
-                        data-testid="nav-company-safety-rating"
-                      >
-                        <div className="w-10 h-10 rounded-lg bg-orange-100 dark:bg-orange-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <Gauge className="w-5 h-5 text-orange-600" />
-                        </div>
-                        <div>
-                          <div className="font-semibold text-sm">{t('navigation.modules.csr.title', 'Company Safety Rating')}</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.csr.description', 'Penalty-based compliance scoring, real-time safety posture')}</div>
-                        </div>
-                      </button>
-                      <button
-                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
-                        onClick={() => {
-                          setLocation("/modules/irata-sprat-task-logging");
-                          setShowModulesMenu(false);
-                        }}
-                        data-testid="nav-irata-task-logging"
-                      >
-                        <div className="w-10 h-10 rounded-lg bg-cyan-100 dark:bg-cyan-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <ClipboardCheck className="w-5 h-5 text-cyan-600" />
-                        </div>
-                        <div>
-                          <div className="font-semibold text-sm">{t('navigation.modules.irataLogging.title', 'IRATA/SPRAT Task Logging')}</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.irataLogging.description', 'Same-day hour logging, OCR import, career-portable records')}</div>
-                        </div>
-                      </button>
-                      <button
-                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
-                        onClick={() => {
-                          setLocation("/modules/employee-management");
-                          setShowModulesMenu(false);
-                        }}
-                        data-testid="nav-employee-management"
-                      >
-                        <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <Users className="w-5 h-5 text-blue-600" />
-                        </div>
-                        <div>
-                          <div className="font-semibold text-sm">{t('navigation.modules.employeeManagement.title', 'Employee Management')}</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.employeeManagement.description', 'Portable identities, certification tracking, permissions')}</div>
-                        </div>
-                      </button>
-                    </div>
-                    {/* Column 3: Resources & Scheduling (4 items) */}
-                    <div className="flex-1 flex flex-col gap-2">
-                      <button
-                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
-                        onClick={() => {
-                          setLocation("/modules/technician-passport");
-                          setShowModulesMenu(false);
-                        }}
-                        data-testid="nav-technician-passport"
-                      >
-                        <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <IdCard className="w-5 h-5 text-amber-600" />
-                        </div>
-                        <div>
-                          <div className="font-semibold text-sm">{t('navigation.modules.technicianPassport.title', 'Technician Passport')}</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.technicianPassport.description', 'Portable work history, certifications, career-long records')}</div>
-                        </div>
-                      </button>
-                      <button
-                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
-                        onClick={() => {
-                          setLocation("/modules/employer-job-board");
-                          setShowModulesMenu(false);
-                        }}
-                        data-testid="nav-employer-job-board"
-                      >
-                        <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <Search className="w-5 h-5 text-blue-600" />
-                        </div>
-                        <div>
-                          <div className="font-semibold text-sm">{t('navigation.modules.employerJobBoard.title', 'Job Board Ecosystem')}</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.employerJobBoard.description', 'Talent browser, unlimited postings, direct offers')}</div>
-                        </div>
-                      </button>
-                      <button
-                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
-                        onClick={() => {
-                          setLocation("/modules/gear-inventory");
-                          setShowModulesMenu(false);
-                        }}
-                        data-testid="nav-gear-inventory"
-                      >
-                        <div className="w-10 h-10 rounded-lg bg-teal-100 dark:bg-teal-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <Package className="w-5 h-5 text-teal-600" />
-                        </div>
-                        <div>
-                          <div className="font-semibold text-sm">{t('navigation.modules.gearInventory.title', 'Gear Inventory Management')}</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.gearInventory.description', 'Equipment tracking, assignments, service life')}</div>
-                        </div>
-                      </button>
-                      <button
-                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/scheduling-calendar");
                           setShowModulesMenu(false);
                         }}
                         data-testid="nav-scheduling-calendar"
                       >
-                        <div className="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <Calendar className="w-5 h-5 text-indigo-600" />
+                        <div className="w-9 h-9 rounded-lg bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <Calendar className="w-4 h-4 text-indigo-600" />
                         </div>
                         <div>
-                          <div className="font-semibold text-sm">{t('navigation.modules.scheduling.title', 'Scheduling & Calendar')}</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.scheduling.description', 'Conflict detection, dual calendars, time-off management')}</div>
+                          <div className="font-medium text-sm">{t('navigation.modules.scheduling.title', 'Scheduling & Calendar')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Conflict detection, time-off</div>
                         </div>
                       </button>
-                    </div>
-                    {/* Column 4: Financial & Sales (2 items) */}
-                    <div className="flex-1 flex flex-col gap-2">
                       <button
-                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
                         onClick={() => {
-                          setLocation("/modules/payroll-financial");
+                          setLocation("/modules/gear-inventory");
                           setShowModulesMenu(false);
                         }}
-                        data-testid="nav-payroll-financial"
+                        data-testid="nav-gear-inventory"
                       >
-                        <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <DollarSign className="w-5 h-5 text-emerald-600" />
+                        <div className="w-9 h-9 rounded-lg bg-teal-100 dark:bg-teal-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <Package className="w-4 h-4 text-teal-600" />
                         </div>
                         <div>
-                          <div className="font-semibold text-sm">{t('navigation.modules.payroll.title', 'Payroll & Financial')}</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.payroll.description', 'Automated timesheets, overtime calculation, payroll exports')}</div>
+                          <div className="font-medium text-sm">{t('navigation.modules.gearInventory.title', 'Gear Inventory Management')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Equipment tracking, service life</div>
                         </div>
                       </button>
                       <button
-                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
-                        onClick={() => {
-                          setLocation("/modules/quoting-sales-pipeline");
-                          setShowModulesMenu(false);
-                        }}
-                        data-testid="nav-quoting-sales-pipeline"
-                      >
-                        <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <Calculator className="w-5 h-5 text-rose-600" />
-                        </div>
-                        <div>
-                          <div className="font-semibold text-sm">{t('navigation.modules.quoting.title', 'Quoting & Sales Pipeline')}</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.quoting.description', 'Service-specific quotes, financial privacy, visual pipeline')}</div>
-                        </div>
-                      </button>
-                      <button
-                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
-                        onClick={() => {
-                          setLocation("/modules/client-relationship-management");
-                          setShowModulesMenu(false);
-                        }}
-                        data-testid="nav-client-relationship-management"
-                      >
-                        <div className="w-10 h-10 rounded-lg bg-cyan-100 dark:bg-cyan-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <Users className="w-5 h-5 text-cyan-600" />
-                        </div>
-                        <div>
-                          <div className="font-semibold text-sm">Client Relationship Management</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">Client portfolios, building specs, autofill intelligence</div>
-                        </div>
-                      </button>
-                      <button
-                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/white-label-branding");
                           setShowModulesMenu(false);
                         }}
                         data-testid="nav-white-label-branding"
                       >
-                        <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <Palette className="w-5 h-5 text-purple-600" />
+                        <div className="w-9 h-9 rounded-lg bg-purple-100 dark:bg-purple-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <Palette className="w-4 h-4 text-purple-600" />
                         </div>
                         <div>
-                          <div className="font-semibold text-sm">{t('navigation.modules.whiteLabel.title', 'White-Label Branding')}</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.whiteLabel.description', 'Your logo, colors, and brand across every touchpoint')}</div>
+                          <div className="font-medium text-sm">{t('navigation.modules.whiteLabel.title', 'White-Label Branding')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Custom logo, colors, brand</div>
+                        </div>
+                      </button>
+                    </div>
+
+                    {/* Column 2: Safety (4 items) */}
+                    <div className="flex-1 flex flex-col gap-1">
+                      <div className="flex items-center gap-2 px-3 py-2 mb-1" data-testid="menu-category-safety">
+                        <HeartPulse className="w-4 h-4 text-red-600" />
+                        <span className="font-semibold text-sm text-foreground">Safety</span>
+                      </div>
+                      <button
+                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
+                        onClick={() => {
+                          setLocation("/modules/safety-compliance");
+                          setShowModulesMenu(false);
+                        }}
+                        data-testid="nav-safety-compliance"
+                      >
+                        <div className="w-9 h-9 rounded-lg bg-sky-100 dark:bg-sky-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <Shield className="w-4 h-4 text-sky-600" />
+                        </div>
+                        <div>
+                          <div className="font-medium text-sm">{t('navigation.modules.safetyCompliance.title', 'Safety & Compliance')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Inspections, toolbox meetings</div>
                         </div>
                       </button>
                       <button
-                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
+                        onClick={() => {
+                          setLocation("/modules/company-safety-rating");
+                          setShowModulesMenu(false);
+                        }}
+                        data-testid="nav-company-safety-rating"
+                      >
+                        <div className="w-9 h-9 rounded-lg bg-orange-100 dark:bg-orange-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <Gauge className="w-4 h-4 text-orange-600" />
+                        </div>
+                        <div>
+                          <div className="font-medium text-sm">{t('navigation.modules.csr.title', 'Company Safety Rating')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Compliance scoring, safety posture</div>
+                        </div>
+                      </button>
+                      <button
+                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
+                        onClick={() => {
+                          setLocation("/modules/irata-sprat-task-logging");
+                          setShowModulesMenu(false);
+                        }}
+                        data-testid="nav-irata-task-logging"
+                      >
+                        <div className="w-9 h-9 rounded-lg bg-cyan-100 dark:bg-cyan-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <ClipboardCheck className="w-4 h-4 text-cyan-600" />
+                        </div>
+                        <div>
+                          <div className="font-medium text-sm">{t('navigation.modules.irataLogging.title', 'IRATA/SPRAT Task Logging')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Task logging, OCR import</div>
+                        </div>
+                      </button>
+                      <button
+                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
+                        onClick={() => {
+                          setLocation("/modules/document-management");
+                          setShowModulesMenu(false);
+                        }}
+                        data-testid="nav-document-management"
+                      >
+                        <div className="w-9 h-9 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <FileText className="w-4 h-4 text-violet-600" />
+                        </div>
+                        <div>
+                          <div className="font-medium text-sm">{t('navigation.modules.documentManagement.title', 'Document Management')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Digital signatures, audit trails</div>
+                        </div>
+                      </button>
+                    </div>
+
+                    {/* Column 3: Team (4 items) */}
+                    <div className="flex-1 flex flex-col gap-1">
+                      <div className="flex items-center gap-2 px-3 py-2 mb-1" data-testid="menu-category-team">
+                        <Users className="w-4 h-4 text-violet-600" />
+                        <span className="font-semibold text-sm text-foreground">Team</span>
+                      </div>
+                      <button
+                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
+                        onClick={() => {
+                          setLocation("/modules/employee-management");
+                          setShowModulesMenu(false);
+                        }}
+                        data-testid="nav-employee-management"
+                      >
+                        <div className="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <Users className="w-4 h-4 text-blue-600" />
+                        </div>
+                        <div>
+                          <div className="font-medium text-sm">{t('navigation.modules.employeeManagement.title', 'Employee Management')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Certifications, permissions</div>
+                        </div>
+                      </button>
+                      <button
+                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
+                        onClick={() => {
+                          setLocation("/modules/technician-passport");
+                          setShowModulesMenu(false);
+                        }}
+                        data-testid="nav-technician-passport"
+                      >
+                        <div className="w-9 h-9 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <IdCard className="w-4 h-4 text-amber-600" />
+                        </div>
+                        <div>
+                          <div className="font-medium text-sm">{t('navigation.modules.technicianPassport.title', 'Technician Passport')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Portable work history, records</div>
+                        </div>
+                      </button>
+                      <button
+                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
+                        onClick={() => {
+                          setLocation("/modules/employer-job-board");
+                          setShowModulesMenu(false);
+                        }}
+                        data-testid="nav-employer-job-board"
+                      >
+                        <div className="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <Search className="w-4 h-4 text-blue-600" />
+                        </div>
+                        <div>
+                          <div className="font-medium text-sm">{t('navigation.modules.employerJobBoard.title', 'Job Board Ecosystem')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Talent browser, job postings</div>
+                        </div>
+                      </button>
+                      <button
+                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
+                        onClick={() => {
+                          setLocation("/modules/user-access-authentication");
+                          setShowModulesMenu(false);
+                        }}
+                        data-testid="nav-user-access"
+                      >
+                        <div className="w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <Lock className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+                        </div>
+                        <div>
+                          <div className="font-medium text-sm">{t('navigation.modules.userAccess.title', 'User Access & Authentication')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Permissions, role-based access</div>
+                        </div>
+                      </button>
+                    </div>
+
+                    {/* Column 4: Financial & Sales (3 items) */}
+                    <div className="flex-1 flex flex-col gap-1">
+                      <div className="flex items-center gap-2 px-3 py-2 mb-1" data-testid="menu-category-financial-sales">
+                        <Wallet className="w-4 h-4 text-emerald-600" />
+                        <span className="font-semibold text-sm text-foreground">Financial & Sales</span>
+                      </div>
+                      <button
+                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
+                        onClick={() => {
+                          setLocation("/modules/payroll-financial");
+                          setShowModulesMenu(false);
+                        }}
+                        data-testid="nav-payroll-financial"
+                      >
+                        <div className="w-9 h-9 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <DollarSign className="w-4 h-4 text-emerald-600" />
+                        </div>
+                        <div>
+                          <div className="font-medium text-sm">{t('navigation.modules.payroll.title', 'Payroll & Financial')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Timesheets, overtime, exports</div>
+                        </div>
+                      </button>
+                      <button
+                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
+                        onClick={() => {
+                          setLocation("/modules/quoting-sales-pipeline");
+                          setShowModulesMenu(false);
+                        }}
+                        data-testid="nav-quoting-sales-pipeline"
+                      >
+                        <div className="w-9 h-9 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <Calculator className="w-4 h-4 text-rose-600" />
+                        </div>
+                        <div>
+                          <div className="font-medium text-sm">{t('navigation.modules.quoting.title', 'Quoting & Sales Pipeline')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Service quotes, visual pipeline</div>
+                        </div>
+                      </button>
+                      <button
+                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
+                        onClick={() => {
+                          setLocation("/modules/client-relationship-management");
+                          setShowModulesMenu(false);
+                        }}
+                        data-testid="nav-client-relationship-management"
+                      >
+                        <div className="w-9 h-9 rounded-lg bg-cyan-100 dark:bg-cyan-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <Users className="w-4 h-4 text-cyan-600" />
+                        </div>
+                        <div>
+                          <div className="font-medium text-sm">Client Relationship Management</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Client portfolios, building specs</div>
+                        </div>
+                      </button>
+                    </div>
+
+                    {/* Column 5: Communication (2 items) */}
+                    <div className="flex-1 flex flex-col gap-1">
+                      <div className="flex items-center gap-2 px-3 py-2 mb-1" data-testid="menu-category-communication">
+                        <MessageSquare className="w-4 h-4 text-rose-600" />
+                        <span className="font-semibold text-sm text-foreground">Communication</span>
+                      </div>
+                      <button
+                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/resident-portal");
                           setShowModulesMenu(false);
                         }}
                         data-testid="nav-resident-portal"
                       >
-                        <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <MessageSquare className="w-5 h-5 text-rose-600" />
+                        <div className="w-9 h-9 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <MessageSquare className="w-4 h-4 text-rose-600" />
                         </div>
                         <div>
-                          <div className="font-semibold text-sm">{t('navigation.modules.residentPortal.title', 'Resident Portal')}</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.residentPortal.description', 'Real-time feedback, two-way communication, photo evidence')}</div>
+                          <div className="font-medium text-sm">{t('navigation.modules.residentPortal.title', 'Resident Portal')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Real-time feedback, photos</div>
                         </div>
                       </button>
                       <button
-                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group"
+                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/property-manager-interface");
                           setShowModulesMenu(false);
                         }}
                         data-testid="nav-property-manager-interface"
                       >
-                        <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <Globe className="w-5 h-5 text-emerald-600" />
+                        <div className="w-9 h-9 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <Globe className="w-4 h-4 text-emerald-600" />
                         </div>
                         <div>
-                          <div className="font-semibold text-sm">Property Manager Interface</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">CSR visibility, response time tracking, due diligence documentation</div>
+                          <div className="font-medium text-sm">Property Manager Interface</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">CSR visibility, due diligence</div>
                         </div>
                       </button>
                     </div>
@@ -656,194 +683,128 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
               </button>
               
               {mobileModulesExpanded && (
-                <div className="mt-2 ml-4 space-y-1">
-                  <button
-                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
-                    onClick={() => {
-                      setLocation("/modules/safety-compliance");
-                      setMobileMenuOpen(false);
-                    }}
-                    data-testid="nav-mobile-safety-compliance"
-                  >
-                    <Shield className="w-5 h-5 text-sky-600" />
-                    <span className="text-sm">{t('navigation.modules.safetyCompliance.title', 'Safety & Compliance')}</span>
-                  </button>
-                  <button
-                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
-                    onClick={() => {
-                      setLocation("/modules/user-access-authentication");
-                      setMobileMenuOpen(false);
-                    }}
-                    data-testid="nav-mobile-user-access"
-                  >
-                    <Lock className="w-5 h-5 text-blue-600" />
-                    <span className="text-sm">{t('navigation.modules.userAccess.title', 'User Access & Authentication')}</span>
-                  </button>
-                  <button
-                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
-                    onClick={() => {
-                      setLocation("/modules/project-management");
-                      setMobileMenuOpen(false);
-                    }}
-                    data-testid="nav-mobile-project-management"
-                  >
-                    <Briefcase className="w-5 h-5 text-emerald-600" />
-                    <span className="text-sm">{t('navigation.modules.projectManagement.title', 'Project Management')}</span>
-                  </button>
-                  <button
-                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
-                    onClick={() => {
-                      setLocation("/modules/company-safety-rating");
-                      setMobileMenuOpen(false);
-                    }}
-                    data-testid="nav-mobile-company-safety-rating"
-                  >
-                    <Gauge className="w-5 h-5 text-orange-600" />
-                    <span className="text-sm">{t('navigation.modules.csr.title', 'Company Safety Rating')}</span>
-                  </button>
-                  <button
-                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
-                    onClick={() => {
-                      setLocation("/modules/work-session-time-tracking");
-                      setMobileMenuOpen(false);
-                    }}
-                    data-testid="nav-mobile-work-session"
-                  >
-                    <Clock className="w-5 h-5 text-amber-600" />
-                    <span className="text-sm">{t('navigation.modules.workSession.title', 'Work Session & Time Tracking')}</span>
-                  </button>
-                  <button
-                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
-                    onClick={() => {
-                      setLocation("/modules/irata-sprat-task-logging");
-                      setMobileMenuOpen(false);
-                    }}
-                    data-testid="nav-mobile-irata-logging"
-                  >
-                    <ClipboardCheck className="w-5 h-5 text-cyan-600" />
-                    <span className="text-sm">{t('navigation.modules.irataLogging.title', 'IRATA/SPRAT Task Logging')}</span>
-                  </button>
-                  <button
-                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
-                    onClick={() => {
-                      setLocation("/modules/document-management");
-                      setMobileMenuOpen(false);
-                    }}
-                    data-testid="nav-mobile-document-management"
-                  >
-                    <FileText className="w-5 h-5 text-violet-600" />
-                    <span className="text-sm">{t('navigation.modules.documentManagement.title', 'Document Management')}</span>
-                  </button>
-                  <button
-                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
-                    onClick={() => {
-                      setLocation("/modules/employee-management");
-                      setMobileMenuOpen(false);
-                    }}
-                    data-testid="nav-mobile-employee-management"
-                  >
-                    <Users className="w-5 h-5 text-blue-600" />
-                    <span className="text-sm">{t('navigation.modules.employeeManagement.title', 'Employee Management')}</span>
-                  </button>
-                  <button
-                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
-                    onClick={() => {
-                      setLocation("/modules/technician-passport");
-                      setMobileMenuOpen(false);
-                    }}
-                    data-testid="nav-mobile-technician-passport"
-                  >
-                    <IdCard className="w-5 h-5 text-amber-600" />
-                    <span className="text-sm">{t('navigation.modules.technicianPassport.title', 'Technician Passport')}</span>
-                  </button>
-                  <button
-                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
-                    onClick={() => {
-                      setLocation("/modules/employer-job-board");
-                      setMobileMenuOpen(false);
-                    }}
-                    data-testid="nav-mobile-employer-job-board"
-                  >
-                    <Search className="w-5 h-5 text-blue-600" />
-                    <span className="text-sm">{t('navigation.modules.employerJobBoard.title', 'Job Board Ecosystem')}</span>
-                  </button>
-                  <button
-                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
-                    onClick={() => {
-                      setLocation("/modules/gear-inventory");
-                      setMobileMenuOpen(false);
-                    }}
-                    data-testid="nav-mobile-gear-inventory"
-                  >
-                    <Package className="w-5 h-5 text-teal-600" />
-                    <span className="text-sm">{t('navigation.modules.gearInventory.title', 'Gear Inventory Management')}</span>
-                  </button>
-                  <button
-                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
-                    onClick={() => {
-                      setLocation("/modules/scheduling-calendar");
-                      setMobileMenuOpen(false);
-                    }}
-                    data-testid="nav-mobile-scheduling-calendar"
-                  >
-                    <Calendar className="w-5 h-5 text-indigo-600" />
-                    <span className="text-sm">{t('navigation.modules.scheduling.title', 'Scheduling & Calendar')}</span>
-                  </button>
-                  <button
-                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
-                    onClick={() => {
-                      setLocation("/modules/payroll-financial");
-                      setMobileMenuOpen(false);
-                    }}
-                    data-testid="nav-mobile-payroll-financial"
-                  >
-                    <DollarSign className="w-5 h-5 text-emerald-600" />
-                    <span className="text-sm">{t('navigation.modules.payroll.title', 'Payroll & Financial')}</span>
-                  </button>
-                  <button
-                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
-                    onClick={() => {
-                      setLocation("/modules/quoting-sales-pipeline");
-                      setMobileMenuOpen(false);
-                    }}
-                    data-testid="nav-mobile-quoting-sales-pipeline"
-                  >
-                    <Calculator className="w-5 h-5 text-rose-600" />
-                    <span className="text-sm">{t('navigation.modules.quoting.title', 'Quoting & Sales Pipeline')}</span>
-                  </button>
-                  <button
-                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
-                    onClick={() => {
-                      setLocation("/modules/white-label-branding");
-                      setMobileMenuOpen(false);
-                    }}
-                    data-testid="nav-mobile-white-label-branding"
-                  >
-                    <Palette className="w-5 h-5 text-purple-600" />
-                    <span className="text-sm">{t('navigation.modules.whiteLabel.title', 'White-Label Branding')}</span>
-                  </button>
-                  <button
-                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
-                    onClick={() => {
-                      setLocation("/modules/resident-portal");
-                      setMobileMenuOpen(false);
-                    }}
-                    data-testid="nav-mobile-resident-portal"
-                  >
-                    <MessageSquare className="w-5 h-5 text-rose-600" />
-                    <span className="text-sm">{t('navigation.modules.residentPortal.title', 'Resident Portal')}</span>
-                  </button>
-                  <button
-                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
-                    onClick={() => {
-                      setLocation("/modules/property-manager-interface");
-                      setMobileMenuOpen(false);
-                    }}
-                    data-testid="nav-mobile-property-manager-interface"
-                  >
-                    <Globe className="w-5 h-5 text-emerald-600" />
-                    <span className="text-sm">Property Manager Interface</span>
-                  </button>
+                <div className="mt-2 ml-4 space-y-3">
+                  {/* Operations */}
+                  <div>
+                    <div className="flex items-center gap-2 px-4 py-1.5 text-xs font-semibold text-blue-600 uppercase tracking-wide" data-testid="mobile-menu-category-operations">
+                      <Settings className="w-3.5 h-3.5" />
+                      Operations
+                    </div>
+                    <div className="space-y-0.5">
+                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/project-management"); setMobileMenuOpen(false); }} data-testid="nav-mobile-project-management">
+                        <Briefcase className="w-4 h-4 text-emerald-600" />
+                        <span className="text-sm">Project Management</span>
+                      </button>
+                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/work-session-time-tracking"); setMobileMenuOpen(false); }} data-testid="nav-mobile-work-session">
+                        <Clock className="w-4 h-4 text-amber-600" />
+                        <span className="text-sm">Work Session & Time Tracking</span>
+                      </button>
+                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/scheduling-calendar"); setMobileMenuOpen(false); }} data-testid="nav-mobile-scheduling-calendar">
+                        <Calendar className="w-4 h-4 text-indigo-600" />
+                        <span className="text-sm">Scheduling & Calendar</span>
+                      </button>
+                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/gear-inventory"); setMobileMenuOpen(false); }} data-testid="nav-mobile-gear-inventory">
+                        <Package className="w-4 h-4 text-teal-600" />
+                        <span className="text-sm">Gear Inventory Management</span>
+                      </button>
+                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/white-label-branding"); setMobileMenuOpen(false); }} data-testid="nav-mobile-white-label-branding">
+                        <Palette className="w-4 h-4 text-purple-600" />
+                        <span className="text-sm">White-Label Branding</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Safety */}
+                  <div>
+                    <div className="flex items-center gap-2 px-4 py-1.5 text-xs font-semibold text-red-600 uppercase tracking-wide" data-testid="mobile-menu-category-safety">
+                      <HeartPulse className="w-3.5 h-3.5" />
+                      Safety
+                    </div>
+                    <div className="space-y-0.5">
+                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/safety-compliance"); setMobileMenuOpen(false); }} data-testid="nav-mobile-safety-compliance">
+                        <Shield className="w-4 h-4 text-sky-600" />
+                        <span className="text-sm">Safety & Compliance</span>
+                      </button>
+                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/company-safety-rating"); setMobileMenuOpen(false); }} data-testid="nav-mobile-company-safety-rating">
+                        <Gauge className="w-4 h-4 text-orange-600" />
+                        <span className="text-sm">Company Safety Rating</span>
+                      </button>
+                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/irata-sprat-task-logging"); setMobileMenuOpen(false); }} data-testid="nav-mobile-irata-logging">
+                        <ClipboardCheck className="w-4 h-4 text-cyan-600" />
+                        <span className="text-sm">IRATA/SPRAT Task Logging</span>
+                      </button>
+                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/document-management"); setMobileMenuOpen(false); }} data-testid="nav-mobile-document-management">
+                        <FileText className="w-4 h-4 text-violet-600" />
+                        <span className="text-sm">Document Management</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Team */}
+                  <div>
+                    <div className="flex items-center gap-2 px-4 py-1.5 text-xs font-semibold text-violet-600 uppercase tracking-wide" data-testid="mobile-menu-category-team">
+                      <Users className="w-3.5 h-3.5" />
+                      Team
+                    </div>
+                    <div className="space-y-0.5">
+                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/employee-management"); setMobileMenuOpen(false); }} data-testid="nav-mobile-employee-management">
+                        <Users className="w-4 h-4 text-blue-600" />
+                        <span className="text-sm">Employee Management</span>
+                      </button>
+                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/technician-passport"); setMobileMenuOpen(false); }} data-testid="nav-mobile-technician-passport">
+                        <IdCard className="w-4 h-4 text-amber-600" />
+                        <span className="text-sm">Technician Passport</span>
+                      </button>
+                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/employer-job-board"); setMobileMenuOpen(false); }} data-testid="nav-mobile-employer-job-board">
+                        <Search className="w-4 h-4 text-blue-600" />
+                        <span className="text-sm">Job Board Ecosystem</span>
+                      </button>
+                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/user-access-authentication"); setMobileMenuOpen(false); }} data-testid="nav-mobile-user-access">
+                        <Lock className="w-4 h-4 text-slate-600" />
+                        <span className="text-sm">User Access & Authentication</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Financial */}
+                  <div>
+                    <div className="flex items-center gap-2 px-4 py-1.5 text-xs font-semibold text-emerald-600 uppercase tracking-wide" data-testid="mobile-menu-category-financial-sales">
+                      <Wallet className="w-3.5 h-3.5" />
+                      Financial & Sales
+                    </div>
+                    <div className="space-y-0.5">
+                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/payroll-financial"); setMobileMenuOpen(false); }} data-testid="nav-mobile-payroll-financial">
+                        <DollarSign className="w-4 h-4 text-emerald-600" />
+                        <span className="text-sm">Payroll & Financial</span>
+                      </button>
+                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/quoting-sales-pipeline"); setMobileMenuOpen(false); }} data-testid="nav-mobile-quoting-sales-pipeline">
+                        <Calculator className="w-4 h-4 text-rose-600" />
+                        <span className="text-sm">Quoting & Sales Pipeline</span>
+                      </button>
+                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/client-relationship-management"); setMobileMenuOpen(false); }} data-testid="nav-mobile-crm">
+                        <Users className="w-4 h-4 text-cyan-600" />
+                        <span className="text-sm">Client Relationship Management</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Communication */}
+                  <div>
+                    <div className="flex items-center gap-2 px-4 py-1.5 text-xs font-semibold text-rose-600 uppercase tracking-wide" data-testid="mobile-menu-category-communication">
+                      <MessageSquare className="w-3.5 h-3.5" />
+                      Communication
+                    </div>
+                    <div className="space-y-0.5">
+                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/resident-portal"); setMobileMenuOpen(false); }} data-testid="nav-mobile-resident-portal">
+                        <MessageSquare className="w-4 h-4 text-rose-600" />
+                        <span className="text-sm">Resident Portal</span>
+                      </button>
+                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/property-manager-interface"); setMobileMenuOpen(false); }} data-testid="nav-mobile-property-manager-interface">
+                        <Globe className="w-4 h-4 text-emerald-600" />
+                        <span className="text-sm">Property Manager Interface</span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
