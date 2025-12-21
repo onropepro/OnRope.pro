@@ -41,7 +41,7 @@ import { Switch } from "@/components/ui/switch";
 import type { Project, Client, InsertClient } from "@shared/schema";
 import { normalizeStrataPlan } from "@shared/schema";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip as RechartsTooltip } from "recharts";
-import { isManagement, hasFinancialAccess, canManageEmployees, canViewPerformance, hasPermission, isReadOnly, canViewSchedule, canViewPastProjects } from "@/lib/permissions";
+import { isManagement, hasFinancialAccess, canAccessQuotes, canManageEmployees, canViewPerformance, hasPermission, isReadOnly, canViewSchedule, canViewPastProjects } from "@/lib/permissions";
 import { DocumentUploader } from "@/components/DocumentUploader";
 import { RefreshButton } from "@/components/RefreshButton";
 import { CSRBadge } from "@/components/CSRBadge";
@@ -3414,7 +3414,7 @@ export default function Dashboard() {
       icon: "request_quote",
       onClick: () => setLocation("/quotes"),
       testId: "button-quotes",
-      isVisible: (user: any) => hasFinancialAccess(user), // Financial permission required
+      isVisible: (user: any) => canAccessQuotes(user), // Any quote permission grants access
       borderColor: "#16a34a",
       category: "financial",
     },

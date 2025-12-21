@@ -114,6 +114,18 @@ export function canAccessPayroll(user: User | null | undefined): boolean {
   return hasFinancialAccess(user);
 }
 
+/** Check if user can access quotes (view or create) */
+export function canAccessQuotes(user: User | null | undefined): boolean {
+  if (!user) return false;
+  if (isCompanyOwner(user)) return true;
+  // User can access quotes if they have any quote-related permission
+  return checkPermission(user, 'view_quotes') || 
+         checkPermission(user, 'create_quotes') ||
+         checkPermission(user, 'edit_quotes') ||
+         checkPermission(user, 'delete_quotes') ||
+         checkPermission(user, 'view_quote_financials');
+}
+
 // ============================================================================
 // OPERATIONS PERMISSIONS
 // ============================================================================
