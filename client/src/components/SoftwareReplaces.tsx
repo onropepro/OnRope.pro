@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import deputyLogo from "@assets/deputy-scheduling_1766279422627.png";
 import {
   SiAsana,
   SiTrello,
@@ -78,7 +79,7 @@ const softwareData: Record<SoftwareKey, SoftwareInfo> = {
   asana: { name: "Asana", icon: <SiAsana className="w-5 h-5" /> },
   trello: { name: "Trello", icon: <SiTrello className="w-5 h-5" /> },
   safetyculture: { name: "SafetyCulture", icon: <Shield className="w-5 h-5" /> },
-  deputy: { name: "Deputy", icon: <Clock className="w-5 h-5" /> },
+  deputy: { name: "Deputy", icon: <img src={deputyLogo} alt="Deputy" className="w-5 h-5 object-contain" /> },
   clockify: { name: "Clockify", icon: <SiClockify className="w-5 h-5" /> },
   quickbooks: { name: "QuickBooks", icon: <SiQuickbooks className="w-5 h-5" /> },
   xero: { name: "Xero", icon: <SiXero className="w-5 h-5" /> },
