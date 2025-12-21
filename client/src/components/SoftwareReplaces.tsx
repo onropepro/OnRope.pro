@@ -148,7 +148,7 @@ export function SoftwareReplaces({ software, className = "" }: SoftwareReplacesP
 export const MODULE_SOFTWARE_MAPPING: Record<string, SoftwareKey[]> = {
   "technician-passport": ["bamboohr", "docusign", "paper"],
   "safety-compliance": ["safetyculture", "paper", "notesApp", "notebook"],
-  "project-management": ["monday", "asana", "trello"],
+  "project-management": ["monday", "asana", "trello", "notebook", "notesApp"],
   "work-session-time-tracking": ["deputy", "clockify", "vericlock", "notesApp", "notebook"],
   "company-safety-rating": ["excel", "spreadsheets"],
   "irata-sprat-task-logging": ["excel", "paper", "notesApp"],
