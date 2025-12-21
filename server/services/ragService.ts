@@ -129,6 +129,13 @@ export const guideRegistry = [
     sourceFile: 'client/src/pages/AnalyticsGuide.tsx',
     stakeholders: ['owner', 'operations_manager'],
   },
+  {
+    slug: 'client-relationship-management',
+    title: 'Client Relationship Management (CRM)',
+    category: 'operations',
+    sourceFile: 'client/src/pages/CRMGuide.tsx',
+    stakeholders: ['owner', 'operations_manager'],
+  },
 ];
 
 /**
