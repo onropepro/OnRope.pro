@@ -46,8 +46,9 @@ export default function WhiteLabelBrandingLanding() {
   const [adoptionRate, setAdoptionRate] = useState(0);
   const [setupMinutes, setSetupMinutes] = useState(0);
   
-  const [expandedProblems, setExpandedProblems] = useState<string[]>([]); const [showSignIn, setShowSignIn] = useState<string[]>([]);
+  const [expandedProblems, setExpandedProblems] = useState<string[]>([]);
   const [expandedFaqs, setExpandedFaqs] = useState<string[]>([]);
+  const [showSignIn, setShowSignIn] = useState(false);
 
   const allProblemIds = ["employer-1", "employer-2", "employer-3", "employer-4", "employer-5", "ops-1", "ops-2", "tech-1", "tech-2", "bm-1", "bm-2", "resident-1"];
   const allFaqIds = ["faq-1", "faq-2", "faq-3", "faq-4", "faq-5", "faq-6", "faq-7", "faq-8", "faq-9", "faq-10", "faq-11", "faq-12"];
@@ -112,13 +113,12 @@ export default function WhiteLabelBrandingLanding() {
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-hero-faqs">
-                <Link href="#faqs">
-                  {t('modules.whiteLabel.hero.ctaFaqs', 'Find Answers')}
-                  <BookOpen className="ml-2 w-5 h-5" />
-                </Link>
+              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={() => setShowSignIn(true)} data-testid="button-hero-signin">
+                Sign In
               </Button>
             </div>
+            
+            <SignInModal isOpen={showSignIn} onClose={() => setShowSignIn(false)} buttonColor="#0B64A3" />
 
             <SoftwareReplaces 
               software={MODULE_SOFTWARE_MAPPING["white-label-branding"]} 
