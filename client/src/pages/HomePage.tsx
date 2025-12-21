@@ -40,7 +40,18 @@ import {
   Lock,
   HeartHandshake,
   Mail,
+  LayoutGrid,
+  Settings,
+  HeartPulse,
+  Wallet,
+  IdCard,
+  Search,
+  Globe,
+  Package,
+  Gauge,
+  ClipboardCheck,
 } from "lucide-react";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 type Segment =
   | "employer"
@@ -190,86 +201,129 @@ const segmentContent = {
   },
 };
 
+// Module categories for filtering
+const moduleCategories = [
+  { id: "all", label: "All", icon: LayoutGrid },
+  { id: "operations", label: "Operations", icon: Settings },
+  { id: "safety", label: "Safety", icon: HeartPulse },
+  { id: "team", label: "Team", icon: Users },
+  { id: "financial", label: "Financial & Sales", icon: Wallet },
+  { id: "communication", label: "Communication", icon: MessageSquare },
+];
+
 const modules = [
+  // Operations (5)
   {
     name: "Project Management",
     desc: "Create, assign, track, and close jobs. Every building. Every drop. Every hour.",
     icon: FolderOpen,
+    category: "operations",
   },
   {
-    name: "Time & Work Sessions",
+    name: "Work Session & Time Tracking",
     desc: "GPS-verified clock in/out. Automatic overtime. Zero disputed hours.",
     icon: Clock,
-  },
-  {
-    name: "Payroll Processing",
-    desc: "One-click prep. 87-93% faster. Export to QuickBooks or download CSVs.",
-    icon: DollarSign,
+    category: "operations",
   },
   {
     name: "Scheduling & Calendar",
     desc: "Drag-and-drop crew assignments. Conflict detection. Time-off management.",
     icon: Calendar,
+    category: "operations",
   },
   {
-    name: "Safety & Compliance",
-    desc: "SWMS, Toolbox Meetings, Anchor Certs, JHAs. Audit-ready in 4 minutes.",
-    icon: Shield,
-  },
-  {
-    name: "Equipment Inventory",
+    name: "Gear Inventory Management",
     desc: "Every harness, rope, and descender tracked. Serial numbers. Service life alerts.",
-    icon: Wrench,
-  },
-  {
-    name: "IRATA/SPRAT Task Logging",
-    desc: "Automatic hour logging toward certification. Exportable for assessments.",
-    icon: BookOpen,
-  },
-  {
-    name: "Document Management",
-    desc: "Insurance certs, training records, rope access plans. Upload once, access anywhere.",
-    icon: FileText,
-  },
-  {
-    name: "Quoting System",
-    desc: "Multi-service quotes with historical pricing. Pipeline tracking. Stop underbidding.",
-    icon: DollarSign,
-  },
-  {
-    name: "Client Management",
-    desc: "Building database with service history. Know every building's quirks.",
-    icon: Building2,
-  },
-  {
-    name: "Resident Portal",
-    desc: "Residents submit feedback with photos. 70% fewer calls to building managers.",
-    icon: Home,
-  },
-  {
-    name: "Complaint Management",
-    desc: "Track, assign, resolve, document. Metrics that win contract renewals.",
-    icon: MessageSquare,
-  },
-  {
-    name: "Employee Management",
-    desc: "Profiles, certifications, hourly rates, permissions. Onboard in minutes.",
-    icon: UserCog,
-  },
-  {
-    name: "Company Safety Rating",
-    desc: "Aggregate safety score. Differentiate in bids. Impress building managers.",
-    icon: Award,
-  },
-  {
-    name: "Performance Analytics",
-    desc: "Which techs are fastest? Which buildings take longest? Data replaces guessing.",
-    icon: LineChart,
+    icon: Package,
+    category: "operations",
   },
   {
     name: "White-Label Branding",
     desc: "Your logo, your colors. Professional client-facing portal.",
     icon: Palette,
+    category: "operations",
+  },
+  // Safety (4)
+  {
+    name: "Safety & Compliance",
+    desc: "SWMS, Toolbox Meetings, Anchor Certs, JHAs. Audit-ready in 4 minutes.",
+    icon: Shield,
+    category: "safety",
+  },
+  {
+    name: "Company Safety Rating",
+    desc: "Aggregate safety score. Differentiate in bids. Impress building managers.",
+    icon: Gauge,
+    category: "safety",
+  },
+  {
+    name: "IRATA/SPRAT Task Logging",
+    desc: "Automatic hour logging toward certification. Exportable for assessments.",
+    icon: ClipboardCheck,
+    category: "safety",
+  },
+  {
+    name: "Document Management",
+    desc: "Insurance certs, training records, rope access plans. Upload once, access anywhere.",
+    icon: FileText,
+    category: "safety",
+  },
+  // Team (4)
+  {
+    name: "Employee Management",
+    desc: "Profiles, certifications, hourly rates, permissions. Onboard in minutes.",
+    icon: UserCog,
+    category: "team",
+  },
+  {
+    name: "Technician Passport",
+    desc: "Portable work history and certifications. Access from any employer.",
+    icon: IdCard,
+    category: "team",
+  },
+  {
+    name: "Job Board Ecosystem",
+    desc: "Find qualified technicians. Post jobs. Connect with talent industry-wide.",
+    icon: Search,
+    category: "team",
+  },
+  {
+    name: "User Access & Authentication",
+    desc: "Role-based permissions. Multi-level access control. Secure data.",
+    icon: Lock,
+    category: "team",
+  },
+  // Financial & Sales (3)
+  {
+    name: "Payroll & Financial",
+    desc: "One-click prep. 87-93% faster. Export to QuickBooks or download CSVs.",
+    icon: DollarSign,
+    category: "financial",
+  },
+  {
+    name: "Quoting & Sales Pipeline",
+    desc: "Multi-service quotes with historical pricing. Pipeline tracking. Stop underbidding.",
+    icon: Briefcase,
+    category: "financial",
+  },
+  {
+    name: "Client Relationship Management",
+    desc: "Building database with service history. Know every building's quirks.",
+    icon: Building2,
+    category: "financial",
+  },
+  // Communication (2)
+  {
+    name: "Resident Portal",
+    desc: "Residents submit feedback with photos. 70% fewer calls to building managers.",
+    icon: Home,
+    category: "communication",
+  },
+  {
+    name: "Property Manager Interface",
+    desc: "Vendor oversight, CSR visibility, and due diligence tools for property managers.",
+    icon: Globe,
+    category: "communication",
   },
 ];
 
@@ -339,7 +393,13 @@ const roiExample = [
 
 export default function HomePage() {
   const [activeSegment, setActiveSegment] = useState<Segment | null>(null);
+  const [selectedModuleCategory, setSelectedModuleCategory] = useState<string>("all");
   const content = activeSegment ? segmentContent[activeSegment] : null;
+  
+  // Filter modules based on selected category
+  const filteredModules = selectedModuleCategory === "all" 
+    ? modules 
+    : modules.filter(m => m.category === selectedModuleCategory);
 
   const segmentButtons: {
     id: Segment;
@@ -614,12 +674,12 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-      {/* Features Section - 16 Modules */}
+      {/* Features Section - 18 Modules */}
       <section className="bg-white dark:bg-slate-950 py-16 md:py-24 px-4">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
+          <div className="text-center mb-8">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              16 Modules. One Platform. All Connected. All Included.
+              18 Modules. One Platform. All Connected. All Included.
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Everything you need to run a profitable rope access company, from
@@ -627,9 +687,42 @@ export default function HomePage() {
             </p>
           </div>
 
+          {/* Category Filter Tabs */}
+          <div className="mb-8">
+            <ScrollArea className="w-full">
+              <div className="flex gap-2 pb-2 justify-center">
+                {moduleCategories.map((category) => {
+                  const modulesInCategory = category.id === "all" 
+                    ? modules.length 
+                    : modules.filter(m => m.category === category.id).length;
+                  
+                  return (
+                    <Button
+                      key={category.id}
+                      variant={selectedModuleCategory === category.id ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setSelectedModuleCategory(category.id)}
+                      className="gap-2 whitespace-nowrap"
+                      data-testid={`button-module-category-${category.id}`}
+                    >
+                      <category.icon className="w-4 h-4" />
+                      {category.label}
+                      {category.id !== "all" && (
+                        <Badge variant="secondary" className="ml-1 min-w-[20px] h-5 text-xs">
+                          {modulesInCategory}
+                        </Badge>
+                      )}
+                    </Button>
+                  );
+                })}
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+          </div>
+
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {modules.map((module, i) => (
-              <Card key={i} className="hover-elevate">
+            {filteredModules.map((module, i) => (
+              <Card key={i} className="hover-elevate" data-testid={`card-module-${module.name.toLowerCase().replace(/\s+/g, '-')}`}>
                 <CardContent className="p-4">
                   <div className="flex items-start gap-3">
                     <div className="w-10 h-10 rounded-lg bg-[#0B64A3]/10 flex items-center justify-center shrink-0">
