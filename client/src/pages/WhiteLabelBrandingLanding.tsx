@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { PublicHeader } from "@/components/PublicHeader";
+import { SignInModal } from "@/components/SignInModal";
 import { SoftwareReplaces, MODULE_SOFTWARE_MAPPING } from "@/components/SoftwareReplaces";
 import {
   Palette,
@@ -45,7 +46,7 @@ export default function WhiteLabelBrandingLanding() {
   const [adoptionRate, setAdoptionRate] = useState(0);
   const [setupMinutes, setSetupMinutes] = useState(0);
   
-  const [expandedProblems, setExpandedProblems] = useState<string[]>([]);
+  const [expandedProblems, setExpandedProblems] = useState<string[]>([]); const [showSignIn, setShowSignIn] = useState<string[]>([]);
   const [expandedFaqs, setExpandedFaqs] = useState<string[]>([]);
 
   const allProblemIds = ["employer-1", "employer-2", "employer-3", "employer-4", "employer-5", "ops-1", "ops-2", "tech-1", "tech-2", "bm-1", "bm-2", "resident-1"];

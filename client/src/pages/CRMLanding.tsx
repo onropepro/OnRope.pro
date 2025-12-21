@@ -6,6 +6,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { useState } from "react";
 import { Link } from "wouter";
 import { PublicHeader } from "@/components/PublicHeader";
+import { SoftwareReplaces, MODULE_SOFTWARE_MAPPING } from "@/components/SoftwareReplaces";
+import { SignInModal } from "@/components/SignInModal";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import {
   Briefcase,
@@ -43,6 +45,7 @@ const ALL_ACCORDION_ITEMS = [
 
 export default function CRMLanding() {
   const [expandedProblems, setExpandedProblems] = useState<string[]>([]);
+  const [showSignIn, setShowSignIn] = useState(false);
   const allExpanded = expandedProblems.length === ALL_ACCORDION_ITEMS.length;
 
   const toggleAll = () => {
@@ -85,13 +88,17 @@ export default function CRMLanding() {
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" className="border-white/40 text-white bg-white/10" asChild data-testid="button-cta-demo">
-                <Link href="#problems-solved">
-                  Find Answers
-                  <BookOpen className="ml-2 w-5 h-5" />
-                </Link>
+              <Button size="lg" variant="outline" className="border-white/40 text-white bg-white/10" onClick={() => setShowSignIn(true)} data-testid="button-cta-signin">
+                Sign In
               </Button>
             </div>
+            
+            <SignInModal isOpen={showSignIn} onClose={() => setShowSignIn(false)} buttonColor="#0B64A3" />
+            
+            <SoftwareReplaces 
+              software={MODULE_SOFTWARE_MAPPING["client-relationship-management"]} 
+              className="mt-8 bg-white/5 rounded-lg mx-auto max-w-2xl [&_span]:text-blue-100 [&_svg]:text-blue-200"
+            />
           </div>
         </div>
         
