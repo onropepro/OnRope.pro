@@ -27,9 +27,11 @@ interface AttentionItem {
   icon: React.ElementType;
   actionLabel: string;
   onAction: () => void;
-  bgColor: string;
+  borderColor: string;
   iconBgColor: string;
   iconColor: string;
+  countColor: string;
+  actionColor: string;
 }
 
 interface KPIMetric {
@@ -113,9 +115,11 @@ export function DashboardOverview({
       icon: Award,
       actionLabel: t("dashboard.overview.review", "Review"),
       onAction: () => onNavigate("employees"),
-      bgColor: "bg-amber-50 dark:bg-amber-950/30",
+      borderColor: "border-l-amber-500",
       iconBgColor: "bg-amber-100 dark:bg-amber-900/50",
       iconColor: "text-amber-600 dark:text-amber-400",
+      countColor: "text-amber-600 dark:text-amber-400",
+      actionColor: "text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300",
     },
     {
       id: "inspections",
@@ -125,9 +129,11 @@ export function DashboardOverview({
       icon: ClipboardCheck,
       actionLabel: t("dashboard.overview.inspect", "Inspect"),
       onAction: () => onRouteNavigate("/inventory"),
-      bgColor: "bg-rose-50 dark:bg-rose-950/30",
+      borderColor: "border-l-rose-500",
       iconBgColor: "bg-rose-100 dark:bg-rose-900/50",
       iconColor: "text-rose-600 dark:text-rose-400",
+      countColor: "text-rose-600 dark:text-rose-400",
+      actionColor: "text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300",
     },
     {
       id: "timesheets",
@@ -137,9 +143,11 @@ export function DashboardOverview({
       icon: Clock,
       actionLabel: t("dashboard.overview.approve", "Approve"),
       onAction: () => onRouteNavigate("/non-billable-hours"),
-      bgColor: "bg-sky-50 dark:bg-sky-950/30",
+      borderColor: "border-l-sky-500",
       iconBgColor: "bg-sky-100 dark:bg-sky-900/50",
       iconColor: "text-sky-600 dark:text-sky-400",
+      countColor: "text-sky-600 dark:text-sky-400",
+      actionColor: "text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300",
     },
     {
       id: "documents",
@@ -149,9 +157,11 @@ export function DashboardOverview({
       icon: FileSignature,
       actionLabel: t("dashboard.overview.send", "Send"),
       onAction: () => onNavigate("documents"),
-      bgColor: "bg-pink-50 dark:bg-pink-950/30",
+      borderColor: "border-l-pink-500",
       iconBgColor: "bg-pink-100 dark:bg-pink-900/50",
       iconColor: "text-pink-600 dark:text-pink-400",
+      countColor: "text-pink-600 dark:text-pink-400",
+      actionColor: "text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300",
     },
   ];
 
@@ -265,15 +275,16 @@ export function DashboardOverview({
             return (
               <Card 
                 key={item.id} 
-                className={`${item.bgColor} border-0 shadow-sm`}
+                className="shadow-sm relative overflow-hidden"
                 data-testid={`card-attention-${item.id}`}
               >
+                <div className={`absolute left-0 top-0 bottom-0 w-px ${item.borderColor.replace('border-l-', 'bg-')}`} />
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between mb-3">
                     <div className={`w-10 h-10 rounded-lg ${item.iconBgColor} flex items-center justify-center`}>
                       <Icon className={`w-5 h-5 ${item.iconColor}`} />
                     </div>
-                    <span className={`text-2xl font-bold ${item.iconColor}`} data-testid={`text-${item.id}-count`}>
+                    <span className={`text-2xl font-bold ${item.countColor}`} data-testid={`text-${item.id}-count`}>
                       {item.count}
                     </span>
                   </div>
@@ -281,7 +292,7 @@ export function DashboardOverview({
                   <p className="text-sm text-muted-foreground mb-3">{item.description}</p>
                   <button 
                     onClick={item.onAction}
-                    className={`text-sm font-medium ${item.iconColor} flex items-center gap-1 hover:underline`}
+                    className={`text-sm font-medium ${item.actionColor} flex items-center gap-1`}
                     data-testid={`button-${item.id}-action`}
                   >
                     {item.actionLabel}
@@ -372,50 +383,122 @@ export function DashboardOverview({
           </CardContent>
         </Card>
 
-        <Card className="shadow-sm" data-testid="card-today-schedule">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-lg font-semibold">
-              {t("dashboard.overview.todaysSchedule", "Today's Schedule")}
-            </CardTitle>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => onRouteNavigate("/schedule")}
-              className="text-muted-foreground hover:text-foreground"
-              data-testid="button-full-calendar"
-            >
-              {t("dashboard.overview.fullCalendar", "Full calendar")}
-            </Button>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="space-y-4">
-              {todaySchedule.map((item) => (
-                <div 
-                  key={item.id} 
-                  className="flex items-start gap-4"
-                  data-testid={`row-schedule-${item.id}`}
-                >
-                  <div className="text-sm font-medium text-muted-foreground w-12 shrink-0 pt-0.5">
-                    {item.time}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-foreground">{item.title}</p>
-                    <p className="text-sm text-muted-foreground">{item.location}</p>
-                    <div className="flex items-center gap-1 mt-2">
-                      {item.technicians.map((tech, idx) => (
-                        <Avatar key={idx} className="w-6 h-6 border-2 border-background -ml-1 first:ml-0">
-                          <AvatarFallback className={`${tech.color} text-white text-[10px] font-medium`}>
-                            {tech.initials}
-                          </AvatarFallback>
-                        </Avatar>
-                      ))}
+        <div className="space-y-6">
+          <Card className="shadow-sm" data-testid="card-today-schedule">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-lg font-semibold">
+                {t("dashboard.overview.todaysSchedule", "Today's Schedule")}
+              </CardTitle>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => onRouteNavigate("/schedule")}
+                className="text-muted-foreground hover:text-foreground"
+                data-testid="button-full-calendar"
+              >
+                {t("dashboard.overview.fullCalendar", "Full calendar")}
+              </Button>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="space-y-4">
+                {todaySchedule.map((item) => (
+                  <div 
+                    key={item.id} 
+                    className="flex items-start gap-4"
+                    data-testid={`row-schedule-${item.id}`}
+                  >
+                    <div className="text-sm font-medium text-muted-foreground w-12 shrink-0 pt-0.5">
+                      {item.time}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-foreground">{item.title}</p>
+                      <p className="text-sm text-muted-foreground">{item.location}</p>
+                      <div className="flex items-center gap-1 mt-2">
+                        {item.technicians.map((tech, idx) => (
+                          <Avatar key={idx} className="w-6 h-6 border-2 border-background -ml-1 first:ml-0">
+                            <AvatarFallback className={`${tech.color} text-white text-[10px] font-medium`}>
+                              {tech.initials}
+                            </AvatarFallback>
+                          </Avatar>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-sm" data-testid="card-certification-alerts">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-lg font-semibold">
+                {t("dashboard.overview.certificationAlerts", "Certification Alerts")}
+              </CardTitle>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => onNavigate("employees")}
+                className="text-muted-foreground hover:text-foreground"
+                data-testid="button-view-all-certifications"
+              >
+                {t("dashboard.overview.viewAll", "View all")}
+              </Button>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="space-y-4">
+                {expiringCertifications.length > 0 ? (
+                  expiringCertifications.slice(0, 3).map((emp: any) => {
+                    const expiryDate = new Date(emp.irataExpiry);
+                    const now = new Date();
+                    const daysLeft = Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                    const initials = `${emp.firstName?.charAt(0) || ''}${emp.lastName?.charAt(0) || ''}`.toUpperCase();
+                    const certLevel = emp.irataLevel ? `IRATA L${emp.irataLevel}` : 'IRATA';
+                    
+                    let badgeColor = "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400";
+                    if (daysLeft <= 7) {
+                      badgeColor = "bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-400";
+                    } else if (daysLeft <= 14) {
+                      badgeColor = "bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-400";
+                    }
+                    
+                    return (
+                      <div 
+                        key={emp.id} 
+                        className="flex items-center gap-3"
+                        data-testid={`row-cert-alert-${emp.id}`}
+                      >
+                        <Avatar className="w-10 h-10">
+                          <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                            {initials}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-foreground">
+                            {emp.firstName} {emp.lastName}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {certLevel} expires {format(expiryDate, "MMM d")}
+                          </p>
+                        </div>
+                        <Badge 
+                          variant="secondary" 
+                          className={`${badgeColor} shrink-0`}
+                          data-testid={`badge-days-left-${emp.id}`}
+                        >
+                          {daysLeft}d left
+                        </Badge>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <p className="text-center text-muted-foreground py-4">
+                    {t("dashboard.overview.noCertificationAlerts", "No expiring certifications")}
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
