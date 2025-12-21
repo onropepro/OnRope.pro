@@ -231,7 +231,7 @@ export function DashboardOverview({
       iconColor: "text-amber-600 dark:text-amber-400",
       countColor: "text-amber-600 dark:text-amber-400",
       actionColor: "text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300",
-      visible: isEmployer || canViewEmployees,
+      visible: (isEmployer || canViewEmployees) && expiringCertifications.length > 0,
     },
     {
       id: "inspections",
@@ -246,7 +246,7 @@ export function DashboardOverview({
       iconColor: "text-rose-600 dark:text-rose-400",
       countColor: "text-rose-600 dark:text-rose-400",
       actionColor: "text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300",
-      visible: isEmployer || hasInventoryAccess,
+      visible: (isEmployer || hasInventoryAccess) && overdueInspections.length > 0,
     },
     {
       id: "timesheets",
@@ -261,7 +261,7 @@ export function DashboardOverview({
       iconColor: "text-sky-600 dark:text-sky-400",
       countColor: "text-sky-600 dark:text-sky-400",
       actionColor: "text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300",
-      visible: isEmployer || isManagerOrAbove || hasFinancialPermission,
+      visible: (isEmployer || isManagerOrAbove || hasFinancialPermission) && pendingTimesheets > 0,
     },
     {
       id: "documents",
@@ -276,7 +276,7 @@ export function DashboardOverview({
       iconColor: "text-pink-600 dark:text-pink-400",
       countColor: "text-pink-600 dark:text-pink-400",
       actionColor: "text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300",
-      visible: isEmployer || canViewSafety,
+      visible: (isEmployer || canViewSafety) && unsignedDocuments > 0,
     },
   ];
 
