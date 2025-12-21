@@ -86,6 +86,36 @@ type RecentChange = {
 
 const recentChangesData: RecentChange[] = [
   {
+    date: "December 21, 2025",
+    title: "Server-Side Quiz Translation System",
+    description: "Implemented full multilingual support for certification and safety quizzes. French and Spanish translations for 6 quizzes (IRATA Level 1 A/B, SWP Window Cleaning, FLHA Assessment, Harness Inspection) served via API with automatic English fallback. Server-side architecture keeps client bundles lean while supporting 420+ translated questions",
+    type: "feature"
+  },
+  {
+    date: "December 20, 2025",
+    title: "Employer Registration Modal Enhancement",
+    description: "Registration modal added to all 18 module landing pages for seamless sign-up flow. Float software added to scheduling calendar replacements. Standardized 'Try Free Trial' buttons now open sign-in modal instead of navigating away from page",
+    type: "improvement"
+  },
+  {
+    date: "December 19, 2025",
+    title: "Company Profile Page Redesign",
+    description: "Profile page reorganized into distinct information and action columns for improved visual hierarchy. Better separation of company details, contact information, and action buttons. Enhanced mobile responsiveness with full-width grid layouts",
+    type: "improvement"
+  },
+  {
+    date: "December 18, 2025",
+    title: "Visual Rating Tiers for CSR",
+    description: "Color-coded rating tier visualization added to Company Safety Rating display. Rating levels now show distinct visual bands (Excellent/Good/Needs Improvement/Poor) with matching colors. Help article table support added with proper markdown rendering",
+    type: "improvement"
+  },
+  {
+    date: "December 17, 2025",
+    title: "Module Landing Page Icons",
+    description: "Custom branded logos added for Deputy and When I Work integrations across scheduling and project management modules. Icon styling updated with proper filters (brightness-0 invert opacity-60) for consistent appearance. Added Notebook and Phone Notes to project management software list",
+    type: "improvement"
+  },
+  {
     date: "December 16, 2025",
     title: "JobBoardGuide Design System Compliance",
     description: "Complete rewrite of Job Board feature guide to comply with Changelog Pages Design System. Added proper section ordering (Introduction, Golden Rule, Key Features, Problems Solved), Accordion component with Expand/Collapse All toggle, four-part problem structure (The Pain, Real Example, Solution, Benefit), and stakeholder color coding (Employers=Blue, Technicians=Orange, Building Managers=Violet)",
@@ -445,6 +475,14 @@ const pagesData: PageCategory[] = [
       { name: "Technician Passport", path: "/modules/technician-passport", description: "Technician profile and PLUS tier overview", roles: ["Public"] },
       { name: "Technician Job Board", path: "/modules/technician-job-board", description: "Job browser, applications, and profile visibility", roles: ["Public"] },
       { name: "Employer Job Board", path: "/modules/employer-job-board", description: "Talent browser, unlimited postings, direct offers", roles: ["Public"] },
+      { name: "Gear Inventory", path: "/modules/gear-inventory", description: "Equipment tracking and compliance module overview", roles: ["Public"] },
+      { name: "Scheduling & Calendar", path: "/modules/scheduling-calendar", description: "Team scheduling and time-off management overview", roles: ["Public"] },
+      { name: "Payroll & Financial", path: "/modules/payroll-financial", description: "Payroll processing and financial reporting overview", roles: ["Public"] },
+      { name: "Quoting & Sales Pipeline", path: "/modules/quoting-sales-pipeline", description: "Quote generation and sales CRM overview", roles: ["Public"] },
+      { name: "White-Label Branding", path: "/modules/white-label-branding", description: "Custom branding and logo customization overview", roles: ["Public"] },
+      { name: "Resident Portal", path: "/modules/resident-portal", description: "Resident feedback and communication overview", roles: ["Public"] },
+      { name: "Property Manager Interface", path: "/modules/property-manager-interface", description: "Vendor management and portfolio overview", roles: ["Public"] },
+      { name: "Client Relationship Management", path: "/modules/client-relationship-management", description: "Client and building database overview", roles: ["Public"] },
     ]
   },
   {
@@ -1094,7 +1132,7 @@ export default function Changelog() {
                     <Code className="h-5 w-5 text-action-600 dark:text-action-400" />
                   </div>
                   <div>
-                    <div className="text-2xl font-bold">136,800</div>
+                    <div className="text-2xl font-bold">202,872</div>
                     <div className="text-sm text-muted-foreground">Lines of Code</div>
                   </div>
                 </div>
