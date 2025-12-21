@@ -56,14 +56,23 @@ export function QuizSection() {
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Get current language from i18n
+  const { i18n } = useTranslation();
+  const currentLanguage = i18n.language?.substring(0, 2) || 'en';
+
   // Fetch available quizzes
   const { data: quizzesData, isLoading } = useQuery<{ quizzes: Quiz[] }>({
     queryKey: ["/api/quiz/available"],
   });
 
-  // Fetch quiz questions when a quiz is selected
+  // Fetch quiz questions when a quiz is selected (with language parameter)
   const { data: questionsData, isLoading: loadingQuestions } = useQuery<{ quiz: { id: string | number; documentType?: string; title?: string; certification?: string; level?: number; quizCategory?: string; questions: Question[] } }>({
-    queryKey: ["/api/quiz", selectedQuiz?.id],
+    queryKey: ["/api/quiz", selectedQuiz?.id, currentLanguage],
+    queryFn: async () => {
+      const response = await fetch(`/api/quiz/${selectedQuiz?.id}?lang=${currentLanguage}`);
+      if (!response.ok) throw new Error('Failed to fetch quiz');
+      return response.json();
+    },
     enabled: !!selectedQuiz && !quizResult,
   });
 

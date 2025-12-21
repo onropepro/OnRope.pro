@@ -21321,10 +21321,14 @@ Do not include any other text, just the JSON object.`
   app.get("/api/quiz/:quizId", requireAuth, async (req: Request, res: Response) => {
     try {
       const { quizId } = req.params;
+      const lang = (req.query.lang as string) || 'en';
       const currentUser = await storage.getUserById(req.session.userId!);
       if (!currentUser) {
         return res.status(404).json({ message: "User not found" });
       }
+
+      // Import translation function
+      const { getTranslatedQuestion } = await import('./quizTranslations');
 
       // Handle certification quizzes (IDs start with "cert_")
       if (quizId.startsWith("cert_")) {
@@ -21346,12 +21350,15 @@ Do not include any other text, just the JSON object.`
           }
         }
 
-        // Return questions WITHOUT correct answers
-        const questionsForTaking = certQuiz.questions.map((q) => ({
-          questionNumber: q.questionNumber,
-          question: q.question,
-          options: q.options,
-        }));
+        // Return questions WITHOUT correct answers, with translation if available
+        const questionsForTaking = certQuiz.questions.map((q) => {
+          const translation = getTranslatedQuestion(quizType, q.questionNumber, lang);
+          return {
+            questionNumber: q.questionNumber,
+            question: translation?.question || q.question,
+            options: translation?.options || q.options,
+          };
+        });
 
         return res.json({
           quiz: {
@@ -21376,12 +21383,15 @@ Do not include any other text, just the JSON object.`
           return res.status(404).json({ message: "Safety quiz not found" });
         }
 
-        // Return questions WITHOUT correct answers
-        const questionsForTaking = safetyQuiz.questions.map((q) => ({
-          questionNumber: q.questionNumber,
-          question: q.question,
-          options: q.options,
-        }));
+        // Return questions WITHOUT correct answers, with translation if available
+        const questionsForTaking = safetyQuiz.questions.map((q) => {
+          const translation = getTranslatedQuestion(quizType, q.questionNumber, lang);
+          return {
+            questionNumber: q.questionNumber,
+            question: translation?.question || q.question,
+            options: translation?.options || q.options,
+          };
+        });
 
         return res.json({
           quiz: {
