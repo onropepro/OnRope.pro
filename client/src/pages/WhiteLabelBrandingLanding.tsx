@@ -1147,6 +1147,8 @@ export default function WhiteLabelBrandingLanding() {
           </div>
         </div>
       </section>
+
+      <EmployerRegistration open={showRegistration} onOpenChange={setShowRegistration} />
     </div>
   );
 }

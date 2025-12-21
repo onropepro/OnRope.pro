@@ -1003,6 +1003,8 @@ export default function DocumentManagementLanding() {
           </div>
         </div>
       </footer>
+
+      <EmployerRegistration open={showRegistration} onOpenChange={setShowRegistration} />
     </div>
   );
 }

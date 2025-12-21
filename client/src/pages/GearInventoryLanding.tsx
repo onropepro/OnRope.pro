@@ -865,6 +865,8 @@ export default function GearInventoryLanding() {
 
       {/* Footer spacer */}
       <div className="h-16"></div>
+
+      <EmployerRegistration open={showRegistration} onOpenChange={setShowRegistration} />
     </div>
   );
 }

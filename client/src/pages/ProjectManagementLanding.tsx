@@ -1292,6 +1292,8 @@ export default function ProjectManagementLanding() {
           </div>
         </div>
       </footer>
+
+      <EmployerRegistration open={showRegistration} onOpenChange={setShowRegistration} />
     </div>
   );
 }

@@ -863,6 +863,8 @@ export default function EmployerJobBoardLanding() {
           </p>
         </div>
       </footer>
+
+      <EmployerRegistration open={showRegistration} onOpenChange={setShowRegistration} />
     </div>
   );
 }

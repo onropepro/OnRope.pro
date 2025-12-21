@@ -881,6 +881,8 @@ export default function ResidentPortalLanding() {
           </div>
         </div>
       </footer>
+
+      <EmployerRegistration open={showRegistration} onOpenChange={setShowRegistration} />
     </div>
   );
 }

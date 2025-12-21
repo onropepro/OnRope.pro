@@ -724,6 +724,8 @@ export default function SafetyComplianceLanding() {
           </Card>
         </div>
       </section>
+
+      <EmployerRegistration open={showRegistration} onOpenChange={setShowRegistration} />
     </div>
   );
 }

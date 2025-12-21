@@ -966,6 +966,8 @@ export default function IRATATaskLoggingLanding() {
           </div>
         </div>
       </section>
+
+      <EmployerRegistration open={showRegistration} onOpenChange={setShowRegistration} />
     </div>
   );
 }

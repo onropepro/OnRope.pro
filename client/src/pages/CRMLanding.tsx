@@ -857,6 +857,8 @@ export default function CRMLanding() {
           </div>
         </div>
       </footer>
+
+      <EmployerRegistration open={showRegistration} onOpenChange={setShowRegistration} />
     </div>
   );
 }

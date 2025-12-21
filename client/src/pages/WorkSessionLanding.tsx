@@ -1090,6 +1090,8 @@ export default function WorkSessionLanding() {
           </p>
         </div>
       </section>
+
+      <EmployerRegistration open={showRegistration} onOpenChange={setShowRegistration} />
     </div>
   );
 }

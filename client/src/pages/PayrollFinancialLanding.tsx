@@ -891,6 +891,8 @@ export default function PayrollFinancialLanding() {
           </div>
         </div>
       </section>
+
+      <EmployerRegistration open={showRegistration} onOpenChange={setShowRegistration} />
     </div>
   );
 }

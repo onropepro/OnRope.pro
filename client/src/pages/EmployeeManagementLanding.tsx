@@ -924,6 +924,8 @@ export default function EmployeeManagementLanding() {
           </div>
         </div>
       </section>
+
+      <EmployerRegistration open={showRegistration} onOpenChange={setShowRegistration} />
     </div>
   );
 }

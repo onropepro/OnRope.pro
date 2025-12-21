@@ -1022,6 +1022,8 @@ export default function CSRLanding() {
           </p>
         </div>
       </footer>
+
+      <EmployerRegistration open={showRegistration} onOpenChange={setShowRegistration} />
     </div>
   );
 }

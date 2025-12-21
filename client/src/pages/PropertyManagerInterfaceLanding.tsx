@@ -758,6 +758,8 @@ export default function PropertyManagerInterfaceLanding() {
           </div>
         </div>
       </footer>
+
+      <EmployerRegistration open={showRegistration} onOpenChange={setShowRegistration} />
     </div>
   );
 }
