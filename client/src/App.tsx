@@ -55,6 +55,7 @@ import MyLoggedHours from "@/pages/MyLoggedHours";
 import Changelog from "@/pages/Changelog";
 import InventoryGuide from "@/pages/InventoryGuide";
 import SafetyGuide from "@/pages/SafetyGuide";
+import ConnectionsGuide from "@/pages/ConnectionsGuide";
 import UserAccessGuide from "@/pages/UserAccessGuide";
 import ProjectsGuide from "@/pages/ProjectsGuide";
 import TimeTrackingGuide from "@/pages/TimeTrackingGuide";
@@ -418,6 +419,7 @@ function Router() {
       <Route path="/changelog/payroll" component={PayrollGuide} />
       <Route path="/changelog/mobile-design" component={MobileDesignGuide} />
       <Route path="/changelog/job-board" component={JobBoardGuide} />
+      <Route path="/changelog/connections" component={ConnectionsGuide} />
       <Route path="/changelog/pricing" component={Pricing} />
       <Route path="/roi-calculator" component={ROICalculator} />
       <Route path="/help" component={HelpCenter} />

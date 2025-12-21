@@ -457,6 +457,7 @@ const pagesData: PageCategory[] = [
       { name: "Payroll Guide", path: "/changelog/payroll", description: "Timesheet and payroll processing", roles: ["Public"] },
       { name: "Mobile Design Guide", path: "/changelog/mobile-design", description: "Mobile-first design patterns", roles: ["Public"] },
       { name: "Job Board Guide", path: "/changelog/job-board", description: "Employment marketplace ecosystem", roles: ["Public"] },
+      { name: "Portable Accounts & Connections", path: "/changelog/connections", description: "Account binding and network effects", roles: ["Public"] },
     ]
   },
   {
