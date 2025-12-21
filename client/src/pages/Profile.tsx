@@ -1210,7 +1210,10 @@ export default function Profile() {
               <TabsTrigger value="feature-requests" data-testid="tab-feature-requests">{t('profile.feedback', 'Feedback')}</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="profile" className="space-y-6 mt-4">
+            <TabsContent value="profile" className="mt-4">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Left Column - Profile & Security */}
+                <div className="lg:col-span-2 space-y-6">
               {/* Profile Information - Glass-morphism container */}
               <div className="bg-card/60 backdrop-blur-sm rounded-2xl border border-border/50 shadow-xl p-6">
                 {/* Header with icon */}
@@ -1712,7 +1715,10 @@ export default function Profile() {
               </form>
             </Form>
               </div>
+                </div>
 
+                {/* Right Column - Quick Actions & Danger Zone */}
+                <div className="space-y-6">
               {/* Quick Actions - Glass-morphism container */}
               <div className="bg-card/60 backdrop-blur-sm rounded-2xl border border-border/50 shadow-xl p-6">
                 {/* Header with icon */}
@@ -1777,6 +1783,8 @@ export default function Profile() {
                     <span className="material-icons mr-2">delete_forever</span>
                     Delete Company Account
                   </Button>
+                </div>
+              </div>
                 </div>
               </div>
             </TabsContent>
