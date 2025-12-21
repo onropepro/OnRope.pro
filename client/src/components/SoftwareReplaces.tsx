@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import deputyLogo from "@assets/Deputy_icon_1766279815503.png";
-import whenIWorkLogo from "@assets/when-I-Work_1766279470163.png";
+import whenIWorkLogo from "@assets/whenIwork-icon_1766280122946.png";
 import {
   SiAsana,
   SiTrello,
