@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { PublicHeader } from "@/components/PublicHeader";
+import { SignInModal } from "@/components/SignInModal";
 import { SoftwareReplaces, MODULE_SOFTWARE_MAPPING } from "@/components/SoftwareReplaces";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import {
@@ -52,6 +53,7 @@ export default function PropertyManagerInterfaceLanding() {
   const [dataPoints, setDataPoints] = useState(0);
   const [reportReduction, setReportReduction] = useState(0);
   const [dueDiligence, setDueDiligence] = useState(0);
+  const [showSignIn, setShowSignIn] = useState(false);
 
   useEffect(() => {
     let current1 = 0, current2 = 0, current3 = 0, current4 = 0;
@@ -105,13 +107,12 @@ export default function PropertyManagerInterfaceLanding() {
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-hero-faqs">
-                <Link href="#faqs">
-                  Find Answers
-                  <BookOpen className="ml-2 w-5 h-5" />
-                </Link>
+              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={() => setShowSignIn(true)} data-testid="button-hero-signin">
+                Sign In
               </Button>
             </div>
+            
+            <SignInModal isOpen={showSignIn} onClose={() => setShowSignIn(false)} buttonColor="#0B64A3" />
 
             <SoftwareReplaces 
               software={MODULE_SOFTWARE_MAPPING["property-manager-interface"]} 

@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Link } from "wouter";
 import { PublicHeader } from "@/components/PublicHeader";
+import { SignInModal } from "@/components/SignInModal";
 import { SoftwareReplaces, MODULE_SOFTWARE_MAPPING } from "@/components/SoftwareReplaces";
 import {
   ArrowRight,
@@ -45,6 +46,7 @@ export default function SchedulingCalendarLanding() {
   const { t } = useTranslation();
   const [openItems, setOpenItems] = useState<string[]>([]);
   const [faqOpenItems, setFaqOpenItems] = useState<string[]>([]);
+  const [showSignIn, setShowSignIn] = useState(false);
   
   const allExpanded = openItems.length === PROBLEM_ACCORDION_ITEMS.length;
   
@@ -88,13 +90,12 @@ export default function SchedulingCalendarLanding() {
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-hero-faqs">
-                <Link href="#faqs">
-                  {t('modules.scheduling.hero.ctaFaqs', 'Find Answers')}
-                  <BookOpen className="ml-2 w-5 h-5" />
-                </Link>
+              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={() => setShowSignIn(true)} data-testid="button-hero-signin">
+                Sign In
               </Button>
             </div>
+            
+            <SignInModal isOpen={showSignIn} onClose={() => setShowSignIn(false)} buttonColor="#0B64A3" />
 
             <SoftwareReplaces 
               software={MODULE_SOFTWARE_MAPPING["scheduling-calendar"]} 
