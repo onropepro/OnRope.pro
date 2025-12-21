@@ -70,6 +70,8 @@ import { ProgressPromptDialog } from "@/components/ProgressPromptDialog";
 import { BusinessCardScanner } from "@/components/BusinessCardScanner";
 import { DoubleBookingWarningDialog } from "@/components/DoubleBookingWarningDialog";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
+import { DashboardSidebar } from "@/components/DashboardSidebar";
+import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 
 import { JOB_CATEGORIES, JOB_TYPES, getJobTypesByCategory, getJobTypeConfig, getDefaultElevation, isElevationConfigurable, isDropBasedJobType, getAllJobTypeValues, getProgressType, getCategoryForJobType, type JobCategory } from "@shared/jobTypes";
 
@@ -3608,87 +3610,86 @@ export default function Dashboard() {
     );
   }
 
+  const sidebarStyle = {
+    "--sidebar-width": "15rem",
+    "--sidebar-width-icon": "3.5rem",
+  } as React.CSSProperties;
+
+  const alertCounts = {
+    jobApplications: totalJobApplications || 0,
+  };
+
   return (
-    <div className="min-h-screen page-gradient">
-      
-      {/* Header - Premium Glass Effect */}
-      <header 
-        className={`sticky top-0 z-[100] glass backdrop-blur-xl border-b shadow-premium ${hasCustomBranding ? 'custom-brand-border' : 'border-border/50'}`}
-      >
-        <div className="px-3 sm:px-6 h-14 sm:h-20 flex items-center justify-between max-w-7xl mx-auto gap-2">
-          <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
-            {hasCustomBranding && branding.logoUrl && (
-              <img 
-                src={branding.logoUrl} 
-                alt="Company Logo" 
-                className="h-8 sm:h-12 w-auto object-contain flex-shrink-0"
-                data-testid="company-logo"
-              />
-            )}
-            <div className="flex items-center gap-2 sm:gap-4 min-w-0">
-              <div className="min-w-0">
-                <h1 className={`text-lg sm:text-2xl font-bold truncate ${hasCustomBranding ? 'custom-brand-text' : 'gradient-text'}`}>
-                  {getPageTitle()}
-                </h1>
-                {companyName && (
-                  <p className="text-xs text-muted-foreground font-medium mt-0.5 sm:mt-1 truncate">{companyName}</p>
-                )}
-              </div>
-              
-              {currentUser?.role === 'company' && (currentUser?.residentCode || currentUser?.propertyManagerCode) && (
-                <div className="hidden lg:flex flex-col gap-0.5 text-xs">
-                  {currentUser?.residentCode && (
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-muted-foreground font-medium">{t('dashboard.header.resident', 'Resident:')}</span>
-                      <Badge variant="outline" className="font-mono text-xs px-2 py-0.5" data-testid="badge-resident-code">
-                        {currentUser.residentCode}
-                      </Badge>
-                    </div>
-                  )}
-                  {currentUser?.propertyManagerCode && (
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-muted-foreground font-medium">{t('dashboard.header.propertyMgr', 'Property Mgr:')}</span>
-                      <Badge variant="outline" className="font-mono text-xs px-2 py-0.5" data-testid="badge-property-manager-code">
-                        {currentUser.propertyManagerCode}
-                      </Badge>
+    <SidebarProvider style={sidebarStyle}>
+      <div className="flex min-h-screen w-full">
+        <DashboardSidebar
+          currentUser={currentUser}
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          brandingLogoUrl={currentUser?.brandingLogoUrl}
+          whitelabelBrandingActive={currentUser?.whitelabelBrandingActive}
+          alertCounts={alertCounts}
+        />
+        
+        <SidebarInset className="flex-1 flex flex-col page-gradient">
+          {/* Header - Premium Glass Effect */}
+          <header 
+            className={`sticky top-0 z-[100] glass backdrop-blur-xl border-b shadow-premium ${hasCustomBranding ? 'custom-brand-border' : 'border-border/50'}`}
+          >
+            <div className="px-3 sm:px-6 h-14 flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
+                <SidebarTrigger data-testid="button-sidebar-toggle" className="-ml-1" />
+                <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+                  <div className="min-w-0">
+                    <h1 className={`text-lg sm:text-xl font-bold truncate ${hasCustomBranding ? 'custom-brand-text' : 'gradient-text'}`}>
+                      {getPageTitle()}
+                    </h1>
+                    {companyName && (
+                      <p className="text-xs text-muted-foreground font-medium truncate">{companyName}</p>
+                    )}
+                  </div>
+                  
+                  {currentUser?.role === 'company' && (currentUser?.residentCode || currentUser?.propertyManagerCode) && (
+                    <div className="hidden lg:flex flex-col gap-0.5 text-xs">
+                      {currentUser?.residentCode && (
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-muted-foreground font-medium">{t('dashboard.header.resident', 'Resident:')}</span>
+                          <Badge variant="outline" className="font-mono text-xs px-2 py-0.5" data-testid="badge-resident-code">
+                            {currentUser.residentCode}
+                          </Badge>
+                        </div>
+                      )}
+                      {currentUser?.propertyManagerCode && (
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-muted-foreground font-medium">{t('dashboard.header.propertyMgr', 'Property Mgr:')}</span>
+                          <Badge variant="outline" className="font-mono text-xs px-2 py-0.5" data-testid="badge-property-manager-code">
+                            {currentUser.propertyManagerCode}
+                          </Badge>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
-              )}
-            </div>
-          </div>
-          <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
-            {/* License Expiry Warning - Inline in header */}
-            {currentUser && (currentUser.role === 'company' || canManageEmployees(currentUser)) && employees.length > 0 && (
-              <LicenseExpiryWarningBanner employees={employees} onReviewClick={() => handleTabChange("employees")} />
-            )}
-            {/* Subscription Renewal Countdown - Company owners only */}
-            {currentUser?.role === 'company' && (
-              <SubscriptionRenewalBadge 
-                subscriptionEndDate={currentUser.subscriptionEndDate} 
-                subscriptionStatus={currentUser.subscriptionStatus}
-              />
-            )}
-            {/* Install PWA Button */}
-            <InstallPWAButton />
-            {/* My Account Button */}
-            {currentUser?.role === 'company' && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setLocation("/profile")}
-                className="gap-1.5 hidden sm:flex"
-                data-testid="button-header-my-account"
-              >
-                <span className="material-icons text-lg">settings</span>
-                <span className="text-xs">{t('dashboard.cards.myAccount.label', 'My Account')}</span>
-              </Button>
-            )}
-            {/* Notification Bell - Company owners only */}
-            {currentUser?.role === 'company' && (
-              <NotificationBell />
-            )}
-            <CSRBadge user={currentUser} />
+              </div>
+              <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+                {/* License Expiry Warning - Inline in header */}
+                {currentUser && (currentUser.role === 'company' || canManageEmployees(currentUser)) && employees.length > 0 && (
+                  <LicenseExpiryWarningBanner employees={employees} onReviewClick={() => handleTabChange("employees")} />
+                )}
+                {/* Subscription Renewal Countdown - Company owners only */}
+                {currentUser?.role === 'company' && (
+                  <SubscriptionRenewalBadge 
+                    subscriptionEndDate={currentUser.subscriptionEndDate} 
+                    subscriptionStatus={currentUser.subscriptionStatus}
+                  />
+                )}
+                {/* Install PWA Button */}
+                <InstallPWAButton />
+                {/* Notification Bell - Company owners only */}
+                {currentUser?.role === 'company' && (
+                  <NotificationBell />
+                )}
+                <CSRBadge user={currentUser} />
             {/* Language Toggle Button */}
             <LanguageDropdown />
             <RefreshButton />
@@ -11710,6 +11711,8 @@ export default function Dashboard() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+        </SidebarInset>
+      </div>
+    </SidebarProvider>
   );
 }
