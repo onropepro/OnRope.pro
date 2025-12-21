@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "wouter";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -203,12 +204,12 @@ const segmentContent = {
 
 // Module categories for filtering
 const moduleCategories = [
-  { id: "all", label: "All", icon: LayoutGrid },
-  { id: "operations", label: "Operations", icon: Settings },
-  { id: "safety", label: "Safety", icon: HeartPulse },
-  { id: "team", label: "Team", icon: Users },
-  { id: "financial", label: "Financial & Sales", icon: Wallet },
-  { id: "communication", label: "Communication", icon: MessageSquare },
+  { id: "all", label: "All", icon: LayoutGrid, color: "text-foreground" },
+  { id: "operations", label: "Operations", icon: Settings, color: "text-blue-600" },
+  { id: "safety", label: "Safety", icon: HeartPulse, color: "text-red-600" },
+  { id: "team", label: "Team", icon: Users, color: "text-violet-600" },
+  { id: "financial", label: "Financial & Sales", icon: Wallet, color: "text-emerald-600" },
+  { id: "communication", label: "Communication", icon: MessageSquare, color: "text-rose-600" },
 ];
 
 const modules = [
@@ -695,17 +696,18 @@ export default function HomePage() {
                   const modulesInCategory = category.id === "all" 
                     ? modules.length 
                     : modules.filter(m => m.category === category.id).length;
+                  const isSelected = selectedModuleCategory === category.id;
                   
                   return (
                     <Button
                       key={category.id}
-                      variant={selectedModuleCategory === category.id ? "default" : "outline"}
+                      variant={isSelected ? "default" : "outline"}
                       size="sm"
                       onClick={() => setSelectedModuleCategory(category.id)}
                       className="gap-2 whitespace-nowrap"
                       data-testid={`button-module-category-${category.id}`}
                     >
-                      <category.icon className="w-4 h-4" />
+                      <category.icon className={`w-4 h-4 ${isSelected ? "" : category.color}`} />
                       {category.label}
                       {category.id !== "all" && (
                         <Badge variant="secondary" className="ml-1 min-w-[20px] h-5 text-xs">
@@ -720,27 +722,41 @@ export default function HomePage() {
             </ScrollArea>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {filteredModules.map((module, i) => (
-              <Card key={i} className="hover-elevate" data-testid={`card-module-${module.name.toLowerCase().replace(/\s+/g, '-')}`}>
-                <CardContent className="p-4">
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-[#0B64A3]/10 flex items-center justify-center shrink-0">
-                      <module.icon className="w-5 h-5 text-[#0B64A3]" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-foreground mb-1">
-                        {module.name}
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        {module.desc}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <motion.div 
+            className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4"
+            layout
+          >
+            <AnimatePresence mode="popLayout">
+              {filteredModules.map((module) => (
+                <motion.div
+                  key={module.name}
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                >
+                  <Card className="hover-elevate h-full" data-testid={`card-module-${module.name.toLowerCase().replace(/\s+/g, '-')}`}>
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-[#0B64A3]/10 flex items-center justify-center shrink-0">
+                          <module.icon className="w-5 h-5 text-[#0B64A3]" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-foreground mb-1">
+                            {module.name}
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            {module.desc}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
 
           <div className="text-center mt-8">
             <Button
