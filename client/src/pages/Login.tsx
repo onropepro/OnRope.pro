@@ -2,64 +2,33 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { trackLogin } from "@/lib/analytics";
-import { Rocket, Play, Building2, Clock, DollarSign, Users, Shield, FileText, Calculator, FileSpreadsheet, Radio, ClipboardCheck, MessageSquare, Home, Award, Calendar, FolderOpen, TrendingUp, ArrowRight, HardHat } from "lucide-react";
-import { PublicHeader } from "@/components/PublicHeader";
-import { TechnicianRegistration } from "@/components/TechnicianRegistration";
-import { Slider } from "@/components/ui/slider";
+import { Mail, KeyRound, ArrowRight, Loader2, HardHat, Building2 } from "lucide-react";
+import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 const loginSchema = z.object({
-  identifier: z.string().min(1, "Email is required"),
+  identifier: z.string().min(1, "Email or identifier is required"),
   password: z.string().min(1, "Password is required"),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function Login() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
-  const [showLoginForm, setShowLoginForm] = useState(false);
-  const [showTechnicianRegistration, setShowTechnicianRegistration] = useState(false);
-  const [currentWordIndex, setCurrentWordIndex] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [roiEmployeeCount, setRoiEmployeeCount] = useState(12);
-
-
-  const rotatingWords = [
-    t('login.rotatingWords.safetyMeeting', 'safety meeting'),
-    t('login.rotatingWords.project', 'project'),
-    t('login.rotatingWords.hourWorked', 'hour worked'),
-    t('login.rotatingWords.drop', 'drop'),
-    t('login.rotatingWords.residentFeedback', 'resident feedback'),
-    t('login.rotatingWords.pieceOfGear', 'piece of gear'),
-    t('login.rotatingWords.nonBillableHour', 'non-billable hour'),
-    t('login.rotatingWords.jobQuote', 'job quote'),
-    t('login.rotatingWords.jobProgress', "job's progress"),
-    t('login.rotatingWords.hourScheduled', 'drop'),
-    t('login.rotatingWords.employeePerformance', "employee's performance level")
-  ];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIsAnimating(true);
-      setTimeout(() => {
-        setCurrentWordIndex((prev) => (prev + 1) % rotatingWords.length);
-        setIsAnimating(false);
-      }, 300);
-    }, 2500);
-    return () => clearInterval(interval);
-  }, []);
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loginMethod, setLoginMethod] = useState<"email" | "license">("email");
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -69,34 +38,51 @@ export default function Login() {
     },
   });
 
-  // Check if user is already logged in and redirect appropriately
+  const handleLoginMethodChange = (method: string) => {
+    setLoginMethod(method as "email" | "license");
+    form.setValue("identifier", "");
+    form.clearErrors("identifier");
+  };
+
   const { data: userData, isLoading: isCheckingAuth, error: authError } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
     retry: false,
   });
 
   useEffect(() => {
-    // Don't redirect while loading or if there's an auth error
     if (isCheckingAuth || authError) {
       return;
     }
     
-    // Only redirect if we have confirmed user data from a successful API call
     if (userData?.user) {
-      console.log("👤 Already logged in, redirecting...", userData.user.role);
-      if (userData.user.role === "resident") {
-        setLocation("/resident-dashboard");
-      } else if (userData.user.role === "property_manager") {
-        setLocation("/property-manager");
-      } else if (userData.user.role === "superuser") {
-        setLocation("/superuser");
-      } else {
-        setLocation("/dashboard");
-      }
+      redirectBasedOnRole(userData.user.role);
     }
-  }, [userData, isCheckingAuth, authError, setLocation]);
+  }, [userData, isCheckingAuth, authError]);
+
+  const redirectBasedOnRole = (role: string) => {
+    switch (role) {
+      case "resident":
+        setLocation("/resident-dashboard");
+        break;
+      case "property_manager":
+        setLocation("/property-manager");
+        break;
+      case "superuser":
+        setLocation("/superuser");
+        break;
+      case "building_manager":
+        setLocation("/building-portal");
+        break;
+      case "rope_access_tech":
+        setLocation("/technician-portal");
+        break;
+      default:
+        setLocation("/dashboard");
+    }
+  };
 
   const onSubmit = async (data: LoginFormData) => {
+    setIsSubmitting(true);
     try {
       const response = await fetch("/api/login", {
         method: "POST",
@@ -109,13 +95,12 @@ export default function Login() {
 
       if (!response.ok) {
         form.setError("identifier", { message: result.message || "Login failed" });
+        setIsSubmitting(false);
         return;
       }
 
-      // Invalidate user cache to ensure fresh data is fetched
       await queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       
-      // Fetch fresh user data to get the latest subscription status
       const userResponse = await fetch("/api/user", {
         credentials: "include",
       });
@@ -124,612 +109,240 @@ export default function Login() {
         form.setError("identifier", { 
           message: "Failed to verify account status. Please try again." 
         });
+        setIsSubmitting(false);
         return;
       }
       
       const userData = await userResponse.json();
       const user = userData.user;
       
-      console.log("🔐 Login successful! User data:", {
-        id: user.id,
-        username: user.username,
-        role: user.role,
-        companyId: user.companyId
+      trackLogin(loginMethod);
+      
+      toast({
+        title: "Welcome back!",
+        description: `Signed in as ${user.name || user.email}`,
       });
-      
-      // Track login event
-      trackLogin('email');
-      
-      // Use client-side navigation to preserve React state and cache
-      if (user.role === "resident") {
-        console.log("🏠 Redirecting to resident dashboard...");
-        setLocation("/resident-dashboard");
-      } else if (user.role === "property_manager") {
-        console.log("🏢 Redirecting to property manager dashboard...");
-        setLocation("/property-manager");
-      } else if (user.role === "superuser") {
-        console.log("🔧 Redirecting to superuser dashboard...");
-        setLocation("/superuser");
-      } else if (user.role === "building_manager") {
-        console.log("🏗️ Redirecting to building portal...");
-        setLocation("/building-portal");
-      } else if (user.role === "rope_access_tech") {
-        console.log("🧗 Redirecting to technician portal...");
-        setLocation("/technician-portal");
-      } else {
-        console.log("📊 Redirecting to employee dashboard...");
-        setLocation("/dashboard");
-      }
-      
-      console.log("✅ Navigation triggered");
+
+      redirectBasedOnRole(user.role);
+      setIsSubmitting(false);
     } catch (error) {
       form.setError("identifier", { message: "An error occurred. Please try again." });
+      setIsSubmitting(false);
     }
   };
 
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-primary/5 via-background to-background flex flex-col">
-      <PublicHeader onSignInClick={() => setShowLoginForm(true)} />
-      {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center text-center px-6 py-16 md:py-24" style={{ backgroundColor: '#F3F3F3' }}>
-        <h1 className="text-xs md:text-sm font-semibold tracking-widest text-muted-foreground uppercase mb-1.5">
-          {t('login.hero.subtitle', 'Building Maintenance Management Software')}
-        </h1>
-        <p className="text-xs md:text-sm font-semibold tracking-widest text-muted-foreground uppercase" style={{ marginBottom: '60px' }}>
-          {t('login.hero.builtBy', 'Built by a Level 3 irata Tech')}
-        </p>
-        
-        <p className="text-2xl md:text-4xl font-medium mb-0 text-[#3B3B3B]" style={{ color: '#3B3B3B' }}>
-          {t('login.hero.tagline', "Your competitors think they're organized.")}
-        </p>
-        
-        <div className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight mb-4" style={{ color: '#3B3B3B' }}>
-          {t('login.hero.taglineBold', "THEY'RE NOT")}
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900">
+      {/* Header */}
+      <header className="w-full py-6 px-4">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2">
+            <img 
+              src={onRopeProLogo} 
+              alt="OnRopePro" 
+              className="h-8 w-auto brightness-0 dark:invert opacity-80"
+            />
+          </Link>
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-muted-foreground hidden sm:inline">
+              {t('login.noAccount', "Don't have an account?")}
+            </span>
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/register">
+                {t('login.signUp', 'Sign Up')}
+              </Link>
+            </Button>
+          </div>
         </div>
-        
-        <p className="text-base md:text-lg max-w-xl mb-8" style={{ color: '#3B3B3B' }}>
-          {t('login.hero.description', 'You track every')}{" "}
-          <span 
-            className="inline-block transition-all duration-300 opacity-100 translate-y-0 text-[#3B3B3B] font-bold"
-          >
-            {rotatingWords[currentWordIndex]}
-          </span>
-          {t('login.hero.descriptionEnd', ', from a single platform that actually speaks rope access.')}
-        </p>
-        
-        <div className="flex flex-col sm:flex-row items-center gap-4">
-          <Button 
-            size="lg"
-            onClick={() => setLocation("/pricing")}
-            className="gap-2 px-6 bg-[#A3320B]"
-            data-testid="button-get-started-free"
-          >
-            <Rocket className="w-4 h-4" />
-            {t('login.hero.getStartedFree', 'Get Started Free')}
-          </Button>
-          <Button 
-            variant="outline"
-            size="lg"
-            className="gap-2 px-6"
-            data-testid="button-watch-demo"
-          >
-            <Play className="w-4 h-4" />
-            {t('login.hero.watchDemo', 'Watch Demo')}
-          </Button>
-        </div>
-      </section>
-      {/* ROI Calculator Section - Embedded Question 1 */}
-      <section className="py-16 md:py-24 px-6 bg-primary/5">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-2xl md:text-4xl font-bold mb-4">
-            {t('login.roiCalculator.title', 'Calculate Your Hidden Costs')}<br />
-            {t('login.roiCalculator.titleLine2', 'In Less Than 60 Seconds')}
-          </h2>
-          <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-            {t('login.roiCalculator.subtitle', 'Most rope access companies waste $15,000-25,000 per year on scattered online SAAS tools, manual processes, hidden admin costs, and wasted time. Find out how much you could save.')}
-          </p>
-          
-          {/* Embedded Employee Slider - Question 1 */}
-          <Card className="max-w-lg mx-auto">
-            <CardContent className="pt-6 space-y-6">
-              <div className="flex items-center gap-3 justify-center">
-                <Users className="w-6 h-6 text-primary" />
-                <h3 className="text-lg font-semibold">
-                  {t('roi.questions.employees.title', 'How many employees work in the field or office?')}
-                </h3>
-              </div>
-              
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">{t('roi.questions.employees.min', '5 employees')}</span>
-                  <span className="text-3xl font-bold text-primary">{roiEmployeeCount}</span>
-                  <span className="text-sm text-muted-foreground">{t('roi.questions.employees.max', '50 employees')}</span>
-                </div>
-                <Slider
-                  value={[roiEmployeeCount]}
-                  onValueChange={(value) => setRoiEmployeeCount(value[0])}
-                  min={5}
-                  max={50}
-                  step={1}
-                  className="w-full"
-                  data-testid="slider-landing-employee-count"
-                />
-                <p className="text-sm text-muted-foreground text-center">
-                  {t('roi.questions.employees.description', 'Include all field technicians, office staff, and management')}
-                </p>
-              </div>
-              
-              <Button 
-                size="lg"
-                onClick={() => setLocation(`/roi-calculator?employees=${roiEmployeeCount}&step=2`)}
-                className="w-full gap-2"
-                data-testid="button-roi-calculator-next"
-              >
-                {t('roi.navigation.next', 'Next')}
-                <ArrowRight className="w-5 h-5" />
-              </Button>
+      </header>
+
+      {/* Main Content */}
+      <main className="flex-1 flex items-center justify-center px-4 py-8">
+        <div className="w-full max-w-md">
+          {/* Login Card */}
+          <Card className="shadow-xl border-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl">
+            <CardHeader className="text-center pb-2">
+              <CardTitle className="text-2xl font-bold">
+                {t('login.title', 'Sign in to your account')}
+              </CardTitle>
+              <CardDescription className="text-base">
+                {t('login.subtitle', 'Enter your credentials to access your dashboard')}
+              </CardDescription>
+            </CardHeader>
+            
+            <CardContent className="pt-4">
+              {/* Login Method Tabs */}
+              <Tabs value={loginMethod} onValueChange={handleLoginMethodChange} className="mb-6">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="email" className="gap-2" data-testid="tab-login-email">
+                    <Mail className="w-4 h-4" />
+                    <span className="hidden sm:inline">{t('login.emailTab', 'Email')}</span>
+                    <span className="sm:hidden">Email</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="license" className="gap-2" data-testid="tab-login-license">
+                    <HardHat className="w-4 h-4" />
+                    <span className="hidden sm:inline">{t('login.licenseTab', 'License #')}</span>
+                    <span className="sm:hidden">License</span>
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="identifier"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          {loginMethod === "email" 
+                            ? t('login.emailLabel', 'Email Address')
+                            : t('login.licenseLabel', 'IRATA / SPRAT License Number')
+                          }
+                        </FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            {loginMethod === "email" ? (
+                              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                            ) : (
+                              <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                            )}
+                            <Input 
+                              {...field} 
+                              type={loginMethod === "email" ? "email" : "text"}
+                              placeholder={loginMethod === "email" 
+                                ? "you@company.com" 
+                                : "e.g., IRATA-12345"
+                              }
+                              autoComplete={loginMethod === "email" ? "email" : "username"}
+                              className="pl-10"
+                              data-testid="input-login-identifier"
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="flex items-center justify-between">
+                          <FormLabel>{t('login.passwordLabel', 'Password')}</FormLabel>
+                          <Link 
+                            href="/reset-password" 
+                            className="text-sm text-primary hover:underline"
+                            data-testid="link-forgot-password"
+                          >
+                            {t('login.forgotPassword', 'Forgot password?')}
+                          </Link>
+                        </div>
+                        <FormControl>
+                          <Input 
+                            {...field} 
+                            type="password"
+                            placeholder="Enter your password"
+                            autoComplete="current-password"
+                            data-testid="input-login-password"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button 
+                    type="submit" 
+                    className="w-full gap-2" 
+                    size="lg"
+                    disabled={isSubmitting}
+                    data-testid="button-login-submit"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        {t('login.signingIn', 'Signing in...')}
+                      </>
+                    ) : (
+                      <>
+                        {t('login.signIn', 'Sign In')}
+                        <ArrowRight className="w-4 h-4" />
+                      </>
+                    )}
+                  </Button>
+                </form>
+              </Form>
             </CardContent>
-          </Card>
-        </div>
-      </section>
-      {/* Pain Points Section - Below the Fold */}
-      <section className="py-16 md:py-24 px-6">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-2xl md:text-4xl font-bold mb-12">
-            {t('login.painPoints.title', "Your competitors think they're organized.")}<br />
-            <span className="font-normal">{t('login.painPoints.subtitle', 'But in reality:')}</span>
-          </h2>
-          
-          <div className="space-y-4 md:space-y-5 text-base md:text-lg text-muted-foreground">
-            <p>
-              {t('login.painPoints.payrollErrors', "They're losing $40K/year to payroll errors they don't see.")}
-            </p>
-            <p>
-              {t('login.painPoints.adminTime', "They're spending 80 hours monthly on admin that should take 10.")}
-            </p>
-            <p>
-              {t('login.painPoints.underbidding', "They're underbidding 25% of jobs because they're guessing.")}
-            </p>
-            <p>
-              {t('login.painPoints.feedback', "They're juggling resident feedback between memory, emails, texts, phone calls, notes in a glovebox.")}
-            </p>
-            <p>
-              {t('login.painPoints.lawsuit', "They're one accident away from a lawsuit they can't defend because their safety documentation is (maybe) under the driver's front seat.")}
-            </p>
-            <p>
-              {t('login.painPoints.losingContracts', "They're losing contracts because they look like amateurs next to you.")}
-            </p>
-          </div>
-          
-          <p className="text-xl md:text-2xl font-bold mt-12">
-            {t('login.painPoints.conclusion', "Let them keep thinking they're organized.")}
-          </p>
-        </div>
-      </section>
-      {/* CTA Section */}
-      <section className="py-16 md:py-24 px-6 bg-muted/30">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-2xl md:text-4xl font-bold mb-4">
-            {t('login.cta.title', 'Ready to Streamline Your Rope Access Operations?')}
-          </h2>
-          <p className="text-muted-foreground mb-8">
-            {t('login.cta.subtitle', "Join rope access companies who've already ditched the spreadsheet chaos")}
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button 
-              size="lg"
-              onClick={() => setLocation("/register")}
-              className="gap-2 px-6"
-              data-testid="button-start-free-trial"
-            >
-              <Rocket className="w-4 h-4" />
-              {t('login.cta.startFreeTrial', 'Start Free Trial')}
-            </Button>
-            <Button 
-              variant="outline"
-              size="lg"
-              className="gap-2 px-6"
-              data-testid="button-schedule-demo"
-            >
-              <span className="material-icons text-lg">calendar_today</span>
-              {t('login.cta.scheduleDemo', 'Schedule Demo')}
-            </Button>
-          </div>
-        </div>
-      </section>
-      {/* Features Section */}
-      <section className="py-16 md:py-24 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-2xl md:text-4xl font-bold mb-4">
-              {t('login.features.title', 'Juggling 10 Different Tools Is Costing You More Than Time')}
-            </h2>
-            <p className="text-muted-foreground max-w-3xl mx-auto">
-              {t('login.features.subtitle', 'Replace scattered systems with one platform built specifically for rope access companies managing techs across multiple buildings. Time tracking, safety compliance, project visibility, payroll precision, resident communication - all within one intelligent platform.')}
-            </p>
-          </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Feature 1 */}
-            <div className="bg-card border rounded-lg p-6 space-y-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Building2 className="w-5 h-5 text-primary" />
+            <CardFooter className="flex flex-col gap-4 pt-2">
+              <div className="relative w-full">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-card px-2 text-muted-foreground">
+                    {t('login.orContinueWith', 'Or continue with')}
+                  </span>
+                </div>
               </div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('login.features.cards.projects.category')}</p>
-              <h3 className="font-bold">{t('login.features.cards.projects.title')}</h3>
-              <p className="text-sm text-primary font-medium">{t('login.features.cards.projects.tagline')}</p>
-              <p className="text-sm text-muted-foreground">
-                {t('login.features.cards.projects.description')}
-              </p>
-            </div>
 
-            {/* Feature 2 */}
-            <div className="bg-card border rounded-lg p-6 space-y-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Clock className="w-5 h-5 text-primary" />
-              </div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('login.features.cards.workSessions.category')}</p>
-              <h3 className="font-bold">{t('login.features.cards.workSessions.title')}</h3>
-              <p className="text-sm text-primary font-medium">{t('login.features.cards.workSessions.tagline')}</p>
-              <p className="text-sm text-muted-foreground">
-                {t('login.features.cards.workSessions.description')}
-              </p>
-            </div>
-
-            {/* Feature 3 */}
-            <div className="bg-card border rounded-lg p-6 space-y-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <DollarSign className="w-5 h-5 text-primary" />
-              </div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('login.features.cards.nonBillable.category')}</p>
-              <h3 className="font-bold">{t('login.features.cards.nonBillable.title')}</h3>
-              <p className="text-sm text-primary font-medium">{t('login.features.cards.nonBillable.tagline')}</p>
-              <p className="text-sm text-muted-foreground">
-                {t('login.features.cards.nonBillable.description')}
-              </p>
-            </div>
-
-            {/* Feature 4 */}
-            <div className="bg-card border rounded-lg p-6 space-y-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Users className="w-5 h-5 text-primary" />
-              </div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('login.features.cards.employees.category')}</p>
-              <h3 className="font-bold">{t('login.features.cards.employees.title')}</h3>
-              <p className="text-sm text-primary font-medium">{t('login.features.cards.employees.tagline')}</p>
-              <p className="text-sm text-muted-foreground">
-                {t('login.features.cards.employees.description')}
-              </p>
-            </div>
-
-            {/* Feature 5 */}
-            <div className="bg-card border rounded-lg p-6 space-y-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Shield className="w-5 h-5 text-primary" />
-              </div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('login.features.cards.inventory.category')}</p>
-              <h3 className="font-bold">{t('login.features.cards.inventory.title')}</h3>
-              <p className="text-sm text-primary font-medium">{t('login.features.cards.inventory.tagline')}</p>
-              <p className="text-sm text-muted-foreground">
-                {t('login.features.cards.inventory.description')}
-              </p>
-            </div>
-
-            {/* Feature 6 */}
-            <div className="bg-card border rounded-lg p-6 space-y-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <FileText className="w-5 h-5 text-primary" />
-              </div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('login.features.cards.toolbox.category')}</p>
-              <h3 className="font-bold">{t('login.features.cards.toolbox.title')}</h3>
-              <p className="text-sm text-primary font-medium">{t('login.features.cards.toolbox.tagline')}</p>
-              <p className="text-sm text-muted-foreground">
-                {t('login.features.cards.toolbox.description')}
-              </p>
-            </div>
-
-            {/* Feature 7 */}
-            <div className="bg-card border rounded-lg p-6 space-y-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Calculator className="w-5 h-5 text-primary" />
-              </div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('login.features.cards.payroll.category')}</p>
-              <h3 className="font-bold">{t('login.features.cards.payroll.title')}</h3>
-              <p className="text-sm text-primary font-medium">{t('login.features.cards.payroll.tagline')}</p>
-              <p className="text-sm text-muted-foreground">
-                {t('login.features.cards.payroll.description')}
-              </p>
-            </div>
-
-            {/* Feature 8 */}
-            <div className="bg-card border rounded-lg p-6 space-y-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <FileSpreadsheet className="w-5 h-5 text-primary" />
-              </div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('login.features.cards.quoting.category')}</p>
-              <h3 className="font-bold">{t('login.features.cards.quoting.title')}</h3>
-              <p className="text-sm text-primary font-medium">{t('login.features.cards.quoting.tagline')}</p>
-              <p className="text-sm text-muted-foreground">
-                {t('login.features.cards.quoting.description')}
-              </p>
-            </div>
-
-            {/* Feature 9 */}
-            <div className="bg-card border rounded-lg p-6 space-y-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Radio className="w-5 h-5 text-primary" />
-              </div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('login.features.cards.tracking.category')}</p>
-              <h3 className="font-bold">{t('login.features.cards.tracking.title')}</h3>
-              <p className="text-sm text-primary font-medium">{t('login.features.cards.tracking.tagline')}</p>
-              <p className="text-sm text-muted-foreground">
-                {t('login.features.cards.tracking.description')}
-              </p>
-            </div>
-
-            {/* Feature 10 */}
-            <div className="bg-card border rounded-lg p-6 space-y-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <ClipboardCheck className="w-5 h-5 text-primary" />
-              </div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('login.features.cards.safety.category')}</p>
-              <h3 className="font-bold">{t('login.features.cards.safety.title')}</h3>
-              <p className="text-sm text-muted-foreground">
-                {t('login.features.cards.safety.description')}
-              </p>
-            </div>
-
-            {/* Feature 11 */}
-            <div className="bg-card border rounded-lg p-6 space-y-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <MessageSquare className="w-5 h-5 text-primary" />
-              </div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('login.features.cards.feedback.category')}</p>
-              <h3 className="font-bold">{t('login.features.cards.feedback.title')}</h3>
-              <p className="text-sm text-primary font-medium">{t('login.features.cards.feedback.tagline')}</p>
-              <p className="text-sm text-muted-foreground">
-                {t('login.features.cards.feedback.description')}
-              </p>
-            </div>
-
-            {/* Feature 12 */}
-            <div className="bg-card border rounded-lg p-6 space-y-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Home className="w-5 h-5 text-primary" />
-              </div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('login.features.cards.residents.category')}</p>
-              <h3 className="font-bold">{t('login.features.cards.residents.title')}</h3>
-              <p className="text-sm text-primary font-medium">{t('login.features.cards.residents.tagline')}</p>
-              <p className="text-sm text-muted-foreground">
-                {t('login.features.cards.residents.description')}
-              </p>
-            </div>
-
-            {/* Feature 13 */}
-            <div className="bg-card border rounded-lg p-6 space-y-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Award className="w-5 h-5 text-primary" />
-              </div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('login.features.cards.audit.category')}</p>
-              <h3 className="font-bold">{t('login.features.cards.audit.title')}</h3>
-              <p className="text-sm text-muted-foreground">
-                {t('login.features.cards.audit.description')}
-              </p>
-            </div>
-
-            {/* Feature 14 */}
-            <div className="bg-card border rounded-lg p-6 space-y-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Calendar className="w-5 h-5 text-primary" />
-              </div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('login.features.cards.scheduling.category')}</p>
-              <h3 className="font-bold">{t('login.features.cards.scheduling.title')}</h3>
-              <p className="text-sm text-primary font-medium">{t('login.features.cards.scheduling.tagline')}</p>
-              <p className="text-sm text-muted-foreground">
-                {t('login.features.cards.scheduling.description')}
-              </p>
-            </div>
-
-            {/* Feature 15 */}
-            <div className="bg-card border rounded-lg p-6 space-y-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <FolderOpen className="w-5 h-5 text-primary" />
-              </div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('login.features.cards.clientDashboard.category')}</p>
-              <h3 className="font-bold">{t('login.features.cards.clientDashboard.title')}</h3>
-              <p className="text-sm text-primary font-medium">{t('login.features.cards.clientDashboard.tagline')}</p>
-              <p className="text-sm text-muted-foreground">
-                {t('login.features.cards.clientDashboard.description')}
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-      {/* Login Modal - Overlay when shown */}
-      {showLoginForm && (
-        <div 
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-start md:items-center justify-center p-4 overflow-y-auto"
-          onClick={() => setShowLoginForm(false)}
-        >
-          <Card 
-            className="w-full max-w-md shadow-2xl border-2 relative my-4 md:my-0"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Close Button - Sticky on mobile */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute top-3 right-3 z-20 bg-background/80 backdrop-blur-sm"
-              onClick={() => setShowLoginForm(false)}
-              data-testid="button-close-login"
-            >
-              <span className="material-icons">close</span>
-            </Button>
-          <CardHeader className="space-y-3 pb-6">
-            <div className="flex items-center gap-3 md:hidden mb-2">
-              <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                <span className="material-icons text-2xl text-primary">apartment</span>
-              </div>
-              <div>
-                <CardTitle className="text-2xl">Rope Access</CardTitle>
-                <CardDescription className="text-xs">Management Platform</CardDescription>
-              </div>
-            </div>
-            <CardTitle className="text-3xl font-bold">{t('login.form.title', 'Welcome')}</CardTitle>
-            <CardDescription className="text-base">
-              {t('login.form.subtitle', 'Sign in to access your dashboard and manage operations')}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-                <FormField
-                  control={form.control}
-                  name="identifier"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm font-medium">{t('login.form.email', 'Email')}</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <span className="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground text-xl">
-                            email
-                          </span>
-                          <Input 
-                            type="email"
-                            placeholder={t('login.form.emailPlaceholder', 'your@email.com')} 
-                            {...field} 
-                            data-testid="input-identifier" 
-                            className="h-12 pl-12 text-base" 
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm font-medium">{t('login.form.password', 'Password')}</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <span className="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground text-xl">
-                            lock
-                          </span>
-                          <Input 
-                            type="password" 
-                            placeholder={t('login.form.passwordPlaceholder', 'Enter your password')} 
-                            {...field} 
-                            data-testid="input-password" 
-                            className="h-12 pl-12 text-base" 
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <Button 
-                  type="submit" 
-                  className="w-full h-12 text-base font-medium shadow-lg hover:shadow-xl transition-shadow" 
-                  data-testid="button-login"
-                >
-                  <span className="material-icons mr-2">login</span>
-                  {t('login.form.signInButton', 'Sign In')}
-                </Button>
-              </form>
-            </Form>
-
-            {/* Portal Access Section */}
-            <div className="space-y-3 pt-2">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3 w-full">
                 <Button 
                   variant="outline" 
-                  className="h-11 text-sm font-medium border-amber-500/50 text-amber-600 dark:text-amber-400" 
-                  onClick={() => setLocation("/technician")}
-                  data-testid="button-technician-login"
+                  className="gap-2"
+                  onClick={() => setLocation("/technician-login")}
+                  data-testid="button-technician-portal"
                 >
-                  <HardHat className="mr-2 h-4 w-4" />
-                  {t('login.buttons.technicianLogin', 'Technician Login')}
+                  <HardHat className="w-4 h-4" />
+                  <span className="text-sm">{t('login.technicianPortal', 'Technician Portal')}</span>
                 </Button>
                 <Button 
                   variant="outline" 
-                  className="h-11 text-sm font-medium" 
+                  className="gap-2"
                   onClick={() => setLocation("/building-portal")}
                   data-testid="button-building-portal"
                 >
-                  <Building2 className="mr-2 h-4 w-4" />
-                  {t('login.buttons.buildingPortal', 'Building Portal')}
+                  <Building2 className="w-4 h-4" />
+                  <span className="text-sm">{t('login.buildingPortal', 'Building Portal')}</span>
                 </Button>
               </div>
-            </div>
+            </CardFooter>
+          </Card>
 
-            {/* Divider */}
-            <div className="relative pt-2">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">{t('login.buttons.newToPlatform', 'New to the platform?')}</span>
-              </div>
-            </div>
-
-            {/* New User Options */}
-            <div className="space-y-2">
-              <Button 
-                variant="default" 
-                className="w-full h-11 text-sm font-medium" 
-                onClick={() => setLocation("/get-license")}
-                data-testid="button-get-license"
-              >
-                <span className="material-icons mr-2 text-lg">shopping_cart</span>
-                {t('login.buttons.getCompanyLicense', 'Get Company License')}
-              </Button>
-              
-              <div className="grid grid-cols-2 gap-2">
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className="h-9 text-xs font-medium text-muted-foreground" 
-                  onClick={() => setLocation("/register")}
-                  data-testid="link-register"
-                >
-                  <span className="material-icons mr-1 text-sm">person_add</span>
-                  {t('login.buttons.residentManager', 'Resident / Manager')}
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className="h-9 text-xs font-medium text-amber-600 dark:text-amber-400" 
-                  onClick={() => {
-                    setShowLoginForm(false);
-                    setShowTechnicianRegistration(true);
-                  }}
-                  data-testid="button-create-technician-account"
-                >
-                  <HardHat className="mr-1 h-3 w-3" />
-                  {t('login.buttons.technician', 'Technician')}
-                </Button>
-              </div>
-            </div>
-
-            {/* Footer */}
-            <div className="pt-3 text-center text-xs text-muted-foreground">
-              <p>{t('login.footer.tagline', 'Secure, Professional, Transparent')}</p>
-            </div>
-          </CardContent>
-        </Card>
+          {/* Additional Links */}
+          <div className="mt-6 text-center space-y-2">
+            <p className="text-sm text-muted-foreground">
+              {t('login.newToOnRopePro', 'New to OnRopePro?')}{' '}
+              <Link href="/register" className="text-primary font-medium hover:underline" data-testid="link-create-account">
+                {t('login.createAccount', 'Create an account')}
+              </Link>
+            </p>
+            <p className="text-sm text-muted-foreground">
+              <Link href="/" className="text-primary font-medium hover:underline" data-testid="link-learn-more">
+                {t('login.learnMore', 'Learn more about OnRopePro')}
+              </Link>
+            </p>
+          </div>
         </div>
-      )}
+      </main>
 
-      <TechnicianRegistration 
-        open={showTechnicianRegistration} 
-        onOpenChange={setShowTechnicianRegistration} 
-      />
+      {/* Footer */}
+      <footer className="py-6 px-4 text-center">
+        <p className="text-sm text-muted-foreground">
+          {t('login.copyright', '© 2024 OnRopePro. All rights reserved.')}
+        </p>
+      </footer>
     </div>
   );
 }
