@@ -1091,6 +1091,8 @@ export default function QuotingSalesLanding() {
 
       {/* Footer spacing */}
       <div className="h-16"></div>
+
+      <EmployerRegistration open={showRegistration} onOpenChange={setShowRegistration} />
     </div>
   );
 }
