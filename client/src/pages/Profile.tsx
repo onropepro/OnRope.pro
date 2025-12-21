@@ -1210,38 +1210,198 @@ export default function Profile() {
               <TabsTrigger value="feature-requests" data-testid="tab-feature-requests">{t('profile.feedback', 'Feedback')}</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="profile" className="space-y-6 mt-4">
-              {/* Glass-morphism container for Profile Information */}
-              <div className="bg-card/60 backdrop-blur-sm rounded-2xl border border-border/50 shadow-xl p-6">
-                {/* Section Header */}
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
-                    <span className="material-icons text-primary">person</span>
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-bold" data-testid="text-profile-title">{t('profile.profileInformation', 'Profile Information')}</h2>
-                    <p className="text-sm text-muted-foreground">{t('profile.profileDesc', 'Manage your account details')}</p>
-                  </div>
-                </div>
+            <TabsContent value="profile" className="space-y-4 mt-4">
+              {/* Profile Information */}
+              <Card>
+          <CardHeader>
+            <CardTitle>{t('profile.profileInformation', 'Profile Information')}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Form {...profileForm}>
+              <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-4">
+                <FormField
+                  control={profileForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('common.name', 'Name')}</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder={t('profile.yourName', 'Your name')}
+                          {...field}
+                          data-testid="input-name"
+                          className="h-12"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-                <Form {...profileForm}>
-                  <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-6">
-                    {/* Personal Information Section */}
+                {user?.role !== "company" && (
+                  <FormField
+                    control={profileForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('common.email', 'Email')}</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="email"
+                            placeholder="your.email@example.com"
+                            {...field}
+                            data-testid="input-email"
+                            className="h-12"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
+                {user?.role === "resident" && (
+                  <>
+                    <FormField
+                      control={profileForm.control}
+                      name="unitNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('profile.unitNumber', 'Unit Number')}</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="e.g., 101, 1205"
+                              {...field}
+                              data-testid="input-unit-number"
+                              className="h-12"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={profileForm.control}
+                      name="parkingStallNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('profile.parkingStallNumber', 'Parking Stall Number')}</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="e.g., 42, A-5, P1-23"
+                              {...field}
+                              data-testid="input-parking-stall"
+                              className="h-12"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    {/* Company Code Linking */}
+                    {user?.companyId && companyData?.company ? (
+                      <div className="p-4 bg-success/10 border border-success/20 rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="material-icons text-success text-lg">check_circle</span>
+                          <span className="text-sm font-medium">Linked to Company</span>
+                        </div>
+                        <p className="text-base font-semibold">{companyData.company.companyName}</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          To change, enter a new company code below
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="p-4 bg-muted/50 border border-border rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="material-icons text-muted-foreground text-lg">info</span>
+                          <span className="text-sm font-medium">Not Linked</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Enter a company code below to link your account
+                        </p>
+                      </div>
+                    )}
+                    
+                    <FormField
+                      control={profileForm.control}
+                      name="residentLinkCode"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Company Code {!user?.companyId && "(Required to view projects)"}</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Enter 10-character code"
+                              {...field}
+                              onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+                              maxLength={10}
+                              className="h-12 font-mono"
+                              data-testid="input-company-code"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
+                )}
+
+                {user?.role === "company" && (
+                  <>
+                    <FormField
+                      control={profileForm.control}
+                      name="companyName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('profile.companyName', 'Company Name')}</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Company name"
+                              {...field}
+                              data-testid="input-company-name"
+                              className="h-12"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={profileForm.control}
+                      name="residentCode"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('profile.residentCode', 'Resident Code')}</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="10-character code for residents"
+                              {...field}
+                              data-testid="input-resident-code"
+                              className="h-12 font-mono"
+                              maxLength={10}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <Separator className="my-4" />
+
                     <div className="space-y-4">
-                      <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-                        {t('profile.personalInfo', 'Personal Details')}
-                      </h3>
+                      <h3 className="text-sm font-medium">{t('profile.companyInformation', 'Company Information')}</h3>
+                      
                       <FormField
                         control={profileForm.control}
-                        name="name"
+                        name="streetAddress"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t('common.name', 'Name')}</FormLabel>
+                            <FormLabel>{t('profile.streetAddress', 'Street Address')}</FormLabel>
                             <FormControl>
                               <Input
-                                placeholder={t('profile.yourName', 'Your name')}
+                                placeholder="123 Main St, Suite 100"
                                 {...field}
-                                data-testid="input-name"
+                                data-testid="input-street-address"
                                 className="h-12"
                               />
                             </FormControl>
@@ -1250,175 +1410,18 @@ export default function Profile() {
                         )}
                       />
 
-                      {user?.role !== "company" && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField
                           control={profileForm.control}
-                          name="email"
+                          name="province"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t('common.email', 'Email')}</FormLabel>
+                              <FormLabel>{t('profile.provinceState', 'Province/State')}</FormLabel>
                               <FormControl>
                                 <Input
-                                  type="email"
-                                  placeholder="your.email@example.com"
+                                  placeholder="BC, ON, etc."
                                   {...field}
-                                  data-testid="input-email"
-                                  className="h-12"
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      )}
-
-                      {user?.role === "resident" && (
-                        <>
-                          <FormField
-                            control={profileForm.control}
-                            name="unitNumber"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>{t('profile.unitNumber', 'Unit Number')}</FormLabel>
-                                <FormControl>
-                                  <Input
-                                    placeholder="e.g., 101, 1205"
-                                    {...field}
-                                    data-testid="input-unit-number"
-                                    className="h-12"
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={profileForm.control}
-                            name="parkingStallNumber"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>{t('profile.parkingStallNumber', 'Parking Stall Number')}</FormLabel>
-                                <FormControl>
-                                  <Input
-                                    placeholder="e.g., 42, A-5, P1-23"
-                                    {...field}
-                                    data-testid="input-parking-stall"
-                                    className="h-12"
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          
-                          {/* Company Code Linking */}
-                          {user?.companyId && companyData?.company ? (
-                            <div className="p-4 bg-success/10 border border-success/20 rounded-lg">
-                              <div className="flex items-center gap-2 mb-2">
-                                <span className="material-icons text-success text-lg">check_circle</span>
-                                <span className="text-sm font-medium">Linked to Company</span>
-                              </div>
-                              <p className="text-base font-semibold">{companyData.company.companyName}</p>
-                              <p className="text-xs text-muted-foreground mt-1">
-                                To change, enter a new company code below
-                              </p>
-                            </div>
-                          ) : (
-                            <div className="p-4 bg-muted/50 border border-border rounded-lg">
-                              <div className="flex items-center gap-2 mb-2">
-                                <span className="material-icons text-muted-foreground text-lg">info</span>
-                                <span className="text-sm font-medium">Not Linked</span>
-                              </div>
-                              <p className="text-xs text-muted-foreground">
-                                Enter a company code below to link your account
-                              </p>
-                            </div>
-                          )}
-                          
-                          <FormField
-                            control={profileForm.control}
-                            name="residentLinkCode"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Company Code {!user?.companyId && "(Required to view projects)"}</FormLabel>
-                                <FormControl>
-                                  <Input
-                                    placeholder="Enter 10-character code"
-                                    {...field}
-                                    onChange={(e) => field.onChange(e.target.value.toUpperCase())}
-                                    maxLength={10}
-                                    className="h-12 font-mono"
-                                    data-testid="input-company-code"
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </>
-                      )}
-
-                      {user?.role === "company" && (
-                        <>
-                          <FormField
-                            control={profileForm.control}
-                            name="companyName"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>{t('profile.companyName', 'Company Name')}</FormLabel>
-                                <FormControl>
-                                  <Input
-                                    placeholder="Company name"
-                                    {...field}
-                                    data-testid="input-company-name"
-                                    className="h-12"
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={profileForm.control}
-                            name="residentCode"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>{t('profile.residentCode', 'Resident Code')}</FormLabel>
-                                <FormControl>
-                                  <Input
-                                    placeholder="10-character code for residents"
-                                    {...field}
-                                    data-testid="input-resident-code"
-                                    className="h-12 font-mono"
-                                    maxLength={10}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </>
-                      )}
-                    </div>
-
-                    {/* Company Information Section */}
-                    {user?.role === "company" && (
-                      <div className="pt-6 border-t space-y-4">
-                        <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-                          {t('profile.companyInformation', 'Company Information')}
-                        </h3>
-                        
-                        <FormField
-                          control={profileForm.control}
-                          name="streetAddress"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{t('profile.streetAddress', 'Street Address')}</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder="123 Main St, Suite 100"
-                                  {...field}
-                                  data-testid="input-street-address"
+                                  data-testid="input-province"
                                   className="h-12"
                                 />
                               </FormControl>
@@ -1427,57 +1430,17 @@ export default function Profile() {
                           )}
                         />
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <FormField
-                            control={profileForm.control}
-                            name="province"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>{t('profile.provinceState', 'Province/State')}</FormLabel>
-                                <FormControl>
-                                  <Input
-                                    placeholder="BC, ON, etc."
-                                    {...field}
-                                    data-testid="input-province"
-                                    className="h-12"
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <FormField
-                            control={profileForm.control}
-                            name="country"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>{t('profile.country', 'Country')}</FormLabel>
-                                <FormControl>
-                                  <Input
-                                    placeholder="Canada, USA, etc."
-                                    {...field}
-                                    data-testid="input-country"
-                                    className="h-12"
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-
                         <FormField
                           control={profileForm.control}
-                          name="zipCode"
+                          name="country"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t('profile.postalZipCode', 'Postal/Zip Code')}</FormLabel>
+                              <FormLabel>{t('profile.country', 'Country')}</FormLabel>
                               <FormControl>
                                 <Input
-                                  placeholder="V6B 1A1, 90210, etc."
+                                  placeholder="Canada, USA, etc."
                                   {...field}
-                                  data-testid="input-zip-code"
+                                  data-testid="input-country"
                                   className="h-12"
                                 />
                               </FormControl>
@@ -1485,6 +1448,26 @@ export default function Profile() {
                             </FormItem>
                           )}
                         />
+                      </div>
+
+                      <FormField
+                        control={profileForm.control}
+                        name="zipCode"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t('profile.postalZipCode', 'Postal/Zip Code')}</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="V6B 1A1, 90210, etc."
+                                {...field}
+                                data-testid="input-zip-code"
+                                className="h-12"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
                       <FormField
                         control={profileForm.control}
