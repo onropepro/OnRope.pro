@@ -24,7 +24,8 @@ import {
   ChevronLeft,
   Star,
   Smartphone,
-  Briefcase
+  Briefcase,
+  Link2
 } from "lucide-react";
 
 interface GuideLink {
@@ -58,6 +59,7 @@ const guideLinks: GuideLink[] = [
   { name: "Mobile-First Design", path: "/changelog/mobile-design", icon: Smartphone },
   { name: "GPS & Location Services", path: "/changelog/gps", icon: MapPin },
   { name: "Job Board Ecosystem", path: "/changelog/job-board", icon: Briefcase },
+  { name: "Portable Accounts & Connections", path: "/changelog/connections", icon: Link2 },
 ];
 
 interface ChangelogGuideLayoutProps {
