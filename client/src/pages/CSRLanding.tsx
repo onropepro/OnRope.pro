@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { PublicHeader } from "@/components/PublicHeader";
 import { SignInModal } from "@/components/SignInModal";
+import { EmployerRegistration } from "@/components/EmployerRegistration";
 import { SoftwareReplaces, MODULE_SOFTWARE_MAPPING } from "@/components/SoftwareReplaces";
 import { useTranslation } from "react-i18next";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
@@ -45,6 +46,7 @@ export default function CSRLanding() {
   const [, setLocation] = useLocation();
   const { t } = useTranslation();
   const [showSignIn, setShowSignIn] = useState(false);
+  const [showRegistration, setShowRegistration] = useState(false);
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
@@ -72,11 +74,9 @@ export default function CSRLanding() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-hero-trial">
-                <Link href="/register">
-                  {t('modules.csr.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
+              <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" onClick={() => setShowRegistration(true)} data-testid="button-hero-trial">
+                {t('modules.csr.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
+                <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={() => setShowSignIn(true)} data-testid="button-hero-signin">
                 Sign In
@@ -997,11 +997,9 @@ export default function CSRLanding() {
             {t('modules.csr.cta.descriptionLine2', 'Full access. No credit card. Real compliance data from day one.')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-cta-trial">
-              <Link href="/register">
-                {t('modules.csr.cta.startTrial', 'Start Your 60-Day Trial')}
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Link>
+            <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" onClick={() => setShowRegistration(true)} data-testid="button-cta-trial">
+              {t('modules.csr.cta.startTrial', 'Start Your Free 60-Day Trial')}
+              <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
             <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-cta-guide">
               <Link href="/guides/csr">

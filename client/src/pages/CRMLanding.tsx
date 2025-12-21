@@ -8,6 +8,7 @@ import { Link } from "wouter";
 import { PublicHeader } from "@/components/PublicHeader";
 import { SoftwareReplaces, MODULE_SOFTWARE_MAPPING } from "@/components/SoftwareReplaces";
 import { SignInModal } from "@/components/SignInModal";
+import { EmployerRegistration } from "@/components/EmployerRegistration";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import {
   Briefcase,
@@ -46,6 +47,7 @@ const ALL_ACCORDION_ITEMS = [
 export default function CRMLanding() {
   const [expandedProblems, setExpandedProblems] = useState<string[]>([]);
   const [showSignIn, setShowSignIn] = useState(false);
+  const [showRegistration, setShowRegistration] = useState(false);
   const allExpanded = expandedProblems.length === ALL_ACCORDION_ITEMS.length;
 
   const toggleAll = () => {
@@ -82,11 +84,9 @@ export default function CRMLanding() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" className="bg-white text-[#0B64A3] border-white" asChild data-testid="button-cta-trial">
-                <Link href="/register">
-                  Start Your Free 60-Day Trial
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
+              <Button size="lg" className="bg-white text-[#0B64A3] border-white" onClick={() => setShowRegistration(true)} data-testid="button-cta-trial">
+                Start Your Free 60-Day Trial
+                <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white bg-white/10" onClick={() => setShowSignIn(true)} data-testid="button-cta-signin">
                 Sign In
@@ -738,11 +738,9 @@ export default function CRMLanding() {
               You didn't start a rope access company to manage spreadsheets. The CRM gives you back the time to run an actual business.
             </p>
             <div className="pt-4">
-              <Button size="lg" className="bg-[#0B64A3] text-white hover:bg-[#0369A1]" asChild data-testid="button-final-cta">
-                <Link href="/register">
-                  Start Your Free 60-Day Trial
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
+              <Button size="lg" className="bg-[#0B64A3] text-white hover:bg-[#0369A1]" onClick={() => setShowRegistration(true)} data-testid="button-final-cta">
+                Start Your Free 60-Day Trial
+                <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </div>
           </CardContent>

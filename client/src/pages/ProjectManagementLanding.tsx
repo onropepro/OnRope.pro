@@ -8,6 +8,7 @@ import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { PublicHeader } from "@/components/PublicHeader";
 import { SignInModal } from "@/components/SignInModal";
+import { EmployerRegistration } from "@/components/EmployerRegistration";
 import { SoftwareReplaces, MODULE_SOFTWARE_MAPPING } from "@/components/SoftwareReplaces";
 import ropeAccessSoftwareImg from "@assets/rope-access-software_1765481835892.jpg";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
@@ -52,6 +53,7 @@ export default function ProjectManagementLanding() {
   const { t } = useTranslation();
   const [expandedProblems, setExpandedProblems] = useState<string[]>([]);
   const [showSignIn, setShowSignIn] = useState(false);
+  const [showRegistration, setShowRegistration] = useState(false);
   const [, setLocation] = useLocation();
   const allExpanded = expandedProblems.length === ALL_ACCORDION_ITEMS.length;
 
@@ -88,11 +90,9 @@ export default function ProjectManagementLanding() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-cta-trial">
-                <Link href="/register">
-                  {t('modules.projects.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
+              <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" onClick={() => setShowRegistration(true)} data-testid="button-cta-trial">
+                {t('modules.projects.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
+                <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={() => setShowSignIn(true)} data-testid="button-cta-signin">
                 Sign In
@@ -1264,11 +1264,9 @@ export default function ProjectManagementLanding() {
             <p className="font-medium text-white">{t('modules.projects.cta.desc3', 'Your brain stops being the database. The system carries the cognitive load. Your mental bandwidth goes to growing the business instead of tracking the business.')}</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-cta-trial-bottom">
-              <Link href="/register">
-                {t('modules.projects.cta.trialButton', 'Start Your Free 60-Day Trial')}
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Link>
+            <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" onClick={() => setShowRegistration(true)} data-testid="button-cta-trial-bottom">
+              {t('modules.projects.cta.trialButton', 'Start Your Free 60-Day Trial')}
+              <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
             <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-cta-modules">
               <Link href="/modules">

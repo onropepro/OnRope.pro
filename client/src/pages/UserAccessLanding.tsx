@@ -8,6 +8,7 @@ import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { PublicHeader } from "@/components/PublicHeader";
 import { SignInModal } from "@/components/SignInModal";
+import { EmployerRegistration } from "@/components/EmployerRegistration";
 import { SoftwareReplaces, MODULE_SOFTWARE_MAPPING } from "@/components/SoftwareReplaces";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import {
@@ -52,6 +53,7 @@ export default function UserAccessLanding() {
   const [count3, setCount3] = useState(0);
   const [controlPercentage, setControlPercentage] = useState(0);
   const [showSignIn, setShowSignIn] = useState(false);
+  const [showRegistration, setShowRegistration] = useState(false);
 
   // Initialize countdown numbers and count-up percentage
   useEffect(() => {
@@ -106,11 +108,9 @@ export default function UserAccessLanding() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-hero-trial">
-                <Link href="/register">
-                  {t('modules.userAccess.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
+              <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" onClick={() => setShowRegistration(true)} data-testid="button-hero-trial">
+                {t('modules.userAccess.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
+                <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={() => setShowSignIn(true)} data-testid="button-hero-signin">
                 Sign In
@@ -1159,11 +1159,9 @@ export default function UserAccessLanding() {
             {t('modules.userAccess.cta.subtitleLine2', 'Full access. No credit card. Real data stays private from day one.')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-cta-trial">
-              <Link href="/register">
-                {t('modules.userAccess.cta.ctaTrial', 'Start Your 60-Day Trial')}
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Link>
+            <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" onClick={() => setShowRegistration(true)} data-testid="button-cta-trial">
+              {t('modules.userAccess.cta.ctaTrial', 'Start Your Free 60-Day Trial')}
+              <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
             <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-cta-guide">
               <Link href="#faqs">

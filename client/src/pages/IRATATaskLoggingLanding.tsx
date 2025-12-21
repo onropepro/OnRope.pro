@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { PublicHeader } from "@/components/PublicHeader";
 import { SignInModal } from "@/components/SignInModal";
+import { EmployerRegistration } from "@/components/EmployerRegistration";
 import { SoftwareReplaces, MODULE_SOFTWARE_MAPPING } from "@/components/SoftwareReplaces";
 import { useTranslation } from "react-i18next";
 import {
@@ -39,6 +40,7 @@ import {
 export default function IRATATaskLoggingLanding() {
   const { t } = useTranslation();
   const [showSignIn, setShowSignIn] = useState(false);
+  const [showRegistration, setShowRegistration] = useState(false);
   
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
@@ -65,11 +67,9 @@ export default function IRATATaskLoggingLanding() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" className="bg-white text-[#0B64A3]" asChild data-testid="button-hero-trial">
-                <Link href="/register">
-                  {t('modules.irataLogging.hero.trialButton', 'Start Your Free 60-Day Trial')}
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
+              <Button size="lg" className="bg-white text-[#0B64A3]" onClick={() => setShowRegistration(true)} data-testid="button-hero-trial">
+                {t('modules.irataLogging.hero.trialButton', 'Start Your Free 60-Day Trial')}
+                <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white" onClick={() => setShowSignIn(true)} data-testid="button-hero-signin">
                 Sign In
@@ -953,11 +953,9 @@ export default function IRATATaskLoggingLanding() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Button size="lg" className="bg-white text-[#0B64A3]" asChild data-testid="button-footer-trial">
-              <Link href="/register">
-                {t('modules.irataLogging.footerCta.trialButton', 'Start Your Free 60-Day Trial')}
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Link>
+            <Button size="lg" className="bg-white text-[#0B64A3]" onClick={() => setShowRegistration(true)} data-testid="button-footer-trial">
+              {t('modules.irataLogging.footerCta.trialButton', 'Start Your Free 60-Day Trial')}
+              <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
             <Button size="lg" variant="outline" className="border-white/40 text-white" asChild data-testid="button-footer-faqs">
               <Link href="#faqs">

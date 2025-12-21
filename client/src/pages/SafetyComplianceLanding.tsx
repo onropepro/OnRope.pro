@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { useSafetyAuthority } from "@/hooks/useSafetyAuthority";
 import { PublicHeader } from "@/components/PublicHeader";
 import { SignInModal } from "@/components/SignInModal";
+import { EmployerRegistration } from "@/components/EmployerRegistration";
 import { SoftwareReplaces, MODULE_SOFTWARE_MAPPING } from "@/components/SoftwareReplaces";
 import {
   Shield,
@@ -48,6 +49,7 @@ export default function SafetyComplianceLanding() {
   const { t } = useTranslation();
   const [expandedProblems, setExpandedProblems] = useState<string[]>([]);
   const [showSignIn, setShowSignIn] = useState(false);
+  const [showRegistration, setShowRegistration] = useState(false);
   const [, setLocation] = useLocation();
   const [count1, setCount1] = useState(0);
   const [count2, setCount2] = useState(0);
@@ -108,11 +110,9 @@ export default function SafetyComplianceLanding() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-hero-trial">
-                <Link href="/register">
-                  {t('modules.safety.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
+              <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" onClick={() => setShowRegistration(true)} data-testid="button-hero-trial">
+                {t('modules.safety.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
+                <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={() => setShowSignIn(true)} data-testid="button-hero-signin">
                 Sign In
@@ -697,11 +697,9 @@ export default function SafetyComplianceLanding() {
             {t('modules.safety.finalCta.subtitle2', 'Searchable, exportable, and ready for whatever audit comes next.')}
           </p>
           <div className="pt-4">
-            <Button size="lg" className="bg-white text-sky-700 hover:bg-sky-50" asChild data-testid="button-final-cta">
-              <Link href="/register">
-                {t('modules.safety.finalCta.button', 'Start Your Free Trial')}
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Link>
+            <Button size="lg" className="bg-white text-sky-700 hover:bg-sky-50" onClick={() => setShowRegistration(true)} data-testid="button-final-cta">
+              {t('modules.safety.finalCta.button', 'Start Your Free 60-Day Trial')}
+              <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
             <p className="text-sm text-sky-200 mt-4">
               {t('modules.safety.finalCta.disclaimer', 'Free 90-day trial for Founding Members. No credit card required.')}
