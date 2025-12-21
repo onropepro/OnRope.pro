@@ -19,7 +19,14 @@ import {
   ChevronRight,
   Plus
 } from "lucide-react";
-import { canViewCSR } from "@/lib/permissions";
+import { 
+  canViewCSR, 
+  hasFinancialAccess, 
+  canManageEmployees, 
+  canViewSafetyDocuments,
+  isManagement,
+  canAccessInventory
+} from "@/lib/permissions";
 
 interface CSRData {
   csrRating: number;
@@ -58,6 +65,7 @@ interface AttentionItem {
   iconColor: string;
   countColor: string;
   actionColor: string;
+  visible: boolean;
 }
 
 interface KPIMetric {
@@ -67,6 +75,7 @@ interface KPIMetric {
   trend: number;
   trendLabel: string;
   isPositive: boolean;
+  visible: boolean;
 }
 
 interface ActiveProject {
@@ -109,6 +118,12 @@ export function DashboardOverview({
   const { t } = useTranslation();
 
   const hasCSRAccess = canViewCSR(currentUser);
+  const hasFinancialPermission = hasFinancialAccess(currentUser);
+  const canViewEmployees = canManageEmployees(currentUser);
+  const canViewSafety = canViewSafetyDocuments(currentUser);
+  const isManagerOrAbove = isManagement(currentUser);
+  const hasInventoryAccess = canAccessInventory(currentUser);
+  const isEmployer = currentUser?.role === 'company';
 
   const { data: csrData } = useQuery<CSRData>({
     queryKey: ['/api/company-safety-rating'],
@@ -216,6 +231,7 @@ export function DashboardOverview({
       iconColor: "text-amber-600 dark:text-amber-400",
       countColor: "text-amber-600 dark:text-amber-400",
       actionColor: "text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300",
+      visible: isEmployer || canViewEmployees,
     },
     {
       id: "inspections",
@@ -230,6 +246,7 @@ export function DashboardOverview({
       iconColor: "text-rose-600 dark:text-rose-400",
       countColor: "text-rose-600 dark:text-rose-400",
       actionColor: "text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300",
+      visible: isEmployer || hasInventoryAccess,
     },
     {
       id: "timesheets",
@@ -244,6 +261,7 @@ export function DashboardOverview({
       iconColor: "text-sky-600 dark:text-sky-400",
       countColor: "text-sky-600 dark:text-sky-400",
       actionColor: "text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300",
+      visible: isEmployer || isManagerOrAbove || hasFinancialPermission,
     },
     {
       id: "documents",
@@ -258,6 +276,7 @@ export function DashboardOverview({
       iconColor: "text-pink-600 dark:text-pink-400",
       countColor: "text-pink-600 dark:text-pink-400",
       actionColor: "text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300",
+      visible: isEmployer || canViewSafety,
     },
   ];
 
@@ -269,6 +288,7 @@ export function DashboardOverview({
       trend: 0,
       trendLabel: t("dashboard.overview.currentCount", "current"),
       isPositive: true,
+      visible: true,
     },
     {
       id: "teamUtilization",
@@ -277,6 +297,7 @@ export function DashboardOverview({
       trend: 0,
       trendLabel: t("dashboard.overview.last30Days", "last 30 days"),
       isPositive: teamUtilization >= 50,
+      visible: isEmployer || isManagerOrAbove || canViewEmployees,
     },
     {
       id: "revenueMTD",
@@ -285,6 +306,7 @@ export function DashboardOverview({
       trend: 0,
       trendLabel: t("dashboard.overview.activeContracts", "in active contracts"),
       isPositive: true,
+      visible: isEmployer || hasFinancialPermission,
     },
     {
       id: "safetyRating",
@@ -293,6 +315,7 @@ export function DashboardOverview({
       trend: 0,
       trendLabel: csrData?.csrLabel || t("dashboard.overview.csr", "CSR"),
       isPositive: safetyRating >= 70,
+      visible: hasCSRAccess,
     },
   ];
 
@@ -361,69 +384,73 @@ export function DashboardOverview({
         </Button>
       </div>
 
-      <div>
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-4" data-testid="text-attention-required">
-          {t("dashboard.overview.attentionRequired", "ATTENTION REQUIRED")}
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {attentionItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Card 
-                key={item.id} 
-                className="shadow-sm relative overflow-hidden"
-                data-testid={`card-attention-${item.id}`}
-              >
-                <div className={`absolute left-0 top-0 bottom-0 w-px ${item.borderColor.replace('border-l-', 'bg-')}`} />
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className={`w-10 h-10 rounded-lg ${item.iconBgColor} flex items-center justify-center`}>
-                      <Icon className={`w-5 h-5 ${item.iconColor}`} />
+      {attentionItems.filter(item => item.visible).length > 0 && (
+        <div>
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-4" data-testid="text-attention-required">
+            {t("dashboard.overview.attentionRequired", "ATTENTION REQUIRED")}
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {attentionItems.filter(item => item.visible).map((item) => {
+              const Icon = item.icon;
+              return (
+                <Card 
+                  key={item.id} 
+                  className="shadow-sm relative overflow-hidden"
+                  data-testid={`card-attention-${item.id}`}
+                >
+                  <div className={`absolute left-0 top-0 bottom-0 w-px ${item.borderColor.replace('border-l-', 'bg-')}`} />
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className={`w-10 h-10 rounded-lg ${item.iconBgColor} flex items-center justify-center`}>
+                        <Icon className={`w-5 h-5 ${item.iconColor}`} />
+                      </div>
+                      <span className={`text-2xl font-bold ${item.countColor}`} data-testid={`text-${item.id}-count`}>
+                        {item.count}
+                      </span>
                     </div>
-                    <span className={`text-2xl font-bold ${item.countColor}`} data-testid={`text-${item.id}-count`}>
-                      {item.count}
-                    </span>
-                  </div>
-                  <h3 className="font-semibold text-foreground mb-1">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground mb-3">{item.description}</p>
-                  <button 
-                    onClick={item.onAction}
-                    className={`text-sm font-medium ${item.actionColor} flex items-center gap-1`}
-                    data-testid={`button-${item.id}-action`}
-                  >
-                    {item.actionLabel}
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </CardContent>
-              </Card>
-            );
-          })}
+                    <h3 className="font-semibold text-foreground mb-1">{item.title}</h3>
+                    <p className="text-sm text-muted-foreground mb-3">{item.description}</p>
+                    <button 
+                      onClick={item.onAction}
+                      className={`text-sm font-medium ${item.actionColor} flex items-center gap-1`}
+                      data-testid={`button-${item.id}-action`}
+                    >
+                      {item.actionLabel}
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {kpiMetrics.map((metric) => (
-          <Card key={metric.id} className="shadow-sm" data-testid={`card-kpi-${metric.id}`}>
-            <CardContent className="p-4">
-              <p className="text-sm text-muted-foreground mb-1">{metric.label}</p>
-              <div className="flex items-end justify-between">
-                <span className="text-3xl font-bold text-foreground" data-testid={`text-${metric.id}-value`}>
-                  {metric.value}
-                </span>
-                <div className={`flex items-center gap-1 text-sm ${metric.isPositive ? 'text-emerald-600' : 'text-rose-600'}`}>
-                  {metric.isPositive ? (
-                    <TrendingUp className="w-4 h-4" />
-                  ) : (
-                    <TrendingDown className="w-4 h-4" />
-                  )}
-                  <span data-testid={`text-${metric.id}-trend`}>{metric.trend}%</span>
+      {kpiMetrics.filter(metric => metric.visible).length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {kpiMetrics.filter(metric => metric.visible).map((metric) => (
+            <Card key={metric.id} className="shadow-sm" data-testid={`card-kpi-${metric.id}`}>
+              <CardContent className="p-4">
+                <p className="text-sm text-muted-foreground mb-1">{metric.label}</p>
+                <div className="flex items-end justify-between">
+                  <span className="text-3xl font-bold text-foreground" data-testid={`text-${metric.id}-value`}>
+                    {metric.value}
+                  </span>
+                  <div className={`flex items-center gap-1 text-sm ${metric.isPositive ? 'text-emerald-600' : 'text-rose-600'}`}>
+                    {metric.isPositive ? (
+                      <TrendingUp className="w-4 h-4" />
+                    ) : (
+                      <TrendingDown className="w-4 h-4" />
+                    )}
+                    <span data-testid={`text-${metric.id}-trend`}>{metric.trend}%</span>
+                  </div>
                 </div>
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">{metric.trendLabel}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+                <p className="text-xs text-muted-foreground mt-1">{metric.trendLabel}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="shadow-sm" data-testid="card-active-projects">
