@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { 
   Award, 
@@ -18,6 +19,31 @@ import {
   ChevronRight,
   Plus
 } from "lucide-react";
+import { canViewCSR } from "@/lib/permissions";
+
+interface CSRData {
+  csrRating: number;
+  csrLabel: string;
+  csrColor: string;
+}
+
+interface DocumentSignature {
+  id: string;
+  employeeId: string;
+  documentId: string;
+  signedAt: string | null;
+}
+
+interface WorkSession {
+  id: string;
+  employeeId: string;
+  workDate: string;
+  startTime: string;
+  endTime: string | null;
+  regularHours: string | null;
+  overtimeHours: string | null;
+  doubleTimeHours: string | null;
+}
 
 interface AttentionItem {
   id: string;
@@ -82,6 +108,23 @@ export function DashboardOverview({
 }: DashboardOverviewProps) {
   const { t } = useTranslation();
 
+  const hasCSRAccess = canViewCSR(currentUser);
+
+  const { data: csrData } = useQuery<CSRData>({
+    queryKey: ['/api/company-safety-rating'],
+    enabled: hasCSRAccess,
+  });
+
+  const { data: documentSignaturesData } = useQuery<{ signatures: DocumentSignature[] }>({
+    queryKey: ['/api/document-review-signatures'],
+    enabled: !!currentUser,
+  });
+
+  const { data: workSessionsData } = useQuery<{ sessions: WorkSession[] }>({
+    queryKey: ['/api/all-work-sessions'],
+    enabled: !!currentUser,
+  });
+
   const activeEmployees = employees?.filter(
     (e: any) => e.status !== "terminated" && e.status !== "suspended"
   ) || [];
@@ -99,12 +142,65 @@ export function DashboardOverview({
     return new Date(inspection.nextInspectionDate) < new Date();
   }) || [];
 
-  const pendingTimesheets = 8;
-  const unsignedDocuments = 4;
+  const unsignedDocuments = documentSignaturesData?.signatures?.filter(
+    (sig: DocumentSignature) => !sig.signedAt
+  )?.length || 0;
+
+  const pendingTimesheets = 0;
 
   const activeProjects = projects?.filter(
     (p: any) => p.status === "active" || p.status === "in_progress"
   ) || [];
+
+  const safetyRating = csrData?.csrRating ?? 0;
+  
+  const revenueMTD = activeProjects.reduce((sum: number, p: any) => {
+    const contractValue = typeof p.contractValue === 'string' 
+      ? parseFloat(p.contractValue) 
+      : (typeof p.contractValue === 'number' ? p.contractValue : 0);
+    return sum + (isNaN(contractValue) ? 0 : contractValue);
+  }, 0);
+
+  const calculateTeamUtilization = (): number => {
+    if (!workSessionsData?.sessions || activeEmployees.length === 0) {
+      return 0;
+    }
+    
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    
+    const recentSessions = workSessionsData.sessions.filter((session: WorkSession) => {
+      const workDate = new Date(session.workDate);
+      return workDate >= thirtyDaysAgo && workDate <= now;
+    });
+    
+    const employeesWithHours = new Set(recentSessions.map((s: WorkSession) => s.employeeId));
+    
+    const totalHoursWorked = recentSessions.reduce((sum: number, session: WorkSession) => {
+      const regular = parseFloat(session.regularHours || '0') || 0;
+      const overtime = parseFloat(session.overtimeHours || '0') || 0;
+      const doubleTime = parseFloat(session.doubleTimeHours || '0') || 0;
+      return sum + regular + overtime + doubleTime;
+    }, 0);
+    
+    const expectedHoursPerEmployee = 8 * 22;
+    const totalExpectedHours = activeEmployees.length * expectedHoursPerEmployee;
+    
+    if (totalExpectedHours === 0) return 0;
+    
+    return Math.min(100, Math.round((totalHoursWorked / totalExpectedHours) * 100));
+  };
+
+  const teamUtilization = calculateTeamUtilization();
+
+  const formatCurrency = (value: number): string => {
+    if (value >= 1000000) {
+      return `$${(value / 1000000).toFixed(1)}M`;
+    } else if (value >= 1000) {
+      return `$${(value / 1000).toFixed(1)}K`;
+    }
+    return `$${value.toFixed(0)}`;
+  };
 
   const attentionItems: AttentionItem[] = [
     {
@@ -170,33 +266,33 @@ export function DashboardOverview({
       id: "activeProjects",
       label: t("dashboard.overview.activeProjects", "Active Projects"),
       value: String(activeProjects.length),
-      trend: 2,
-      trendLabel: t("dashboard.overview.fromLastMonth", "from last month"),
+      trend: 0,
+      trendLabel: t("dashboard.overview.currentCount", "current"),
       isPositive: true,
     },
     {
       id: "teamUtilization",
       label: t("dashboard.overview.teamUtilization", "Team Utilization"),
-      value: "87%",
-      trend: 5,
-      trendLabel: t("dashboard.overview.fromLastWeek", "from last week"),
-      isPositive: true,
+      value: `${Math.min(100, teamUtilization)}%`,
+      trend: 0,
+      trendLabel: t("dashboard.overview.last30Days", "last 30 days"),
+      isPositive: teamUtilization >= 50,
     },
     {
       id: "revenueMTD",
-      label: t("dashboard.overview.revenueMTD", "Revenue MTD"),
-      value: "$124.5K",
-      trend: 12,
-      trendLabel: t("dashboard.overview.vsTarget", "vs target"),
+      label: t("dashboard.overview.contractValue", "Contract Value"),
+      value: formatCurrency(revenueMTD),
+      trend: 0,
+      trendLabel: t("dashboard.overview.activeContracts", "in active contracts"),
       isPositive: true,
     },
     {
       id: "safetyRating",
       label: t("dashboard.overview.safetyRating", "Safety Rating"),
-      value: "82%",
-      trend: 2,
-      trendLabel: t("dashboard.overview.fromLastMonth", "from last month"),
-      isPositive: false,
+      value: hasCSRAccess && csrData ? `${Math.round(safetyRating)}%` : "--",
+      trend: 0,
+      trendLabel: csrData?.csrLabel || t("dashboard.overview.csr", "CSR"),
+      isPositive: safetyRating >= 70,
     },
   ];
 
