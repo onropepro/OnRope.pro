@@ -268,6 +268,61 @@ export default function HelpArticle() {
                       continue;
                     }
                     
+                    // Markdown tables - detect lines starting with |
+                    if (line.startsWith('|') && line.endsWith('|')) {
+                      const tableRows: string[][] = [];
+                      let hasHeader = false;
+                      
+                      while (i < lines.length && lines[i].trim().startsWith('|') && lines[i].trim().endsWith('|')) {
+                        const rowLine = lines[i].trim();
+                        // Check if this is a separator row (|---|---|)
+                        if (/^\|[\s\-:|]+\|$/.test(rowLine)) {
+                          hasHeader = true;
+                          i++;
+                          continue;
+                        }
+                        // Parse cells - split by | and filter out empty first/last
+                        const cells = rowLine.split('|').slice(1, -1).map(cell => cell.trim());
+                        tableRows.push(cells);
+                        i++;
+                      }
+                      
+                      if (tableRows.length > 0) {
+                        const headerRow = hasHeader ? tableRows[0] : null;
+                        const bodyRows = hasHeader ? tableRows.slice(1) : tableRows;
+                        
+                        elements.push(
+                          <div key={`table-${i}`} className="my-6 overflow-x-auto">
+                            <table className="w-full border-collapse border border-border rounded-lg overflow-hidden">
+                              {headerRow && (
+                                <thead className="bg-muted">
+                                  <tr>
+                                    {headerRow.map((cell, idx) => (
+                                      <th key={idx} className="border border-border px-4 py-2 text-left font-semibold text-sm">
+                                        {renderInlineFormatting(cell)}
+                                      </th>
+                                    ))}
+                                  </tr>
+                                </thead>
+                              )}
+                              <tbody>
+                                {bodyRows.map((row, rowIdx) => (
+                                  <tr key={rowIdx} className={rowIdx % 2 === 0 ? 'bg-background' : 'bg-muted/30'}>
+                                    {row.map((cell, cellIdx) => (
+                                      <td key={cellIdx} className="border border-border px-4 py-2 text-sm">
+                                        {renderInlineFormatting(cell)}
+                                      </td>
+                                    ))}
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        );
+                      }
+                      continue;
+                    }
+                    
                     // Bullet list
                     if (line.startsWith('- ')) {
                       const items: string[] = [];
