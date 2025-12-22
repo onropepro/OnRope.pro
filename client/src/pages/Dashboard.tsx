@@ -1136,8 +1136,18 @@ function LicenseExpiryWarningBanner({ employees, onReviewClick }: { employees: a
 export default function Dashboard() {
   const { t } = useTranslation();
   const { currentLanguage, changeLanguage } = useLanguage();
+  const [location] = useLocation();
   const [activeTab, setActiveTab] = useState("");
   const [projectsSubTab, setProjectsSubTab] = useState<"active" | "past">("active");
+  
+  // Synchronize activeTab with URL query parameter
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tab = urlParams.get('tab') || "";
+    if (tab !== activeTab) {
+      setActiveTab(tab);
+    }
+  }, [location]);
   
   const { brandColors: contextBrandColors, brandingActive } = useContext(BrandingContext);
   const defaultCalendarColor = brandingActive && contextBrandColors.length > 0 ? contextBrandColors[0] : "hsl(var(--primary))";
