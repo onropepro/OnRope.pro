@@ -93,7 +93,9 @@ interface ScheduleItem {
   time: string;
   title: string;
   location: string;
-  technicians: Array<{ initials: string; color: string }>;
+  technicians: Array<{ id?: string; initials: string; name?: string; color: string }>;
+  status?: string;
+  jobType?: string;
 }
 
 interface DashboardOverviewProps {
@@ -137,6 +139,11 @@ export function DashboardOverview({
 
   const { data: workSessionsData } = useQuery<{ sessions: WorkSession[] }>({
     queryKey: ['/api/all-work-sessions'],
+    enabled: !!currentUser,
+  });
+
+  const { data: todayScheduleData } = useQuery<{ scheduleItems: ScheduleItem[] }>({
+    queryKey: ['/api/schedule/today'],
     enabled: !!currentUser,
   });
 
@@ -329,39 +336,7 @@ export function DashboardOverview({
     status: project.status || "active",
   }));
 
-  const todaySchedule: ScheduleItem[] = [
-    {
-      id: 1,
-      time: "07:00",
-      title: "Window cleaning - Floors 20-25",
-      location: "Pacific Centre Tower A",
-      technicians: [
-        { initials: "MC", color: "bg-blue-500" },
-        { initials: "SW", color: "bg-green-500" },
-      ],
-    },
-    {
-      id: 2,
-      time: "08:30",
-      title: "Facade inspection - East side",
-      location: "Bentall 5 Annual",
-      technicians: [
-        { initials: "JM", color: "bg-purple-500" },
-        { initials: "TK", color: "bg-orange-500" },
-        { initials: "AR", color: "bg-teal-500" },
-      ],
-    },
-    {
-      id: 3,
-      time: "13:00",
-      title: "Window cleaning - Floors 26-30",
-      location: "Pacific Centre Tower A",
-      technicians: [
-        { initials: "MC", color: "bg-blue-500" },
-        { initials: "SW", color: "bg-green-500" },
-      ],
-    },
-  ];
+  const todaySchedule: ScheduleItem[] = todayScheduleData?.scheduleItems || [];
 
   return (
     <div className="space-y-6">

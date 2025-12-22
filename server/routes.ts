@@ -19204,6 +19204,79 @@ Do not include any other text, just the JSON object.`
     }
   });
 
+  // Get today's schedule for dashboard
+  app.get("/api/schedule/today", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Get all scheduled jobs for the company
+      const allJobs = await storage.getScheduledJobsByCompany(companyId);
+      
+      // Filter to jobs happening today
+      const today = new Date();
+      const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
+      const endOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+      
+      let todayJobs = allJobs.filter(job => {
+        const jobStart = new Date(job.startDate);
+        const jobEnd = new Date(job.endDate);
+        // Job overlaps with today if it starts before end of today AND ends after start of today
+        return jobStart <= endOfToday && jobEnd >= startOfToday;
+      });
+      
+      // For non-company users (technicians), filter to only their assigned jobs
+      if (currentUser.role !== "company") {
+        todayJobs = todayJobs.filter(job => {
+          const isAssigned = job.assignedEmployees?.some((emp: any) => emp.id === currentUser.id) ||
+                            job.employeeAssignments?.some((assignment: any) => assignment.employee?.id === currentUser.id);
+          return isAssigned;
+        });
+      }
+      
+      // Format for dashboard display
+      const scheduleItems = todayJobs.map(job => {
+        const startTime = new Date(job.startDate);
+        const technicians = (job.employeeAssignments || []).map((assignment: any) => {
+          const emp = assignment.employee;
+          if (!emp) return null;
+          const initials = `${(emp.firstName || '')[0] || ''}${(emp.lastName || '')[0] || ''}`.toUpperCase() || 'NA';
+          // Generate consistent color based on employee id
+          const colors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-orange-500', 'bg-teal-500', 'bg-rose-500', 'bg-amber-500'];
+          const colorIndex = emp.id ? emp.id.charCodeAt(0) % colors.length : 0;
+          return {
+            id: emp.id,
+            initials,
+            name: `${emp.firstName || ''} ${emp.lastName || ''}`.trim(),
+            color: colors[colorIndex],
+          };
+        }).filter(Boolean);
+        
+        return {
+          id: job.id,
+          time: startTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
+          title: job.title,
+          location: job.location || job.project?.buildingName || 'TBD',
+          technicians,
+          status: job.status,
+          jobType: job.jobType,
+        };
+      }).sort((a, b) => a.time.localeCompare(b.time));
+      
+      res.json({ scheduleItems });
+    } catch (error) {
+      console.error("Get today's schedule error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Get scheduled jobs assigned to current employee
   app.get("/api/schedule/my-jobs", requireAuth, async (req: Request, res: Response) => {
     try {
