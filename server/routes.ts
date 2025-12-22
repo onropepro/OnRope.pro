@@ -20978,7 +20978,8 @@ Do not include any other text, just the JSON object.`
   });
 
   // Helper function to calculate individual technician safety rating
-  function calculateTechnicianSafetyRating(tech: any): { safetyRating: number; safetyLabel: string; safetyColor: string; safetyBreakdown: any } {
+  // quizAttempts parameter is optional - if provided, quiz points are calculated
+  function calculateTechnicianSafetyRating(tech: any, quizAttempts?: any[]): { safetyRating: number; safetyLabel: string; safetyColor: string; safetyBreakdown: any } {
     const now = new Date();
     let totalPoints = 0;
     let maxPoints = 0;
@@ -20995,6 +20996,9 @@ Do not include any other text, just the JSON object.`
       hasResume: false,
       resumePoints: 0,
       resumeMax: 5,
+      quizzesPassed: 0,
+      quizPoints: 0,
+      quizMax: 20,
     };
     
     // 1. Certification Score (up to 40 points) - BEST OF IRATA or SPRAT
@@ -21067,6 +21071,27 @@ Do not include any other text, just the JSON object.`
       breakdown.resumePoints = 5;
     }
     
+    // 4. Quiz Completion (up to 20 points) - 2 points per unique quiz passed, max 10 quizzes
+    // Only include quiz points in calculation when quiz data is explicitly provided
+    if (quizAttempts !== undefined) {
+      maxPoints += 20;
+      if (quizAttempts.length > 0) {
+        // Use Set to count unique passed quizzes (prevents farming)
+        const passedQuizIds = new Set<string>();
+        for (const attempt of quizAttempts) {
+          if (attempt.passed && attempt.quizId) {
+            passedQuizIds.add(attempt.quizId);
+          }
+        }
+        const quizzesPassed = passedQuizIds.size;
+        breakdown.quizzesPassed = quizzesPassed;
+        // 2 points per quiz, max 20 points (10 quizzes)
+        const quizPts = Math.min(20, quizzesPassed * 2);
+        totalPoints += quizPts;
+        breakdown.quizPoints = quizPts;
+      }
+    }
+    
     // Calculate percentage
     const safetyRating = maxPoints > 0 ? Math.round((totalPoints / maxPoints) * 100) : 0;
     
@@ -21125,9 +21150,27 @@ Do not include any other text, just the JSON object.`
         ))
         .orderBy(sql`${users.visibilityEnabledAt} DESC`);
 
-      // Add safety rating to each technician
+      // Fetch all quiz attempts for visible technicians (for PSR calculation)
+      const techIds = visibleTechs.map(t => t.id);
+      const allQuizAttempts = techIds.length > 0 
+        ? await db.select().from(quizAttempts).where(sql`${quizAttempts.employeeId} = ANY(${techIds})`)
+        : [];
+      
+      // Group quiz attempts by employee ID
+      const quizAttemptsByEmployee = new Map<string, any[]>();
+      for (const attempt of allQuizAttempts) {
+        if (attempt.employeeId) {
+          if (!quizAttemptsByEmployee.has(attempt.employeeId)) {
+            quizAttemptsByEmployee.set(attempt.employeeId, []);
+          }
+          quizAttemptsByEmployee.get(attempt.employeeId)!.push(attempt);
+        }
+      }
+
+      // Add safety rating to each technician (with quiz data)
       const techniciansWithRating = visibleTechs.map(tech => {
-        const { safetyRating, safetyLabel, safetyColor, safetyBreakdown } = calculateTechnicianSafetyRating(tech);
+        const techQuizAttempts = quizAttemptsByEmployee.get(tech.id) || [];
+        const { safetyRating, safetyLabel, safetyColor, safetyBreakdown } = calculateTechnicianSafetyRating(tech, techQuizAttempts);
         return {
           ...tech,
           safetyRating,
