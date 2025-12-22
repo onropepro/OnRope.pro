@@ -340,15 +340,10 @@ export function DashboardOverview({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground" data-testid="text-dashboard-title">
-            {t("dashboard.overview.title", "Dashboard")}
-          </h1>
-          <p className="text-muted-foreground" data-testid="text-dashboard-date">
-            {format(new Date(), "EEEE, MMMM d, yyyy")}
-          </p>
-        </div>
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-sm text-muted-foreground" data-testid="text-dashboard-date">
+          {format(new Date(), "EEEE, MMMM d, yyyy")}
+        </p>
         <Button 
           onClick={onQuickAdd} 
           className="gap-2"

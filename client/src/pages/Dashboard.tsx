@@ -3638,9 +3638,11 @@ export default function Dashboard() {
               <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
                 <div className="flex items-center gap-2 sm:gap-4 min-w-0">
                   <div className="min-w-0">
-                    <h1 className={`text-lg sm:text-xl font-bold truncate ${hasCustomBranding ? 'custom-brand-text' : 'gradient-text'}`}>
-                      {getPageTitle()}
-                    </h1>
+                    {activeTab !== "" && (
+                      <h1 className={`text-lg sm:text-xl font-bold truncate ${hasCustomBranding ? 'custom-brand-text' : 'gradient-text'}`}>
+                        {getPageTitle()}
+                      </h1>
+                    )}
                     {companyName && (
                       <p className="text-xs text-muted-foreground font-medium truncate">{companyName}</p>
                     )}
