@@ -28,7 +28,7 @@ export function DashboardCard({
       data-testid={`card-${cardId}`}
     >
       {isEditMode && (
-        <div className="absolute top-2 right-2 z-10 flex items-center gap-1">
+        <div className="absolute top-2 right-2 z-20 flex items-center gap-0.5 bg-background/95 backdrop-blur-sm rounded-md border border-border shadow-sm px-1 py-0.5">
           <div
             {...dragHandleProps}
             className="cursor-grab active:cursor-grabbing p-1 rounded hover:bg-muted"
