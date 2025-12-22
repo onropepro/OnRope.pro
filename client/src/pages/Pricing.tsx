@@ -209,7 +209,7 @@ export default function Pricing() {
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-hero-trial">
-                <Link href="/register">
+                <Link href="/get-license">
                   Start 30-Day Free Trial
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
@@ -707,12 +707,12 @@ export default function Pricing() {
           <div className="space-y-6">
             <div>
               <p className="text-xl text-blue-100 mb-2">30-Day Free Trial</p>
-              <p className="text-blue-200">No credit card required. Full access to every feature. Cancel anytime.</p>
+              <p className="text-blue-200">Full access to every feature. Cancel anytime. You won't be charged until the trial ends.</p>
             </div>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" asChild data-testid="button-cta-trial">
-                <Link href="/register">
+                <Link href="/get-license">
                   Start Free Trial
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
