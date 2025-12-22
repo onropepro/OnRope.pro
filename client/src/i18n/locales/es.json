@@ -13068,5 +13068,674 @@
       },
       "tagline": "OnRopePro - Creado por acceso con cuerdas, para acceso con cuerdas"
     }
+  },
+  "technicianLanding": {
+    "hero": {
+      "badge": "Para técnicos de acceso con cuerdas",
+      "badgeSubtitle": "Pasaporte de técnico urbano - Creado por un técnico IRATA nivel 3",
+      "title": "Tus horas. Tu prueba.",
+      "titleHighlight": "Para siempre.",
+      "subtitle": "El pasaporte profesional portátil para técnicos de acceso con cuerdas.",
+      "subtitleStrong": "Cada edificio. Cada descenso. Cada hora registrada, protegida y tuya.",
+      "createAccount": "Crear cuenta gratuita",
+      "signIn": "Iniciar sesión",
+      "noCreditCard": "Sin tarjeta de crédito, nunca."
+    },
+    "loginForm": {
+      "licenseNumber": "Número de licencia",
+      "email": "Correo electrónico",
+      "licenseLabel": "Número de licencia IRATA o SPRAT",
+      "emailLabel": "Dirección de correo electrónico",
+      "licensePlaceholder": "ej: 123456 (sin /1, /2, /3)",
+      "emailPlaceholder": "tu@ejemplo.com",
+      "licenseHint": "Ingresa solo el número sin el prefijo de nivel (ej: 123456 no 1/123456)",
+      "password": "Contraseña",
+      "passwordPlaceholder": "Ingresa tu contraseña",
+      "signInButton": "Iniciar sesión",
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "resetTitle": "Restablecer tu contraseña",
+      "resetDescription": "Ingresa tu correo electrónico y te enviaremos instrucciones de restablecimiento.",
+      "sendResetLink": "Enviar enlace de restablecimiento",
+      "backToSignIn": "Volver a iniciar sesión",
+      "checkEmail": "Revisa tu correo electrónico",
+      "resetSentDescription": "Si existe una cuenta con ese correo, recibirás instrucciones de restablecimiento."
+    },
+    "problemValidation": {
+      "title": "Has perdido horas. Solo no sabes cuántas.",
+      "paragraph1": "El martes pasado. Ese edificio de 40 pisos en el centro. ¿Hiciste 3 o 4 descensos?",
+      "paragraph2": "Hace tres semanas. El complejo industrial junto al puerto. ¿Fueron 6 horas u 8?",
+      "paragraph3": "Hace seis meses. La empresa que cerró. Todas esas horas desaparecidas con su papeleo.",
+      "paragraph4": "No eres descuidado. Estás ocupado cubriendo 5 edificios a la semana, manejando equipo, manteniéndote seguro en altura. Los detalles se difuminan. La memoria falla. Y cuando te sientas a llenar tu bitácora IRATA, estás adivinando los datos de los que depende tu certificación.",
+      "statistic": "El promedio de la industria: 15-20% de las horas registradas son estimaciones, no registros.",
+      "statisticSubtext": "Eso es tu progresión de carrera. Tu L2. Tu L3. Construido sobre suposiciones."
+    },
+    "valueProposition": {
+      "title": "Una cuenta. Cada empleador. Toda tu carrera.",
+      "paragraph1": "OnRopePro te da algo que la industria nunca ha ofrecido: una identidad profesional que realmente te pertenece.",
+      "paragraph2": "No encerrada en el archivero de tu empleador. No perdida cuando las empresas cierran. No empezando desde cero cada vez que cambias de trabajo.",
+      "paragraph3": "Tu número IRATA o SPRAT se convierte en tu identificador permanente. Tu historial de trabajo se acumula automáticamente cuando tu empleador usa OnRopePro, o vía importación fotográfica de tu bitácora existente. Tu reputación profesional viaja contigo - de Vancouver a Toronto a Seattle a Chicago y de regreso.",
+      "cta": "Cuando creas una cuenta de técnico, no te estás registrando en un software.",
+      "ctaHighlight": "Estás construyendo una identidad profesional portátil que gana valor con cada hora registrada."
+    },
+    "freeVsPlus": {
+      "title": "Claro y directo: Qué es gratis, qué es PLUS",
+      "freeAccount": {
+        "title": "Cuenta GRATUITA",
+        "subtitle": "Siempre gratis. Nunca expira.",
+        "features": {
+          "profile": "Perfil profesional con foto y certificaciones",
+          "id": "ID IRATA/SPRAT verificado como credencial",
+          "history": "Historial de trabajo completo que viaja contigo",
+          "export": "Exportar a PDF o CSV para tu bitácora física",
+          "fastOnboarding": "Incorporación instantánea con nuevos empleadores",
+          "storage": "Almacenamiento seguro incluso entre trabajos"
+        }
+      },
+      "plusAccount": {
+        "title": "Cuenta PLUS",
+        "subtitle": "Todas las funciones gratuitas, más:",
+        "features": {
+          "jobBoard": "Acceso al tablero de empleos (buscar oportunidades)",
+          "visibility": "Visibilidad prioritaria ante empleadores",
+          "logbook": "Importar bitácora existente por foto (la IA lee la escritura)",
+          "analytics": "Análisis de horas y seguimiento de progresión de carrera"
+        },
+        "price": "$9.95/mes",
+        "orFree": "o GRATIS con una referencia"
+      }
+    },
+    "whoItsFor": {
+      "title": "Para quién es esto",
+      "newTechs": {
+        "title": "Técnicos nuevos",
+        "subtitle": "Recién certificado. Primer trabajo. Cero horas registradas.",
+        "problem": "El problema",
+        "problemText1": "Cada empleador quiere \"experiencia\". Pero ¿cómo construyes un historial cuando tus horas están atrapadas en la hoja de cálculo de otro?",
+        "problemText2": "Necesitas un historial de trabajo verificable en el que los empleadores confíen - antes de tener 1,000 horas.",
+        "solution": "La solución",
+        "solutionText1": "Empieza a registrar desde el día uno. Cada descenso, cada edificio, cada hora - verificada y portátil. Para cuando tengas 200 horas, tienes pruebas. Pruebas que se transfieren a tu evaluación L2. Pruebas que hacen que el siguiente empleador te contrate en lugar del otro L1 nuevo.",
+        "solutionText2": "100 horas verificadas vencen 500 horas declaradas.",
+        "testimonial": "\"Tenía 47 horas registradas cuando me despidieron. Dos semanas después, le mostré mi perfil verificado a un nuevo empleador. Empecé el lunes.\"",
+        "testimonialAuthor": "- Marcus T., L1 IRATA, Vancouver"
+      },
+      "experienced": {
+        "title": "Técnicos experimentados",
+        "subtitle": "500+ horas. Quizás 1,000+. Con 3-4 empleadores en 6 años.",
+        "problem": "El problema",
+        "problemText1": "Tus horas están dispersas entre empresas desaparecidas, registros en papel en almacenamiento y recuerdos que se desvanecen. Cuando llega la evaluación, estás reconstruyendo tu carrera a partir de fragmentos.",
+        "problemText2": "Tu L3 depende de la precisión. No deberías estar adivinando.",
+        "solution": "La solución",
+        "solutionText1": "Fotografía las páginas de tu bitácora existente. La app lee tu escritura, extrae los datos y construye tu registro digital completo. Cada hora de cada empleador - consolidada, verificada, exportable.",
+        "solutionText2": "Cuando Apex Rope cerró en 2023, 23 de sus técnicos perdieron acceso a sus registros de horas. ¿Los 7 que tenían cuentas OnRopePro? Sus horas ya estaban seguras.",
+        "testimonial": "\"Seis empleadores en 8 años. Tenía horas dispersas en tres provincias. Ahora todo está en un solo lugar, y puedo probar cada una.\"",
+        "testimonialAuthor": "- Dave M., L3 IRATA, Montreal"
+      },
+      "freedom": {
+        "title": "Buscadores de libertad",
+        "subtitle": "Trabajas donde hay trabajo. Vancouver en verano. Calgary para paros. Quizás Seattle o Houston cuando el mercado está bien.",
+        "problem": "El problema",
+        "problemText1": "No eres inestable. Eres móvil. Pero cada nueva ciudad significa demostrar tu valía de nuevo. Referencias a 2,000 millas. Sin reputación local. Tres horas de papeleo antes de tu primer turno.",
+        "problemText2": "Necesitas empezar a ganar AHORA, no después de una semana de incorporación burocrática.",
+        "solution": "La solución",
+        "solutionText1": "Tu identidad profesional viaja contigo. ¿Tu historial de Vancouver? Visible en Seattle. ¿Tus certificaciones? Pre-verificadas. ¿Tu calificación de seguridad? Prueba de que eres confiable antes de aparecer.",
+        "solutionText2": "Renuncia el viernes en una ciudad. Empieza el lunes en otra. Cero papeleo.",
+        "testimonial": "\"Llegué a Toronto sin nada más que mi equipo y mi perfil OnRopePro. Empecé a trabajar esa tarde.\"",
+        "testimonialAuthor": "- Lena B., L2 IRATA, Nómada"
+      }
+    },
+    "howItWorks": {
+      "title": "30 segundos para configurar. 10 años de datos de carrera protegidos.",
+      "step1": {
+        "title": "Crea tu cuenta",
+        "description": "Ingresa tu número de licencia IRATA o SPRAT. Agrega tus certificaciones. Sube tu foto. Listo."
+      },
+      "step2": {
+        "title": "Conéctate con empleadores",
+        "description": "Cuando te unes a una empresa que usa OnRopePro, te envían una invitación. Acéptala. Tu perfil llena su sistema instantáneamente. Sin formularios. Sin entrada de datos redundante."
+      },
+      "step3": {
+        "title": "Trabaja. Todo se registra automáticamente.",
+        "description": "Cuando estás conectado a un empleador en OnRopePro, cada sesión de trabajo captura: fecha, edificio, altura, tareas, duración. Agrupado por proyecto. Totalizado por mes y año."
+      },
+      "step4": {
+        "title": "Exporta y llena tu bitácora física",
+        "description": "Descarga tu historial de trabajo completo como PDF o CSV. Transfiere datos precisos a tu bitácora física IRATA/SPRAT. Tu evaluador aún revisa tu libro físico - OnRopePro solo asegura que los datos sean correctos."
+      },
+      "note": "Nota:",
+      "noteText": "Tu cuenta funciona incluso sin un empleador en la plataforma. Puedes almacenar certificaciones, seguir el historial manualmente y acceder al tablero de empleos (PLUS). ¿Pero cuando tu empleador también usa OnRopePro? Todo se potencia - seguimiento automático de horas, incorporación instantánea, documentación fluida.",
+      "tellYourBoss": "Dile a tu jefe que lo revise. Ambos ganan."
+    },
+    "clarifications": {
+      "warningTitle": "ESTO NO REEMPLAZA TU BITÁCORA FÍSICA",
+      "warningText1": "Tu bitácora física IRATA/SPRAT sigue siendo requerida. OnRopePro es un asistente digital que te da datos precisos para transferir a tu bitácora oficial - no la reemplaza.",
+      "warningText2": "Los organismos de certificación IRATA y SPRAT requieren que mantengas tu bitácora física. Ese requisito no ha cambiado. Lo que ha cambiado es qué tan precisas pueden ser tus entradas.",
+      "before": "Antes:",
+      "beforeText": "Adivinas horas y detalles al llenar tu bitácora semanas después",
+      "after": "Después:",
+      "afterText": "Copias datos precisos con marca de tiempo desde OnRopePro a tu bitácora",
+      "warningText3": "Tu evaluador aún revisa tu libro físico. OnRopePro solo asegura que los datos estén correctos.",
+      "dataControl": {
+        "title": "Tus datos. Tu control.",
+        "export": "Exporta en cualquier momento. Sin ataduras.",
+        "delete": "Elimina tu cuenta en cualquier momento. Tus datos van contigo.",
+        "privacy": "Los empleadores solo ven lo que eliges compartir.",
+        "sinOptional": "Tu número de seguro social es opcional. Negarte no limitará tu cuenta."
+      },
+      "security": {
+        "title": "Seguridad",
+        "encryption": "Datos bancarios y sensibles encriptados usando AES-256-GCM.",
+        "soc2": "Cumple SOC2 Tipo II.",
+        "pipeda": "Cumple PIPEDA."
+      }
+    },
+    "socialProof": {
+      "title": "Más de 500 técnicos de acceso con cuerdas en Norteamérica",
+      "testimonial1": {
+        "quote": "\"Casi pierdo 187 horas cuando Skyline Rope Access cerró. Esas horas siguen en mi cuenta OnRopePro. Portátiles, protegidas, mías.\"",
+        "author": "- Tyler R., L2 IRATA, Calgary"
+      },
+      "testimonial2": {
+        "quote": "\"Cambié de empleador dos veces este año. Tiempo total de incorporación: menos de 5 minutos. Combinado.\"",
+        "author": "- Sarah K., L3 IRATA, Toronto"
+      },
+      "testimonial3": {
+        "quote": "\"No soy bueno con las apps. ¿Pero esta? Registro un edificio en 10 segundos entre descensos. Un año después, tengo registros perfectos.\"",
+        "author": "- Mike D., L1 SPRAT, Vancouver"
+      },
+      "testimonial4": {
+        "quote": "\"Por fin algo construido para técnicos, no para empleadores que pretenden preocuparse por los técnicos.\"",
+        "author": "- Jordan L., L2 IRATA, Seattle"
+      }
+    },
+    "plusUpgrade": {
+      "title": "Desbloquea PLUS. No pagues nada. Así es como.",
+      "description": "Las cuentas PLUS son gratis. No \"prueba gratis\". No \"gratis por 30 días\". Realmente gratis.",
+      "howItWorks": "Cómo funciona:",
+      "step1": "Crea tu cuenta gratuita",
+      "step2": "Refiere a otro técnico",
+      "step3": "Te actualizan automáticamente",
+      "conclusion": "Eso es todo. Una referencia. Acceso PLUS de por vida para ti.",
+      "whyTitle": "Por qué hacemos esto",
+      "whyText": "Los técnicos SON la red. Mientras más técnicos en OnRopePro, más empleadores lo adoptan. Mientras más empleadores lo adoptan, más valioso se vuelve tu perfil.",
+      "whyConclusion": "No eres el producto. Eres la razón por la que existe la plataforma."
+    },
+    "faq": {
+      "title": "Preguntas frecuentes",
+      "q1": "¿La cuenta de técnico es realmente gratis?",
+      "a1": "Sí. Gratis para siempre. Sin tarjeta de crédito requerida. Sin límites de tiempo. Sin restricciones de funciones que te bloqueen de repente.",
+      "q2": "¿Qué pasa si mi empleador no usa OnRopePro?",
+      "a2Intro": "Tu cuenta sigue funcionando. Puedes:",
+      "a2List1": "Almacenar certificaciones y datos de perfil",
+      "a2List2": "Importar tu bitácora existente por foto",
+      "a2List3": "Registrar horas manualmente",
+      "a2List4": "Acceder al tablero de empleos (PLUS)",
+      "a2Conclusion": "Lo que no tendrás es seguimiento automático de horas - eso solo funciona cuando tu empleador también está en la plataforma. Pero aquí está la cosa: cuando tu empleador se une, tu cuenta se actualiza instantáneamente. Todo ese registro manual se vuelve automático. Dile a tu jefe.",
+      "q3": "¿Cómo importo mi bitácora existente?",
+      "a3": "Abre la app, fotografía las páginas de tu bitácora, y la app lee tu escritura y extrae los datos. Revisa, confirma, listo. Años de horas históricas importadas en minutos - sin entrada manual de datos.",
+      "q4": "¿Esto reemplaza mi bitácora IRATA/SPRAT?",
+      "a4": "No. Aún necesitas tu bitácora física. IRATA y SPRAT lo requieren. Tu evaluador la revisará. OnRopePro es un asistente digital que captura datos precisos para que puedas llenar tu bitácora física correctamente - no es un reemplazo.",
+      "q5": "¿Cuál es la diferencia entre registro automático y manual?",
+      "a5Manual": "Registro manual:",
+      "a5ManualText": "Tú ingresas horas, edificios y tareas (o fotografías tu bitácora para importar). Funciona en cualquier momento, con o sin empleador en la plataforma.",
+      "a5Auto": "Registro automático:",
+      "a5AutoText": "Cuando tu empleador usa OnRopePro, tus horas se registran automáticamente cuando marcas entrada/salida. Edificio, altura, tareas, duración - todo capturado sin que ingreses nada. Este es el verdadero ahorro de tiempo.",
+      "q6": "¿Qué pasa con mis datos si dejo una empresa?",
+      "a6": "Tu perfil (certificaciones, historial de trabajo, calificación de seguridad) se queda contigo permanentemente. Los datos específicos de la empresa (equipo asignado, documentos de la empresa) se quedan con ese empleador. Tu identidad principal siempre es tuya.",
+      "q7": "¿Cómo obtengo PLUS?",
+      "a7": "Refiere a otro técnico que cree una cuenta. Ambos son actualizados a PLUS automáticamente. Sin pago requerido.",
+      "q8": "¿Están seguros mis datos?",
+      "a8": "Encriptación AES-256-GCM para todos los datos sensibles. Infraestructura que cumple SOC2 Tipo II. Cumple PIPEDA (Canadá). Tu número de seguro social es completamente opcional.",
+      "q9": "¿Los empleadores pueden ver que estoy buscando otro trabajo?",
+      "a9": "No. Tu actividad en el tablero de empleos es privada. Los empleadores solo ven lo que explícitamente compartes con ellos."
+    },
+    "finalCta": {
+      "title": "Tus horas sobreviven a tu empleador.",
+      "subtitle": "Las empresas cierran. Los supervisores renuncian. El papel se pierde. Las hojas de cálculo se corrompen. Pero tu inversión de carrera - las 500, 1,000, 2,000 horas que has trabajado en altura - eso nunca debería desaparecer.",
+      "description": "Crea tu cuenta. Empieza a construir tu identidad profesional portátil. Es gratis. Es tuya. Para siempre.",
+      "learnAboutEmployers": "Conoce las funciones para empleadores"
+    },
+    "footer": {
+      "allRightsReserved": "Todos los derechos reservados.",
+      "privacyPolicy": "Política de privacidad"
+    },
+    "toast": {
+      "welcome": "¡Bienvenido de nuevo!",
+      "loggedIn": "Conectado como",
+      "checkEmail": "Revisa tu correo electrónico",
+      "resetSent": "Si existe una cuenta con ese correo, recibirás instrucciones de restablecimiento."
+    },
+    "errors": {
+      "licenseRequired": "El número de licencia o correo electrónico es requerido",
+      "passwordRequired": "La contraseña es requerida",
+      "loginFailed": "Error de inicio de sesión",
+      "verifyFailed": "Error al verificar el estado de la cuenta. Por favor intenta de nuevo.",
+      "genericError": "Ocurrió un error. Por favor intenta de nuevo."
+    }
+  },
+  "propertyManagerLanding": {
+    "hero": {
+      "badge": "Para Administradores de Propiedades",
+      "titleLine1": "Deja de ser el departamento de quejas.",
+      "titleLine2": "Empieza a ser el administrador de propiedades.",
+      "subtitle": "Cuando tus proveedores de acceso con cuerdas usan OnRopePro, los residentes envían quejas directamente a ellos. Te mantienes informado sin ser el intermediario. Acceso gratuito a calificaciones de seguridad de proveedores, tiempos de respuesta y datos de resolución de quejas. Sin costo. Sin trampa. Solo libertad."
+    },
+    "cta": {
+      "createFreeAccount": "Crea tu cuenta gratuita",
+      "learnHow": "Descubre cómo funciona",
+      "getFreeAccess": "Obtén acceso gratuito",
+      "tellVendor": "Cuéntale a tu proveedor sobre OnRopePro"
+    },
+    "hook": {
+      "question": "¿Cuántas quejas de residentes transmitiste a proveedores el mes pasado?",
+      "problem": "Cada ventana con rayas, cada pregunta sobre el horario, cada \"¿cuándo vienen a mi lado del edificio?\" llega primero a tu escritorio. Reenvías. Das seguimiento. Transmites la respuesta. Eres el intermediario para cada problema de cada edificio que administras.",
+      "solution": "¿Y si las quejas fueran directamente a tu proveedor?",
+      "description": "Cuando tus proveedores usan OnRopePro, los residentes envían sus comentarios directamente a ellos. Ves todo: qué se reportó, cuándo se vio, qué tan rápido se resolvió. Pero ya no estás en medio de todo.",
+      "tagline": "Supervisión sin involucramiento. Eso es el Portal de Administrador de Propiedades."
+    },
+    "features": {
+      "title": "Fuera del ciclo de quejas. En el conocimiento.",
+      "directComplaints": {
+        "title": "Los residentes se quejan directamente con los proveedores. No contigo.",
+        "badge": "Lo más importante",
+        "p1": "Cuando tus proveedores usan OnRopePro, los residentes obtienen acceso a un Portal de Residentes. Envían quejas con fotos directamente a la empresa de mantenimiento. El proveedor responde. El problema se resuelve.",
+        "p2": "No estás en medio. No eres el intermediario. No pasas tu martes reenviando correos y haciendo llamadas de seguimiento.",
+        "p3": "Pero ves todo. Cada queja. Cada respuesta. Cada resolución. Visibilidad completa sin ser el intermediario.",
+        "p4": "Para un administrador de propiedades que maneja 50 edificios, esta es la diferencia entre ahogarse en la coordinación de quejas y realmente administrar propiedades."
+      },
+      "responseTime": {
+        "title": "Métricas de tiempo de respuesta: La responsabilidad que te faltaba",
+        "p1": "Cuando los residentes se quejan directamente con los proveedores, estos pueden ignorarlos. O pueden responder en 24 horas. Ahora sabes cuál.",
+        "p2": "El Portal de Administrador de Propiedades muestra tiempos de resolución promedio y tasas de respuesta a comentarios para cada contratista. Cuando ves a un proveedor tardando 12 días en responder mientras otro resuelve problemas en 2 días, tienes datos para tu próxima conversación contractual.",
+        "p3": "Esto es lo que Tommy (nuestro cofundador, 15 años en acceso con cuerdas) dice que los administradores de propiedades más valoran: \"Este será un factor más importante que las calificaciones de seguridad. ¿Están realmente respondiendo a las quejas?\""
+      },
+      "safetyRatings": {
+        "title": "Calificaciones de seguridad de proveedores: Saber antes de que algo salga mal",
+        "p1": "Cada empresa de acceso con cuerdas en OnRopePro tiene una Calificación de Seguridad de Empresa (CSR) construida a partir de tres métricas de cumplimiento: exhaustividad de documentación, frecuencia de reuniones de seguridad y tasas de inspección de arneses.",
+        "p2": "Ves exactamente dónde está cada proveedor. Sin adivinar. Sin pedir informes que pueden falsificar.",
+        "p3": "Cuando un ajustador de seguros pregunta \"¿Qué sabías sobre las prácticas de seguridad de este proveedor?\", tienes una respuesta."
+      },
+      "vendorDashboard": {
+        "title": "Todos tus proveedores. Un solo panel.",
+        "p1": "¿Administras 20 edificios con diferentes contratistas? Encontrar qué empresa da servicio a qué edificio no debería requerir revisar correos y contratos.",
+        "p2": "El Panel de Mis Proveedores muestra cada empresa de acceso con cuerdas contratada, sus puntuaciones de seguridad, sus tiempos de respuesta y cuáles de tus edificios atienden. Treinta segundos en lugar de veinte minutos."
+      },
+      "feedbackHistory": {
+        "title": "Historial de comentarios por edificio",
+        "p1": "¿Ese residente que se quejó de ventanas con rayas tres veces? Rastrea toda la conversación. Ve cuándo respondió el proveedor, qué dijo, cuánto tardó la resolución.",
+        "p2": "El historial de quejas y resoluciones edificio por edificio te da documentación cuando las conversaciones sobre rendimiento se vuelven difíciles. O cuando estás decidiendo si renovar un contrato."
+      },
+      "anchorInspection": {
+        "title": "Carga de certificado de inspección de anclajes",
+        "p1": "Las inspecciones anuales de anclajes son requeridas para trabajos de acceso con cuerdas. Recibes el certificado del inspector externo. Ahora tienes un lugar para guardarlo.",
+        "p2": "Carga certificados de inspección de anclajes directamente en el registro de cada edificio. Tu único permiso de escritura. Todo lo demás es solo lectura para la integridad de datos."
+      }
+    },
+    "comparison": {
+      "title": "Antes vs. Después: A dónde van las quejas",
+      "before": {
+        "title": "Antes de OnRopePro",
+        "step1": "El residente nota un problema",
+        "step2": "El residente llama/envía correo al administrador de propiedades",
+        "step3": "El administrador de propiedades reenvía al proveedor",
+        "step4": "(esperar...)",
+        "step5": "El proveedor responde al administrador de propiedades",
+        "step6": "El administrador de propiedades transmite al residente",
+        "step7": "El residente tiene una pregunta de seguimiento...",
+        "repeat": "(repetir todo el ciclo)",
+        "summary": "Eres el intermediario. Cada queja, cada actualización, cada seguimiento pasa por tu bandeja de entrada. Multiplica por 50 edificios. Esa es tu semana."
+      },
+      "after": {
+        "title": "Con OnRopePro",
+        "step1": "El residente nota un problema",
+        "step2": "El residente envía directamente al proveedor (con fotos)",
+        "step3": "El proveedor responde directamente al residente",
+        "resolved": "Problema resuelto",
+        "whereAreYou": "¿Dónde estás tú en este flujo?",
+        "watching": "Observando desde tu panel. Ves cada queja que llega, cuándo se vio, cuánto tardó la resolución. Si un proveedor ignora quejas, lo sabrás. Si responden en 24 horas, también lo verás.",
+        "notMiddle": "Pero no estás en medio. No eres el intermediario. No pasas horas en coordinación de quejas.",
+        "oversight": "Eres el administrador de propiedades con supervisión. No el departamento de quejas."
+      }
+    },
+    "howItWorks": {
+      "title": "Tres pasos. Cinco minutos. Gratis para siempre.",
+      "step1": {
+        "title": "Obtén tu código de administrador de propiedades",
+        "description": "Pídele a tu proveedor de acceso con cuerdas un Código de Administrador de Propiedades. Cualquier empresa que use OnRopePro puede generar uno para ti. Les toma 30 segundos."
+      },
+      "step2": {
+        "title": "Crea tu cuenta gratuita",
+        "description": "Ingresa el código, crea tu cuenta y especifica qué edificios administras. Sin tarjeta de crédito. Sin período de prueba. Acceso gratuito. Punto."
+      },
+      "step3": {
+        "title": "Observa cómo disminuye tu carga de trabajo",
+        "description": "Ve calificaciones de seguridad, métricas de respuesta y datos de resolución de quejas para cada proveedor que da servicio a tus edificios. Ve quejas siendo manejadas sin tu involucramiento. Compara contratistas objetivamente. Toma decisiones informadas."
+      },
+      "footer": "Cuando los residentes de tus edificios empiecen a usar el Portal de Residentes, las quejas dejan de pasar por ti. Solo ves los resultados."
+    },
+    "whyFree": {
+      "title": "Sí, es realmente gratis. He aquí por qué.",
+      "p1": "Tus proveedores pagan por OnRopePro. Tú no.",
+      "p2": "Cuando los administradores de propiedades pueden ver las calificaciones de seguridad de los proveedores, los contratistas tienen una motivación poderosa para mantener puntuaciones altas. Las empresas con buenos registros de seguridad obtienen más trabajo. Las empresas con malos registros pierden contratos.",
+      "p3": "Esa transparencia beneficia a todos: trabajo más seguro para técnicos, mejor selección de proveedores para ti, cumplimiento documentado para propósitos de seguros.",
+      "p4": "Tu acceso no es el producto. Tu visibilidad es lo que hace valioso el producto."
+    },
+    "documentation": {
+      "title": "La documentación que desearás tener. Antes de necesitarla.",
+      "p1": "Auditorías de seguros. Reclamos de responsabilidad. Consultas de la junta directiva. Inspecciones regulatorias.",
+      "p2": "Todos hacen la misma pregunta: \"¿Qué sabías sobre las prácticas de seguridad de tu proveedor?\"",
+      "p3": "El Portal de Administrador de Propiedades crea un rastro de auditoría automático. Cada vez que verificas el CSR de un proveedor, ves sus métricas de respuesta o comparas contratistas, esa visibilidad queda documentada.",
+      "p4": "Cuando alguien pregunta qué debida diligencia realizaste, tienes una respuesta.",
+      "p5": "Cuando el edificio de un competidor tiene un incidente y las noticias preguntan \"¿Podría pasar esto aquí?\", tienes datos que muestran exactamente cómo se comparan tus proveedores."
+    },
+    "timeBack": {
+      "title": "¿Qué harías con 10 horas extra a la semana?",
+      "p1": "Los administradores de propiedades que manejan 30+ edificios pasan 8-15 horas semanales solo en coordinación de quejas. Reenviando correos. Dando seguimiento a proveedores. Transmitiendo respuestas. Persiguiendo actualizaciones.",
+      "p2": "Cuando las quejas van directamente a los proveedores:",
+      "p3": "Esas horas desaparecen de tu carga de trabajo.",
+      "p4": "Sigues teniendo visibilidad completa. Sigues viendo tiempos de respuesta. Sigues teniendo documentación para reuniones de junta y renovaciones de contratos. Solo ya no tienes que ser el intermediario.",
+      "p5": "Ese es tiempo de vuelta para renovaciones de arrendamiento. Para relaciones con inquilinos. Para el trabajo estratégico que realmente hace crecer tu portafolio. Para salir a las 5pm en lugar de las 7pm.",
+      "p6": "El Portal de Administrador de Propiedades no solo te da datos. Te devuelve tu tiempo."
+    },
+    "accountability": {
+      "title": "Cuando los proveedores saben que estás observando, todo cambia.",
+      "p1": "Esto es lo que pasa cuando puedes ver los tiempos de respuesta de los proveedores:",
+      "p2": "El proveedor que tarda 12 días en responder a quejas sabe que puedes verlo. El proveedor que resuelve problemas en 48 horas sabe que también puedes verlo.",
+      "p3": "Una calificación de seguridad del 86% versus una del 23% cuenta una historia. Un tiempo de resolución promedio de 2 días versus uno de 14 días cuenta otra.",
+      "p4": "Cuando los administradores de propiedades pueden ver estos números, los proveedores no pueden esconderse detrás de garantías vagas. Las empresas que hacen bien el trabajo finalmente tienen pruebas. Las empresas que toman atajos o ignoran quejas quedan expuestas.",
+      "p5": "Tu visibilidad crea responsabilidad. Cuando los proveedores saben que sus tiempos de respuesta afectan sus contratos, la capacidad de respuesta se convierte en una ventaja competitiva.",
+      "p6": "Mejor para los residentes. Mejor para ti. Mejor para todos los que viven y trabajan en tus edificios."
+    },
+    "faq": {
+      "title": "Preguntas frecuentes",
+      "q1": {
+        "question": "\"¿Qué pasa si mis proveedores no usan OnRopePro?\"",
+        "a1": "Pregúntales al respecto. Los proveedores que priorizan la seguridad y la capacidad de respuesta quieren que los administradores de propiedades vean sus calificaciones y tiempos de resolución. Si resisten la transparencia, eso te dice algo.",
+        "a2": "También puedes decirles: \"Me gustaría dejar de ser el intermediario de quejas entre los residentes y tu empresa. OnRopePro permite que los residentes envíen directamente a ti, y yo obtengo visibilidad de los tiempos de respuesta.\"",
+        "a3": "La mayoría de los proveedores verán eso como un beneficio, no una carga."
+      },
+      "q2": {
+        "question": "\"¿Qué pasa si los residentes siguen quejándose conmigo de todos modos?\"",
+        "a1": "Redirígelos. \"Envía tus comentarios a través del Portal de Residentes. El proveedor lo verá inmediatamente y responderá directamente. Puedo ver todo lo que envías, pero responderán más rápido si vas directamente.\"",
+        "a2": "La mayoría de los residentes prefieren el acceso directo a esperar que tú transmitas mensajes. El sistema entrena el comportamiento rápidamente."
+      },
+      "q3": {
+        "question": "\"No quiero perder visibilidad de lo que pasa en mis edificios.\"",
+        "a1": "No la perderás. Ese es el punto.",
+        "a2": "Ves cada queja que llega, cuándo se vio, cuándo se resolvió, qué dijo el proveedor. Tienes visibilidad completa de toda la conversación.",
+        "a3": "Solo ya no tienes que estar EN la conversación. Supervisión sin involucramiento."
+      },
+      "q4": {
+        "question": "\"Ya rasteo certificados de proveedores en hojas de cálculo.\"",
+        "a1": "Los certificados confirman que existe el seguro. No te dicen si los trabajadores realmente siguen protocolos de seguridad. CSR muestra cumplimiento en tiempo real, no papeleo.",
+        "a2": "Y las hojas de cálculo no enrutan quejas directamente a los proveedores. No te muestran métricas de tiempo de respuesta. No te dan los datos que necesitas para decisiones de contratos."
+      },
+      "q5": {
+        "question": "\"Esto parece demasiado bueno para ser gratis.\"",
+        "a1": "Tus proveedores pagan por la plataforma. Tu acceso crea la visibilidad que hace valiosa su inversión. No hay trampa porque no eres el cliente. Eres el mecanismo de responsabilidad que hace funcionar el sistema."
+      },
+      "q6": {
+        "question": "\"Necesito consultar primero con mi gerente de portafolio.\"",
+        "a1": "Muéstrale esta página. El argumento del ROI se escribe solo:",
+        "a2": "Acceso gratuito. Eliminación de quejas. Datos de responsabilidad de proveedores. Documentación de responsabilidad. No se requiere presupuesto.",
+        "a3": "¿Cuál es el contraargumento?"
+      }
+    },
+    "finalCta": {
+      "title": "Supervisión sin involucramiento. Visibilidad sin carga.",
+      "subtitle1": "Las quejas van directamente a los proveedores. Ves todo sin estar en medio.",
+      "subtitle2": "Las calificaciones de seguridad muestran cumplimiento real. Los tiempos de respuesta prueban responsabilidad.",
+      "free": "Gratis. Sin tarjeta de crédito. Sin expiración de prueba.",
+      "askVendor": "Solo pídele a tu proveedor un Código de Administrador de Propiedades y crea tu cuenta."
+    },
+    "footer": {
+      "tagline": "Software de gestión para acceso con cuerdas",
+      "privacy": "Política de privacidad",
+      "terms": "Términos de servicio"
+    }
+  },
+  "residentLanding": {
+    "hero": {
+      "badge": "Para residentes del edificio",
+      "title": "Sepa que su comentario fue recibido.",
+      "subtitle": "Sígalo hasta su resolución.",
+      "description": "Envíe comentarios con fotos, vea exactamente cuándo fueron vistos y siga el progreso en tiempo real.",
+      "tagline": "Sin más llamadas telefónicas. Sin más suposiciones."
+    },
+    "buttons": {
+      "close": "Cerrar",
+      "createAccount": "Crear su cuenta",
+      "createAccountShort": "Crear cuenta",
+      "signIn": "Iniciar sesión",
+      "logIn": "Ingresar"
+    },
+    "form": {
+      "emailAddress": "Correo electrónico",
+      "emailPlaceholder": "usted@ejemplo.com",
+      "password": "Contraseña",
+      "passwordPlaceholder": "Su contraseña",
+      "forgotPassword": "¿Olvidó su contraseña?",
+      "noAccount": "¿No tiene una cuenta?",
+      "resetPassword": "Restablecer su contraseña",
+      "resetInstructions": "Ingrese su correo electrónico y le enviaremos instrucciones para restablecer.",
+      "sendResetLink": "Enviar enlace de restablecimiento",
+      "backToSignIn": "Volver a iniciar sesión",
+      "checkYourEmail": "Revise su correo electrónico",
+      "resetEmailSent": "Si existe una cuenta con ese correo electrónico, recibirá instrucciones de restablecimiento en breve."
+    },
+    "toast": {
+      "welcomeBack": "¡Bienvenido de vuelta!",
+      "redirecting": "Redirigiendo a su panel de control...",
+      "checkEmail": "Revise su correo electrónico",
+      "resetInstructions": "Si existe una cuenta con ese correo electrónico, recibirá instrucciones de restablecimiento."
+    },
+    "errors": {
+      "invalidCredentials": "Correo electrónico o contraseña inválidos",
+      "somethingWentWrong": "Algo salió mal. Por favor, inténtelo de nuevo."
+    },
+    "stats": {
+      "oneSubmission": "1 Envío",
+      "notThreeCalls": "(No 3 llamadas)",
+      "proofTheySawIt": "Prueba de que lo vieron",
+      "viewedTimestamp": "Marca de tiempo de visualización",
+      "zeroLost": "0 Perdidas",
+      "complaints": "Quejas",
+      "twentyFourHourResolution": "Resolución en 24h",
+      "notFiveDays": "(No 5 días)"
+    },
+    "problemStatement": {
+      "title": "¿Cansado de quejas que no llegan a ningún lado?",
+      "paragraph1": "Envía un correo electrónico al administrador de la propiedad sobre manchas en su ventana. Pasa una semana. Nada. Llama. Dicen que lo reenviaron al proveedor. El proveedor dice que nunca lo recibió.",
+      "paragraph2": "Ahora tres personas están involucradas en rastrear un correo electrónico que puede o no haber sido enviado.",
+      "paragraph3": "Mientras tanto, ve equipos trabajando en el edificio pero no tiene idea si han llegado a su lado. Llama de nuevo. Resulta que terminaron su piso ayer.",
+      "solution": "El Portal de Residentes lo pone en contacto directo con la empresa de servicio que trabaja en su edificio. Envíe una vez. Vea cuándo fue visto. Sígalo hasta la resolución."
+    },
+    "whatYouCanDo": {
+      "title": "Su portal. Su control.",
+      "subtitle": "El Portal de Residentes le da acceso directo a actualizaciones de proyectos y un canal de comunicación documentado con el equipo de servicio."
+    },
+    "features": {
+      "trackProgress": {
+        "title": "Seguir el progreso del proyecto",
+        "description": "Vea exactamente dónde están trabajando los equipos y cuándo llegarán a su lado del edificio. Las barras de progreso en tiempo real muestran qué fachadas están completas, para que sepa cuándo mover las plantas del balcón o prepararse para el acceso a las ventanas.",
+        "whatYouSee": "Lo que ve:",
+        "item1": "Qué lado del edificio se está trabajando ahora",
+        "item2": "Porcentaje de finalización para cada fachada",
+        "item3": "Cronograma de finalización esperado",
+        "item4": "Sin más llamadas prematuras de \"se saltaron mi ventana\""
+      },
+      "submitFeedback": {
+        "title": "Enviar comentarios con fotos",
+        "description": "Informe problemas, inquietudes o elogios directamente a través del portal. Adjunte fotos desde su teléfono. Un solo envío captura su nombre, número de unidad y la evidencia visual necesaria para una resolución rápida.",
+        "whatYouCanSubmit": "Lo que puede enviar:",
+        "item1": "Manchas, marcas o áreas omitidas",
+        "item2": "Inquietudes sobre daños",
+        "item3": "Problemas de acceso (plantas, muebles en el camino)",
+        "item4": "Elogios por un trabajo bien hecho"
+      },
+      "trackStatus": {
+        "title": "Seguir el estado de sus comentarios",
+        "description": "Cada envío tiene marca de tiempo y seguimiento. Vea cuándo la empresa vio su comentario por primera vez. Observe el estado cambiar de Nuevo a Visto a Cerrado. Sin más preguntarse si alguien lo vio.",
+        "whatYouTrack": "Lo que sigue:",
+        "item1": "Fecha y hora de envío",
+        "item2": "Marca de tiempo \"Visto\" que muestra cuándo la empresa lo vio",
+        "item3": "Estado actual (Nuevo, Visto, Cerrado)",
+        "item4": "Respuestas del equipo de servicio"
+      }
+    },
+    "screenshots": {
+      "title": "Véalo en acción",
+      "subtitle": "Esto es lo que verá cuando inicie sesión en su Portal de Residentes.",
+      "projectProgressCaption": "Vista del progreso del proyecto mostrando el estado de finalización para cada fachada del edificio",
+      "workNoticesAlt": "Pantalla de avisos de trabajo",
+      "workNoticesCaption": "Pantalla de avisos de trabajo mostrando limpieza de ventanas programada con aviso de privacidad",
+      "submitFeedbackAlt": "Formulario de envío de comentarios",
+      "submitFeedbackCaption": "Formulario de envío con campos para nombre, teléfono, número de unidad, selección de proyecto y mensaje",
+      "feedbackHistoryAlt": "Vista del historial de comentarios",
+      "feedbackHistoryCaption": "Vista del historial de comentarios mostrando envíos con estado y fecha",
+      "residentProfileAlt": "Pestaña de perfil del residente",
+      "residentProfileCaption": "Pestaña de perfil donde cambia los detalles de su cuenta si se muda, e ingresa su código de empresa para ver trabajos en curso"
+    },
+    "howItWorks": {
+      "title": "Tres pasos hacia una comunicación directa",
+      "step1": {
+        "label": "Paso 1",
+        "title": "Cree su cuenta",
+        "description": "Regístrese con su correo electrónico, número de plan de strata y número de unidad. Esto vincula su cuenta a su edificio y unidad específicos. Toma aproximadamente dos minutos."
+      },
+      "step2": {
+        "label": "Paso 2",
+        "title": "Ingrese el código del proveedor",
+        "description": "Su administrador de edificio o administrador de propiedades le proporciona un código de proveedor. Ingréselo una vez en su perfil para conectarse con la empresa de servicio que trabaja en su edificio."
+      },
+      "step3": {
+        "label": "Paso 3",
+        "title": "Vea proyectos y envíe comentarios",
+        "description": "Su panel de control muestra proyectos activos en su edificio. Vea el progreso. Envíe comentarios. Siga las respuestas. Todo en un solo lugar."
+      },
+      "note": {
+        "label": "Nota:",
+        "text": "Su cuenta permanece con usted. Si se muda a un edificio diferente, actualice su número de strata e ingrese el nuevo código del proveedor. No es necesario empezar de nuevo."
+      }
+    },
+    "problemsSolved": {
+      "title": "Problemas reales. Soluciones reales.",
+      "problem1": {
+        "trigger": "\"Mi queja desapareció en un agujero negro.\"",
+        "description": "Envió un comentario por correo electrónico o teléfono. Pasan los días. Sin respuesta. Hace seguimiento. No pueden encontrarlo. Explica todo de nuevo. Todavía nada.",
+        "solution": "Con el Portal de Residentes, cada envío se registra con una marca de tiempo. Ve la fecha y hora exactas en que la empresa abrió su comentario. \"No lo vi\" se vuelve imposible cuando puede probar que lo vieron el martes a las 2:47 PM."
+      },
+      "problem2": {
+        "trigger": "\"Ya expliqué esto tres veces.\"",
+        "description": "Teléfono al administrador de propiedades. Administrador al proveedor. Proveedor al técnico. En algún momento del camino, \"mancha de agua en la ventana del dormitorio\" se convirtió en \"problema con el vidrio del balcón\". El técnico llega confundido.",
+        "solution": "Envíe una vez a través del portal. Su nombre, unidad, teléfono y descripción son capturados. Adjunte fotos. Listo. El equipo ve exactamente lo que usted ve. Sin teléfono descompuesto."
+      },
+      "problem3": {
+        "trigger": "\"No tengo idea si ya hicieron mi ventana.\"",
+        "description": "Hay equipos en el edificio. Puede verlos desde la calle. ¿Pero están en el lado norte o sur? ¿Terminaron su piso ayer o está programado para la próxima semana?",
+        "solution": "El portal muestra el progreso en tiempo real por fachada. Sabe que su lado aún no ha sido tocado. Espera. Sin llamadas innecesarias preguntando \"¿ya terminaron?\""
+      },
+      "problem4": {
+        "trigger": "\"Dijeron que lo arreglarían pero nada cambió.\"",
+        "description": "Comentario enviado. Respuesta recibida. Problema marcado como cerrado. Pero nada mejoró realmente. ¿Y ahora qué?",
+        "solution": "Puede ver el historial de estados y cualquier respuesta del equipo. Si el problema persiste después del cierre, contacte a su administrador de edificio con prueba documentada de lo que se comunicó."
+      }
+    },
+    "keyFeatures": {
+      "title": "Construido para la claridad",
+      "subtitle": "Cada función existe para eliminar la confusión y darle visibilidad sobre lo que está sucediendo en su edificio.",
+      "viewedTimestamp": {
+        "title": "Marca de tiempo de visualización",
+        "description": "Vea la fecha y hora exactas en que la empresa abrió su comentario por primera vez. Responsabilidad incorporada."
+      },
+      "photoUploads": {
+        "title": "Carga de fotos",
+        "description": "Adjunte fotos directamente desde su teléfono al enviar comentarios. La evidencia clara acelera la resolución."
+      },
+      "progressTracking": {
+        "title": "Seguimiento del progreso",
+        "description": "Las barras de progreso en tiempo real muestran qué lado del edificio está completo. Sepa cuándo el trabajo se acerca a su unidad."
+      },
+      "statusBadges": {
+        "title": "Insignias de estado",
+        "description": "Nuevo, Visto, Cerrado. Siempre sepa dónde está su comentario de un vistazo."
+      },
+      "portableAccount": {
+        "title": "Cuenta portátil",
+        "description": "¿Se muda a un nuevo edificio? Actualice su número de strata e ingrese el nuevo código del proveedor. Su cuenta lo sigue."
+      },
+      "privacyProtection": {
+        "title": "Protección de privacidad",
+        "description": "Sus comentarios solo son visibles para usted y la empresa de servicio. Otros residentes no pueden ver sus envíos."
+      }
+    },
+    "measurableResults": {
+      "title": "Lo que cambia con el portal",
+      "fasterResponse": {
+        "title": "Respuesta más rápida",
+        "description": "Los envíos de comentarios con fotos reciben una respuesta inicial en 24 horas en promedio. Sin más esperar una semana para saber si alguien recibió su queja."
+      },
+      "resolutionTime": {
+        "title": "Tiempo de resolución",
+        "description": "Los problemas que antes tardaban 3-5 días en resolverse ahora se cierran en 24 horas en promedio. La comunicación directa elimina la demora del intermediario."
+      },
+      "zeroLostComplaints": {
+        "title": "Cero quejas perdidas",
+        "description": "Cada envío se registra, tiene marca de tiempo y se rastrea. Nada se escapa."
+      },
+      "selfServeUpdates": {
+        "title": "Actualizaciones de autoservicio",
+        "description": "Verifique el progreso del proyecto en cualquier momento sin llamar. Sepa cuándo el trabajo llegará a su lado antes de tener que preguntar."
+      }
+    },
+    "faqs": {
+      "title": "Preguntas frecuentes",
+      "faq1": {
+        "question": "¿Cómo obtengo el código del proveedor?",
+        "answer": "Contacte a su administrador de edificio o administrador de propiedades. Ellos reciben el código del proveedor de la empresa de servicio y lo comparten con los residentes."
+      },
+      "faq2": {
+        "question": "¿Puedo acceder al portal desde mi teléfono?",
+        "answer": "Sí. El portal funciona en cualquier dispositivo con acceso a Internet: teléfono, tableta o computadora."
+      },
+      "faq3": {
+        "question": "¿Qué pasa si me mudo a otra unidad en el mismo edificio?",
+        "answer": "Actualice su número de unidad en la configuración de su cuenta. Su número de plan de strata permanece igual."
+      },
+      "faq4": {
+        "question": "¿Qué pasa si me mudo a un edificio diferente?",
+        "answer": "Actualice tanto su número de plan de strata como su número de unidad. Ingrese el nuevo código del proveedor cuando lo reciba de su nuevo administrador de edificio."
+      },
+      "faq5": {
+        "question": "¿Pueden otros residentes ver mis comentarios?",
+        "answer": "No. Solo puede ver los comentarios que usted envió. Los administradores de edificio y la empresa de servicio pueden ver todos los comentarios del edificio, pero otros residentes no."
+      },
+      "faq6": {
+        "question": "¿Qué pasa si mi comentario está cerrado pero el problema persiste?",
+        "answer": "Solo la empresa puede reabrir comentarios cerrados. Si cree que un problema no se resolvió completamente, contacte a su administrador de edificio o administrador de propiedades con prueba documentada del portal."
+      },
+      "faq7": {
+        "question": "¿Puedo enviar comentarios positivos?",
+        "answer": "Absolutamente. El sistema acepta todo tipo de comentarios: inquietudes, elogios, preguntas y sugerencias."
+      },
+      "faq8": {
+        "question": "¿Cuánto tiempo tengo para enviar comentarios después de que se termina el trabajo?",
+        "answer": "Los residentes tienen 5 días hábiles después de la finalización del proyecto para enviar comentarios. Esta ventana permite tiempo para notar problemas mientras mantiene el período de queja razonable."
+      },
+      "faq9": {
+        "question": "¿Están seguros mis datos?",
+        "answer": "Sí. Su cuenta usa contraseñas encriptadas y sesiones seguras. Sus comentarios son privados y visibles solo para usted y el personal autorizado."
+      }
+    },
+    "cta": {
+      "title": "Su edificio ya está usando este sistema",
+      "description": "La empresa de servicio de su edificio eligió OnRopePro para mejorar la comunicación con residentes como usted. Crear una cuenta toma dos minutos. Una vez que ingrese el código del proveedor, tendrá acceso directo para enviar comentarios.",
+      "tagline": "Sin más preguntarse. Sin más esperar. Sin más repetirse.",
+      "vendorCodeHelp": "¿Necesita el código del proveedor? Contacte a su administrador de edificio o administrador de propiedades."
+    },
+    "footer": {
+      "tagline": "Software de gestión para acceso con cuerdas",
+      "privacyPolicy": "Política de privacidad",
+      "termsOfService": "Términos de servicio"
+    }
   }
 }

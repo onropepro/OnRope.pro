@@ -188,19 +188,19 @@ export default function TechnicianLanding() {
           <div className="text-center space-y-6 pt-16">
             <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-technician-portal">
               <div className="flex flex-col items-center gap-1">
-                <span>For Rope Access Techs</span>
-                <span className="text-xs opacity-90">Urban Rope Tech Passport - Built by a Level 3 IRATA Tech</span>
+                <span>{t('technicianLanding.hero.badge')}</span>
+                <span className="text-xs opacity-90">{t('technicianLanding.hero.badgeSubtitle')}</span>
               </div>
             </Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              Your Hours. Your Proof.<br />
-              <span className="text-orange-100">Forever.</span>
+              {t('technicianLanding.hero.title')}<br />
+              <span className="text-orange-100">{t('technicianLanding.hero.titleHighlight')}</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-orange-100 max-w-3xl mx-auto leading-relaxed">
-              The portable work passport for rope access technicians.<br />
-              <strong>Every building. Every drop. Every hour-logged,<br />protected, and owned by you.</strong>
+              {t('technicianLanding.hero.subtitle')}<br />
+              <strong>{t('technicianLanding.hero.subtitleStrong')}</strong>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
@@ -211,7 +211,7 @@ export default function TechnicianLanding() {
                 onClick={() => setShowRegistration(true)}
                 data-testid="button-hero-create-account"
               >
-                Create Free Account
+                {t('technicianLanding.hero.createAccount')}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
               <Button 
@@ -221,12 +221,12 @@ export default function TechnicianLanding() {
                 onClick={handleToggleSignIn}
                 data-testid="button-hero-login"
               >
-                {t('techLogin.hero.signIn', 'Sign In')}
+                {t('technicianLanding.hero.signIn')}
               </Button>
             </div>
             
             <p className="text-sm text-orange-100/80">
-              No credit card, ever.
+              {t('technicianLanding.hero.noCreditCard')}
             </p>
 
             {/* Inline Sign In Form */}
@@ -475,29 +475,29 @@ export default function TechnicianLanding() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center space-y-6 mb-12">
             <h2 className="text-3xl md:text-4xl font-bold">
-              One account. Every employer. Your entire career.
+              {t('technicianLanding.valueProposition.title')}
             </h2>
           </div>
           
           <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
             <p>
-              OnRopePro gives you something the industry has never offered: a professional identity you actually own.
+              {t('technicianLanding.valueProposition.paragraph1')}
             </p>
             <p>
-              Not locked in your employer's filing cabinet. Not lost when companies fold. Not starting from zero every time you change jobs.
+              {t('technicianLanding.valueProposition.paragraph2')}
             </p>
             <p>
-              Your IRATA or SPRAT number becomes your permanent identifier. Your work history accumulates-automatically when your employer uses OnRopePro, or via photo import of your existing logbook. Your professional reputation travels with you-Vancouver to Toronto to Seattle to Chicago and back.
+              {t('technicianLanding.valueProposition.paragraph3')}
             </p>
           </div>
           
           <Card className="mt-8 border-2 border-[#AB4521] bg-white dark:bg-slate-950">
             <CardContent className="p-6 text-center">
               <p className="text-xl font-semibold text-foreground">
-                When you create a tech account, you're not signing up for software.
+                {t('technicianLanding.valueProposition.cta')}
               </p>
               <p className="text-lg text-[#AB4521] font-medium mt-2">
-                You're building a portable professional identity that gains value with every logged hour.
+                {t('technicianLanding.valueProposition.ctaHighlight')}
               </p>
             </CardContent>
           </Card>
@@ -508,7 +508,7 @@ export default function TechnicianLanding() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center space-y-4 mb-12">
             <h2 className="text-3xl md:text-4xl font-bold">
-              Crystal Clear: What's Free, What's PLUS
+              {t('technicianLanding.freeVsPlus.title')}
             </h2>
           </div>
           
@@ -521,8 +521,8 @@ export default function TechnicianLanding() {
                     <HardHat className="w-5 h-5 text-slate-600 dark:text-slate-300" />
                   </div>
                   <div>
-                    <CardTitle className="text-xl">FREE Account</CardTitle>
-                    <p className="text-sm text-muted-foreground">Free forever. No credit card. No catch.</p>
+                    <CardTitle className="text-xl">{t('technicianLanding.freeVsPlus.freeAccount.title')}</CardTitle>
+                    <p className="text-sm text-muted-foreground">{t('technicianLanding.freeVsPlus.freeAccount.subtitle')}</p>
                   </div>
                 </div>
               </CardHeader>
@@ -595,10 +595,10 @@ export default function TechnicianLanding() {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <CardTitle className="text-xl">PLUS Account</CardTitle>
+                      <CardTitle className="text-xl">{t('technicianLanding.freeVsPlus.plusAccount.title')}</CardTitle>
                       <Badge className="bg-[#AB4521] text-white">PRO</Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground">Free when you refer one tech</p>
+                    <p className="text-sm text-muted-foreground">{t('technicianLanding.freeVsPlus.plusAccount.orFree')}</p>
                   </div>
                 </div>
               </CardHeader>

@@ -79,7 +79,7 @@ export default function CSRLanding() {
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={() => setShowSignIn(true)} data-testid="button-hero-signin">
-                Sign In
+                {t('modules.csr.hero.signIn', 'Sign In')}
               </Button>
             </div>
             
@@ -289,9 +289,9 @@ export default function CSRLanding() {
               <div className="mx-auto w-16 h-16 rounded-full bg-green-500 flex items-center justify-center mb-4 ring-4 ring-green-200 dark:ring-green-800">
                 <span className="text-white font-bold text-lg">90+</span>
               </div>
-              <p className="font-semibold text-green-700 dark:text-green-300">Green</p>
-              <p className="text-sm font-medium text-green-600 dark:text-green-400">Excellent</p>
-              <p className="text-xs text-green-600/80 dark:text-green-400/80 mt-2">Strong safety culture, highly compliant</p>
+              <p className="font-semibold text-green-700 dark:text-green-300">{t('modules.csr.tiers.green.name', 'Green')}</p>
+              <p className="text-sm font-medium text-green-600 dark:text-green-400">{t('modules.csr.tiers.green.label', 'Excellent')}</p>
+              <p className="text-xs text-green-600/80 dark:text-green-400/80 mt-2">{t('modules.csr.tiers.green.description', 'Strong safety culture, highly compliant')}</p>
             </div>
 
             {/* Yellow - Good */}
@@ -299,9 +299,9 @@ export default function CSRLanding() {
               <div className="mx-auto w-16 h-16 rounded-full bg-yellow-500 flex items-center justify-center mb-4 ring-4 ring-yellow-200 dark:ring-yellow-800">
                 <span className="text-white font-bold text-lg">70+</span>
               </div>
-              <p className="font-semibold text-yellow-700 dark:text-yellow-300">Yellow</p>
-              <p className="text-sm font-medium text-yellow-600 dark:text-yellow-400">Good</p>
-              <p className="text-xs text-yellow-600/80 dark:text-yellow-400/80 mt-2">Solid foundation, minor gaps to address</p>
+              <p className="font-semibold text-yellow-700 dark:text-yellow-300">{t('modules.csr.tiers.yellow.name', 'Yellow')}</p>
+              <p className="text-sm font-medium text-yellow-600 dark:text-yellow-400">{t('modules.csr.tiers.yellow.label', 'Good')}</p>
+              <p className="text-xs text-yellow-600/80 dark:text-yellow-400/80 mt-2">{t('modules.csr.tiers.yellow.description', 'Solid foundation, minor gaps to address')}</p>
             </div>
 
             {/* Orange - Warning */}
@@ -309,9 +309,9 @@ export default function CSRLanding() {
               <div className="mx-auto w-16 h-16 rounded-full bg-orange-500 flex items-center justify-center mb-4 ring-4 ring-orange-200 dark:ring-orange-800">
                 <span className="text-white font-bold text-lg">50+</span>
               </div>
-              <p className="font-semibold text-orange-700 dark:text-orange-300">Orange</p>
-              <p className="text-sm font-medium text-orange-600 dark:text-orange-400">Warning</p>
-              <p className="text-xs text-orange-600/80 dark:text-orange-400/80 mt-2">Significant gaps requiring attention</p>
+              <p className="font-semibold text-orange-700 dark:text-orange-300">{t('modules.csr.tiers.orange.name', 'Orange')}</p>
+              <p className="text-sm font-medium text-orange-600 dark:text-orange-400">{t('modules.csr.tiers.orange.label', 'Warning')}</p>
+              <p className="text-xs text-orange-600/80 dark:text-orange-400/80 mt-2">{t('modules.csr.tiers.orange.description', 'Significant gaps requiring attention')}</p>
             </div>
 
             {/* Red - Critical */}
@@ -319,9 +319,9 @@ export default function CSRLanding() {
               <div className="mx-auto w-16 h-16 rounded-full bg-red-500 flex items-center justify-center mb-4 ring-4 ring-red-200 dark:ring-red-800">
                 <span className="text-white font-bold text-lg">&lt;50</span>
               </div>
-              <p className="font-semibold text-red-700 dark:text-red-300">Red</p>
-              <p className="text-sm font-medium text-red-600 dark:text-red-400">Critical</p>
-              <p className="text-xs text-red-600/80 dark:text-red-400/80 mt-2">Serious compliance issues</p>
+              <p className="font-semibold text-red-700 dark:text-red-300">{t('modules.csr.tiers.red.name', 'Red')}</p>
+              <p className="text-sm font-medium text-red-600 dark:text-red-400">{t('modules.csr.tiers.red.label', 'Critical')}</p>
+              <p className="text-xs text-red-600/80 dark:text-red-400/80 mt-2">{t('modules.csr.tiers.red.description', 'Serious compliance issues')}</p>
             </div>
           </div>
         </div>

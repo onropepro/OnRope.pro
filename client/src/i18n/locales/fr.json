@@ -13422,5 +13422,674 @@
       },
       "tagline": "OnRopePro - Créé par l'accès sur corde, pour l'accès sur corde"
     }
+  },
+  "technicianLanding": {
+    "hero": {
+      "badge": "Pour les techniciens d'accès sur corde",
+      "badgeSubtitle": "Passeport de technicien urbain - Créé par un technicien IRATA niveau 3",
+      "title": "Vos heures. Votre preuve.",
+      "titleHighlight": "Pour toujours.",
+      "subtitle": "Le passeport professionnel portable pour les techniciens d'accès sur corde.",
+      "subtitleStrong": "Chaque bâtiment. Chaque descente. Chaque heure enregistrée, protégée et vous appartenant.",
+      "createAccount": "Créer un compte gratuit",
+      "signIn": "Connexion",
+      "noCreditCard": "Aucune carte de crédit requise, jamais."
+    },
+    "loginForm": {
+      "licenseNumber": "Numéro de licence",
+      "email": "Courriel",
+      "licenseLabel": "Numéro de licence IRATA ou SPRAT",
+      "emailLabel": "Adresse courriel",
+      "licensePlaceholder": "ex: 123456 (sans /1, /2, /3)",
+      "emailPlaceholder": "vous@exemple.com",
+      "licenseHint": "Entrez seulement le numéro sans le préfixe de niveau (ex: 123456 et non 1/123456)",
+      "password": "Mot de passe",
+      "passwordPlaceholder": "Entrez votre mot de passe",
+      "signInButton": "Connexion",
+      "forgotPassword": "Mot de passe oublié?",
+      "resetTitle": "Réinitialiser votre mot de passe",
+      "resetDescription": "Entrez votre courriel et nous vous enverrons les instructions de réinitialisation.",
+      "sendResetLink": "Envoyer le lien de réinitialisation",
+      "backToSignIn": "Retour à la connexion",
+      "checkEmail": "Vérifiez votre courriel",
+      "resetSentDescription": "Si un compte existe avec ce courriel, vous recevrez les instructions de réinitialisation."
+    },
+    "problemValidation": {
+      "title": "Vous avez perdu des heures. Vous ne savez juste pas combien.",
+      "paragraph1": "Mardi dernier. Ce bâtiment de 40 étages au centre-ville. Avez-vous fait 3 ou 4 descentes?",
+      "paragraph2": "Il y a trois semaines. Le complexe industriel près du port. C'était 6 heures ou 8?",
+      "paragraph3": "Il y a six mois. L'entreprise qui a fermé. Toutes ces heures disparues avec leur paperasse.",
+      "paragraph4": "Vous n'êtes pas négligent. Vous êtes occupé à couvrir 5 bâtiments par semaine, à gérer votre équipement, à rester en sécurité en hauteur. Les détails s'estompent. La mémoire fait défaut. Et quand vous vous asseyez pour remplir votre carnet IRATA, vous devinez les données dont dépend votre certification.",
+      "statistic": "La moyenne de l'industrie: 15-20% des heures enregistrées sont des estimations, pas des relevés.",
+      "statisticSubtext": "C'est votre progression de carrière. Votre L2. Votre L3. Construit sur des suppositions."
+    },
+    "valueProposition": {
+      "title": "Un compte. Chaque employeur. Toute votre carrière.",
+      "paragraph1": "OnRopePro vous offre quelque chose que l'industrie n'a jamais proposé: une identité professionnelle qui vous appartient vraiment.",
+      "paragraph2": "Pas enfermée dans le classeur de votre employeur. Pas perdue quand les entreprises ferment. Pas à recommencer à zéro chaque fois que vous changez d'emploi.",
+      "paragraph3": "Votre numéro IRATA ou SPRAT devient votre identifiant permanent. Votre historique de travail s'accumule automatiquement quand votre employeur utilise OnRopePro, ou via l'import photo de votre carnet existant. Votre réputation professionnelle voyage avec vous - de Vancouver à Toronto en passant par Seattle et Chicago.",
+      "cta": "Quand vous créez un compte technicien, vous ne vous inscrivez pas à un logiciel.",
+      "ctaHighlight": "Vous construisez une identité professionnelle portable qui prend de la valeur à chaque heure enregistrée."
+    },
+    "freeVsPlus": {
+      "title": "Clair et net: Ce qui est gratuit, ce qui est PLUS",
+      "freeAccount": {
+        "title": "Compte GRATUIT",
+        "subtitle": "Toujours gratuit. N'expire jamais.",
+        "features": {
+          "profile": "Profil professionnel avec photo et certifications",
+          "id": "ID IRATA/SPRAT vérifié comme identifiant",
+          "history": "Historique de travail complet qui voyage avec vous",
+          "export": "Export en PDF ou CSV pour votre carnet physique",
+          "fastOnboarding": "Intégration instantanée chez les nouveaux employeurs",
+          "storage": "Stockage sécurisé même entre deux emplois"
+        }
+      },
+      "plusAccount": {
+        "title": "Compte PLUS",
+        "subtitle": "Toutes les fonctionnalités gratuites, plus:",
+        "features": {
+          "jobBoard": "Accès au tableau d'emplois (parcourir les opportunités)",
+          "visibility": "Visibilité prioritaire auprès des employeurs",
+          "logbook": "Import de votre carnet existant par photo (l'IA lit l'écriture)",
+          "analytics": "Analyses des heures et suivi de progression de carrière"
+        },
+        "price": "9,95$/mois",
+        "orFree": "ou GRATUIT avec un parrainage"
+      }
+    },
+    "whoItsFor": {
+      "title": "À qui s'adresse ce service",
+      "newTechs": {
+        "title": "Nouveaux techniciens",
+        "subtitle": "Fraîchement certifié. Premier emploi. Zéro heure enregistrée.",
+        "problem": "Le problème",
+        "problemText1": "Chaque employeur veut de \"l'expérience\". Mais comment construire un historique quand vos heures sont prisonnières du tableur de quelqu'un d'autre?",
+        "problemText2": "Vous avez besoin d'un historique de travail vérifiable que les employeurs font confiance - avant d'avoir 1000 heures.",
+        "solution": "La solution",
+        "solutionText1": "Commencez à enregistrer dès le premier jour. Chaque descente, chaque bâtiment, chaque heure - vérifié et portable. Quand vous aurez 200 heures, vous aurez des preuves. Des preuves qui se transfèrent à votre évaluation L2. Des preuves qui font que le prochain employeur vous embauche plutôt que l'autre nouveau L1.",
+        "solutionText2": "100 heures vérifiées battent 500 heures déclarées.",
+        "testimonial": "\"J'avais 47 heures enregistrées quand j'ai été licencié. Deux semaines plus tard, j'ai montré mon profil vérifié à un nouvel employeur. J'ai commencé lundi.\"",
+        "testimonialAuthor": "- Marcus T., L1 IRATA, Vancouver"
+      },
+      "experienced": {
+        "title": "Techniciens expérimentés",
+        "subtitle": "500+ heures. Peut-être 1000+. Chez 3-4 employeurs sur 6 ans.",
+        "problem": "Le problème",
+        "problemText1": "Vos heures sont dispersées entre entreprises disparues, dossiers papier en entreposage et souvenirs qui s'effacent. Au moment de l'évaluation, vous reconstruisez votre carrière à partir de fragments.",
+        "problemText2": "Votre L3 dépend de la précision. Vous ne devriez pas deviner.",
+        "solution": "La solution",
+        "solutionText1": "Photographiez les pages de votre carnet existant. L'application lit votre écriture, extrait les données et construit votre dossier numérique complet. Chaque heure de chaque employeur - consolidée, vérifiée, exportable.",
+        "solutionText2": "Quand Apex Rope a fermé en 2023, 23 de leurs techniciens ont perdu l'accès à leurs relevés d'heures. Les 7 qui avaient des comptes OnRopePro? Leurs heures étaient déjà en sécurité.",
+        "testimonial": "\"Six employeurs sur 8 ans. J'avais des heures dispersées dans trois provinces. Maintenant tout est au même endroit, et je peux prouver chaque heure.\"",
+        "testimonialAuthor": "- Dave M., L3 IRATA, Montréal"
+      },
+      "freedom": {
+        "title": "Chercheurs de liberté",
+        "subtitle": "Vous travaillez là où il y a du travail. Vancouver en été. Calgary pour les arrêts. Peut-être Seattle ou Houston quand le marché est bon.",
+        "problem": "Le problème",
+        "problemText1": "Vous n'êtes pas instable. Vous êtes mobile. Mais chaque nouvelle ville signifie faire ses preuves à nouveau. Des références à 2000 km. Aucune réputation locale. Trois heures de paperasse avant votre premier quart.",
+        "problemText2": "Vous devez commencer à gagner MAINTENANT, pas après une semaine d'intégration bureaucratique.",
+        "solution": "La solution",
+        "solutionText1": "Votre identité professionnelle voyage avec vous. Votre historique de Vancouver? Visible à Seattle. Vos certifications? Pré-vérifiées. Votre cote de sécurité? Preuve de fiabilité avant même d'arriver.",
+        "solutionText2": "Quittez vendredi dans une ville. Commencez lundi dans une autre. Zéro paperasse.",
+        "testimonial": "\"Je suis arrivé à Toronto avec rien d'autre que mon équipement et mon profil OnRopePro. J'ai commencé à travailler cet après-midi-là.\"",
+        "testimonialAuthor": "- Lena B., L2 IRATA, Nomade"
+      }
+    },
+    "howItWorks": {
+      "title": "30 secondes pour configurer. 10 ans de données de carrière protégées.",
+      "step1": {
+        "title": "Créez votre compte",
+        "description": "Entrez votre numéro de licence IRATA ou SPRAT. Ajoutez vos certifications. Téléchargez votre photo. Terminé."
+      },
+      "step2": {
+        "title": "Connectez-vous aux employeurs",
+        "description": "Quand vous rejoignez une entreprise utilisant OnRopePro, elle vous envoie une invitation. Acceptez-la. Votre profil remplit leur système instantanément. Pas de formulaires. Pas de saisie de données redondante."
+      },
+      "step3": {
+        "title": "Travaillez. Tout s'enregistre automatiquement.",
+        "description": "Quand vous êtes connecté à un employeur sur OnRopePro, chaque session de travail capture: date, bâtiment, hauteur, tâches, durée. Groupé par projet. Totalisé par mois et année."
+      },
+      "step4": {
+        "title": "Exportez et remplissez votre carnet physique",
+        "description": "Téléchargez votre historique de travail complet en PDF ou CSV. Transférez des données précises dans votre carnet IRATA/SPRAT physique. Votre évaluateur vérifie toujours votre carnet physique - OnRopePro s'assure juste que les données sont exactes."
+      },
+      "note": "Note:",
+      "noteText": "Votre compte fonctionne même sans employeur sur la plateforme. Vous pouvez stocker des certifications, suivre l'historique manuellement et accéder au tableau d'emplois (PLUS). Mais quand votre employeur utilise aussi OnRopePro? Tout s'accélère - suivi automatique des heures, intégration instantanée, documentation transparente.",
+      "tellYourBoss": "Dites à votre patron d'y jeter un œil. Vous gagnez tous les deux."
+    },
+    "clarifications": {
+      "warningTitle": "CECI NE REMPLACE PAS VOTRE CARNET PHYSIQUE",
+      "warningText1": "Votre carnet physique IRATA/SPRAT est toujours requis. OnRopePro est un assistant numérique qui vous donne des données précises à transférer dans votre carnet officiel - il ne le remplace pas.",
+      "warningText2": "Les organismes de certification IRATA et SPRAT exigent que vous mainteniez votre carnet physique. Cette exigence n'a pas changé. Ce qui a changé, c'est la précision de vos entrées.",
+      "before": "Avant:",
+      "beforeText": "Vous devinez les heures et détails en remplissant votre carnet des semaines plus tard",
+      "after": "Après:",
+      "afterText": "Vous copiez des données précises et horodatées depuis OnRopePro dans votre carnet",
+      "warningText3": "Votre évaluateur vérifie toujours votre carnet physique. OnRopePro s'assure juste que les données sont exactes.",
+      "dataControl": {
+        "title": "Vos données. Votre contrôle.",
+        "export": "Exportez à tout moment. Pas d'enfermement.",
+        "delete": "Supprimez votre compte à tout moment. Vos données partent avec vous.",
+        "privacy": "Les employeurs ne voient que ce que vous choisissez de partager.",
+        "sinOptional": "Votre NAS est optionnel. Refuser ne limitera pas votre compte."
+      },
+      "security": {
+        "title": "Sécurité",
+        "encryption": "Données bancaires et sensibles chiffrées avec AES-256-GCM.",
+        "soc2": "Conforme SOC2 Type II.",
+        "pipeda": "Conforme PIPEDA."
+      }
+    },
+    "socialProof": {
+      "title": "Plus de 500 techniciens d'accès sur corde en Amérique du Nord",
+      "testimonial1": {
+        "quote": "\"J'ai failli perdre 187 heures quand Skyline Rope Access a fermé. Ces heures sont toujours dans mon compte OnRopePro. Portables, protégées, miennes.\"",
+        "author": "- Tyler R., L2 IRATA, Calgary"
+      },
+      "testimonial2": {
+        "quote": "\"J'ai changé d'employeur deux fois cette année. Temps total d'intégration: moins de 5 minutes. Combiné.\"",
+        "author": "- Sarah K., L3 IRATA, Toronto"
+      },
+      "testimonial3": {
+        "quote": "\"Je ne suis pas doué avec les applications. Mais celle-ci? J'enregistre un bâtiment en 10 secondes entre les descentes. Un an plus tard, j'ai des dossiers parfaits.\"",
+        "author": "- Mike D., L1 SPRAT, Vancouver"
+      },
+      "testimonial4": {
+        "quote": "\"Enfin quelque chose construit pour les techniciens, pas pour les employeurs qui prétendent se soucier des techniciens.\"",
+        "author": "- Jordan L., L2 IRATA, Seattle"
+      }
+    },
+    "plusUpgrade": {
+      "title": "Débloquez PLUS. Ne payez rien. Voici comment.",
+      "description": "Les comptes PLUS sont gratuits. Pas un \"essai gratuit\". Pas \"gratuit pendant 30 jours\". Vraiment gratuit.",
+      "howItWorks": "Comment ça marche:",
+      "step1": "Créez votre compte gratuit",
+      "step2": "Parrainez un autre technicien",
+      "step3": "Vous êtes mis à niveau automatiquement",
+      "conclusion": "C'est tout. Un parrainage. Accès PLUS à vie pour vous.",
+      "whyTitle": "Pourquoi nous faisons cela",
+      "whyText": "Les techniciens SONT le réseau. Plus il y a de techniciens sur OnRopePro, plus les employeurs l'adoptent. Plus les employeurs l'adoptent, plus votre profil prend de la valeur.",
+      "whyConclusion": "Vous n'êtes pas le produit. Vous êtes la raison pour laquelle la plateforme existe."
+    },
+    "faq": {
+      "title": "Questions fréquemment posées",
+      "q1": "Le compte technicien est-il vraiment gratuit?",
+      "a1": "Oui. Gratuit pour toujours. Aucune carte de crédit requise. Pas de limite de temps. Pas de restrictions de fonctionnalités qui vous bloquent soudainement.",
+      "q2": "Et si mon employeur n'utilise pas OnRopePro?",
+      "a2Intro": "Votre compte fonctionne quand même. Vous pouvez:",
+      "a2List1": "Stocker certifications et données de profil",
+      "a2List2": "Importer votre carnet existant par photo",
+      "a2List3": "Enregistrer des heures manuellement",
+      "a2List4": "Accéder au tableau d'emplois (PLUS)",
+      "a2Conclusion": "Ce que vous n'aurez pas, c'est le suivi automatique des heures - ça ne fonctionne que quand votre employeur est aussi sur la plateforme. Mais voici le truc: quand votre employeur rejoint, votre compte se met à niveau instantanément. Tout cet enregistrement manuel devient automatique. Dites-le à votre patron.",
+      "q3": "Comment importer mon carnet existant?",
+      "a3": "Ouvrez l'application, photographiez les pages de votre carnet, et l'application lit votre écriture et extrait les données. Vérifiez, confirmez, terminé. Des années d'heures historiques importées en minutes - pas de saisie manuelle.",
+      "q4": "Est-ce que cela remplace mon carnet IRATA/SPRAT?",
+      "a4": "Non. Vous avez toujours besoin de votre carnet physique. IRATA et SPRAT l'exigent. Votre évaluateur le vérifiera. OnRopePro est un assistant numérique qui capture des données précises pour que vous puissiez remplir votre carnet physique correctement - pas un remplacement.",
+      "q5": "Quelle est la différence entre l'enregistrement automatique et manuel?",
+      "a5Manual": "Enregistrement manuel:",
+      "a5ManualText": "Vous entrez les heures, bâtiments et tâches vous-même (ou photographiez votre carnet pour importer). Fonctionne à tout moment, avec ou sans employeur sur la plateforme.",
+      "a5Auto": "Enregistrement automatique:",
+      "a5AutoText": "Quand votre employeur utilise OnRopePro, vos heures s'enregistrent automatiquement quand vous pointez. Bâtiment, hauteur, tâches, durée - tout capturé sans rien entrer. C'est le vrai gain de temps.",
+      "q6": "Qu'arrive-t-il à mes données si je quitte une entreprise?",
+      "a6": "Votre profil (certifications, historique de travail, cote de sécurité) reste avec vous en permanence. Les données spécifiques à l'entreprise (équipement assigné, documents d'entreprise) restent avec cet employeur. Votre identité principale est toujours la vôtre.",
+      "q7": "Comment obtenir PLUS?",
+      "a7": "Parrainez un autre technicien qui crée un compte. Vous êtes tous les deux mis à niveau PLUS automatiquement. Aucun paiement requis.",
+      "q8": "Mes données sont-elles sécurisées?",
+      "a8": "Chiffrement AES-256-GCM pour toutes les données sensibles. Infrastructure conforme SOC2 Type II. Conforme PIPEDA (Canada). Votre NAS est complètement optionnel.",
+      "q9": "Les employeurs peuvent-ils voir que je cherche un autre travail?",
+      "a9": "Non. Votre activité sur le tableau d'emplois est privée. Les employeurs ne voient que ce que vous partagez explicitement avec eux."
+    },
+    "finalCta": {
+      "title": "Vos heures survivent à votre employeur.",
+      "subtitle": "Les entreprises ferment. Les superviseurs démissionnent. Le papier se perd. Les tableurs se corrompent. Mais votre investissement de carrière - les 500, 1000, 2000 heures que vous avez travaillées en hauteur - ça ne devrait jamais disparaître.",
+      "description": "Créez votre compte. Commencez à construire votre identité professionnelle portable. C'est gratuit. C'est à vous. Pour toujours.",
+      "learnAboutEmployers": "En savoir plus sur les fonctionnalités employeur"
+    },
+    "footer": {
+      "allRightsReserved": "Tous droits réservés.",
+      "privacyPolicy": "Politique de confidentialité"
+    },
+    "toast": {
+      "welcome": "Bon retour!",
+      "loggedIn": "Connecté en tant que",
+      "checkEmail": "Vérifiez votre courriel",
+      "resetSent": "Si un compte existe avec ce courriel, vous recevrez les instructions de réinitialisation."
+    },
+    "errors": {
+      "licenseRequired": "Le numéro de licence ou courriel est requis",
+      "passwordRequired": "Le mot de passe est requis",
+      "loginFailed": "Échec de connexion",
+      "verifyFailed": "Échec de vérification du statut du compte. Veuillez réessayer.",
+      "genericError": "Une erreur s'est produite. Veuillez réessayer."
+    }
+  },
+  "propertyManagerLanding": {
+    "hero": {
+      "badge": "Pour les gestionnaires immobiliers",
+      "titleLine1": "Cessez d'être le service des plaintes.",
+      "titleLine2": "Devenez enfin le gestionnaire immobilier.",
+      "subtitle": "Lorsque vos prestataires d'accès sur corde utilisent OnRopePro, les résidents soumettent leurs plaintes directement à ces derniers. Vous restez informé sans être l'intermédiaire. Accès gratuit aux cotes de sécurité des prestataires, aux délais de réponse et aux données de résolution des plaintes. Aucun coût. Aucune contrepartie. Juste la liberté."
+    },
+    "cta": {
+      "createFreeAccount": "Créez votre compte gratuit",
+      "learnHow": "Découvrez comment ça fonctionne",
+      "getFreeAccess": "Obtenez un accès gratuit",
+      "tellVendor": "Parlez d'OnRopePro à votre prestataire"
+    },
+    "hook": {
+      "question": "Combien de plaintes de résidents avez-vous relayées aux prestataires le mois dernier?",
+      "problem": "Chaque vitre avec des traces, chaque question sur l'horaire, chaque « quand viennent-ils de mon côté de l'immeuble? » atterrit d'abord sur votre bureau. Vous transférez. Vous relancez. Vous transmettez la réponse. Vous êtes l'intermédiaire pour chaque problème de chaque immeuble que vous gérez.",
+      "solution": "Et si les plaintes allaient directement à votre prestataire?",
+      "description": "Lorsque vos prestataires utilisent OnRopePro, les résidents soumettent leurs commentaires directement à ces derniers. Vous voyez tout : ce qui a été signalé, quand ça a été consulté, la rapidité de résolution. Mais vous n'êtes plus au milieu de tout ça.",
+      "tagline": "Supervision sans implication. C'est le portail gestionnaire immobilier."
+    },
+    "features": {
+      "title": "Hors de la boucle des plaintes. Dans le coup.",
+      "directComplaints": {
+        "title": "Les résidents se plaignent directement aux prestataires. Pas à vous.",
+        "badge": "L'essentiel",
+        "p1": "Lorsque vos prestataires utilisent OnRopePro, les résidents ont accès à un portail résident. Ils soumettent leurs plaintes avec photos directement à l'entreprise d'entretien. Le prestataire répond. Le problème est résolu.",
+        "p2": "Vous n'êtes pas au milieu. Vous n'êtes pas le relais. Vous ne passez pas votre mardi à transférer des courriels et à faire des appels de suivi.",
+        "p3": "Mais vous voyez tout. Chaque plainte. Chaque réponse. Chaque résolution. Visibilité complète sans être l'intermédiaire.",
+        "p4": "Pour un gestionnaire immobilier gérant 50 immeubles, c'est la différence entre se noyer dans la coordination des plaintes et vraiment gérer des propriétés."
+      },
+      "responseTime": {
+        "title": "Indicateurs de temps de réponse : La responsabilisation qui vous manquait",
+        "p1": "Quand les résidents se plaignent directement aux prestataires, ceux-ci peuvent les ignorer. Ou ils peuvent répondre en 24 heures. Maintenant vous savez lequel.",
+        "p2": "Le portail gestionnaire immobilier affiche les temps de résolution moyens et les taux de réponse aux commentaires pour chaque entrepreneur. Quand vous voyez un prestataire mettre 12 jours à répondre alors qu'un autre résout les problèmes en 2 jours, vous avez des données pour votre prochaine discussion contractuelle.",
+        "p3": "C'est ce que Tommy (notre cofondateur, 15 ans dans l'accès sur corde) dit que les gestionnaires immobiliers apprécient le plus : « Ce sera un facteur plus important que les cotes de sécurité. Répondent-ils vraiment aux plaintes? »"
+      },
+      "safetyRatings": {
+        "title": "Cotes de sécurité des prestataires : Savoir avant que quelque chose tourne mal",
+        "p1": "Chaque entreprise d'accès sur corde sur OnRopePro a une cote de sécurité d'entreprise (CSR) construite à partir de trois indicateurs de conformité : exhaustivité de la documentation, fréquence des réunions de sécurité et taux d'inspection des harnais.",
+        "p2": "Vous voyez exactement où se situe chaque prestataire. Pas de devinettes. Pas besoin de demander des rapports qu'ils peuvent falsifier.",
+        "p3": "Quand un expert en assurance demande « Que saviez-vous des pratiques de sécurité de ce prestataire? », vous avez une réponse."
+      },
+      "vendorDashboard": {
+        "title": "Tous vos prestataires. Un seul tableau de bord.",
+        "p1": "Vous gérez 20 immeubles avec différents entrepreneurs? Trouver quelle entreprise dessert quel immeuble ne devrait pas nécessiter de fouiller dans les courriels et les contrats.",
+        "p2": "Le tableau de bord Mes Prestataires affiche chaque entreprise d'accès sur corde contractée, leurs scores de sécurité, leurs temps de réponse, et lesquels de vos immeubles ils desservent. Trente secondes au lieu de vingt minutes."
+      },
+      "feedbackHistory": {
+        "title": "Historique des commentaires par immeuble",
+        "p1": "Ce résident qui s'est plaint des vitres avec des traces trois fois? Suivez toute la conversation. Voyez quand le prestataire a répondu, ce qu'il a dit, combien de temps a pris la résolution.",
+        "p2": "L'historique des plaintes et résolutions immeuble par immeuble vous donne de la documentation quand les conversations sur la performance deviennent difficiles. Ou quand vous décidez de renouveler ou non un contrat."
+      },
+      "anchorInspection": {
+        "title": "Téléversement du certificat d'inspection des ancrages",
+        "p1": "Les inspections annuelles des ancrages sont requises pour les travaux d'accès sur corde. Vous recevez le certificat de l'inspecteur tiers. Maintenant vous avez un endroit unique pour le stocker.",
+        "p2": "Téléversez les certificats d'inspection des ancrages directement dans le dossier de chaque immeuble. Votre seule permission d'écriture. Tout le reste est en lecture seule pour l'intégrité des données."
+      }
+    },
+    "comparison": {
+      "title": "Avant vs Après : Où vont les plaintes",
+      "before": {
+        "title": "Avant OnRopePro",
+        "step1": "Le résident remarque un problème",
+        "step2": "Le résident appelle/écrit au gestionnaire immobilier",
+        "step3": "Le gestionnaire immobilier transfère au prestataire",
+        "step4": "(attente...)",
+        "step5": "Le prestataire répond au gestionnaire immobilier",
+        "step6": "Le gestionnaire immobilier transmet au résident",
+        "step7": "Le résident a une question de suivi...",
+        "repeat": "(répéter tout le cycle)",
+        "summary": "Vous êtes le relais. Chaque plainte, chaque mise à jour, chaque suivi passe par votre boîte de réception. Multipliez par 50 immeubles. C'est votre semaine."
+      },
+      "after": {
+        "title": "Avec OnRopePro",
+        "step1": "Le résident remarque un problème",
+        "step2": "Le résident soumet directement au prestataire (avec photos)",
+        "step3": "Le prestataire répond directement au résident",
+        "resolved": "Problème résolu",
+        "whereAreYou": "Où êtes-vous dans ce processus?",
+        "watching": "Vous observez depuis votre tableau de bord. Vous voyez chaque plainte qui arrive, quand elle a été consultée, combien de temps a pris la résolution. Si un prestataire ignore les plaintes, vous le saurez. S'il répond en 24 heures, vous le verrez aussi.",
+        "notMiddle": "Mais vous n'êtes pas au milieu. Vous n'êtes pas le relais. Vous ne passez pas des heures sur la coordination des plaintes.",
+        "oversight": "Vous êtes le gestionnaire immobilier avec supervision. Pas le service des plaintes."
+      }
+    },
+    "howItWorks": {
+      "title": "Trois étapes. Cinq minutes. Gratuit pour toujours.",
+      "step1": {
+        "title": "Obtenez votre code gestionnaire immobilier",
+        "description": "Demandez à votre prestataire d'accès sur corde un code gestionnaire immobilier. Toute entreprise utilisant OnRopePro peut en générer un pour vous. Ça leur prend 30 secondes."
+      },
+      "step2": {
+        "title": "Créez votre compte gratuit",
+        "description": "Entrez le code, créez votre compte et spécifiez quels immeubles vous gérez. Pas de carte de crédit. Pas de période d'essai. Accès gratuit. Point."
+      },
+      "step3": {
+        "title": "Regardez votre charge de travail diminuer",
+        "description": "Consultez les cotes de sécurité, les indicateurs de réponse et les données de résolution des plaintes pour chaque prestataire desservant vos immeubles. Voyez les plaintes traitées sans votre implication. Comparez les entrepreneurs objectivement. Prenez des décisions éclairées."
+      },
+      "footer": "Quand les résidents de vos immeubles commencent à utiliser le portail résident, les plaintes cessent de passer par vous. Vous voyez juste les résultats."
+    },
+    "whyFree": {
+      "title": "Oui, c'est vraiment gratuit. Voici pourquoi.",
+      "p1": "Vos prestataires paient pour OnRopePro. Pas vous.",
+      "p2": "Quand les gestionnaires immobiliers peuvent voir les cotes de sécurité des prestataires, les entrepreneurs ont une forte motivation à maintenir des scores élevés. Les entreprises avec de bons dossiers de sécurité obtiennent plus de travail. Les entreprises avec de mauvais dossiers perdent des contrats.",
+      "p3": "Cette transparence profite à tous : travail plus sûr pour les techniciens, meilleure sélection des prestataires pour vous, conformité documentée à des fins d'assurance.",
+      "p4": "Votre accès n'est pas le produit. Votre visibilité est ce qui rend le produit précieux."
+    },
+    "documentation": {
+      "title": "La documentation que vous souhaiterez avoir. Avant d'en avoir besoin.",
+      "p1": "Audits d'assurance. Réclamations de responsabilité. Demandes du conseil d'administration. Inspections réglementaires.",
+      "p2": "Ils posent tous la même question : « Que saviez-vous des pratiques de sécurité de votre prestataire? »",
+      "p3": "Le portail gestionnaire immobilier crée une piste d'audit automatique. Chaque fois que vous vérifiez le CSR d'un prestataire, consultez ses indicateurs de réponse ou comparez des entrepreneurs, cette visibilité est documentée.",
+      "p4": "Quand quelqu'un demande quelle diligence raisonnable vous avez effectuée, vous avez une réponse.",
+      "p5": "Quand l'immeuble d'un concurrent a un incident et que les nouvelles demandent « Cela pourrait-il arriver ici? », vous avez des données montrant exactement comment vos prestataires se comparent."
+    },
+    "timeBack": {
+      "title": "Que feriez-vous avec 10 heures de plus par semaine?",
+      "p1": "Les gestionnaires immobiliers gérant 30+ immeubles passent 8-15 heures par semaine sur la coordination des plaintes uniquement. Transférer des courriels. Relancer les prestataires. Transmettre les réponses. Chasser les mises à jour.",
+      "p2": "Quand les plaintes vont directement aux prestataires :",
+      "p3": "Ces heures disparaissent de votre charge de travail.",
+      "p4": "Vous avez toujours une visibilité complète. Vous voyez toujours les temps de réponse. Vous avez toujours de la documentation pour les réunions du conseil et les renouvellements de contrats. Vous n'avez simplement plus à être l'intermédiaire.",
+      "p5": "C'est du temps retrouvé pour les renouvellements de baux. Pour les relations avec les locataires. Pour le travail stratégique qui fait vraiment croître votre portefeuille. Pour partir à 17h au lieu de 19h.",
+      "p6": "Le portail gestionnaire immobilier ne vous donne pas que des données. Il vous redonne votre temps."
+    },
+    "accountability": {
+      "title": "Quand les prestataires savent que vous regardez, tout change.",
+      "p1": "Voici ce qui se passe quand vous pouvez voir les temps de réponse des prestataires :",
+      "p2": "Le prestataire qui met 12 jours à répondre aux plaintes sait que vous pouvez le voir. Le prestataire qui résout les problèmes en 48 heures sait que vous pouvez le voir aussi.",
+      "p3": "Une cote de sécurité de 86% contre une de 23% raconte une histoire. Un temps de résolution moyen de 2 jours contre un de 14 jours en raconte une autre.",
+      "p4": "Quand les gestionnaires immobiliers peuvent voir ces chiffres, les prestataires ne peuvent plus se cacher derrière des assurances vagues. Les entreprises qui font bien le travail ont enfin des preuves. Les entreprises qui coupent les coins ou ignorent les plaintes sont exposées.",
+      "p5": "Votre visibilité crée la responsabilisation. Quand les prestataires savent que leurs temps de réponse affectent leurs contrats, la réactivité devient un avantage concurrentiel.",
+      "p6": "Mieux pour les résidents. Mieux pour vous. Mieux pour tous ceux qui vivent et travaillent dans vos immeubles."
+    },
+    "faq": {
+      "title": "Questions fréquentes",
+      "q1": {
+        "question": "« Et si mes prestataires n'utilisent pas OnRopePro? »",
+        "a1": "Parlez-leur-en. Les prestataires qui priorisent la sécurité et la réactivité veulent que les gestionnaires immobiliers voient leurs cotes et leurs temps de résolution. S'ils résistent à la transparence, cela vous dit quelque chose.",
+        "a2": "Vous pouvez aussi leur dire : « J'aimerais cesser d'être le relais des plaintes entre les résidents et votre entreprise. OnRopePro permet aux résidents de soumettre directement à vous, et j'obtiens de la visibilité sur les temps de réponse. »",
+        "a3": "La plupart des prestataires y verront un avantage, pas un fardeau."
+      },
+      "q2": {
+        "question": "« Et si les résidents continuent de se plaindre à moi quand même? »",
+        "a1": "Redirigez-les. « Soumettez vos commentaires via le portail résident. Le prestataire le verra immédiatement et répondra directement. Je peux voir tout ce que vous soumettez, mais ils répondront plus vite si vous passez directement. »",
+        "a2": "La plupart des résidents préfèrent l'accès direct plutôt que d'attendre que vous relayiez les messages. Le système façonne rapidement le comportement."
+      },
+      "q3": {
+        "question": "« Je ne veux pas perdre la visibilité sur ce qui se passe dans mes immeubles. »",
+        "a1": "Vous ne la perdrez pas. C'est justement le but.",
+        "a2": "Vous voyez chaque plainte qui arrive, quand elle a été consultée, quand elle a été résolue, ce que le prestataire a dit. Vous avez une visibilité complète sur toute la conversation.",
+        "a3": "Vous n'avez simplement plus à être DANS la conversation. Supervision sans implication."
+      },
+      "q4": {
+        "question": "« Je suis déjà les certificats des prestataires dans des tableurs. »",
+        "a1": "Les certificats confirment que l'assurance existe. Ils ne vous disent pas si les travailleurs suivent vraiment les protocoles de sécurité. Le CSR montre la conformité en temps réel, pas de la paperasse.",
+        "a2": "Et les tableurs n'acheminent pas les plaintes directement aux prestataires. Ils ne vous montrent pas les indicateurs de temps de réponse. Ils ne vous donnent pas les données dont vous avez besoin pour les décisions contractuelles."
+      },
+      "q5": {
+        "question": "« Ça semble trop beau pour être gratuit. »",
+        "a1": "Vos prestataires paient pour la plateforme. Votre accès crée la visibilité qui rend leur investissement précieux. Il n'y a pas de piège parce que vous n'êtes pas le client. Vous êtes le mécanisme de responsabilisation qui fait fonctionner le système."
+      },
+      "q6": {
+        "question": "« Je dois d'abord vérifier avec mon directeur de portefeuille. »",
+        "a1": "Montrez-lui cette page. L'argument du retour sur investissement s'écrit tout seul :",
+        "a2": "Accès gratuit. Élimination des plaintes. Données de responsabilisation des prestataires. Documentation de responsabilité. Aucun budget requis.",
+        "a3": "Quel est le contre-argument?"
+      }
+    },
+    "finalCta": {
+      "title": "Supervision sans implication. Visibilité sans fardeau.",
+      "subtitle1": "Les plaintes vont directement aux prestataires. Vous voyez tout sans être au milieu.",
+      "subtitle2": "Les cotes de sécurité montrent la conformité réelle. Les temps de réponse prouvent la responsabilisation.",
+      "free": "Gratuit. Pas de carte de crédit. Pas d'expiration d'essai.",
+      "askVendor": "Demandez simplement à votre prestataire un code gestionnaire immobilier et créez votre compte."
+    },
+    "footer": {
+      "tagline": "Logiciel de gestion pour l'accès sur corde",
+      "privacy": "Politique de confidentialité",
+      "terms": "Conditions d'utilisation"
+    }
+  },
+  "residentLanding": {
+    "hero": {
+      "badge": "Pour les résidents d'immeuble",
+      "title": "Sachez que votre commentaire a été reçu.",
+      "subtitle": "Suivez-le jusqu'à sa résolution.",
+      "description": "Soumettez des commentaires avec photos, voyez exactement quand ils ont été consultés et suivez la progression en temps réel.",
+      "tagline": "Fini les appels téléphoniques. Fini les suppositions."
+    },
+    "buttons": {
+      "close": "Fermer",
+      "createAccount": "Créer votre compte",
+      "createAccountShort": "Créer un compte",
+      "signIn": "Se connecter",
+      "logIn": "Connexion"
+    },
+    "form": {
+      "emailAddress": "Adresse courriel",
+      "emailPlaceholder": "vous@exemple.com",
+      "password": "Mot de passe",
+      "passwordPlaceholder": "Votre mot de passe",
+      "forgotPassword": "Mot de passe oublié?",
+      "noAccount": "Vous n'avez pas de compte?",
+      "resetPassword": "Réinitialiser votre mot de passe",
+      "resetInstructions": "Entrez votre courriel et nous vous enverrons les instructions de réinitialisation.",
+      "sendResetLink": "Envoyer le lien de réinitialisation",
+      "backToSignIn": "Retour à la connexion",
+      "checkYourEmail": "Vérifiez votre courriel",
+      "resetEmailSent": "Si un compte existe avec ce courriel, vous recevrez bientôt les instructions de réinitialisation."
+    },
+    "toast": {
+      "welcomeBack": "Bon retour!",
+      "redirecting": "Redirection vers votre tableau de bord...",
+      "checkEmail": "Vérifiez votre courriel",
+      "resetInstructions": "Si un compte existe avec ce courriel, vous recevrez les instructions de réinitialisation."
+    },
+    "errors": {
+      "invalidCredentials": "Courriel ou mot de passe invalide",
+      "somethingWentWrong": "Une erreur s'est produite. Veuillez réessayer."
+    },
+    "stats": {
+      "oneSubmission": "1 Soumission",
+      "notThreeCalls": "(Pas 3 appels)",
+      "proofTheySawIt": "Preuve qu'ils l'ont vu",
+      "viewedTimestamp": "Horodatage de consultation",
+      "zeroLost": "0 Perdu",
+      "complaints": "Plaintes",
+      "twentyFourHourResolution": "Résolution en 24h",
+      "notFiveDays": "(Pas 5 jours)"
+    },
+    "problemStatement": {
+      "title": "Fatigué des plaintes qui n'aboutissent à rien?",
+      "paragraph1": "Vous envoyez un courriel au gestionnaire immobilier concernant des traces sur votre fenêtre. Une semaine passe. Rien. Vous appelez. Ils disent l'avoir transmis au prestataire. Le prestataire dit ne jamais l'avoir reçu.",
+      "paragraph2": "Maintenant, trois personnes sont impliquées pour retrouver un courriel qui a peut-être été envoyé ou non.",
+      "paragraph3": "Entre-temps, vous voyez des équipes travailler sur l'immeuble mais vous n'avez aucune idée si elles ont atteint votre côté. Vous rappelez. Il s'avère qu'ils ont terminé votre étage hier.",
+      "solution": "Le Portail Résident vous met en contact direct avec l'entreprise de service travaillant sur votre immeuble. Soumettez une fois. Voyez quand c'est consulté. Suivez jusqu'à la résolution."
+    },
+    "whatYouCanDo": {
+      "title": "Votre portail. Votre contrôle.",
+      "subtitle": "Le Portail Résident vous donne un accès direct aux mises à jour de projets et un canal de communication documenté avec l'équipe de service."
+    },
+    "features": {
+      "trackProgress": {
+        "title": "Suivre l'avancement du projet",
+        "description": "Voyez exactement où les équipes travaillent et quand elles atteindront votre côté de l'immeuble. Les barres de progression en temps réel montrent quelles façades sont terminées, pour savoir quand déplacer vos plantes du balcon ou préparer l'accès aux fenêtres.",
+        "whatYouSee": "Ce que vous voyez:",
+        "item1": "Quel côté de l'immeuble est en cours de traitement",
+        "item2": "Pourcentage d'achèvement pour chaque façade",
+        "item3": "Calendrier d'achèvement prévu",
+        "item4": "Fini les appels prématurés \"vous avez manqué ma fenêtre\""
+      },
+      "submitFeedback": {
+        "title": "Soumettre des commentaires avec photos",
+        "description": "Signalez des problèmes, préoccupations ou compliments directement via le portail. Joignez des photos depuis votre téléphone. Une seule soumission capture votre nom, numéro d'unité et les preuves visuelles nécessaires pour une résolution rapide.",
+        "whatYouCanSubmit": "Ce que vous pouvez soumettre:",
+        "item1": "Traces, taches ou zones manquées",
+        "item2": "Préoccupations concernant des dommages",
+        "item3": "Problèmes d'accès (plantes, meubles gênants)",
+        "item4": "Compliments pour un travail bien fait"
+      },
+      "trackStatus": {
+        "title": "Suivre le statut de vos commentaires",
+        "description": "Chaque soumission est horodatée et suivie. Voyez quand l'entreprise a consulté votre commentaire pour la première fois. Regardez le statut passer de Nouveau à Consulté à Fermé. Fini de se demander si quelqu'un l'a vu.",
+        "whatYouTrack": "Ce que vous suivez:",
+        "item1": "Date et heure de soumission",
+        "item2": "Horodatage \"Consulté\" indiquant quand l'entreprise l'a vu",
+        "item3": "Statut actuel (Nouveau, Consulté, Fermé)",
+        "item4": "Réponses de l'équipe de service"
+      }
+    },
+    "screenshots": {
+      "title": "Voyez-le en action",
+      "subtitle": "Voici ce que vous verrez lorsque vous vous connecterez à votre Portail Résident.",
+      "projectProgressCaption": "Vue de l'avancement du projet montrant le statut d'achèvement pour chaque façade de l'immeuble",
+      "workNoticesAlt": "Écran des avis de travaux",
+      "workNoticesCaption": "Écran des avis de travaux montrant le nettoyage de fenêtres prévu avec un avis de confidentialité",
+      "submitFeedbackAlt": "Formulaire de soumission de commentaires",
+      "submitFeedbackCaption": "Formulaire de soumission avec champs pour nom, téléphone, numéro d'unité, sélection de projet et message",
+      "feedbackHistoryAlt": "Vue de l'historique des commentaires",
+      "feedbackHistoryCaption": "Vue de l'historique des commentaires montrant les soumissions avec statut et date",
+      "residentProfileAlt": "Onglet profil résident",
+      "residentProfileCaption": "Onglet profil où vous modifiez vos informations de compte si vous déménagez, et entrez votre code entreprise pour voir les travaux en cours"
+    },
+    "howItWorks": {
+      "title": "Trois étapes vers une communication directe",
+      "step1": {
+        "label": "Étape 1",
+        "title": "Créez votre compte",
+        "description": "Inscrivez-vous avec votre courriel, numéro de plan cadastral et numéro d'unité. Cela lie votre compte à votre immeuble et unité spécifiques. Prend environ deux minutes."
+      },
+      "step2": {
+        "label": "Étape 2",
+        "title": "Entrez le code prestataire",
+        "description": "Votre gestionnaire d'immeuble ou gestionnaire immobilier vous fournit un code prestataire. Entrez-le une fois dans votre profil pour vous connecter à l'entreprise de service travaillant sur votre immeuble."
+      },
+      "step3": {
+        "label": "Étape 3",
+        "title": "Consultez les projets et soumettez des commentaires",
+        "description": "Votre tableau de bord affiche les projets actifs sur votre immeuble. Consultez l'avancement. Soumettez des commentaires. Suivez les réponses. Tout au même endroit."
+      },
+      "note": {
+        "label": "Note:",
+        "text": "Votre compte vous suit. Si vous déménagez dans un autre immeuble, mettez à jour votre numéro de plan cadastral et entrez le nouveau code prestataire. Pas besoin de recommencer."
+      }
+    },
+    "problemsSolved": {
+      "title": "Vrais problèmes. Vraies solutions.",
+      "problem1": {
+        "trigger": "\"Ma plainte a disparu dans un trou noir.\"",
+        "description": "Vous avez soumis un commentaire par courriel ou téléphone. Les jours passent. Aucune réponse. Vous faites un suivi. Ils ne le trouvent pas. Vous expliquez tout à nouveau. Toujours rien.",
+        "solution": "Avec le Portail Résident, chaque soumission est enregistrée avec un horodatage. Vous voyez la date et l'heure exactes où l'entreprise a consulté votre commentaire. \"Je ne l'ai pas vu\" devient impossible quand vous pouvez prouver qu'ils l'ont consulté mardi à 14h47."
+      },
+      "problem2": {
+        "trigger": "\"J'ai déjà expliqué ça trois fois.\"",
+        "description": "Appel au gestionnaire immobilier. Gestionnaire au prestataire. Prestataire au technicien. Quelque part en chemin, \"tache d'eau sur la fenêtre de la chambre\" est devenu \"problème de vitre du balcon\". Le technicien arrive confus.",
+        "solution": "Soumettez une fois via le portail. Votre nom, unité, téléphone et description sont capturés. Joignez des photos. Terminé. L'équipe voit exactement ce que vous voyez. Pas de téléphone arabe."
+      },
+      "problem3": {
+        "trigger": "\"Je n'ai aucune idée s'ils ont fait ma fenêtre.\"",
+        "description": "Des équipes sont sur l'immeuble. Vous pouvez les voir de la rue. Mais sont-ils du côté nord ou sud? Ont-ils terminé votre étage hier ou est-ce prévu pour la semaine prochaine?",
+        "solution": "Le portail montre l'avancement en temps réel par façade. Vous savez que votre côté n'a pas encore été touché. Vous attendez. Pas d'appels inutiles demandant \"avez-vous terminé?\""
+      },
+      "problem4": {
+        "trigger": "\"Ils ont dit qu'ils régleraient ça mais rien n'a changé.\"",
+        "description": "Commentaire soumis. Réponse reçue. Problème marqué fermé. Mais rien ne s'est réellement amélioré. Et maintenant?",
+        "solution": "Vous pouvez voir l'historique des statuts et toutes les réponses de l'équipe. Si le problème persiste après la fermeture, contactez votre gestionnaire d'immeuble avec des preuves documentées de ce qui a été communiqué."
+      }
+    },
+    "keyFeatures": {
+      "title": "Conçu pour la clarté",
+      "subtitle": "Chaque fonctionnalité existe pour éliminer la confusion et vous donner une visibilité sur ce qui se passe dans votre immeuble.",
+      "viewedTimestamp": {
+        "title": "Horodatage de consultation",
+        "description": "Voyez la date et l'heure exactes où l'entreprise a consulté votre commentaire pour la première fois. Responsabilité intégrée."
+      },
+      "photoUploads": {
+        "title": "Téléchargement de photos",
+        "description": "Joignez des photos directement depuis votre téléphone lors de la soumission de commentaires. Des preuves claires accélèrent la résolution."
+      },
+      "progressTracking": {
+        "title": "Suivi de l'avancement",
+        "description": "Les barres de progression en temps réel montrent quel côté de l'immeuble est terminé. Sachez quand les travaux approchent de votre unité."
+      },
+      "statusBadges": {
+        "title": "Badges de statut",
+        "description": "Nouveau, Consulté, Fermé. Sachez toujours où en est votre commentaire d'un coup d'œil."
+      },
+      "portableAccount": {
+        "title": "Compte portable",
+        "description": "Vous déménagez dans un nouvel immeuble? Mettez à jour votre numéro de plan cadastral et entrez le nouveau code prestataire. Votre compte vous suit."
+      },
+      "privacyProtection": {
+        "title": "Protection de la vie privée",
+        "description": "Vos commentaires ne sont visibles que par vous et l'entreprise de service. Les autres résidents ne peuvent pas voir vos soumissions."
+      }
+    },
+    "measurableResults": {
+      "title": "Ce qui change avec le portail",
+      "fasterResponse": {
+        "title": "Réponse plus rapide",
+        "description": "Les soumissions de commentaires avec photos reçoivent une première réponse en 24 heures en moyenne. Fini d'attendre une semaine pour savoir si quelqu'un a reçu votre plainte."
+      },
+      "resolutionTime": {
+        "title": "Temps de résolution",
+        "description": "Les problèmes qui prenaient auparavant 3 à 5 jours à résoudre se règlent maintenant en 24 heures en moyenne. La communication directe élimine les délais d'intermédiaires."
+      },
+      "zeroLostComplaints": {
+        "title": "Zéro plainte perdue",
+        "description": "Chaque soumission est enregistrée, horodatée et suivie. Rien ne passe entre les mailles du filet."
+      },
+      "selfServeUpdates": {
+        "title": "Mises à jour en libre-service",
+        "description": "Vérifiez l'avancement du projet à tout moment sans appeler. Sachez quand les travaux atteindront votre côté avant de devoir demander."
+      }
+    },
+    "faqs": {
+      "title": "Questions fréquemment posées",
+      "faq1": {
+        "question": "Comment obtenir le code prestataire?",
+        "answer": "Contactez votre gestionnaire d'immeuble ou gestionnaire immobilier. Ils reçoivent le code prestataire de l'entreprise de service et le partagent avec les résidents."
+      },
+      "faq2": {
+        "question": "Puis-je accéder au portail depuis mon téléphone?",
+        "answer": "Oui. Le portail fonctionne sur tout appareil avec accès Internet: téléphone, tablette ou ordinateur."
+      },
+      "faq3": {
+        "question": "Et si je déménage dans une autre unité du même immeuble?",
+        "answer": "Mettez à jour votre numéro d'unité dans les paramètres de votre compte. Votre numéro de plan cadastral reste le même."
+      },
+      "faq4": {
+        "question": "Et si je déménage dans un autre immeuble?",
+        "answer": "Mettez à jour votre numéro de plan cadastral et votre numéro d'unité. Entrez le nouveau code prestataire lorsque vous le recevez de votre nouveau gestionnaire d'immeuble."
+      },
+      "faq5": {
+        "question": "Les autres résidents peuvent-ils voir mes commentaires?",
+        "answer": "Non. Vous ne pouvez voir que les commentaires que vous avez soumis. Les gestionnaires d'immeuble et l'entreprise de service peuvent voir tous les commentaires de l'immeuble, mais pas les autres résidents."
+      },
+      "faq6": {
+        "question": "Que se passe-t-il si mon commentaire est fermé mais que le problème persiste?",
+        "answer": "Seule l'entreprise peut rouvrir les commentaires fermés. Si vous pensez qu'un problème n'a pas été entièrement résolu, contactez votre gestionnaire d'immeuble ou gestionnaire immobilier avec des preuves documentées du portail."
+      },
+      "faq7": {
+        "question": "Puis-je soumettre des commentaires positifs?",
+        "answer": "Absolument. Le système accepte tous types de commentaires: préoccupations, compliments, questions et suggestions."
+      },
+      "faq8": {
+        "question": "Combien de temps ai-je pour soumettre un commentaire après la fin des travaux?",
+        "answer": "Les résidents ont 5 jours ouvrables après l'achèvement du projet pour soumettre des commentaires. Cette fenêtre permet de remarquer les problèmes tout en gardant une période de réclamation raisonnable."
+      },
+      "faq9": {
+        "question": "Mes données sont-elles sécurisées?",
+        "answer": "Oui. Votre compte utilise des mots de passe chiffrés et des sessions sécurisées. Vos commentaires sont privés et visibles uniquement par vous et le personnel autorisé."
+      }
+    },
+    "cta": {
+      "title": "Votre immeuble utilise déjà ce système",
+      "description": "L'entreprise de service de votre immeuble a choisi OnRopePro pour améliorer la communication avec les résidents comme vous. La création d'un compte prend deux minutes. Une fois le code prestataire entré, vous aurez un accès direct pour soumettre des commentaires.",
+      "tagline": "Fini de se demander. Fini d'attendre. Fini de répéter.",
+      "vendorCodeHelp": "Besoin du code prestataire? Contactez votre gestionnaire d'immeuble ou gestionnaire immobilier."
+    },
+    "footer": {
+      "tagline": "Logiciel de gestion pour l'accès sur corde",
+      "privacyPolicy": "Politique de confidentialité",
+      "termsOfService": "Conditions d'utilisation"
+    }
   }
 }
