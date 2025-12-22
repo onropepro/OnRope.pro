@@ -5,7 +5,7 @@ import { db } from "./db";
 import { wsHub } from "./websocket-hub";
 import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates, dashboardPreferences } from "@shared/schema";
 import { CARD_REGISTRY, getAvailableCardsForUser, getDefaultLayoutForRole, getCardsByCategory } from "@shared/dashboardCards";
-import { eq, sql, and, or, isNull, gt, desc, asc, inArray } from "drizzle-orm";
+import { eq, sql, and, or, isNull, gt, gte, lte, desc, asc, inArray } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import multer from "multer";
@@ -3706,6 +3706,521 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // =====================================================================
   // END DASHBOARD PREFERENCES ENDPOINTS
+  // =====================================================================
+
+  // =====================================================================
+  // DASHBOARD CARD DATA ENDPOINTS
+  // =====================================================================
+
+  // Get my time status (for technician's "My Time Today" card)
+  app.get("/api/my-time-status", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const companyId = user.role === "company" ? user.id : user.companyId;
+      if (!companyId) {
+        return res.json({ isClockedIn: false, hoursToday: 0 });
+      }
+
+      const today = getTodayString(companyId);
+      
+      // Find active work session (no end time)
+      const activeSessions = await db.select()
+        .from(workSessions)
+        .where(and(
+          eq(workSessions.employeeId, userId),
+          eq(workSessions.companyId, companyId),
+          isNull(workSessions.endTime)
+        ))
+        .limit(1);
+
+      // Calculate hours worked today
+      const todaySessions = await db.select()
+        .from(workSessions)
+        .where(and(
+          eq(workSessions.employeeId, userId),
+          eq(workSessions.companyId, companyId),
+          eq(workSessions.workDate, today)
+        ));
+
+      let hoursToday = 0;
+      for (const session of todaySessions) {
+        if (session.startTime && session.endTime) {
+          const diff = new Date(session.endTime).getTime() - new Date(session.startTime).getTime();
+          hoursToday += diff / (1000 * 60 * 60);
+        }
+      }
+
+      const activeSession = activeSessions[0];
+      let projectName: string | undefined;
+      if (activeSession) {
+        const project = await storage.getProjectById(activeSession.projectId);
+        projectName = project?.buildingName || undefined;
+      }
+
+      res.json({
+        isClockedIn: !!activeSession,
+        currentSessionStart: activeSession?.startTime?.toISOString(),
+        hoursToday: Math.round(hoursToday * 10) / 10,
+        projectName,
+      });
+    } catch (error: any) {
+      console.error('[Dashboard] Get my time status error:', error);
+      res.status(500).json({ message: error.message || "Failed to get time status" });
+    }
+  });
+
+  // Get active work sessions (for "Active Workers" card)
+  app.get("/api/active-work-sessions", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const companyId = user.role === "company" ? user.id : user.companyId;
+      if (!companyId) {
+        return res.json({ sessions: [], count: 0 });
+      }
+
+      // Find all active work sessions (no end time)
+      const activeSessions = await db.select()
+        .from(workSessions)
+        .where(and(
+          eq(workSessions.companyId, companyId),
+          isNull(workSessions.endTime)
+        ));
+
+      const sessionsWithDetails = await Promise.all(activeSessions.map(async (session) => {
+        const employee = await storage.getUserById(session.employeeId);
+        const project = await storage.getProjectById(session.projectId);
+        return {
+          id: session.id,
+          employeeName: employee ? `${employee.firstName} ${employee.lastName}` : "Unknown",
+          projectName: project?.buildingName || "Unknown Project",
+          startTime: session.startTime?.toISOString(),
+        };
+      }));
+
+      res.json({
+        sessions: sessionsWithDetails,
+        count: activeSessions.length,
+      });
+    } catch (error: any) {
+      console.error('[Dashboard] Get active work sessions error:', error);
+      res.status(500).json({ message: error.message || "Failed to get active sessions" });
+    }
+  });
+
+  // Get my schedule (for technician's "My Schedule" card)
+  app.get("/api/my-schedule", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const companyId = user.role === "company" ? user.id : user.companyId;
+      if (!companyId) {
+        return res.json({ jobs: [] });
+      }
+
+      const now = new Date();
+      const endOfWeek = new Date(now);
+      endOfWeek.setDate(endOfWeek.getDate() + 7);
+
+      // Get job assignments for this employee
+      const assignments = await db.select()
+        .from(jobAssignments)
+        .where(eq(jobAssignments.employeeId, userId));
+
+      const jobIds = assignments.map(a => a.jobId);
+      if (jobIds.length === 0) {
+        return res.json({ jobs: [] });
+      }
+
+      // Get scheduled jobs (upcoming within next 7 days)
+      const jobs = await db.select()
+        .from(scheduledJobs)
+        .where(and(
+          inArray(scheduledJobs.id, jobIds),
+          eq(scheduledJobs.companyId, companyId),
+          gte(scheduledJobs.startDate, now),
+          lte(scheduledJobs.startDate, endOfWeek)
+        ))
+        .orderBy(asc(scheduledJobs.startDate))
+        .limit(5);
+
+      const jobsData = jobs.map(job => ({
+        id: job.id,
+        title: job.title,
+        date: job.startDate?.toISOString().split('T')[0],
+        time: job.startDate?.toISOString().split('T')[1]?.substring(0, 5) || "09:00",
+        location: job.location || "",
+        status: job.status,
+      }));
+
+      res.json({ jobs: jobsData });
+    } catch (error: any) {
+      console.error('[Dashboard] Get my schedule error:', error);
+      res.status(500).json({ message: error.message || "Failed to get schedule" });
+    }
+  });
+
+  // Get week summary (for "Week at a Glance" card)
+  app.get("/api/schedule/week-summary", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const companyId = user.role === "company" ? user.id : user.companyId;
+      if (!companyId) {
+        return res.json({ days: [] });
+      }
+
+      const today = new Date();
+      const weekStart = new Date(today);
+      weekStart.setDate(today.getDate() - today.getDay() + 1); // Monday
+      weekStart.setHours(0, 0, 0, 0);
+      
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 6);
+      weekEnd.setHours(23, 59, 59, 999);
+
+      // Get all jobs for this week (inclusive bounds)
+      const jobs = await db.select()
+        .from(scheduledJobs)
+        .where(and(
+          eq(scheduledJobs.companyId, companyId),
+          gte(scheduledJobs.startDate, weekStart),
+          lte(scheduledJobs.startDate, weekEnd)
+        ));
+
+      const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      const days = [];
+
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(weekStart);
+        date.setDate(weekStart.getDate() + i);
+        const dateStr = date.toISOString().split('T')[0];
+        
+        const jobCount = jobs.filter(job => {
+          const jobDate = job.startDate?.toISOString().split('T')[0];
+          return jobDate === dateStr;
+        }).length;
+
+        days.push({
+          date: dateStr,
+          dayName: dayNames[i],
+          jobCount,
+          isToday: dateStr === today.toISOString().split('T')[0],
+        });
+      }
+
+      res.json({ days });
+    } catch (error: any) {
+      console.error('[Dashboard] Get week summary error:', error);
+      res.status(500).json({ message: error.message || "Failed to get week summary" });
+    }
+  });
+
+  // Get toolbox coverage (for "Toolbox Coverage" card)
+  app.get("/api/toolbox-coverage", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const companyId = user.role === "company" ? user.id : user.companyId;
+      if (!companyId) {
+        return res.json({ lastMeetingDate: null, daysSinceMeeting: 999, totalMeetingsThisMonth: 0 });
+      }
+
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+      // Get toolbox meetings for this company
+      const meetings = await storage.getToolboxMeetings(companyId);
+      
+      // Sort by date descending to get most recent
+      const sortedMeetings = [...meetings].sort((a, b) => 
+        new Date(b.meetingDate).getTime() - new Date(a.meetingDate).getTime()
+      );
+
+      const lastMeeting = sortedMeetings[0];
+      let daysSinceMeeting = 999;
+      let lastMeetingDate: string | null = null;
+
+      if (lastMeeting) {
+        lastMeetingDate = lastMeeting.meetingDate;
+        const lastDate = new Date(lastMeeting.meetingDate);
+        daysSinceMeeting = Math.floor((now.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
+      }
+
+      // Count meetings this month
+      const monthlyMeetings = meetings.filter(m => 
+        new Date(m.meetingDate) >= startOfMonth
+      );
+
+      res.json({
+        lastMeetingDate,
+        daysSinceMeeting,
+        totalMeetingsThisMonth: monthlyMeetings.length,
+      });
+    } catch (error: any) {
+      console.error('[Dashboard] Get toolbox coverage error:', error);
+      res.status(500).json({ message: error.message || "Failed to get toolbox coverage" });
+    }
+  });
+
+  // Get overtime alerts (for "Overtime Alert" card)
+  app.get("/api/overtime-alerts", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const companyId = user.role === "company" ? user.id : user.companyId;
+      if (!companyId) {
+        return res.json({ hasOvertime: false, employeesWithOvertime: 0, totalOvertimeHours: 0 });
+      }
+
+      // Get this week's work sessions
+      const today = new Date();
+      const weekStart = new Date(today);
+      weekStart.setDate(today.getDate() - today.getDay());
+      weekStart.setHours(0, 0, 0, 0);
+
+      const sessions = await db.select()
+        .from(workSessions)
+        .where(and(
+          eq(workSessions.companyId, companyId),
+          gt(workSessions.startTime, weekStart)
+        ));
+
+      // Calculate hours per employee
+      const employeeHours: Record<string, number> = {};
+      for (const session of sessions) {
+        if (session.startTime && session.endTime) {
+          const hours = (new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / (1000 * 60 * 60);
+          employeeHours[session.employeeId] = (employeeHours[session.employeeId] || 0) + hours;
+        }
+      }
+
+      // Count employees with overtime (>40 hours/week)
+      let employeesWithOvertime = 0;
+      let totalOvertimeHours = 0;
+      for (const [, hours] of Object.entries(employeeHours)) {
+        if (hours > 40) {
+          employeesWithOvertime++;
+          totalOvertimeHours += hours - 40;
+        }
+      }
+
+      res.json({
+        hasOvertime: employeesWithOvertime > 0,
+        employeesWithOvertime,
+        totalOvertimeHours: Math.round(totalOvertimeHours * 10) / 10,
+      });
+    } catch (error: any) {
+      console.error('[Dashboard] Get overtime alerts error:', error);
+      res.status(500).json({ message: error.message || "Failed to get overtime alerts" });
+    }
+  });
+
+  // Get current pay period (for "Pay Period Summary" card)
+  app.get("/api/current-pay-period", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const companyId = user.role === "company" ? user.id : user.companyId;
+      if (!companyId) {
+        return res.json({ startDate: null, endDate: null, daysRemaining: 0, totalHours: 0 });
+      }
+
+      // Get pay period config
+      const config = await storage.getPayPeriodConfig(companyId);
+      
+      const today = new Date();
+      let startDate: Date;
+      let endDate: Date;
+      
+      if (config) {
+        // Calculate based on config
+        const periodStart = new Date(config.periodStartDate);
+        const periodLength = config.periodType === 'weekly' ? 7 : 
+                           config.periodType === 'biweekly' ? 14 : 
+                           config.periodType === 'semi_monthly' ? 15 : 30;
+        
+        // Find current period
+        const daysSinceStart = Math.floor((today.getTime() - periodStart.getTime()) / (1000 * 60 * 60 * 24));
+        const periodsElapsed = Math.floor(daysSinceStart / periodLength);
+        
+        startDate = new Date(periodStart);
+        startDate.setDate(periodStart.getDate() + (periodsElapsed * periodLength));
+        
+        endDate = new Date(startDate);
+        endDate.setDate(startDate.getDate() + periodLength - 1);
+        endDate.setHours(23, 59, 59, 999); // Include full final day
+      } else {
+        // Default to biweekly
+        const dayOfMonth = today.getDate();
+        if (dayOfMonth <= 15) {
+          startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+          endDate = new Date(today.getFullYear(), today.getMonth(), 15, 23, 59, 59, 999);
+        } else {
+          startDate = new Date(today.getFullYear(), today.getMonth(), 16);
+          endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59, 999);
+        }
+      }
+
+      const daysRemaining = Math.max(0, Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)));
+
+      // Get work sessions in this period (inclusive bounds)
+      const sessions = await db.select()
+        .from(workSessions)
+        .where(and(
+          eq(workSessions.companyId, companyId),
+          gte(workSessions.startTime, startDate),
+          lte(workSessions.startTime, endDate)
+        ));
+
+      let totalHours = 0;
+      for (const session of sessions) {
+        if (session.startTime && session.endTime) {
+          totalHours += (new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / (1000 * 60 * 60);
+        }
+      }
+
+      res.json({
+        startDate: startDate.toISOString().split('T')[0],
+        endDate: endDate.toISOString().split('T')[0],
+        daysRemaining,
+        totalHours: Math.round(totalHours * 10) / 10,
+      });
+    } catch (error: any) {
+      console.error('[Dashboard] Get current pay period error:', error);
+      res.status(500).json({ message: error.message || "Failed to get pay period" });
+    }
+  });
+
+  // Get quote summary (for "Outstanding Quotes" card)
+  app.get("/api/quote-summary", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const companyId = user.role === "company" ? user.id : user.companyId;
+      if (!companyId) {
+        return res.json({ pendingCount: 0, totalValue: 0, oldestDays: 0 });
+      }
+
+      // Get pending quotes
+      const pendingQuotes = await db.select()
+        .from(quotes)
+        .where(and(
+          eq(quotes.companyId, companyId),
+          inArray(quotes.status, ['draft', 'sent', 'pending'])
+        ));
+
+      let totalValue = 0;
+      let oldestDate: Date | null = null;
+
+      for (const quote of pendingQuotes) {
+        totalValue += Number(quote.totalAmount) || 0;
+        if (quote.createdAt && (!oldestDate || quote.createdAt < oldestDate)) {
+          oldestDate = quote.createdAt;
+        }
+      }
+
+      const oldestDays = oldestDate 
+        ? Math.floor((Date.now() - oldestDate.getTime()) / (1000 * 60 * 60 * 24))
+        : 0;
+
+      res.json({
+        pendingCount: pendingQuotes.length,
+        totalValue: Math.round(totalValue * 100) / 100,
+        oldestDays,
+      });
+    } catch (error: any) {
+      console.error('[Dashboard] Get quote summary error:', error);
+      res.status(500).json({ message: error.message || "Failed to get quote summary" });
+    }
+  });
+
+  // Get my performance (for technician's "My Performance" card)
+  app.get("/api/my-performance", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const companyId = user.role === "company" ? user.id : user.companyId;
+      if (!companyId) {
+        return res.json({ completedJobs: 0, hoursThisMonth: 0, avgHoursPerJob: 0 });
+      }
+
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+      // Get completed work sessions this month for this employee
+      const sessions = await db.select()
+        .from(workSessions)
+        .where(and(
+          eq(workSessions.employeeId, userId),
+          eq(workSessions.companyId, companyId),
+          gt(workSessions.startTime, startOfMonth)
+        ));
+
+      // Calculate total hours and count unique projects
+      let hoursThisMonth = 0;
+      const projectIds = new Set<string>();
+
+      for (const session of sessions) {
+        if (session.startTime && session.endTime) {
+          hoursThisMonth += (new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / (1000 * 60 * 60);
+        }
+        projectIds.add(session.projectId);
+      }
+
+      const completedJobs = projectIds.size;
+      const avgHoursPerJob = completedJobs > 0 ? hoursThisMonth / completedJobs : 0;
+
+      res.json({
+        completedJobs,
+        hoursThisMonth: Math.round(hoursThisMonth * 10) / 10,
+        avgHoursPerJob: Math.round(avgHoursPerJob * 10) / 10,
+      });
+    } catch (error: any) {
+      console.error('[Dashboard] Get my performance error:', error);
+      res.status(500).json({ message: error.message || "Failed to get performance" });
+    }
+  });
+
+  // =====================================================================
+  // END DASHBOARD CARD DATA ENDPOINTS
   // =====================================================================
   
   // Get current user

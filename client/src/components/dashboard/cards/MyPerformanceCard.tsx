@@ -1,11 +1,39 @@
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, ChevronRight, Star, Target } from "lucide-react";
+import { TrendingUp, ChevronRight, BarChart3 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import type { CardProps } from "../cardRegistry";
+
+interface PerformanceData {
+  completedJobs: number;
+  hoursThisMonth: number;
+  avgHoursPerJob: number;
+}
 
 export function MyPerformanceCard({ currentUser, onRouteNavigate, branding }: CardProps) {
   const accentColor = branding?.primaryColor || "#0B64A3";
+
+  const { data: perfData, isLoading } = useQuery<PerformanceData>({
+    queryKey: ["/api/my-performance"],
+  });
+
+  if (isLoading) {
+    return (
+      <>
+        <CardHeader className="px-4 py-3">
+          <CardTitle className="text-base font-semibold flex items-center gap-2">
+            <TrendingUp className="w-5 h-5" style={{ color: accentColor }} />
+            My Performance
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="px-4 pb-4">
+          <div className="animate-pulse h-20 bg-muted rounded" />
+        </CardContent>
+      </>
+    );
+  }
+
+  const hasData = perfData && (perfData.completedJobs > 0 || perfData.hoursThisMonth > 0);
 
   return (
     <>
@@ -16,46 +44,47 @@ export function MyPerformanceCard({ currentUser, onRouteNavigate, branding }: Ca
         </CardTitle>
       </CardHeader>
       <CardContent className="px-4 pb-4">
-        <div className="space-y-3">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-muted/50 p-3 rounded-lg">
-              <div className="flex items-center gap-1 mb-1">
-                <Star className="w-4 h-4 text-amber-500" />
-                <p className="text-sm text-muted-foreground">Rating</p>
+        {hasData ? (
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-muted/50 p-3 rounded-lg">
+                <p className="text-sm text-muted-foreground">Jobs This Month</p>
+                <p className="text-xl font-bold" data-testid="text-my-jobs">
+                  {perfData!.completedJobs}
+                </p>
               </div>
-              <p className="text-xl font-bold" data-testid="text-my-rating">
-                4.8/5
-              </p>
-            </div>
-            <div className="bg-muted/50 p-3 rounded-lg">
-              <div className="flex items-center gap-1 mb-1">
-                <Target className="w-4 h-4 text-green-500" />
-                <p className="text-sm text-muted-foreground">Jobs</p>
+              <div className="bg-muted/50 p-3 rounded-lg">
+                <p className="text-sm text-muted-foreground">Hours Logged</p>
+                <p className="text-xl font-bold" data-testid="text-my-hours">
+                  {perfData!.hoursThisMonth.toFixed(1)}h
+                </p>
               </div>
-              <p className="text-xl font-bold" data-testid="text-my-jobs">
-                12
-              </p>
             </div>
+            {perfData!.avgHoursPerJob > 0 && (
+              <p className="text-sm text-muted-foreground">
+                Avg {perfData!.avgHoursPerJob.toFixed(1)}h per job
+              </p>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-between"
+              onClick={() => onRouteNavigate("/timesheets")}
+              data-testid="button-view-my-performance"
+            >
+              View Details
+              <ChevronRight className="w-4 h-4" />
+            </Button>
           </div>
-          <div className="bg-green-50 dark:bg-green-950/30 p-3 rounded-lg">
-            <p className="text-base font-medium text-green-700 dark:text-green-400">
-              Great month!
-            </p>
-            <p className="text-sm text-muted-foreground">
-              On track for performance bonus
+        ) : (
+          <div className="flex flex-col items-center justify-center py-4 text-center">
+            <BarChart3 className="w-10 h-10 text-muted-foreground/50 mb-2" />
+            <p className="text-base text-muted-foreground">No activity this month</p>
+            <p className="text-sm text-muted-foreground/70">
+              Complete work sessions to see your stats
             </p>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-full justify-between"
-            onClick={() => onRouteNavigate("/profile")}
-            data-testid="button-view-my-performance"
-          >
-            View Details
-            <ChevronRight className="w-4 h-4" />
-          </Button>
-        </div>
+        )}
       </CardContent>
     </>
   );
