@@ -19,8 +19,6 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useToast } from "@/hooks/use-toast";
 import { DollarSign, Calendar, Users, Settings, Clock, Pencil, Trash2, Download, FileText, FileSpreadsheet } from "lucide-react";
 import jsPDF from 'jspdf';
-import { BackButton } from "@/components/BackButton";
-import { MainMenuButton } from "@/components/MainMenuButton";
 import { format } from "date-fns";
 import { fr, enUS } from "date-fns/locale";
 
@@ -697,10 +695,8 @@ export default function Payroll() {
   return (
     <div className="container mx-auto p-4 space-y-6">
       <div className="flex items-center gap-3">
-        <BackButton size="icon" />
-        <MainMenuButton size="icon" />
         <div className="flex-1 min-w-0">
-          <h1 className="text-xl md:text-3xl font-bold truncate" data-testid="heading-payroll">{t('payroll.title', 'Financials')}</h1>
+          <h1 className="text-xl md:text-3xl font-bold truncate" data-testid="heading-payroll">{t('payroll.title', 'Payroll')}</h1>
           <p className="text-sm text-muted-foreground hidden sm:block">{t('payroll.subtitle', 'Manage payroll and quotes')}</p>
         </div>
       </div>

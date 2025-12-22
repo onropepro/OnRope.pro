@@ -4,7 +4,6 @@ import { useLocation } from "wouter";
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BackButton } from "@/components/BackButton";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -5242,12 +5241,9 @@ export default function Documents() {
     <div className="min-h-screen bg-background p-4 pb-24">
       <div className="max-w-6xl mx-auto">
         {/* Page Header */}
-        <div className="flex items-center gap-3 mb-6">
-          <BackButton />
-          <div>
-            <h1 className="text-2xl font-bold">{t('documents.pageTitle', 'Documents & Records')}</h1>
-            <p className="text-muted-foreground text-sm">{t('documents.subtitle', 'Company documents and safety records')}</p>
-          </div>
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold">{t('documents.pageTitle', 'Documents')}</h1>
+          <p className="text-muted-foreground text-sm">{t('documents.subtitle', 'Company documents and safety records')}</p>
         </div>
 
         {/* SuperUser-Style Metric Cards - Flat, minimal, no card backgrounds */}

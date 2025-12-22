@@ -3,7 +3,6 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
-import { BackButton } from "@/components/BackButton";
 import FullCalendar from "@fullcalendar/react";
 import { toLocalDateString, parseLocalDate, nextDateOnly, addDaysToDateString, extractLocalDateFromISO, formatDateTime, formatLocalDate } from "@/lib/dateUtils";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -139,8 +138,6 @@ export default function Schedule() {
   if (currentUser && !hasSchedulePermission) {
     return (
       <div className="p-4 md:p-6 space-y-6">
-        <BackButton to="/dashboard" label={t('schedule.backToDashboard', 'Back to Dashboard')} />
-
         <Card className="border-2 border-destructive/50">
           <CardContent className="pt-6">
             <div className="flex flex-col items-center justify-center text-center space-y-4 py-8">
@@ -966,8 +963,6 @@ export default function Schedule() {
 
     return (
       <div className="p-4 md:p-6 space-y-6">
-        <BackButton to="/dashboard" label={t('schedule.backToDashboard', 'Back to Dashboard')} />
-
         {/* Header */}
         <div className="flex items-center gap-3">
           <Calendar className="w-8 h-8 text-primary" />
@@ -1102,14 +1097,11 @@ export default function Schedule() {
       onDragStart={(event) => setActiveEmployeeId(event.active.id as string)}
     >
     <div className="p-4 md:p-6 space-y-6">
-      {/* Back Button */}
-      <BackButton to="/dashboard" label={t('schedule.backToDashboard', 'Back to Dashboard')} />
-
       {/* Header */}
       <div className="flex items-center gap-3">
         <Calendar className="w-8 h-8 text-primary" />
         <div>
-          <h1 className="text-2xl font-bold">{t('schedule.title', 'Job Schedule')}</h1>
+          <h1 className="text-2xl font-bold">{t('schedule.title', 'Schedule')}</h1>
           <p className="text-sm text-muted-foreground">
             {t('schedule.subtitle', "Manage your team's job assignments and schedule")}
           </p>

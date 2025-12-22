@@ -1562,18 +1562,8 @@ export default function Inventory() {
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
       <header className="sticky top-0 z-[100] bg-card border-b shadow-md">
-        <div className="px-4 h-16 flex items-center justify-between max-w-7xl mx-auto">
-          <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setLocation("/dashboard")}
-              data-testid="button-back"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <h1 className="text-xl font-bold tracking-tight">{t('inventory.title', 'Inventory & Inspections')}</h1>
-          </div>
+        <div className="px-4 h-14 flex items-center justify-between max-w-7xl mx-auto">
+          <h1 className="text-xl font-bold tracking-tight">{t('inventory.title', 'Inventory')}</h1>
         </div>
       </header>
 

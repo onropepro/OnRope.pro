@@ -6,7 +6,6 @@ import { z } from "zod";
 import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
-import { BackButton } from "@/components/BackButton";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { hasFinancialAccess, isManagement, hasPermission } from "@/lib/permissions";
 import { getTaxInfo, calculateTax, getTaxLabel, type TaxInfo } from "@shared/taxRates";
@@ -1301,10 +1300,8 @@ export default function Quotes() {
       return (
         <div className="min-h-screen bg-background p-4 md:p-8">
           <div className="max-w-7xl mx-auto">
-            <BackButton to="/dashboard" label={t('quotes.backToDashboard', 'Back to Dashboard')} />
-
             <div className="mb-6 sm:mb-8">
-              <h1 className="text-2xl sm:text-4xl font-bold text-foreground mb-2">{t('quotes.pageTitle', 'Service Quotes')}</h1>
+              <h1 className="text-2xl sm:text-4xl font-bold text-foreground mb-2">{t('quotes.pageTitle', 'Quotes')}</h1>
               <p className="text-sm sm:text-base text-muted-foreground">{t('quotes.pageSubtitle', 'Create and manage service quotes for buildings')}</p>
             </div>
 
@@ -1480,11 +1477,9 @@ export default function Quotes() {
     return (
       <div className="h-screen bg-background p-4 md:p-6 flex flex-col overflow-hidden">
         <div className="flex-1 flex flex-col min-h-0 max-w-full">
-          <BackButton to="/dashboard" label={t('quotes.backToDashboard', 'Back to Dashboard')} />
-
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-3 gap-2">
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-foreground">{t('quotes.pageTitle', 'Service Quotes')}</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground">{t('quotes.pageTitle', 'Quotes')}</h1>
               <p className="text-xs text-muted-foreground">{t('quotes.pageSubtitle', 'Create and manage service quotes for buildings')}</p>
             </div>
             <Button
@@ -1865,13 +1860,18 @@ export default function Quotes() {
       <>
         <div className="min-h-screen bg-background p-4 md:p-8">
         <div className="max-w-4xl mx-auto">
-          <BackButton 
+          <Button 
+            variant="ghost"
             onClick={() => {
               setSelectedQuote(null);
               setView("list");
             }}
-            label={t('quotes.backToQuotes', 'Back to Quotes')}
-          />
+            className="mb-4"
+            data-testid="button-back-to-quotes"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            {t('quotes.backToQuotes', 'Back to Quotes')}
+          </Button>
 
           <Card className="rounded-2xl shadow-lg border border-border mb-8">
             <CardHeader className="p-4 md:p-8">

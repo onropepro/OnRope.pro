@@ -70,7 +70,6 @@ import { ProgressPromptDialog } from "@/components/ProgressPromptDialog";
 import { BusinessCardScanner } from "@/components/BusinessCardScanner";
 import { DoubleBookingWarningDialog } from "@/components/DoubleBookingWarningDialog";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
-import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
 
@@ -3617,20 +3616,8 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen w-full">
-      {/* Fixed Sidebar */}
-      <DashboardSidebar
-        currentUser={currentUser}
-        activeTab={activeTab}
-        onTabChange={handleTabChange}
-        brandingLogoUrl={currentUser?.brandingLogoUrl}
-        whitelabelBrandingActive={currentUser?.whitelabelBrandingActive}
-        companyName={companyName}
-        employeeCount={employees?.length || 0}
-        alertCounts={alertCounts}
-      />
-      
-      {/* Main Content - offset by sidebar width on desktop (w-60 = 240px) */}
-      <div className="lg:ml-60 flex-1 flex flex-col page-gradient min-h-screen">
+      {/* Main Content - sidebar is now provided by DashboardLayout wrapper */}
+      <div className="flex-1 flex flex-col page-gradient min-h-screen">
           {/* Header - Premium Glass Effect */}
           <header 
             className={`sticky top-0 z-[100] glass backdrop-blur-xl border-b shadow-premium ${hasCustomBranding ? 'custom-brand-border' : 'border-border/50'}`}
