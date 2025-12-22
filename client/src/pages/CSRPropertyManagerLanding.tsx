@@ -642,23 +642,19 @@ export default function CSRPropertyManagerLanding() {
       <EmployerRegistration open={showRegistration} onOpenChange={setShowRegistration} />
 
       {/* Footer */}
-      <footer className="bg-slate-900 text-white py-12 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <div className="flex items-center gap-2">
-              <img src={onRopeProLogo} alt="OnRopePro" className="h-8 object-contain brightness-0 invert" />
-            </div>
-            <div className="text-sm text-slate-400">
-              {t('modules.pmCSR.footer.tagline', 'Management Software for Rope Access')}
-            </div>
-            <div className="flex gap-6 text-sm">
-              <Link href="/privacy" className="hover:text-white transition-colors text-slate-400" data-testid="link-privacy">
-                {t('modules.pmCSR.footer.privacy', 'Privacy Policy')}
-              </Link>
-              <Link href="/terms" className="hover:text-white transition-colors text-slate-400" data-testid="link-terms">
-                {t('modules.pmCSR.footer.terms', 'Terms of Service')}
-              </Link>
-            </div>
+      <footer className="py-8 px-4 border-t">
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <img src={onRopeProLogo} alt="OnRopePro" className="h-8 object-contain" />
+            <span className="text-sm text-muted-foreground">{t('modules.pmCSR.footer.tagline', 'Management Software for Rope Access')}</span>
+          </div>
+          <div className="flex items-center gap-6 text-sm text-muted-foreground">
+            <Link href="/privacy" className="hover:text-foreground transition-colors" data-testid="link-privacy">
+              {t('modules.pmCSR.footer.privacy', 'Privacy Policy')}
+            </Link>
+            <Link href="/terms" className="hover:text-foreground transition-colors" data-testid="link-terms">
+              {t('modules.pmCSR.footer.terms', 'Terms of Service')}
+            </Link>
           </div>
         </div>
       </footer>
