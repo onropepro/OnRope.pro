@@ -1472,11 +1472,22 @@ export const quotes = pgTable("quotes", {
   
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+  
+  // Property Manager Collaboration Fields
+  recipientPropertyManagerId: varchar("recipient_property_manager_id").references(() => users.id, { onDelete: "set null" }),
+  collaborationStatus: varchar("collaboration_status").default('draft'), // draft | sent | viewed | negotiation | accepted | declined | revoked
+  sentAt: timestamp("sent_at"),
+  viewedAt: timestamp("viewed_at"),
+  respondedAt: timestamp("responded_at"),
+  currentRevisionId: integer("current_revision_id"), // FK to quote_revisions added after that table is created
+  createdProjectId: varchar("created_project_id").references(() => projects.id, { onDelete: "set null" }), // Idempotency guard for auto-created project
 }, (table) => [
   index("IDX_quotes_company").on(table.companyId),
   index("IDX_quotes_strata").on(table.strataPlanNumber),
   index("IDX_quotes_status").on(table.companyId, table.status),
   index("IDX_quotes_pipeline_stage").on(table.companyId, table.pipelineStage),
+  index("IDX_quotes_recipient_pm").on(table.recipientPropertyManagerId),
+  index("IDX_quotes_collaboration_status").on(table.companyId, table.collaborationStatus),
 ]);
 
 // Quote services table - each quote can have multiple services
