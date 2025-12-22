@@ -2333,6 +2333,27 @@ export default function Quotes() {
                     });
                   });
                   setEditingServices(servicesMap);
+                  
+                  // Initialize tax info from existing quote data
+                  const q = selectedQuote as any;
+                  if (q.taxRegion && (q.gstRate || q.pstRate || q.hstRate)) {
+                    const gstRate = Number(q.gstRate) || 0;
+                    const pstRate = Number(q.pstRate) || 0;
+                    const hstRate = Number(q.hstRate) || 0;
+                    setEditTaxInfo({
+                      region: q.taxRegion || "",
+                      regionName: q.taxRegion || "",
+                      country: q.taxCountry || "CA",
+                      taxType: q.taxType || "GST+PST",
+                      gstRate,
+                      pstRate,
+                      hstRate,
+                      totalRate: gstRate + pstRate + hstRate
+                    });
+                  } else {
+                    setEditTaxInfo(null);
+                  }
+                  
                   setIsEditDialogOpen(true);
                 }}
                 className="bg-primary hover:bg-primary/90"
@@ -2904,6 +2925,162 @@ export default function Quotes() {
                     })}
                   </Accordion>
                 </div>
+
+                {/* Pricing & Tax Section - only visible to users with financial access */}
+                {canViewFinancialData && (
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold">{t('quotes.pricingAndTax', 'Pricing & Tax')}</h3>
+                    <Card>
+                      <CardContent className="pt-4 space-y-4">
+                        {/* Subtotal - calculated from services */}
+                        <div className="flex items-center justify-between">
+                          <Label className="text-base">{t('quotes.subtotal', 'Subtotal')}</Label>
+                          <span className="text-lg font-semibold">
+                            ${Array.from(editingServices.values()).reduce((sum, s) => sum + Number(s.totalCost || 0), 0).toFixed(2)}
+                          </span>
+                        </div>
+
+                        <Separator />
+
+                        {/* Tax Settings */}
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <Label className="text-base">{t('quotes.taxSettings', 'Tax Settings')}</Label>
+                            {editTaxInfo && (
+                              <Badge variant="secondary">
+                                {editTaxInfo.regionName}
+                              </Badge>
+                            )}
+                          </div>
+
+                          {editTaxInfo ? (
+                            <div className="grid grid-cols-2 gap-4">
+                              {(editTaxInfo.gstRate > 0 || editTaxInfo.taxType?.includes('GST')) && (
+                                <div>
+                                  <Label className="text-sm text-muted-foreground">GST Rate (%)</Label>
+                                  <Input
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    step="0.01"
+                                    value={editTaxInfo.gstRate}
+                                    onChange={(e) => {
+                                      const newGst = parseFloat(e.target.value) || 0;
+                                      setEditTaxInfo({
+                                        ...editTaxInfo,
+                                        gstRate: newGst,
+                                        totalRate: newGst + editTaxInfo.pstRate + editTaxInfo.hstRate
+                                      });
+                                    }}
+                                    className="h-10"
+                                    data-testid="input-edit-gst-rate"
+                                  />
+                                </div>
+                              )}
+                              {(editTaxInfo.pstRate > 0 || editTaxInfo.taxType?.includes('PST')) && (
+                                <div>
+                                  <Label className="text-sm text-muted-foreground">PST Rate (%)</Label>
+                                  <Input
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    step="0.01"
+                                    value={editTaxInfo.pstRate}
+                                    onChange={(e) => {
+                                      const newPst = parseFloat(e.target.value) || 0;
+                                      setEditTaxInfo({
+                                        ...editTaxInfo,
+                                        pstRate: newPst,
+                                        totalRate: editTaxInfo.gstRate + newPst + editTaxInfo.hstRate
+                                      });
+                                    }}
+                                    className="h-10"
+                                    data-testid="input-edit-pst-rate"
+                                  />
+                                </div>
+                              )}
+                              {(editTaxInfo.hstRate > 0 || editTaxInfo.taxType?.includes('HST')) && (
+                                <div>
+                                  <Label className="text-sm text-muted-foreground">HST Rate (%)</Label>
+                                  <Input
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    step="0.01"
+                                    value={editTaxInfo.hstRate}
+                                    onChange={(e) => {
+                                      const newHst = parseFloat(e.target.value) || 0;
+                                      setEditTaxInfo({
+                                        ...editTaxInfo,
+                                        hstRate: newHst,
+                                        totalRate: editTaxInfo.gstRate + editTaxInfo.pstRate + newHst
+                                      });
+                                    }}
+                                    className="h-10"
+                                    data-testid="input-edit-hst-rate"
+                                  />
+                                </div>
+                              )}
+                              <div className="col-span-2">
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setEditTaxInfo(null)}
+                                  data-testid="button-remove-tax"
+                                >
+                                  {t('quotes.removeTax', 'Remove Tax')}
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm text-muted-foreground">{t('quotes.noTaxApplied', 'No tax applied')}</p>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  // Set default tax info based on address or use BC defaults
+                                  setEditTaxInfo({
+                                    region: "BC",
+                                    regionName: "British Columbia",
+                                    country: "CA",
+                                    taxType: "GST+PST",
+                                    gstRate: 5,
+                                    pstRate: 7,
+                                    hstRate: 0,
+                                    totalRate: 12
+                                  });
+                                }}
+                                data-testid="button-add-tax"
+                              >
+                                {t('quotes.addTax', 'Add Tax')}
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+
+                        <Separator />
+
+                        {/* Grand Total */}
+                        <div className="flex items-center justify-between">
+                          <Label className="text-base font-semibold">{t('quotes.grandTotal', 'Grand Total')}</Label>
+                          <span className="text-xl font-bold text-primary">
+                            {(() => {
+                              const subtotal = Array.from(editingServices.values()).reduce((sum, s) => sum + Number(s.totalCost || 0), 0);
+                              if (editTaxInfo) {
+                                const taxCalc = calculateTax(subtotal, editTaxInfo);
+                                return `$${taxCalc.grandTotal.toFixed(2)}`;
+                              }
+                              return `$${subtotal.toFixed(2)}`;
+                            })()}
+                          </span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
 
                 {/* Photo Upload Section */}
                 <div className="space-y-4">
