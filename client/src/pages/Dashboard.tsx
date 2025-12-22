@@ -72,7 +72,6 @@ import { DoubleBookingWarningDialog } from "@/components/DoubleBookingWarningDia
 import { LanguageDropdown } from "@/components/LanguageDropdown";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { DashboardOverview } from "@/components/DashboardOverview";
-import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 
 import { JOB_CATEGORIES, JOB_TYPES, getJobTypesByCategory, getJobTypeConfig, getDefaultElevation, isElevationConfigurable, isDropBasedJobType, getAllJobTypeValues, getProgressType, getCategoryForJobType, type JobCategory } from "@shared/jobTypes";
 
@@ -3611,37 +3610,32 @@ export default function Dashboard() {
     );
   }
 
-  const sidebarStyle = {
-    "--sidebar-width": "15rem",
-    "--sidebar-width-icon": "3.5rem",
-  } as React.CSSProperties;
-
   const alertCounts = {
     jobApplications: totalJobApplications || 0,
   };
 
   return (
-    <SidebarProvider style={sidebarStyle}>
-      <div className="flex min-h-screen w-full">
-        <DashboardSidebar
-          currentUser={currentUser}
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
-          brandingLogoUrl={currentUser?.brandingLogoUrl}
-          whitelabelBrandingActive={currentUser?.whitelabelBrandingActive}
-          companyName={companyName}
-          employeeCount={employees?.length || 0}
-          alertCounts={alertCounts}
-        />
-        
-        <SidebarInset className="flex-1 flex flex-col page-gradient">
+    <div className="min-h-screen w-full">
+      {/* Fixed Sidebar */}
+      <DashboardSidebar
+        currentUser={currentUser}
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        brandingLogoUrl={currentUser?.brandingLogoUrl}
+        whitelabelBrandingActive={currentUser?.whitelabelBrandingActive}
+        companyName={companyName}
+        employeeCount={employees?.length || 0}
+        alertCounts={alertCounts}
+      />
+      
+      {/* Main Content - offset by sidebar width on desktop (w-60 = 240px) */}
+      <div className="lg:ml-60 flex-1 flex flex-col page-gradient min-h-screen">
           {/* Header - Premium Glass Effect */}
           <header 
             className={`sticky top-0 z-[100] glass backdrop-blur-xl border-b shadow-premium ${hasCustomBranding ? 'custom-brand-border' : 'border-border/50'}`}
           >
             <div className="px-3 sm:px-6 h-14 flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
-                <SidebarTrigger data-testid="button-sidebar-toggle" className="-ml-1" />
                 <div className="flex items-center gap-2 sm:gap-4 min-w-0">
                   <div className="min-w-0">
                     <h1 className={`text-lg sm:text-xl font-bold truncate ${hasCustomBranding ? 'custom-brand-text' : 'gradient-text'}`}>
@@ -11629,8 +11623,7 @@ export default function Dashboard() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-        </SidebarInset>
       </div>
-    </SidebarProvider>
+    </div>
   );
 }

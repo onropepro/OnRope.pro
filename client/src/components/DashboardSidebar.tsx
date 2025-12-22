@@ -1,33 +1,17 @@
 import { useLocation } from "wouter";
-import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarFooter,
-  SidebarSeparator,
-} from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
 import {
   Building2,
   Users,
-  BarChart3,
   Calendar,
   Clock,
   Shield,
   FileText,
-  MessageSquare,
   Briefcase,
   Wallet,
   FileCheck,
   Package,
-  ClipboardList,
   LayoutDashboard,
   Settings,
   HelpCircle,
@@ -35,17 +19,17 @@ import {
   Award,
   Wrench,
   ClipboardCheck,
+  Menu,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import type { User } from "@/lib/permissions";
 import {
-  isManagement,
   hasFinancialAccess,
   canManageEmployees,
-  canViewPerformance,
-  hasPermission,
 } from "@/lib/permissions";
+import { useState, useEffect } from "react";
 
 interface NavItem {
   id: string;
@@ -54,7 +38,7 @@ interface NavItem {
   href?: string;
   onClick?: () => void;
   badge?: number;
-  badgeVariant?: "default" | "destructive" | "outline" | "secondary";
+  badgeType?: "alert" | "info";
   isVisible: (user: User | null | undefined) => boolean;
 }
 
@@ -93,6 +77,24 @@ export function DashboardSidebar({
 }: DashboardSidebarProps) {
   const { t } = useTranslation();
   const [location, setLocation] = useLocation();
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Deep Blue brand color - used when white label is not active
+  const BRAND_COLOR = "#0B64A3";
+
+  // Close sidebar on route change (mobile)
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location, activeTab]);
+
+  // Close sidebar on escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsOpen(false);
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, []);
 
   // Get company initials for avatar
   const getInitials = (name: string | undefined): string => {
@@ -129,7 +131,7 @@ export function DashboardSidebar({
           icon: Clock,
           href: "/non-billable-hours",
           badge: alertCounts.pendingTimesheets,
-          badgeVariant: alertCounts.pendingTimesheets ? "destructive" : undefined,
+          badgeType: alertCounts.pendingTimesheets ? "alert" : undefined,
           isVisible: () => true,
         },
       ],
@@ -144,7 +146,7 @@ export function DashboardSidebar({
           icon: Users,
           onClick: () => onTabChange("employees"),
           badge: alertCounts.expiringCerts,
-          badgeVariant: alertCounts.expiringCerts ? "destructive" : undefined,
+          badgeType: alertCounts.expiringCerts ? "alert" : undefined,
           isVisible: (user) => canManageEmployees(user),
         },
         {
@@ -160,7 +162,7 @@ export function DashboardSidebar({
           icon: Briefcase,
           href: "/job-board",
           badge: alertCounts.jobApplications,
-          badgeVariant: alertCounts.jobApplications ? "secondary" : undefined,
+          badgeType: alertCounts.jobApplications ? "info" : undefined,
           isVisible: (user) => user?.role === "company",
         },
       ],
@@ -182,7 +184,7 @@ export function DashboardSidebar({
           icon: ClipboardCheck,
           href: "/inventory",
           badge: alertCounts.overdueInspections,
-          badgeVariant: alertCounts.overdueInspections ? "destructive" : undefined,
+          badgeType: alertCounts.overdueInspections ? "alert" : undefined,
           isVisible: () => true,
         },
         {
@@ -204,7 +206,7 @@ export function DashboardSidebar({
           icon: Shield,
           href: "/safety-forms",
           badge: alertCounts.unsignedDocs,
-          badgeVariant: alertCounts.unsignedDocs ? "destructive" : undefined,
+          badgeType: alertCounts.unsignedDocs ? "alert" : undefined,
           isVisible: () => true,
         },
         {
@@ -272,161 +274,203 @@ export function DashboardSidebar({
     .filter((group) => group.items.length > 0);
 
   const displayCompanyName = companyName || "My Company";
+  const isDashboardActive = activeTab === "home" || activeTab === "" || !activeTab;
 
-  return (
-    <Sidebar 
-      collapsible="icon" 
-      className="border-r bg-white dark:bg-sidebar"
-    >
-      {/* Logo Header */}
-      <SidebarHeader className="px-5 py-4">
-        <div className="flex items-center gap-2.5">
-          {whitelabelBrandingActive && brandingLogoUrl ? (
-            <img
-              src={brandingLogoUrl}
-              alt="Company Logo"
-              className="h-8 w-auto max-w-[160px] object-contain"
-              data-testid="img-sidebar-logo"
-            />
-          ) : (
-            <div className="flex items-center gap-2.5" data-testid="sidebar-default-logo">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[hsl(var(--sidebar-primary))] text-white font-semibold text-sm">
-                OR
-              </div>
-              <span className="font-semibold text-base text-foreground group-data-[collapsible=icon]:hidden">
-                OnRopePro
-              </span>
+  // Get brand color - use CSS variable when white label is active, otherwise use Deep Blue
+  const getBrandColor = () => {
+    if (whitelabelBrandingActive) {
+      return "hsl(var(--sidebar-primary))";
+    }
+    return BRAND_COLOR;
+  };
+
+  const sidebarContent = (
+    <>
+      {/* Logo Header - h-14 (56px) */}
+      <div className="h-14 flex items-center justify-between px-4 border-b border-slate-100 dark:border-slate-800">
+        {whitelabelBrandingActive && brandingLogoUrl ? (
+          <img
+            src={brandingLogoUrl}
+            alt="Company Logo"
+            className="h-7 w-auto max-w-[160px] object-contain"
+            data-testid="img-sidebar-logo"
+          />
+        ) : (
+          <div className="flex items-center gap-2.5" data-testid="sidebar-default-logo">
+            <div 
+              className="flex h-7 w-7 items-center justify-center rounded-md text-white font-semibold text-xs"
+              style={{ backgroundColor: getBrandColor() }}
+            >
+              OR
             </div>
-          )}
-        </div>
-      </SidebarHeader>
+            <span className="font-medium text-sm text-slate-900 dark:text-slate-100">
+              OnRopePro
+            </span>
+          </div>
+        )}
+        {/* Close button for mobile */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="lg:hidden"
+          onClick={() => setIsOpen(false)}
+          data-testid="button-sidebar-close"
+        >
+          <X className="h-5 w-5" />
+        </Button>
+      </div>
 
       {/* Company Selector Card */}
-      <div className="px-4 pb-3 group-data-[collapsible=icon]:hidden">
+      <div className="px-3 py-3">
         <button
-          className="w-full flex items-center gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+          className="w-full flex items-center gap-2.5 p-2.5 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
           data-testid="button-company-selector"
         >
-          <Avatar className="h-9 w-9 rounded-md">
-            <AvatarFallback className="rounded-md bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-sm font-medium">
+          <Avatar className="h-8 w-8 rounded-md">
+            <AvatarFallback 
+              className="rounded-md text-white text-xs font-medium"
+              style={{ backgroundColor: getBrandColor() }}
+            >
               {getInitials(displayCompanyName)}
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 text-left min-w-0">
-            <div className="font-medium text-sm text-foreground truncate">
+            <div className="font-medium text-sm text-slate-700 dark:text-slate-200 truncate">
               {displayCompanyName}
             </div>
-            <div className="text-xs text-muted-foreground">
+            <div className="text-[11px] text-slate-400">
               {employeeCount} {employeeCount === 1 ? 'employee' : 'employees'}
             </div>
           </div>
-          <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+          <ChevronRight className="h-4 w-4 text-slate-400 shrink-0" />
         </button>
       </div>
 
-      {/* Dashboard Item - Always Visible */}
-      <div className="px-3 pb-1">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              onClick={() => onTabChange("home")}
-              isActive={activeTab === "home" || activeTab === "" || !activeTab}
-              tooltip={t("dashboard.sidebar.dashboard", "Dashboard")}
-              data-testid="sidebar-nav-dashboard"
-              className={cn(
-                "w-full justify-start gap-3 py-2.5 px-3.5 rounded-lg font-medium",
-                (activeTab === "home" || activeTab === "" || !activeTab) && 
-                  "bg-[hsl(var(--sidebar-primary))] text-white hover:bg-[hsl(var(--sidebar-primary))]/90"
-              )}
-            >
-              <LayoutDashboard className="h-4 w-4 shrink-0" />
-              <span className="truncate group-data-[collapsible=icon]:hidden">
-                {t("dashboard.sidebar.dashboard", "Dashboard")}
-              </span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+      {/* Dashboard Primary Link */}
+      <div className="px-3 pb-2">
+        <button
+          onClick={() => onTabChange("home")}
+          data-testid="sidebar-nav-dashboard"
+          className={cn(
+            "w-full flex items-center gap-2.5 py-2 px-3 rounded-md text-[13px] font-medium transition-colors",
+            isDashboardActive 
+              ? "text-white shadow-sm"
+              : "text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+          )}
+          style={isDashboardActive ? { backgroundColor: getBrandColor() } : undefined}
+        >
+          <LayoutDashboard className="h-4 w-4 shrink-0" />
+          <span>{t("dashboard.sidebar.dashboard", "Dashboard")}</span>
+        </button>
       </div>
 
-      <SidebarContent className="px-3 pt-2">
-        {filteredGroups.map((group, groupIndex) => (
-          <SidebarGroup key={group.id} className="py-2">
-            <SidebarGroupLabel className="text-[11px] font-semibold text-muted-foreground/70 uppercase tracking-[0.15em] px-3.5 pb-2">
+      {/* Navigation Groups - Scrollable */}
+      <nav className="flex-1 overflow-y-auto px-3 py-1">
+        {filteredGroups.map((group) => (
+          <div key={group.id} className="mb-4">
+            {/* Group Header */}
+            <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-3 py-2">
               {group.label}
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu className="gap-0.5">
-                {group.items.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = isActiveItem(item);
+            </div>
+            
+            {/* Group Items */}
+            <div className="space-y-0.5">
+              {group.items.map((item) => {
+                const Icon = item.icon;
+                const isActive = isActiveItem(item);
 
-                  return (
-                    <SidebarMenuItem key={item.id}>
-                      <SidebarMenuButton
-                        onClick={() => handleItemClick(item)}
-                        isActive={isActive}
-                        tooltip={item.label}
-                        data-testid={`sidebar-nav-${item.id}`}
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleItemClick(item)}
+                    data-testid={`sidebar-nav-${item.id}`}
+                    className={cn(
+                      "w-full flex items-center gap-2.5 py-2 px-3 rounded-md text-[13px] font-medium transition-colors",
+                      isActive 
+                        ? "bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-100"
+                        : "text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                    )}
+                  >
+                    <Icon className="h-4 w-4 shrink-0" />
+                    <span className="flex-1 text-left truncate">{item.label}</span>
+                    {item.badge !== undefined && item.badge > 0 && (
+                      <span
                         className={cn(
-                          "w-full justify-start gap-3 py-2.5 px-3.5 rounded-lg font-medium text-[14px]",
-                          isActive 
-                            ? "bg-[hsl(var(--sidebar-primary))] text-white hover:bg-[hsl(var(--sidebar-primary))]/90"
-                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                          "flex items-center justify-center rounded-full text-[10px] font-medium h-[18px] min-w-[18px] px-1.5",
+                          item.badgeType === "alert" 
+                            ? "bg-rose-500 text-white"
+                            : "bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300"
                         )}
+                        data-testid={`badge-${item.id}-count`}
                       >
-                        <Icon className="h-4 w-4 shrink-0" />
-                        <span className="truncate group-data-[collapsible=icon]:hidden">
-                          {item.label}
-                        </span>
-                        {item.badge !== undefined && item.badge > 0 && (
-                          <Badge
-                            variant={item.badgeVariant || "secondary"}
-                            className="ml-auto rounded-full px-2 py-0.5 text-[11px] font-medium tabular-nums group-data-[collapsible=icon]:hidden min-w-[22px] justify-center"
-                            data-testid={`badge-${item.id}-count`}
-                          >
-                            {item.badge}
-                          </Badge>
-                        )}
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  );
-                })}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
+                        {item.badge}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         ))}
-      </SidebarContent>
+      </nav>
 
-      <SidebarFooter className="px-3 py-4">
-        <SidebarMenu className="gap-0.5">
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              onClick={() => setLocation("/profile")}
-              tooltip={t("dashboard.sidebar.settings", "Settings")}
-              data-testid="sidebar-nav-settings"
-              className="w-full justify-start gap-3 py-2.5 px-3.5 rounded-lg font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
-            >
-              <Settings className="h-4 w-4 shrink-0" />
-              <span className="truncate group-data-[collapsible=icon]:hidden">
-                {t("dashboard.sidebar.settings", "Settings")}
-              </span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              onClick={() => setLocation("/help")}
-              tooltip={t("dashboard.sidebar.help", "Help Center")}
-              data-testid="sidebar-nav-help"
-              className="w-full justify-start gap-3 py-2.5 px-3.5 rounded-lg font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
-            >
-              <HelpCircle className="h-4 w-4 shrink-0" />
-              <span className="truncate group-data-[collapsible=icon]:hidden">
-                {t("dashboard.sidebar.help", "Help Center")}
-              </span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
-    </Sidebar>
+      {/* Footer - Settings and Help */}
+      <div className="border-t border-slate-100 dark:border-slate-800 px-3 py-3">
+        <div className="space-y-0.5">
+          <button
+            onClick={() => setLocation("/profile")}
+            data-testid="sidebar-nav-settings"
+            className="w-full flex items-center gap-2.5 py-2 px-3 rounded-md text-[13px] font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
+          >
+            <Settings className="h-4 w-4 shrink-0" />
+            <span>{t("dashboard.sidebar.settings", "Settings")}</span>
+          </button>
+          <button
+            onClick={() => setLocation("/help")}
+            data-testid="sidebar-nav-help"
+            className="w-full flex items-center gap-2.5 py-2 px-3 rounded-md text-[13px] font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
+          >
+            <HelpCircle className="h-4 w-4 shrink-0" />
+            <span>{t("dashboard.sidebar.help", "Help Center")}</span>
+          </button>
+        </div>
+      </div>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile Toggle Button - visible only on small screens */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="fixed top-3 left-3 z-30 lg:hidden"
+        onClick={() => setIsOpen(true)}
+        data-testid="button-sidebar-toggle"
+      >
+        <Menu className="h-5 w-5" />
+      </Button>
+
+      {/* Mobile Overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          onClick={() => setIsOpen(false)}
+          data-testid="sidebar-overlay"
+        />
+      )}
+
+      {/* Sidebar - Fixed on desktop, slide-in on mobile */}
+      <aside 
+        className={cn(
+          "fixed h-full left-0 top-0 z-40 w-60 bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-700/80 flex flex-col transition-transform duration-200",
+          "lg:translate-x-0",
+          isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+        )}
+        data-testid="dashboard-sidebar"
+      >
+        {sidebarContent}
+      </aside>
+    </>
   );
 }
