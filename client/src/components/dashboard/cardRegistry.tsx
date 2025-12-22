@@ -12,6 +12,12 @@ import { OutstandingQuotesCard } from "./cards/OutstandingQuotesCard";
 import { MyScheduleCard } from "./cards/MyScheduleCard";
 import { WeekAtGlanceCard } from "./cards/WeekAtGlanceCard";
 import { MyPerformanceCard } from "./cards/MyPerformanceCard";
+import { TodaysHoursCard } from "./cards/TodaysHoursCard";
+import { NotClockedInCard } from "./cards/NotClockedInCard";
+import { OverdueProjectsCard } from "./cards/OverdueProjectsCard";
+import { PendingApprovalsCard } from "./cards/PendingApprovalsCard";
+import { ExpiringCertsCard } from "./cards/ExpiringCertsCard";
+import { NewFeedbackCard } from "./cards/NewFeedbackCard";
 import { PlaceholderCard } from "./cards/PlaceholderCard";
 
 export interface CardProps {
@@ -54,6 +60,18 @@ export function getCardComponent(cardId: string, props: CardProps): React.ReactN
       return <WeekAtGlanceCard {...props} />;
     case "perf-my":
       return <MyPerformanceCard {...props} />;
+    case "time-today":
+      return <TodaysHoursCard {...props} />;
+    case "time-notclocked":
+      return <NotClockedInCard {...props} />;
+    case "proj-overdue":
+      return <OverdueProjectsCard {...props} />;
+    case "pay-pending":
+      return <PendingApprovalsCard {...props} />;
+    case "safe-certs":
+      return <ExpiringCertsCard {...props} />;
+    case "feed-new":
+      return <NewFeedbackCard {...props} />;
     default:
       return <PlaceholderCard cardId={cardId} />;
   }
