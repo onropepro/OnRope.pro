@@ -93,7 +93,7 @@ interface ScheduleItem {
   time: string;
   title: string;
   location: string;
-  technicians: Array<{ id?: string; initials: string; name?: string; color: string }>;
+  technicians: Array<{ initials: string; color: string }>;
   status?: string;
   jobType?: string;
 }

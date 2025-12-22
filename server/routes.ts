@@ -19217,23 +19217,45 @@ Do not include any other text, just the JSON object.`
         return res.status(400).json({ message: "Unable to determine company" });
       }
       
+      // Get company for timezone
+      const company = await storage.getUserById(companyId);
+      const companyTimezone = company?.companyTimezone || 'America/Vancouver';
+      
       // Get all scheduled jobs for the company
       const allJobs = await storage.getScheduledJobsByCompany(companyId);
       
-      // Filter to jobs happening today
-      const today = new Date();
-      const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
-      const endOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+      // Filter to jobs happening today in company timezone
+      const { toZonedTime, fromZonedTime } = require('date-fns-tz');
+      
+      // Get current time in company timezone to determine what "today" is there
+      const zonedNow = toZonedTime(new Date(), companyTimezone);
+      const year = zonedNow.getFullYear();
+      const month = zonedNow.getMonth();
+      const day = zonedNow.getDate();
+      
+      // Build midnight and end-of-day strings in company timezone format
+      const startOfDayStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}T00:00:00`;
+      const endOfDayStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}T23:59:59.999`;
+      
+      // Convert to UTC for comparison with job dates
+      const todayStartUtc = fromZonedTime(startOfDayStr, companyTimezone);
+      const todayEndUtc = fromZonedTime(endOfDayStr, companyTimezone);
       
       let todayJobs = allJobs.filter(job => {
         const jobStart = new Date(job.startDate);
         const jobEnd = new Date(job.endDate);
         // Job overlaps with today if it starts before end of today AND ends after start of today
-        return jobStart <= endOfToday && jobEnd >= startOfToday;
+        return jobStart <= todayEndUtc && jobEnd >= todayStartUtc;
       });
       
-      // For non-company users (technicians), filter to only their assigned jobs
-      if (currentUser.role !== "company") {
+      // Role-based filtering:
+      // - company role sees all jobs
+      // - manager/supervisor roles with schedule access see all jobs
+      // - employees/technicians see only their assigned jobs
+      const canViewAllSchedule = currentUser.role === "company" || 
+        (currentUser.companyRole && ['manager', 'supervisor', 'operations_coordinator', 'safety_officer'].includes(currentUser.companyRole));
+      
+      if (!canViewAllSchedule) {
         todayJobs = todayJobs.filter(job => {
           const isAssigned = job.assignedEmployees?.some((emp: any) => emp.id === currentUser.id) ||
                             job.employeeAssignments?.some((assignment: any) => assignment.employee?.id === currentUser.id);
@@ -19241,27 +19263,56 @@ Do not include any other text, just the JSON object.`
         });
       }
       
-      // Format for dashboard display
+      // Format for dashboard display - only expose initials and color, not sensitive data
       const scheduleItems = todayJobs.map(job => {
         const startTime = new Date(job.startDate);
-        const technicians = (job.employeeAssignments || []).map((assignment: any) => {
-          const emp = assignment.employee;
+        const colors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-orange-500', 'bg-teal-500', 'bg-rose-500', 'bg-amber-500'];
+        
+        // Helper to generate initials from employee data with fallbacks
+        const getInitialsFromEmployee = (emp: any): { initials: string; color: string } | null => {
           if (!emp) return null;
-          const initials = `${(emp.firstName || '')[0] || ''}${(emp.lastName || '')[0] || ''}`.toUpperCase() || 'NA';
-          // Generate consistent color based on employee id
-          const colors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-orange-500', 'bg-teal-500', 'bg-rose-500', 'bg-amber-500'];
-          const colorIndex = emp.id ? emp.id.charCodeAt(0) % colors.length : 0;
-          return {
-            id: emp.id,
-            initials,
-            name: `${emp.firstName || ''} ${emp.lastName || ''}`.trim(),
-            color: colors[colorIndex],
-          };
-        }).filter(Boolean);
+          
+          // Check for pre-existing initials field first
+          let initials = emp.initials || '';
+          
+          // If no initials field, try to generate from name
+          if (!initials && (emp.firstName || emp.lastName)) {
+            initials = `${(emp.firstName || '')[0] || ''}${(emp.lastName || '')[0] || ''}`.toUpperCase();
+          }
+          
+          // Fall back to email
+          if (!initials && emp.email) {
+            initials = emp.email.substring(0, 2).toUpperCase();
+          }
+          
+          // Last resort fallback
+          if (!initials) initials = 'NA';
+          
+          // Use pre-existing color if available, otherwise generate from id/email
+          if (emp.color && typeof emp.color === 'string' && emp.color.startsWith('bg-')) {
+            return { initials, color: emp.color };
+          }
+          const colorSeed = emp.id || emp.email || initials;
+          const colorIndex = colorSeed.charCodeAt(0) % colors.length;
+          return { initials, color: colors[colorIndex] };
+        };
+        
+        // Try employeeAssignments first, fall back to assignedEmployees
+        let technicians: Array<{initials: string; color: string}> = [];
+        
+        if (job.employeeAssignments && job.employeeAssignments.length > 0) {
+          technicians = job.employeeAssignments
+            .map((assignment: any) => getInitialsFromEmployee(assignment.employee))
+            .filter(Boolean) as Array<{initials: string; color: string}>;
+        } else if (job.assignedEmployees && job.assignedEmployees.length > 0) {
+          technicians = job.assignedEmployees
+            .map((emp: any) => getInitialsFromEmployee(emp))
+            .filter(Boolean) as Array<{initials: string; color: string}>;
+        }
         
         return {
           id: job.id,
-          time: startTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
+          time: startTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: companyTimezone }),
           title: job.title,
           location: job.location || job.project?.buildingName || 'TBD',
           technicians,
