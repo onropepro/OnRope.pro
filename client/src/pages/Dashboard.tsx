@@ -72,6 +72,7 @@ import { DoubleBookingWarningDialog } from "@/components/DoubleBookingWarningDia
 import { LanguageDropdown } from "@/components/LanguageDropdown";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { DashboardOverview } from "@/components/DashboardOverview";
+import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
 
 import { JOB_CATEGORIES, JOB_TYPES, getJobTypesByCategory, getJobTypeConfig, getDefaultElevation, isElevationConfigurable, isDropBasedJobType, getAllJobTypeValues, getProgressType, getCategoryForJobType, type JobCategory } from "@shared/jobTypes";
 
@@ -3725,16 +3726,16 @@ export default function Dashboard() {
       )}
 
       <div className="p-4 sm:p-6">
-        {/* Dashboard Overview - Operations Command Center */}
+        {/* Dashboard Overview - Customizable Card Grid */}
         {activeTab === "" && (
-          <DashboardOverview
+          <DashboardGrid
             currentUser={currentUser}
             projects={projects}
             employees={employees}
             harnessInspections={harnessInspections}
             onNavigate={handleTabChange}
             onRouteNavigate={setLocation}
-            onQuickAdd={() => setShowProjectDialog(true)}
+            branding={branding}
           />
         )}
 

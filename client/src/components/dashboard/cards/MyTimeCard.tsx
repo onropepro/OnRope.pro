@@ -1,0 +1,114 @@
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Clock, Play, Square, ChevronRight } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import type { CardProps } from "../cardRegistry";
+
+interface MyTimeData {
+  isClockedIn: boolean;
+  currentSessionStart?: string;
+  hoursToday: number;
+  projectName?: string;
+}
+
+export function MyTimeCard({ currentUser, onRouteNavigate, branding }: CardProps) {
+  const accentColor = branding?.primaryColor || "#0B64A3";
+
+  const { data: timeData, isLoading } = useQuery<MyTimeData>({
+    queryKey: ["/api/my-time-status"],
+    refetchInterval: 30000,
+  });
+
+  const formatDuration = (startTime: string) => {
+    const start = new Date(startTime);
+    const now = new Date();
+    const diffMs = now.getTime() - start.getTime();
+    const hours = Math.floor(diffMs / (1000 * 60 * 60));
+    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    return `${hours}h ${minutes}m`;
+  };
+
+  if (isLoading) {
+    return (
+      <>
+        <CardHeader className="px-4 py-3">
+          <CardTitle className="text-base font-semibold flex items-center gap-2">
+            <Clock className="w-5 h-5" style={{ color: accentColor }} />
+            My Time Today
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="px-4 pb-4">
+          <div className="animate-pulse h-20 bg-muted rounded" />
+        </CardContent>
+      </>
+    );
+  }
+
+  const isClockedIn = timeData?.isClockedIn || false;
+
+  return (
+    <>
+      <CardHeader className="px-4 py-3">
+        <div className="flex items-center justify-between gap-2">
+          <CardTitle className="text-base font-semibold flex items-center gap-2">
+            <Clock className="w-5 h-5" style={{ color: accentColor }} />
+            My Time Today
+          </CardTitle>
+          <Badge 
+            variant="secondary"
+            className={isClockedIn 
+              ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" 
+              : "bg-muted text-muted-foreground"
+            }
+            data-testid="badge-my-time-status"
+          >
+            {isClockedIn ? (
+              <>
+                <Play className="w-3 h-3 mr-1 fill-current" />
+                Clocked In
+              </>
+            ) : (
+              <>
+                <Square className="w-3 h-3 mr-1" />
+                Off Duty
+              </>
+            )}
+          </Badge>
+        </div>
+      </CardHeader>
+      <CardContent className="px-4 pb-4">
+        <div className="space-y-3">
+          {isClockedIn && timeData?.currentSessionStart && (
+            <div className="bg-green-50 dark:bg-green-950/30 p-3 rounded-lg">
+              <p className="text-2xl font-bold text-green-700 dark:text-green-400" data-testid="text-current-session">
+                {formatDuration(timeData.currentSessionStart)}
+              </p>
+              {timeData.projectName && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  Working on: {timeData.projectName}
+                </p>
+              )}
+            </div>
+          )}
+          <div className="flex items-center justify-between">
+            <span className="text-base text-muted-foreground">Hours today:</span>
+            <span className="text-base font-medium" data-testid="text-hours-today">
+              {(timeData?.hoursToday || 0).toFixed(1)}h
+            </span>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full justify-between"
+            onClick={() => onRouteNavigate("/time-tracking")}
+            data-testid="button-view-my-timesheet"
+          >
+            View My Timesheet
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+        </div>
+      </CardContent>
+    </>
+  );
+}
