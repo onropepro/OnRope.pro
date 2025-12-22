@@ -10,10 +10,11 @@ interface DashboardLayoutProps {
 }
 
 interface BrandingSettings {
-  logoUrl?: string;
-  primaryColor?: string;
-  companyDisplayName?: string;
+  logoUrl?: string | null;
+  colors?: string[];
+  companyName?: string;
   subscriptionActive?: boolean;
+  pwaAppIconUrl?: string | null;
 }
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
@@ -96,9 +97,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     return "home";
   };
 
-  // White label is active if BrandingContext says so AND we have a primary color
-  const whitelabelActive = brandingContext?.brandingActive && 
-    (brandingData?.subscriptionActive || !!brandingData?.primaryColor);
+  // White label is active if the API says subscriptionActive is true
+  const whitelabelActive = !!brandingData?.subscriptionActive;
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
@@ -108,7 +108,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         onTabChange={handleTabChange}
         brandingLogoUrl={brandingData?.logoUrl}
         whitelabelBrandingActive={whitelabelActive}
-        companyName={brandingData?.companyDisplayName || currentUser?.username}
+        companyName={brandingData?.companyName || currentUser?.username}
         employeeCount={employees?.length || 0}
         alertCounts={alertCounts}
       />
