@@ -338,6 +338,14 @@ export function DashboardOverview({
 
   const todaySchedule: ScheduleItem[] = todayScheduleData?.scheduleItems || [];
 
+  // Helper function to get CSR color scheme based on rating tier
+  const getCsrColorScheme = (rating: number): { bg: string; text: string; label: string } => {
+    if (rating >= 90) return { bg: 'bg-green-50 dark:bg-green-950/30', text: 'text-green-900 dark:text-green-200', label: 'Excellent' };
+    if (rating >= 70) return { bg: 'bg-yellow-50 dark:bg-yellow-950/30', text: 'text-yellow-900 dark:text-yellow-200', label: 'Good' };
+    if (rating >= 50) return { bg: 'bg-orange-50 dark:bg-orange-950/30', text: 'text-orange-900 dark:text-orange-200', label: 'Warning' };
+    return { bg: 'bg-red-50 dark:bg-red-950/30', text: 'text-red-900 dark:text-red-200', label: 'Critical' };
+  };
+
   // Helper function to format job type from SCREAMING_SNAKE_CASE to Title Case
   const formatJobType = (jobType: string): string => {
     if (!jobType) return '';
@@ -407,12 +415,18 @@ export function DashboardOverview({
 
       {kpiMetrics.filter(metric => metric.visible).length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {kpiMetrics.filter(metric => metric.visible).map((metric) => (
-            <Card key={metric.id} className="shadow-sm" data-testid={`card-kpi-${metric.id}`}>
+          {kpiMetrics.filter(metric => metric.visible).map((metric) => {
+            const csrColors = metric.id === 'safetyRating' ? getCsrColorScheme(safetyRating) : null;
+            return (
+            <Card 
+              key={metric.id} 
+              className={`shadow-sm ${csrColors ? csrColors.bg : ''}`}
+              data-testid={`card-kpi-${metric.id}`}
+            >
               <CardContent className="p-4">
-                <p className="text-sm text-muted-foreground mb-1">{metric.label}</p>
+                <p className={`text-sm mb-1 ${csrColors ? csrColors.text : 'text-muted-foreground'}`}>{metric.label}</p>
                 <div className="flex items-end justify-between">
-                  <span className="text-3xl font-bold text-foreground" data-testid={`text-${metric.id}-value`}>
+                  <span className={`text-3xl font-bold ${csrColors ? csrColors.text : 'text-foreground'}`} data-testid={`text-${metric.id}-value`}>
                     {metric.value}
                   </span>
                   <div className={`flex items-center gap-1 text-sm ${metric.isPositive ? 'text-emerald-600' : 'text-rose-600'}`}>
@@ -424,10 +438,11 @@ export function DashboardOverview({
                     <span data-testid={`text-${metric.id}-trend`}>{metric.trend}%</span>
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">{metric.trendLabel}</p>
+                <p className={`text-xs mt-1 ${csrColors ? csrColors.text : 'text-muted-foreground'}`}>{metric.trendLabel}</p>
               </CardContent>
             </Card>
-          ))}
+            );
+          })}
         </div>
       )}
 
