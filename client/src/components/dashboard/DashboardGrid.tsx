@@ -71,10 +71,7 @@ export function DashboardGrid({
 
   const saveLayoutMutation = useMutation({
     mutationFn: async (cards: string[]) => {
-      return apiRequest("/api/dashboard/layout", {
-        method: "PUT",
-        body: JSON.stringify({ cards }),
-      });
+      return apiRequest("PUT", "/api/dashboard/layout", { cards });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/dashboard/layout"] });
