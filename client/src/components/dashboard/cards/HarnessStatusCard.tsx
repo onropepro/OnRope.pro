@@ -1,0 +1,111 @@
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ShieldAlert, ChevronRight, CheckCircle } from "lucide-react";
+import { canViewSafetyDocuments } from "@/lib/permissions";
+import type { CardProps } from "../cardRegistry";
+
+export function HarnessStatusCard({ currentUser, harnessInspections, onRouteNavigate, branding }: CardProps) {
+  const hasAccess = canViewSafetyDocuments(currentUser) || currentUser?.role === "company";
+  const accentColor = branding?.primaryColor || "#0B64A3";
+
+  if (!hasAccess) {
+    return (
+      <>
+        <CardHeader className="px-4 py-3">
+          <CardTitle className="text-base font-semibold flex items-center gap-2">
+            <ShieldAlert className="w-5 h-5" style={{ color: accentColor }} />
+            Harness Status
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="px-4 pb-4">
+          <p className="text-base text-muted-foreground">No access</p>
+        </CardContent>
+      </>
+    );
+  }
+
+  const now = new Date();
+  const overdue = harnessInspections?.filter((i: any) => {
+    if (!i.nextInspectionDate) return false;
+    return new Date(i.nextInspectionDate) < now;
+  }) || [];
+
+  const dueToday = harnessInspections?.filter((i: any) => {
+    if (!i.nextInspectionDate) return false;
+    const dueDate = new Date(i.nextInspectionDate);
+    return dueDate.toDateString() === now.toDateString();
+  }) || [];
+
+  const dueSoon = harnessInspections?.filter((i: any) => {
+    if (!i.nextInspectionDate) return false;
+    const dueDate = new Date(i.nextInspectionDate);
+    const sevenDays = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    return dueDate > now && dueDate <= sevenDays;
+  }) || [];
+
+  const totalAlerts = overdue.length + dueToday.length;
+
+  return (
+    <>
+      <CardHeader className="px-4 py-3">
+        <div className="flex items-center justify-between gap-2">
+          <CardTitle className="text-base font-semibold flex items-center gap-2">
+            <ShieldAlert className="w-5 h-5" style={{ color: accentColor }} />
+            Harness Status
+          </CardTitle>
+          {totalAlerts > 0 && (
+            <Badge variant="destructive" className="text-xs" data-testid="badge-harness-alert-count">
+              {totalAlerts} need attention
+            </Badge>
+          )}
+        </div>
+      </CardHeader>
+      <CardContent className="px-4 pb-4">
+        {totalAlerts === 0 && dueSoon.length === 0 ? (
+          <div className="text-center py-4">
+            <CheckCircle className="w-8 h-8 mx-auto text-green-500 mb-2" />
+            <p className="text-base text-muted-foreground">All harnesses inspected</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {overdue.length > 0 && (
+              <div className="bg-red-50 dark:bg-red-950/30 p-3 rounded-lg">
+                <p className="text-base font-medium text-red-700 dark:text-red-400">
+                  {overdue.length} Overdue
+                </p>
+                <p className="text-sm text-muted-foreground">Past inspection date</p>
+              </div>
+            )}
+            {dueToday.length > 0 && (
+              <div className="bg-amber-50 dark:bg-amber-950/30 p-3 rounded-lg">
+                <p className="text-base font-medium text-amber-700 dark:text-amber-400">
+                  {dueToday.length} Due Today
+                </p>
+                <p className="text-sm text-muted-foreground">Inspection required</p>
+              </div>
+            )}
+            {dueSoon.length > 0 && (
+              <div className="bg-blue-50 dark:bg-blue-950/30 p-3 rounded-lg">
+                <p className="text-base font-medium text-blue-700 dark:text-blue-400">
+                  {dueSoon.length} Due This Week
+                </p>
+                <p className="text-sm text-muted-foreground">Schedule inspection</p>
+              </div>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-between"
+              onClick={() => onRouteNavigate("/inventory")}
+              data-testid="button-view-harness-inspections"
+            >
+              View Inspections
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
+        )}
+      </CardContent>
+    </>
+  );
+}

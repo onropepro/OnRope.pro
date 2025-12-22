@@ -1,0 +1,72 @@
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Briefcase, ChevronRight } from "lucide-react";
+import type { CardProps } from "../cardRegistry";
+
+export function ActiveProjectsCard({ projects, onNavigate, branding }: CardProps) {
+  const accentColor = branding?.primaryColor || "#0B64A3";
+
+  const activeProjects = projects?.filter(
+    (p: any) => p.status === "active" || p.status === "in_progress"
+  ) || [];
+
+  const displayProjects = activeProjects.slice(0, 4);
+
+  return (
+    <>
+      <CardHeader className="px-4 py-3">
+        <div className="flex items-center justify-between gap-2">
+          <CardTitle className="text-base font-semibold flex items-center gap-2">
+            <Briefcase className="w-5 h-5" style={{ color: accentColor }} />
+            Active Projects
+          </CardTitle>
+          <Badge variant="secondary" className="text-xs" data-testid="badge-active-project-count">
+            {activeProjects.length}
+          </Badge>
+        </div>
+      </CardHeader>
+      <CardContent className="px-4 pb-4">
+        {displayProjects.length === 0 ? (
+          <p className="text-base text-muted-foreground">No active projects</p>
+        ) : (
+          <div className="space-y-3">
+            {displayProjects.map((project: any) => {
+              const progress = typeof project.progress === "number" ? project.progress : 0;
+              return (
+                <div 
+                  key={project.id} 
+                  className="space-y-1"
+                  data-testid={`project-item-${project.id}`}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-base font-medium truncate">
+                      {project.buildingName || project.name || "Untitled"}
+                    </p>
+                    <span className="text-sm text-muted-foreground whitespace-nowrap">
+                      {Math.round(progress)}%
+                    </span>
+                  </div>
+                  <Progress value={progress} className="h-2" />
+                </div>
+              );
+            })}
+            {activeProjects.length > 4 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-between"
+                onClick={() => onNavigate("projects")}
+                data-testid="button-view-all-projects"
+              >
+                View All ({activeProjects.length})
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            )}
+          </div>
+        )}
+      </CardContent>
+    </>
+  );
+}
