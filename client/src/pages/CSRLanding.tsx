@@ -107,20 +107,20 @@ export default function CSRLanding() {
             <CardContent className="p-8">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-emerald-600">87%</div>
-                  <div className="text-base text-muted-foreground mt-1">{t('modules.csr.stats.averageCsr', 'Average starting CSR')}</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-sky-600">{t('modules.csr.stats.realTimeValue', 'Real-time')}</div>
-                  <div className="text-base text-muted-foreground mt-1">{t('modules.csr.stats.scoreUpdates', 'Score updates')}</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-violet-600">{t('modules.csr.stats.auditTimeValue', '5 min')}</div>
+                  <div className="text-3xl md:text-4xl font-bold text-emerald-600">{t('modules.csr.stats.auditTimeValue', '5 min')}</div>
                   <div className="text-base text-muted-foreground mt-1">{t('modules.csr.stats.auditPreparation', 'Safety Audit prep')}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-amber-600">100%</div>
-                  <div className="text-base text-muted-foreground mt-1">{t('modules.csr.stats.achievableCompliance', 'Achievable compliance')}</div>
+                  <div className="text-3xl md:text-4xl font-bold text-sky-600">{t('modules.csr.stats.signaturesValue', '100%')}</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.csr.stats.signaturesTracked', 'Employee signatures tracked')}</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl md:text-4xl font-bold text-violet-600">{t('modules.csr.stats.realTimeValue', 'Real-Time')}</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.csr.stats.scoreUpdates', 'Score updates')}</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl md:text-4xl font-bold text-amber-600">{t('modules.csr.stats.pdfExportValue', '1-Click')}</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.csr.stats.pdfExportDesc', 'PDF export with timestamps')}</div>
                 </div>
               </div>
             </CardContent>

@@ -7294,12 +7294,14 @@
         "ctaFaq": "Find Answers"
       },
       "stats": {
-        "averageCsr": "Average starting CSR",
-        "realTimeValue": "Real-time",
-        "scoreUpdates": "Score updates",
         "auditTimeValue": "5 min",
         "auditPreparation": "Safety Audit prep",
-        "achievableCompliance": "Achievable compliance"
+        "signaturesValue": "100%",
+        "signaturesTracked": "Employee signatures tracked",
+        "realTimeValue": "Real-Time",
+        "scoreUpdates": "Score updates",
+        "pdfExportValue": "1-Click",
+        "pdfExportDesc": "PDF export with timestamps"
       },
       "problem": {
         "title": "The Safety Problem Nobody Talks About",
