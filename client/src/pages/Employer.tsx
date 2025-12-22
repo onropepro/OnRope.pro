@@ -301,7 +301,7 @@ export default function Employer() {
               <Button 
                 size="lg" 
                 className="bg-white text-[#0B64A3] hover:bg-blue-50" 
-                onClick={() => setShowRegistration(true)}
+                onClick={() => setLocation('/get-license')}
                 data-testid="button-hero-start-trial"
               >
                 Start Free Trial
@@ -319,7 +319,7 @@ export default function Employer() {
             </div>
 
             <p className="text-sm text-blue-100/80">
-              60-day free trial. No credit card required.
+              30-day free trial. You won't be charged until the trial ends.
             </p>
 
             {/* Inline Sign In Form */}
@@ -412,7 +412,7 @@ export default function Employer() {
                               Do not have an account?{" "}
                               <button
                                 type="button"
-                                onClick={() => setShowRegistration(true)}
+                                onClick={() => setLocation('/get-license')}
                                 className="font-medium hover:underline"
                                 style={{ color: EMPLOYER_COLOR }}
                                 data-testid="link-create-account"
@@ -1022,13 +1022,13 @@ export default function Employer() {
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Stop Wrestling Spreadsheets</h2>
           <p className="text-xl text-blue-100 mb-8">
-            60-day free trial. No credit card required. Full access to every feature.
+            30-day free trial. Full access to every feature. Cancel anytime.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               size="lg" 
               className="bg-white text-[#0B64A3] hover:bg-blue-50" 
-              onClick={() => setShowRegistration(true)}
+              onClick={() => setLocation('/get-license')}
               data-testid="button-cta-start-trial"
             >
               Start Your Free Trial

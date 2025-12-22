@@ -769,7 +769,7 @@ export default function HomePage() {
               className="bg-white text-[#0B64A3] hover:bg-blue-50"
               asChild
             >
-              <Link href="/register">
+              <Link href="/get-license">
                 {t("home.finalCta.startTrial")}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
