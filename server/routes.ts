@@ -1520,11 +1520,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log('[Technician-Register] User created:', user.id);
 
-      // Return success with referral code (don't log them in - they can sign in immediately)
+      // Create session and auto-login the technician
+      req.session.userId = user.id;
+      req.session.role = user.role;
+      
+      console.log(`[Technician-Register] Session created for technician: ${user.id}, email: ${user.email}`);
+      
+      // Save session before responding
+      await new Promise<void>((resolve, reject) => {
+        req.session.save((err) => {
+          if (err) {
+            console.error(`[Technician-Register] Session save error:`, err);
+            reject(err);
+          } else {
+            console.log(`[Technician-Register] Session saved successfully for ${user.email}`);
+            resolve();
+          }
+        });
+      });
+
+      // Return success with referral code and user data
+      const { passwordHash, ...userWithoutPassword } = user;
       res.json({ 
         success: true,
-        message: "Registration completed successfully. You can now sign in to your account.",
+        message: "Registration completed successfully.",
         referralCode: newReferralCode,
+        user: userWithoutPassword,
       });
     } catch (error: any) {
       console.error('[Technician-Register] Error:', error);

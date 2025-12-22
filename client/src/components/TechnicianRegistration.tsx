@@ -129,11 +129,12 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
       if (data.referralCode) {
         setGeneratedReferralCode(data.referralCode);
       }
-      setStep("success");
       toast({
         title: "Registration Complete!",
-        description: "Your account has been created successfully.",
+        description: "Your account has been created successfully. Redirecting to your portal...",
       });
+      // Redirect to technician portal after successful registration
+      window.location.href = "/technician-portal";
     },
     onError: (error: Error) => {
       setError(error.message);
