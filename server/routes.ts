@@ -15,7 +15,7 @@ import { type TierName, type Currency, TIER_CONFIG, ADDON_CONFIG } from "../shar
 import { checkSubscriptionLimits } from "./subscription-middleware";
 import { getTodayString, toLocalDateString, parseLocalDate, getStartOfWeek, getEndOfWeek } from "./dateUtils";
 import { getDefaultElevation, usesPercentageProgress } from "@shared/jobTypes";
-import { getProjectTimezone, sessionOverlapsDay } from "./timezoneUtils";
+import { getProjectTimezone, sessionOverlapsDay, getZonedDayBounds } from "./timezoneUtils";
 import { Resend } from "resend";
 import rateLimit from "express-rate-limit";
 import OpenAI from "openai";
@@ -19224,22 +19224,8 @@ Do not include any other text, just the JSON object.`
       // Get all scheduled jobs for the company
       const allJobs = await storage.getScheduledJobsByCompany(companyId);
       
-      // Filter to jobs happening today in company timezone
-      const { toZonedTime, fromZonedTime } = require('date-fns-tz');
-      
-      // Get current time in company timezone to determine what "today" is there
-      const zonedNow = toZonedTime(new Date(), companyTimezone);
-      const year = zonedNow.getFullYear();
-      const month = zonedNow.getMonth();
-      const day = zonedNow.getDate();
-      
-      // Build midnight and end-of-day strings in company timezone format
-      const startOfDayStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}T00:00:00`;
-      const endOfDayStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}T23:59:59.999`;
-      
-      // Convert to UTC for comparison with job dates
-      const todayStartUtc = fromZonedTime(startOfDayStr, companyTimezone);
-      const todayEndUtc = fromZonedTime(endOfDayStr, companyTimezone);
+      // Filter to jobs happening today in company timezone using project utility
+      const { startOfDay: todayStartUtc, endOfDay: todayEndUtc } = getZonedDayBounds(companyTimezone);
       
       let todayJobs = allJobs.filter(job => {
         const jobStart = new Date(job.startDate);
