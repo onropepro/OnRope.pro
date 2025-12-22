@@ -133,10 +133,10 @@ export default function CSRPropertyManagerLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            {t('modules.csr.tiers.title', 'Rating Tiers')}
+            {t('modules.pmCSR.tiers.title', 'Vendor Safety at a Glance')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-3xl mx-auto">
-            {t('modules.csr.tiers.subtitle', 'Your CSR score determines your rating tier, displayed as a color-coded badge visible to property managers.')}
+            {t('modules.pmCSR.tiers.subtitle', 'Every rope access vendor on OnRopePro has a Company Safety Rating (CSR) visible in your vendor dashboard. Use it to compare vendors, verify compliance, and document your due diligence in vendor selection.')}
           </p>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
@@ -147,7 +147,7 @@ export default function CSRPropertyManagerLanding() {
               </div>
               <p className="font-semibold text-green-700 dark:text-green-300">{t('modules.csr.tiers.green.name', 'Green')}</p>
               <p className="text-sm font-medium text-green-600 dark:text-green-400">{t('modules.csr.tiers.green.label', 'Excellent')}</p>
-              <p className="text-xs text-green-600/80 dark:text-green-400/80 mt-2">{t('modules.csr.tiers.green.description', 'Strong safety culture, highly compliant')}</p>
+              <p className="text-xs text-green-600/80 dark:text-green-400/80 mt-2">{t('modules.pmCSR.tiers.green.description', 'Vendor maintains strong safety culture with consistent compliance. Low-risk choice for your properties.')}</p>
             </div>
 
             {/* Yellow - Good */}
@@ -157,7 +157,7 @@ export default function CSRPropertyManagerLanding() {
               </div>
               <p className="font-semibold text-yellow-700 dark:text-yellow-300">{t('modules.csr.tiers.yellow.name', 'Yellow')}</p>
               <p className="text-sm font-medium text-yellow-600 dark:text-yellow-400">{t('modules.csr.tiers.yellow.label', 'Good')}</p>
-              <p className="text-xs text-yellow-600/80 dark:text-yellow-400/80 mt-2">{t('modules.csr.tiers.yellow.description', 'Solid foundation, minor gaps to address')}</p>
+              <p className="text-xs text-yellow-600/80 dark:text-yellow-400/80 mt-2">{t('modules.pmCSR.tiers.yellow.description', 'Vendor has solid foundation with minor gaps. Review specifics before contracting.')}</p>
             </div>
 
             {/* Orange - Warning */}
@@ -167,7 +167,7 @@ export default function CSRPropertyManagerLanding() {
               </div>
               <p className="font-semibold text-orange-700 dark:text-orange-300">{t('modules.csr.tiers.orange.name', 'Orange')}</p>
               <p className="text-sm font-medium text-orange-600 dark:text-orange-400">{t('modules.csr.tiers.orange.label', 'Warning')}</p>
-              <p className="text-xs text-orange-600/80 dark:text-orange-400/80 mt-2">{t('modules.csr.tiers.orange.description', 'Significant gaps requiring attention')}</p>
+              <p className="text-xs text-orange-600/80 dark:text-orange-400/80 mt-2">{t('modules.pmCSR.tiers.orange.description', 'Vendor has significant compliance gaps. Request remediation plan before engagement.')}</p>
             </div>
 
             {/* Red - Critical */}
@@ -177,7 +177,7 @@ export default function CSRPropertyManagerLanding() {
               </div>
               <p className="font-semibold text-red-700 dark:text-red-300">{t('modules.csr.tiers.red.name', 'Red')}</p>
               <p className="text-sm font-medium text-red-600 dark:text-red-400">{t('modules.csr.tiers.red.label', 'Critical')}</p>
-              <p className="text-xs text-red-600/80 dark:text-red-400/80 mt-2">{t('modules.csr.tiers.red.description', 'Serious compliance issues')}</p>
+              <p className="text-xs text-red-600/80 dark:text-red-400/80 mt-2">{t('modules.pmCSR.tiers.red.description', 'Vendor has serious compliance issues. Consider alternative vendors for liability protection.')}</p>
             </div>
           </div>
         </div>
