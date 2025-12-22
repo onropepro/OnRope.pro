@@ -66,6 +66,8 @@ When you are satisfied with your dashboard layout:
 - Click **Cancel** to discard changes and restore the previous layout
 - Click **Reset** to return to the default dashboard configuration
 
+![Save your new layout](/assets/help/dashboard/save-changes.png)
+
 Your saved layout is stored in the database and will be restored automatically each time you log in.
 
 ---
