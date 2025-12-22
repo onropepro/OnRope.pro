@@ -5,11 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { TIER_CONFIG } from "@shared/stripe-config";
+import { EmbeddedCheckoutDialog } from "@/components/EmbeddedCheckout";
 
 export default function GetLicense() {
   const { t } = useTranslation();
   const [processingTier, setProcessingTier] = useState<string | null>(null);
   const [currency, setCurrency] = useState<'usd' | 'cad'>('usd');
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [selectedTier, setSelectedTier] = useState<string>('basic');
   const { toast } = useToast();
 
   // Auto-detect Canadian users based on timezone or browser locale
@@ -41,37 +44,15 @@ export default function GetLicense() {
     }
   }, []);
 
-  const handleSelectTier = async (tierName: keyof typeof TIER_CONFIG) => {
-    try {
-      setProcessingTier(tierName);
-      
-      // Create checkout session with selected currency
-      const response = await fetch('/api/stripe/create-license-checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          tier: tierName,
-          currency: currency,
-        }),
-      });
+  const handleSelectTier = (tierName: keyof typeof TIER_CONFIG) => {
+    setSelectedTier(tierName);
+    setProcessingTier(tierName);
+    setCheckoutOpen(true);
+  };
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to create checkout session');
-      }
-
-      const { sessionUrl } = await response.json();
-      
-      // Redirect to Stripe Checkout
-      window.location.href = sessionUrl;
-    } catch (error: any) {
-      console.error('[GetLicense] Failed to start checkout:', error);
-      toast({
-        title: t('getLicense.errors.checkoutError', 'Checkout Error'),
-        description: error.message || t('getLicense.errors.checkoutFailed', 'Failed to start checkout process. Please try again.'),
-        variant: "destructive",
-      });
+  const handleCheckoutClose = (open: boolean) => {
+    setCheckoutOpen(open);
+    if (!open) {
       setProcessingTier(null);
     }
   };
@@ -252,6 +233,14 @@ export default function GetLicense() {
           </Card>
         </div>
       </div>
+
+      <EmbeddedCheckoutDialog
+        open={checkoutOpen}
+        onOpenChange={handleCheckoutClose}
+        tier={selectedTier}
+        currency={currency}
+        isNewCustomer={true}
+      />
     </div>
   );
 }
