@@ -116,7 +116,7 @@ export default function CSRLanding() {
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-violet-600">{t('modules.csr.stats.auditTimeValue', '5 min')}</div>
-                  <div className="text-base text-muted-foreground mt-1">{t('modules.csr.stats.auditPreparation', 'Audit preparation')}</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('modules.csr.stats.auditPreparation', 'Safety Audit prep')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-amber-600">100%</div>
