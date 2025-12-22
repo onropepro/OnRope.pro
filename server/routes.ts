@@ -5,7 +5,7 @@ import { db } from "./db";
 import { wsHub } from "./websocket-hub";
 import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates, dashboardPreferences } from "@shared/schema";
 import { CARD_REGISTRY, getAvailableCardsForUser, getDefaultLayoutForRole, getCardsByCategory } from "@shared/dashboardCards";
-import { eq, sql, and, or, isNull, gt, gte, lte, desc, asc, inArray } from "drizzle-orm";
+import { eq, sql, and, or, isNull, gt, gte, lt, lte, desc, asc, inArray } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import multer from "multer";
@@ -4216,6 +4216,363 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error('[Dashboard] Get my performance error:', error);
       res.status(500).json({ message: error.message || "Failed to get performance" });
+    }
+  });
+
+  // Get today's hours (company-wide total for "Today's Hours" card)
+  // Permission: viewWorkSessions
+  app.get("/api/todays-hours", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Permission check: viewWorkSessions
+      const hasPermission = user.role === 'company' || user.permissions?.includes('view_work_sessions');
+      if (!hasPermission) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const companyId = user.role === "company" ? user.id : user.companyId;
+      if (!companyId) {
+        return res.json({ totalHours: 0, activeCount: 0, completedSessions: 0 });
+      }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      const sessions = await db.select()
+        .from(workSessions)
+        .where(and(
+          eq(workSessions.companyId, companyId),
+          gte(workSessions.startTime, today),
+          lt(workSessions.startTime, tomorrow)
+        ));
+
+      let totalHours = 0;
+      let activeCount = 0;
+      let completedSessions = 0;
+
+      for (const session of sessions) {
+        if (session.startTime && session.endTime) {
+          totalHours += (new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / (1000 * 60 * 60);
+          completedSessions++;
+        } else if (session.startTime && !session.endTime) {
+          activeCount++;
+          totalHours += (Date.now() - new Date(session.startTime).getTime()) / (1000 * 60 * 60);
+        }
+      }
+
+      res.json({
+        totalHours: Math.round(totalHours * 10) / 10,
+        activeCount,
+        completedSessions,
+      });
+    } catch (error: any) {
+      console.error('[Dashboard] Get todays hours error:', error);
+      res.status(500).json({ message: error.message || "Failed to get today's hours" });
+    }
+  });
+
+  // Get employees not clocked in (for "Not Clocked In" card)
+  // Permission: manageEmployees
+  app.get("/api/not-clocked-in", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Permission check: manageEmployees
+      const hasPermission = user.role === 'company' || user.permissions?.includes('manage_employees');
+      if (!hasPermission) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const companyId = user.role === "company" ? user.id : user.companyId;
+      if (!companyId) {
+        return res.json({ employees: [], count: 0 });
+      }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(today);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      // Get today's scheduled jobs
+      const todaysJobs = await db.select()
+        .from(scheduledJobs)
+        .where(and(
+          eq(scheduledJobs.companyId, companyId),
+          gte(scheduledJobs.startDate, today),
+          lte(scheduledJobs.startDate, endOfDay)
+        ));
+
+      const jobIds = todaysJobs.map(j => j.id);
+      if (jobIds.length === 0) {
+        return res.json({ employees: [], count: 0 });
+      }
+
+      // Get assigned employees for today's jobs
+      const assignments = await db.select()
+        .from(jobAssignments)
+        .where(inArray(jobAssignments.jobId, jobIds));
+
+      const scheduledEmployeeIds = [...new Set(assignments.map(a => a.employeeId))];
+      if (scheduledEmployeeIds.length === 0) {
+        return res.json({ employees: [], count: 0 });
+      }
+
+      // Get active work sessions
+      const activeSessions = await db.select()
+        .from(workSessions)
+        .where(and(
+          eq(workSessions.companyId, companyId),
+          gte(workSessions.startTime, today),
+          isNull(workSessions.endTime)
+        ));
+
+      const clockedInEmployeeIds = new Set(activeSessions.map(s => s.employeeId));
+
+      // Find employees who are scheduled but not clocked in
+      const notClockedIn: Array<{ id: string; name: string; scheduledTime: string }> = [];
+      
+      for (const empId of scheduledEmployeeIds) {
+        if (!clockedInEmployeeIds.has(empId)) {
+          const emp = await storage.getUserById(empId);
+          if (emp) {
+            const empAssignment = assignments.find(a => a.employeeId === empId);
+            const job = todaysJobs.find(j => j.id === empAssignment?.jobId);
+            notClockedIn.push({
+              id: empId,
+              name: emp.name || emp.email,
+              scheduledTime: job?.startDate ? new Date(job.startDate).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : 'Today',
+            });
+          }
+        }
+      }
+
+      res.json({ employees: notClockedIn, count: notClockedIn.length });
+    } catch (error: any) {
+      console.error('[Dashboard] Get not clocked in error:', error);
+      res.status(500).json({ message: error.message || "Failed to get not clocked in" });
+    }
+  });
+
+  // Get overdue projects (for "Overdue Projects" card)
+  // Permission: viewProjects
+  app.get("/api/overdue-projects", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Permission check: viewProjects
+      const hasPermission = user.role === 'company' || user.permissions?.includes('view_projects');
+      if (!hasPermission) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const companyId = user.role === "company" ? user.id : user.companyId;
+      if (!companyId) {
+        return res.json({ projects: [], count: 0 });
+      }
+
+      const allProjects = await storage.getProjectsByCompanyId(companyId);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const overdueProjects = allProjects
+        .filter(p => {
+          if (p.status === 'completed' || p.status === 'cancelled') return false;
+          if (!p.endDate) return false;
+          const endDate = new Date(p.endDate);
+          return endDate < today;
+        })
+        .map(p => {
+          const endDate = new Date(p.endDate!);
+          const daysOverdue = Math.floor((today.getTime() - endDate.getTime()) / (1000 * 60 * 60 * 24));
+          return {
+            id: p.id,
+            name: p.name,
+            daysOverdue,
+          };
+        })
+        .sort((a, b) => b.daysOverdue - a.daysOverdue);
+
+      res.json({ projects: overdueProjects, count: overdueProjects.length });
+    } catch (error: any) {
+      console.error('[Dashboard] Get overdue projects error:', error);
+      res.status(500).json({ message: error.message || "Failed to get overdue projects" });
+    }
+  });
+
+  // Get pending approvals (for "Pending Approvals" card)
+  // Permission: canAccessFinancials
+  app.get("/api/pending-approvals", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Permission check: canAccessFinancials
+      const hasPermission = user.role === 'company' || user.permissions?.includes('view_financial_data');
+      if (!hasPermission) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const companyId = user.role === "company" ? user.id : user.companyId;
+      if (!companyId) {
+        return res.json({ timesheetCount: 0, totalHours: 0 });
+      }
+
+      // Get work sessions that need approval (completed but not approved)
+      const pendingSessions = await db.select()
+        .from(workSessions)
+        .where(and(
+          eq(workSessions.companyId, companyId),
+          eq(workSessions.approved, false),
+          isNull(workSessions.endTime).not()
+        ));
+
+      let totalHours = 0;
+      for (const session of pendingSessions) {
+        if (session.startTime && session.endTime) {
+          totalHours += (new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / (1000 * 60 * 60);
+        }
+      }
+
+      res.json({
+        timesheetCount: pendingSessions.length,
+        totalHours: Math.round(totalHours * 10) / 10,
+      });
+    } catch (error: any) {
+      console.error('[Dashboard] Get pending approvals error:', error);
+      res.status(500).json({ message: error.message || "Failed to get pending approvals" });
+    }
+  });
+
+  // Get expiring certifications (for "Expiring Certs" card)
+  // Permission: viewSafetyDocuments
+  app.get("/api/expiring-certs", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Permission check: viewSafetyDocuments
+      const hasPermission = user.role === 'company' || user.permissions?.includes('view_safety_documents');
+      if (!hasPermission) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const companyId = user.role === "company" ? user.id : user.companyId;
+      if (!companyId) {
+        return res.json({ certs: [], count: 0 });
+      }
+
+      const employees = await storage.getEmployeesByCompanyId(companyId);
+      const today = new Date();
+      const sixtyDaysFromNow = new Date(today);
+      sixtyDaysFromNow.setDate(sixtyDaysFromNow.getDate() + 60);
+
+      const expiringCerts: Array<{
+        employeeId: string;
+        employeeName: string;
+        certType: string;
+        daysUntilExpiry: number;
+      }> = [];
+
+      for (const emp of employees) {
+        // Check IRATA expiry
+        if (emp.irataExpiryDate) {
+          const expiryDate = new Date(emp.irataExpiryDate);
+          if (expiryDate >= today && expiryDate <= sixtyDaysFromNow) {
+            const daysUntil = Math.ceil((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+            expiringCerts.push({
+              employeeId: emp.id,
+              employeeName: emp.name || emp.email,
+              certType: `IRATA Level ${emp.irataLevel || '?'}`,
+              daysUntilExpiry: daysUntil,
+            });
+          }
+        }
+        // Check SPRAT expiry
+        if (emp.spratExpiryDate) {
+          const expiryDate = new Date(emp.spratExpiryDate);
+          if (expiryDate >= today && expiryDate <= sixtyDaysFromNow) {
+            const daysUntil = Math.ceil((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+            expiringCerts.push({
+              employeeId: emp.id,
+              employeeName: emp.name || emp.email,
+              certType: `SPRAT Level ${emp.spratLevel || '?'}`,
+              daysUntilExpiry: daysUntil,
+            });
+          }
+        }
+      }
+
+      expiringCerts.sort((a, b) => a.daysUntilExpiry - b.daysUntilExpiry);
+
+      res.json({ certs: expiringCerts, count: expiringCerts.length });
+    } catch (error: any) {
+      console.error('[Dashboard] Get expiring certs error:', error);
+      res.status(500).json({ message: error.message || "Failed to get expiring certs" });
+    }
+  });
+
+  // Get new feedback (for "New Feedback" card)
+  // Permission: viewFeedback
+  app.get("/api/new-feedback", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Permission check: viewFeedback
+      const hasPermission = user.role === 'company' || user.permissions?.includes('view_feedback');
+      if (!hasPermission) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const companyId = user.role === "company" ? user.id : user.companyId;
+      if (!companyId) {
+        return res.json({ unreadCount: 0, recentItems: [] });
+      }
+
+      // Get feature requests (as feedback items)
+      const requests = await db.select()
+        .from(featureRequests)
+        .where(eq(featureRequests.companyId, companyId))
+        .orderBy(desc(featureRequests.createdAt))
+        .limit(10);
+
+      const unreadItems = requests.filter(r => r.status === 'pending' || r.status === 'open');
+
+      res.json({
+        unreadCount: unreadItems.length,
+        recentItems: unreadItems.slice(0, 5).map(r => ({
+          id: r.id,
+          subject: r.title,
+          type: r.type || 'Feedback',
+        })),
+      });
+    } catch (error: any) {
+      console.error('[Dashboard] Get new feedback error:', error);
+      res.status(500).json({ message: error.message || "Failed to get feedback" });
     }
   });
 
