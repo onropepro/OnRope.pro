@@ -606,6 +606,368 @@ White cards, rounded-2xl, shadow-md, p-6, H2 headers with icon (24px Ocean Blue)
 **Data Tables:**  
 White bg, rounded-xl, shadow-sm, sticky header (Cloud bg, shadow-xs), alternating row backgrounds (subtle Cloud on even), Ocean Blue link text, sortable headers with icons, pagination controls (Ocean Blue active).
 
+---
+
+## Employer Dashboard Design System (Foundation for All Portals)
+
+**CANONICAL REFERENCE:** `client/src/components/DashboardOverview.tsx`, `client/src/components/DashboardSidebar.tsx`
+
+The Employer Dashboard establishes the foundational design patterns that ALL other portal sections (Technician, Resident, Property Manager, Building Manager) must follow. This is the "Operations Command Center" aesthetic - professional, data-dense, and enterprise-grade.
+
+---
+
+### Design Philosophy
+
+**Core Principles:**
+- **Data-Dense Professional Design:** Maximize information density without sacrificing readability
+- **White-Label Compatible:** All brand colors use CSS variables when branding is active, Deep Blue (#0B64A3) as fallback
+- **Mobile-First Responsive:** Full functionality on all screen sizes with optimized layouts
+- **Dark Mode Native:** Every element has explicit light/dark mode variants
+
+**Design Aesthetic:**
+- Clean, minimal chrome with focus on content
+- Subtle shadows and borders for depth hierarchy
+- Professional slate color palette for neutral elements
+- Brand color accents for interactive elements and status indicators
+
+---
+
+### Typography Standards (MANDATORY)
+
+**Site-Wide Minimum Font Sizes:**
+| Content Type | Tailwind Class | Pixel Size | Usage |
+|--------------|----------------|------------|-------|
+| Primary Content | `text-base` | 16px | Body text, labels, card headers, navigation items, project names |
+| Secondary Content | `text-sm` | 14px | Metadata, timestamps, trend labels, client names, group headers, badges |
+
+**CRITICAL:** Never use `text-xs` (12px) or smaller for any readable content. The Outfit font requires larger sizes for comfortable reading.
+
+**Typography Hierarchy:**
+```tsx
+// Card Headers
+<h3 className="text-base font-semibold text-slate-800 dark:text-slate-200">
+
+// Primary Labels/Text
+<p className="text-base text-muted-foreground">
+<span className="text-base font-medium text-slate-800 dark:text-slate-200">
+
+// Secondary Metadata
+<p className="text-sm text-slate-500 dark:text-slate-400">
+<span className="text-sm text-muted-foreground">
+
+// Large Metrics (KPI Values)
+<span className="text-3xl font-bold text-foreground">
+
+// Navigation Group Headers
+<div className="text-sm font-semibold text-slate-400 uppercase tracking-wider">
+```
+
+---
+
+### Sidebar Design
+
+**CANONICAL REFERENCE:** `client/src/components/DashboardSidebar.tsx`
+
+**Dimensions & Layout:**
+- Fixed width: `w-60` (240px)
+- Full height: `h-full`
+- Background: `bg-white dark:bg-slate-900`
+- Border: `border-r border-slate-200/80 dark:border-slate-700/80`
+- Desktop: Fixed position, always visible
+- Mobile: Slide-in drawer with overlay backdrop
+
+**Brand Header:**
+```tsx
+// Logo Container
+<div className="flex items-center gap-2.5">
+  {/* Custom Logo (when white-label active) */}
+  <img className="h-7 w-auto max-w-[160px] object-contain" />
+  
+  {/* Default Logo (Deep Blue fallback) */}
+  <div 
+    className="flex h-7 w-7 items-center justify-center rounded-md text-white font-semibold text-sm"
+    style={{ backgroundColor: '#0B64A3' }}
+  >
+    OR
+  </div>
+  <span className="font-medium text-base text-slate-900 dark:text-slate-100">
+    CompanyName
+  </span>
+</div>
+```
+
+**Navigation Items:**
+```tsx
+// Active State (uses brand color)
+<button
+  className="w-full flex items-center gap-2.5 py-2 px-3 rounded-md text-base font-medium text-white shadow-sm"
+  style={{ backgroundColor: getBrandColor() }}
+>
+  <Icon className="h-4 w-4 shrink-0" />
+  <span>Label</span>
+</button>
+
+// Inactive State
+<button className="w-full flex items-center gap-2.5 py-2 px-3 rounded-md text-base font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors">
+```
+
+**Navigation Group Headers:**
+```tsx
+<div className="text-sm font-semibold text-slate-400 uppercase tracking-wider px-3 py-2">
+  GROUP NAME
+</div>
+```
+
+**Alert Badges:**
+```tsx
+<span className="flex items-center justify-center rounded-full text-sm font-medium h-5 min-w-5 px-1.5 bg-rose-500 text-white">
+  {count}
+</span>
+```
+
+**Mobile Responsiveness:**
+- Toggle button: `fixed top-3 left-3 z-30 lg:hidden`
+- Overlay: `fixed inset-0 bg-black/50 z-30 lg:hidden`
+- Sidebar: `lg:translate-x-0` (visible on desktop), slide transition on mobile
+- Content margin: `lg:ml-60` (only on desktop)
+
+---
+
+### Dashboard Card Design
+
+**CANONICAL REFERENCE:** `client/src/components/DashboardOverview.tsx`
+
+**Base Card Structure:**
+```tsx
+<div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+  {/* Card Header */}
+  <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 flex items-center justify-between gap-2">
+    <h3 className="text-base font-semibold text-slate-800 dark:text-slate-200">
+      Card Title
+    </h3>
+    <Button variant="ghost" size="sm" className="text-sm text-slate-500 hover:text-slate-700 h-auto py-1 px-2">
+      Action
+    </Button>
+  </div>
+  {/* Card Content */}
+  <div>
+    {/* Content rows */}
+  </div>
+</div>
+```
+
+**Card Header Specifications:**
+- Padding: `px-4 py-3`
+- Border: `border-b border-slate-100 dark:border-slate-800`
+- Background: `bg-slate-50/50 dark:bg-slate-800/50`
+- Title: `text-base font-semibold text-slate-800 dark:text-slate-200`
+- Actions: Ghost buttons with `h-auto py-1 px-2`
+
+**List Row Design:**
+```tsx
+<div className="px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group cursor-pointer border-b border-slate-100 dark:border-slate-800 last:border-b-0">
+  <div className="flex items-start gap-3">
+    {/* Status Indicator */}
+    <div className="w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900 shadow-sm shrink-0 mt-1.5" />
+    {/* Content */}
+    <div className="flex-1 min-w-0">
+      <p className="text-base font-medium text-slate-800 dark:text-slate-200 group-hover:text-[#0B64A3] truncate">
+        Primary Text
+      </p>
+      <p className="text-sm text-slate-500 dark:text-slate-400 truncate">
+        Secondary Text
+      </p>
+    </div>
+  </div>
+</div>
+```
+
+---
+
+### KPI Metric Cards
+
+**Structure:**
+```tsx
+<Card className={csrColors?.bg || ''}>
+  <CardContent className="p-4">
+    <p className="text-base mb-1 text-muted-foreground">{label}</p>
+    <div className="flex items-end justify-between">
+      <span className="text-3xl font-bold text-foreground">{value}</span>
+      <div className="flex items-center gap-1 text-base text-emerald-600">
+        <TrendingUp className="w-4 h-4" />
+        <span>{trend}%</span>
+      </div>
+    </div>
+    <p className="text-sm mt-1 text-muted-foreground">{trendLabel}</p>
+  </CardContent>
+</Card>
+```
+
+**CSR Rating Color Tiers:**
+```tsx
+const getCsrColorScheme = (rating: number) => {
+  if (rating >= 90) return { bg: 'bg-green-50 dark:bg-green-950/30', text: 'text-green-900 dark:text-green-200', label: 'Excellent' };
+  if (rating >= 70) return { bg: 'bg-yellow-50 dark:bg-yellow-950/30', text: 'text-yellow-900 dark:text-yellow-200', label: 'Good' };
+  if (rating >= 50) return { bg: 'bg-orange-50 dark:bg-orange-950/30', text: 'text-orange-900 dark:text-orange-200', label: 'Warning' };
+  return { bg: 'bg-red-50 dark:bg-red-950/30', text: 'text-red-900 dark:text-red-200', label: 'Critical' };
+};
+```
+
+---
+
+### Progress Bar Design
+
+**Slim Progress Bars (6px height):**
+```tsx
+<div className="flex items-center gap-2">
+  <div className="flex-1 h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+    <div 
+      className="h-full bg-[#0B64A3] rounded-full transition-all"
+      style={{ width: `${progress}%` }}
+    />
+  </div>
+  <span className="text-sm font-medium text-slate-500 dark:text-slate-400 w-8 text-right">
+    {progress}%
+  </span>
+</div>
+```
+
+**Key Specifications:**
+- Track height: `h-1.5` (6px)
+- Track background: `bg-slate-100 dark:bg-slate-700`
+- Indicator: `bg-[#0B64A3]` (Deep Blue brand color)
+- Border radius: `rounded-full`
+- Percentage label: `text-sm font-medium w-8 text-right`
+
+---
+
+### Attention/Alert Items
+
+**Alert Card Structure:**
+```tsx
+<div className="border-l-4 border-l-amber-500 bg-amber-50 dark:bg-amber-950/30 p-4 rounded-r-lg">
+  <div className="flex items-start gap-3">
+    <div className="p-2 rounded-lg bg-amber-100 dark:bg-amber-900/50">
+      <AlertIcon className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+    </div>
+    <div className="flex-1">
+      <h4 className="text-base font-semibold text-slate-800 dark:text-slate-200">Title</h4>
+      <p className="text-sm text-slate-600 dark:text-slate-400">Description</p>
+    </div>
+    <span className="text-2xl font-bold text-amber-600">{count}</span>
+  </div>
+</div>
+```
+
+**Alert Color Variants:**
+| Type | Border | Background | Icon BG | Icon/Text |
+|------|--------|------------|---------|-----------|
+| Warning (Certs) | `border-l-amber-500` | `bg-amber-50 dark:bg-amber-950/30` | `bg-amber-100 dark:bg-amber-900/50` | `text-amber-600 dark:text-amber-400` |
+| Critical (Inspections) | `border-l-rose-500` | `bg-rose-50 dark:bg-rose-950/30` | `bg-rose-100 dark:bg-rose-900/50` | `text-rose-600 dark:text-rose-400` |
+| Info (Timesheets) | `border-l-sky-500` | `bg-sky-50 dark:bg-sky-950/30` | `bg-sky-100 dark:bg-sky-900/50` | `text-sky-600 dark:text-sky-400` |
+| Notice (Documents) | `border-l-pink-500` | `bg-pink-50 dark:bg-pink-950/30` | `bg-pink-100 dark:bg-pink-900/50` | `text-pink-600 dark:text-pink-400` |
+
+---
+
+### Schedule List Design
+
+**Time Column Layout:**
+```tsx
+<div className="flex items-start gap-0">
+  {/* Time Column - Fixed Width */}
+  <div className="w-12 shrink-0">
+    <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+      {time}
+    </span>
+  </div>
+  {/* Vertical Connector Line */}
+  <div className="border-l-2 border-slate-100 dark:border-slate-700 group-hover:border-[#0B64A3]/30 pl-3 flex-1">
+    <p className="text-sm font-semibold text-slate-600 tracking-wide">{jobType}</p>
+    <p className="text-base font-medium text-slate-500">{title}</p>
+    <p className="text-sm text-slate-500">{location}</p>
+    {/* Stacked Avatars */}
+    <div className="flex items-center mt-2">
+      {technicians.map((tech, idx) => (
+        <Avatar className="w-6 h-6 border-2 border-white -ml-1.5 first:ml-0">
+          <AvatarFallback className={`${tech.color} text-white text-sm font-medium`}>
+            {tech.initials}
+          </AvatarFallback>
+        </Avatar>
+      ))}
+    </div>
+  </div>
+</div>
+```
+
+---
+
+### White-Label Branding Compatibility
+
+**Brand Color Logic:**
+```tsx
+const BRAND_COLOR = "#0B64A3"; // Deep Blue fallback
+
+const getBrandColor = (): string => {
+  // When white-label branding active, use CSS variable
+  if (whitelabelBrandingActive) {
+    return 'var(--brand-primary, #0B64A3)';
+  }
+  return BRAND_COLOR;
+};
+```
+
+**White-Label Compatible Elements:**
+- Sidebar active state background
+- Progress bar indicator color
+- Interactive hover states
+- Navigation badges (when using brand color)
+- Logo display (custom vs default)
+
+---
+
+### Dashboard Layout Grid
+
+**Responsive Grid Structure:**
+```tsx
+<div className="space-y-6">
+  {/* KPI Metrics Row */}
+  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    {/* 4 KPI cards */}
+  </div>
+  
+  {/* Main Content Grid */}
+  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    {/* Left: Active Projects (full height) */}
+    {/* Right: Schedule + Alerts (stacked) */}
+  </div>
+</div>
+```
+
+**Content Area Margin:**
+- Desktop: `lg:ml-60` (accounts for fixed sidebar)
+- Mobile: No margin (sidebar slides over)
+
+---
+
+### Dashboard Checklist
+
+When implementing or modifying dashboard sections:
+
+- [ ] All primary content uses `text-base` (16px minimum)
+- [ ] All secondary/metadata content uses `text-sm` (14px minimum)
+- [ ] No `text-xs` (12px) anywhere in readable content
+- [ ] Cards use proper header structure: `px-4 py-3 border-b bg-slate-50/50`
+- [ ] Progress bars are 6px height (`h-1.5`) with Deep Blue indicator
+- [ ] Alert items use 4px left border with proper color variants
+- [ ] All elements have explicit dark mode variants
+- [ ] Interactive elements use brand color from `getBrandColor()`
+- [ ] Sidebar navigation items are 16px (`text-base`)
+- [ ] Badges/counts use 14px (`text-sm`) minimum
+- [ ] Avatars have proper fallback with visible initials
+- [ ] Mobile responsive with `lg:` breakpoint prefix
+
+---
+
 ## Forms
 
 **Input Fields:**  
