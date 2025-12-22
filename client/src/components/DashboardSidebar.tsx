@@ -63,6 +63,7 @@ interface DashboardSidebarProps {
     pendingTimesheets?: number;
     unsignedDocs?: number;
     jobApplications?: number;
+    quoteNotifications?: number;
   };
 }
 
@@ -242,6 +243,8 @@ export function DashboardSidebar({
           label: t("dashboard.cards.quotes.label", "Quotes"),
           icon: FileCheck,
           href: "/quotes",
+          badge: alertCounts.quoteNotifications,
+          badgeType: alertCounts.quoteNotifications ? "alert" : undefined,
           isVisible: (user) => canAccessQuotes(user) || hasFinancialAccess(user),
         },
       ],
