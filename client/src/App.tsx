@@ -1,4 +1,4 @@
-import { useEffect, createContext } from "react";
+import { useEffect, createContext, ReactNode } from "react";
 import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider, useQuery } from "@tanstack/react-query";
@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { usePermissionSync } from "@/hooks/use-permission-sync";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { DashboardLayout } from "@/components/DashboardLayout";
 
 // Pages
 import Register from "@/pages/Register";
@@ -124,6 +125,21 @@ import VisibleTechniciansBrowser from "@/pages/VisibleTechniciansBrowser";
 import NotFound from "@/pages/not-found";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { EMPLOYEE_ROLES } from "@/lib/permissions";
+
+interface WithDashboardLayoutProps {
+  children: ReactNode;
+  allowedRoles?: string[];
+}
+
+function WithDashboardLayout({ children, allowedRoles }: WithDashboardLayoutProps) {
+  return (
+    <ProtectedRoute allowedRoles={allowedRoles}>
+      <DashboardLayout>
+        {children}
+      </DashboardLayout>
+    </ProtectedRoute>
+  );
+}
 
 function Router() {
   const [location] = useLocation();
@@ -250,14 +266,14 @@ function Router() {
         </ProtectedRoute>
       </Route>
       <Route path="/dashboard">
-        <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
+        <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
           <Dashboard />
-        </ProtectedRoute>
+        </WithDashboardLayout>
       </Route>
       <Route path="/job-board">
-        <ProtectedRoute allowedRoles={["company"]}>
+        <WithDashboardLayout allowedRoles={["company"]}>
           <CompanyJobBoard />
-        </ProtectedRoute>
+        </WithDashboardLayout>
       </Route>
       <Route path="/talent-browser">
         <ProtectedRoute allowedRoles={["company", "superuser"]}>
@@ -265,24 +281,24 @@ function Router() {
         </ProtectedRoute>
       </Route>
       <Route path="/complaints/:id">
-        <ProtectedRoute allowedRoles={["company", "operations_manager", "supervisor", "rope_access_tech", "resident"]}>
+        <WithDashboardLayout allowedRoles={["company", "operations_manager", "supervisor", "rope_access_tech", "resident"]}>
           <ComplaintDetail />
-        </ProtectedRoute>
+        </WithDashboardLayout>
       </Route>
       <Route path="/projects/:id/work-sessions">
-        <ProtectedRoute allowedRoles={["company", "operations_manager", "supervisor", "rope_access_tech"]}>
+        <WithDashboardLayout allowedRoles={["company", "operations_manager", "supervisor", "rope_access_tech"]}>
           <WorkSessionHistory />
-        </ProtectedRoute>
+        </WithDashboardLayout>
       </Route>
       <Route path="/projects/:id">
-        <ProtectedRoute>
+        <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
           <ProjectDetail />
-        </ProtectedRoute>
+        </WithDashboardLayout>
       </Route>
       <Route path="/profile">
-        <ProtectedRoute>
+        <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
           <Profile />
-        </ProtectedRoute>
+        </WithDashboardLayout>
       </Route>
       <Route path="/property-manager-settings">
         <ProtectedRoute allowedRoles={["property_manager"]}>
@@ -300,9 +316,9 @@ function Router() {
         </ProtectedRoute>
       </Route>
       <Route path="/safety-forms">
-        <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
+        <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
           <SafetyForms />
-        </ProtectedRoute>
+        </WithDashboardLayout>
       </Route>
       <Route path="/toolbox-meeting">
         <ProtectedRoute allowedRoles={["rope_access_tech", "supervisor", "operations_manager", "company"]}>
@@ -325,54 +341,54 @@ function Router() {
         </ProtectedRoute>
       </Route>
       <Route path="/payroll">
-        <ProtectedRoute allowedRoles={["company", "operations_manager", "supervisor"]}>
+        <WithDashboardLayout allowedRoles={["company", "operations_manager", "supervisor"]}>
           <Payroll />
-        </ProtectedRoute>
+        </WithDashboardLayout>
       </Route>
       <Route path="/quotes">
-        <ProtectedRoute allowedRoles={["company", "operations_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"]}>
+        <WithDashboardLayout allowedRoles={["company", "operations_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"]}>
           <Quotes />
-        </ProtectedRoute>
+        </WithDashboardLayout>
       </Route>
       <Route path="/active-workers">
-        <ProtectedRoute allowedRoles={["company", "operations_manager", "supervisor"]}>
+        <WithDashboardLayout allowedRoles={["company", "operations_manager", "supervisor"]}>
           <ActiveWorkers />
-        </ProtectedRoute>
+        </WithDashboardLayout>
       </Route>
       <Route path="/non-billable-hours">
-        <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
+        <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
           <NonBillableHours />
-        </ProtectedRoute>
+        </WithDashboardLayout>
       </Route>
       <Route path="/inventory">
-        <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
+        <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
           <Inventory />
-        </ProtectedRoute>
+        </WithDashboardLayout>
       </Route>
       <Route path="/hours-analytics">
-        <ProtectedRoute allowedRoles={["company", "operations_manager", "supervisor"]}>
+        <WithDashboardLayout allowedRoles={["company", "operations_manager", "supervisor"]}>
           <HoursAnalytics />
-        </ProtectedRoute>
+        </WithDashboardLayout>
       </Route>
       <Route path="/schedule">
-        <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
+        <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
           <ScheduleRouter />
-        </ProtectedRoute>
+        </WithDashboardLayout>
       </Route>
       <Route path="/residents">
-        <ProtectedRoute allowedRoles={["company", "operations_manager", "supervisor"]}>
+        <WithDashboardLayout allowedRoles={["company", "operations_manager", "supervisor"]}>
           <ResidentsManagement />
-        </ProtectedRoute>
+        </WithDashboardLayout>
       </Route>
       <Route path="/documents">
-        <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
+        <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
           <Documents />
-        </ProtectedRoute>
+        </WithDashboardLayout>
       </Route>
       <Route path="/my-logged-hours">
-        <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
+        <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
           <MyLoggedHours />
-        </ProtectedRoute>
+        </WithDashboardLayout>
       </Route>
       <Route path="/changelog" component={Changelog} />
       <Route path="/changelog/authentication" component={UserAccessGuide} />
