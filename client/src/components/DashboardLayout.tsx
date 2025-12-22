@@ -13,25 +13,42 @@ interface BrandingSettings {
   logoUrl?: string;
   primaryColor?: string;
   companyDisplayName?: string;
+  subscriptionActive?: boolean;
 }
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [location, setLocation] = useLocation();
   const brandingContext = useContext(BrandingContext);
 
-  const { data: currentUser } = useQuery<User>({
+  // Correctly typed to match API response shape: { user: {...} }
+  const { data: userData } = useQuery<{ user: User & { username?: string; companyId?: string } }>({
     queryKey: ["/api/user"],
   });
+  const currentUser = userData?.user;
+  
+  // Get company ID for branding - company users use their own ID, employees use companyId
+  const companyIdForBranding = currentUser?.role === 'company' 
+    ? currentUser?.id 
+    : currentUser?.companyId;
 
-  const { data: branding } = useQuery<BrandingSettings>({
-    queryKey: ["/api/branding"],
-    enabled: !!currentUser,
+  // Fetch branding using the company endpoint pattern (matches Dashboard.tsx)
+  const { data: brandingData } = useQuery<BrandingSettings | null>({
+    queryKey: ["/api/company", companyIdForBranding, "branding"],
+    queryFn: async () => {
+      if (!companyIdForBranding) return null;
+      const response = await fetch(`/api/company/${companyIdForBranding}/branding`);
+      if (response.status === 404) return null;
+      if (!response.ok) return null;
+      return response.json();
+    },
+    enabled: !!companyIdForBranding,
   });
 
-  const { data: employees } = useQuery<any[]>({
+  const { data: employeesData } = useQuery<{ employees: any[] }>({
     queryKey: ["/api/employees"],
     enabled: !!currentUser,
   });
+  const employees = employeesData?.employees;
 
   const { data: alertCounts } = useQuery<{
     expiringCerts?: number;
@@ -79,7 +96,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     return "home";
   };
 
-  const whitelabelActive = brandingContext?.brandingActive && !!branding?.primaryColor;
+  // White label is active if BrandingContext says so AND we have a primary color
+  const whitelabelActive = brandingContext?.brandingActive && 
+    (brandingData?.subscriptionActive || !!brandingData?.primaryColor);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
@@ -87,9 +106,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         currentUser={currentUser}
         activeTab={getActiveTab()}
         onTabChange={handleTabChange}
-        brandingLogoUrl={branding?.logoUrl}
+        brandingLogoUrl={brandingData?.logoUrl}
         whitelabelBrandingActive={whitelabelActive}
-        companyName={branding?.companyDisplayName || currentUser?.username}
+        companyName={brandingData?.companyDisplayName || currentUser?.username}
         employeeCount={employees?.length || 0}
         alertCounts={alertCounts}
       />
