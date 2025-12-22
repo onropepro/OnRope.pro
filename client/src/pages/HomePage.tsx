@@ -82,7 +82,7 @@ const segmentIcons = {
 
 const segmentHrefs = {
   employer: {
-    primaryCta: "/register",
+    primaryCta: "/get-license",
     secondaryCta: "/pricing",
   },
   technician: {
