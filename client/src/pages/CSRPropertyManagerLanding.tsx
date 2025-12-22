@@ -615,23 +615,21 @@ export default function CSRPropertyManagerLanding() {
         </div>
       </section>
 
-      <Separator className="my-8" />
-
       {/* CTA Section */}
-      <section className="py-16 md:py-24 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+      <section className="py-16 md:py-20 px-4 text-white" style={{backgroundImage: `linear-gradient(135deg, ${SAGE_GREEN} 0%, #5A7A60 100%)`}}>
+        <div className="max-w-3xl mx-auto text-center space-y-6">
+          <h2 className="text-3xl md:text-4xl font-bold">
             {t('modules.pmCSR.cta.title', 'From Liability Exposure to Documented Risk Management')}
           </h2>
-          <p className="text-muted-foreground text-lg mb-8 max-w-2xl mx-auto">
+          <p className="text-lg text-white/90">
             {t('modules.pmCSR.cta.description', 'With CSR, you check one dashboard and know exactly which vendors pose risk across your entire portfolio. Compliance gaps get flagged before insurance audits discover them.')}
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" onClick={() => setShowRegistration(true)} data-testid="button-cta-trial" style={{backgroundColor: SAGE_GREEN}}>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+            <Button size="lg" className="bg-white hover:bg-gray-50" style={{color: SAGE_GREEN}} onClick={() => setShowRegistration(true)} data-testid="button-cta-trial">
               {t('modules.pmCSR.cta.trial', 'Start Your 60-Day Trial')}
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
-            <Button size="lg" variant="outline" onClick={() => document.getElementById('faqs')?.scrollIntoView({ behavior: 'smooth' })} data-testid="button-cta-faqs">
+            <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={() => document.getElementById('faqs')?.scrollIntoView({ behavior: 'smooth' })} data-testid="button-cta-faqs">
               {t('modules.pmCSR.cta.faqs', 'Read FAQs')}
             </Button>
           </div>
