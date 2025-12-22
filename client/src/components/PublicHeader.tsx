@@ -254,11 +254,13 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
               </Button>
               {showModulesMenu && (
                 <div 
-                  className="fixed top-[88px] left-1/2 -translate-x-1/2 pt-4 z-50"
-                  onMouseEnter={() => setShowModulesMenu(true)}
-                  onMouseLeave={() => setShowModulesMenu(false)}
+                  className="absolute top-full left-1/2 -translate-x-1/2 pt-2 z-50 pointer-events-none"
                 >
-                  <div className="bg-card border border-border rounded-xl shadow-xl p-5 w-[1100px] max-w-[calc(100vw-2rem)]">
+                  <div 
+                    className="bg-card border border-border rounded-xl shadow-xl p-5 w-[1100px] max-w-[calc(100vw-2rem)] pointer-events-auto"
+                    onMouseEnter={() => setShowModulesMenu(true)}
+                    onMouseLeave={() => setShowModulesMenu(false)}
+                  >
                   <div className="flex gap-4">
                     {/* Column 1: Operations (5 items) */}
                     <div className="flex-1 flex flex-col gap-1">
