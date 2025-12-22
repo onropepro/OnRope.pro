@@ -237,7 +237,10 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
             <div 
               className="relative flex items-center" 
               ref={modulesMenuRef}
-              onMouseEnter={() => setShowModulesMenu(true)}
+              onMouseEnter={() => {
+                setShowModulesMenu(true);
+                setShowTechnicianMenu(false);
+              }}
               onMouseLeave={() => setShowModulesMenu(false)}
             >
               <Button
@@ -594,7 +597,10 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
             <div 
               className="relative flex items-center" 
               ref={technicianMenuRef}
-              onMouseEnter={() => setShowTechnicianMenu(true)}
+              onMouseEnter={() => {
+                setShowTechnicianMenu(true);
+                setShowModulesMenu(false);
+              }}
               onMouseLeave={() => setShowTechnicianMenu(false)}
             >
               <Button
@@ -655,6 +661,10 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                 variant="ghost"
                 className={`text-sm font-medium ${activeNav === item.id ? "text-primary" : ""}`}
                 onClick={() => setLocation(item.href)}
+                onMouseEnter={() => {
+                  setShowModulesMenu(false);
+                  setShowTechnicianMenu(false);
+                }}
                 data-testid={`nav-${item.id}`}
               >
                 {item.label}
