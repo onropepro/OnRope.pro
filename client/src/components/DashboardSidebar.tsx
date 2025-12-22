@@ -28,6 +28,7 @@ import type { User } from "@/lib/permissions";
 import {
   hasFinancialAccess,
   canManageEmployees,
+  canAccessQuotes,
 } from "@/lib/permissions";
 import { useState, useEffect } from "react";
 
@@ -241,7 +242,7 @@ export function DashboardSidebar({
           label: t("dashboard.cards.quotes.label", "Quotes"),
           icon: FileCheck,
           href: "/quotes",
-          isVisible: (user) => hasFinancialAccess(user),
+          isVisible: (user) => canAccessQuotes(user) || hasFinancialAccess(user),
         },
       ],
     },
