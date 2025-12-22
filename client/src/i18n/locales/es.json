@@ -7797,12 +7797,14 @@
         "ctaFaq": "Encontrar respuestas"
       },
       "stats": {
-        "averageCsr": "CSE promedio inicial",
-        "realTimeValue": "Tiempo real",
-        "scoreUpdates": "Actualizaciones de puntuación",
         "auditTimeValue": "5 min",
-        "auditPreparation": "Preparación de auditoría",
-        "achievableCompliance": "Cumplimiento alcanzable"
+        "auditPreparation": "Prep. Auditoría de Seguridad",
+        "signaturesValue": "100%",
+        "signaturesTracked": "Firmas de empleados rastreadas",
+        "realTimeValue": "Tiempo Real",
+        "scoreUpdates": "Actualizaciones de puntuación",
+        "pdfExportValue": "1-Clic",
+        "pdfExportDesc": "Exportación PDF con marcas de tiempo"
       },
       "problem": {
         "title": "El problema de seguridad del que nadie habla",

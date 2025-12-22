@@ -100,6 +100,7 @@ import ResidentLanding from "@/pages/ResidentLanding";
 import ResetPassword from "@/pages/ResetPassword";
 import PropertyManagerLanding from "@/pages/PropertyManagerLanding";
 import PropertyManagerInterfaceLanding from "@/pages/PropertyManagerInterfaceLanding";
+import CSRPropertyManagerLanding from "@/pages/CSRPropertyManagerLanding";
 import TechnicianLanding from "@/pages/TechnicianLanding";
 import JobBoardGuide from "@/pages/JobBoardGuide";
 import Pricing from "@/pages/Pricing";
@@ -159,6 +160,7 @@ function Router() {
       <Route path="/resident" component={ResidentLanding} />
       <Route path="/reset-password" component={ResetPassword} />
       <Route path="/property-manager" component={PropertyManagerLanding} />
+      <Route path="/property-manager/company-safety-rating" component={CSRPropertyManagerLanding} />
       <Route path="/technician" component={TechnicianLanding} />
       <Route path="/pricing" component={Pricing} />
       <Route path="/get-license" component={GetLicense} />

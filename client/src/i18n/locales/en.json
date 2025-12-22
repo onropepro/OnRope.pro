@@ -7294,12 +7294,14 @@
         "ctaFaq": "Find Answers"
       },
       "stats": {
-        "averageCsr": "Average starting CSR",
-        "realTimeValue": "Real-time",
-        "scoreUpdates": "Score updates",
         "auditTimeValue": "5 min",
-        "auditPreparation": "Audit preparation",
-        "achievableCompliance": "Achievable compliance"
+        "auditPreparation": "Safety Audit prep",
+        "signaturesValue": "100%",
+        "signaturesTracked": "Employee signatures tracked",
+        "realTimeValue": "Real-Time",
+        "scoreUpdates": "Score updates",
+        "pdfExportValue": "1-Click",
+        "pdfExportDesc": "PDF export with timestamps"
       },
       "problem": {
         "title": "The Safety Problem Nobody Talks About",
@@ -10846,14 +10848,14 @@
         "ctaFaqs": "Read FAQs"
       },
       "stats": {
-        "realTimeLabel": "Real-Time",
-        "realTimeValue": "Score Updates",
-        "categoriesLabel": "4 Categories",
-        "categoriesValue": "Measured",
-        "visibilityLabel": "Full Visibility",
-        "visibilityValue": "For Stakeholders",
-        "documentedLabel": "Documented",
-        "documentedValue": "Compliance"
+        "auditTimeValue": "5 min",
+        "auditPreparation": "Safety Audit prep",
+        "signaturesValue": "100%",
+        "signaturesTracked": "Employee signatures tracked",
+        "realTimeValue": "Real-Time",
+        "scoreUpdates": "Score updates",
+        "pdfExportValue": "1-Click",
+        "pdfExportDesc": "PDF export with timestamps"
       },
       "problem": {
         "title": "The Problem With Safety Theater",

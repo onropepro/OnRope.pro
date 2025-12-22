@@ -7920,12 +7920,14 @@
         "ctaFaq": "Trouver des réponses"
       },
       "stats": {
-        "averageCsr": "CSE moyen de départ",
-        "realTimeValue": "Temps réel",
-        "scoreUpdates": "Mises à jour du score",
         "auditTimeValue": "5 min",
-        "auditPreparation": "Préparation d'audit",
-        "achievableCompliance": "Conformité atteignable"
+        "auditPreparation": "Prép. Audit de Sécurité",
+        "signaturesValue": "100%",
+        "signaturesTracked": "Signatures des employés suivies",
+        "realTimeValue": "Temps Réel",
+        "scoreUpdates": "Mises à jour du score",
+        "pdfExportValue": "1-Clic",
+        "pdfExportDesc": "Export PDF avec horodatage"
       },
       "problem": {
         "title": "Le problème de sécurité dont personne ne parle",
