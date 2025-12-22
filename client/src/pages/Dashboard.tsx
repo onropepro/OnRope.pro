@@ -3685,9 +3685,8 @@ export default function Dashboard() {
                 {currentUser?.role === 'company' && (
                   <NotificationBell />
                 )}
-                <CSRBadge user={currentUser} />
-            {/* Language Toggle Button */}
-            <LanguageDropdown />
+                {/* Language Toggle Button */}
+                <LanguageDropdown />
             <RefreshButton />
             <Button variant="ghost" size="icon" data-testid="button-logout" onClick={() => setShowLogoutDialog(true)}>
               <span className="material-icons text-xl sm:text-2xl">logout</span>
