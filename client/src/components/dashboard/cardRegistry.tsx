@@ -11,6 +11,7 @@ import { ToolboxCoverageCard } from "./cards/ToolboxCoverageCard";
 import { OutstandingQuotesCard } from "./cards/OutstandingQuotesCard";
 import { MyScheduleCard } from "./cards/MyScheduleCard";
 import { WeekAtGlanceCard } from "./cards/WeekAtGlanceCard";
+import { MyPerformanceCard } from "./cards/MyPerformanceCard";
 import { PlaceholderCard } from "./cards/PlaceholderCard";
 
 export interface CardProps {
@@ -51,6 +52,8 @@ export function getCardComponent(cardId: string, props: CardProps): React.ReactN
       return <MyScheduleCard {...props} />;
     case "sched-week":
       return <WeekAtGlanceCard {...props} />;
+    case "perf-my":
+      return <MyPerformanceCard {...props} />;
     default:
       return <PlaceholderCard cardId={cardId} />;
   }
